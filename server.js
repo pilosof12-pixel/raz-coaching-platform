@@ -71,10 +71,12 @@ async function runEngine(userContent) {
     config: {
       systemInstruction: ENGINE,
       temperature: 0.4,
-      // 2.5-flash is a thinking model. Give a large ceiling AND cap the
-      // thinking budget so the token allowance goes to the visible program,
-      // not internal reasoning (which previously truncated the output).
-      maxOutputTokens: 16384,
+      // 2.5-flash is a thinking model. thinkingBudget:0 is only a HINT — the
+      // model still spends ~4-5k tokens "thinking", which counts against the
+      // ceiling. The v11 engine produces a long, dense program, so we set a
+      // high ceiling (32768) to leave room for both the (unavoidable) thinking
+      // tokens AND the full visible program. Too low here = truncated output.
+      maxOutputTokens: 32768,
       thinkingConfig: { thinkingBudget: 0 },
     },
   });
@@ -90,12 +92,13 @@ const CLIENT_OUTPUT_CONTRACT = [
   "  * internal abbreviations: MEV, MAV, MRV, SQS, EVU, LTOS, VCS",
   "  * any 'Art. N' / article-number citation",
   "  * training-tier labels: T1, T2, T3, T4, novice/intermediate/advanced/elite used as a TIER label",
-  "  * a 'Stress' column or any internal stress/exposure-routing label as a visible column (Stress, Main Goal Exposure, Maintenance, Support, Trunk as table columns)",
+  "  * a 'Stress' column or any internal stress/exposure-routing label as a visible column (Stress, Main Goal Exposure, Session Focus, Intensity, Maintenance, Support, Trunk as table columns)",
   "  * percentage-of-max-set figures, raw internal scores",
   "- ALLOWED and encouraged: RPE, RIR, Zone 2-5, rest times, plain coaching explanations in normal language.",
+  "- THE WEEK 1 TABLE MUST HAVE EXACTLY THESE 7 COLUMNS, IN THIS ORDER, AND NO OTHERS: Day | Exercise | Sets | Reps/Duration | Load/RIR | Rest | Notes. Do NOT add a 'Session Focus', 'Stress', 'Main Goal Exposure', 'Intensity', 'Purpose', 'Modification', or any other extra column. If you want to convey a day's theme or the purpose of an exercise, put it in plain words inside the Notes cell or in the intro paragraph — never as its own column. A table with more than 7 columns, or with any internal-routing column, is a HARD FAIL.",
   "- Deliver, in this order and in plain client language:",
   "  1) A short, friendly intro: what this program is built to achieve for them and how it's structured (no jargon labels).",
-  "  2) The Week 1 training table (Day, Exercise, Sets, Reps/Duration, Load or RPE/RIR, Rest, Notes).",
+  "  2) The Week 1 training table with EXACTLY the 7 columns above (Day, Exercise, Sets, Reps/Duration, Load or RPE/RIR, Rest, Notes) — no extra columns.",
   "  3) A short 'How to progress weeks 2-4' note in plain language.",
   "  4) Pain/injury guidance and substitutions relevant to THIS client only.",
   "  5) The machine block: START_WEEK1_TSV ... END_WEEK1_TSV with columns Day, Exercise, Weight, Sets, Reps, Rest, Target RPE, Notes, Results (Results empty). Plain text only, no LaTeX.",
@@ -158,12 +161,56 @@ function scrubForbiddenWords(s) {
   return s;
 }
 
+// Remove forbidden internal-routing COLUMNS from any markdown table.
+// The word-scrubber can't fix structure, so if the model emits a table with
+// columns like 'Stress' / 'Main Goal Exposure' / 'Session Focus' / 'Intensity'
+// / 'Purpose' / 'Modification', we drop those columns entirely and keep the rest.
+const FORBIDDEN_COL = /^(stress|main goal exposure|session focus|intensity|exposure|maintenance|support|trunk|purpose|modification|focus|weekly state|training state)$/i;
+function stripForbiddenColumns(md) {
+  if (!md) return md;
+  const lines = md.split("\n");
+  const isRow = (l) => /^\s*\|.*\|\s*$/.test(l);
+  const cells = (l) => l.trim().replace(/^\|/, "").replace(/\|$/, "").split("|").map((c) => c.trim());
+  const out = [];
+  let i = 0;
+  while (i < lines.length) {
+    // Detect a table: a header row, then a separator row of dashes.
+    if (isRow(lines[i]) && i + 1 < lines.length && /^\s*\|[\s:|-]+\|\s*$/.test(lines[i + 1])) {
+      const header = cells(lines[i]);
+      const dropIdx = header
+        .map((h, idx) => (FORBIDDEN_COL.test(h.replace(/\*/g, "").trim()) ? idx : -1))
+        .filter((x) => x >= 0);
+      if (dropIdx.length === 0) { out.push(lines[i]); i++; continue; }
+      const keep = (arr) => arr.filter((_, idx) => !dropIdx.includes(idx));
+      // header + separator
+      out.push("| " + keep(header).join(" | ") + " |");
+      out.push("|" + keep(cells(lines[i + 1])).map(() => "---").join("|") + "|");
+      i += 2;
+      // body rows
+      while (i < lines.length && isRow(lines[i]) && !/^\s*\|[\s:|-]+\|\s*$/.test(lines[i])) {
+        const row = cells(lines[i]);
+        // pad short rows so column indices line up before dropping
+        while (row.length < header.length) row.push("");
+        out.push("| " + keep(row).join(" | ") + " |");
+        i++;
+      }
+      continue;
+    }
+    out.push(lines[i]);
+    i++;
+  }
+  return out.join("\n");
+}
+
 function privacyScrub(text) {
   if (!text) return text;
   // Split off the TSV machine block so we never alter its STRUCTURE.
   const startIdx = text.indexOf("START_WEEK1_TSV");
   let prose = startIdx === -1 ? text : text.slice(0, startIdx);
   let tsv = startIdx === -1 ? "" : text.slice(startIdx);
+
+  // Strip forbidden internal columns from the markdown table in the prose part.
+  prose = stripForbiddenColumns(prose);
 
   // Remove a 'Weekly State: ...' line entirely.
   prose = prose.replace(/^.*Weekly\s*State.*$/gim, "").trim();
@@ -199,14 +246,51 @@ app.get("/api/health", (req, res) => {
   });
 });
 
-// Build a new program (new client OR re-build for a token)
+// ---------- Async job runner ----------
+// Engine calls can take ~30-60s. On free hosts (e.g. Render free tier) a long
+// synchronous request times out and the program comes back truncated. So we
+// return a job id immediately and generate in the background; the client polls
+// GET /api/job/:id until status is "done" (or "error").
+
+async function runBuildJob(jobId, token, intake) {
+  try {
+    const program = privacyScrub(await runEngine(buildPrompt(intake)));
+    const now = Date.now();
+    const intakeJSON = JSON.stringify(intake);
+    await store.upsertClient(token, intakeJSON, program, now);
+    await store.addHistory(token, "build", intakeJSON, program, now);
+    await store.bumpUsage(token, "build");
+    await store.finishJob(jobId, "done", program, null, now);
+  } catch (e) {
+    console.error("build job error:", e);
+    await store.finishJob(jobId, "error", null, e.message || "Engine error.", Date.now());
+  }
+}
+
+async function runAdjustJob(jobId, token, changeRequest) {
+  try {
+    const client = await store.getClient(token);
+    if (!client) throw new Error("No saved program for this client yet.");
+    const intake = JSON.parse(client.intake);
+    const program = privacyScrub(await runEngine(adjustPrompt(intake, client.program, changeRequest)));
+    const now = Date.now();
+    await store.updateClientProgram(token, program, now);
+    await store.addHistory(token, "adjust", changeRequest, program, now);
+    await store.bumpUsage(token, "adjust");
+    await store.finishJob(jobId, "done", program, null, now);
+  } catch (e) {
+    console.error("adjust job error:", e);
+    await store.finishJob(jobId, "error", null, e.message || "Engine error.", Date.now());
+  }
+}
+
+// Build a new program (new client OR re-build for a token) -> returns a job id
 app.post("/api/build", async (req, res) => {
   try {
     const intake = req.body?.intake;
     if (!intake || typeof intake !== "object") {
       return res.status(400).json({ error: "Missing intake." });
     }
-    // token: reuse if client already has one, else create
     let token = (req.body?.token || "").trim();
     if (!token) token = crypto.randomBytes(16).toString("hex");
 
@@ -217,21 +301,18 @@ app.post("/api/build", async (req, res) => {
       });
     }
 
-    const program = privacyScrub(await runEngine(buildPrompt(intake)));
-    const now = Date.now();
-    const intakeJSON = JSON.stringify(intake);
-    await store.upsertClient(token, intakeJSON, program, now);
-    await store.addHistory(token, "build", intakeJSON, program, now);
-    await store.bumpUsage(token, "build");
-
-    res.json({ token, program });
+    const jobId = crypto.randomBytes(16).toString("hex");
+    await store.createJob(jobId, token, "build", Date.now());
+    // fire-and-forget; do not await
+    runBuildJob(jobId, token, intake);
+    res.status(202).json({ job_id: jobId, token, status: "pending" });
   } catch (e) {
     console.error("build error:", e);
     res.status(500).json({ error: e.message || "Engine error." });
   }
 });
 
-// Adjust an existing program (surgical diff)
+// Adjust an existing program (surgical diff) -> returns a job id
 app.post("/api/adjust", async (req, res) => {
   try {
     const token = (req.body?.token || "").trim();
@@ -249,18 +330,28 @@ app.post("/api/adjust", async (req, res) => {
       });
     }
 
-    const intake = JSON.parse(client.intake);
-    const program = privacyScrub(await runEngine(adjustPrompt(intake, client.program, changeRequest)));
-    const now = Date.now();
-    await store.updateClientProgram(token, program, now);
-    await store.addHistory(token, "adjust", changeRequest, program, now);
-    await store.bumpUsage(token, "adjust");
-
-    res.json({ token, program });
+    const jobId = crypto.randomBytes(16).toString("hex");
+    await store.createJob(jobId, token, "adjust", Date.now());
+    runAdjustJob(jobId, token, changeRequest);
+    res.status(202).json({ job_id: jobId, token, status: "pending" });
   } catch (e) {
     console.error("adjust error:", e);
     res.status(500).json({ error: e.message || "Engine error." });
   }
+});
+
+// Poll a job until it is done/error
+app.get("/api/job/:id", async (req, res) => {
+  const job = await store.getJob(req.params.id);
+  if (!job) return res.status(404).json({ error: "Job not found." });
+  res.json({
+    job_id: job.id,
+    token: job.token,
+    kind: job.kind,
+    status: job.status, // pending | done | error
+    program: job.status === "done" ? job.program : undefined,
+    error: job.status === "error" ? job.error : undefined,
+  });
 });
 
 // Load a returning client's saved program

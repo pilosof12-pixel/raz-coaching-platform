@@ -68,6 +68,32 @@
     return data;
   }
 
+  // Start an async job (build/adjust) then poll /api/job/:id until done.
+  // Returns { token, program }. onTick(seconds) lets us update the status text.
+  async function runJob(url, body, onTick) {
+    const start = await postJSON(url, body); // { job_id, token, status }
+    const jobId = start.job_id;
+    const token = start.token;
+    const began = Date.now();
+    // poll every 2s, up to ~4 minutes (cold starts + generation)
+    for (let i = 0; i < 120; i++) {
+      await new Promise((r) => setTimeout(r, 2000));
+      const secs = Math.round((Date.now() - began) / 1000);
+      if (onTick) onTick(secs);
+      let job;
+      try {
+        const res = await fetch("/api/job/" + encodeURIComponent(jobId));
+        job = await res.json();
+        if (!res.ok) continue; // transient (e.g. cold start) — keep polling
+      } catch (_) {
+        continue; // network blip during cold start — keep polling
+      }
+      if (job.status === "done") return { token: token || job.token, program: job.program };
+      if (job.status === "error") throw new Error(job.error || "Engine error.");
+    }
+    throw new Error("This is taking longer than expected. Your code is " + token + " — try loading it again in a minute.");
+  }
+
   // BUILD
   $("build-btn").addEventListener("click", async () => {
     const intake = collectIntake();
@@ -76,9 +102,13 @@
     if (err) { setStatus($("build-status"), err, "err"); return; }
     btn.disabled = true;
     $("build-label").innerHTML = '<span class="spinner"></span> Building your program…';
-    setStatus($("build-status"), "This takes about 15–30 seconds. Hang tight.", "");
+    setStatus($("build-status"), "This usually takes 30–60 seconds. Hang tight — don't close this tab.", "");
     try {
-      const data = await postJSON("/api/build", { intake, token: currentToken || undefined });
+      const data = await runJob(
+        "/api/build",
+        { intake, token: currentToken || undefined },
+        (secs) => setStatus($("build-status"), `Building your program… (${secs}s)`, "")
+      );
       showProgram(data.program, data.token);
       setStatus($("build-status"), "Done. Your program is below.", "ok");
     } catch (e) {
@@ -99,7 +129,11 @@
     btn.innerHTML = '<span class="spinner"></span> Updating…';
     setStatus($("adjust-status"), "Adjusting only what changed…", "");
     try {
-      const data = await postJSON("/api/adjust", { token: currentToken, request });
+      const data = await runJob(
+        "/api/adjust",
+        { token: currentToken, request },
+        (secs) => setStatus($("adjust-status"), `Adjusting only what changed… (${secs}s)`, "")
+      );
       showProgram(data.program, data.token);
       $("adjust-input").value = "";
       setStatus($("adjust-status"), "Updated. See the changes at the top of your program.", "ok");

@@ -116,6 +116,27 @@ function makeSupabaseStorage() {
         .from("history")
         .insert({ token, kind, request, program, created_at: now });
     },
+
+    // ---- async job tracking ----
+    async createJob(id, token, kind, now) {
+      const s = await sb();
+      await s.from("jobs").insert({
+        id, token, kind, status: "pending", program: null, error: null,
+        created_at: now, updated_at: now,
+      });
+    },
+    async finishJob(id, status, program, error, now) {
+      const s = await sb();
+      await s
+        .from("jobs")
+        .update({ status, program: program || null, error: error || null, updated_at: now })
+        .eq("id", id);
+    },
+    async getJob(id) {
+      const s = await sb();
+      const { data } = await s.from("jobs").select("*").eq("id", id).maybeSingle();
+      return data || null;
+    },
   };
 }
 
@@ -140,6 +161,10 @@ async function makeSqliteStorage() {
     CREATE TABLE IF NOT EXISTS usage (
       token TEXT, day TEXT, builds INTEGER DEFAULT 0, adjusts INTEGER DEFAULT 0,
       PRIMARY KEY (token, day)
+    );
+    CREATE TABLE IF NOT EXISTS jobs (
+      id TEXT PRIMARY KEY, token TEXT, kind TEXT, status TEXT,
+      program TEXT, error TEXT, created_at INTEGER, updated_at INTEGER
     );
   `);
 
@@ -182,6 +207,21 @@ async function makeSqliteStorage() {
       db.prepare(
         "INSERT INTO history (token, kind, request, program, created_at) VALUES (?,?,?,?,?)"
       ).run(token, kind, request, program, now);
+    },
+
+    // ---- async job tracking ----
+    async createJob(id, token, kind, now) {
+      db.prepare(
+        "INSERT INTO jobs (id, token, kind, status, program, error, created_at, updated_at) VALUES (?,?,?,?,NULL,NULL,?,?)"
+      ).run(id, token, kind, "pending", now, now);
+    },
+    async finishJob(id, status, program, error, now) {
+      db.prepare(
+        "UPDATE jobs SET status=?, program=?, error=?, updated_at=? WHERE id=?"
+      ).run(status, program || null, error || null, now, id);
+    },
+    async getJob(id) {
+      return db.prepare("SELECT * FROM jobs WHERE id=?").get(id) || null;
     },
   };
 }

@@ -27,3 +27,16 @@ CREATE TABLE IF NOT EXISTS usage (
   adjusts     integer DEFAULT 0,
   PRIMARY KEY (token, day)
 );
+
+-- Async job tracking: build/adjust run in the background and the client polls.
+CREATE TABLE IF NOT EXISTS jobs (
+  id          text PRIMARY KEY,
+  token       text,
+  kind        text,            -- 'build' | 'adjust'
+  status      text,            -- 'pending' | 'done' | 'error'
+  program     text,
+  error       text,
+  created_at  bigint,
+  updated_at  bigint
+);
+CREATE INDEX IF NOT EXISTS jobs_token_idx ON jobs (token);

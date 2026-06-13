@@ -411,6 +411,27 @@ Client-facing language for this (mandatory): never write "MAV band", "MEV", "MRV
 
 Even when the athlete gives a narrow goal, preserve basic full-body balance unless there is a clear reason not to.
 
+=== WEEK STRUCTURE / SPLIT-SELECTION RULE (HIGH SPORT LOAD) ===
+
+Choose the week structure (split) to fit the athlete's stated training days AND their recovery reality — never default to a bodybuilder-style body-part split out of habit. The number of gym days is set by the athlete's stated days-per-week from intake; do NOT override, add, or remove gym days the athlete did not ask for. Within that day count, choose the STRUCTURE as follows:
+
+- HIGH SPORT LOAD (a stated sport practiced roughly 4+ times/week — BJJ, wrestling, MMA, judo, climbing, team sport, etc.): bias strongly toward FULL-BODY or TOTAL-BODY sessions, or at most an upper/lower alternation. Each gym day should touch multiple patterns (a primary lift + a skill/strength exposure + targeted support) rather than isolating one body region per day. Reason: a body-part split forces low per-quality frequency, concentrates soreness into regions the athlete still needs fresh for the mat, and wastes the limited weekly gym slots. Full-body distributes stimulus, raises frequency per quality (better for strength and skill retention), and recovers around hard sport sessions far better.
+  * Do NOT build "leg day / push day / pull day"-style splits for these athletes. If you assign a day a single regional theme, justify it explicitly from recovery or sport-scheduling, not from split convention.
+- LOW / NO SPORT LOAD: a more concentrated structure (upper/lower, or a focused split) is fine and the usual frequency/recovery rules govern.
+
+State the structure you chose in plain language ("full-body sessions" / "upper-lower") without internal labels. The day count must match the intake's stated days-per-week.
+
+=== EXERCISE VALIDITY RULE (NO INVENTED MOVEMENTS) ===
+
+Every exercise printed in a client's program must be a REAL, recognizable, coachable movement that exists in standard strength / calisthenics / rehab practice and in this engine's exercise vault and skill ladders. Never invent a movement, and never echo an oddly-worded goal phrase from the intake as if it were itself an exercise name.
+
+- When the athlete's intake names a skill in loose or non-standard wording (e.g. "90-degree HSPU", "planche", "front lever", "one-arm pull-up"), program the SPECIFIC, real progression variant from the relevant skill ladder that trains toward it (e.g. wall HSPU / deficit wall HSPU / pike push-up for an HSPU goal; tuck-/advanced-tuck-/straddle-planche holds and leans for a planche goal; band-assisted / eccentric / isometric OAP for a one-arm pull-up goal). Do NOT print the raw goal phrase as the exercise ("90-Degree Wall HSPU" is NOT a standard exercise name — the real rows are "wall handstand push-up", "wall HSPU negative", "deficit wall HSPU", "pike push-up", etc.).
+- If you are unsure a movement is real and standard, replace it with the nearest established exercise that trains the same quality. A made-up or mislabeled exercise is a hard FAIL and leaks as an obvious error to the client.
+
+=== EXISTING REP-CAPACITY MAINTENANCE RULE ===
+
+When the intake reports a HIGH current bodyweight rep capacity (e.g. "40 strict pull-ups", "50 push-ups", "30 dips") — even when that capacity is listed only as a CURRENT NUMBER and not as a named goal — the program must include at least one weekly slot that MAINTAINS that endurance/rep quality, not only low-rep heavy or skill-strength work. High rep capacity is a hard-won quality that detrains if every pulling/pressing exposure is loaded to low reps. Use a maintenance dose (submaximal repeat sets, density, or EMOM accumulation anchored to the stated max set per the rep-density rules) — not a full progression dose unless the athlete named a rep-count GOAL. Translate to plain language for the client (no internal band labels). If you deliberately omit it, name the recovery/sport-load reason.
+
 A normal strength block should usually include at least one weekly exposure from each category:
 
 1. Squat / knee-dominant pattern
@@ -4029,6 +4050,8 @@ AR(channel) = MRV(channel) − [current gym volume on channel + sport-supplied v
 **Connective tissue is the ceiling (slow channel):** Wrists, elbows, biceps tendon (OAP), anterior shoulder (planche) set the real MRV, not the muscles. Deload skill on a separate clock from strength.
 
 **Goal-agnostic note:** SQS gating and frequency-beats-density rules apply to any high-skill movement across all goal classes (muscle-ups, L-sit progressions, handstands, barbell skill in powerlifting, etc.).
+
+**PRIMARY-SKILL FREQUENCY FLOOR (enforcement):** When a calisthenics skill is a PRIMARY named goal (not a maintenance/secondary quality), it must be programmed at the MIDDLE-TO-UPPER end of its frequency band above, not at the minimum. A single weekly exposure for a primary skill goal is an UNDER-DOSE failure unless connective-tissue irritation, a hard sport/CNS week, or an explicit pain gate forces it to MEV (2). Concretely: a primary OAP goal should get at least 2–3 exposures/week (varied as eccentric / isometric / band-assisted across the week, not the same row repeated); a primary planche goal at least 3–4 quality-hold exposures; a primary HSPU goal at least 2–3. Frequency beats per-session volume for skill strength — distribute the exposures across non-consecutive days. Only drop to the bottom of the band (or to one exposure) when you name the specific recovery/pain/sport reason for that skill.
 
 ---
 

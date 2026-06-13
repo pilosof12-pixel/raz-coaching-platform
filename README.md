@@ -11,8 +11,13 @@ An AI coaching engine: a client fills in a short intake (goal, experience, days,
 
 ## Endpoints
 
-- `POST /api/build` — body `{ "intake": { ... } }` → returns `{ token, program }`
-- `POST /api/adjust` — body `{ token, request }` → surgical adjustment of an existing program
+- `POST /api/build` — body `{ "intake": { ... } }` → returns `202 { job_id, token, status }` and generates in the background
+- `POST /api/adjust` — body `{ token, request }` → returns `202 { job_id, token, status }`; surgical adjustment of an existing program
+- `GET /api/job/:id` — poll a build/adjust job → `{ status: "pending"|"done"|"error", program?, error? }`
+
+  Build/adjust are async because the engine call takes ~30-60s; a synchronous request times out on free hosts (e.g. Render free tier) and truncates the program. The front-end polls `/api/job/:id` every 2s until done.
+
+  Note: `gemini-2.5-flash` is a thinking model — `thinkingConfig.thinkingBudget: 0` is only a hint (it still spends ~4-5k tokens thinking), so `maxOutputTokens` is set to 32768 to leave room for the full program.
 - `GET /api/program/:token` — fetch a saved program
 - `GET /api/health` — shows mode (`gemini` when a key is set)
 
