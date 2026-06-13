@@ -146,6 +146,35 @@ function adjustPrompt(intake, currentProgram, changeRequest) {
 // exercise names, RPE/RIR, or the TSV machine block.
 // Applies the forbidden-label substitutions that are SAFE to run anywhere,
 // including inside the TSV machine block (single words -> client-safe synonyms).
+// Deterministic exercise-name corrector. The engine instructs the model never to
+// print a raw/loose goal phrase (e.g. "90-Degree Wall HSPU") as an exercise name,
+// but a large prompt + a fast model can still leak one. This is a hard code-level
+// safety net: it rewrites known-invalid or non-standard exercise names to the real
+// progression name from the skill ladder, regardless of which model produced them.
+// Order matters: most specific patterns first.
+const EXERCISE_FIXES = [
+  // --- HSPU family: "90-degree (wall) HSPU/handstand push-up" is NOT a real exercise. ---
+  // A 90-degree HSPU is a GOAL (lower to 90 deg of elbow flexion); the real working
+  // movement is a wall handstand push-up to that range. Map the invalid combos.
+  [/\b(?:wall\s+)?90[-\s]?degree\s+wall\s+(hspu|handstand\s+push[-\s]?ups?)\b/gi, "Wall Handstand Push-up"],
+  [/\bwall\s+90[-\s]?degree\s+(hspu|handstand\s+push[-\s]?ups?)\b/gi, "Wall Handstand Push-up"],
+  [/\b90[-\s]?degree\s+(hspu|handstand\s+push[-\s]?ups?)\b/gi, "Wall Handstand Push-up"],
+  // Bare "HSPU" acronym in a client-facing context -> spelled out, real name.
+  [/\bwall\s+hspu\s+negatives?\b/gi, "Wall Handstand Push-up Negative"],
+  [/\bdeficit\s+wall\s+hspu\b/gi, "Deficit Wall Handstand Push-up"],
+  [/\bwall\s+hspu\b/gi, "Wall Handstand Push-up"],
+  [/\bfreestanding\s+hspu\b/gi, "Freestanding Handstand Push-up"],
+  [/\bhspu\b/gi, "Handstand Push-up"],
+  // --- OAP family: "one-arm pull-up" goal printed as the raw goal, not a progression. ---
+  // We only normalise the acronym; band/eccentric variants are valid as written.
+  [/\boap\b/gi, "One-Arm Pull-up"],
+];
+function fixInvalidExerciseNames(s) {
+  if (!s) return s;
+  for (const [re, repl] of EXERCISE_FIXES) s = s.replace(re, repl);
+  return s;
+}
+
 function scrubForbiddenWords(s) {
   if (!s) return s;
   // Weekly training-state names -> client-safe synonyms (any context/case).
@@ -212,13 +241,16 @@ function privacyScrub(text) {
   // Strip forbidden internal columns from the markdown table in the prose part.
   prose = stripForbiddenColumns(prose);
 
+  // Correct any invalid/non-standard exercise names to real ladder names.
+  prose = fixInvalidExerciseNames(prose);
+
   // Remove a 'Weekly State: ...' line entirely.
   prose = prose.replace(/^.*Weekly\s*State.*$/gim, "").trim();
   // Apply word substitutions to prose, then collapse double spaces.
   prose = scrubForbiddenWords(prose).replace(/[ ]{2,}/g, " ");
   // Apply the SAME single-word substitutions to the TSV block (structure preserved:
   // these only swap whole words, never touch tabs, newlines, or column count).
-  if (tsv) tsv = scrubForbiddenWords(tsv);
+  if (tsv) tsv = scrubForbiddenWords(fixInvalidExerciseNames(tsv));
 
   return tsv ? prose.trim() + "\n\n" + tsv : prose.trim();
 }
