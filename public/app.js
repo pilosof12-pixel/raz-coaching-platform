@@ -5,7 +5,14 @@
   const $ = (id) => document.getElementById(id);
   const LS_TOKEN = "coaching_token";
 
-  let currentToken = localStorage.getItem(LS_TOKEN) || "";
+  // In-memory token store (works in preview iframe where web storage is blocked).
+  const memStore = {};
+  const store = {
+    get(k){ return memStore[k] || ""; },
+    set(k,v){ memStore[k] = v; },
+  };
+
+  let currentToken = store.get(LS_TOKEN) || "";
   let currentProgram = "";
 
   function setStatus(el, msg, kind) {
@@ -40,7 +47,7 @@
   function showProgram(program, token) {
     currentProgram = program;
     currentToken = token;
-    if (token) localStorage.setItem(LS_TOKEN, token);
+    if (token) store.set(LS_TOKEN, token);
     $("program-text").textContent = program;
     $("token-display").textContent = token;
     $("program-card").classList.remove("hidden");
