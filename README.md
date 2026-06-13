@@ -6,7 +6,7 @@ An AI coaching engine: a client fills in a short intake (goal, experience, days,
 
 - **Backend:** Node.js + Express (`server.js`)
 - **AI:** Google Gemini (`@google/genai`), model `gemini-2.5-flash`
-- **Storage:** SQLite (`better-sqlite3`) at `data/data.db`
+- **Storage:** Supabase (Postgres) in production; SQLite (`better-sqlite3`) fallback for local dev. Selected automatically by env vars (see below).
 - **Front-end:** static HTML/JS in `public/`
 
 ## Endpoints
@@ -35,9 +35,20 @@ GEMINI_API_KEY=your-key node server.js
    - **Start command:** `npm start`
 4. **Environment** tab → add:
    - `GEMINI_API_KEY` = your Google AI Studio key
+   - `SUPABASE_URL` = your Supabase project URL
+   - `SUPABASE_ANON_KEY` = your Supabase legacy anon (JWT) key
    - (optional) `GEMINI_MODEL` = `gemini-2.5-flash`
    - Do **not** set `USE_PPLX_PROXY`.
-5. Deploy. Check `/api/health` shows `"mode":"gemini"`.
+5. Deploy. Check `/api/health` shows `"mode":"gemini","storage":"supabase"`.
+
+## Storage
+
+The app auto-selects its database:
+
+- **Supabase (Postgres)** when `SUPABASE_URL` and `SUPABASE_ANON_KEY` are set — persistent, survives restarts/redeploys, recommended for real clients.
+- **SQLite** otherwise — zero-config local dev only; data does not persist on a fresh host.
+
+Schema lives in `supabase_migration.sql` (already applied to the connected project).
 
 > Set a billing cap in [Google Cloud Console](https://console.cloud.google.com) → Billing → Budgets.
 

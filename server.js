@@ -6,15 +6,16 @@
 //   1) PRODUCTION: your own Gemini API key  -> set GEMINI_API_KEY env var
 //   2) LOCAL TEST: Perplexity sandbox proxy -> set USE_PPLX_PROXY=1 (dev only)
 //
-// Storage: SQLite file at data/data.db (named data.db so it persists on redeploy).
+// Storage: Supabase (Postgres) when SUPABASE_URL + SUPABASE_ANON_KEY are set;
+// otherwise SQLite at data/data.db for local dev. See storage.js.
 
 import express from "express";
 import rateLimit from "express-rate-limit";
-import Database from "better-sqlite3";
 import fs from "node:fs";
 import path from "node:path";
 import crypto from "node:crypto";
 import { fileURLToPath } from "node:url";
+import { makeStorage } from "./storage.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const PORT = process.env.PORT || 8000;
@@ -25,57 +26,12 @@ const ENGINE = fs.readFileSync(
   "utf8"
 );
 
-// ---------- Storage (SQLite, file named data.db for redeploy persistence) ----------
-const DB_PATH = path.join(__dirname, "data", "data.db");
-fs.mkdirSync(path.dirname(DB_PATH), { recursive: true });
-const db = new Database(DB_PATH);
-db.pragma("journal_mode = WAL");
-db.exec(`
-  CREATE TABLE IF NOT EXISTS clients (
-    token       TEXT PRIMARY KEY,
-    intake      TEXT,
-    program     TEXT,
-    created_at  INTEGER,
-    updated_at  INTEGER
-  );
-  CREATE TABLE IF NOT EXISTS history (
-    id          INTEGER PRIMARY KEY AUTOINCREMENT,
-    token       TEXT,
-    kind        TEXT,        -- 'build' | 'adjust'
-    request     TEXT,
-    program     TEXT,
-    created_at  INTEGER
-  );
-  CREATE TABLE IF NOT EXISTS usage (
-    token       TEXT,
-    day         TEXT,        -- YYYY-MM-DD (UTC)
-    builds      INTEGER DEFAULT 0,
-    adjusts     INTEGER DEFAULT 0,
-    PRIMARY KEY (token, day)
-  );
-`);
+// ---------- Storage (Supabase in prod when configured; SQLite for local dev) ----------
+const store = await makeStorage();
 
 // ---------- Rate limits (cost guard) ----------
 const DAILY_BUILDS = Number(process.env.DAILY_BUILDS || 2);
 const DAILY_ADJUSTS = Number(process.env.DAILY_ADJUSTS || 8);
-
-function todayUTC() {
-  return new Date().toISOString().slice(0, 10);
-}
-function getUsage(token) {
-  const day = todayUTC();
-  let row = db.prepare("SELECT * FROM usage WHERE token=? AND day=?").get(token, day);
-  if (!row) {
-    db.prepare("INSERT INTO usage (token, day, builds, adjusts) VALUES (?,?,0,0)").run(token, day);
-    row = { token, day, builds: 0, adjusts: 0 };
-  }
-  return row;
-}
-function bumpUsage(token, kind) {
-  const day = todayUTC();
-  const col = kind === "build" ? "builds" : "adjusts";
-  db.prepare(`UPDATE usage SET ${col}=${col}+1 WHERE token=? AND day=?`).run(token, day);
-}
 
 // ---------- Gemini call (your key in prod; proxy in local dev) ----------
 const USE_PPLX_PROXY = process.env.USE_PPLX_PROXY === "1";
@@ -239,6 +195,7 @@ app.get("/api/health", (req, res) => {
     ok: true,
     mode: USE_PPLX_PROXY ? "pplx-proxy(dev)" : GEMINI_API_KEY ? "gemini" : "no-key",
     model: USE_PPLX_PROXY ? process.env.PPLX_MODEL || "gemini_3_flash" : GEMINI_MODEL,
+    storage: store.backend,
   });
 });
 
@@ -253,7 +210,7 @@ app.post("/api/build", async (req, res) => {
     let token = (req.body?.token || "").trim();
     if (!token) token = crypto.randomBytes(16).toString("hex");
 
-    const u = getUsage(token);
+    const u = await store.getUsage(token);
     if (u.builds >= DAILY_BUILDS) {
       return res.status(429).json({
         error: `You've reached today's program-build limit (${DAILY_BUILDS}). Try again tomorrow or use Adjust.`,
@@ -262,15 +219,10 @@ app.post("/api/build", async (req, res) => {
 
     const program = privacyScrub(await runEngine(buildPrompt(intake)));
     const now = Date.now();
-    db.prepare(
-      `INSERT INTO clients (token, intake, program, created_at, updated_at)
-       VALUES (?,?,?,?,?)
-       ON CONFLICT(token) DO UPDATE SET intake=excluded.intake, program=excluded.program, updated_at=excluded.updated_at`
-    ).run(token, JSON.stringify(intake), program, now, now);
-    db.prepare(
-      "INSERT INTO history (token, kind, request, program, created_at) VALUES (?,?,?,?,?)"
-    ).run(token, "build", JSON.stringify(intake), program, now);
-    bumpUsage(token, "build");
+    const intakeJSON = JSON.stringify(intake);
+    await store.upsertClient(token, intakeJSON, program, now);
+    await store.addHistory(token, "build", intakeJSON, program, now);
+    await store.bumpUsage(token, "build");
 
     res.json({ token, program });
   } catch (e) {
@@ -287,10 +239,10 @@ app.post("/api/adjust", async (req, res) => {
     if (!token) return res.status(400).json({ error: "Missing client token." });
     if (!changeRequest) return res.status(400).json({ error: "Tell me what changed." });
 
-    const client = db.prepare("SELECT * FROM clients WHERE token=?").get(token);
+    const client = await store.getClient(token);
     if (!client) return res.status(404).json({ error: "No saved program for this client yet." });
 
-    const u = getUsage(token);
+    const u = await store.getUsage(token);
     if (u.adjusts >= DAILY_ADJUSTS) {
       return res.status(429).json({
         error: `You've reached today's adjustment limit (${DAILY_ADJUSTS}). Try again tomorrow.`,
@@ -300,11 +252,9 @@ app.post("/api/adjust", async (req, res) => {
     const intake = JSON.parse(client.intake);
     const program = privacyScrub(await runEngine(adjustPrompt(intake, client.program, changeRequest)));
     const now = Date.now();
-    db.prepare("UPDATE clients SET program=?, updated_at=? WHERE token=?").run(program, now, token);
-    db.prepare(
-      "INSERT INTO history (token, kind, request, program, created_at) VALUES (?,?,?,?,?)"
-    ).run(token, "adjust", changeRequest, program, now);
-    bumpUsage(token, "adjust");
+    await store.updateClientProgram(token, program, now);
+    await store.addHistory(token, "adjust", changeRequest, program, now);
+    await store.bumpUsage(token, "adjust");
 
     res.json({ token, program });
   } catch (e) {
@@ -314,8 +264,8 @@ app.post("/api/adjust", async (req, res) => {
 });
 
 // Load a returning client's saved program
-app.get("/api/program/:token", (req, res) => {
-  const client = db.prepare("SELECT * FROM clients WHERE token=?").get(req.params.token);
+app.get("/api/program/:token", async (req, res) => {
+  const client = await store.getClient(req.params.token);
   if (!client) return res.status(404).json({ error: "Not found." });
   res.json({
     token: client.token,
