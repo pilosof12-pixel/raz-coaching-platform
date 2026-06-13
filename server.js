@@ -49,7 +49,7 @@ const GEMINI_MODEL = process.env.GEMINI_MODEL || "gemini-2.5-flash";
 // the gate. Default 4096; set THINKING_BUDGET=0 to revert to the old fast/cheap
 // behaviour. -1 lets the model decide dynamically.
 const THINKING_BUDGET = Number(
-  process.env.THINKING_BUDGET === undefined ? 4096 : process.env.THINKING_BUDGET
+  process.env.THINKING_BUDGET === undefined ? 8192 : process.env.THINKING_BUDGET
 );
 
 let genaiClient = null;
@@ -115,6 +115,10 @@ function isValidProgram(p) {
   // Collapsed/degenerate: a single dominant non-alphanumeric char (dashes, dots, etc.)
   const letters = (t.match(/[A-Za-z]/g) || []).length;
   if (letters / t.length < 0.25) return false;
+  // Whitespace-run collapse: a rare large-prompt MAX_TOKENS failure where the model
+  // emits a single enormous run of spaces/newlines (seen as a 1M+ char blob). A real
+  // program never contains a 400+ char unbroken whitespace run, so reject and retry.
+  if (/[ \t]{400,}|\n{200,}/.test(p)) return false;
   // Must contain the machine block markers the rest of the app and the UI rely on.
   if (!t.includes("START_WEEK1_TSV") || !t.includes("END_WEEK1_TSV")) return false;
   return true;
@@ -150,8 +154,8 @@ async function runEngineRaw(userContent) {
   // hold BOTH the thinking pass AND the long visible v11 program. With a 4k thinking
   // budget the old 32768 ceiling could clip a dense program, so we lift it to 40960.
   const genParams = {
-    temperature: 0.4,
-    maxOutputTokens: 40960,
+    temperature: 0.3,
+    maxOutputTokens: 49152,
     thinkingConfig: { thinkingBudget: THINKING_BUDGET },
   };
 
@@ -190,7 +194,7 @@ async function runEngineRaw(userContent) {
 // the model returned a degenerate/invalid program. Each attempt is independent,
 // so an intermittent collapse is recovered transparently.
 async function runEngine(userContent) {
-  const MAX_ATTEMPTS = 3;
+  const MAX_ATTEMPTS = 5;
   let last = "";
   for (let attempt = 1; attempt <= MAX_ATTEMPTS; attempt++) {
     last = await runEngineRaw(userContent);
@@ -211,7 +215,7 @@ const CLIENT_OUTPUT_CONTRACT = [
   "OUTPUT CONTRACT (client-facing — this text is shown directly to the paying client):",
   "- Write ONLY the client-facing deliverable. Do NOT print your internal reasoning, planning sections, or coach-only analysis.",
   "- ABSOLUTELY FORBIDDEN anywhere in the output (these are internal labels the client must never see):",
-  "  * weekly training-state names: Push, Maintain, Reduce, Deload (do not label the week or any block with these words)",
+  "  * weekly training-state names: Push, Maintain, Reduce (do not label the week or any block with these words). NOTE: 'Deload' is allowed in client output as a normal recovery-week term.",
   "  * internal abbreviations: MEV, MAV, MRV, SQS, EVU, LTOS, VCS",
   "  * any 'Art. N' / article-number citation",
   "  * training-tier labels: T1, T2, T3, T4, novice/intermediate/advanced/elite used as a TIER label",
@@ -319,9 +323,13 @@ function fixInvalidExerciseNames(s) {
 function scrubForbiddenWords(s) {
   if (!s) return s;
   // Weekly training-state names -> client-safe synonyms (any context/case).
-  // 'Deload' is a legitimate recovery concept; we keep the meaning, drop the label.
-  s = s.replace(/\bdeload\b/gi, "recovery");
+  // 'Deload' is intentionally NOT scrubbed: it is standard, client-friendly
+  // recovery-week language and athletes expect to see it.
   s = s.replace(/\b(Push|Maintain|Reduce)\b(?=\s+(?:for|block|week|phase|state|everything|on)\b)/g, "focus");
+  // Spelled-out internal score/label names (catch BEFORE the abbreviation pass so the
+  // parenthetical abbreviation is removed with its phrase). "Skill Quality Score (SQS)"
+  // -> "movement quality"; drop any trailing numeric value too (e.g. "SQS 0.7").
+  s = s.replace(/\bskill\s+quality\s+score\s*(?:\((?:SQS)\))?(?:\s*(?:below|under|of|=|:)?\s*[0-9.]+)?/gi, "movement quality");
   // Internal volume abbreviations.
   s = s.replace(/\b(MEV|MAV|MRV|SQS|EVU|LTOS|VCS)\b/g, "target volume");
   // Spinal Debt internal term.
