@@ -61,8 +61,25 @@
     .status.err{color:var(--red)} .status.ok{color:var(--ok)}
     .hidden{display:none!important}
     /* program display */
+    /* legacy raw block (fallback only) — clean sans-serif, readable */
     #program-card pre{white-space:pre-wrap;word-break:break-word;background:var(--panel2);border:1px solid var(--line);
-      border-radius:10px;padding:18px;font-size:13.5px;line-height:1.6;font-family:'SF Mono',ui-monospace,Menlo,Consolas,monospace;color:#e7efee;overflow-x:auto}
+      border-radius:10px;padding:18px;font-size:14.5px;line-height:1.65;font-family:var(--font);color:#eef3f2;overflow-x:auto}
+    /* readable program: narrative blocks + real table */
+    #program-render{font-family:var(--font);color:#eef3f2;font-size:14.5px;line-height:1.65}
+    #program-render .prog-narrative{white-space:pre-wrap;word-break:break-word;margin:0 0 18px;color:#dfe8e6}
+    #program-render .prog-narrative.after{margin:20px 0 0}
+    #program-render h4.prog-week{font-size:15px;font-weight:800;letter-spacing:-.01em;margin:6px 0 10px;color:#fff}
+    .prog-table-wrap{border:1px solid var(--line);border-radius:12px;overflow:auto;background:var(--panel2)}
+    table.prog-table{border-collapse:collapse;width:100%;min-width:680px;font-size:13.5px}
+    table.prog-table th{position:sticky;top:0;background:var(--teal);color:#04211f;font-weight:800;text-align:left;
+      padding:10px 12px;font-size:12.5px;letter-spacing:.01em;white-space:nowrap;border-bottom:1px solid var(--teal-dim)}
+    table.prog-table td{padding:10px 12px;border-bottom:1px solid var(--line);color:#e7efee;vertical-align:top}
+    table.prog-table tbody tr:nth-child(even){background:rgba(255,255,255,.022)}
+    table.prog-table tbody tr.day-start td{border-top:2px solid var(--teal-dim)}
+    table.prog-table td.col-day{font-weight:800;color:var(--teal);white-space:nowrap}
+    table.prog-table td.col-ex{font-weight:600;color:#fff;min-width:200px}
+    table.prog-table td.col-rpe{color:var(--teal);font-weight:700}
+    table.prog-table td.col-notes{color:var(--muted);font-size:12.5px;min-width:220px}
     .spinner{width:18px;height:18px;border:2.5px solid rgba(4,33,31,.35);border-top-color:#04211f;border-radius:50%;
       animation:spin .7s linear infinite;display:inline-block}
     .spinner.teal{border-color:rgba(24,211,197,.25);border-top-color:var(--teal)}
@@ -213,7 +230,8 @@
         <div class="status" id="token-status" style="margin-top:8px"></div>
       </div>
 
-      <pre id="program-text"></pre>
+      <div id="program-render"></div>
+      <pre id="program-text" class="hidden"></pre>
 
       <div class="btn-row">
         <button class="btn" id="sheet-btn" type="button">Create spreadsheet</button>

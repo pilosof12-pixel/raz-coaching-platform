@@ -121,13 +121,104 @@
     return null;
   }
 
+  // Day labels we recognise so the table can mark day boundaries / bold the day cell.
+  const DAY_RX = /^(mon|tue|wed|thu|fri|sat|sun|day\s*\d)/i;
+
+  function renderProgram(program) {
+    const host = $("program-render");
+    if (!host) return false;
+    const getTable = window.getProgramTable;
+    const splitNarr = window.splitProgramNarrative;
+    const rows = getTable ? getTable(program) : null;
+    if (!rows || rows.length < 2) {
+      host.innerHTML = "";
+      return false; // caller falls back to raw <pre>
+    }
+    const parts = splitNarr ? splitNarr(program) : { before: "", after: "" };
+    const frag = document.createDocumentFragment();
+
+    if (parts.before) {
+      const p = document.createElement("div");
+      p.className = "prog-narrative";
+      p.textContent = parts.before;
+      frag.appendChild(p);
+    }
+
+    const h = document.createElement("h4");
+    h.className = "prog-week";
+    h.textContent = "Week 1";
+    frag.appendChild(h);
+
+    const wrap = document.createElement("div");
+    wrap.className = "prog-table-wrap";
+    const table = document.createElement("table");
+    table.className = "prog-table";
+    const headers = rows[0];
+    const thead = document.createElement("thead");
+    const htr = document.createElement("tr");
+    headers.forEach((hd) => {
+      const th = document.createElement("th");
+      th.textContent = hd;
+      htr.appendChild(th);
+    });
+    thead.appendChild(htr);
+    table.appendChild(thead);
+
+    const tbody = document.createElement("tbody");
+    let lastDay = null;
+    const lc = headers.map((x) => String(x).toLowerCase());
+    const dayIdx = lc.findIndex((x) => x === "day");
+    const exIdx = lc.findIndex((x) => x === "exercise");
+    const rpeIdx = lc.findIndex((x) => x.includes("rpe"));
+    const notesIdx = lc.findIndex((x) => x.includes("note"));
+    for (let r = 1; r < rows.length; r++) {
+      const cells = rows[r];
+      const tr = document.createElement("tr");
+      const dayVal = dayIdx >= 0 ? (cells[dayIdx] || "").trim() : "";
+      if (dayVal && dayVal !== lastDay && DAY_RX.test(dayVal)) {
+        tr.className = "day-start";
+        lastDay = dayVal;
+      }
+      cells.forEach((c, i) => {
+        const td = document.createElement("td");
+        td.textContent = c;
+        if (i === dayIdx) td.className = "col-day";
+        else if (i === exIdx) td.className = "col-ex";
+        else if (i === rpeIdx) td.className = "col-rpe";
+        else if (i === notesIdx) td.className = "col-notes";
+        tr.appendChild(td);
+      });
+      tbody.appendChild(tr);
+    }
+    table.appendChild(tbody);
+    wrap.appendChild(table);
+    frag.appendChild(wrap);
+
+    if (parts.after) {
+      const p = document.createElement("div");
+      p.className = "prog-narrative after";
+      p.textContent = parts.after;
+      frag.appendChild(p);
+    }
+
+    host.innerHTML = "";
+    host.appendChild(frag);
+    return true;
+  }
+
   function showProgram(program, token) {
     currentProgram = program;
     currentToken = token;
     if (token) store.set(LS_TOKEN, token);
+    // Always keep the raw text in the (hidden) <pre> for Copy/parse safety.
     $("program-text").textContent = program;
     $("token-display").textContent = token;
     $("program-card").classList.remove("hidden");
+    // Render the clean narrative + styled table. If parsing fails, fall back
+    // to showing the raw <pre> block (now in a clean sans-serif).
+    const rendered = renderProgram(program);
+    $("program-text").classList.toggle("hidden", rendered);
+    $("program-render").classList.toggle("hidden", !rendered);
     // Toggle spreadsheet button if no TSV/table detected
     const hasData = window.hasSpreadsheetData && window.hasSpreadsheetData(program);
     $("sheet-btn").style.display = hasData ? "" : "none";

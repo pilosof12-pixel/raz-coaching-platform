@@ -240,6 +240,32 @@
     try { extractRows(text); return true; } catch (_) { return false; }
   }
 
+  // Return the normalized table rows (header + rows) for on-page rendering,
+  // or null if no usable table is present. Uses the same parser as the
+  // spreadsheet export so the on-screen table can never drift from the file.
+  function getProgramTable(text) {
+    try { return extractRows(text); } catch (_) { return null; }
+  }
+
+  // Split program text into the narrative before the table and after it,
+  // with the raw TSV/markdown table block (and START/END markers) removed.
+  function splitProgramNarrative(text) {
+    if (!text) return { before: "", after: "" };
+    const s = text.indexOf("START_WEEK1_TSV");
+    const e = text.indexOf("END_WEEK1_TSV");
+    if (s !== -1 && e !== -1 && e > s) {
+      const before = text.slice(0, s).replace(/```(?:text|tsv|plaintext)?\s*$/i, "").trim();
+      const after = text.slice(e + "END_WEEK1_TSV".length).replace(/^\s*```/i, "").trim();
+      return { before, after };
+    }
+    // No markers: strip any pipe/tab table lines so narrative shows clean.
+    const lines = text.split(/\r?\n/);
+    const keep = lines.filter((l) => !(l.includes("|") || /\t/.test(l)));
+    return { before: keep.join("\n").trim(), after: "" };
+  }
+
   window.buildStrengthSpreadsheet = buildStrengthSpreadsheet;
   window.hasSpreadsheetData = hasSpreadsheetData;
+  window.getProgramTable = getProgramTable;
+  window.splitProgramNarrative = splitProgramNarrative;
 })();
