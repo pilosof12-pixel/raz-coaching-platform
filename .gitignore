@@ -1,0 +1,21 @@
+# Dependencies (Render runs `npm install`)
+node_modules/
+
+# Environment / secrets — NEVER commit your Gemini key
+.env
+.env.local
+*.key
+
+# SQLite database + write-ahead logs (created at runtime)
+data/data.db
+data/data.db-shm
+data/data.db-wal
+data/*.db
+data/*.db-*
+
+# Logs
+*.log
+
+# OS / editor
+.DS_Store
+Thumbs.db
