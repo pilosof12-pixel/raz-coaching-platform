@@ -38,12 +38,69 @@ const USE_PPLX_PROXY = process.env.USE_PPLX_PROXY === "1";
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY || "";
 const GEMINI_MODEL = process.env.GEMINI_MODEL || "gemini-2.5-flash";
 
+// ---------- Reasoning budget (program QUALITY, env-switchable) ----------
+// 2.5-flash is a thinking model. The engine's GOAL-COVERAGE PRE-FLIGHT GATE is
+// genuine reasoning work: before writing any rows the model must build an internal
+// goal table, apply the priority-frequency floor (top-2 goals get >=2 direct
+// exposures), and kill near-empty filler days. With thinkingBudget:0 the model
+// tends to write the rule-respecting prose but SKIP the gate computation, so it
+// satisfies ">=1 exposure each" and pads the leftover day instead of giving the
+// top goals their second exposure. Giving it a real budget lets it actually run
+// the gate. Default 4096; set THINKING_BUDGET=0 to revert to the old fast/cheap
+// behaviour. -1 lets the model decide dynamically.
+const THINKING_BUDGET = Number(
+  process.env.THINKING_BUDGET === undefined ? 4096 : process.env.THINKING_BUDGET
+);
+
 let genaiClient = null;
 async function getGenAI() {
   if (genaiClient) return genaiClient;
   const { GoogleGenAI } = await import("@google/genai");
   genaiClient = new GoogleGenAI({ apiKey: GEMINI_API_KEY });
   return genaiClient;
+}
+
+// ---------- Context caching (cost optimization, ZERO quality change) ----------
+// The ~360K-token engine is byte-for-byte identical on every request. Caching it
+// lets Google bill the cached input at the lower cached rate instead of re-reading
+// the full engine each time. CRITICAL: this does NOT change what the model sees or
+// produces — the cache stores the EXACT same ENGINE text as the systemInstruction,
+// same model, same generation params. It is purely a billing/storage feature.
+//
+// Safety design:
+//  - Caching is OFF unless ENABLE_ENGINE_CACHE=1 (so it can be toggled with no deploy).
+//  - The cache is created lazily and reused while valid; we refresh before TTL expiry.
+//  - On ANY cache error (create/expire/reference) we fall back to the inline
+//    systemInstruction path below, which is the exact behaviour we ship today.
+//    The client never receives a different or degraded program because of caching.
+const ENABLE_ENGINE_CACHE = process.env.ENABLE_ENGINE_CACHE === "1";
+const CACHE_TTL_SECONDS = Number(process.env.ENGINE_CACHE_TTL || 1800); // 30 min default
+let cacheState = { name: null, expiresAt: 0 };
+
+async function getEngineCacheName() {
+  if (!ENABLE_ENGINE_CACHE) return null;
+  const now = Date.now();
+  // Reuse the live cache if it still has comfortable headroom (>60s) before expiry.
+  if (cacheState.name && now < cacheState.expiresAt - 60_000) return cacheState.name;
+  try {
+    const ai = await getGenAI();
+    const cache = await ai.caches.create({
+      model: GEMINI_MODEL,
+      config: {
+        systemInstruction: ENGINE, // EXACT same engine text as the inline path
+        ttl: `${CACHE_TTL_SECONDS}s`,
+        displayName: "raz-engine-v11",
+      },
+    });
+    cacheState = { name: cache.name, expiresAt: now + CACHE_TTL_SECONDS * 1000 };
+    console.log(`engine cache created: ${cache.name} (ttl ${CACHE_TTL_SECONDS}s)`);
+    return cacheState.name;
+  } catch (e) {
+    // Any failure -> disable cache for this request; the caller falls back to inline.
+    console.warn(`engine cache create failed, using inline engine: ${e && e.message}`);
+    cacheState = { name: null, expiresAt: 0 };
+    return null;
+  }
 }
 
 // Calls the model with the engine as system instruction. Returns plain text.
@@ -81,20 +138,50 @@ async function runEngineRaw(userContent) {
     throw new Error("GEMINI_API_KEY is not set. Add your Google AI Studio key to run the engine.");
   }
   const ai = await getGenAI();
+
+  // Shared generation params. These are IDENTICAL whether or not caching is used
+  // — caching only changes HOW the engine is supplied (referenced vs. inline),
+  // never the model, temperature, token ceiling, or thinking config. So the
+  // produced program is the same quality either way.
+  // 2.5-flash is a thinking model. We now give it a real thinking budget so it
+  // actually RUNS the Goal-Coverage Pre-Flight Gate (forces 2nd exposures for the
+  // top goals and kills near-empty filler days) instead of skipping that reasoning.
+  // Thinking tokens count against maxOutputTokens, so the ceiling must comfortably
+  // hold BOTH the thinking pass AND the long visible v11 program. With a 4k thinking
+  // budget the old 32768 ceiling could clip a dense program, so we lift it to 40960.
+  const genParams = {
+    temperature: 0.4,
+    maxOutputTokens: 40960,
+    thinkingConfig: { thinkingBudget: THINKING_BUDGET },
+  };
+
+  // Try the cached-engine path first (cost saving). The cache holds the EXACT
+  // same ENGINE text as systemInstruction, so when we reference it we must NOT
+  // also pass systemInstruction inline (the engine would otherwise be supplied
+  // twice). Same content reaches the model, just billed at the cached rate.
+  const cacheName = await getEngineCacheName();
+  if (cacheName) {
+    try {
+      const resp = await ai.models.generateContent({
+        model: GEMINI_MODEL,
+        contents: userContent,
+        config: { ...genParams, cachedContent: cacheName },
+      });
+      return resp.text;
+    } catch (e) {
+      // Cache may have expired or been evicted server-side between create and use.
+      // Invalidate and fall through to the inline path so the request still succeeds
+      // with the exact same engine and quality.
+      console.warn(`cached generate failed, retrying inline: ${e && e.message}`);
+      cacheState = { name: null, expiresAt: 0 };
+    }
+  }
+
+  // INLINE path (today's exact behaviour): send the full engine as systemInstruction.
   const resp = await ai.models.generateContent({
     model: GEMINI_MODEL,
     contents: userContent,
-    config: {
-      systemInstruction: ENGINE,
-      temperature: 0.4,
-      // 2.5-flash is a thinking model. thinkingBudget:0 is only a HINT — the
-      // model still spends ~4-5k tokens "thinking", which counts against the
-      // ceiling. The v11 engine produces a long, dense program, so we set a
-      // high ceiling (32768) to leave room for both the (unavoidable) thinking
-      // tokens AND the full visible program. Too low here = truncated output.
-      maxOutputTokens: 32768,
-      thinkingConfig: { thinkingBudget: 0 },
-    },
+    config: { ...genParams, systemInstruction: ENGINE },
   });
   return resp.text;
 }
@@ -362,6 +449,12 @@ app.get("/api/health", (req, res) => {
     mode: USE_PPLX_PROXY ? "pplx-proxy(dev)" : GEMINI_API_KEY ? "gemini" : "no-key",
     model: USE_PPLX_PROXY ? process.env.PPLX_MODEL || "gemini_3_flash" : GEMINI_MODEL,
     storage: store.backend,
+    thinking_budget: THINKING_BUDGET,
+    cache: {
+      enabled: ENABLE_ENGINE_CACHE,
+      ttl_seconds: CACHE_TTL_SECONDS,
+      active: Boolean(cacheState.name) && Date.now() < cacheState.expiresAt,
+    },
   });
 });
 
