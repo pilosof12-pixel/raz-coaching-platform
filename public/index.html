@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AI Coaching Engine — Build Your Program</title>
+  <style>
+    :root{
+      --bg:#080909; --panel:#121414; --panel2:#181b1b; --line:#2a3030;
+      --teal:#18d3c5; --teal-dim:#0fa99e; --text:#f4f5f5; --muted:#b8c0c0;
+      --red:#ff5454; --ok:#66e38a; --radius:18px;
+      --font:Arial,Calibri,'Helvetica Neue',Helvetica,sans-serif;
+    }
+    *{box-sizing:border-box}
+    html,body{margin:0;padding:0}
+    body{background:radial-gradient(circle at top left, rgba(24,211,197,0.12), transparent 38%), var(--bg);color:var(--text);font-family:var(--font);line-height:1.55;-webkit-font-smoothing:antialiased}
+    a{color:var(--teal)}
+    .wrap{max-width:880px;margin:0 auto;padding:32px 20px 80px}
+    header.brand{display:flex;align-items:center;gap:12px;margin-bottom:8px}
+    .logo{width:34px;height:34px;flex:0 0 auto}
+    .brand h1{font-size:19px;margin:0;font-weight:700;letter-spacing:-.01em}
+    .brand .sub{color:var(--muted);font-size:13px;margin-top:2px}
+    .hero{margin:26px 0 22px}
+    .hero h2{font-size:27px;line-height:1.2;margin:0 0 8px;font-weight:800;letter-spacing:-.02em}
+    .hero p{color:var(--muted);margin:0;font-size:15px;max-width:60ch}
+    .card{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:22px;margin:18px 0}
+    .card h3{margin:0 0 4px;font-size:17px;font-weight:700}
+    .card .hint{color:var(--muted);font-size:13px;margin:0 0 16px}
+    label{display:block;font-size:13px;font-weight:600;margin:14px 0 6px;color:#cfe0dd}
+    .req{color:var(--teal)}
+    input[type=text],input[type=number],select,textarea{
+      width:100%;background:var(--panel2);border:1px solid var(--line);color:var(--text);
+      border-radius:10px;padding:11px 12px;font-size:14px;font-family:inherit;outline:none;transition:border-color .15s}
+    input:focus,select:focus,textarea:focus{border-color:var(--teal)}
+    textarea{resize:vertical;min-height:74px}
+    .grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+    @media(max-width:560px){.grid2{grid-template-columns:1fr}}
+    .row-help{font-size:12px;color:var(--muted);margin-top:5px}
+    .btn{display:inline-flex;align-items:center;gap:9px;background:var(--teal);color:#04211f;border:none;
+      border-radius:11px;padding:13px 22px;font-size:15px;font-weight:700;cursor:pointer;font-family:inherit;
+      transition:filter .15s, transform .05s}
+    .btn:hover{filter:brightness(1.07)}
+    .btn:active{transform:translateY(1px)}
+    .btn[disabled]{opacity:.5;cursor:not-allowed;filter:none}
+    .btn.secondary{background:transparent;color:var(--teal);border:1px solid var(--teal-dim)}
+    .btn.ghost{background:var(--panel2);color:var(--text);border:1px solid var(--line)}
+    .btn-row{display:flex;flex-wrap:wrap;gap:10px;margin-top:8px}
+    .center{display:flex;justify-content:center;margin-top:22px}
+    .status{margin-top:12px;font-size:13.5px;min-height:18px}
+    .status.err{color:var(--red)} .status.ok{color:var(--ok)}
+    .hidden{display:none!important}
+    /* program display */
+    #program-card pre{white-space:pre-wrap;word-break:break-word;background:var(--panel2);border:1px solid var(--line);
+      border-radius:10px;padding:18px;font-size:13.5px;line-height:1.6;font-family:'SF Mono',ui-monospace,Menlo,Consolas,monospace;color:#e7efee;overflow-x:auto}
+    .spinner{width:18px;height:18px;border:2.5px solid rgba(4,33,31,.35);border-top-color:#04211f;border-radius:50%;
+      animation:spin .7s linear infinite;display:inline-block}
+    .spinner.teal{border-color:rgba(24,211,197,.25);border-top-color:var(--teal)}
+    @keyframes spin{to{transform:rotate(360deg)}}
+    .pill{display:inline-block;background:var(--panel2);border:1px solid var(--line);border-radius:999px;
+      padding:3px 11px;font-size:12px;color:var(--muted);margin-left:8px}
+    .save-note{background:rgba(24,211,197,.08);border:1px solid var(--teal-dim);border-radius:10px;padding:12px 14px;font-size:13px;color:#bfeee9;margin-top:14px}
+    .save-note code{background:#04211f;padding:2px 7px;border-radius:6px;color:var(--teal);font-size:12px;word-break:break-all}
+    .divider{height:1px;background:var(--line);margin:26px 0}
+    footer{color:var(--muted);font-size:12px;text-align:center;margin-top:40px}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header class="brand">
+      <svg class="logo" viewBox="0 0 40 40" fill="none" aria-label="Coaching Engine logo">
+        <rect x="2" y="2" width="36" height="36" rx="9" stroke="currentColor" stroke-width="2" style="color:var(--teal)"/>
+        <path d="M11 26 L17 14 L23 26 M13.5 21 H20.5" stroke="var(--teal)" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
+        <circle cx="28.5" cy="15" r="3" fill="var(--teal)"/>
+      </svg>
+      <div>
+        <h1>AI Coaching Engine</h1>
+        <div class="sub">Elite programming, built around your goals</div>
+      </div>
+    </header>
+
+    <section class="hero">
+      <h2>Build your training program</h2>
+      <p>Answer a few questions about your goals, experience, and any injuries. The engine builds a complete, individualized program — then turn it into a spreadsheet in one click. Come back any time to adjust it.</p>
+    </section>
+
+    <!-- RETURNING CLIENT -->
+    <section class="card" id="returning-card">
+      <h3>Returning?</h3>
+      <p class="hint">If you've built a program before, paste your personal code to load it.</p>
+      <div class="grid2">
+        <input type="text" id="return-token" placeholder="Your personal code" />
+        <button class="btn ghost" id="load-btn" type="button">Load my program</button>
+      </div>
+      <div class="status" id="return-status"></div>
+    </section>
+
+    <!-- QUESTIONNAIRE -->
+    <section class="card" id="intake-card">
+      <h3>Your intake</h3>
+      <p class="hint">Be specific. The more precise your goal, the sharper your program. <span class="req">*</span> = required.</p>
+
+      <label>Primary goal <span class="req">*</span></label>
+      <input type="text" id="goal_primary" placeholder="e.g. 180 kg deadlift · first strict pull-up · sub-40 min 10k · ADCC conditioning" />
+      <div class="row-help">Name the exact result you want — a load, a rep count, a skill, a sport, a time.</div>
+
+      <label>Secondary goal (optional)</label>
+      <input type="text" id="goal_secondary" placeholder="e.g. general strength, add muscle, stay conditioned" />
+
+      <div class="grid2">
+        <div>
+          <label>Experience level <span class="req">*</span></label>
+          <select id="experience">
+            <option value="">Select…</option>
+            <option>Beginner (under 1 year)</option>
+            <option>Intermediate (1–3 years)</option>
+            <option>Advanced (3+ years)</option>
+            <option>Elite / competitive</option>
+          </select>
+        </div>
+        <div>
+          <label>Training days per week <span class="req">*</span></label>
+          <select id="days">
+            <option value="">Select…</option>
+            <option>2</option><option>3</option><option>4</option><option>5</option><option>6</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="grid2">
+        <div>
+          <label>Session length</label>
+          <select id="session_length">
+            <option value="">Any</option>
+            <option>30 min</option><option>45 min</option><option>60 min</option><option>75–90 min</option>
+          </select>
+        </div>
+        <div>
+          <label>Bodyweight (optional)</label>
+          <input type="text" id="bodyweight" placeholder="e.g. 78 kg" />
+        </div>
+      </div>
+
+      <label>Equipment available <span class="req">*</span></label>
+      <input type="text" id="equipment" placeholder="e.g. full gym · barbell + rack + dumbbells · pull-up bar + bands + DBs at home" />
+
+      <label>Current strength / relevant numbers (optional but helpful)</label>
+      <textarea id="current_numbers" placeholder="e.g. squat 120 kg x 5, max 12 strict pull-ups, can hold a 20s tuck planche"></textarea>
+      <div class="row-help">Helps the engine size the work to you. Only what you actually do now.</div>
+
+      <label>Injuries, pain, or movements to avoid (optional)</label>
+      <textarea id="injuries" placeholder="e.g. right knee aches on deep squats; old shoulder issue overhead. Write 'none' if all clear."></textarea>
+
+      <label>Sport / activity load outside the gym (optional)</label>
+      <input type="text" id="sport" placeholder="e.g. BJJ 3x/week, running 2x/week, on feet all day at work" />
+
+      <label>Anything else for your coach (optional)</label>
+      <textarea id="notes" placeholder="Preferences, schedule constraints, what you've tried before…"></textarea>
+
+      <div class="center">
+        <button class="btn" id="build-btn" type="button">
+          <span id="build-label">Build my program</span>
+        </button>
+      </div>
+      <div class="status" id="build-status" style="text-align:center"></div>
+    </section>
+
+    <!-- PROGRAM -->
+    <section class="card hidden" id="program-card">
+      <h3>Your program <span class="pill" id="prog-pill">Week 1</span></h3>
+      <p class="hint" id="prog-sub">Your individualized plan. Scroll the table, then make a spreadsheet or adjust it below.</p>
+      <pre id="program-text"></pre>
+
+      <div class="btn-row">
+        <button class="btn" id="sheet-btn" type="button">Create spreadsheet</button>
+        <button class="btn secondary" id="copy-btn" type="button">Copy program</button>
+      </div>
+      <div class="status" id="sheet-status"></div>
+
+      <div class="save-note" id="save-note">
+        <strong>Save your personal code</strong> to return and adjust later:<br>
+        <code id="token-display"></code>
+        <div style="margin-top:8px"><button class="btn ghost" id="copy-token" type="button" style="padding:7px 14px;font-size:13px">Copy code</button></div>
+      </div>
+
+      <div class="divider"></div>
+
+      <h3>Adjust your program</h3>
+      <p class="hint">Tell the engine in plain English what changed. It updates only what's needed — everything else stays the same.</p>
+      <textarea id="adjust-input" placeholder="e.g. My knee feels good now, let's load squats fuller. And I only have 30 minutes on day 2 this week."></textarea>
+      <div class="btn-row">
+        <button class="btn" id="adjust-btn" type="button">Update my program</button>
+      </div>
+      <div class="status" id="adjust-status"></div>
+    </section>
+
+    <footer>
+      AI Coaching Engine · Your data stays private to your program. &copy; <span id="yr"></span> Raz Pilosof
+    </footer>
+  </div>
+
+  <script src="exceljs.lib.js"></script>
+  <script src="spreadsheet.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
