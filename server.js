@@ -47,7 +47,23 @@ async function getGenAI() {
 }
 
 // Calls the model with the engine as system instruction. Returns plain text.
-async function runEngine(userContent) {
+// A program is degenerate/invalid if it's too short, missing the machine TSV
+// markers, or collapsed into a run of repeated punctuation (a rare large-prompt
+// failure mode where the model emits e.g. a long line of dashes). We retry when
+// this happens so a client never receives garbage.
+function isValidProgram(p) {
+  if (!p || typeof p !== "string") return false;
+  const t = p.trim();
+  if (t.length < 800) return false;
+  // Collapsed/degenerate: a single dominant non-alphanumeric char (dashes, dots, etc.)
+  const letters = (t.match(/[A-Za-z]/g) || []).length;
+  if (letters / t.length < 0.25) return false;
+  // Must contain the machine block markers the rest of the app and the UI rely on.
+  if (!t.includes("START_WEEK1_TSV") || !t.includes("END_WEEK1_TSV")) return false;
+  return true;
+}
+
+async function runEngineRaw(userContent) {
   if (USE_PPLX_PROXY) {
     // LOCAL DEV ONLY: route through the Perplexity sandbox proxy (Anthropic SDK).
     const { default: Anthropic } = await import("@anthropic-ai/sdk");
@@ -81,6 +97,26 @@ async function runEngine(userContent) {
     },
   });
   return resp.text;
+}
+
+// Wrapper: call the engine, validate the result, and retry a couple of times if
+// the model returned a degenerate/invalid program. Each attempt is independent,
+// so an intermittent collapse is recovered transparently.
+async function runEngine(userContent) {
+  const MAX_ATTEMPTS = 3;
+  let last = "";
+  for (let attempt = 1; attempt <= MAX_ATTEMPTS; attempt++) {
+    last = await runEngineRaw(userContent);
+    if (isValidProgram(last)) return last;
+    console.warn(
+      `runEngine: invalid/degenerate output on attempt ${attempt}/${MAX_ATTEMPTS} ` +
+        `(len=${last ? last.trim().length : 0}); retrying`
+    );
+  }
+  // All attempts failed validation — surface a clear error rather than garbage.
+  throw new Error(
+    "The program generator returned an unusable result after multiple attempts. Please try again."
+  );
 }
 
 // ---------- Prompt builders ----------
