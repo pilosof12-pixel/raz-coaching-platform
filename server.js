@@ -115,7 +115,11 @@ async function runEngine(userContent) {
     config: {
       systemInstruction: ENGINE,
       temperature: 0.4,
-      maxOutputTokens: 8192,
+      // 2.5-flash is a thinking model. Give a large ceiling AND cap the
+      // thinking budget so the token allowance goes to the visible program,
+      // not internal reasoning (which previously truncated the output).
+      maxOutputTokens: 16384,
+      thinkingConfig: { thinkingBudget: 0 },
     },
   });
   return resp.text;
@@ -181,21 +185,37 @@ function adjustPrompt(intake, currentProgram, changeRequest) {
 // This is a LAST-RESORT scrub of obvious banned tokens in the client-facing prose.
 // It is conservative: it only neutralizes clear internal-label leaks, never touches
 // exercise names, RPE/RIR, or the TSV machine block.
+// Applies the forbidden-label substitutions that are SAFE to run anywhere,
+// including inside the TSV machine block (single words -> client-safe synonyms).
+function scrubForbiddenWords(s) {
+  if (!s) return s;
+  // Weekly training-state names -> client-safe synonyms (any context/case).
+  // 'Deload' is a legitimate recovery concept; we keep the meaning, drop the label.
+  s = s.replace(/\bdeload\b/gi, "recovery");
+  s = s.replace(/\b(Push|Maintain|Reduce)\b(?=\s+(?:for|block|week|phase|state|everything|on)\b)/g, "focus");
+  // Internal volume abbreviations.
+  s = s.replace(/\b(MEV|MAV|MRV|SQS|EVU|LTOS|VCS)\b/g, "target volume");
+  // Spinal Debt internal term.
+  s = s.replace(/\bspinal\s+debt\b/gi, "lower-back fatigue");
+  // Art. N citations.
+  s = s.replace(/\(?\bArt\.?\s?\d+[a-z]?\)?/gi, "");
+  return s;
+}
+
 function privacyScrub(text) {
   if (!text) return text;
-  // Split off the TSV machine block so we never alter it.
+  // Split off the TSV machine block so we never alter its STRUCTURE.
   const startIdx = text.indexOf("START_WEEK1_TSV");
   let prose = startIdx === -1 ? text : text.slice(0, startIdx);
-  const tsv = startIdx === -1 ? "" : text.slice(startIdx);
+  let tsv = startIdx === -1 ? "" : text.slice(startIdx);
 
   // Remove a 'Weekly State: ...' line entirely.
   prose = prose.replace(/^.*Weekly\s*State.*$/gim, "").trim();
-  // Neutralize standalone weekly-state words used as block labels (word-boundary, capitalized usage).
-  prose = prose.replace(/\b(Push|Maintain|Reduce|Deload)\b(?=\s+(?:for|block|week|phase|state|everything|on))/g, "focus");
-  // Strip internal abbreviations if any slipped through.
-  prose = prose.replace(/\b(MEV|MAV|MRV|SQS|EVU|LTOS|VCS)\b/g, "target volume");
-  // Strip Art. N citations.
-  prose = prose.replace(/\(?\bArt\.?\s?\d+[a-z]?\)?/gi, "").replace(/[ ]{2,}/g, " ");
+  // Apply word substitutions to prose, then collapse double spaces.
+  prose = scrubForbiddenWords(prose).replace(/[ ]{2,}/g, " ");
+  // Apply the SAME single-word substitutions to the TSV block (structure preserved:
+  // these only swap whole words, never touch tabs, newlines, or column count).
+  if (tsv) tsv = scrubForbiddenWords(tsv);
 
   return tsv ? prose.trim() + "\n\n" + tsv : prose.trim();
 }
