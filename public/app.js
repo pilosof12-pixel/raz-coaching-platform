@@ -20,24 +20,101 @@
     el.textContent = msg || "";
   }
 
+  // ---- Sport-day scheduler (chips) ----
+  const DAYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
+  // sportState[day] = null | "light" | "moderate" | "hard"
+  const sportState = {};
+  function buildSportDays() {
+    const wrap = $("sport-days");
+    if (!wrap) return;
+    DAYS.forEach((day) => {
+      sportState[day] = null;
+      const row = document.createElement("div");
+      row.className = "sport-day";
+      const dayBtn = document.createElement("button");
+      dayBtn.type = "button";
+      dayBtn.className = "daybtn";
+      dayBtn.textContent = day;
+      const inten = document.createElement("div");
+      inten.className = "intensity hidden";
+      ["Light", "Moderate", "Hard"].forEach((lvl) => {
+        const b = document.createElement("button");
+        b.type = "button";
+        b.className = "ibtn";
+        b.textContent = lvl;
+        b.addEventListener("click", () => {
+          const val = lvl.toLowerCase();
+          sportState[day] = val;
+          inten.querySelectorAll(".ibtn").forEach((x) => x.classList.remove("on"));
+          b.classList.add("on");
+        });
+        inten.appendChild(b);
+      });
+      dayBtn.addEventListener("click", () => {
+        const turningOn = !dayBtn.classList.contains("on");
+        dayBtn.classList.toggle("on", turningOn);
+        inten.classList.toggle("hidden", !turningOn);
+        if (turningOn) {
+          // default to moderate when a day is first selected
+          sportState[day] = "moderate";
+          inten.querySelectorAll(".ibtn").forEach((x) => x.classList.remove("on"));
+          inten.querySelectorAll(".ibtn")[1].classList.add("on");
+        } else {
+          sportState[day] = null;
+          inten.querySelectorAll(".ibtn").forEach((x) => x.classList.remove("on"));
+        }
+      });
+      row.appendChild(dayBtn);
+      row.appendChild(inten);
+      wrap.appendChild(row);
+    });
+  }
+  buildSportDays();
+
+  function sportSchedule() {
+    // Returns e.g. [{day:"Mon", intensity:"hard"}, ...] for any selected days.
+    return DAYS.filter((d) => sportState[d]).map((d) => ({ day: d, intensity: sportState[d] }));
+  }
+
+  // ---- Equipment type toggle ----
+  const eqType = $("equipment_type");
+  if (eqType) {
+    eqType.addEventListener("change", () => {
+      $("equipment_specify_wrap").classList.toggle("hidden", eqType.value !== "specify");
+    });
+  }
+
+  // Split lines from a textarea into a clean array (one item per line).
+  function lines(id) {
+    return $(id).value.split("\n").map((s) => s.trim()).filter(Boolean);
+  }
+
   function collectIntake() {
+    const eqMode = $("equipment_type").value;
+    const equipment = eqMode === "full_gym"
+      ? "Full commercial gym — all standard barbells, dumbbells, racks, machines, cables and bodyweight stations available."
+      : $("equipment").value.trim();
+    const sport_name = $("sport").value.trim();
+    const schedule = sportSchedule();
     return {
-      primary_goal: $("goal_primary").value.trim(),
-      secondary_goal: $("goal_secondary").value.trim(),
+      primary_goals: lines("goal_primary"),
+      secondary_goals: lines("goal_secondary"),
       experience: $("experience").value,
       days_per_week: $("days").value,
       session_length: $("session_length").value,
       bodyweight: $("bodyweight").value.trim(),
-      equipment: $("equipment").value.trim(),
+      equipment: equipment,
+      split_preference: $("split_pref").value,
       current_numbers: $("current_numbers").value.trim(),
       injuries: $("injuries").value.trim(),
-      sport_load: $("sport").value.trim(),
+      sport: sport_name,
+      sport_schedule: schedule,
       notes: $("notes").value.trim(),
     };
   }
 
   function validateIntake(i) {
-    if (!i.primary_goal) return "Please name your primary goal.";
+    if (!i.primary_goals || !i.primary_goals.length) return "Please list at least one primary goal.";
     if (!i.experience) return "Please choose your experience level.";
     if (!i.days_per_week) return "Please choose your training days per week.";
     if (!i.equipment) return "Please tell us what equipment you have.";
@@ -110,7 +187,7 @@
         (secs) => setStatus($("build-status"), `Building your program… (${secs}s)`, "")
       );
       showProgram(data.program, data.token);
-      setStatus($("build-status"), "Done. Your program is below.", "ok");
+      setStatus($("build-status"), "Done. Your program is below — copy and save your personal code first.", "ok");
     } catch (e) {
       setStatus($("build-status"), e.message, "err");
     } finally {
@@ -180,7 +257,12 @@
 
   // COPY TOKEN
   $("copy-token").addEventListener("click", async () => {
-    try { await navigator.clipboard.writeText(currentToken); } catch (_) {}
+    try {
+      await navigator.clipboard.writeText(currentToken);
+      setStatus($("token-status"), "Code copied. Paste it somewhere safe so you can come back and adjust your program.", "ok");
+    } catch (_) {
+      setStatus($("token-status"), "Copy didn't work — select the code above and copy it manually, then save it somewhere safe.", "err");
+    }
   });
 
   // Auto-load if we already have a token saved locally

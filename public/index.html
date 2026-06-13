@@ -36,6 +36,17 @@
     .grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
     @media(max-width:560px){.grid2{grid-template-columns:1fr}}
     .row-help{font-size:12px;color:var(--muted);margin-top:5px}
+    /* sport-day chips */
+    .sport-grid{display:flex;flex-direction:column;gap:8px}
+    .sport-day{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+    .sport-day .daybtn{flex:0 0 64px;background:var(--panel2);border:1px solid var(--line);color:var(--muted);
+      border-radius:9px;padding:9px 0;font-size:13px;font-weight:600;cursor:pointer;text-align:center;font-family:inherit;transition:all .12s;user-select:none}
+    .sport-day .daybtn.on{background:rgba(24,211,197,.14);border-color:var(--teal);color:var(--teal)}
+    .sport-day .intensity{display:flex;gap:6px}
+    .sport-day .intensity.hidden{display:none}
+    .sport-day .ibtn{background:var(--panel2);border:1px solid var(--line);color:var(--muted);
+      border-radius:8px;padding:7px 12px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;transition:all .12s;user-select:none}
+    .sport-day .ibtn.on{background:var(--teal);border-color:var(--teal);color:#04211f}
     .btn{display:inline-flex;align-items:center;gap:9px;background:var(--teal);color:#04211f;border:none;
       border-radius:11px;padding:13px 22px;font-size:15px;font-weight:700;cursor:pointer;font-family:inherit;
       transition:filter .15s, transform .05s}
@@ -60,6 +71,10 @@
       padding:3px 11px;font-size:12px;color:var(--muted);margin-left:8px}
     .save-note{background:rgba(24,211,197,.08);border:1px solid var(--teal-dim);border-radius:10px;padding:12px 14px;font-size:13px;color:#bfeee9;margin-top:14px}
     .save-note code{background:#04211f;padding:2px 7px;border-radius:6px;color:var(--teal);font-size:12px;word-break:break-all}
+    .save-note-strong{background:rgba(24,211,197,.13);border:2px solid var(--teal);box-shadow:0 0 0 4px rgba(24,211,197,.07);padding:16px 18px;margin:6px 0 18px}
+    .save-note-strong .save-title{font-size:15px;font-weight:800;color:var(--teal);margin-bottom:6px}
+    .save-note-strong .save-why{margin:0 0 12px;font-size:13px;color:#d6efec;line-height:1.5}
+    .save-note-strong code{display:inline-block;font-size:14px;padding:6px 11px;font-weight:700}
     .divider{height:1px;background:var(--line);margin:26px 0}
     footer{color:var(--muted);font-size:12px;text-align:center;margin-top:40px}
   </style>
@@ -80,13 +95,13 @@
 
     <section class="hero">
       <h2>Build your training program</h2>
-      <p>Answer a few questions about your goals, experience, and any injuries. The engine builds a complete, individualized program — then turn it into a spreadsheet in one click. Come back any time to adjust it.</p>
+      <p>Answer a few questions about your goals, experience, and any injuries. The engine builds a complete, individualized program, then turn it into a spreadsheet in one click. Come back any time to adjust it.</p>
     </section>
 
     <!-- RETURNING CLIENT -->
     <section class="card" id="returning-card">
       <h3>Returning?</h3>
-      <p class="hint">If you've built a program before, paste your personal code to load it.</p>
+      <p class="hint">Already built a program? Paste the personal code you saved to load it back and make adjustments.</p>
       <div class="grid2">
         <input type="text" id="return-token" placeholder="Your personal code" />
         <button class="btn ghost" id="load-btn" type="button">Load my program</button>
@@ -99,12 +114,13 @@
       <h3>Your intake</h3>
       <p class="hint">Be specific. The more precise your goal, the sharper your program. <span class="req">*</span> = required.</p>
 
-      <label>Primary goal <span class="req">*</span></label>
-      <input type="text" id="goal_primary" placeholder="e.g. 180 kg deadlift · first strict pull-up · sub-40 min 10k · ADCC conditioning" />
-      <div class="row-help">Name the exact result you want — a load, a rep count, a skill, a sport, a time.</div>
+      <label>Primary goals <span class="req">*</span></label>
+      <textarea id="goal_primary" placeholder="List your top priorities, one per line. e.g.&#10;200 kg back squat&#10;100 kg strict overhead press&#10;one-arm pull-up&#10;MMA / sparring conditioning"></textarea>
+      <div class="row-help">List every result that matters most — one per line. They all get equal top priority in your program. A load, a rep count, a skill, a sport, a time.</div>
 
-      <label>Secondary goal (optional)</label>
-      <input type="text" id="goal_secondary" placeholder="e.g. general strength, add muscle, stay conditioned" />
+      <label>Secondary goals (optional)</label>
+      <textarea id="goal_secondary" placeholder="Nice-to-haves, one per line. e.g.&#10;add some muscle&#10;stay generally conditioned"></textarea>
+      <div class="row-help">These get worked around your primary goals when there's room.</div>
 
       <div class="grid2">
         <div>
@@ -141,7 +157,14 @@
       </div>
 
       <label>Equipment available <span class="req">*</span></label>
-      <input type="text" id="equipment" placeholder="e.g. full gym · barbell + rack + dumbbells · pull-up bar + bands + DBs at home" />
+      <select id="equipment_type">
+        <option value="full_gym">Full commercial gym (everything available)</option>
+        <option value="specify">Let me specify what I have</option>
+      </select>
+      <div id="equipment_specify_wrap" class="hidden" style="margin-top:10px">
+        <textarea id="equipment" placeholder="List what you've got. e.g. barbell + rack + plates to 180 kg, adjustable dumbbells to 40 kg, pull-up bar, bands, bench. No machines."></textarea>
+        <div class="row-help">Only list what you actually have access to — the engine builds strictly within it.</div>
+      </div>
 
       <label>Current strength / relevant numbers (optional but helpful)</label>
       <textarea id="current_numbers" placeholder="e.g. squat 120 kg x 5, max 12 strict pull-ups, can hold a 20s tuck planche"></textarea>
@@ -150,8 +173,20 @@
       <label>Injuries, pain, or movements to avoid (optional)</label>
       <textarea id="injuries" placeholder="e.g. right knee aches on deep squats; old shoulder issue overhead. Write 'none' if all clear."></textarea>
 
-      <label>Sport / activity load outside the gym (optional)</label>
-      <input type="text" id="sport" placeholder="e.g. BJJ 3x/week, running 2x/week, on feet all day at work" />
+      <label>Training split preference</label>
+      <select id="split_pref">
+        <option value="coach_decide">Let the coach decide (recommended)</option>
+        <option value="full_body">Full body</option>
+        <option value="ppl">Push / Pull / Legs</option>
+        <option value="upper_lower">Upper / Lower</option>
+      </select>
+      <div class="row-help">How your training week is structured. Leave on "let the coach decide" and it picks the best fit for your goals and days.</div>
+
+      <label>Sport / activity outside the gym (optional)</label>
+      <p class="hint" style="margin:0 0 8px">Tick the days you train your sport and how hard, so the engine won't stack heavy lifting on a hard sparring day.</p>
+      <div id="sport-days" class="sport-grid"></div>
+      <input type="text" id="sport" placeholder="What is it? e.g. BJJ, MMA, running, climbing" style="margin-top:10px" />
+      <div class="row-help">Name your sport above, then mark the days and intensity below. Leave blank if none.</div>
 
       <label>Anything else for your coach (optional)</label>
       <textarea id="notes" placeholder="Preferences, schedule constraints, what you've tried before…"></textarea>
@@ -168,6 +203,16 @@
     <section class="card hidden" id="program-card">
       <h3>Your program <span class="pill" id="prog-pill">Week 1</span></h3>
       <p class="hint" id="prog-sub">Your individualized plan. Scroll the table, then make a spreadsheet or adjust it below.</p>
+
+      <!-- SAVE CODE — shown FIRST, before the program, so it can't be missed -->
+      <div class="save-note save-note-strong" id="save-note">
+        <div class="save-title">Save this code before you go</div>
+        <p class="save-why">This is the only way back to your program. Copy it somewhere safe (notes app, screenshot, or email it to yourself). Without it you'll have to start a brand new program from scratch, and you won't be able to load this one or adjust it later.</p>
+        <code id="token-display"></code>
+        <div style="margin-top:10px"><button class="btn" id="copy-token" type="button" style="padding:9px 16px;font-size:13.5px">Copy my code</button></div>
+        <div class="status" id="token-status" style="margin-top:8px"></div>
+      </div>
+
       <pre id="program-text"></pre>
 
       <div class="btn-row">
@@ -175,12 +220,6 @@
         <button class="btn secondary" id="copy-btn" type="button">Copy program</button>
       </div>
       <div class="status" id="sheet-status"></div>
-
-      <div class="save-note" id="save-note">
-        <strong>Save your personal code</strong> to return and adjust later:<br>
-        <code id="token-display"></code>
-        <div style="margin-top:8px"><button class="btn ghost" id="copy-token" type="button" style="padding:7px 14px;font-size:13px">Copy code</button></div>
-      </div>
 
       <div class="divider"></div>
 

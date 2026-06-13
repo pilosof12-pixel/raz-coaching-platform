@@ -131,6 +131,7 @@ const CLIENT_OUTPUT_CONTRACT = [
   "  * a 'Stress' column or any internal stress/exposure-routing label as a visible column (Stress, Main Goal Exposure, Session Focus, Intensity, Maintenance, Support, Trunk as table columns)",
   "  * percentage-of-max-set figures, raw internal scores",
   "- ALLOWED and encouraged: RPE, RIR, Zone 2-5, rest times, plain coaching explanations in normal language.",
+  "- WRITE LIKE A REAL HUMAN COACH, NOT LIKE AI. Do NOT use em-dashes or en-dashes (— or –) anywhere. Use commas, full stops, or 'and' instead. Avoid the stock AI phrasing patterns (no 'it's not just X, it's Y', no 'let's dive in', no overuse of dashes for emphasis). Plain hyphens inside words (pull-up, one-arm) and inside number ranges (8-12) are fine.",
   "- THE WEEK 1 TABLE MUST HAVE EXACTLY THESE 7 COLUMNS, IN THIS ORDER, AND NO OTHERS: Day | Exercise | Sets | Reps/Duration | Load/RIR | Rest | Notes. Do NOT add a 'Session Focus', 'Stress', 'Main Goal Exposure', 'Intensity', 'Purpose', 'Modification', or any other extra column. If you want to convey a day's theme or the purpose of an exercise, put it in plain words inside the Notes cell or in the intro paragraph — never as its own column. A table with more than 7 columns, or with any internal-routing column, is a HARD FAIL.",
   "- Deliver, in this order and in plain client language:",
   "  1) A short, friendly intro: what this program is built to achieve for them and how it's structured (no jargon labels).",
@@ -140,6 +141,19 @@ const CLIENT_OUTPUT_CONTRACT = [
   "  5) The machine block: START_WEEK1_TSV ... END_WEEK1_TSV with columns Day, Exercise, Weight, Sets, Reps, Rest, Target RPE, Notes, Results (Results empty). Plain text only, no LaTeX.",
 ].join("\n");
 
+// Rules that tell the engine how to interpret the structured intake fields.
+// These keep multi-goal, split, equipment and sport-schedule handling consistent
+// regardless of which model runs.
+const INTAKE_HANDLING_RULES = [
+  "=== HOW TO READ THIS INTAKE ===",
+  "- 'primary_goals' is an ARRAY. EVERY item in it is an EQUAL top priority. Do not rank them, do not pick a favourite, do not treat the first one as more important than the rest. Allocate the week so that ALL primary goals get meaningful, direct work. If two primaries compete for the same slot (e.g. heavy squat vs heavy press on a short week), interleave them across days and across the 4-week block so none is neglected — never drop a primary goal.",
+  "- 'secondary_goals' is an ARRAY of lower-priority aims. Work them in only where they do not compromise the primary goals or recovery.",
+  "- 'split_preference' tells you the client's preferred week structure: 'coach_decide' = you choose the optimal split for their goals and days; 'full_body' = full-body sessions; 'ppl' = push/pull/legs; 'upper_lower' = upper/lower. Honour the explicit choice unless it is clearly unsafe given their days_per_week, in which case pick the closest workable structure and explain why in plain language.",
+  "- 'equipment' is the ONLY equipment they have. Select every exercise strictly from within it. Never program a movement that needs gear they did not list.",
+  "- 'sport_schedule' is an ARRAY of { day, intensity } for their sport days (intensity = light | moderate | hard). 'sport' names the activity. On a HARD sport day, do NOT stack heavy/high-fatigue lifting (especially heavy lower-body or heavy spinal-loading work) on the same day — keep gym work light, technical, or skill-based, or schedule it as recovery/mobility; place the demanding lifting sessions on non-sport days or light sport days. Treat the sport sessions as real training stress when managing weekly fatigue and recovery. Respect the day-of-week placement they gave you.",
+  "- 'days_per_week' is the number of GYM training days. Build exactly that many gym sessions. Never override it.",
+].join("\n");
+
 function buildPrompt(intake) {
   return [
     "A NEW CLIENT has submitted their intake. Build their Week 1 program now.",
@@ -147,6 +161,8 @@ function buildPrompt(intake) {
     "",
     "=== CLIENT INTAKE ===",
     JSON.stringify(intake, null, 2),
+    "",
+    INTAKE_HANDLING_RULES,
     "",
     CLIENT_OUTPUT_CONTRACT,
   ].join("\n");
@@ -160,6 +176,8 @@ function adjustPrompt(intake, currentProgram, changeRequest) {
     "",
     "=== CLIENT INTAKE (original) ===",
     JSON.stringify(intake, null, 2),
+    "",
+    INTAKE_HANDLING_RULES,
     "",
     "=== CURRENT PROGRAM (their existing plan) ===",
     currentProgram,
@@ -267,6 +285,37 @@ function stripForbiddenColumns(md) {
   return out.join("\n");
 }
 
+// Remove the em-dash / en-dash "AI tell" so the program reads like a human wrote it.
+// This runs ONLY on prose (the TSV machine block is split off before this is called),
+// and it is written to be SAFE around the things a dash is legitimately part of:
+//   - markdown table separator rows  |---|---|  (left untouched)
+//   - hyphenated words: pull-up, push-up, one-arm, 90-degree, Zone 2-5
+//   - numeric ranges: 8-12 reps, 60-90s, RPE 7-8
+// It only rewrites em/en dashes and a spaced hyphen used as a sentence connector.
+function dehyphenateProse(s) {
+  if (!s) return s;
+  return s.split("\n").map((line) => {
+    // Never touch a markdown table separator row (e.g. |---|:--:|---|).
+    if (/^\s*\|[\s:|-]+\|\s*$/.test(line)) return line;
+    // Inside table rows, only the dashes WITHIN cell text matter; the same
+    // word-boundary rules below are safe there too, so we treat all lines alike.
+    let l = line;
+    // 1) Em/en dash used as a parenthetical or clause break, with spaces around it:
+    //    "squats — they build..."  ->  "squats, they build..."
+    l = l.replace(/\s+[\u2014\u2013]\s+/g, ", ");
+    // 2) Em/en dash with NO spaces between words (rarer): "strength—power" -> "strength, power"
+    l = l.replace(/([A-Za-z0-9])[\u2014\u2013]([A-Za-z0-9])/g, "$1, $2");
+    // 3) A spaced ASCII hyphen used as a clause connector: " - " -> ", "
+    //    (a real range like 8-12 has NO surrounding spaces, so it is untouched)
+    l = l.replace(/\s+-\s+/g, ", ");
+    // 4) Any leftover bare em/en dash -> comma+space, then tidy doubles.
+    l = l.replace(/[\u2014\u2013]/g, ", ");
+    // Cosmetic cleanup from the substitutions above.
+    l = l.replace(/,\s*,/g, ",").replace(/,\s*\./g, ".").replace(/\(\s*,\s*/g, "(").replace(/\s+,/g, ",");
+    return l;
+  }).join("\n");
+}
+
 function privacyScrub(text) {
   if (!text) return text;
   // Split off the TSV machine block so we never alter its STRUCTURE.
@@ -284,6 +333,8 @@ function privacyScrub(text) {
   prose = prose.replace(/^.*Weekly\s*State.*$/gim, "").trim();
   // Apply word substitutions to prose, then collapse double spaces.
   prose = scrubForbiddenWords(prose).replace(/[ ]{2,}/g, " ");
+  // Strip the em-dash AI tell so it reads human-written (prose only, TSV untouched).
+  prose = dehyphenateProse(prose);
   // Apply the SAME single-word substitutions to the TSV block (structure preserved:
   // these only swap whole words, never touch tabs, newlines, or column count).
   if (tsv) tsv = scrubForbiddenWords(fixInvalidExerciseNames(tsv));
