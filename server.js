@@ -411,12 +411,101 @@ function dehyphenateProse(s) {
   }).join("\n");
 }
 
+// Remove any markdown pipe table (and an immediately-preceding heading like
+// "### Week 1 Training Schedule") from the PROSE body. The Week 1 program is
+// rendered by the client from the START_WEEK1_TSV block only, so a second table
+// in the narrative is redundant, breaks the layout, and the user explicitly
+// asked for it gone. This is a deterministic belt-and-suspenders strip that runs
+// regardless of whether the model obeyed the no-pipe-table prompt rule.
+// Operates on PROSE ONLY (TSV is split off before this is called), so it can
+// never damage the machine block.
+function stripBodyProgramTable(s) {
+  if (!s || s.indexOf("|") === -1) return s;
+  const lines = s.split("\n");
+  const isTableRow = (l) => /^\s*\|.*\|\s*$/.test(l);
+  // A heading that introduces the redundant week table; remove it with the table.
+  const isTableHeading = (l) =>
+    /^\s*#{1,6}\s*.*(week\s*1|training schedule|base microcycle|weekly schedule|microcycle).*$/i.test(l);
+  const out = [];
+  for (let i = 0; i < lines.length; i++) {
+    // Detect the start of a pipe table: a header row followed by a separator row
+    // (|---|---|) on the next non-empty line. Standard markdown table shape.
+    if (isTableRow(lines[i])) {
+      let j = i + 1;
+      // allow the separator to be the immediate next line
+      if (j < lines.length && /^\s*\|[\s:|-]+\|\s*$/.test(lines[j])) {
+        // This is a real markdown table. Consume all contiguous table rows.
+        let k = j + 1;
+        while (k < lines.length && isTableRow(lines[k])) k++;
+        // Drop a heading line and blank lines that directly precede the table.
+        while (out.length && out[out.length - 1].trim() === "") out.pop();
+        if (out.length && isTableHeading(out[out.length - 1])) out.pop();
+        while (out.length && out[out.length - 1].trim() === "") out.pop();
+        // Skip blank lines and a lone "---" horizontal rule that often wraps the table.
+        while (k < lines.length && (lines[k].trim() === "" || /^\s*-{3,}\s*$/.test(lines[k]))) k++;
+        // Also drop a horizontal rule left immediately before the table.
+        while (out.length && /^\s*-{3,}\s*$/.test(out[out.length - 1])) out.pop();
+        while (out.length && out[out.length - 1].trim() === "") out.pop();
+        i = k - 1; // continue after the table block
+        continue;
+      }
+    }
+    out.push(lines[i]);
+  }
+  // Collapse any triple+ blank lines left behind.
+  return out.join("\n").replace(/\n{3,}/g, "\n\n");
+}
+
+// stripAndFlagFormulaViolations — best-effort post-hoc sanity check on density / static rows.
+// Looks at the TSV table block and flags rows that obviously break the per-set formulas.
+// Does NOT delete rows (engine should already have followed the formula); appends a hidden
+// QA comment line if a row looks suspicious. This is belt-and-suspenders only.
+function stripAndFlagFormulaViolations(s) {
+  if (!s || typeof s !== 'string') return s;
+  // Split off TSV block (between START_WEEK1_TSV / END_WEEK1_TSV) so we only inspect that.
+  const tsvMatch = s.match(/(START_WEEK1_TSV[\s\S]*?END_WEEK1_TSV)/);
+  if (!tsvMatch) return s;
+  const block = tsvMatch[1];
+  const lines = block.split('\n');
+  const flags = [];
+  for (const line of lines) {
+    // Look for "dip" / "pull-up" / "push-up" / "muscle-up" rep rows with very low per-set rep counts
+    // alongside a clearly higher athlete-stated max in the same line context. Best-effort regex only.
+    const lower = line.toLowerCase();
+    if (/(dip|pull-up|push-up|chin-up|muscle-up|row|squat|bench|press)/.test(lower)) {
+      const reps = (line.match(/(\d+)\s*reps?/) || [])[1];
+      const sets = (line.match(/(\d+)\s*sets?/) || [])[1];
+      if (reps && sets) {
+        const r = parseInt(reps, 10);
+        // crude heuristic: <8 reps for a non-loaded calisthenics endurance goal is suspicious
+        if (r > 0 && r < 8 && /bodyweight|bw|strict|reps to/.test(lower)) {
+          flags.push(`possible-density-undershoot: ${line.trim().slice(0, 120)}`);
+        }
+      }
+    }
+    if (/(planche|lever|handstand|hold|sit)/.test(lower)) {
+      const secs = (line.match(/(\d+)\s*s(ec(onds?)?)?\b/) || [])[1];
+      if (secs && parseInt(secs, 10) < 3) {
+        flags.push(`possible-static-undershoot: ${line.trim().slice(0, 120)}`);
+      }
+    }
+  }
+  if (flags.length === 0) return s;
+  // Append flags as a hidden HTML comment (won't render in client UI)
+  return s + '\n<!-- QA_FORMULA_FLAGS: ' + flags.join(' | ') + ' -->\n';
+}
+
 function privacyScrub(text) {
   if (!text) return text;
   // Split off the TSV machine block so we never alter its STRUCTURE.
   const startIdx = text.indexOf("START_WEEK1_TSV");
   let prose = startIdx === -1 ? text : text.slice(0, startIdx);
   let tsv = startIdx === -1 ? "" : text.slice(startIdx);
+
+  // Remove any redundant Week 1 program table from the narrative body (the
+  // client renders the week from the TSV block only). Deterministic guarantee.
+  prose = stripBodyProgramTable(prose);
+  prose = stripAndFlagFormulaViolations(prose);  // NEW
 
   // Strip forbidden internal columns from the markdown table in the prose part.
   prose = stripForbiddenColumns(prose);

@@ -66,8 +66,20 @@
       border-radius:10px;padding:18px;font-size:14.5px;line-height:1.65;font-family:var(--font);color:#eef3f2;overflow-x:auto}
     /* readable program: narrative blocks + real table */
     #program-render{font-family:var(--font);color:#eef3f2;font-size:14.5px;line-height:1.65}
-    #program-render .prog-narrative{white-space:pre-wrap;word-break:break-word;margin:0 0 18px;color:#dfe8e6}
+    #program-render .prog-narrative{word-break:break-word;margin:0 0 18px;color:#dfe8e6}
     #program-render .prog-narrative.after{margin:20px 0 0}
+    /* rendered markdown inside the coaching narrative */
+    #program-render .prog-narrative p{margin:0 0 12px;color:#dfe8e6}
+    #program-render .prog-narrative h4.prog-h{font-size:17px;font-weight:800;letter-spacing:-.01em;
+      margin:24px 0 10px;padding-bottom:6px;border-bottom:1px solid var(--line);color:#fff}
+    #program-render .prog-narrative h4.prog-h:first-child{margin-top:0}
+    #program-render .prog-narrative h5.prog-h{font-size:14.5px;font-weight:800;margin:18px 0 8px;color:var(--teal)}
+    #program-render .prog-narrative h6.prog-h{font-size:13.5px;font-weight:700;margin:14px 0 6px;color:#cfe6e2}
+    #program-render .prog-narrative ul,
+    #program-render .prog-narrative ol{margin:0 0 14px;padding-left:22px;color:#dfe8e6}
+    #program-render .prog-narrative li{margin:0 0 6px;line-height:1.6}
+    #program-render .prog-narrative strong{color:#fff;font-weight:700}
+    #program-render .prog-narrative em{color:#e7efee;font-style:italic}
     #program-render h4.prog-week{font-size:15px;font-weight:800;letter-spacing:-.01em;margin:6px 0 10px;color:#fff}
     .prog-table-wrap{border:1px solid var(--line);border-radius:12px;overflow:auto;background:var(--panel2)}
     table.prog-table{border-collapse:collapse;width:100%;min-width:680px;font-size:13.5px}

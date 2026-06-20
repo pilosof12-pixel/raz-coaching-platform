@@ -124,6 +124,106 @@
   // Day labels we recognise so the table can mark day boundaries / bold the day cell.
   const DAY_RX = /^(mon|tue|wed|thu|fri|sat|sun|day\s*\d)/i;
 
+  // Escape HTML so model text can never inject markup.
+  function esc(s) {
+    return String(s)
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;");
+  }
+
+  // Lightweight, safe Markdown -> HTML for the coaching narrative.
+  // Handles ## / ### headings, **bold**, *italic*, bullet + numbered lists,
+  // and paragraphs. Everything is escaped first, so it is XSS-safe.
+  function mdToHtml(md) {
+    const lines = String(md).replace(/\r\n/g, "\n").split("\n");
+    const out = [];
+    let listType = null; // 'ul' | 'ol' | null
+    let para = [];
+    function inline(t) {
+      return esc(t)
+        .replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>")
+        .replace(/(^|[^*])\*([^*]+)\*(?!\*)/g, "$1<em>$2</em>");
+    }
+    function flushPara() {
+      if (para.length) {
+        out.push("<p>" + inline(para.join(" ")) + "</p>");
+        para = [];
+      }
+    }
+    function closeList() {
+      if (listType) {
+        out.push("</" + listType + ">");
+        listType = null;
+      }
+    }
+    for (let raw of lines) {
+      const line = raw.replace(/\s+$/, "");
+      if (!line.trim()) {
+        flushPara();
+        closeList();
+        continue;
+      }
+      let m;
+      if ((m = line.match(/^\s{0,3}(#{1,6})\s+(.*)$/))) {
+        flushPara();
+        closeList();
+        const lvl = Math.min(m[1].length + 2, 6); // ## -> h4, ### -> h5
+        out.push("<h" + lvl + ' class="prog-h">' + inline(m[2].trim()) + "</h" + lvl + ">");
+      } else if ((m = line.match(/^\s*[-*+]\s+(.*)$/))) {
+        flushPara();
+        if (listType !== "ul") {
+          closeList();
+          out.push("<ul>");
+          listType = "ul";
+        }
+        out.push("<li>" + inline(m[1].trim()) + "</li>");
+      } else if ((m = line.match(/^\s*\d+[.)]\s+(.*)$/))) {
+        flushPara();
+        if (listType !== "ol") {
+          closeList();
+          out.push("<ol>");
+          listType = "ol";
+        }
+        out.push("<li>" + inline(m[1].trim()) + "</li>");
+      } else {
+        closeList();
+        para.push(line.trim());
+      }
+    }
+    flushPara();
+    closeList();
+    return out.join("\n");
+  }
+
+  // Client-side safety net: remove any Markdown pipe table (and a preceding
+  // "### Week 1 ..." heading) from text we are about to render as the narrative.
+  // The server already strips this, but cached/older programs and adjustment
+  // responses may still contain one. Mirrors server.js stripBodyProgramTable.
+  function stripPipeTables(s) {
+    if (!s || s.indexOf("|") === -1) return s;
+    const lines = s.split("\n");
+    const isRow = (l) => /^\s*\|.*\|\s*$/.test(l);
+    const isSep = (l) => /^\s*\|[\s:|-]+\|\s*$/.test(l);
+    const isHeading = (l) =>
+      /^\s*#{1,6}\s*.*(week\s*1|training schedule|base microcycle|weekly schedule|microcycle).*$/i.test(l);
+    const out = [];
+    for (let i = 0; i < lines.length; i++) {
+      if (isRow(lines[i]) && i + 1 < lines.length && isSep(lines[i + 1])) {
+        let k = i + 2;
+        while (k < lines.length && isRow(lines[k])) k++;
+        while (out.length && out[out.length - 1].trim() === "") out.pop();
+        if (out.length && isHeading(out[out.length - 1])) out.pop();
+        while (out.length && (out[out.length - 1].trim() === "" || /^\s*-{3,}\s*$/.test(out[out.length - 1]))) out.pop();
+        while (k < lines.length && (lines[k].trim() === "" || /^\s*-{3,}\s*$/.test(lines[k]))) k++;
+        i = k - 1;
+        continue;
+      }
+      out.push(lines[i]);
+    }
+    return out.join("\n").replace(/\n{3,}/g, "\n\n");
+  }
+
   function renderProgram(program) {
     const host = $("program-render");
     if (!host) return false;
@@ -131,8 +231,13 @@
     const splitNarr = window.splitProgramNarrative;
     const rows = getTable ? getTable(program) : null;
     if (!rows || rows.length < 2) {
-      host.innerHTML = "";
-      return false; // caller falls back to raw <pre>
+      // No parseable Week 1 table (e.g. an adjustment / follow-up response).
+      // Still render the text as clean Markdown (headings, bold, lists) instead
+      // of dumping raw "###"/"**"/"| ... |" into a <pre>. We strip any leftover
+      // markdown pipe table here too, since the body should never show one.
+      const cleaned = stripPipeTables(String(program));
+      host.innerHTML = '<div class="prog-narrative">' + mdToHtml(cleaned) + "</div>";
+      return true; // we rendered it cleanly; do not fall back to raw <pre>
     }
     const parts = splitNarr ? splitNarr(program) : { before: "", after: "" };
     const frag = document.createDocumentFragment();
@@ -140,7 +245,7 @@
     if (parts.before) {
       const p = document.createElement("div");
       p.className = "prog-narrative";
-      p.textContent = parts.before;
+      p.innerHTML = mdToHtml(parts.before);
       frag.appendChild(p);
     }
 
@@ -197,7 +302,7 @@
     if (parts.after) {
       const p = document.createElement("div");
       p.className = "prog-narrative after";
-      p.textContent = parts.after;
+      p.innerHTML = mdToHtml(parts.after);
       frag.appendChild(p);
     }
 
