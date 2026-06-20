@@ -456,47 +456,241 @@ function stripBodyProgramTable(s) {
   return out.join("\n").replace(/\n{3,}/g, "\n\n");
 }
 
-// stripAndFlagFormulaViolations — best-effort post-hoc sanity check on density / static rows.
-// Looks at the TSV table block and flags rows that obviously break the per-set formulas.
-// Does NOT delete rows (engine should already have followed the formula); appends a hidden
-// QA comment line if a row looks suspicious. This is belt-and-suspenders only.
-function stripAndFlagFormulaViolations(s) {
-  if (!s || typeof s !== 'string') return s;
-  // Split off TSV block (between START_WEEK1_TSV / END_WEEK1_TSV) so we only inspect that.
-  const tsvMatch = s.match(/(START_WEEK1_TSV[\s\S]*?END_WEEK1_TSV)/);
-  if (!tsvMatch) return s;
-  const block = tsvMatch[1];
-  const lines = block.split('\n');
-  const flags = [];
-  for (const line of lines) {
-    // Look for "dip" / "pull-up" / "push-up" / "muscle-up" rep rows with very low per-set rep counts
-    // alongside a clearly higher athlete-stated max in the same line context. Best-effort regex only.
-    const lower = line.toLowerCase();
-    if (/(dip|pull-up|push-up|chin-up|muscle-up|row|squat|bench|press)/.test(lower)) {
-      const reps = (line.match(/(\d+)\s*reps?/) || [])[1];
-      const sets = (line.match(/(\d+)\s*sets?/) || [])[1];
-      if (reps && sets) {
-        const r = parseInt(reps, 10);
-        // crude heuristic: <8 reps for a non-loaded calisthenics endurance goal is suspicious
-        if (r > 0 && r < 8 && /bodyweight|bw|strict|reps to/.test(lower)) {
-          flags.push(`possible-density-undershoot: ${line.trim().slice(0, 120)}`);
-        }
-      }
-    }
-    if (/(planche|lever|handstand|hold|sit)/.test(lower)) {
-      const secs = (line.match(/(\d+)\s*s(ec(onds?)?)?\b/) || [])[1];
-      if (secs && parseInt(secs, 10) < 3) {
-        flags.push(`possible-static-undershoot: ${line.trim().slice(0, 120)}`);
-      }
-    }
-  }
-  if (flags.length === 0) return s;
-  // Append flags as a hidden HTML comment (won't render in client UI)
-  return s + '\n<!-- QA_FORMULA_FLAGS: ' + flags.join(' | ') + ' -->\n';
+// ---------------------------------------------------------------------------
+// Formula validator (defense-in-depth for the two HARD INTENSITY RULES)
+// ---------------------------------------------------------------------------
+// The engine instructions are the primary lever; this is the server-side net.
+// It parses the athlete intake for current-max benchmarks (reps per movement,
+// hold seconds per static position) and checks each TSV density/static row's
+// per-set load against the mandated bands:
+//   - rep-endurance/density: per-set reps must be 65-85% of CURRENT max reps.
+//       We flag below 60% (junk dose) or above 90% (over the band / unsafe).
+//   - static hold (TUT): per-set hold must be 40-70% of CURRENT max hold sec.
+//       We flag above 90% of current max (and above current max outright).
+// When current-max for a row cannot be parsed, that row is SKIPPED (we never
+// false-positive on missing data). It never deletes rows or touches the privacy
+// scrub; it is detection-only and returns a structured violation count + flags.
+
+const STATIC_TERMS = [
+  "hold", "iron cross", "planche", "lever", "l-sit", "l sit", "lsit",
+  "handstand", "tuck", "straddle", "maltese", "victorian", "manna",
+];
+const DENSITY_LABELS = ["density", "endurance", "submaximal", "submax"];
+
+// Canonical movement buckets -> keyword aliases used to match an intake max to a row.
+const MOVEMENT_ALIASES = {
+  "push-up": ["push-up", "push up", "pushup", "press-up", "pressup"],
+  "pull-up": ["pull-up", "pull up", "pullup", "chin-up", "chin up", "chinup"],
+  "dip": ["dip"],
+  "muscle-up": ["muscle-up", "muscle up", "muscleup"],
+  "squat": ["squat"],
+  "row": ["inverted row", "bodyweight row", " row"],
+  "iron cross": ["iron cross"],
+  "planche": ["planche"],
+  "front lever": ["front lever"],
+  "back lever": ["back lever"],
+  "lever": ["lever"],
+  "handstand": ["handstand", "hspu"],
+  "l-sit": ["l-sit", "l sit", "lsit"],
+};
+
+// Pull every string field out of the (possibly nested) intake so we can scan
+// it for "<N> <movement>" rep maxes and "<N>s <position>" hold maxes.
+function collectIntakeStrings(intake) {
+  const out = [];
+  const walk = (v) => {
+    if (v == null) return;
+    if (typeof v === "string") { out.push(v); return; }
+    if (typeof v === "number") { out.push(String(v)); return; }
+    if (Array.isArray(v)) { v.forEach(walk); return; }
+    if (typeof v === "object") { Object.values(v).forEach(walk); return; }
+  };
+  // Prioritise the fields most likely to hold the current benchmark, but fall
+  // back to scanning everything (current_strength / goal_specifics / etc.).
+  const priority = [
+    "current_strength", "current", "goal_specifics", "goal_primary",
+    "primary_goals", "secondary_goals", "notes",
+  ];
+  for (const k of priority) if (intake && intake[k] != null) walk(intake[k]);
+  walk(intake);
+  return out;
 }
 
-function privacyScrub(text) {
+// Find which canonical movement a piece of text refers to (first alias hit).
+function matchMovement(text) {
+  const lower = (text || "").toLowerCase();
+  for (const [canon, aliases] of Object.entries(MOVEMENT_ALIASES)) {
+    if (aliases.some((a) => lower.includes(a))) return canon;
+  }
+  return null;
+}
+
+// Parse current-max benchmarks from the intake.
+//  - current_max_reps: { movement -> reps }  (largest stated number per movement)
+//  - current_max_hold_sec: { position -> seconds } (largest stated hold per position)
+function parseCurrentMax(intake) {
+  const reps = {};
+  const holdSec = {};
+  if (!intake || typeof intake !== "object") return { reps, holdSec };
+  const strings = collectIntakeStrings(intake);
+  for (const raw of strings) {
+    const text = String(raw);
+    const lower = text.toLowerCase();
+
+    // Hold seconds: "5s straddle", "2 sec iron cross", "20-second handstand".
+    // The CURRENT max hold is the benchmark we want; a goal hold ("want 20s")
+    // is larger and must NOT be taken as the max. Use the same current-vs-goal
+    // disambiguation as reps: skip goal-phrased numbers, and when ambiguous keep
+    // the SMALLER value (current ability is the lower of current vs goal).
+    const holdRe = /(\d+(?:\.\d+)?)\s*(?:s\b|sec\b|secs\b|second[s]?\b|-second)/gi;
+    let hm;
+    while ((hm = holdRe.exec(lower)) !== null) {
+      const val = parseFloat(hm[1]);
+      if (!Number.isFinite(val) || val <= 0) continue;
+      // Look at a window around the number for a static position name.
+      const around = lower.slice(Math.max(0, hm.index - 40), hm.index + 40);
+      if (!STATIC_TERMS.some((t) => around.includes(t))) continue;
+      const isGoalish = /\b(want|goal|target|aim|reach|chasing|get to)\b/.test(around);
+      const isCurrentish = /\b(max|current|now|currently|best|can hold|hold for|clean)\b/.test(around) || /\bmax\b/.test(lower);
+      if (isGoalish && !isCurrentish) continue; // a pure goal number, not the max
+      const mv = matchMovement(around) || STATIC_TERMS.find((t) => around.includes(t));
+      if (!mv) continue;
+      if (!(mv in holdSec)) holdSec[mv] = val;
+      else holdSec[mv] = Math.min(holdSec[mv], val); // current max is the lower one
+    }
+
+    // Rep maxes: "20 push-ups max", "max 20 push-ups", "20 strict push-ups".
+    // Only treat as a CURRENT max when the context reads like a current ability,
+    // not a goal target (avoid "want 100 push-ups").
+    const repRe = /(\d+)\s*(push-?ups?|pull-?ups?|chin-?ups?|dips?|muscle-?ups?|squats?|rows?|reps?)/gi;
+    let rm;
+    while ((rm = repRe.exec(lower)) !== null) {
+      const val = parseInt(rm[1], 10);
+      if (!Number.isFinite(val) || val <= 0) continue;
+      const around = lower.slice(Math.max(0, rm.index - 30), rm.index + 30);
+      // Skip obvious goal phrasing ("want", "goal", "target", "in one set" as a target).
+      const isGoalish = /\b(want|goal|target|aim|reach|chasing|get to)\b/.test(around);
+      const isCurrentish = /\b(max|current|now|currently|best|strict|can do|hit)\b/.test(around) || /max/.test(lower);
+      const mv = matchMovement(around);
+      if (!mv) continue;
+      // Prefer current-context numbers; if both a current and a goal number exist
+      // for the same movement, keep the SMALLER (current is the lower benchmark).
+      if (isGoalish && !isCurrentish) continue;
+      if (!(mv in reps)) reps[mv] = val;
+      else reps[mv] = Math.min(reps[mv], val); // current max is the lower of the two
+    }
+  }
+  return { reps, holdSec };
+}
+
+// Parse the TSV machine block into header + rows (tab- or comma-delimited).
+function parseTsvBlock(block) {
+  const inner = block
+    .replace(/^[\s\S]*?START_WEEK1_TSV/i, "")
+    .replace(/END_WEEK1_TSV[\s\S]*$/i, "")
+    .trim();
+  const lines = inner.split("\n").map((l) => l.replace(/\r$/, "")).filter((l) => l.trim());
+  if (lines.length < 2) return null;
+  const delim = lines[0].includes("\t") ? "\t" : lines[0].includes(",") ? "," : null;
+  if (!delim) return null;
+  const cells = (l) => l.split(delim).map((c) => c.trim());
+  const header = cells(lines[0]).map((h) => h.toLowerCase());
+  const rows = lines.slice(1).map(cells);
+  return { header, rows, delim };
+}
+
+// Pull the first per-set number from a cell like "13", "13-17", "3x15", "5s", "0.8-1.4s".
+function firstNumber(str) {
+  const m = String(str || "").match(/(\d+(?:\.\d+)?)/);
+  return m ? parseFloat(m[1]) : null;
+}
+
+function stripAndFlagFormulaViolations(s, intake) {
+  if (!s || typeof s !== "string") return { violations: 0, flags: [] };
+  const tsvMatch = s.match(/(START_WEEK1_TSV[\s\S]*?END_WEEK1_TSV)/);
+  if (!tsvMatch) return { violations: 0, flags: [] };
+
+  const { reps: maxReps, holdSec: maxHold } = parseCurrentMax(intake);
+  const parsed = parseTsvBlock(tsvMatch[1]);
+  if (!parsed) return { violations: 0, flags: [] };
+
+  const idx = (name) => parsed.header.indexOf(name);
+  const exIdx = idx("exercise");
+  // Reps / hold can live under a few header names depending on the column set.
+  const repsIdx = [idx("reps"), idx("reps/duration"), idx("duration")].find((i) => i >= 0);
+  const notesIdx = idx("notes");
+
+  const flags = [];
+  for (const row of parsed.rows) {
+    const exercise = (exIdx >= 0 ? row[exIdx] : row.join(" ")) || "";
+    const notes = (notesIdx >= 0 ? row[notesIdx] : "") || "";
+    const repsCell = repsIdx >= 0 ? row[repsIdx] : "";
+    const ctx = (exercise + " " + notes + " " + repsCell).toLowerCase();
+
+    const isStatic = STATIC_TERMS.some((t) => ctx.includes(t));
+    const isDensityLabeled = DENSITY_LABELS.some((t) => ctx.includes(t));
+    const movement = matchMovement(ctx);
+
+    if (isStatic) {
+      // Static-hold TUT check (only when we know the athlete's current max hold).
+      let benchmark = movement && movement in maxHold ? maxHold[movement] : null;
+      if (benchmark == null) {
+        const term = STATIC_TERMS.find((t) => ctx.includes(t) && t in maxHold);
+        if (term) benchmark = maxHold[term];
+      }
+      if (benchmark == null || benchmark <= 0) continue; // unparseable -> skip
+      const holdVal = firstNumber(repsCell);
+      if (holdVal == null) continue;
+      if (holdVal > benchmark * 0.9 || holdVal > benchmark) {
+        flags.push(
+          `static-TUT-over-band: "${exercise.slice(0, 40)}" prescribes ${holdVal}s vs current max ${benchmark}s (band 40-70% = ${(benchmark * 0.4).toFixed(1)}-${(benchmark * 0.7).toFixed(1)}s)`
+        );
+      }
+      continue;
+    }
+
+    // Rep-endurance / density check. Only run when the row is density/endurance
+    // labeled OR the movement clearly has a current rep max we can anchor to.
+    const repBenchmark = movement && movement in maxReps ? maxReps[movement] : null;
+    if (repBenchmark == null || repBenchmark <= 0) continue; // unparseable -> skip
+    if (!isDensityLabeled && !movement) continue;
+    const repsVal = firstNumber(repsCell);
+    if (repsVal == null || repsVal <= 0) continue;
+    if (repsVal < 0.6 * repBenchmark || repsVal > 0.9 * repBenchmark) {
+      flags.push(
+        `density-reps-out-of-band: "${exercise.slice(0, 40)}" prescribes ${repsVal} reps vs current max ${repBenchmark} (band 65-85% = ${Math.round(repBenchmark * 0.65)}-${Math.round(repBenchmark * 0.85)})`
+      );
+    }
+  }
+
+  // Detection only: never mutate the program here. privacyScrub owns final
+  // output assembly and appends the hidden violation-count marker once.
+  return { violations: flags.length, flags };
+}
+
+// Extract the violation count embedded by the validator (for _meta.violations).
+function readViolationCount(program) {
+  if (!program || typeof program !== "string") return 0;
+  const m = program.match(/QA_FORMULA_VIOLATION_COUNT:\s*(\d+)/);
+  return m ? parseInt(m[1], 10) : 0;
+}
+
+function privacyScrub(text, intake) {
   if (!text) return text;
+
+  // Formula validator (defense-in-depth) runs on the FULL text first, because
+  // it must inspect the START_WEEK1_TSV row block. It anchors per-set loads to
+  // the athlete's current-max benchmarks parsed from the intake. It never edits
+  // the program; it returns a violation count + flags, which we log server-side
+  // and surface as a hidden marker on the output (read back into _meta.violations).
+  const fv = stripAndFlagFormulaViolations(text, intake);
+  if (fv.violations > 0) {
+    console.warn(
+      `[engine recalibration] ${fv.violations} formula-band violation(s) detected:\n  - ` +
+        fv.flags.join("\n  - ")
+    );
+  }
+
   // Split off the TSV machine block so we never alter its STRUCTURE.
   const startIdx = text.indexOf("START_WEEK1_TSV");
   let prose = startIdx === -1 ? text : text.slice(0, startIdx);
@@ -505,7 +699,6 @@ function privacyScrub(text) {
   // Remove any redundant Week 1 program table from the narrative body (the
   // client renders the week from the TSV block only). Deterministic guarantee.
   prose = stripBodyProgramTable(prose);
-  prose = stripAndFlagFormulaViolations(prose);  // NEW
 
   // Strip forbidden internal columns from the markdown table in the prose part.
   prose = stripForbiddenColumns(prose);
@@ -523,7 +716,13 @@ function privacyScrub(text) {
   // these only swap whole words, never touch tabs, newlines, or column count).
   if (tsv) tsv = scrubForbiddenWords(fixInvalidExerciseNames(tsv));
 
-  return tsv ? prose.trim() + "\n\n" + tsv : prose.trim();
+  let out = tsv ? prose.trim() + "\n\n" + tsv : prose.trim();
+  // Append the hidden violation-count marker so _meta.violations can be exposed
+  // downstream without a DB schema change. Never rendered in the client UI.
+  if (fv.violations > 0) {
+    out += "\n<!-- QA_FORMULA_VIOLATION_COUNT: " + fv.violations + " -->";
+  }
+  return out;
 }
 
 // ---------- App ----------
@@ -563,7 +762,7 @@ app.get("/api/health", (req, res) => {
 
 async function runBuildJob(jobId, token, intake) {
   try {
-    const program = privacyScrub(await runEngine(buildPrompt(intake)));
+    const program = privacyScrub(await runEngine(buildPrompt(intake)), intake);
     const now = Date.now();
     const intakeJSON = JSON.stringify(intake);
     await store.upsertClient(token, intakeJSON, program, now);
@@ -581,7 +780,7 @@ async function runAdjustJob(jobId, token, changeRequest) {
     const client = await store.getClient(token);
     if (!client) throw new Error("No saved program for this client yet.");
     const intake = JSON.parse(client.intake);
-    const program = privacyScrub(await runEngine(adjustPrompt(intake, client.program, changeRequest)));
+    const program = privacyScrub(await runEngine(adjustPrompt(intake, client.program, changeRequest)), intake);
     const now = Date.now();
     await store.updateClientProgram(token, program, now);
     await store.addHistory(token, "adjust", changeRequest, program, now);
@@ -660,6 +859,7 @@ app.get("/api/job/:id", async (req, res) => {
     status: job.status, // pending | done | error
     program: job.status === "done" ? job.program : undefined,
     error: job.status === "error" ? job.error : undefined,
+    _meta: job.status === "done" ? { violations: readViolationCount(job.program) } : undefined,
   });
 });
 
@@ -672,6 +872,7 @@ app.get("/api/program/:token", async (req, res) => {
     intake: JSON.parse(client.intake),
     program: client.program,
     updated_at: client.updated_at,
+    _meta: { violations: readViolationCount(client.program) },
   });
 });
 
