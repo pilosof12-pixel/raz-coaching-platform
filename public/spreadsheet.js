@@ -110,8 +110,11 @@
     };
   }
 
-  async function buildStrengthSpreadsheet(text) {
+    async function buildStrengthSpreadsheet(text) {
     if (!window.ExcelJS) throw new Error("Spreadsheet engine did not load. Check your connection and try again.");
+    if (window.ExerciseDemos && window.ExerciseDemos.load) {
+      try { await window.ExerciseDemos.load(); } catch (e) { console.warn("Exercise demos failed to load, falling back to search:", e); }
+    }
     const rows = extractRows(text);
     const workbook = new ExcelJS.Workbook();
     workbook.creator = "Raz Pilosof Strength Program Coaching Engine";
@@ -124,7 +127,7 @@
     [12, 34, 24, 8, 12, 10, 12, 50, 18].forEach((width, i) => { paste.getColumn(i + 1).width = width; });
     readme.getColumn(1).width = 4;
     readme.getColumn(2).width = 100;
-    rows.forEach((row, rIdx) => {
+        rows.forEach((row, rIdx) => {
       const r = paste.getRow(rIdx + 1);
       row.forEach((value, cIdx) => {
         const cell = r.getCell(cIdx + 1);
@@ -133,14 +136,34 @@
           fill: rIdx === 0 ? "FF1F4E78" : "FFFFFFFF",
           font: { name: "Calibri", size: rIdx === 0 ? 11 : 10, bold: rIdx === 0, color: { argb: rIdx === 0 ? "FFFFFFFF" : "FF111111" } }
         });
+        // Hyperlink Exercise column (cIdx 1 = column 2) on data rows
+        if (rIdx > 0 && cIdx === 1 && value && window.ExerciseDemos) {
+          const demo = window.ExerciseDemos.resolveExerciseDemo(value);
+          if (demo && demo.url) {
+            cell.value = { text: value, hyperlink: demo.url, tooltip: "Open demo in YouTube (use incognito to avoid watch-history)" };
+            cell.font = { name: "Calibri", size: 10, color: { argb: "FF0563C1" }, underline: true };
+          }
+        }
       });
       r.height = rIdx === 0 ? 22 : 28;
     });
-    paste.views = [{ state: "frozen", ySplit: 1 }];
+     paste.views = [{ state: "frozen", ySplit: 1 }];
     readme.getCell("B2").value = "Strength Block Spreadsheet";
     readme.getCell("B2").font = { name: "Calibri", size: 20, bold: true, color: { argb: "FF000000" } };
     readme.getCell("B4").value = "Created by the AI Coaching Engine. Use the Strength Block sheet for the client-facing program. Use the black Results column to record completed work.";
     readme.getCell("B4").alignment = { wrapText: true };
+
+    // Privacy disclosure for embedded YouTube demo hyperlinks
+    readme.getCell("B6").value = "Exercise Demo Links — Privacy Notice";
+    readme.getCell("B6").font = { name: "Calibri", size: 12, bold: true, color: { argb: "FF000000" } };
+    const disclosure = (window.ExerciseDemos && window.ExerciseDemos.getPrivacyDisclosure)
+      ? window.ExerciseDemos.getPrivacyDisclosure()
+      : "Exercise demos open in YouTube. To keep them out of your watch history, open them in incognito/private mode, or replace 'youtube.com' with 'youtube-nocookie.com' in the URL.";
+    readme.getCell("B7").value = disclosure;
+    readme.getCell("B7").alignment = { wrapText: true, vertical: "top" };
+    readme.getCell("B7").font = { name: "Calibri", size: 10, color: { argb: "FF333333" } };
+    readme.getRow(7).height = 60;
+
     for (let r = 1; r <= 90; r++) {
       ws.getRow(r).height = r < 15 ? 14 : 18;
       for (let c = 1; c <= 9; c++) {
@@ -193,14 +216,23 @@
       currentDay = day;
       const r = ws.getRow(excelRow);
       r.height = 38;
-      for (let c = 2; c <= 8; c++) {
+        for (let c = 2; c <= 8; c++) {
         const cell = r.getCell(c);
-        cell.value = row[c - 1] || "";
+        const rawValue = row[c - 1] || "";
+        cell.value = rawValue;
         styleCell(cell, {
           fill: "FFEDEDED",
           font: { name: "Calibri", size: 9, bold: c === 2 || c === 7, color: { argb: c === 7 ? "FF0E9C91" : "FF111111" } },
           alignment: { horizontal: [2, 3, 8].includes(c) ? "left" : "center", vertical: "middle", wrapText: true }
         });
+        // Hyperlink the Exercise column (col 2) to a video demo
+        if (c === 2 && rawValue && window.ExerciseDemos) {
+          const demo = window.ExerciseDemos.resolveExerciseDemo(rawValue);
+          if (demo && demo.url) {
+            cell.value = { text: rawValue, hyperlink: demo.url, tooltip: "Open demo in YouTube (use incognito to avoid watch-history)" };
+            cell.font = { name: "Calibri", size: 9, bold: true, color: { argb: "FF0563C1" }, underline: true };
+          }
+        }
       }
       const resultCell = r.getCell(9);
       resultCell.value = "";
