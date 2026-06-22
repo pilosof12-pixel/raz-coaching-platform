@@ -194,6 +194,200 @@
     "dead_hang": { "canonical": "Dead Hang", "demo_url": null, "channel": null, "aliases": ["passive_hang"] },
     "cat_cow": { "canonical": "Cat-Cow", "demo_url": null, "channel": null, "aliases": ["cat_camel"] },
     "diaphragmatic_breathing": { "canonical": "Diaphragmatic Breathing", "demo_url": null, "channel": null, "aliases": ["belly_breathing","crocodile_breathing"] },
-    "worlds_greatest_stretch": { "canonical": "World's Greatest Stretch", "demo_url": null, "channel": null, "aliases": ["wgs"] }
-  }
-}
+    "worlds_greatest_stretch": { "canonical": "World's Greatest Stretch", "demo_url": null, "channel": null, "aliases": ["wgs"] },
+
+"sled_push": {
+  "name": "Sled Push (Prowler)",
+  "url": "https://www.youtube.com/watch?v=pv4JY9ke2Tg",
+  "source": "Strongman Coach"
+},
+"sled_drag": {
+  "name": "Backward Sled Drag",
+  "url": "https://www.youtube.com/watch?v=hbCeJFBFyYk",
+  "source": "Strength Coach"
+},
+"sled_pull": {
+  "name": "Sled Pull (Forward Harness)",
+  "url": "https://www.youtube.com/watch?v=AUbTajVA_Cg",
+  "source": "10 Sled Variations"
+},
+"single_leg_sled_drag": {
+  "name": "Single-Leg Sled Drag",
+  "url": "https://www.youtube.com/watch?v=AdAOLFSW__s",
+  "source": "Strength Coach"
+},
+"farmers_carry": {
+  "name": "Farmer's Carry",
+  "url": "https://www.youtube.com/watch?v=Kh0871u60z0",
+  "source": "Strongman Tutorial"
+},
+"yoke_walk": {
+  "name": "Yoke Walk",
+  "url": "https://www.youtube.com/watch?v=VkYj9uWZLiQ",
+  "source": "Liefia Ingalls — Strongwoman"
+},
+"atlas_stone": {
+  "name": "Atlas Stone Load",
+  "url": "https://www.youtube.com/watch?v=9eapa0eef3E",
+  "source": "Brian Alsruhe"
+},
+    "snatch": {
+  "name": "Snatch (Full)",
+  "url": "https://www.youtube.com/watch?v=ygoz0ANCcto",
+  "source": "Torokhtiy Weightlifting"
+},
+"hang_snatch": {
+  "name": "Hang Snatch",
+  "url": "https://www.catalystathletics.com/exercise/63/Hang-Snatch/",
+  "source": "Catalyst Athletics"
+},
+"hang_power_snatch": {
+  "name": "Hang Power Snatch",
+  "url": "https://www.youtube.com/watch?v=RzYvb5IRHvs",
+  "source": "Catalyst Athletics"
+},
+"high_hang_snatch": {
+  "name": "High Hang Snatch",
+  "url": "https://www.youtube.com/watch?v=kig_B5CPhQo",
+  "source": "Catalyst Athletics"
+},
+"tall_snatch": {
+  "name": "Tall Snatch",
+  "url": "https://www.catalystathletics.com/exercise/217/Tall-Snatch/",
+  "source": "Catalyst Athletics"
+},
+"hang_muscle_snatch": {
+  "name": "Hang Muscle Snatch",
+  "url": "https://www.catalystathletics.com/exercise/465/Hang-Muscle-Snatch/",
+  "source": "Catalyst Athletics"
+},
+"snatch_pull": {
+  "name": "Snatch Pull",
+  "url": "https://www.youtube.com/watch?v=hi9M6V83j9U",
+  "source": "Torokhtiy Weightlifting"
+},
+"clean_pull_from_power_position": {
+  "name": "Clean Pull from Power Position",
+  "url": "https://www.catalystathletics.com/exercise/657/Clean-Pull-From-Power-Position/",
+  "source": "Catalyst Athletics"
+},
+"clean_segment_pull": {
+  "name": "Clean Segment Pull",
+  "url": "https://www.catalystathletics.com/exercise/322/Clean-Segment-Pull/",
+  "source": "Catalyst Athletics"
+},
+"overhead_squat": {
+  "name": "Overhead Squat",
+  "url": "https://www.catalystathletics.com/exercise/79/Overhead-Squat/",
+  "source": "Catalyst Athletics"
+},
+"snatch_balance": {
+  "name": "Snatch Balance",
+  "url": "https://www.youtube.com/watch?v=8TzXVhZiBuI",
+  "source": "Torokhtiy Weightlifting"
+},
+"snatch_push_press": {
+  "name": "Snatch Push Press + OHS",
+  "url": "https://www.youtube.com/watch?v=8TzXVhZiBuI",
+  "source": "Torokhtiy Weightlifting"
+},
+    "kb_swing": {
+  "name": "Kettlebell Swing (Hardstyle)",
+  "url": "https://www.youtube.com/watch?v=PAhDt_0PjP4",
+  "source": "StrongFirst"
+},
+"kb_clean": {
+  "name": "Kettlebell Clean",
+  "url": "https://www.youtube.com/watch?v=erzURVCRcAk",
+  "source": "StrongFirst"
+},
+"kb_snatch": {
+  "name": "Kettlebell Snatch",
+  "url": "https://www.youtube.com/watch?v=AR6E01ABoHk",
+  "source": "StrongFirst"
+},
+"turkish_get_up": {
+  "name": "Turkish Get-Up",
+  "url": "https://www.youtube.com/watch?v=0bWRPC49-KI",
+  "source": "StrongFirst — Brett Jones"
+},
+"kb_clean_and_jerk": {
+  "name": "Kettlebell Clean & Jerk",
+  "url": "https://www.youtube.com/watch?v=tu-VfhP3B3Y",
+  "source": "StrongFirst"
+},
+"kb_deadlift": {
+  "name": "Kettlebell Deadlift",
+  "url": "https://www.youtube.com/watch?v=Ax4PPdacf74",
+  "source": "StrongFirst"
+},
+"kb_goblet_squat": {
+  "name": "Goblet Squat",
+  "url": "https://www.youtube.com/watch?v=MJRWRfQRBcI",
+  "source": "StrongFirst"
+},
+"kb_press": {
+  "name": "Kettlebell Military Press",
+  "url": "https://www.youtube.com/watch?v=Us6xQzMuIMQ",
+  "source": "StrongFirst — Brett Jones"
+},
+    "back_lever": {
+  "name": "Back Lever",
+  "url": "https://www.youtube.com/watch?v=PFALmtU6J6U",
+  "source": "FitnessFAQs"
+},
+"front_lever": {
+  "name": "Front Lever",
+  "url": "https://www.youtube.com/watch?v=WexxsNvvcsw",
+  "source": "FitnessFAQs"
+},
+"skin_the_cat": {
+  "name": "Skin the Cat",
+  "url": "https://www.youtube.com/watch?v=HXaG8mJmSnU",
+  "source": "FitnessFAQs"
+},
+"german_hang": {
+  "name": "German Hang",
+  "url": "https://www.youtube.com/watch?v=ePStMMI5Ye4",
+  "source": "FitnessFAQs"
+},
+"ring_muscle_up": {
+  "name": "Ring Muscle-Up (Strict)",
+  "url": "https://www.youtube.com/watch?v=S2ohHaHFg7g",
+  "source": "FitnessFAQs"
+},
+"ring_dip": {
+  "name": "Ring Dip",
+  "url": "https://www.youtube.com/watch?v=Ikeg_v5fvz4",
+  "source": "FitnessFAQs"
+},
+"false_grip_pull_up": {
+  "name": "False Grip Pull-Up",
+  "url": "https://www.youtube.com/watch?v=KDgmWq0V90c",
+  "source": "FitnessFAQs"
+},
+"handstand": {
+  "name": "Freestanding Handstand",
+  "url": "https://www.youtube.com/watch?v=Y3FSeSecjKA",
+  "source": "GMB Fitness"
+},
+"press_to_handstand": {
+  "name": "Press to Handstand",
+  "url": "https://www.youtube.com/watch?v=SfLaCKaljU4",
+  "source": "GMB Fitness"
+},
+"handstand_push_up": {
+  "name": "Handstand Push-Up",
+  "url": "https://www.youtube.com/watch?v=nk-bjYYZVaE",
+  "source": "FitnessFAQs"
+},
+"one_arm_handstand": {
+  "name": "One-Arm Handstand",
+  "url": "https://gmb.io/oahs/",
+  "source": "GMB Fitness"
+},
+"l_sit": {
+  "name": "L-Sit",
+  "url": "https://www.youtube.com/watch?v=otLf0tw8vYE",
+  "source": "FitnessFAQs"
+},
