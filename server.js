@@ -245,6 +245,95 @@ const INTAKE_HANDLING_RULES = [
   "- 'days_per_week' is the number of GYM training days. Build exactly that many gym sessions. Never override it.",
 ].join("\n");
 
+// =================================================================
+// PERIODISATION + DENSITY + SPORT-DAY HARD PRESCRIPTION RULES (v11)
+// =================================================================
+// These are POSITIVE PRESCRIPTION GATES, not advisory text. The engine
+// instructions describe the WHAT (models, methods); these rules describe
+// the HOW for THIS request: the model must SELECT, COMMIT, and APPLY one
+// periodisation model and the correct density/endurance methods, with
+// session structure driven by the sport_schedule. The output contract
+// still hides the labels from the client; these gates only force the
+// model to ACTUALLY USE the knowledge layer instead of treating it as
+// reference material.
+
+const PERIODISATION_PRESCRIPTION_RULES = [
+  "=== PERIODISATION MODEL SELECTION (MANDATORY) ===",
+  "Before writing ANY rows, you MUST internally choose ONE periodisation model for this 4-week block and document the choice + rationale in your hidden reasoning. Selection is driven by athlete profile, NOT by default:",
+  "",
+  "  * BEGINNER (training_age < 1 yr OR low current_strength benchmarks): LINEAR PROGRESSION. Same lifts each week, add reps or small load weekly. Do NOT use DUP or conjugate, the athlete cannot recover from the variation.",
+  "",
+  "  * INTERMEDIATE (1-3 yr training_age, multiple primary goals, mixed strength + sport): DAILY UNDULATING PERIODISATION (DUP). Vary rep ranges across the week per movement pattern (e.g. squat heavy day, squat moderate day, squat speed day). DUP is the default for hybrid athletes balancing strength + a sport.",
+  "",
+  "  * ADVANCED + STRENGTH-DOMINANT GOAL (3+ yr, max strength is a primary goal, days_per_week >= 4): CONJUGATE (Westside ME/DE split). Maximal Effort day = work up to a heavy single or triple on a main lift variation (>=90% effort, RPE 8-9). Dynamic Effort day = speed-strength, 50-60% load moved with intent, short rests, multiple sets of low reps. Repeated Effort = hypertrophy assistance at 65-85% of max reps.",
+  "",
+  "  * ADVANCED + MULTIPLE COMPETING PRIORITIES (3+ yr, e.g. strength + grappling/MMA + endurance): BLOCK PERIODISATION inside the 4-week microcycle. Week 1-2 emphasises one quality, week 3 emphasises the second, week 4 is a deload OR a peak depending on phase.",
+  "",
+  "  * MASTERS (40+) OR RECOVERY-LIMITED (high-stress life, poor sleep flagged in intake): HIGH/LOW (Charlie Francis model). Strict separation of HIGH CNS days (heavy lifting, sprint, hard sport) from LOW CNS days (tempo, mobility, technique, Zone 2). Never two HIGH days back-to-back.",
+  "",
+  "Once selected, EVERY day's prescription must visibly reflect the model. If you picked DUP, the heavy/moderate/speed character of each squat or press day must be evident in the Sets/Reps/Load columns. If you picked Conjugate, the week must contain at least one ME-style row and one DE-style row per main movement pattern. The client never sees the model name (it lives in plain Notes language like 'heavy day', 'speed day', 'recovery focus'), but the structure must be present.",
+  "",
+  "If your selection conflicts with days_per_week (e.g. Conjugate needs 4 days minimum), drop to the next-best model and note WHY in your hidden reasoning.",
+].join("\n");
+
+const DENSITY_AND_ENDURANCE_RULES = [
+  "=== DENSITY, ENDURANCE & SUBMAXIMAL METHOD ASSIGNMENT (MANDATORY) ===",
+  "The intake will frequently contain endurance, work-capacity, calisthenics-volume, conditioning, or grappling-gas-tank goals. For EACH such goal, you MUST include AT LEAST ONE qualifying row per week in the Week 1 TSV. Qualifying methods:",
+  "",
+  "  * REP-ENDURANCE / DENSITY SETS: per-set reps in the 65-85% of current max reps band. Use for bodyweight strength-endurance goals (push-up, pull-up, dip volume; muscle-up volume; squat reps). Format: 'AMRAP at RPE 8' or '3 sets of N reps' where N sits in the band. The formula validator will flag rows outside 60-90%.",
+  "",
+  "  * EMOM (Every Minute On the Minute): for conditioning, work-capacity, sport-specific gas. Format: 'EMOM 10 min: 5 reps' or '10 rounds, on the minute'. Choose load/reps so the athlete finishes each round with 15-30s rest.",
+  "",
+  "  * AMRAP DENSITY BLOCK: 'As many rounds as possible in X minutes' with a fixed couplet/triplet. Use for grappling/MMA gas, hybrid-athlete conditioning.",
+  "",
+  "  * TEMPO INTERVALS / ZONE 2 / MAS WORK: for aerobic base, recovery, masters athletes, and any 'lose fat / improve cardio' goal. Format: 'Zone 2 30-45 min' or 'Tempo: 6x200m at 75% effort, 60s rest'. Place on LOW CNS days when High/Low model is in effect.",
+  "",
+  "  * THRESHOLD / VO2 INTERVALS: for athletes with measurable cardio goals (5k time, fight conditioning). 4-6 min hard / equal rest, 3-5 rounds.",
+  "",
+  "  * STATIC HOLD / TUT: for gymnastics holds (planche, lever, L-sit, handstand). Per-set hold seconds must sit in the 40-70% of current max hold band. The formula validator will flag rows above 90% of max hold.",
+  "",
+  "ASSIGNMENT LOGIC:",
+  "  - Calisthenics-skill goal (muscle-up, OAP, HSPU) -> minimum 1 density row + 1 skill/strength row per week.",
+  "  - Grappling/MMA/BJJ gas-tank goal -> minimum 1 EMOM or AMRAP density block per week, scheduled on a moderate or non-sport day.",
+  "  - Hypertrophy goal -> Repeated Effort (8-15 reps at 65-80% intensity) is the bulk of work, with density rows as accessory finishers.",
+  "  - Max strength goal -> ME or top-set work is primary; density/endurance rows are NOT the main driver here, but 1 sub-max accessory row per movement pattern is still appropriate.",
+  "  - Endurance / fat loss / Zone 2 goal -> minimum 2 aerobic rows (Zone 2 OR threshold OR MAS) per week.",
+  "",
+  "If a primary goal would NORMALLY demand a density/endurance row and you omit it, that is a HARD FAIL of the goal-coverage gate. The validator runs server-side and will surface QA_FORMULA_VIOLATION markers in _meta.",
+].join("\n");
+
+const SPORT_DAY_COUPLING_RULES = [
+  "=== SPORT-DAY COUPLING (MANDATORY POSITIVE RULES) ===",
+  "The intake's sport_schedule is the SKELETON the gym week wraps around. Sport days are real training stress with measurable CNS, muscular, and joint cost. Apply these rules in ORDER:",
+  "",
+  "STEP 1: Classify each calendar day:",
+  "  - HARD sport day: high-intensity sparring, hard rolling, competition prep, hard run, hard MMA. Treat as a HIGH CNS day.",
+  "  - MODERATE sport day: technical drilling, positional sparring, moderate run, skill sport. Treat as MODERATE CNS.",
+  "  - LIGHT sport day: flow rolling, mobility, light technique, easy aerobic. Treat as LOW CNS.",
+  "  - NON-sport day: pure gym or rest.",
+  "",
+  "STEP 2: Place gym sessions by CNS demand:",
+  "  - On a HARD sport day: gym session MUST be one of: (a) Dynamic Effort speed-strength work (low volume, high intent, sub-60% loads), (b) skill/technique only (gymnastic positions, Oly technique under 70%), (c) light upper-body accessory if sport was lower-body dominant, or (d) recovery/mobility. ABSOLUTELY NO heavy bilateral squat/deadlift, no ME-style top sets, no high-volume hypertrophy on the same day as a HARD sport session.",
+  "  - On a MODERATE sport day: Repeated Effort hypertrophy or moderate-volume work is fine. Avoid ME on the same day.",
+  "  - On a LIGHT sport day: any gym work is permissible, including ME if the model calls for it.",
+  "  - On a NON-sport day: this is your primary slot for ME, heavy compound work, or the highest-density density block of the week.",
+  "",
+  "STEP 3: Manage weekly fatigue budget:",
+  "  - Count HARD sport days as full training days for fatigue purposes.",
+  "  - Total HIGH CNS exposures per week (HARD sport + ME gym + DE gym) should not exceed: 3 for masters/recovery-limited, 4 for intermediate hybrid, 5 for advanced strength-dominant.",
+  "  - Never schedule two HARD sport days back-to-back AND a gym ME day in the same 72-hour window.",
+  "  - If days_per_week (gym) + HARD sport days exceeds the weekly HIGH CNS budget, REDUCE gym intensity that week (more DE, less ME), do not drop days.",
+  "",
+  "STEP 4: Volume calibration against the FULL load:",
+  "  - For athletes with 3+ sport days per week, total weekly hard sets per muscle group should sit at 8-14 (maintenance to slight growth), NOT 16-22 (which is for non-sport athletes).",
+  "  - For athletes with 5+ sport days per week (e.g. competitive grappler training daily), drop to 6-10 hard sets per muscle group, prioritise compound movements only, drop most isolation work.",
+  "  - For athletes with 0-1 sport days, full hypertrophy volume (12-20 hard sets per muscle group) is appropriate if hypertrophy is a primary goal.",
+  "",
+  "STEP 5: Document the rhythm:",
+  "  - In the client-facing intro paragraph (plain language, NO labels), state which days are heavy/moderate/easy and WHY they are placed where they are relative to their sport days. Example acceptable wording: 'Tuesday is your heaviest lifting day because your BJJ session that day is lighter drilling; Thursday is light technique work in the gym because you have hard rolling Wednesday and Friday.'",
+  "  - This sentence is the client-visible PROOF that the engine respected their sport schedule. If you cannot write it honestly, the schedule is broken and you must rebuild.",
+].join("\n");
+
 function buildPrompt(intake) {
   return [
     "A NEW CLIENT has submitted their intake. Build their Week 1 program now.",
@@ -253,7 +342,13 @@ function buildPrompt(intake) {
     "=== CLIENT INTAKE ===",
     JSON.stringify(intake, null, 2),
     "",
-    INTAKE_HANDLING_RULES,
+        INTAKE_HANDLING_RULES,
+    "",
+    PERIODISATION_PRESCRIPTION_RULES,
+    "",
+    DENSITY_AND_ENDURANCE_RULES,
+    "",
+    SPORT_DAY_COUPLING_RULES,
     "",
     CLIENT_OUTPUT_CONTRACT,
   ].join("\n");
@@ -268,7 +363,13 @@ function adjustPrompt(intake, currentProgram, changeRequest) {
     "=== CLIENT INTAKE (original) ===",
     JSON.stringify(intake, null, 2),
     "",
-    INTAKE_HANDLING_RULES,
+        INTAKE_HANDLING_RULES,
+    "",
+    PERIODISATION_PRESCRIPTION_RULES,
+    "",
+    DENSITY_AND_ENDURANCE_RULES,
+    "",
+    SPORT_DAY_COUPLING_RULES,
     "",
     "=== CURRENT PROGRAM (their existing plan) ===",
     currentProgram,
@@ -661,6 +762,111 @@ function stripAndFlagFormulaViolations(s, intake) {
         `density-reps-out-of-band: "${exercise.slice(0, 40)}" prescribes ${repsVal} reps vs current max ${repBenchmark} (band 65-85% = ${Math.round(repBenchmark * 0.65)}-${Math.round(repBenchmark * 0.85)})`
       );
     }
+  }
+
+    // -------------------------------------------------------------------
+  // NEW: density/endurance ABSENCE check (Path Z mission 2 verification)
+  // -------------------------------------------------------------------
+  // If the intake declares an endurance/conditioning/calisthenics-volume
+  // goal, the week MUST contain at least one density/EMOM/AMRAP/Zone 2
+  // /threshold row. Absence is a goal-coverage HARD FAIL.
+  try {
+    const goalText = JSON.stringify({
+      p: intake?.primary_goals, s: intake?.secondary_goals,
+      g: intake?.goal_specifics, c: intake?.current_strength, n: intake?.notes,
+    }).toLowerCase();
+    const DENSITY_DEMANDING_GOAL = /(endurance|conditioning|gas tank|work capacity|cardio|fat loss|lose fat|zone\s*2|aerobic|muscle.?up volume|push.?up volume|pull.?up volume|emom|amrap|density|threshold|mas\b|vo2)/;
+    const demandsDensity = DENSITY_DEMANDING_GOAL.test(goalText);
+    if (demandsDensity) {
+      const tsvLower = (tsvMatch[1] || "").toLowerCase();
+      const HAS_DENSITY_ROW = /(emom|amrap|zone\s*2|threshold|tempo interval|mas\b|density|amrap|every minute|on the minute|max reps|reps to failure|rpe 9|rpe 10)/;
+      if (!HAS_DENSITY_ROW.test(tsvLower)) {
+        flags.push(
+          "density-goal-coverage-fail: intake declares an endurance/conditioning/volume goal but the Week 1 TSV contains zero density/EMOM/AMRAP/Zone 2 rows"
+        );
+      }
+    }
+  } catch (e) {
+    // Defensive: never let validator errors break the program return.
+    console.warn("density-absence check failed:", e && e.message);
+  }
+
+  // -------------------------------------------------------------------
+  // NEW: periodisation-structure check (Path Z mission 3 verification)
+  // -------------------------------------------------------------------
+  // For intermediate/advanced athletes with >=3 days_per_week, the week
+  // should show INTRA-WEEK VARIATION in rep ranges per main movement
+  // pattern (the signature of DUP / Conjugate / Block). If every squat
+  // row in the week is e.g. "3x5" with identical loading, the engine
+  // produced a flat linear week when a varied model was warranted.
+  try {
+    const days = Number(intake?.days_per_week) || 0;
+    const trainingAge = String(intake?.training_age || intake?.experience || "").toLowerCase();
+    const isLinearOnly = /\b(beginner|novice|new|0|under 1|first|starting)\b/.test(trainingAge);
+    if (days >= 3 && !isLinearOnly) {
+      const rowsByMovement = {};
+      for (const row of parsed.rows) {
+        const ex = ((exIdx >= 0 ? row[exIdx] : "") || "").toLowerCase();
+        const repsCell = repsIdx >= 0 ? row[repsIdx] : "";
+        const mv = matchMovement(ex);
+        if (!mv) continue;
+        if (!rowsByMovement[mv]) rowsByMovement[mv] = new Set();
+        // bucket by first rep number to detect variation
+        const n = firstNumber(repsCell);
+        if (n != null) rowsByMovement[mv].add(Math.round(n));
+      }
+      // For any movement appearing 2+ times in the week, demand at least 2 distinct rep buckets.
+      for (const [mv, buckets] of Object.entries(rowsByMovement)) {
+        // Count occurrences of this movement in the week
+        const occurrences = parsed.rows.filter((r) => {
+          const ex = ((exIdx >= 0 ? r[exIdx] : "") || "").toLowerCase();
+          return matchMovement(ex) === mv;
+        }).length;
+        if (occurrences >= 2 && buckets.size < 2) {
+          flags.push(
+            `periodisation-flat-week: "${mv}" appears ${occurrences}x in the week with identical rep prescription, expected intra-week variation (DUP/Conjugate/Block) for intermediate+ athletes`
+          );
+        }
+      }
+    }
+  } catch (e) {
+    console.warn("periodisation-structure check failed:", e && e.message);
+  }
+
+  // -------------------------------------------------------------------
+  // NEW: sport-day coupling check (Path Z mission 3 verification)
+  // -------------------------------------------------------------------
+  // If a HARD sport day is declared, the SAME calendar day in the gym
+  // schedule MUST NOT contain heavy bilateral squat/deadlift or ME-style
+  // top sets. We inspect notes and exercise names for known heavy markers.
+  try {
+    const schedule = Array.isArray(intake?.sport_schedule) ? intake.sport_schedule : [];
+    const hardDays = schedule
+      .filter((s) => s && /hard/i.test(String(s.intensity || "")))
+      .map((s) => String(s.day || "").toLowerCase().trim())
+      .filter(Boolean);
+    if (hardDays.length > 0) {
+      const dayIdxLocal = idx("day");
+      const HEAVY_MARKER = /(back squat|front squat|deadlift|conventional deadlift|sumo deadlift|bench press|overhead press|ohp|rpe\s*9|rpe\s*10|1rm|1\s*rep max|top set|max effort|me day|heavy single|heavy triple)/i;
+      const LIGHT_OK = /(speed|dynamic|technique|mobility|recovery|zone\s*2|light|skill|drill)/i;
+      for (const row of parsed.rows) {
+        const dayCell = dayIdxLocal >= 0 ? String(row[dayIdxLocal] || "").toLowerCase().trim() : "";
+        if (!dayCell) continue;
+        const isHardSportDay = hardDays.some((hd) => dayCell.includes(hd) || hd.includes(dayCell));
+        if (!isHardSportDay) continue;
+        const ex = (exIdx >= 0 ? row[exIdx] : "") || "";
+        const notes = (notesIdx >= 0 ? row[notesIdx] : "") || "";
+        const repsCell = repsIdx >= 0 ? row[repsIdx] : "";
+        const rowText = (ex + " " + notes + " " + repsCell);
+        if (HEAVY_MARKER.test(rowText) && !LIGHT_OK.test(rowText)) {
+          flags.push(
+            `sport-day-coupling-fail: "${ex.slice(0, 40)}" prescribed on HARD sport day "${dayCell}" (heavy lifting on hard sport day is forbidden)`
+          );
+        }
+      }
+    }
+  } catch (e) {
+    console.warn("sport-day coupling check failed:", e && e.message);
   }
 
   // Detection only: never mutate the program here. privacyScrub owns final
