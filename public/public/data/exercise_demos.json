@@ -1,49 +1,200 @@
-// lib/exerciseDemos.js
-const fs = require('fs');
-const path = require('path');
-
-const demos = JSON.parse(
-  fs.readFileSync(path.join(__dirname, '..', 'data', 'exercise_demos.json'), 'utf8')
-);
-
-function normalizeExerciseName(name) {
-  return String(name || '')
-    .toLowerCase()
-    .replace(/\([^)]*\)/g, '')
-    .replace(/[^a-z0-9]+/g, '_')
-    .replace(/_+/g, '_')
-    .replace(/^_|_$/g, '');
-}
-
-function resolveExerciseDemo(name) {
-  if (!name) return null;
-  const key = normalizeExerciseName(name);
-
-  // 1. Direct hit
-  const direct = demos.entries[key];
-  if (direct?.demo_url) {
-    return { url: direct.demo_url, source: 'curated', channel: direct.channel, canonical: direct.canonical };
-  }
-
-  // 2. Alias hit
-  for (const [k, v] of Object.entries(demos.entries)) {
-    if (v.aliases?.includes(key) && v.demo_url) {
-      return { url: v.demo_url, source: 'curated', channel: v.channel, canonical: v.canonical };
+{
+  "version": "2.0.0",
+  "updated": "2026-06-22",
+  "policy": {
+    "url_format": "https://www.youtube.com/watch?v=<ID> — no tracking/user params",
+    "privacy_disclosure": "Exercise demos open in YouTube. To keep them out of your watch history, open them in incognito/private mode, or replace 'youtube.com' with 'youtube-nocookie.com' in the URL.",
+    "fallback": "If demo_url is null, runtime builds: https://www.youtube.com/results?search_query=<encoded(name + ' exercise demo')>",
+    "channels_whitelist": [
+      "Squat University", "Calisthenicmovement", "Juggernaut Training Systems",
+      "Catalyst Athletics", "Jeff Nippard", "Alan Thrall / Untamed Strength",
+      "Barbell Medicine", "FitnessFAQs", "GMB Fitness", "Tom Merrick",
+      "Renaissance Periodization", "Power Monkey Fitness", "Athlean-X",
+      "E3 Rehab", "Brussels Barbell", "Knees Over Toes Guy / Ben Patrick",
+      "Buff Dudes", "CrossFit Invictus", "Tiger Fitness"
+    ]
+  },
+  "normalize_spec": {
+    "rules": [
+      "lowercase",
+      "strip parenthesized text",
+      "replace non-alphanumeric runs with underscore",
+      "collapse repeated underscores",
+      "trim leading/trailing underscores"
+    ],
+    "examples": {
+      "Snatch-Grip Pendlay Row": "snatch_grip_pendlay_row",
+      "ATG Split Squat (Ben Patrick)": "atg_split_squat",
+      "B-Stance Hip Thrust": "b_stance_hip_thrust"
     }
+  },
+  "entries": {
+    "back_squat": { "canonical": "Back Squat", "demo_url": "https://www.youtube.com/watch?v=SbgHegC6lEs", "channel": "Squat University", "aliases": ["high_bar_back_squat","squat","barbell_back_squat"] },
+    "low_bar_back_squat": { "canonical": "Low-Bar Back Squat", "demo_url": "https://www.youtube.com/watch?v=SbgHegC6lEs", "channel": "Squat University", "aliases": ["low_bar_squat","powerlifting_squat"] },
+    "front_squat": { "canonical": "Front Squat", "demo_url": "https://www.youtube.com/watch?v=G-Vamqoy8qM", "channel": "Catalyst Athletics", "aliases": ["barbell_front_squat","clean_grip_front_squat"] },
+    "box_squat": { "canonical": "Box Squat", "demo_url": null, "channel": null, "aliases": ["barbell_box_squat"] },
+    "paused_squat": { "canonical": "Paused Back Squat", "demo_url": "https://www.youtube.com/watch?v=g3kAQyU9BX8", "channel": "Catalyst Athletics", "aliases": ["pause_squat","paused_back_squat"] },
+    "tempo_squat": { "canonical": "Tempo Squat", "demo_url": "https://www.youtube.com/watch?v=qNPVjehTyKA", "channel": "Juggernaut Training Systems", "aliases": ["slow_squat","3_1_1_squat"] },
+    "stiletto_squat": { "canonical": "Stiletto Squat", "demo_url": "https://www.youtube.com/watch?v=7uYm860iQS0", "channel": null, "aliases": ["heels_elevated_narrow_squat"] },
+    "sissy_squat": { "canonical": "Sissy Squat", "demo_url": null, "channel": null, "aliases": [] },
+    "goblet_squat": { "canonical": "Goblet Squat", "demo_url": null, "channel": null, "aliases": ["db_goblet_squat","kb_goblet_squat"] },
+    "zercher_squat": { "canonical": "Zercher Squat", "demo_url": null, "channel": null, "aliases": [] },
+    "bulgarian_split_squat": { "canonical": "Bulgarian Split Squat", "demo_url": null, "channel": null, "aliases": ["rear_foot_elevated_split_squat","rfess"] },
+    "cossack_squat": { "canonical": "Cossack Squat", "demo_url": null, "channel": null, "aliases": [] },
+    "pistol_squat": { "canonical": "Pistol Squat", "demo_url": null, "channel": null, "aliases": ["single_leg_squat"] },
+    "hatfield_squat": { "canonical": "Hatfield Squat", "demo_url": null, "channel": null, "aliases": ["safety_bar_hatfield"] },
+    "heels_elevated_squat": { "canonical": "Heels-Elevated Squat", "demo_url": null, "channel": null, "aliases": ["plate_elevated_squat"] },
+    "pin_squat": { "canonical": "Pin Squat", "demo_url": null, "channel": null, "aliases": ["dead_stop_squat"] },
+    "atg_split_squat": { "canonical": "ATG Split Squat", "demo_url": "https://www.youtube.com/watch?v=hCMlNxbQeIw", "channel": "Knees Over Toes Guy / Ben Patrick", "aliases": ["knees_over_toes_split_squat","kot_split_squat"] },
+    "slant_board_squat": { "canonical": "Slant Board Squat", "demo_url": null, "channel": null, "aliases": ["wedge_squat"] },
+    "patrick_step": { "canonical": "Patrick Step", "demo_url": null, "channel": null, "aliases": ["vmo_step"] },
+
+    "conventional_deadlift": { "canonical": "Conventional Deadlift", "demo_url": "https://www.youtube.com/watch?v=MBbyAqvTNkU", "channel": "Alan Thrall / Untamed Strength", "aliases": ["deadlift","conv_dl","barbell_deadlift"] },
+    "sumo_deadlift": { "canonical": "Sumo Deadlift", "demo_url": null, "channel": null, "aliases": ["sumo_dl"] },
+    "deficit_deadlift": { "canonical": "Deficit Deadlift", "demo_url": "https://www.youtube.com/watch?v=LYjfywJGG7o", "channel": "Juggernaut Training Systems", "aliases": ["deficit_dl"] },
+    "block_pull": { "canonical": "Block Pull", "demo_url": null, "channel": null, "aliases": ["block_deadlift"] },
+    "rack_pull": { "canonical": "Rack Pull", "demo_url": null, "channel": null, "aliases": [] },
+    "snatch_grip_deadlift": { "canonical": "Snatch-Grip Deadlift", "demo_url": "https://www.youtube.com/watch?v=juzQViMKo8E", "channel": "Catalyst Athletics", "aliases": ["sn_grip_dl","wide_grip_deadlift"] },
+    "romanian_deadlift": { "canonical": "Romanian Deadlift", "demo_url": "https://www.youtube.com/watch?v=5bJEigM5iVg", "channel": "Squat University", "aliases": ["rdl"] },
+    "single_leg_rdl": { "canonical": "Single-Leg RDL", "demo_url": "https://www.youtube.com/watch?v=Zfr6wizR8rs", "channel": null, "aliases": ["sl_rdl","one_leg_rdl"] },
+    "hex_bar_deadlift": { "canonical": "Hex Bar Deadlift", "demo_url": null, "channel": null, "aliases": ["trap_bar_deadlift"] },
+    "stiff_leg_deadlift": { "canonical": "Stiff-Leg Deadlift", "demo_url": null, "channel": null, "aliases": ["sldl"] },
+    "jefferson_curl": { "canonical": "Jefferson Curl", "demo_url": "https://www.youtube.com/watch?v=KakOzWGaXfk", "channel": null, "aliases": [] },
+    "good_morning": { "canonical": "Good Morning", "demo_url": "https://www.youtube.com/watch?v=ivfRflssBW0", "channel": "Brussels Barbell", "aliases": ["barbell_good_morning"] },
+
+    "bench_press": { "canonical": "Bench Press", "demo_url": "https://www.youtube.com/watch?v=x7m1JW7mg6Q", "channel": "Alan Thrall / Untamed Strength", "aliases": ["flat_bench","barbell_bench_press","flat_barbell_bench"] },
+    "incline_bench_press": { "canonical": "Incline Bench Press", "demo_url": null, "channel": null, "aliases": ["incline_barbell_bench"] },
+    "decline_bench_press": { "canonical": "Decline Bench Press", "demo_url": null, "channel": null, "aliases": [] },
+    "close_grip_bench_press": { "canonical": "Close-Grip Bench Press", "demo_url": null, "channel": null, "aliases": ["cgbp"] },
+    "floor_press": { "canonical": "Floor Press", "demo_url": null, "channel": null, "aliases": ["barbell_floor_press"] },
+    "spoto_press": { "canonical": "Spoto Press", "demo_url": null, "channel": null, "aliases": [] },
+    "paused_bench_press": { "canonical": "Paused Bench Press", "demo_url": null, "channel": null, "aliases": ["pause_bench"] },
+    "pin_bench_press": { "canonical": "Pin Bench Press", "demo_url": null, "channel": null, "aliases": ["dead_stop_bench"] },
+    "larsen_press": { "canonical": "Larsen Press", "demo_url": null, "channel": null, "aliases": [] },
+    "db_bench_press": { "canonical": "DB Bench Press", "demo_url": null, "channel": null, "aliases": ["dumbbell_bench_press","flat_db_press"] },
+    "incline_db_bench_press": { "canonical": "Incline DB Bench Press", "demo_url": "https://www.youtube.com/watch?v=UbKpLLPO12c", "channel": null, "aliases": ["incline_dumbbell_press","incline_db_press"] },
+
+    "overhead_press": { "canonical": "Overhead Press", "demo_url": "https://www.youtube.com/watch?v=wol7Hko8RhY", "channel": "Alan Thrall / Untamed Strength", "aliases": ["ohp","strict_press","barbell_overhead_press","military_press"] },
+    "push_press": { "canonical": "Push Press", "demo_url": "https://www.youtube.com/watch?v=yklSQG1_Ovc", "channel": "Catalyst Athletics", "aliases": ["barbell_push_press"] },
+    "push_jerk": { "canonical": "Push Jerk", "demo_url": null, "channel": null, "aliases": [] },
+    "split_jerk": { "canonical": "Split Jerk", "demo_url": null, "channel": null, "aliases": [] },
+    "snatch_push_press": { "canonical": "Snatch Push Press", "demo_url": "https://www.youtube.com/watch?v=yklSQG1_Ovc", "channel": "Catalyst Athletics", "aliases": ["wide_grip_push_press"] },
+    "z_press": { "canonical": "Z Press", "demo_url": null, "channel": null, "aliases": ["seated_floor_press"] },
+    "landmine_press": { "canonical": "Landmine Press", "demo_url": null, "channel": null, "aliases": [] },
+    "seated_db_press": { "canonical": "Seated DB Shoulder Press", "demo_url": "https://www.youtube.com/watch?v=qEwKCR5JCog", "channel": "Buff Dudes", "aliases": ["db_shoulder_press","dumbbell_shoulder_press","seated_dumbbell_press"] },
+
+    "pull_up": { "canonical": "Pull-Up", "demo_url": null, "channel": null, "aliases": ["pullup","strict_pull_up"] },
+    "chin_up": { "canonical": "Chin-Up", "demo_url": null, "channel": null, "aliases": ["chinup","supinated_pull_up"] },
+    "weighted_pull_up": { "canonical": "Weighted Pull-Up", "demo_url": null, "channel": null, "aliases": ["weighted_pullup"] },
+    "scapular_pull_up": { "canonical": "Scapular Pull-Up", "demo_url": null, "channel": null, "aliases": ["scap_pull_up"] },
+    "lat_pulldown": { "canonical": "Lat Pulldown", "demo_url": null, "channel": null, "aliases": ["cable_pulldown"] },
+    "pendlay_row": { "canonical": "Pendlay Row", "demo_url": "https://www.youtube.com/watch?v=cYVkgmPqRMw", "channel": "Catalyst Athletics", "aliases": ["dead_stop_row"] },
+    "snatch_grip_pendlay_row": { "canonical": "Snatch-Grip Pendlay Row", "demo_url": "https://www.youtube.com/watch?v=4CM7Rifs3bE", "channel": "Catalyst Athletics", "aliases": ["wide_grip_pendlay_row"] },
+    "bent_over_row": { "canonical": "Bent-Over Barbell Row", "demo_url": "https://www.youtube.com/watch?v=RQU8wZPbioA", "channel": null, "aliases": ["barbell_row","bb_row"] },
+    "single_arm_db_row": { "canonical": "Single-Arm DB Row", "demo_url": "https://www.youtube.com/watch?v=gfUg6qWohTk", "channel": "Athlean-X", "aliases": ["one_arm_db_row","db_row"] },
+    "chest_supported_row": { "canonical": "Chest-Supported Row", "demo_url": "https://www.youtube.com/watch?v=H75im9fAUMc", "channel": null, "aliases": ["chest_supported_db_row","incline_db_row"] },
+    "meadows_row": { "canonical": "Meadows Row", "demo_url": null, "channel": null, "aliases": ["landmine_row"] },
+    "t_bar_row": { "canonical": "T-Bar Row", "demo_url": null, "channel": null, "aliases": ["tbar_row"] },
+    "seal_row": { "canonical": "Seal Row", "demo_url": null, "channel": null, "aliases": ["bench_supported_row"] },
+    "kelso_shrug": { "canonical": "Kelso Shrug", "demo_url": null, "channel": null, "aliases": [] },
+    "face_pull": { "canonical": "Face Pull", "demo_url": "https://www.youtube.com/watch?v=j0vWz7hoEOE", "channel": "Jeff Nippard", "aliases": ["cable_face_pull"] },
+    "inverted_row": { "canonical": "Inverted Row", "demo_url": null, "channel": null, "aliases": ["bodyweight_row","ring_row"] },
+    "cable_row": { "canonical": "Cable Row", "demo_url": null, "channel": null, "aliases": ["seated_cable_row"] },
+
+    "power_clean": { "canonical": "Power Clean", "demo_url": null, "channel": null, "aliases": [] },
+    "squat_clean": { "canonical": "Squat Clean", "demo_url": null, "channel": null, "aliases": ["full_clean","clean"] },
+    "hang_clean": { "canonical": "Hang Clean", "demo_url": null, "channel": null, "aliases": ["hang_power_clean"] },
+    "power_snatch": { "canonical": "Power Snatch", "demo_url": null, "channel": null, "aliases": [] },
+    "squat_snatch": { "canonical": "Squat Snatch", "demo_url": null, "channel": null, "aliases": ["full_snatch","snatch"] },
+    "hang_snatch": { "canonical": "Hang Snatch", "demo_url": null, "channel": null, "aliases": ["hang_power_snatch"] },
+    "clean_pull": { "canonical": "Clean Pull", "demo_url": null, "channel": null, "aliases": [] },
+    "snatch_pull": { "canonical": "Snatch Pull", "demo_url": null, "channel": null, "aliases": [] },
+    "clean_deadlift": { "canonical": "Clean Deadlift", "demo_url": null, "channel": null, "aliases": ["clean_dl"] },
+    "snatch_deadlift": { "canonical": "Snatch Deadlift", "demo_url": null, "channel": null, "aliases": ["snatch_dl"] },
+
+    "tuck_planche": { "canonical": "Tuck Planche", "demo_url": "https://www.youtube.com/watch?v=f30rLg3yBug", "channel": "FitnessFAQs", "aliases": [] },
+    "advanced_tuck_planche": { "canonical": "Advanced Tuck Planche", "demo_url": null, "channel": null, "aliases": ["adv_tuck_planche"] },
+    "straddle_planche": { "canonical": "Straddle Planche", "demo_url": null, "channel": null, "aliases": [] },
+    "full_planche": { "canonical": "Full Planche", "demo_url": null, "channel": null, "aliases": [] },
+    "pseudo_planche_push_up": { "canonical": "Pseudo Planche Push-Up", "demo_url": null, "channel": null, "aliases": ["ppp","pseudo_planche_pushup"] },
+    "front_lever": { "canonical": "Front Lever", "demo_url": "https://www.youtube.com/watch?v=WexxsNvvcsw", "channel": "FitnessFAQs", "aliases": [] },
+    "tuck_front_lever": { "canonical": "Tuck Front Lever", "demo_url": null, "channel": null, "aliases": ["tuck_fl"] },
+    "front_lever_raise": { "canonical": "Front Lever Raise", "demo_url": null, "channel": null, "aliases": ["fl_raise"] },
+    "tuck_front_lever_raise": { "canonical": "Tuck Front Lever Raise", "demo_url": "https://www.youtube.com/watch?v=oNtIlTb1LLE", "channel": null, "aliases": ["tuck_fl_raise","tuck_front_raise"] },
+    "l_sit": { "canonical": "L-Sit", "demo_url": null, "channel": null, "aliases": ["l_seat"] },
+    "handstand_push_up": { "canonical": "Handstand Push-Up", "demo_url": "https://www.youtube.com/watch?v=wdEOdHGt9HY", "channel": null, "aliases": ["hspu"] },
+    "handstand": { "canonical": "Freestanding Handstand", "demo_url": null, "channel": null, "aliases": ["free_handstand"] },
+    "muscle_up": { "canonical": "Muscle-Up", "demo_url": "https://www.youtube.com/watch?v=_eQ2gw_Gg5Y", "channel": "FitnessFAQs", "aliases": ["bar_muscle_up","strict_muscle_up"] },
+    "ring_muscle_up": { "canonical": "Ring Muscle-Up", "demo_url": null, "channel": null, "aliases": ["ring_mu"] },
+    "dip": { "canonical": "Dip", "demo_url": null, "channel": null, "aliases": ["parallel_bar_dip"] },
+    "weighted_dip": { "canonical": "Weighted Dip", "demo_url": null, "channel": null, "aliases": [] },
+    "ring_dip": { "canonical": "Ring Dip", "demo_url": null, "channel": null, "aliases": [] },
+
+    "sled_push": { "canonical": "Sled Push", "demo_url": null, "channel": null, "aliases": ["prowler_push"] },
+    "sled_drag": { "canonical": "Sled Drag", "demo_url": null, "channel": null, "aliases": ["backward_sled_drag","reverse_sled_drag"] },
+    "reverse_nordic_curl": { "canonical": "Reverse Nordic Curl", "demo_url": "https://www.youtube.com/watch?v=XHCz7nkfap4", "channel": null, "aliases": ["reverse_nordics"] },
+    "tibialis_raise": { "canonical": "Tibialis Raise", "demo_url": "https://www.youtube.com/watch?v=5yCB_v-dnt0", "channel": null, "aliases": ["tib_raise"] },
+    "wall_tibialis_raise": { "canonical": "Wall Tibialis Raise", "demo_url": "https://www.youtube.com/watch?v=O8ZcXfwFuqs", "channel": null, "aliases": ["wall_tib_raise"] },
+    "loaded_tibialis_raise": { "canonical": "Loaded Tibialis Raise", "demo_url": "https://www.youtube.com/watch?v=NL-grTwW2CU", "channel": null, "aliases": ["weighted_tib_raise"] },
+
+    "hip_thrust": { "canonical": "Barbell Hip Thrust", "demo_url": "https://www.youtube.com/watch?v=Asuvykbvz5E", "channel": null, "aliases": ["bb_hip_thrust"] },
+    "b_stance_hip_thrust": { "canonical": "B-Stance Hip Thrust", "demo_url": null, "channel": null, "aliases": ["staggered_hip_thrust"] },
+    "glute_bridge": { "canonical": "Glute Bridge", "demo_url": null, "channel": null, "aliases": ["barbell_glute_bridge"] },
+    "nordic_curl": { "canonical": "Nordic Curl", "demo_url": null, "channel": null, "aliases": ["nordic_hamstring_curl"] },
+    "hyperextension": { "canonical": "Hyperextension", "demo_url": null, "channel": null, "aliases": ["back_extension","45_back_extension"] },
+    "reverse_hyper": { "canonical": "Reverse Hyper", "demo_url": null, "channel": null, "aliases": ["reverse_hyperextension"] },
+    "ghr": { "canonical": "Glute Ham Raise", "demo_url": null, "channel": null, "aliases": ["glute_ham_raise"] },
+    "cable_pull_through": { "canonical": "Cable Pull-Through", "demo_url": null, "channel": null, "aliases": ["pull_through"] },
+
+    "db_lateral_raise": { "canonical": "DB Lateral Raise", "demo_url": null, "channel": null, "aliases": ["dumbbell_lateral_raise","side_raise"] },
+    "cable_lateral_raise": { "canonical": "Cable Lateral Raise", "demo_url": "https://www.youtube.com/watch?v=zpbm-xRHB6k", "channel": null, "aliases": ["cable_side_raise"] },
+    "egyptian_lateral_raise": { "canonical": "Egyptian Lateral Raise", "demo_url": "https://www.youtube.com/watch?v=fjqnDGmlKOg", "channel": "Tiger Fitness", "aliases": ["leaning_cable_lateral_raise"] },
+    "cable_y_raise": { "canonical": "Cable Y Raise", "demo_url": null, "channel": null, "aliases": ["y_raise"] },
+    "bayesian_curl": { "canonical": "Bayesian Cable Curl", "demo_url": null, "channel": null, "aliases": ["bayesian_cable_curl"] },
+    "reverse_pec_deck": { "canonical": "Reverse Pec Deck", "demo_url": null, "channel": null, "aliases": ["rear_delt_machine"] },
+    "bent_over_reverse_fly": { "canonical": "Bent-Over Reverse Fly", "demo_url": null, "channel": null, "aliases": ["rear_delt_fly","db_reverse_fly"] },
+    "behind_back_cuff_raise": { "canonical": "Behind-the-Back Cable Cuff Raise", "demo_url": null, "channel": null, "aliases": [] },
+    "upright_row": { "canonical": "Upright Row", "demo_url": null, "channel": null, "aliases": [] },
+
+    "ez_bar_curl": { "canonical": "EZ Bar Curl", "demo_url": null, "channel": null, "aliases": ["ez_curl"] },
+    "barbell_curl": { "canonical": "Barbell Curl", "demo_url": null, "channel": null, "aliases": ["bb_curl"] },
+    "db_curl": { "canonical": "Dumbbell Curl", "demo_url": null, "channel": null, "aliases": ["dumbbell_curl","alt_db_curl"] },
+    "hammer_curl": { "canonical": "Hammer Curl", "demo_url": null, "channel": null, "aliases": ["db_hammer_curl"] },
+    "preacher_curl": { "canonical": "Preacher Curl", "demo_url": null, "channel": null, "aliases": [] },
+    "incline_db_curl": { "canonical": "Incline DB Curl", "demo_url": null, "channel": null, "aliases": ["incline_dumbbell_curl"] },
+    "cable_triceps_pushdown": { "canonical": "Cable Triceps Pushdown", "demo_url": null, "channel": null, "aliases": ["triceps_pushdown","tri_pushdown"] },
+    "overhead_triceps_extension": { "canonical": "Overhead Triceps Extension", "demo_url": null, "channel": null, "aliases": ["overhead_tri_ext","french_press"] },
+    "skullcrusher": { "canonical": "Skullcrusher", "demo_url": null, "channel": null, "aliases": ["lying_triceps_extension"] },
+    "jm_press": { "canonical": "JM Press", "demo_url": null, "channel": null, "aliases": [] },
+    "triceps_kickback": { "canonical": "Triceps Kickback", "demo_url": null, "channel": null, "aliases": ["db_kickback"] },
+
+    "plank": { "canonical": "Plank", "demo_url": null, "channel": null, "aliases": ["front_plank","forearm_plank"] },
+    "side_plank": { "canonical": "Side Plank", "demo_url": null, "channel": null, "aliases": [] },
+    "copenhagen_plank": { "canonical": "Copenhagen Plank", "demo_url": "https://www.youtube.com/watch?v=kD1t1hWzIDE", "channel": "E3 Rehab", "aliases": ["copenhagen_adductor_plank"] },
+    "dead_bug": { "canonical": "Dead Bug", "demo_url": null, "channel": null, "aliases": ["deadbug"] },
+    "bird_dog": { "canonical": "Bird Dog", "demo_url": null, "channel": null, "aliases": [] },
+    "pallof_press": { "canonical": "Pallof Press", "demo_url": null, "channel": null, "aliases": ["cable_pallof_press"] },
+    "ab_wheel_rollout": { "canonical": "Ab Wheel Rollout", "demo_url": null, "channel": null, "aliases": ["ab_wheel","ab_rollout"] },
+    "hollow_hold": { "canonical": "Hollow Hold", "demo_url": null, "channel": null, "aliases": ["hollow_body_hold"] },
+    "hanging_leg_raise": { "canonical": "Hanging Leg Raise", "demo_url": null, "channel": null, "aliases": ["hlr"] },
+    "toes_to_bar": { "canonical": "Toes-to-Bar", "demo_url": null, "channel": null, "aliases": ["t2b"] },
+    "cable_crunch": { "canonical": "Cable Crunch", "demo_url": null, "channel": null, "aliases": ["kneeling_cable_crunch"] },
+    "dragon_flag": { "canonical": "Dragon Flag", "demo_url": null, "channel": null, "aliases": [] },
+
+    "airdyne": { "canonical": "Airdyne / Assault Bike", "demo_url": null, "channel": null, "aliases": ["assault_bike","air_bike"] },
+    "ski_erg": { "canonical": "Ski Erg", "demo_url": null, "channel": null, "aliases": ["ski_ergometer"] },
+    "rower": { "canonical": "Rowing Erg", "demo_url": null, "channel": null, "aliases": ["concept2_row","erg_row"] },
+    "battle_ropes": { "canonical": "Battle Ropes", "demo_url": null, "channel": null, "aliases": ["battle_rope_waves"] },
+    "farmer_carry": { "canonical": "Farmer Carry", "demo_url": null, "channel": null, "aliases": ["farmers_walk","loaded_carry"] },
+    "yoke_walk": { "canonical": "Yoke Walk", "demo_url": null, "channel": null, "aliases": [] },
+
+    "ninety_ninety_hip": { "canonical": "90/90 Hip Switch", "demo_url": null, "channel": null, "aliases": ["90_90_hip","ninety_ninety"] },
+    "ankle_rocker": { "canonical": "Ankle Rocker", "demo_url": null, "channel": null, "aliases": ["ankle_dorsiflexion_mobility"] },
+    "couch_stretch": { "canonical": "Couch Stretch", "demo_url": null, "channel": null, "aliases": ["hip_flexor_stretch"] },
+    "dead_hang": { "canonical": "Dead Hang", "demo_url": null, "channel": null, "aliases": ["passive_hang"] },
+    "cat_cow": { "canonical": "Cat-Cow", "demo_url": null, "channel": null, "aliases": ["cat_camel"] },
+    "diaphragmatic_breathing": { "canonical": "Diaphragmatic Breathing", "demo_url": null, "channel": null, "aliases": ["belly_breathing","crocodile_breathing"] },
+    "worlds_greatest_stretch": { "canonical": "World's Greatest Stretch", "demo_url": null, "channel": null, "aliases": ["wgs"] }
   }
-
-  // 3. Search fallback
-  const q = encodeURIComponent(`${name} exercise demo`);
-  return {
-    url: `https://www.youtube.com/results?search_query=${q}`,
-    source: 'search',
-    channel: null,
-    canonical: name
-  };
 }
-
-function getPrivacyDisclosure() {
-  return demos.policy.privacy_disclosure;
-}
-
 module.exports = { normalizeExerciseName, resolveExerciseDemo, getPrivacyDisclosure, demos };
