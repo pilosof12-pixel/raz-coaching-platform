@@ -182,6 +182,20 @@
     let groupStart = excelRow;
     let currentDay = null;
     const dataRows = wk.rows.slice(1);
+    // Apply a thick teal bottom border across all 9 columns of the given row
+    // to visually separate one training day from the next.
+    const applyDayBottomBorder = (excelRowNum) => {
+      for (let c = 1; c <= 9; c++) {
+        const cell = ws.getRow(excelRowNum).getCell(c);
+        const existing = cell.border || {};
+        cell.border = {
+          top: existing.top || { style: "thin", color: { argb: "FFCFCFCF" } },
+          left: existing.left || { style: "thin", color: { argb: "FFCFCFCF" } },
+          right: existing.right || { style: "thin", color: { argb: "FFCFCFCF" } },
+          bottom: { style: "medium", color: { argb: "FF18D3C5" } }
+        };
+      }
+    };
     dataRows.forEach((row) => {
       const day = row[0] || currentDay || "";
       if (currentDay !== null && day !== currentDay) {
@@ -194,6 +208,8 @@
           alignment: { horizontal: "center", vertical: "middle", textRotation: 90, wrapText: true },
           border: "FF18D3C5"
         });
+        // Draw the separator on the LAST row of the previous day.
+        applyDayBottomBorder(excelRow - 1);
         groupStart = excelRow;
       }
       currentDay = day;
@@ -235,6 +251,8 @@
         alignment: { horizontal: "center", vertical: "middle", textRotation: 90, wrapText: true },
         border: "FF18D3C5"
       });
+      // Draw the closing separator on the final day's last row.
+      applyDayBottomBorder(excelRow - 1);
     }
   }
 
