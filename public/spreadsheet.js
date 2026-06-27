@@ -1,6 +1,7 @@
-// Reusable spreadsheet builder. Emits a 4-week block when the engine provides it,
-// gracefully falls back to Week 1 only. Exposes window.buildStrengthSpreadsheet.
-// Depends on ExcelJS (loaded via exceljs.lib.js).
+// Reusable spreadsheet builder.
+// Emits one "Strength Block - Week N" tab per week the engine provides, plus a README
+// that includes the full program narrative.
+// Exposes window.buildStrengthSpreadsheet. Depends on ExcelJS.
 
 (function () {
   const REQUIRED = ["Day", "Exercise", "Weight", "Sets", "Reps", "Rest", "Target RPE", "Notes", "Results"];
@@ -133,36 +134,13 @@
     };
   }
 
-  function renderPasteTab(workbook, sheetName, rows) {
-    const paste = workbook.addWorksheet(sheetName);
-    [12, 34, 24, 8, 12, 10, 12, 50, 18].forEach((width, i) => { paste.getColumn(i + 1).width = width; });
-    rows.forEach((row, rIdx) => {
-      const r = paste.getRow(rIdx + 1);
-      row.forEach((value, cIdx) => {
-        const cell = r.getCell(cIdx + 1);
-        cell.value = value;
-        styleCell(cell, {
-          fill: rIdx === 0 ? "FF1F4E78" : "FFFFFFFF",
-          font: { name: "Calibri", size: rIdx === 0 ? 11 : 10, bold: rIdx === 0, color: { argb: rIdx === 0 ? "FFFFFFFF" : "FF111111" } }
-        });
-        if (rIdx > 0 && cIdx === 1 && value && window.ExerciseDemos) {
-          const demo = window.ExerciseDemos.resolveExerciseDemo(value);
-          if (demo && demo.url) {
-            cell.value = { text: value, hyperlink: demo.url, tooltip: "Open demo in YouTube (use incognito to avoid watch-history)" };
-            cell.font = { name: "Calibri", size: 10, color: { argb: "FF0563C1" }, underline: true };
-          }
-        }
-      });
-      r.height = rIdx === 0 ? 22 : 28;
-    });
-    paste.views = [{ state: "frozen", ySplit: 1 }];
-  }
-
-  function renderStrengthBlock(ws, weeks) {
+  // Render ONE styled "Strength Block - Week N" sheet for a single week.
+  function renderWeekSheet(ws, wk) {
     const widths = [4.28, 34, 26, 8, 11, 10, 12, 42, 16.8];
     widths.forEach((width, i) => { ws.getColumn(i + 1).width = width; });
-    // Paint a black canvas large enough for 4 weeks of dense rows.
-    for (let r = 1; r <= 400; r++) {
+
+    // Black canvas (matches the existing visual style)
+    for (let r = 1; r <= 200; r++) {
       ws.getRow(r).height = r < 13 ? 14 : 18;
       for (let c = 1; c <= 9; c++) {
         styleCell(ws.getRow(r).getCell(c), {
@@ -172,81 +150,41 @@
         });
       }
     }
+
     let excelRow = 13;
-    weeks.forEach((wk) => {
-      // Banner
-      ws.mergeCells("B" + excelRow + ":I" + excelRow);
-      const banner = ws.getCell("B" + excelRow);
-      banner.value = "WEEK " + wk.week;
-      styleCell(banner, {
-        fill: "FF18D3C5",
-        font: { name: "Calibri", size: 11, bold: true, color: { argb: "FF000000" } },
-        alignment: { horizontal: "center", vertical: "middle" },
-        border: "FFCFCFCF"
+    // WEEK N banner
+    ws.mergeCells("B" + excelRow + ":I" + excelRow);
+    const banner = ws.getCell("B" + excelRow);
+    banner.value = "WEEK " + wk.week;
+    styleCell(banner, {
+      fill: "FF18D3C5",
+      font: { name: "Calibri", size: 11, bold: true, color: { argb: "FF000000" } },
+      alignment: { horizontal: "center", vertical: "middle" },
+      border: "FFCFCFCF"
+    });
+    ws.getRow(excelRow).height = 22;
+    excelRow += 1;
+
+    // Header row
+    REQUIRED.slice(1).forEach((h, i) => {
+      const c = ws.getRow(excelRow).getCell(i + 2);
+      c.value = h;
+      styleCell(c, {
+        fill: i + 2 === 9 ? "FF000000" : "FFD9D9D9",
+        font: { name: "Calibri", size: 9, bold: true, color: { argb: i + 2 === 9 ? "FFFFFFFF" : "FF111111" } },
+        alignment: { horizontal: "center", vertical: "middle", wrapText: true }
       });
-      ws.getRow(excelRow).height = 22;
-      excelRow += 1;
-      // Header row
-      REQUIRED.slice(1).forEach((h, i) => {
-        const c = ws.getRow(excelRow).getCell(i + 2);
-        c.value = h;
-        styleCell(c, {
-          fill: i + 2 === 9 ? "FF000000" : "FFD9D9D9",
-          font: { name: "Calibri", size: 9, bold: true, color: { argb: i + 2 === 9 ? "FFFFFFFF" : "FF111111" } },
-          alignment: { horizontal: "center", vertical: "middle", wrapText: true }
-        });
-      });
-      ws.getRow(excelRow).height = 20;
-      excelRow += 1;
-      // Data rows grouped by Day
-      let groupStart = excelRow;
-      let currentDay = null;
-      const dataRows = wk.rows.slice(1);
-      dataRows.forEach((row) => {
-        const day = row[0] || currentDay || "";
-        if (currentDay !== null && day !== currentDay) {
-          if (excelRow - 1 > groupStart) ws.mergeCells(groupStart, 1, excelRow - 1, 1);
-          const dayCell = ws.getRow(groupStart).getCell(1);
-          dayCell.value = currentDay;
-          styleCell(dayCell, {
-            fill: "FF18D3C5",
-            font: { name: "Calibri", size: 8, bold: true, color: { argb: "FF000000" } },
-            alignment: { horizontal: "center", vertical: "middle", textRotation: 90, wrapText: true },
-            border: "FF18D3C5"
-          });
-          excelRow += 1;
-          groupStart = excelRow;
-        }
-        currentDay = day;
-        const r = ws.getRow(excelRow);
-        r.height = 38;
-        for (let c = 2; c <= 8; c++) {
-          const cell = r.getCell(c);
-          const rawValue = row[c - 1] || "";
-          cell.value = rawValue;
-          styleCell(cell, {
-            fill: "FFEDEDED",
-            font: { name: "Calibri", size: 9, bold: c === 2 || c === 7, color: { argb: c === 7 ? "FF0E9C91" : "FF111111" } },
-            alignment: { horizontal: [2, 3, 8].includes(c) ? "left" : "center", vertical: "middle", wrapText: true }
-          });
-          if (c === 2 && rawValue && window.ExerciseDemos) {
-            const demo = window.ExerciseDemos.resolveExerciseDemo(rawValue);
-            if (demo && demo.url) {
-              cell.value = { text: rawValue, hyperlink: demo.url, tooltip: "Open demo in YouTube (use incognito to avoid watch-history)" };
-              cell.font = { name: "Calibri", size: 9, bold: true, color: { argb: "FF0563C1" }, underline: true };
-            }
-          }
-        }
-        const resultCell = r.getCell(9);
-        resultCell.value = "";
-        styleCell(resultCell, {
-          fill: "FF000000",
-          font: { name: "Calibri", size: 9, bold: true, color: { argb: "FFFFFFFF" } },
-          alignment: { horizontal: "center", vertical: "middle", wrapText: true }
-        });
-        excelRow += 1;
-      });
-      if (currentDay !== null) {
+    });
+    ws.getRow(excelRow).height = 20;
+    excelRow += 1;
+
+    // Data rows grouped by Day
+    let groupStart = excelRow;
+    let currentDay = null;
+    const dataRows = wk.rows.slice(1);
+    dataRows.forEach((row) => {
+      const day = row[0] || currentDay || "";
+      if (currentDay !== null && day !== currentDay) {
         if (excelRow - 1 > groupStart) ws.mergeCells(groupStart, 1, excelRow - 1, 1);
         const dayCell = ws.getRow(groupStart).getCell(1);
         dayCell.value = currentDay;
@@ -256,10 +194,119 @@
           alignment: { horizontal: "center", vertical: "middle", textRotation: 90, wrapText: true },
           border: "FF18D3C5"
         });
+        groupStart = excelRow;
       }
-      // Spacer between weeks
-      excelRow += 2;
+      currentDay = day;
+      const r = ws.getRow(excelRow);
+      r.height = 38;
+      for (let c = 2; c <= 8; c++) {
+        const cell = r.getCell(c);
+        const rawValue = row[c - 1] || "";
+        cell.value = rawValue;
+        styleCell(cell, {
+          fill: "FFEDEDED",
+          font: { name: "Calibri", size: 9, bold: c === 2 || c === 7, color: { argb: c === 7 ? "FF0E9C91" : "FF111111" } },
+          alignment: { horizontal: [2, 3, 8].includes(c) ? "left" : "center", vertical: "middle", wrapText: true }
+        });
+        if (c === 2 && rawValue && window.ExerciseDemos) {
+          const demo = window.ExerciseDemos.resolveExerciseDemo(rawValue);
+          if (demo && demo.url) {
+            cell.value = { text: rawValue, hyperlink: demo.url, tooltip: "Open demo in YouTube (use incognito to avoid watch-history)" };
+            cell.font = { name: "Calibri", size: 9, bold: true, color: { argb: "FF0563C1" }, underline: true };
+          }
+        }
+      }
+      const resultCell = r.getCell(9);
+      resultCell.value = "";
+      styleCell(resultCell, {
+        fill: "FF000000",
+        font: { name: "Calibri", size: 9, bold: true, color: { argb: "FFFFFFFF" } },
+        alignment: { horizontal: "center", vertical: "middle", wrapText: true }
+      });
+      excelRow += 1;
     });
+    if (currentDay !== null) {
+      if (excelRow - 1 > groupStart) ws.mergeCells(groupStart, 1, excelRow - 1, 1);
+      const dayCell = ws.getRow(groupStart).getCell(1);
+      dayCell.value = currentDay;
+      styleCell(dayCell, {
+        fill: "FF18D3C5",
+        font: { name: "Calibri", size: 8, bold: true, color: { argb: "FF000000" } },
+        alignment: { horizontal: "center", vertical: "middle", textRotation: 90, wrapText: true },
+        border: "FF18D3C5"
+      });
+    }
+  }
+
+  // Strip TSV machine blocks from the program text so README shows clean prose.
+  function stripMachineBlocks(text) {
+    if (!text) return "";
+    let cleaned = text;
+    const markers = [
+      ["START_WEEK1_TSV", "END_WEEK1_TSV"],
+      ["START_WEEK2_TSV", "END_WEEK2_TSV"],
+      ["START_WEEK3_TSV", "END_WEEK3_TSV"],
+      ["START_WEEK4_TSV", "END_WEEK4_TSV"]
+    ];
+    markers.forEach(([s, e]) => {
+      const re = new RegExp(s + "[\\s\\S]*?" + e, "g");
+      cleaned = cleaned.replace(re, "");
+    });
+    // Remove QA marker lines.
+    cleaned = cleaned.replace(/^QA_FORMULA_VIOLATION_COUNT:.*$/gm, "");
+    cleaned = cleaned.replace(/^QA_NOTES:.*$/gm, "");
+    // Strip leftover code fences.
+    cleaned = cleaned.replace(/```[a-z]*\n?/gi, "");
+    return cleaned.replace(/\n{3,}/g, "\n\n").trim();
+  }
+
+  // Render README with the full engine narrative (the prose the page shows).
+  function renderReadme(readme, weeks, programText) {
+    readme.getColumn(1).width = 4;
+    readme.getColumn(2).width = 110;
+    readme.getCell("B2").value = "Strength Block - Program Summary";
+    readme.getCell("B2").font = { name: "Calibri", size: 20, bold: true, color: { argb: "FF000000" } };
+
+    const weeksFound = weeks.map((w) => "Week " + w.week).join(", ");
+    readme.getCell("B4").value = "This workbook contains " + weeks.length + " week(s): " + weeksFound +
+      ". Each week lives on its own tab (Strength Block - Week N). Record completed work in the black Results column.";
+    readme.getCell("B4").alignment = { wrapText: true, vertical: "top" };
+    readme.getRow(4).height = 40;
+
+    let row = 6;
+    const narrative = stripMachineBlocks(programText);
+    if (narrative) {
+      readme.getCell("B" + row).value = "Coaching Notes from the Engine";
+      readme.getCell("B" + row).font = { name: "Calibri", size: 13, bold: true, color: { argb: "FF000000" } };
+      row += 1;
+      // Split narrative into ~80-char-wrapped paragraphs into Excel rows so it
+      // displays cleanly. ExcelJS handles wrapText so we can paste each paragraph
+      // into one cell and let row height auto-feel.
+      const paragraphs = narrative.split(/\n{2,}/).filter((p) => p.trim());
+      paragraphs.forEach((p) => {
+        const cell = readme.getCell("B" + row);
+        cell.value = p.trim();
+        cell.alignment = { wrapText: true, vertical: "top" };
+        cell.font = { name: "Calibri", size: 10, color: { argb: "FF222222" } };
+        // Rough height estimate: ~15px per ~95 chars (col width 110).
+        const lines = Math.ceil(p.length / 95) + (p.match(/\n/g) || []).length + 1;
+        readme.getRow(row).height = Math.min(Math.max(lines * 14, 18), 360);
+        row += 1;
+      });
+      row += 1;
+    }
+
+    // Privacy disclosure stays at the bottom.
+    readme.getCell("B" + row).value = "Exercise Demo Links - Privacy Notice";
+    readme.getCell("B" + row).font = { name: "Calibri", size: 12, bold: true, color: { argb: "FF000000" } };
+    row += 1;
+    const disclosure = (window.ExerciseDemos && window.ExerciseDemos.getPrivacyDisclosure)
+      ? window.ExerciseDemos.getPrivacyDisclosure()
+      : "Exercise demos open in YouTube. To keep them out of your watch history, open them in incognito/private mode, or replace 'youtube.com' with 'youtube-nocookie.com' in the URL.";
+    readme.getCell("B" + row).value = disclosure;
+    readme.getCell("B" + row).alignment = { wrapText: true, vertical: "top" };
+    readme.getCell("B" + row).font = { name: "Calibri", size: 10, color: { argb: "FF333333" } };
+    readme.getRow(row).height = 60;
   }
 
   async function buildStrengthSpreadsheet(text) {
@@ -271,38 +318,26 @@
     const workbook = new ExcelJS.Workbook();
     workbook.creator = "Raz Pilosof Strength Program Coaching Engine";
     workbook.created = new Date();
-    const ws = workbook.addWorksheet("Strength Block", { views: [{ showGridLines: false, state: "frozen", xSplit: 1, ySplit: 12 }] });
+
+    // One styled sheet per week. No PASTE tabs.
     weeks.forEach((wk) => {
-      renderPasteTab(workbook, "PASTE_WEEK_" + wk.week, wk.rows);
+      const sheetName = "Strength Block - Week " + wk.week;
+      const ws = workbook.addWorksheet(sheetName, {
+        views: [{ showGridLines: false, state: "frozen", xSplit: 1, ySplit: 14 }]
+      });
+      renderWeekSheet(ws, wk);
     });
+
+    // README with the full engine narrative.
     const readme = workbook.addWorksheet("README", { views: [{ showGridLines: false }] });
-    readme.getColumn(1).width = 4;
-    readme.getColumn(2).width = 100;
-
-    renderStrengthBlock(ws, weeks);
-
-    readme.getCell("B2").value = "Strength Block Spreadsheet";
-    readme.getCell("B2").font = { name: "Calibri", size: 20, bold: true, color: { argb: "FF000000" } };
-    const weeksFound = weeks.map((w) => "Week " + w.week).join(", ");
-    readme.getCell("B4").value = "Created by the AI Coaching Engine. This workbook contains " + weeks.length + " week(s): " + weeksFound + ". Use the Strength Block sheet for the client-facing program. Use the black Results column to record completed work.";
-    readme.getCell("B4").alignment = { wrapText: true };
-
-    readme.getCell("B6").value = "Exercise Demo Links — Privacy Notice";
-    readme.getCell("B6").font = { name: "Calibri", size: 12, bold: true, color: { argb: "FF000000" } };
-    const disclosure = (window.ExerciseDemos && window.ExerciseDemos.getPrivacyDisclosure)
-      ? window.ExerciseDemos.getPrivacyDisclosure()
-      : "Exercise demos open in YouTube. To keep them out of your watch history, open them in incognito/private mode, or replace 'youtube.com' with 'youtube-nocookie.com' in the URL.";
-    readme.getCell("B7").value = disclosure;
-    readme.getCell("B7").alignment = { wrapText: true, vertical: "top" };
-    readme.getCell("B7").font = { name: "Calibri", size: 10, color: { argb: "FF333333" } };
-    readme.getRow(7).height = 60;
+    renderReadme(readme, weeks, text);
 
     const buffer = await workbook.xlsx.writeBuffer();
     const blob = new Blob([buffer], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
-    a.download = weeks.length > 1 ? "strength_block_4_weeks.xlsx" : "strength_block_week1.xlsx";
+    a.download = weeks.length > 1 ? "strength_block_" + weeks.length + "_weeks.xlsx" : "strength_block_week1.xlsx";
     document.body.appendChild(a);
     a.click();
     a.remove();
