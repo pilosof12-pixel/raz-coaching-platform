@@ -1,5 +1,5 @@
-// Reusable spreadsheet builder, extracted from the original Week 1 Spreadsheet Creator.
-// Exposes window.buildStrengthSpreadsheet(tsvOrTableText) -> downloads strength_block_week1.xlsx
+// Reusable spreadsheet builder. Emits a 4-week block when the engine provides it,
+// gracefully falls back to Week 1 only. Exposes window.buildStrengthSpreadsheet.
 // Depends on ExcelJS (loaded via exceljs.lib.js).
 
 (function () {
@@ -48,19 +48,25 @@
       .filter((cells) => !cells.every((cell) => /^:?-{3,}:?$/.test(cell)));
     return rows.length ? rows : null;
   }
-  function parseDelimited(text) {
+  function parseDelimitedRegion(text, startMarker, endMarker) {
     let raw = text.replace(/```(?:text|tsv|plaintext)?/gi, "").replace(/```/g, "").trim();
-    const startIndex = raw.indexOf("START_WEEK1_TSV");
-    const endIndex = raw.indexOf("END_WEEK1_TSV");
-    if (startIndex !== -1 && endIndex !== -1 && endIndex > startIndex) {
-      raw = raw.slice(startIndex, endIndex + "END_WEEK1_TSV".length);
+    if (startMarker && endMarker) {
+      const s = raw.indexOf(startMarker);
+      const e = raw.indexOf(endMarker);
+      if (s === -1 || e === -1 || e <= s) return null;
+      raw = raw.slice(s + startMarker.length, e).trim();
     }
-    raw = raw.replace(/^START_WEEK1_TSV\s*/i, "").replace(/\s*END_WEEK1_TSV$/i, "").trim();
     const lines = raw.split(/\r?\n/).filter((l) => l.trim());
     if (!lines.length) return null;
     const delimiter = lines[0].includes("\t") ? "\t" : lines[0].includes(",") ? "," : null;
     if (!delimiter) return null;
     return lines.map((line) => line.split(delimiter).map(cleanCell));
+  }
+  function parseDelimited(text) {
+    return (
+      parseDelimitedRegion(text, "START_WEEK1_TSV", "END_WEEK1_TSV") ||
+      parseDelimitedRegion(text, null, null)
+    );
   }
   function convertRows(rows) {
     if (!rows || rows.length < 2) throw new Error("Could not find a table with a header row and exercise rows.");
@@ -97,6 +103,23 @@
     const rows = parseDelimited(text) || parseMarkdownTable(text);
     return convertRows(rows);
   }
+  function extractWeek(text, weekNumber) {
+    const start = "START_WEEK" + weekNumber + "_TSV";
+    const end = "END_WEEK" + weekNumber + "_TSV";
+    const region = parseDelimitedRegion(text, start, end);
+    if (!region) return null;
+    try { return convertRows(region); } catch (_) { return null; }
+  }
+  function extractAllWeeks(text) {
+    const weeks = [];
+    const w1 = extractWeek(text, 1);
+    weeks.push({ week: 1, rows: w1 || extractRows(text) });
+    for (let n = 2; n <= 4; n++) {
+      const rows = extractWeek(text, n);
+      if (rows) weeks.push({ week: n, rows });
+    }
+    return weeks;
+  }
 
   function styleCell(cell, options = {}) {
     cell.font = options.font || { name: "Calibri", size: 9, color: { argb: "FF111111" } };
@@ -110,24 +133,10 @@
     };
   }
 
-    async function buildStrengthSpreadsheet(text) {
-    if (!window.ExcelJS) throw new Error("Spreadsheet engine did not load. Check your connection and try again.");
-    if (window.ExerciseDemos && window.ExerciseDemos.load) {
-      try { await window.ExerciseDemos.load(); } catch (e) { console.warn("Exercise demos failed to load, falling back to search:", e); }
-    }
-    const rows = extractRows(text);
-    const workbook = new ExcelJS.Workbook();
-    workbook.creator = "Raz Pilosof Strength Program Coaching Engine";
-    workbook.created = new Date();
-    const ws = workbook.addWorksheet("Strength Block", { views: [{ showGridLines: false, state: "frozen", xSplit: 1, ySplit: 15 }] });
-    const paste = workbook.addWorksheet("PASTE_WEEK_1");
-    const readme = workbook.addWorksheet("README", { views: [{ showGridLines: false }] });
-    const widths = [4.28, 34, 26, 8, 11, 10, 12, 42, 16.8];
-    widths.forEach((width, i) => { ws.getColumn(i + 1).width = width; });
+  function renderPasteTab(workbook, sheetName, rows) {
+    const paste = workbook.addWorksheet(sheetName);
     [12, 34, 24, 8, 12, 10, 12, 50, 18].forEach((width, i) => { paste.getColumn(i + 1).width = width; });
-    readme.getColumn(1).width = 4;
-    readme.getColumn(2).width = 100;
-        rows.forEach((row, rIdx) => {
+    rows.forEach((row, rIdx) => {
       const r = paste.getRow(rIdx + 1);
       row.forEach((value, cIdx) => {
         const cell = r.getCell(cIdx + 1);
@@ -136,7 +145,6 @@
           fill: rIdx === 0 ? "FF1F4E78" : "FFFFFFFF",
           font: { name: "Calibri", size: rIdx === 0 ? 11 : 10, bold: rIdx === 0, color: { argb: rIdx === 0 ? "FFFFFFFF" : "FF111111" } }
         });
-        // Hyperlink Exercise column (cIdx 1 = column 2) on data rows
         if (rIdx > 0 && cIdx === 1 && value && window.ExerciseDemos) {
           const demo = window.ExerciseDemos.resolveExerciseDemo(value);
           if (demo && demo.url) {
@@ -147,13 +155,138 @@
       });
       r.height = rIdx === 0 ? 22 : 28;
     });
-     paste.views = [{ state: "frozen", ySplit: 1 }];
+    paste.views = [{ state: "frozen", ySplit: 1 }];
+  }
+
+  function renderStrengthBlock(ws, weeks) {
+    const widths = [4.28, 34, 26, 8, 11, 10, 12, 42, 16.8];
+    widths.forEach((width, i) => { ws.getColumn(i + 1).width = width; });
+    // Paint a black canvas large enough for 4 weeks of dense rows.
+    for (let r = 1; r <= 400; r++) {
+      ws.getRow(r).height = r < 13 ? 14 : 18;
+      for (let c = 1; c <= 9; c++) {
+        styleCell(ws.getRow(r).getCell(c), {
+          fill: "FF000000",
+          font: { name: "Calibri", size: 9, color: { argb: "FFFFFFFF" } },
+          border: "FF222222"
+        });
+      }
+    }
+    let excelRow = 13;
+    weeks.forEach((wk) => {
+      // Banner
+      ws.mergeCells("B" + excelRow + ":I" + excelRow);
+      const banner = ws.getCell("B" + excelRow);
+      banner.value = "WEEK " + wk.week;
+      styleCell(banner, {
+        fill: "FF18D3C5",
+        font: { name: "Calibri", size: 11, bold: true, color: { argb: "FF000000" } },
+        alignment: { horizontal: "center", vertical: "middle" },
+        border: "FFCFCFCF"
+      });
+      ws.getRow(excelRow).height = 22;
+      excelRow += 1;
+      // Header row
+      REQUIRED.slice(1).forEach((h, i) => {
+        const c = ws.getRow(excelRow).getCell(i + 2);
+        c.value = h;
+        styleCell(c, {
+          fill: i + 2 === 9 ? "FF000000" : "FFD9D9D9",
+          font: { name: "Calibri", size: 9, bold: true, color: { argb: i + 2 === 9 ? "FFFFFFFF" : "FF111111" } },
+          alignment: { horizontal: "center", vertical: "middle", wrapText: true }
+        });
+      });
+      ws.getRow(excelRow).height = 20;
+      excelRow += 1;
+      // Data rows grouped by Day
+      let groupStart = excelRow;
+      let currentDay = null;
+      const dataRows = wk.rows.slice(1);
+      dataRows.forEach((row) => {
+        const day = row[0] || currentDay || "";
+        if (currentDay !== null && day !== currentDay) {
+          if (excelRow - 1 > groupStart) ws.mergeCells(groupStart, 1, excelRow - 1, 1);
+          const dayCell = ws.getRow(groupStart).getCell(1);
+          dayCell.value = currentDay;
+          styleCell(dayCell, {
+            fill: "FF18D3C5",
+            font: { name: "Calibri", size: 8, bold: true, color: { argb: "FF000000" } },
+            alignment: { horizontal: "center", vertical: "middle", textRotation: 90, wrapText: true },
+            border: "FF18D3C5"
+          });
+          excelRow += 1;
+          groupStart = excelRow;
+        }
+        currentDay = day;
+        const r = ws.getRow(excelRow);
+        r.height = 38;
+        for (let c = 2; c <= 8; c++) {
+          const cell = r.getCell(c);
+          const rawValue = row[c - 1] || "";
+          cell.value = rawValue;
+          styleCell(cell, {
+            fill: "FFEDEDED",
+            font: { name: "Calibri", size: 9, bold: c === 2 || c === 7, color: { argb: c === 7 ? "FF0E9C91" : "FF111111" } },
+            alignment: { horizontal: [2, 3, 8].includes(c) ? "left" : "center", vertical: "middle", wrapText: true }
+          });
+          if (c === 2 && rawValue && window.ExerciseDemos) {
+            const demo = window.ExerciseDemos.resolveExerciseDemo(rawValue);
+            if (demo && demo.url) {
+              cell.value = { text: rawValue, hyperlink: demo.url, tooltip: "Open demo in YouTube (use incognito to avoid watch-history)" };
+              cell.font = { name: "Calibri", size: 9, bold: true, color: { argb: "FF0563C1" }, underline: true };
+            }
+          }
+        }
+        const resultCell = r.getCell(9);
+        resultCell.value = "";
+        styleCell(resultCell, {
+          fill: "FF000000",
+          font: { name: "Calibri", size: 9, bold: true, color: { argb: "FFFFFFFF" } },
+          alignment: { horizontal: "center", vertical: "middle", wrapText: true }
+        });
+        excelRow += 1;
+      });
+      if (currentDay !== null) {
+        if (excelRow - 1 > groupStart) ws.mergeCells(groupStart, 1, excelRow - 1, 1);
+        const dayCell = ws.getRow(groupStart).getCell(1);
+        dayCell.value = currentDay;
+        styleCell(dayCell, {
+          fill: "FF18D3C5",
+          font: { name: "Calibri", size: 8, bold: true, color: { argb: "FF000000" } },
+          alignment: { horizontal: "center", vertical: "middle", textRotation: 90, wrapText: true },
+          border: "FF18D3C5"
+        });
+      }
+      // Spacer between weeks
+      excelRow += 2;
+    });
+  }
+
+  async function buildStrengthSpreadsheet(text) {
+    if (!window.ExcelJS) throw new Error("Spreadsheet engine did not load. Check your connection and try again.");
+    if (window.ExerciseDemos && window.ExerciseDemos.load) {
+      try { await window.ExerciseDemos.load(); } catch (e) { console.warn("Exercise demos failed to load, falling back to search:", e); }
+    }
+    const weeks = extractAllWeeks(text);
+    const workbook = new ExcelJS.Workbook();
+    workbook.creator = "Raz Pilosof Strength Program Coaching Engine";
+    workbook.created = new Date();
+    const ws = workbook.addWorksheet("Strength Block", { views: [{ showGridLines: false, state: "frozen", xSplit: 1, ySplit: 12 }] });
+    weeks.forEach((wk) => {
+      renderPasteTab(workbook, "PASTE_WEEK_" + wk.week, wk.rows);
+    });
+    const readme = workbook.addWorksheet("README", { views: [{ showGridLines: false }] });
+    readme.getColumn(1).width = 4;
+    readme.getColumn(2).width = 100;
+
+    renderStrengthBlock(ws, weeks);
+
     readme.getCell("B2").value = "Strength Block Spreadsheet";
     readme.getCell("B2").font = { name: "Calibri", size: 20, bold: true, color: { argb: "FF000000" } };
-    readme.getCell("B4").value = "Created by the AI Coaching Engine. Use the Strength Block sheet for the client-facing program. Use the black Results column to record completed work.";
+    const weeksFound = weeks.map((w) => "Week " + w.week).join(", ");
+    readme.getCell("B4").value = "Created by the AI Coaching Engine. This workbook contains " + weeks.length + " week(s): " + weeksFound + ". Use the Strength Block sheet for the client-facing program. Use the black Results column to record completed work.";
     readme.getCell("B4").alignment = { wrapText: true };
 
-    // Privacy disclosure for embedded YouTube demo hyperlinks
     readme.getCell("B6").value = "Exercise Demo Links — Privacy Notice";
     readme.getCell("B6").font = { name: "Calibri", size: 12, bold: true, color: { argb: "FF000000" } };
     const disclosure = (window.ExerciseDemos && window.ExerciseDemos.getPrivacyDisclosure)
@@ -164,133 +297,54 @@
     readme.getCell("B7").font = { name: "Calibri", size: 10, color: { argb: "FF333333" } };
     readme.getRow(7).height = 60;
 
-    for (let r = 1; r <= 90; r++) {
-      ws.getRow(r).height = r < 15 ? 14 : 18;
-      for (let c = 1; c <= 9; c++) {
-        styleCell(ws.getRow(r).getCell(c), {
-          fill: "FF000000",
-          font: { name: "Calibri", size: 9, color: { argb: "FFFFFFFF" } },
-          border: "FF222222"
-        });
-      }
-    }
-    ws.mergeCells("B15:I15");
-    const week = ws.getCell("B15");
-    week.value = "WEEK 1";
-    styleCell(week, {
-      fill: "FF18D3C5",
-      font: { name: "Calibri", size: 11, bold: true, color: { argb: "FF000000" } },
-      alignment: { horizontal: "center", vertical: "middle" },
-      border: "FFCFCFCF"
-    });
-    ws.getRow(15).height = 22;
-    REQUIRED.slice(1).forEach((h, i) => {
-      const c = ws.getRow(16).getCell(i + 2);
-      c.value = h;
-      styleCell(c, {
-        fill: i + 2 === 9 ? "FF000000" : "FFD9D9D9",
-        font: { name: "Calibri", size: 9, bold: true, color: { argb: i + 2 === 9 ? "FFFFFFFF" : "FF111111" } },
-        alignment: { horizontal: "center", vertical: "middle", wrapText: true }
-      });
-    });
-    ws.getRow(16).height = 20;
-    let excelRow = 17;
-    let groupStart = 17;
-    let currentDay = null;
-    const dataRows = rows.slice(1);
-    dataRows.forEach((row) => {
-      const day = row[0] || currentDay || "";
-      if (currentDay !== null && day !== currentDay) {
-        if (excelRow - 1 > groupStart) ws.mergeCells(groupStart, 1, excelRow - 1, 1);
-        const dayCell = ws.getRow(groupStart).getCell(1);
-        dayCell.value = currentDay;
-        styleCell(dayCell, {
-          fill: "FF18D3C5",
-          font: { name: "Calibri", size: 8, bold: true, color: { argb: "FF000000" } },
-          alignment: { horizontal: "center", vertical: "middle", textRotation: 90, wrapText: true },
-          border: "FF18D3C5"
-        });
-        excelRow += 1;
-        groupStart = excelRow;
-      }
-      currentDay = day;
-      const r = ws.getRow(excelRow);
-      r.height = 38;
-        for (let c = 2; c <= 8; c++) {
-        const cell = r.getCell(c);
-        const rawValue = row[c - 1] || "";
-        cell.value = rawValue;
-        styleCell(cell, {
-          fill: "FFEDEDED",
-          font: { name: "Calibri", size: 9, bold: c === 2 || c === 7, color: { argb: c === 7 ? "FF0E9C91" : "FF111111" } },
-          alignment: { horizontal: [2, 3, 8].includes(c) ? "left" : "center", vertical: "middle", wrapText: true }
-        });
-        // Hyperlink the Exercise column (col 2) to a video demo
-        if (c === 2 && rawValue && window.ExerciseDemos) {
-          const demo = window.ExerciseDemos.resolveExerciseDemo(rawValue);
-          if (demo && demo.url) {
-            cell.value = { text: rawValue, hyperlink: demo.url, tooltip: "Open demo in YouTube (use incognito to avoid watch-history)" };
-            cell.font = { name: "Calibri", size: 9, bold: true, color: { argb: "FF0563C1" }, underline: true };
-          }
-        }
-      }
-      const resultCell = r.getCell(9);
-      resultCell.value = "";
-      styleCell(resultCell, {
-        fill: "FF000000",
-        font: { name: "Calibri", size: 9, bold: true, color: { argb: "FFFFFFFF" } },
-        alignment: { horizontal: "center", vertical: "middle", wrapText: true }
-      });
-      excelRow += 1;
-    });
-    if (currentDay !== null) {
-      if (excelRow - 1 > groupStart) ws.mergeCells(groupStart, 1, excelRow - 1, 1);
-      const dayCell = ws.getRow(groupStart).getCell(1);
-      dayCell.value = currentDay;
-      styleCell(dayCell, {
-        fill: "FF18D3C5",
-        font: { name: "Calibri", size: 8, bold: true, color: { argb: "FF000000" } },
-        alignment: { horizontal: "center", vertical: "middle", textRotation: 90, wrapText: true },
-        border: "FF18D3C5"
-      });
-    }
     const buffer = await workbook.xlsx.writeBuffer();
     const blob = new Blob([buffer], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
-    a.download = "strength_block_week1.xlsx";
+    a.download = weeks.length > 1 ? "strength_block_4_weeks.xlsx" : "strength_block_week1.xlsx";
     document.body.appendChild(a);
     a.click();
     a.remove();
     URL.revokeObjectURL(url);
-    return rows.length - 1;
+    return weeks.reduce((acc, w) => acc + (w.rows.length - 1), 0);
   }
 
-  // Detect whether a program text contains a usable TSV/table block
   function hasSpreadsheetData(text) {
     try { extractRows(text); return true; } catch (_) { return false; }
   }
-
-  // Return the normalized table rows (header + rows) for on-page rendering,
-  // or null if no usable table is present. Uses the same parser as the
-  // spreadsheet export so the on-screen table can never drift from the file.
   function getProgramTable(text) {
     try { return extractRows(text); } catch (_) { return null; }
   }
-
-  // Split program text into the narrative before the table and after it,
-  // with the raw TSV/markdown table block (and START/END markers) removed.
   function splitProgramNarrative(text) {
     if (!text) return { before: "", after: "" };
-    const s = text.indexOf("START_WEEK1_TSV");
-    const e = text.indexOf("END_WEEK1_TSV");
-    if (s !== -1 && e !== -1 && e > s) {
-      const before = text.slice(0, s).replace(/```(?:text|tsv|plaintext)?\s*$/i, "").trim();
-      const after = text.slice(e + "END_WEEK1_TSV".length).replace(/^\s*```/i, "").trim();
-      return { before, after };
+    const markers = [
+      ["START_WEEK1_TSV", "END_WEEK1_TSV"],
+      ["START_WEEK2_TSV", "END_WEEK2_TSV"],
+      ["START_WEEK3_TSV", "END_WEEK3_TSV"],
+      ["START_WEEK4_TSV", "END_WEEK4_TSV"]
+    ];
+    let firstStart = -1;
+    let lastEnd = -1;
+    markers.forEach(([s, e]) => {
+      const si = text.indexOf(s);
+      const ei = text.indexOf(e);
+      if (si !== -1 && ei !== -1 && ei > si) {
+        if (firstStart === -1 || si < firstStart) firstStart = si;
+        const endPos = ei + e.length;
+        if (endPos > lastEnd) lastEnd = endPos;
+      }
+    });
+    if (firstStart !== -1 && lastEnd !== -1) {
+      let before = text.slice(0, firstStart).replace(/```(?:text|tsv|plaintext)?\s*$/i, "").trim();
+      let after = text.slice(lastEnd).replace(/^\s*```/i, "").trim();
+      markers.forEach(([s, e]) => {
+        const re = new RegExp(s + "[\\s\\S]*?" + e, "g");
+        before = before.replace(re, "");
+        after = after.replace(re, "");
+      });
+      return { before: before.trim(), after: after.trim() };
     }
-    // No markers: strip any pipe/tab table lines so narrative shows clean.
     const lines = text.split(/\r?\n/);
     const keep = lines.filter((l) => !(l.includes("|") || /\t/.test(l)));
     return { before: keep.join("\n").trim(), after: "" };
