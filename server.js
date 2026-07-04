@@ -1519,6 +1519,79 @@ app.post("/api/build", async (req, res) => {
 });
 
 // Adjust an existing program (surgical diff) -> returns a job id
+// Change program language (en <-> he) WITHOUT rebuilding the whole plan.
+// Persists intake.language and triggers an adjust-style translation job so
+// prose, exercise names and Notes are re-emitted in the target language
+// while structural TSV tokens (columns, day names, [WARMUP] prefix, loads)
+// stay unchanged.
+async function runSetLanguageJob(jobId, token, targetLang) {
+  try {
+    const client = await store.getClient(token);
+    if (!client) throw new Error("No saved program for this client yet.");
+    const intake = JSON.parse(client.intake);
+    const previousLang = intake.language || "en";
+    intake.language = targetLang;
+    const now = Date.now();
+    // Persist the language change FIRST so future adjusts inherit it even if
+    // the translation step fails.
+    await store.upsertClient(token, JSON.stringify(intake), client.program, now);
+
+    const targetName = targetLang === "he" ? "Hebrew" : "English";
+    const changeRequest = [
+      `LANGUAGE CHANGE ONLY. Translate this entire program from ${previousLang === "he" ? "Hebrew" : "English"} to ${targetName}.`,
+      "Do NOT change any loads, sets, reps, rest times, RPE targets, days, or exercise selection.",
+      "Do NOT rebuild the program. Only re-emit every client-facing string in the target language.",
+      "Obey LOCALIZATION_RULES exactly: structural TSV tokens (column headers, Mon/Tue/... day tokens, [WARMUP] prefix, WEEK1..WEEK4 labels, kg/s/min units and numeric values) remain in English regardless of target language.",
+      `intake.language is now '${targetLang}' — keep it that way.`,
+    ].join(" ");
+    const program = privacyScrub(await runEngine(adjustPrompt(intake, client.program, changeRequest)), intake);
+    const finishedAt = Date.now();
+    await store.updateClientProgram(token, program, finishedAt);
+    await store.addHistory(token, "adjust", `[language:${targetLang}] ${changeRequest}`, program, finishedAt);
+    await store.finishJob(jobId, "done", program, null, finishedAt);
+  } catch (e) {
+    console.error("set-language job error:", e);
+    await store.finishJob(jobId, "error", null, e.message || "Engine error.", Date.now());
+  }
+}
+
+app.post("/api/set-language", async (req, res) => {
+  try {
+    const token = (req.body?.token || "").trim();
+    const language = (req.body?.language || "").trim().toLowerCase();
+    if (!token) return res.status(400).json({ error: "Missing client token." });
+    if (language !== "en" && language !== "he") {
+      return res.status(400).json({ error: "Language must be 'en' or 'he'." });
+    }
+    const client = await store.getClient(token);
+    if (!client) return res.status(404).json({ error: "No saved program for this client yet." });
+
+    // Fast path: if the requested language already matches the stored intake,
+    // there is nothing to translate. Return the current program immediately.
+    const intake = JSON.parse(client.intake);
+    if ((intake.language || "en") === language) {
+      return res.json({ status: "nochange", token, language });
+    }
+
+    // Language change counts against the adjust quota because it uses the
+    // same engine path.
+    const u = await store.getUsage(token);
+    if (u.adjusts >= DAILY_ADJUSTS) {
+      return res.status(429).json({
+        error: `You've reached today's adjustment limit (${DAILY_ADJUSTS}). Try again tomorrow.`,
+      });
+    }
+
+    const jobId = crypto.randomBytes(16).toString("hex");
+    await store.createJob(jobId, token, "adjust", Date.now());
+    runSetLanguageJob(jobId, token, language);
+    res.status(202).json({ job_id: jobId, token, status: "pending", language });
+  } catch (e) {
+    console.error("set-language error:", e);
+    res.status(500).json({ error: e.message || "Engine error." });
+  }
+});
+
 app.post("/api/adjust", async (req, res) => {
   try {
     const token = (req.body?.token || "").trim();

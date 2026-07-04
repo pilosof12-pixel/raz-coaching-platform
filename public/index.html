@@ -60,6 +60,21 @@
     .status{margin-top:12px;font-size:13.5px;min-height:18px}
     .status.err{color:var(--red)} .status.ok{color:var(--ok)}
     .hidden{display:none!important}
+
+    /* Language toggle (intake + program card) */
+    .lang-toggle{display:inline-flex;gap:0;background:var(--panel2);border:1px solid var(--line);
+      border-radius:10px;padding:4px;margin:6px 0 2px}
+    .lang-btn{background:transparent;color:var(--muted);border:none;padding:9px 18px;
+      font-size:14px;font-weight:600;border-radius:7px;cursor:pointer;letter-spacing:.2px;
+      transition:background .15s ease,color .15s ease}
+    .lang-btn:hover{color:var(--text)}
+    .lang-btn.active{background:var(--teal);color:#04211f}
+    .lang-btn[disabled]{opacity:.5;cursor:not-allowed}
+    .lang-toggle-compact .lang-btn{padding:6px 12px;font-size:13px}
+    .program-head{display:flex;align-items:flex-start;justify-content:space-between;gap:14px;flex-wrap:wrap;margin-bottom:12px}
+    /* Right-to-left rendering when program is Hebrew */
+    #program-render[dir="rtl"] table{direction:rtl}
+    #program-render[dir="rtl"] th,#program-render[dir="rtl"] td{text-align:right}
     /* program display */
     /* legacy raw block (fallback only) — clean sans-serif, readable */
     #program-card pre{white-space:pre-wrap;word-break:break-word;background:var(--panel2);border:1px solid var(--line);
@@ -143,6 +158,17 @@
       <h3>Your intake</h3>
       <p class="hint">Be specific. The more precise your goal, the sharper your program. <span class="req">*</span> = required.</p>
 
+      <label>Program language <span class="req">*</span></label>
+      <div class="lang-toggle" role="radiogroup" aria-label="Program language">
+        <button type="button" class="lang-btn active" data-lang="en" id="lang-en">English</button>
+        <button type="button" class="lang-btn" data-lang="he" id="lang-he">עברית &middot; Hebrew</button>
+      </div>
+      <select id="language" class="hidden" aria-hidden="true">
+        <option value="en" selected>English</option>
+        <option value="he">עברית (Hebrew)</option>
+      </select>
+      <div class="row-help">All coaching prose, exercise names and notes will be written in this language. Numbers and units stay in kg.</div>
+
       <label>Primary goals <span class="req">*</span></label>
       <textarea id="goal_primary" placeholder="List your top priorities, one per line. e.g.&#10;200 kg back squat&#10;100 kg strict overhead press&#10;one-arm pull-up&#10;MMA / sparring conditioning"></textarea>
       <div class="row-help">List every result that matters most — one per line. They all get equal top priority in your program. A load, a rep count, a skill, a sport, a time.</div>
@@ -205,13 +231,6 @@
         <div class="row-help">Only list what you actually have access to — the engine builds strictly within it.</div>
       </div>
 
-      <label>Program language</label>
-      <select id="language">
-        <option value="en">English</option>
-        <option value="he">עברית (Hebrew)</option>
-      </select>
-      <div class="row-help">Coaching prose, exercise names and notes are written in this language. Numbers and units stay in kg.</div>
-
       <label>Current strength / relevant numbers (optional but helpful)</label>
       <textarea id="current_numbers" placeholder="e.g. squat 120 kg x 5, max 12 strict pull-ups, can hold a 20s tuck planche"></textarea>
       <div class="row-help">Helps the engine size the work to you. Only what you actually do now.</div>
@@ -247,8 +266,17 @@
 
     <!-- PROGRAM -->
     <section class="card hidden" id="program-card">
-      <h3>Your program <span class="pill" id="prog-pill">Week 1</span></h3>
-      <p class="hint" id="prog-sub">Your individualized plan. Scroll the table, then make a spreadsheet or adjust it below.</p>
+      <div class="program-head">
+        <div>
+          <h3 style="margin:0">Your program <span class="pill" id="prog-pill">Week 1</span></h3>
+          <p class="hint" id="prog-sub" style="margin:6px 0 0">Your individualized plan. Scroll the table, then make a spreadsheet or adjust it below.</p>
+        </div>
+        <div class="lang-toggle lang-toggle-compact" role="radiogroup" aria-label="Program language">
+          <button type="button" class="lang-btn active" data-lang="en" id="prog-lang-en">EN</button>
+          <button type="button" class="lang-btn" data-lang="he" id="prog-lang-he">עברית</button>
+        </div>
+      </div>
+      <div class="status" id="prog-lang-status" style="margin-top:6px"></div>
 
       <!-- SAVE CODE — shown FIRST, before the program, so it can't be missed -->
       <div class="save-note save-note-strong" id="save-note">

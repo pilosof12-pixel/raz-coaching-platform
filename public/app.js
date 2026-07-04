@@ -14,10 +14,85 @@
 
   let currentToken = store.get(LS_TOKEN) || "";
   let currentProgram = "";
+  let currentLanguage = "en"; // reflects the language of the CURRENT program on screen
 
   function setStatus(el, msg, kind) {
     el.className = "status" + (kind ? " " + kind : "");
     el.textContent = msg || "";
+  }
+
+  // ---- Language toggle (intake form + program card) ----
+  // The intake toggle mirrors its state into the hidden <select id="language">
+  // so collectIntake() keeps working unchanged.
+  function bindLangGroup(buttonIds, onChange) {
+    const buttons = buttonIds.map((id) => $(id)).filter(Boolean);
+    buttons.forEach((btn) => {
+      btn.addEventListener("click", () => {
+        const lang = btn.getAttribute("data-lang");
+        buttons.forEach((b) => b.classList.toggle("active", b === btn));
+        if (typeof onChange === "function") onChange(lang);
+      });
+    });
+    return {
+      set(lang) {
+        buttons.forEach((b) => b.classList.toggle("active", b.getAttribute("data-lang") === lang));
+      },
+      disable(disabled) {
+        buttons.forEach((b) => { b.disabled = !!disabled; });
+      },
+    };
+  }
+
+  const intakeLangCtl = bindLangGroup(["lang-en", "lang-he"], (lang) => {
+    const sel = $("language");
+    if (sel) sel.value = lang;
+  });
+  // Initialise the hidden select from the default-active button.
+  (function initIntakeLang(){
+    const active = document.querySelector(".lang-toggle .lang-btn.active");
+    const sel = $("language");
+    if (active && sel) sel.value = active.getAttribute("data-lang") || "en";
+  })();
+
+  // Program-card toggle: switches the ACTIVE program's language via API.
+  const programLangCtl = bindLangGroup(["prog-lang-en", "prog-lang-he"], async (lang) => {
+    if (!currentToken) {
+      setStatus($("prog-lang-status"), "Build a program first.", "err");
+      programLangCtl.set(currentLanguage);
+      return;
+    }
+    if (lang === currentLanguage) return;
+    programLangCtl.disable(true);
+    setStatus($("prog-lang-status"), lang === "he" ? "מתרגם לעברית…" : "Switching to English…", "");
+    try {
+      const data = await runJob(
+        "/api/set-language",
+        { token: currentToken, language: lang },
+        (secs) => setStatus($("prog-lang-status"), (lang === "he" ? "מתרגם… " : "Translating… ") + "(" + secs + "s)", "")
+      );
+      if (data && data.program) {
+        currentLanguage = lang;
+        showProgram(data.program, data.token || currentToken);
+        setStatus($("prog-lang-status"), lang === "he" ? "התוכנית עודכנה לעברית." : "Program updated to English.", "ok");
+      } else {
+        // Server may return {status:'nochange'} — just sync UI.
+        currentLanguage = lang;
+        setStatus($("prog-lang-status"), "", "");
+      }
+    } catch (e) {
+      programLangCtl.set(currentLanguage);
+      setStatus($("prog-lang-status"), e.message || "Language switch failed.", "err");
+    } finally {
+      programLangCtl.disable(false);
+    }
+  });
+
+  // Detect the language of the currently displayed program so the toggle
+  // reflects reality after build/adjust/load. Cheap heuristic: any Hebrew
+  // codepoint in the client-facing prose implies he.
+  function detectProgramLanguage(program) {
+    if (!program) return "en";
+    return /[\u0590-\u05FF]/.test(program) ? "he" : "en";
   }
 
   // ---- Sport-day scheduler (chips) ----
@@ -327,6 +402,11 @@
     const rendered = renderProgram(program);
     $("program-text").classList.toggle("hidden", rendered);
     $("program-render").classList.toggle("hidden", !rendered);
+    // Sync program-card language toggle to what we're actually showing.
+    currentLanguage = detectProgramLanguage(program);
+    programLangCtl.set(currentLanguage);
+    const renderHost = $("program-render");
+    if (renderHost) renderHost.setAttribute("dir", currentLanguage === "he" ? "rtl" : "ltr");
     // Toggle spreadsheet button if no TSV/table detected
     const hasData = window.hasSpreadsheetData && window.hasSpreadsheetData(program);
     $("sheet-btn").style.display = hasData ? "" : "none";
