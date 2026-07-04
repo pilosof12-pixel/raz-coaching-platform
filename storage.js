@@ -16,8 +16,12 @@ import { fileURLToPath } from "url";
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 const SUPABASE_URL = process.env.SUPABASE_URL || "";
+const SUPABASE_SERVICE_ROLE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY || "";
 const SUPABASE_ANON_KEY = process.env.SUPABASE_ANON_KEY || "";
-export const USING_SUPABASE = Boolean(SUPABASE_URL && SUPABASE_ANON_KEY);
+// Prefer service_role (backend-only, bypasses RLS). Fall back to anon for local dev.
+const SUPABASE_KEY = SUPABASE_SERVICE_ROLE_KEY || SUPABASE_ANON_KEY;
+export const USING_SUPABASE = Boolean(SUPABASE_URL && SUPABASE_KEY);
+export const SUPABASE_KEY_MODE = SUPABASE_SERVICE_ROLE_KEY ? "service_role" : (SUPABASE_ANON_KEY ? "anon" : "none");
 
 function todayUTC() {
   return new Date().toISOString().slice(0, 10);
@@ -35,7 +39,7 @@ function makeSupabaseStorage() {
     // needs an explicit WebSocket transport or it throws at construction time,
     // so we supply the `ws` package. Render's free tier may also run Node 20.
     const { default: WS } = await import("ws");
-    client = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+    client = createClient(SUPABASE_URL, SUPABASE_KEY, {
       auth: { persistSession: false, autoRefreshToken: false },
       realtime: { transport: WS },
       global: { headers: { "X-Client-Info": "raz-coaching-platform" } },
