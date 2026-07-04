@@ -185,6 +185,16 @@
         </div>
       </div>
 
+      <label>Where will you train? <span class="req">*</span></label>
+      <select id="training_location">
+        <option value="commercial_gym">Commercial gym</option>
+        <option value="home_gym">Home gym / garage</option>
+        <option value="outdoor_park">Outdoor park / calisthenics bars</option>
+        <option value="hotel_room">Hotel room / travel</option>
+        <option value="home_bodyweight">Home, bodyweight only</option>
+      </select>
+      <div class="row-help">The engine will only prescribe exercises that are physically possible in this location.</div>
+
       <label>Equipment available <span class="req">*</span></label>
       <select id="equipment_type">
         <option value="full_gym">Full commercial gym (everything available)</option>
@@ -194,6 +204,13 @@
         <textarea id="equipment" placeholder="List what you've got. e.g. barbell + rack + plates to 180 kg, adjustable dumbbells to 40 kg, pull-up bar, bands, bench. No machines."></textarea>
         <div class="row-help">Only list what you actually have access to — the engine builds strictly within it.</div>
       </div>
+
+      <label>Program language</label>
+      <select id="language">
+        <option value="en">English</option>
+        <option value="he">עברית (Hebrew)</option>
+      </select>
+      <div class="row-help">Coaching prose, exercise names and notes are written in this language. Numbers and units stay in kg.</div>
 
       <label>Current strength / relevant numbers (optional but helpful)</label>
       <textarea id="current_numbers" placeholder="e.g. squat 120 kg x 5, max 12 strict pull-ups, can hold a 20s tuck planche"></textarea>

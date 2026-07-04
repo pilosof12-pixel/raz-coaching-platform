@@ -104,6 +104,8 @@
       session_length: $("session_length").value,
       bodyweight: $("bodyweight").value.trim(),
       equipment: equipment,
+      training_location: ($("training_location") && $("training_location").value) || "commercial_gym",
+      language: ($("language") && $("language").value) || "en",
       split_preference: $("split_pref").value,
       current_numbers: $("current_numbers").value.trim(),
       injuries: $("injuries").value.trim(),
@@ -118,6 +120,7 @@
     if (!i.experience) return "Please choose your experience level.";
     if (!i.days_per_week) return "Please choose your training days per week.";
     if (!i.equipment) return "Please tell us what equipment you have.";
+    if (!i.training_location) return "Please tell us where you'll train.";
     return null;
   }
 
