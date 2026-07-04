@@ -510,6 +510,25 @@
       const res = await fetch("/api/program/" + encodeURIComponent(token));
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Couldn't find that code.");
+      // Rebuildable = intake saved but the last build failed (empty program).
+      // Offer a one-click retry with the same token instead of a dead code.
+      if (data.rebuildable && data.intake) {
+        currentToken = data.token;
+        store.set(LS_TOKEN, data.token);
+        setStatus($("return-status"), "We saved your intake but the last build didn't finish. Retrying now…", "");
+        try {
+          const built = await runJob(
+            "/api/build",
+            { intake: data.intake, token: data.token },
+            (secs) => setStatus($("return-status"), `Building again… (${secs}s)`, "")
+          );
+          showProgram(built.program, built.token);
+          setStatus($("return-status"), "Your program is ready.", "ok");
+        } catch (rebuildErr) {
+          setStatus($("return-status"), (rebuildErr && rebuildErr.message) || "Rebuild failed. Please try again in a minute.", "err");
+        }
+        return;
+      }
       showProgram(data.program, data.token);
       setStatus($("return-status"), "Loaded your saved program.", "ok");
     } catch (e) {

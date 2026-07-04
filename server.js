@@ -112,14 +112,26 @@ function isValidProgram(p) {
   if (!p || typeof p !== "string") return false;
   const t = p.trim();
   if (t.length < 800) return false;
-  // Collapsed/degenerate: a single dominant non-alphanumeric char (dashes, dots, etc.)
-  const letters = (t.match(/[A-Za-z]/g) || []).length;
+  // Collapsed/degenerate: too few LETTERS relative to length (dashes/dots/spam).
+  // NOTE: we count letters from ANY script (Latin, Hebrew, Cyrillic, CJK, etc.)
+  // via the Unicode Letter property. The previous [A-Za-z]-only check rejected
+  // valid Hebrew programs as "degenerate" and drove the 5-attempt retry loop
+  // into failure when intake.language == 'he'.
+  let letters = 0;
+  try {
+    letters = (t.match(/\p{L}/gu) || []).length;
+  } catch (_e) {
+    // Extremely old Node without \p{L} support: fall back to Latin + Hebrew.
+    letters = (t.match(/[A-Za-z\u0590-\u05FF]/g) || []).length;
+  }
   if (letters / t.length < 0.25) return false;
   // Whitespace-run collapse: a rare large-prompt MAX_TOKENS failure where the model
   // emits a single enormous run of spaces/newlines (seen as a 1M+ char blob). A real
   // program never contains a 400+ char unbroken whitespace run, so reject and retry.
   if (/[ \t]{400,}|\n{200,}/.test(p)) return false;
   // Must contain the machine block markers the rest of the app and the UI rely on.
+  // These are STRUCTURAL tokens that stay literal English per LOCALIZATION_RULES,
+  // so they are safe to check regardless of the program's language.
   if (!t.includes("START_WEEK1_TSV") || !t.includes("END_WEEK1_TSV")) return false;
   return true;
 }
@@ -1459,6 +1471,27 @@ app.get("/api/health", (req, res) => {
 // GET /api/job/:id until status is "done" (or "error").
 
 async function runBuildJob(jobId, token, intake) {
+  // Persist the intake against the token BEFORE we run the engine. This way,
+  // if the engine call fails, the user's token is not orphaned: they can retry
+  // with the same code and the intake is still on file for a rebuild.
+  try {
+    const startedAt = Date.now();
+    const intakeJSON = JSON.stringify(intake);
+    const existing = await store.getClient(token);
+    // Only write a placeholder program if there's no client row yet; a returning
+    // token that's rebuilding must keep its previous good program until the new
+    // one is validated.
+    if (!existing) {
+      await store.upsertClient(token, intakeJSON, "", startedAt);
+    } else {
+      // Refresh the stored intake (client may have edited it) but keep the
+      // previous program intact until we have a new valid one.
+      await store.upsertClient(token, intakeJSON, existing.program || "", startedAt);
+    }
+  } catch (persistErr) {
+    console.error("pre-build intake persist failed:", persistErr);
+    // Continue — the build attempt is still worth running.
+  }
   try {
     const program = privacyScrub(await runEngine(buildPrompt(intake)), intake);
     const now = Date.now();
@@ -1638,12 +1671,18 @@ app.get("/api/job/:id", async (req, res) => {
 app.get("/api/program/:token", async (req, res) => {
   const client = await store.getClient(req.params.token);
   if (!client) return res.status(404).json({ error: "Not found." });
+  // A token whose only build failed will have an empty program string but a
+  // stored intake (we pre-persist before running the engine). Signal that
+  // clearly so the client can offer a one-click rebuild with the same token.
+  const program = client.program || "";
+  const rebuildable = !program.trim();
   res.json({
     token: client.token,
     intake: JSON.parse(client.intake),
-    program: client.program,
+    program,
     updated_at: client.updated_at,
-    _meta: { violations: readViolationCount(client.program) },
+    rebuildable,
+    _meta: { violations: readViolationCount(program) },
   });
 });
 
