@@ -29,10 +29,12 @@
 
   function cleanCell(value) {
     return String(value || "")
-      .replace(/<br\s*\/?>/gi, " ")
+      .replace(/<br\s*\/?>/gi, "\n")
+      .replace(/\\n/g, "\n")
       .replace(/\*\*/g, "")
       .replace(/`/g, "")
-      .replace(/\s+/g, " ")
+      .replace(/[ \t\r\f\v]+/g, " ")
+      .replace(/ *\n */g, "\n")
       .trim();
   }
   function normalizeHeader(value) {
