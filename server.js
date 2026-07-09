@@ -16,6 +16,19 @@ import path from "node:path";
 import crypto from "node:crypto";
 import { fileURLToPath } from "node:url";
 import { makeStorage } from "./storage.js";
+// Engine v19: deterministic post-generation validators (dependency-free module,
+// also imported directly by test/v19_validators.test.js).
+import {
+  validateExercisesAgainstDictionary,
+  validateEquipmentAgainstLocation,
+  enforceUnilateralIntensityFloor,
+  enforceIntradayConditioningOrder,
+  validateSportDayCoupling,
+  validateWeeklyVolumeBudget,
+  reformatWarmupCells,
+  hardSubstitute,
+  RETRIABLE_CODES,
+} from "./engine/exercise_dictionary.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const PORT = process.env.PORT || 8000;
@@ -1470,6 +1483,85 @@ app.get("/api/health", (req, res) => {
 // return a job id immediately and generate in the background; the client polls
 // GET /api/job/:id until status is "done" (or "error").
 
+// Engine v19: generate a program AND run it through the deterministic
+// post-generation validators, wrapping the existing 5-attempt retry loop.
+//
+// Pipeline per attempt (spec order):
+//   1. fixInvalidExerciseNames            (existing regex normalizer)
+//   2. validateExercisesAgainstDictionary (aliases corrected in place; throws EXERCISE_HALLUCINATION)
+//   3. validateEquipmentAgainstLocation   (throws EQUIPMENT_VIOLATION)
+//   4. enforceUnilateralIntensityFloor    (throws UNILATERAL_UNDERSTIMULATION)
+//   5. enforceIntradayConditioningOrder   (reorders in place; throws INTRADAY_ORDER_VIOLATION)
+//   6. validateSportDayCoupling           (throws SPORT_DAY_COUPLING_VIOLATION)
+//   7. validateWeeklyVolumeBudget         (throws WEEKLY_MRV_EXCEEDED)
+//   8. reformatWarmupCells                 (combine warmup drills into one cell, newline-separated)
+// scrubForbiddenWords / stripForbiddenColumns run afterwards inside privacyScrub.
+//
+// Each validator throws a retriable error carrying an amended user message. The
+// amendments ACCUMULATE across attempts (append, never replace). After a given
+// error code has failed 3 times we downgrade to a deterministic hard-substitute
+// pass rather than failing the whole build.
+async function generateValidatedProgram(intake) {
+  const MAX_ATTEMPTS = 5;
+  const basePrompt = buildPrompt(intake);
+  const amendments = [];
+  const failCounts = Object.create(null);
+  let lastValid = null;
+  for (let attempt = 1; attempt <= MAX_ATTEMPTS; attempt++) {
+    const userContent = amendments.length
+      ? basePrompt + "\n\n" + amendments.join("\n\n")
+      : basePrompt;
+    const raw = await runEngineRaw(userContent);
+    if (!isValidProgram(raw)) {
+      console.warn(
+        `generateValidatedProgram: invalid/degenerate output attempt ${attempt}/${MAX_ATTEMPTS} ` +
+          `(len=${raw ? raw.trim().length : 0}); retrying`
+      );
+      continue;
+    }
+    let program = fixInvalidExerciseNames(raw); // step 1
+    try {
+      const dict = validateExercisesAgainstDictionary(program, intake); // step 2
+      program = dict.program;
+      validateEquipmentAgainstLocation(program, intake);        // step 3
+      enforceUnilateralIntensityFloor(program, intake);         // step 4
+      program = enforceIntradayConditioningOrder(program, intake); // step 5
+      validateSportDayCoupling(program, intake);                // step 6
+      validateWeeklyVolumeBudget(program, intake);              // step 7
+      program = reformatWarmupCells(program);                   // step 8
+      return program;
+    } catch (err) {
+      if (err && err.code && RETRIABLE_CODES.has(err.code)) {
+        lastValid = program;
+        failCounts[err.code] = (failCounts[err.code] || 0) + 1;
+        console.warn(
+          `generateValidatedProgram: ${err.code} on attempt ${attempt}/${MAX_ATTEMPTS} ` +
+            `(count=${failCounts[err.code]})`
+        );
+        if (failCounts[err.code] >= 3) {
+          // Downgrade: deterministic hard-substitute pass so the client still
+          // gets a program instead of a hard failure.
+          console.warn(`generateValidatedProgram: downgrading to hard-substitute for ${err.code}`);
+          program = hardSubstitute(err.code, program, intake);
+          return reformatWarmupCells(program);
+        }
+        if (!amendments.includes(err.amendment)) amendments.push(err.amendment);
+        continue;
+      }
+      throw err; // non-retriable — surface it
+    }
+  }
+  // Attempts exhausted. If we ever produced a structurally-valid program, ship
+  // it through a final hard-substitute + warmup split rather than fail outright.
+  if (lastValid) {
+    for (const code of Object.keys(failCounts)) lastValid = hardSubstitute(code, lastValid, intake);
+    return reformatWarmupCells(lastValid);
+  }
+  throw new Error(
+    "The program generator returned an unusable result after multiple attempts. Please try again."
+  );
+}
+
 async function runBuildJob(jobId, token, intake) {
   // Persist the intake against the token BEFORE we run the engine. This way,
   // if the engine call fails, the user's token is not orphaned: they can retry
@@ -1493,7 +1585,7 @@ async function runBuildJob(jobId, token, intake) {
     // Continue — the build attempt is still worth running.
   }
   try {
-    const program = privacyScrub(await runEngine(buildPrompt(intake)), intake);
+    const program = privacyScrub(await generateValidatedProgram(intake), intake);
     const now = Date.now();
     const intakeJSON = JSON.stringify(intake);
     await store.upsertClient(token, intakeJSON, program, now);
