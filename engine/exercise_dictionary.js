@@ -137,13 +137,25 @@ const DICTIONARY_LIST = [
   "Weighted Vest Hill Sprint", "Sled Push", "Sled Drag", "Prowler Push",
   "Stair Sprint", "Jump Rope", "Skipping", "Shuttle Run", "Bear Hug Carry",
   "Burpee EMOM", "Sandbag Carry", "Backpack Carry",
+  "Zone-2 Bike", "Zone-2 Row", "Zone-2 Run", "Assault Bike", "Airbike Intervals",
   // --- Warmup / mobility drills (so prep chains land on real names) ---
   "Jumping Jacks", "Arm Circles", "Leg Swings", "Cat-Cow", "Bird-Dog",
   "World's Greatest Stretch", "Spiderman Lunge", "Inchworm", "Hip Airplane",
-  "90/90 Hip Rotation", "Ankle Dorsiflexion Drill", "Wrist Prep",
-  "Shoulder Dislocates", "Scapular Push-up", "Wall Slides", "Glute Activation",
-  "Band Pull-Apart Warm-up", "Cossack Squat Warm-up", "Deep Squat Hold",
-  "Thoracic Rotation", "Hip Flexor Stretch", "Adductor Rock",
+  "90/90 Hip Rotation", "90/90 Hip Switch", "Ankle Dorsiflexion Drill", "Wrist Prep",
+  "Shoulder Dislocates", "Banded Shoulder Dislocates", "Scapular Push-up",
+  "Wall Slides", "Glute Activation", "Glute Bridge",
+  "Band Pull-Apart Warm-up", "Band Pull-Apart", "Cossack Squat Warm-up",
+  "Deep Squat Hold", "Thoracic Rotation", "Quadruped T-Spine Rotation",
+  "T-Spine Rotation", "T-Spine Extension", "Hip Flexor Stretch", "Adductor Rock",
+  "Couch Stretch", "Sleeper Stretch", "Sleeper Stretch Modified",
+  "Banded Ankle Distraction", "Wall Ankle Dorsiflexion Test",
+  "Cat-Camel", "Spine Cycling", "Wrist Circles", "Shoulder CARs",
+  "Dead Hang", "Dead Bug", "Neck Isometric", "Neck Iso",
+  "Banded Hip Flexor March", "Pallof Press",
+  "Boxing Bag Warm-up", "Easy Skip", "Skipping Warm-up",
+  // --- Weighted variants (LLM prefers explicit names) ---
+  "Weighted Dip", "Weighted Chin-up", "Weighted Muscle-up",
+  "Weighted Pistol Squat", "Weighted Push-up", "Weighted Pull-up",
 ];
 
 export const EXERCISE_DICTIONARY = new Set(DICTIONARY_LIST);
@@ -154,6 +166,22 @@ export const EXERCISE_DICTIONARY = new Set(DICTIONARY_LIST);
 //    dictionary entry's normalized value (acronyms, reorderings, brand words).
 // ---------------------------------------------------------------------------
 const ALIAS_LIST = [
+  // Warmup / mobility hyphenation and phrasing variants
+  ["Scap Push-Up", "Scapular Push-up"],
+  ["Scap Push-up", "Scapular Push-up"],
+  ["Scapular Push-Up", "Scapular Push-up"],
+  ["Boxing Bag Work Easy", "Boxing Bag Warm-up"],
+  ["Bag Work Easy", "Boxing Bag Warm-up"],
+  ["Bike Easy", "Zone-2 Bike"],
+  ["Airbike Easy", "Zone-2 Bike"],
+  ["Assault Bike Easy", "Zone-2 Bike"],
+  ["Easy Bike", "Zone-2 Bike"],
+  ["90/90 Hip Rotations", "90/90 Hip Rotation"],
+  ["90/90 Hips", "90/90 Hip Rotation"],
+  ["Neck Isometric Front", "Neck Isometric"],
+  ["Neck Isometric Back", "Neck Isometric"],
+  ["Neck Isometric Side", "Neck Isometric"],
+  ["Wrist CARs", "Wrist Circles"],
   ["Wall HSPU", "Wall Handstand Push-up"],
   ["Wall HSPU Partial", "Wall Handstand Push-up Partial"],
   ["Deficit Wall HSPU", "Deficit Wall Handstand Push-up"],
