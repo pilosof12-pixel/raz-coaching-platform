@@ -16,6 +16,17 @@
 //   - LOCKED_OUT_UNDERSTIMULATING_EXERCISES (Set)
 //   - the four validators + their helpers
 //   - RetriableValidationError       (error class carrying a prompt amendment)
+//
+// v20 additionally imports the (dependency-free) skill-progression graph and
+// exports validateAndCalibrateSkills + SkillCalibrationError.
+
+import {
+  SKILL_PROGRESSIONS,
+  getGoalFamily,
+  parseSkillBenchmarks,
+  selectRungForSkill,
+  renderSkillWorkForRung,
+} from "./skill_progressions.js";
 
 // ---------------------------------------------------------------------------
 // 1. CANONICAL EXERCISE DICTIONARY
@@ -207,6 +218,19 @@ const ALIAS_LIST = [
   ["Single Leg Box Jump", "Single-Leg Box Jump"],
   ["Eccentric Pistol", "Eccentric Pistol Squat"],
   ["5s Eccentric Pistol Squat", "5-Second Eccentric Pistol Squat"],
+  // v20 FIX A: equipment-flavored / hyphenation variants seen in live builds.
+  ["Band-Assisted One-Arm Pull-Up Eccentric", "One-Arm Pull-up Eccentric"],
+  ["Band-Assisted OAP Eccentric", "One-Arm Pull-up Eccentric"],
+  ["Band-Assisted One-Arm Pull-Up", "Assisted One-Arm Pull-up"],
+  ["Band-Assisted OAP", "Assisted One-Arm Pull-up"],
+  ["Towel Pull-Up", "Pull-up"],
+  ["Towel Pull-up", "Pull-up"],
+  ["Weighted Push-Up", "Push-up"],
+  ["Weighted Push-up", "Push-up"],
+  ["Freestanding Handstand Push-Up Negative", "Freestanding Handstand Push-up Negative"],
+  ["Freestanding Handstand Push-Up Partial", "Freestanding Handstand Push-up Partial"],
+  ["Wall Handstand Push-Up Partial ROM", "Wall Handstand Push-up Partial"],
+  ["Wall Handstand Push-Up Partial", "Wall Handstand Push-up Partial"],
 ];
 
 export const EXERCISE_ALIASES = new Map(ALIAS_LIST);
@@ -514,7 +538,40 @@ const MODIFIER_SET = new Set([
   "eccentric", "eccentrics", "negative", "negatives", "isometric", "iso",
   "hold", "holds", "partial", "partials", "rom", "assisted", "tempo",
   "paused", "pause", "cluster", "amrap", "emom",
+  // v20: equipment-qualifier tokens (defense-in-depth if the parenthetical
+  // stripper in coreExerciseName misses a trailing bare qualifier).
+  "bar", "bars", "rings", "vest", "bench", "parallel", "parallelettes",
+  "wall", "floor", "mat", "band", "strict", "weighted", "single", "dual",
+  "towel", "two-handed",
 ]);
+
+// v20 FIX A: tokens that appear inside parentheses purely as equipment
+// annotations (e.g. "Archer Pull-Up (bar)", "Pistol Squat (Weighted Vest)").
+// When a parenthetical's inner content is composed only of these, it must be
+// stripped so the outer canonical name matches the dictionary. Case-insensitive.
+export const EQUIPMENT_QUALIFIERS = new Set([
+  "bar", "bars", "pull-up bar", "pull up bar", "dip bars", "parallel bars",
+  "parallelettes", "paralettes", "rings", "ring", "vest", "weighted vest",
+  "bench", "low bench", "high bench", "box", "plyo box", "wall", "floor", "mat",
+  "single towel two-handed", "towel", "dual towels", "dual towel",
+  "barbell", "dumbbells", "dumbbell", "kettlebell", "kettlebells", "band",
+  "bands", "resistance band", "cable", "smith", "landmine", "machine",
+  "assisted", "bodyweight",
+]);
+
+// True when a parenthetical's inner text is purely equipment annotation:
+// either the whole string is a known qualifier, or every /-, comma- or
+// space-separated chunk is one.
+export function isEquipmentQualifier(inner) {
+  const raw = String(inner || "").toLowerCase().trim();
+  if (!raw) return false;
+  if (EQUIPMENT_QUALIFIERS.has(raw)) return true;
+  const chunks = raw.split(/\s*[\/,]\s*/).map((c) => c.trim()).filter(Boolean);
+  if (chunks.length > 1 && chunks.every((c) => EQUIPMENT_QUALIFIERS.has(c))) return true;
+  const toks = raw.split(/\s+/).filter(Boolean);
+  if (toks.length && toks.every((t) => EQUIPMENT_QUALIFIERS.has(t))) return true;
+  return false;
+}
 
 const WARMUP_PREFIX_RE = /^\s*"?\s*\[(?:WARMUP|חימום)\]/i;
 export function isWarmupCell(cell) {
@@ -534,7 +591,8 @@ export function coreExerciseName(cell, isHebrew = false) {
     const inner = paren[2].trim();
     const outerHeb = /[֐-׿]/.test(outer);
     const innerLatin = /[A-Za-z]/.test(inner);
-    if (outerHeb && innerLatin) s = inner;                      // Hebrew-first -> English
+    if (isEquipmentQualifier(inner)) s = outer;                 // v20: equipment qualifier -> drop
+    else if (outerHeb && innerLatin) s = inner;                 // Hebrew-first -> English
     else if (/\d|sec|\bs\b|min|lower|hold|side|each|leg|tempo|pause|%|rir|rpe/i.test(inner)) s = outer; // annotation
     else s = outer + " " + inner;                               // brand/qualifier -> keep whole
   }
@@ -639,7 +697,21 @@ export class RetriableValidationError extends Error {
 export const RETRIABLE_CODES = new Set([
   "EXERCISE_HALLUCINATION", "EQUIPMENT_VIOLATION", "UNILATERAL_UNDERSTIMULATION",
   "INTRADAY_ORDER_VIOLATION", "SPORT_DAY_COUPLING_VIOLATION", "WEEKLY_MRV_EXCEEDED",
+  "SKILL_PREREQ_VIOLATION", "SKILL_UNDER_PROGRAMMED",
 ]);
+
+// Retriable error carrying a prompt amendment for skill-calibration failures.
+// Structurally identical to RetriableValidationError (so the retry loop treats
+// it uniformly) but named distinctly per the v20 spec.
+export class SkillCalibrationError extends Error {
+  constructor(code, amendment, details = {}) {
+    super(code);
+    this.name = "SkillCalibrationError";
+    this.code = code;
+    this.amendment = amendment;
+    this.details = details;
+  }
+}
 
 // ---------------------------------------------------------------------------
 // 10. VALIDATOR: exercise dictionary (zero-hallucination)
@@ -1469,6 +1541,207 @@ export function hardSubstitute(code, program, intake) {
     case "INTRADAY_ORDER_VIOLATION": return forceIntradayReorder(program, intake);
     case "SPORT_DAY_COUPLING_VIOLATION": return swapSportDayContent(program, intake);
     case "WEEKLY_MRV_EXCEEDED": return trimAccessorySets(program, intake);
+    case "SKILL_PREREQ_VIOLATION":
+    case "SKILL_UNDER_PROGRAMMED": return hardSubstituteSkills(program, intake);
     default: return program;
   }
+}
+
+// ---------------------------------------------------------------------------
+// 19. VALIDATOR (v20 FIX C): elite skill progression calibration
+// ---------------------------------------------------------------------------
+// For every skill-mappable primary goal, verify the program's prescription for
+// that family (a) does not exceed a hard prerequisite/equipment gate, (b) is not
+// grossly under-programmed relative to the athlete's demonstrated rung, and
+// (c) meets the family's recommended weekly frequency (non-fatal annotation).
+
+// Return the rung index of a program row within a family's ladder, or -1.
+// Exact normalized-name match wins; otherwise the longest ladder rung whose
+// normalized name is a substring of (or contains) the row's core name.
+function familyRungIndex(family, core) {
+  const skill = SKILL_PROGRESSIONS.get(family);
+  if (!skill || !core) return -1;
+  const nc = norm(core);
+  if (!nc) return -1;
+  for (let i = 0; i < skill.rungs.length; i++) {
+    if (norm(skill.rungs[i].name) === nc) return i;
+  }
+  let best = -1, bestLen = 0;
+  for (let i = 0; i < skill.rungs.length; i++) {
+    const rn = norm(skill.rungs[i].name);
+    if (!rn) continue;
+    if (nc.includes(rn) || rn.includes(nc)) {
+      if (rn.length > bestLen) { best = i; bestLen = rn.length; }
+    }
+  }
+  return best;
+}
+
+function goalsList(intake) {
+  const g = intake && intake.primary_goals;
+  if (Array.isArray(g)) return g;
+  if (g == null || g === "") return [];
+  return [g];
+}
+
+// Collect, per family, every prescribed rung index (across all weeks/rows).
+function collectFamilyRungs(program, family, isHebrew) {
+  const out = [];
+  for (const row of collectExerciseRows(program)) {
+    const core = coreExerciseName(row.exercise, isHebrew);
+    if (!core) continue;
+    const ri = familyRungIndex(family, core);
+    if (ri >= 0) out.push({ rungIndex: ri, core });
+  }
+  return out;
+}
+
+// Max distinct days (within any single week) that carry a family row at rungIndex.
+function countFamilyFrequency(program, family, rungIndex, isHebrew) {
+  let maxDays = 0;
+  eachTsvBlock(program, (dataRows, { header }) => {
+    const days = new Set();
+    for (const g of groupByDay(dataRows, header)) {
+      for (const cells of g.rows) {
+        const core = coreExerciseName(cellAt(cells, colIdx(header, "exercise")), isHebrew);
+        if (familyRungIndex(family, core) === rungIndex) { days.add(g.day || "?"); break; }
+      }
+    }
+    if (days.size > maxDays) maxDays = days.size;
+    return dataRows;
+  });
+  return maxDays;
+}
+
+// Append a note to the notes cell of the first family row at rungIndex.
+function annotateFamilyRow(program, family, rungIndex, note, isHebrew) {
+  let done = false;
+  return transformTsvBlocks(program, (cells, ctx) => {
+    if (done || ctx.exIdx < 0 || ctx.exIdx >= cells.length) return null;
+    const core = coreExerciseName(cells[ctx.exIdx], isHebrew);
+    if (familyRungIndex(family, core) !== rungIndex) return null;
+    const notesIdx = ctx.header.indexOf("notes");
+    if (notesIdx >= 0 && notesIdx < cells.length) {
+      const cur = String(cells[notesIdx] || "").trim();
+      cells[notesIdx] = (cur ? cur + " " : "") + note;
+    }
+    done = true;
+    return cells;
+  });
+}
+
+export function validateAndCalibrateSkills(program, intake = {}) {
+  const isHebrew = String(intake.language || "").toLowerCase() === "he";
+  const benchmarks = parseSkillBenchmarks(intake);
+  const annotations = [];
+  let out = program;
+
+  for (const goal of goalsList(intake)) {
+    const family = getGoalFamily(goal);
+    if (!family || !SKILL_PROGRESSIONS.has(family)) continue; // not a skill goal
+    const skill = SKILL_PROGRESSIONS.get(family);
+    const prescribed = collectFamilyRungs(out, family, isHebrew);
+    const maxPrescribed = prescribed.length ? Math.max(...prescribed.map((p) => p.rungIndex)) : -1;
+    const selection = selectRungForSkill(family, benchmarks, intake);
+
+    // (1) Prerequisite / equipment gate.
+    if (selection.gated) {
+      const allowedMax = selection.rungIndex; // gate pins to a beginner rung (0)
+      if (maxPrescribed > allowedMax) {
+        const missing = selection.missing || (selection.reason ? [selection.reason] : []);
+        const amendment =
+          `PRIOR ATTEMPT FAILED SKILL CALIBRATION. Goal "${goal}" maps to the ` +
+          `${skill.goal} (${family}) family, which is GATED: ${selection.reason}. ` +
+          `Do NOT program any rung above "${skill.rungs[allowedMax].name}" for this ` +
+          `family until the athlete meets: [${missing.join("; ")}]. Replace the ` +
+          `over-progressed rows with the gated beginner rung.`;
+        throw new SkillCalibrationError("SKILL_PREREQ_VIOLATION", amendment, {
+          family, goal, missing, maxPrescribed, allowedMax, reason: selection.reason,
+        });
+      }
+      // Gated but nothing over-prescribed: leave a non-fatal note if any row exists.
+      if (maxPrescribed >= 0) {
+        const note = `[REVIEW] ${family} gated — ${selection.reason}`;
+        out = annotateFamilyRow(out, family, maxPrescribed, note, isHebrew);
+        annotations.push({ family, type: "gated", note });
+      }
+      continue;
+    }
+
+    if (!prescribed.length) continue; // nothing programmed for this family; nothing to calibrate
+
+    // (2) Under-programming: primary working row must be at rung N or N+1.
+    const N = selection.rungIndex;
+    if (maxPrescribed <= N - 2) {
+      const amendment =
+        `PRIOR ATTEMPT FAILED SKILL CALIBRATION. For goal "${goal}" (${skill.goal}, ` +
+        `${family}) the athlete's benchmarks demonstrate readiness for rung ` +
+        `${N} ("${skill.rungs[N].name}"), but the program's primary work is only at ` +
+        `rung ${maxPrescribed} ("${skill.rungs[maxPrescribed].name}"). Program the ` +
+        `primary working set at "${skill.rungs[N].name}" (or one rung higher for ` +
+        `progression) using its prescribed dose.`;
+      throw new SkillCalibrationError("SKILL_UNDER_PROGRAMMED", amendment, {
+        family, goal, selected: N, maxPrescribed,
+      });
+    }
+
+    // (3) Weekly frequency (non-fatal annotation).
+    const rung = skill.rungs[maxPrescribed];
+    const recommended = rung && rung.dose ? rung.dose.frequency_per_week : null;
+    if (recommended) {
+      const actual = countFamilyFrequency(out, family, maxPrescribed, isHebrew);
+      if (actual > 0 && actual < recommended) {
+        const note = `[REVIEW] Frequency below skill-family recommendation (${actual}x/week vs recommended ${recommended}x/week)`;
+        out = annotateFamilyRow(out, family, maxPrescribed, note, isHebrew);
+        annotations.push({ family, type: "frequency", actual, recommended, note });
+      }
+    }
+  }
+
+  return { program: out, ok: true, annotations };
+}
+
+// Hard-downgrade: for each skill goal, replace the mis-calibrated family rows
+// with the correctly-selected rung's rendered working set, preserving the day.
+export function hardSubstituteSkills(program, intake = {}) {
+  const isHebrew = String(intake.language || "").toLowerCase() === "he";
+  const benchmarks = parseSkillBenchmarks(intake);
+  let out = program;
+
+  for (const goal of goalsList(intake)) {
+    const family = getGoalFamily(goal);
+    if (!family || !SKILL_PROGRESSIONS.has(family)) continue;
+    const selection = selectRungForSkill(family, benchmarks, intake);
+    const targetRung = selection.rung;
+    if (!targetRung) continue;
+
+    // Replace the first prescribed family row with the correct working row;
+    // drop any other family rows so we don't leave over-progressed duplicates.
+    let replaced = false;
+    out = transformTsvBlocks(out, (cells, ctx) => {
+      if (ctx.exIdx < 0 || ctx.exIdx >= cells.length) return null;
+      const core = coreExerciseName(cells[ctx.exIdx], isHebrew);
+      if (familyRungIndex(family, core) < 0) return null;
+      const dayIdx = ctx.header.indexOf("day");
+      const day = dayIdx >= 0 ? cellAt(cells, dayIdx) : "";
+      if (!replaced) {
+        replaced = true;
+        const rows = renderSkillWorkForRung(targetRung, intake, day);
+        // Pad/truncate each rendered row to this block's column count.
+        const width = ctx.header.length;
+        return rows.map((r) => {
+          const c = r.slice(0, width);
+          while (c.length < width) c.push("");
+          return c;
+        });
+      }
+      // Additional family rows are removed (return empty row set is not supported,
+      // so blank the exercise cell and mark for review).
+      cells[ctx.exIdx] = "[REVIEW] duplicate skill row removed";
+      const notesIdx = ctx.header.indexOf("notes");
+      if (notesIdx >= 0 && notesIdx < cells.length) cells[notesIdx] = "superseded by calibrated rung";
+      return cells;
+    });
+  }
+  return out;
 }

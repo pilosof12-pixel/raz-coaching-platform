@@ -20,6 +20,7 @@ import { makeStorage } from "./storage.js";
 // also imported directly by test/v19_validators.test.js).
 import {
   validateExercisesAgainstDictionary,
+  validateAndCalibrateSkills,
   validateEquipmentAgainstLocation,
   enforceUnilateralIntensityFloor,
   enforceIntradayConditioningOrder,
@@ -421,6 +422,13 @@ const CALISTHENICS_PROGRESSION_RULES = [
   "  - Prescribing a straddle variant when the goal is a full (legs-together) variant, with no mobility limiter cited.",
   "  - Printing the goal phrase as the prescribed exercise when the athlete cannot perform 1 clean rep / 5 s hold of it.",
   "  - Prescribing only volume at a simpler variation with no eccentric / isometric / partial-ROM / assisted exposure to the target skill itself.",
+  "",
+  "=== ELITE_SKILL_PROGRESSION_RULES (v20 addendum — code enforces these downstream) ===",
+  "- Iron Cross, Maltese, Victorian: ring-required, hard-gate. Do NOT program unless prerequisites in `current_numbers` clearly demonstrate: 3+ years straight-arm training, 5+ strict muscle-ups, 30s straddle L-sit, 10+ weighted pull-ups at BW+30%. Even when programming, always start at Straddle L Ring Support -> Bulgarian Dip Hold. Do NOT jump to Iron Cross Negative unless athlete has previously trained band-assisted Iron Cross.",
+  "- Human Flag: requires vertical structure (pole or sturdy vertical bar). Prerequisites: 15 strict pull-ups + 20s straight-arm side plank.",
+  "- Planche: floor OR parallelettes. Progression is Planche Lean (30s clean) -> Tuck Planche (15s) -> Advanced Tuck (15s) -> Straddle (10s) -> Half-Lay (5s) -> Full (3s). NEVER skip more than 1 rung.",
+  "- One-Arm Handstand: prerequisite is 30s freestanding handstand hold.",
+  "- Rung selection is NOT the LLM's guess — the engine calls selectRungForSkill(family, benchmarks, intake) and programs that rung. Working dose comes from the rung's dose object. If you over-program past a gate, the code throws SKILL_PREREQ_VIOLATION; if you under-program below the athlete's demonstrated rung, it throws SKILL_UNDER_PROGRAMMED.",
 ].join("\n");
 
 const RIR_LOAD_RANGE_RULES = [
@@ -1489,12 +1497,13 @@ app.get("/api/health", (req, res) => {
 // Pipeline per attempt (spec order):
 //   1. fixInvalidExerciseNames            (existing regex normalizer)
 //   2. validateExercisesAgainstDictionary (aliases corrected in place; throws EXERCISE_HALLUCINATION)
-//   3. validateEquipmentAgainstLocation   (throws EQUIPMENT_VIOLATION)
-//   4. enforceUnilateralIntensityFloor    (throws UNILATERAL_UNDERSTIMULATION)
-//   5. enforceIntradayConditioningOrder   (reorders in place; throws INTRADAY_ORDER_VIOLATION)
-//   6. validateSportDayCoupling           (throws SPORT_DAY_COUPLING_VIOLATION)
-//   7. validateWeeklyVolumeBudget         (throws WEEKLY_MRV_EXCEEDED)
-//   8. reformatWarmupCells                 (combine warmup drills into one cell, newline-separated)
+//   3. validateAndCalibrateSkills         (skill-progression gate/rung check; throws SKILL_PREREQ_VIOLATION / SKILL_UNDER_PROGRAMMED)
+//   4. validateEquipmentAgainstLocation   (throws EQUIPMENT_VIOLATION)
+//   5. enforceUnilateralIntensityFloor    (throws UNILATERAL_UNDERSTIMULATION)
+//   6. enforceIntradayConditioningOrder   (reorders in place; throws INTRADAY_ORDER_VIOLATION)
+//   7. validateSportDayCoupling           (throws SPORT_DAY_COUPLING_VIOLATION)
+//   8. validateWeeklyVolumeBudget         (throws WEEKLY_MRV_EXCEEDED)
+//   9. reformatWarmupCells                 (combine warmup drills into one cell, newline-separated)
 // scrubForbiddenWords / stripForbiddenColumns run afterwards inside privacyScrub.
 //
 // Each validator throws a retriable error carrying an amended user message. The
@@ -1523,12 +1532,14 @@ async function generateValidatedProgram(intake) {
     try {
       const dict = validateExercisesAgainstDictionary(program, intake); // step 2
       program = dict.program;
-      validateEquipmentAgainstLocation(program, intake);        // step 3
-      enforceUnilateralIntensityFloor(program, intake);         // step 4
-      program = enforceIntradayConditioningOrder(program, intake); // step 5
-      validateSportDayCoupling(program, intake);                // step 6
-      validateWeeklyVolumeBudget(program, intake);              // step 7
-      program = reformatWarmupCells(program);                   // step 8
+      const skills = validateAndCalibrateSkills(program, intake); // step 3
+      program = skills.program;
+      validateEquipmentAgainstLocation(program, intake);        // step 4
+      enforceUnilateralIntensityFloor(program, intake);         // step 5
+      program = enforceIntradayConditioningOrder(program, intake); // step 6
+      validateSportDayCoupling(program, intake);                // step 7
+      validateWeeklyVolumeBudget(program, intake);              // step 8
+      program = reformatWarmupCells(program);                   // step 9
       return program;
     } catch (err) {
       if (err && err.code && RETRIABLE_CODES.has(err.code)) {
