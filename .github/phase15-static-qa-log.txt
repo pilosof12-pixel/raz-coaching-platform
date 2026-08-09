@@ -3,27 +3,27 @@ TAP version 13
 # Subtest: dual box squat outcomes stay distinct
 ok 1 - dual box squat outcomes stay distinct
   ---
-  duration_ms: 1.281617
+  duration_ms: 0.865712
   ...
 # Subtest: OAP prescription matches a two-rep strict athlete and separates direct from support work
 ok 2 - OAP prescription matches a two-rep strict athlete and separates direct from support work
   ---
-  duration_ms: 0.464709
+  duration_ms: 0.273196
   ...
 # Subtest: strict OHP keeps direct specificity while allowing purposeful variation
 ok 3 - strict OHP keeps direct specificity while allowing purposeful variation
   ---
-  duration_ms: 0.302925
+  duration_ms: 0.177046
   ...
 # Subtest: all four gym days remain strength days and aerobic work stays low fatigue
 ok 4 - all four gym days remain strength days and aerobic work stays low fatigue
   ---
-  duration_ms: 1.103669
+  duration_ms: 0.855579
   ...
 # Subtest: client-facing exercise naming has no review path in the brief
 ok 5 - client-facing exercise naming has no review path in the brief
   ---
-  duration_ms: 0.242514
+  duration_ms: 0.141718
   ...
 1..5
 # tests 5
@@ -33,14 +33,14 @@ ok 5 - client-facing exercise naming has no review path in the brief
 # cancelled 0
 # skipped 0
 # todo 0
-# duration_ms 68.305332
+# duration_ms 47.400652
 EXIT=0
 ===== specialist_rules =====
 TAP version 13
 # Subtest: planche goal activates authored Article N2 and observed-level rule
 not ok 1 - planche goal activates authored Article N2 and observed-level rule
   ---
-  duration_ms: 5.989144
+  duration_ms: 4.150272
   location: '/home/runner/work/raz-coaching-platform/raz-coaching-platform/phase14/test/phase15_specialist_rules.test.mjs:19:1'
   failureType: 'testCodeFailure'
   error: |-
@@ -99,17 +99,17 @@ not ok 1 - planche goal activates authored Article N2 and observed-level rule
 # Subtest: weighted chin-up 1RM goal routes to maximal-strength Article N8
 ok 2 - weighted chin-up 1RM goal routes to maximal-strength Article N8
   ---
-  duration_ms: 2.289823
+  duration_ms: 1.55624
   ...
 # Subtest: weighted dip fixed-load rep goal routes to two-track loaded endurance
 ok 3 - weighted dip fixed-load rep goal routes to two-track loaded endurance
   ---
-  duration_ms: 0.599711
+  duration_ms: 0.391122
   ...
 # Subtest: street lifting classifier does not confuse max and endurance expressions
 ok 4 - street lifting classifier does not confuse max and endurance expressions
   ---
-  duration_ms: 0.16605
+  duration_ms: 0.107596
   ...
 1..4
 # tests 4
@@ -119,14 +119,14 @@ ok 4 - street lifting classifier does not confuse max and endurance expressions
 # cancelled 0
 # skipped 0
 # todo 0
-# duration_ms 71.499739
+# duration_ms 47.441666
 EXIT=1
 ===== demo_coverage =====
 TAP version 13
 # Subtest: every Phase 15 client-facing critical exercise resolves to a direct curated video
 ok 1 - every Phase 15 client-facing critical exercise resolves to a direct curated video
   ---
-  duration_ms: 2.095932
+  duration_ms: 1.404852
   ...
 1..1
 # tests 1
@@ -136,7 +136,7 @@ ok 1 - every Phase 15 client-facing critical exercise resolves to a direct curat
 # cancelled 0
 # skipped 0
 # todo 0
-# duration_ms 59.147734
+# duration_ms 39.237109
 EXIT=0
 ===== build_runtime =====
 built server.phase15.js with deterministic skeleton v4 + direct-skill protection + variation-aware final QA
