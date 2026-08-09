@@ -1,0 +1,20 @@
+{
+  "version": "1.0.0",
+  "policy": "Direct YouTube watch URLs only. These override/fill gaps in exercise_demos.json. No search-result URLs.",
+  "entries": {
+    "box_squat_to_parallel": { "canonical": "Box Squat to Parallel", "demo_url": "https://www.youtube.com/watch?v=r1LMzfShloQ", "channel": "Verified coaching source", "aliases": ["box_squat"] },
+    "box_jump": { "canonical": "Box Jump", "demo_url": "https://www.youtube.com/watch?v=hxldG9FX4j4", "channel": "Verified coaching source", "aliases": [] },
+    "weighted_chin_up": { "canonical": "Weighted Chin-up", "demo_url": "https://www.youtube.com/watch?v=CUNuOSkvj-k", "channel": "Verified coaching source", "aliases": ["weighted_chinup"] },
+    "weighted_pull_up": { "canonical": "Weighted Pull-up", "demo_url": "https://www.youtube.com/watch?v=5joIx-VL2XI", "channel": "Verified coaching source", "aliases": ["weighted_pullup"] },
+    "dip": { "canonical": "Dip", "demo_url": "https://www.youtube.com/watch?v=KoS_NMmuxMM", "channel": "FitnessFAQs", "aliases": ["parallel_bar_dip"] },
+    "weighted_dip": { "canonical": "Weighted Dip", "demo_url": "https://www.youtube.com/watch?v=KoS_NMmuxMM", "channel": "FitnessFAQs", "aliases": [] },
+    "one_arm_pull_up": { "canonical": "One-Arm Pull-up", "demo_url": "https://www.youtube.com/watch?v=Sxxe154aEis", "channel": "One-Arm Pull-up tutorial", "aliases": ["one_arm_pullup", "one_arm_chin_up"] },
+    "assisted_one_arm_pull_up": { "canonical": "Assisted One-Arm Pull-up", "demo_url": "https://www.youtube.com/watch?v=Sxxe154aEis", "channel": "One-Arm Pull-up tutorial", "aliases": ["band_assisted_one_arm_pull_up", "assisted_oap"] },
+    "zone_2_bike": { "canonical": "Zone-2 Bike", "demo_url": "https://www.youtube.com/watch?v=Tj5t3aVrhSo", "channel": "Aerobic base explainer", "aliases": ["stationary_bike_zone_2", "bike_zone_2"] },
+    "zone_2_row": { "canonical": "Zone-2 Row", "demo_url": "https://www.youtube.com/watch?v=Tj5t3aVrhSo", "channel": "Aerobic base explainer", "aliases": ["rowing_erg_zone_2", "row_zone_2"] },
+    "advanced_tuck_planche": { "canonical": "Advanced Tuck Planche", "demo_url": "https://www.youtube.com/watch?v=f30rLg3yBug", "channel": "FitnessFAQs", "aliases": ["adv_tuck_planche"] },
+    "straddle_planche": { "canonical": "Straddle Planche", "demo_url": "https://www.youtube.com/watch?v=f30rLg3yBug", "channel": "FitnessFAQs", "aliases": [] },
+    "full_planche": { "canonical": "Full Planche", "demo_url": "https://www.youtube.com/watch?v=f30rLg3yBug", "channel": "FitnessFAQs", "aliases": [] },
+    "pseudo_planche_push_up": { "canonical": "Pseudo Planche Push-up", "demo_url": "https://www.youtube.com/watch?v=f30rLg3yBug", "channel": "FitnessFAQs", "aliases": ["pseudo_planche_pushup", "ppp"] }
+  }
+}
