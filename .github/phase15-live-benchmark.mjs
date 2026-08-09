@@ -1,5 +1,6 @@
 // Phase 15 attack QA for deterministic-skeleton-v3 OpenAI runtime.
 import fs from 'node:fs';
+import { resolveExerciseDemo } from '../phase14/data/lib/exerciseDemos.js';
 const base = process.env.BASE_URL || 'https://raz-coaching-platform.onrender.com';
 const intake = {
   language:'en',
@@ -63,6 +64,12 @@ async function safeJsonFetch(url, options={}, retries=4) {
   throw new Error(`safeJsonFetch failed: ${last}`);
 }
 
+function parseWeek(program, w){
+  const block=(program.match(new RegExp(`START_WEEK${w}_TSV\\s*\\n([\\s\\S]*?)\\nEND_WEEK${w}_TSV`,'i'))||[])[1]||'';
+  const lines=block.split('\n').filter(Boolean);
+  return {block,rows:lines.slice(1).map(x=>x.split('\t'))};
+}
+
 try {
   let hb=null, hStatus=0;
   const deployWaitStarted=Date.now();
@@ -113,9 +120,8 @@ try {
   const structureOk=[1,2,3,4].every(w=>markerCount(`START_WEEK${w}_TSV`)===1&&markerCount(`END_WEEK${w}_TSV`)===1);
   check('one block per week',structureOk,JSON.stringify([1,2,3,4].map(w=>({w,start:markerCount(`START_WEEK${w}_TSV`),end:markerCount(`END_WEEK${w}_TSV`)}))));
 
-  const block=(p.match(/START_WEEK1_TSV\s*\n([\s\S]*?)\nEND_WEEK1_TSV/i)||[])[1]||'';
-  const lines=block.split('\n').filter(Boolean);
-  const rows=lines.slice(1).map(x=>x.split('\t'));
+  const weeks=[1,2,3,4].map(w=>parseWeek(p,w));
+  const rows=weeks[0].rows;
   const days=[...new Set(rows.map(r=>r[0]).filter(Boolean))];
   check('four Week 1 gym days',days.length===4,JSON.stringify(days));
 
@@ -125,20 +131,21 @@ try {
 
   const squat=rows.filter(r=>/box squat/i.test(r[1]||'')&&!/^\[WARMUP\]/i.test(r[1]||''));
   const squatReps=squat.map(r=>Number(((r[4]||'').match(/\d+/)||[])[0])).filter(Boolean);
-  check('squat max plus rep-strength coverage',squatReps.some(n=>n<=5)&&squatReps.some(n=>n>=6),JSON.stringify(squat.map(r=>[r[0],r[1],r[2],r[4],r[6]])));
+  check('squat max plus rep-strength coverage',squatReps.some(n=>n<=4)&&squatReps.some(n=>n>=6),JSON.stringify(squat.map(r=>[r[0],r[1],r[2],r[4],r[6]])));
   const squatLoads=squat.map(r=>({reps:Number(((r[4]||'').match(/\d+/)||[])[0]),kg:Number(((r[2]||'').match(/\d+(?:\.\d+)?/)||[])[0])}));
   const repLoadOk=squatLoads.some(x=>x.reps>=6&&x.kg>=150&&x.kg<=170);
-  const heavyLoadOk=squatLoads.some(x=>x.reps<=5&&x.kg>=170&&x.kg<=195);
+  const heavyLoadOk=squatLoads.some(x=>x.reps<=4&&x.kg>=170&&x.kg<=195);
   check('box squat loads calibrated to current 210 kg max',repLoadOk&&heavyLoadOk,JSON.stringify(squatLoads));
 
   const oap=rows.filter(r=>/one.?arm (pull|chin).?up/i.test(r[1]||'')&&!/^\[WARMUP\]/i.test(r[1]||''));
-  const strict=oap.filter(r=>!/(eccentric|negative|assisted|partial|isometric)/i.test(r[1]||''));
+  const strict=oap.filter(r=>!/(eccentric|negative|assisted|partial|isometric|archer)/i.test(r[1]||''));
   const assisted=oap.filter(r=>/assisted/i.test(r[1]||''));
-  const eccentric=oap.filter(r=>/(eccentric|negative)/i.test(r[1]||''));
-  check('OAP advanced stage',new Set([...strict,...assisted].map(r=>r[0])).size>=2&&strict.length>=1&&eccentric.length===0,JSON.stringify(oap.map(r=>[r[0],r[1],r[3],r[4]])));
+  const regression=oap.filter(r=>/(eccentric|negative|archer)/i.test(r[1]||''));
+  check('OAP advanced stage',new Set([...strict,...assisted].map(r=>r[0])).size>=2&&strict.length>=1&&regression.length===0,JSON.stringify(oap.map(r=>[r[0],r[1],r[3],r[4]])));
 
-  const ohp=rows.filter(r=>/overhead press|push press/i.test(r[1]||'')&&!/^\[WARMUP\]/i.test(r[1]||''));
-  check('OHP meaningful frequency',new Set(ohp.map(r=>r[0])).size>=2,JSON.stringify(ohp.map(r=>[r[0],r[1],r[2],r[3],r[4]])));
+  const strictOhp=rows.filter(r=>/^(?:standing barbell )?overhead press$/i.test(String(r[1]||'').trim()));
+  const pushPress=rows.filter(r=>/push press/i.test(r[1]||''));
+  check('two strict OHP exposures',new Set(strictOhp.map(r=>r[0])).size>=2,JSON.stringify({strict:strictOhp.map(r=>[r[0],r[1],r[2],r[3],r[4]]),push:pushPress.map(r=>[r[0],r[1]])}));
 
   const painRisk=rows.filter(r=>/(back extension|romanian deadlift|good morning)/i.test(r[1]||''));
   check('pain tolerance acknowledged',painRisk.every(r=>/(toler|pain.?free|symptom|if comfortable|stop if|proven)/i.test(r[7]||'')),JSON.stringify(painRisk.map(r=>[r[0],r[1],r[7]])));
@@ -162,8 +169,12 @@ try {
   const face=rows.filter(r=>/face pull/i.test(r[1]||''));
   check('maintenance accessories retained',lateral.length>=1&&face.length>=1,JSON.stringify({lateral:lateral.map(r=>r[0]),face:face.map(r=>r[0])}));
 
-  const reviewRows=rows.filter(r=>/\[REVIEW\]|support|placeholder/i.test(`${r[1]||''} ${r[7]||''}`));
+  const reviewRows=rows.filter(r=>/\[REVIEW\]|contact\s+support|placeholder|could not be safely generated/i.test(`${r[1]||''} ${r[7]||''}`));
   check('no unresolved review/support markers',reviewRows.length===0,JSON.stringify(reviewRows.map(r=>[r[0],r[1]])));
+
+  const allWorkingExercises=[...new Set(weeks.flatMap(w=>w.rows).map(r=>String(r[1]||'').trim()).filter(x=>x&&!/^\[WARMUP\]/i.test(x)))];
+  const missingDemos=allWorkingExercises.filter(x=>!resolveExerciseDemo(x));
+  check('every client working exercise has direct curated demo',missingDemos.length===0,JSON.stringify({missing:missingDemos,checked:allWorkingExercises}));
 
   report.score={passed:report.checks.filter(x=>x.ok).length,total:report.checks.length};
   report.quality_percent=Math.round(100*report.score.passed/report.score.total);
