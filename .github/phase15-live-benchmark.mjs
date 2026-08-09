@@ -1,4 +1,4 @@
-// Triggered after confirmed Render deploy: OpenAI Phase 15 attack QA (developer-chunk architecture live)
+// Triggered after confirmed Render deploy: OpenAI Phase 15 attack QA (compact execution path live)
 import fs from 'node:fs';
 const base = process.env.BASE_URL || 'https://raz-coaching-platform.onrender.com';
 const intake = {
