@@ -60,25 +60,27 @@ test('dual box squat outcomes stay distinct', () => {
   assert.match(brief, /180 kg x 10 target is NOT the Week 1 working load/i);
 });
 
-test('OAP prescription matches a two-rep strict athlete', () => {
+test('OAP prescription matches a two-rep strict athlete and separates direct from support work', () => {
   assert.match(brief, /athlete already owns 2 strict One-Arm Pull-up reps/i);
   assert.match(brief, /strict One-Arm Pull-up singles or clusters/i);
   assert.match(brief, /Assisted One-Arm Pull-up doubles or triples/i);
+  assert.match(brief, /direct unilateral practice drives the skill/i);
+  assert.match(brief, /Weighted Chin-up or Weighted Pull-up is valuable base strength support/i);
+  assert.match(brief, /never counts as either required direct OAP exposure/i);
   assert.match(brief, /One-Arm Pull-up Eccentric\/negative as either main OAP exposure/i);
   assert.match(brief, /Archer Pull-up.*substitute/i);
-  assert.match(brief, /Weighted Chin-up may be used once weekly as bilateral support/i);
   assert.match(brief, /current \+80 kg external-load 1RM/i);
 });
 
-test('strict OHP gets two real exposures from the current level', () => {
+test('strict OHP keeps direct specificity while allowing purposeful variation', () => {
   assert.match(brief, /STRICT OHP IS A PROGRESSION GOAL/);
-  assert.match(brief, /OHP exposure A: strength-biased strict Overhead Press/);
-  assert.match(brief, /3-5 reps/);
-  assert.match(brief, /OHP exposure B: volume\/technique strict Overhead Press/);
-  assert.match(brief, /5-8 reps/);
+  assert.match(brief, /at least one direct strict Overhead Press exposure every week/i);
+  assert.match(brief, /at least two meaningful vertical-press exposures/i);
+  assert.match(brief, /second may deliberately vary the stimulus/i);
+  assert.match(brief, /Push Press overload/i);
+  assert.match(brief, /Variation is a tool, not random exercise rotation/i);
   assert.match(brief, /Current strict OHP anchor is 75 kg x about 4\+ reps/);
   assert.match(brief, /Long-term strict OHP target is about 100 kg/);
-  assert.match(brief, /Push Press may be an optional explosive overload, but it does not replace both strict OHP exposures/);
 });
 
 test('all four gym days remain strength days and aerobic work stays low fatigue', () => {
@@ -100,4 +102,5 @@ test('client-facing exercise naming has no review path in the brief', () => {
   assert.match(brief, /Zone-2 Bike/);
   assert.match(brief, /Assisted One-Arm Pull-up/);
   assert.match(brief, /Box Squat to Parallel/);
+  assert.match(brief, /use Box Jump/i);
 });
