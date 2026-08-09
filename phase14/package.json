@@ -3,11 +3,12 @@
   "version": "1.0.0",
   "description": "AI Coaching Engine platform — questionnaire to program to spreadsheet",
   "type": "module",
-  "main": "server.js",
+  "main": "server.phase15.js",
   "scripts": {
-    "start": "node server.js",
+    "phase15:build": "node scripts/build_phase15_runtime.mjs",
+    "start": "npm run phase15:build && node server.phase15.js",
     "test": "node --test test/*.test.js",
-    "check": "node --check server.js && node --check storage.js && node --check public/app.js && node --check public/spreadsheet.js && node --check public/exerciseDemos.js && node --test test/*.test.js"
+    "check": "npm run phase15:build && node --check server.phase15.js && node --check storage.js && node --check public/app.js && node --check public/spreadsheet.js && node --check public/exerciseDemos.js && node --test test/*.test.js"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.104.1",
