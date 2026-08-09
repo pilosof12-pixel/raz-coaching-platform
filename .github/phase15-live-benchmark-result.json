@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-08-09T08:52:51.542Z",
+  "timestamp": "2026-08-09T09:09:38.194Z",
   "base": "https://raz-coaching-platform.onrender.com",
   "provider_expected": "openai",
   "model_expected": "gpt-5.4",
@@ -59,7 +59,64 @@
     "recovery_rating": "Average",
     "notes": "Advanced concurrent strength and combat athlete. Recovery varies. Prefer low volume full body training. Prioritize strength return per unit fatigue. OAP should use two unilateral specific exposures, not maximal work every day. Weighted chin work must respect +80 kg 1RM. OHP outranks HSPU. Keep low volume jumps or med ball throws if low fatigue and stop before velocity loss. Two to three Zone 2 sessions desirable. Do not add hard running or hard conditioning unnecessarily."
   },
-  "checks": [],
+  "checks": [
+    {
+      "name": "health",
+      "ok": true,
+      "detail": "{\"ok\":true,\"mode\":\"openai\",\"model\":\"gpt-5.4\",\"openai_execution_path\":\"compact-rule-packet\",\"openai_legacy_engine_chars_not_sent\":1494152,\"openai_compact_developer_chars\":1729,\"last_ai_usage\":{\"provider\":\"openai\",\"model\":\"gpt-5.4\",\"reasoning_effort\":\"medium\",\"input_tokens\":17008,\"cached_input_tokens\":16128,\"output_tokens\":18000,\"reasoning_tokens\":14936,\"compact_developer_chars\":1729,\"user_prompt_chars\":65825,\"legacy_engine_chars_not_sent\":1494152,\"long_context_pricing\":false,\"estimated_cost_usd\":0.2762,\"elapsed_ms\":154230},\"storage\":\"supabase\",\"storage_ok\":true,\"ai_configured\":true,\"thinking_budget\":8192,\"cache\":{\"enabled\":true,\"ttl_seconds\":1800,\"active\":false}}"
+    },
+    {
+      "name": "OpenAI provider active",
+      "ok": true,
+      "detail": "{\"mode\":\"openai\",\"model\":\"gpt-5.4\"}"
+    },
+    {
+      "name": "build accepted",
+      "ok": true,
+      "detail": "{\"job_id\":\"3b0034de1d8dafbb9cbd4b6eccb176e7\",\"token\":\"64cd5836e2b46293d1c0067ce6e9adbb\",\"status\":\"pending\"}"
+    }
+  ],
   "ok": false,
-  "error": "SyntaxError: Unexpected token '<', \"<!DOCTYPE \"... is not valid JSON\n    at JSON.parse (<anonymous>)\n    at parseJSONFromBytes (node:internal/deps/undici/undici:5880:19)\n    at successSteps (node:internal/deps/undici/undici:5861:27)\n    at fullyReadBody (node:internal/deps/undici/undici:4753:9)\n    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)\n    at async consumeBody (node:internal/deps/undici/undici:5870:7)\n    at async file:///home/runner/work/raz-coaching-platform/raz-coaching-platform/.github/phase15-live-benchmark.mjs:52:53"
+  "health_before": {
+    "ok": true,
+    "mode": "openai",
+    "model": "gpt-5.4",
+    "openai_execution_path": "compact-rule-packet",
+    "openai_legacy_engine_chars_not_sent": 1494152,
+    "openai_compact_developer_chars": 1729,
+    "last_ai_usage": {
+      "provider": "openai",
+      "model": "gpt-5.4",
+      "reasoning_effort": "medium",
+      "input_tokens": 17008,
+      "cached_input_tokens": 16128,
+      "output_tokens": 18000,
+      "reasoning_tokens": 14936,
+      "compact_developer_chars": 1729,
+      "user_prompt_chars": 65825,
+      "legacy_engine_chars_not_sent": 1494152,
+      "long_context_pricing": false,
+      "estimated_cost_usd": 0.2762,
+      "elapsed_ms": 154230
+    },
+    "storage": "supabase",
+    "storage_ok": true,
+    "ai_configured": true,
+    "thinking_budget": 8192,
+    "cache": {
+      "enabled": true,
+      "ttl_seconds": 1800,
+      "active": false
+    }
+  },
+  "job_id": "3b0034de1d8dafbb9cbd4b6eccb176e7",
+  "token": "64cd5836e2b46293d1c0067ce6e9adbb",
+  "last_job": {
+    "status": "error",
+    "stage": "generating",
+    "attempt": 2,
+    "detail": "regenerating after quality check",
+    "error": "OpenAI returned no output_text content."
+  },
+  "error": "Error: OpenAI returned no output_text content.\n    at file:///home/runner/work/raz-coaching-platform/raz-coaching-platform/.github/phase15-live-benchmark.mjs:69:34\n    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)"
 }
