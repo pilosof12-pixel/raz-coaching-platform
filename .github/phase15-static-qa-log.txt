@@ -1,0 +1,583 @@
+===== planner_regression =====
+TAP version 13
+# Subtest: dual box squat outcomes stay distinct
+not ok 1 - dual box squat outcomes stay distinct
+  ---
+  duration_ms: 3.051833
+  location: '/home/runner/work/raz-coaching-platform/raz-coaching-platform/phase14/test/phase15_planner_regression.test.mjs:51:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    The input did not match the regular expression /double-progression logic/. Input:
+    
+    '=== DETERMINISTIC PROGRAM SKELETON, DO NOT DELETE REQUIRED EXPOSURES ===\n' +
+      'Gym days (4): Wed, Fri, Sat, Sun.\n' +
+      'Hard session cap: 60 minutes INCLUDING warm-up, rests, transitions and any Zone 2 placed inside the session.\n' +
+      'Required coaching constraints:\n' +
+      '* DUAL BOX-SQUAT GOAL: the high-rep target and max target are different outcomes and require different exposures.\n' +
+      '* BOX_SQUAT_HEAVY: one max-strength exposure each week, normally 1-4 reps per set, long rest, no grinding; this serves the 1RM/max side.\n' +
+      '* BOX_SQUAT_REP: separate rep-strength exposure for the 10-rep outcome. Start with repeatable 6-8 rep work and progress toward 8-10 quality reps. Speed doubles/triples do not count.\n' +
+      '* Rep-strength progression is primarily double progression: earn clean reps inside the RPE window, then add 2.5-5 kg and rebuild reps. The distant 180 kg x 10 target is NOT the Week 1 working load.\n' +
+      '* Current tolerated box-squat max anchor is about 210 kg. Initial 6-8 rep work should usually sit around 150-167.5 kg at RPE 7-8; 2-4 rep max-strength work around 172.5-190 kg at roughly RPE 7.5-8.5. Adjust from observed RPE, never from the future target.\n' +
+      '* OAP LEVEL: athlete already owns 2 strict One-Arm Pull-up reps. Program from demonstrated advanced level.\n' +
+      '* OAP exposure A: strict One-Arm Pull-up singles/clusters, multiple high-quality singles per arm, normally at least 1 rep from technical failure.\n' +
+      '* OAP exposure B: Assisted One-Arm Pull-up doubles/triples with the minimum assistance needed for clean symmetrical reps. Progress by less assistance or more clean reps.\n' +
+      '* STRICT OHP IS A PROGRESSION GOAL, not maintenance. Use two meaningful strict Overhead Press exposures on separate days.\n' +
+      '* OHP exposure A: strength-biased strict Overhead Press, usually 3-5 reps per set around RPE 7.5-8.5.\n' +
+      '* OHP exposure B: volume/technique strict Overhead Press, usually 5-8 reps per set around RPE 6.5-8. Push Press is optional overload and does not replace both strict exposures.\n' +
+      '* Current strict OHP anchor is 75 kg x about 4+ reps; prescribe from CURRENT performance, not historical PR or target.\n' +
+      '* Long-term strict OHP target is about 75 kg; use repeatable submaximal progression, not token maintenance or weekly grinders.\n' +
+      '* Two meaningful low-fatigue Zone 2 exposures using canonical Zone-2 Bike or Zone-2 Row, roughly 20-35 minutes each. A 10-12 minute mini-dose does not satisfy this aerobic-base goal.\n' +
+      '* Retain direct Cable Lateral Raise at minimum useful dose.\n' +
+      '* Retain Face Pull at minimum useful dose.\n' +
+      '* Retain one or two very low-volume explosive primers. Use verified canonical Box Jump or Broad Jump unless another exact verified movement exists. Place after warm-up and before heavy strength; stop before velocity loss.\n' +
+      '* ALL 4 listed gym days are genuine strength/full-body sessions. Zone 2 may be appended/separate, but no gym day may be cardio-only. Every gym day needs real strength or advanced-skill work; with full-body preference it should normally include meaningful upper and lower/support work when recovery allows.\n' +
+      'Preferred/support choices:\n' +
+      '* Weighted Chin-up may support OAP once weekly but never replace unilateral specificity. With current +80 kg external-load 1RM, an initial 4-6 rep support range around +45 to +57.5 kg is plausible, autoregulated by RPE and elbow/grip freshness.\n' +
+      '* Use explicitly tolerated Box Squat to Parallel instead of forcing deeper ROM.\n' +
+      '* Hip Thrust or Glute Bridge is preferred low-spinal-fatigue posterior-chain assistance.\n' +
+      'Forbidden/tolerance-gated choices:\n' +
+      '* One-Arm Pull-up Eccentric/negative as either main OAP exposure for an athlete already owning 2+ strict reps.\n' +
+      '* Archer Pull-up or generic bilateral pulling as a substitute for either required unilateral OAP exposure.\n' +
+      '* Freestanding HSPU volume that steals recovery/session time from strict OHP when HSPU is explicitly nice-to-have.\n' +
+      '* Unrequested hard intervals, threshold, VO2, AMRAP, sprints or hard running when combat sport already supplies high-intensity conditioning.\n' +
+      '* Deep loaded squatting that reproduces lumbar-flexion symptoms.\n' +
+      '* Heavy Romanian Deadlift, Good Morning or Back Extension unless tolerance is explicitly established and the row states a tolerance gate.\n' +
+      '=== GOAL-SPECIFIC SPECIALIST RULES ===\n' +
+      '* SPECIALIST SOURCE: Advanced Gymnastics / skill graph family=one_arm_pull_up.\n' +
+      '* Universal skill rule: direct exposure to the actual skill family remains the anchor once the athlete can perform a measurable tolerated version. Assistance supports specificity; it does not replace it. Quality stops the set before technically poor attempts accumulate.\n' +
+      '* Anti-hallucination rule: prescribe only complete named variations that exist in the verified skill graph/exercise library. Never invent a banded, wall, eccentric, partial, one-leg, tuck or deficit variation by wording alone.\n' +
+      '* Ordering rule: primary skill work is performed after warm-up and any genuinely non-fatiguing primer, before fatigue-producing strength/hypertrophy work.\n' +
+      '* DETERMINISTIC SKILL-GRAPH SELECTION: {"gated":true,"rungIndex":0,"rung":{"name":"Weighted Pull-Up","criterion":{"type":"benchmark","metric":"weighted_pullup_bw_pct","min":50},"dose":{"sets":5,"reps":"3-5","rest":"3 min","rir":"1","frequency_per_week":2},"complementary":["Scapular Pull-up"]},"demonstratedIndex":-1,"missing":["12+ strict pull-ups","weighted pull-up at BW+30%"],"reason":"Prerequisite gate for One-Arm Pull-Up not met — 12+ strict pull-ups; weighted pull-up at BW+30%"}. Use observed current ability over an arbitrary easier gate.\n' +
+      '* SPECIALIST SOURCE: Advanced Gymnastics / skill graph family=hspu.\n' +
+      '* Universal skill rule: direct exposure to the actual skill family remains the anchor once the athlete can perform a measurable tolerated version. Assistance supports specificity; it does not replace it. Quality stops the set before technically poor attempts accumulate.\n' +
+      '* Anti-hallucination rule: prescribe only complete named variations that exist in the verified skill graph/exercise library. Never invent a banded, wall, eccentric, partial, one-leg, tuck or deficit variation by wording alone.\n' +
+      '* Ordering rule: primary skill work is performed after warm-up and any genuinely non-fatiguing primer, before fatigue-producing strength/hypertrophy work.\n' +
+      '* DETERMINISTIC SKILL-GRAPH SELECTION: {"gated":true,"rungIndex":0,"rung":{"name":"Pike Push-Up","criterion":{"type":"reps","metric":"pike_push_up","min":12},"dose":{"sets":4,"reps":"8-12","rest":"90s","rir":"1-2","frequency_per_week":3},"complementary":["Wall Handstand Hold"]},"demonstratedIndex":-1,"missing":["8+ pike push-ups"],"reason":"Prerequisite gate for Freestanding 90-Degree Handstand Push-up not met — 8+ pike push-ups"}. Use observed current ability over an arbitrary easier gate.\n' +
+      'Session skeleton:\n' +
+      '* Wed: BOX_SQUAT_REP, OHP_STRENGTH; same-day sport=moderate.\n' +
+      '* Fri: OAP_STRICT, OHP_VOLUME; no listed sport.\n' +
+      '* Sat: BOX_SQUAT_HEAVY, OAP_ASSISTED_ADVANCED, ZONE2_A; no listed sport.\n' +
+      '* Sun: LOW_COST_STRENGTH_SUPPORT, ZONE2_B; same-day sport=moderate.\n' +
+      'LOW_COST_STRENGTH_SUPPORT means real low-fatigue strength selected from athlete needs, never cardio-only filler.\n' +
+      'Exercise-name rule: use exact verified canonical names. Never output [REVIEW], support messages, placeholders or invented exercise variations.\n' +
+      'Model responsibility: choose realistic sets, reps, loads, RPE/RIR, rest, compact warm-up ramps, four-week progression and concise notes around this skeleton. Cut lower-priority work before primary specificity.'
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected:
+  actual: |-
+    === DETERMINISTIC PROGRAM SKELETON, DO NOT DELETE REQUIRED EXPOSURES ===
+    Gym days (4): Wed, Fri, Sat, Sun.
+    Hard session cap: 60 minutes INCLUDING warm-up, rests, transitions and any Zone 2 placed inside the session.
+    Required coaching constraints:
+    * DUAL BOX-SQUAT GOAL: the high-rep target and max target are different outcomes and require different exposures.
+    * BOX_SQUAT_HEAVY: one max-strength exposure each week, normally 1-4 reps per set, long rest, no grinding; this serves the 1RM/max side.
+    * BOX_SQUAT_REP: separate rep-strength exposure for the 10-rep outcome. Start with repeatable 6-8 rep work and progress toward 8-10 quality reps. Speed doubles/triples do not count.
+    * Rep-strength progression is primarily double progression: earn clean reps inside the RPE window, then add 2.5-5 kg and rebuild reps. The distant 180 kg x 10 target is NOT the Week 1 working load.
+    * Current tolerated box-squat max anchor is about 210 kg. Initial 6-8 rep work should usually sit around 150-167.5 kg at RPE 7-8; 2-4 rep max-strength work around 172.5-190 kg at roughly RPE 7.5-8.5. Adjust from observed RPE, never from the future target.
+    * OAP LEVEL: athlete already owns 2 strict One-Arm Pull-up reps. Program from demonstrated advanced level.
+    * OAP exposure A: strict One-Arm Pull-up singles/clusters, multiple high-quality singles per arm, normally at least 1 rep from technical failure.
+    * OAP exposure B: Assisted One-Arm Pull-up doubles/triples with the minimum assistance needed for clean symmetrical reps. Progress by less assistance or more clean reps.
+    * STRICT OHP IS A PROGRESSION GOAL, not maintenance. Use two meaningful strict Overhead Press exposures on separate days.
+    * OHP exposure A: strength-biased strict Overhead Press, usually 3-5 reps per set around RPE 7.5-8.5.
+    * OHP exposure B: volume/technique strict Overhead Press, usually 5-8 reps per set around RPE 6.5-8. Push Press is optional overload and does not replace both strict exposures.
+    * Current strict OHP anchor is 75 kg x about 4+ reps; prescribe from CURRENT performance, not historical PR or target.
+    * Long-term strict OHP target is about 75 kg; use repeatable submaximal progression, not token maintenance or weekly grinders.
+    * Two meaningful low-fatigue Zone 2 exposures using canonical Zone-2 Bike or Zone-2 Row, roughly 20-35 minutes each. A 10-12 minute mini-dose does not satisfy this aerobic-base goal.
+    * Retain direct Cable Lateral Raise at minimum useful dose.
+    * Retain Face Pull at minimum useful dose.
+    * Retain one or two very low-volume explosive primers. Use verified canonical Box Jump or Broad Jump unless another exact verified movement exists. Place after warm-up and before heavy strength; stop before velocity loss.
+    * ALL 4 listed gym days are genuine strength/full-body sessions. Zone 2 may be appended/separate, but no gym day may be cardio-only. Every gym day needs real strength or advanced-skill work; with full-body preference it should normally include meaningful upper and lower/support work when recovery allows.
+    Preferred/support choices:
+    * Weighted Chin-up may support OAP once weekly but never replace unilateral specificity. With current +80 kg external-load 1RM, an initial 4-6 rep support range around +45 to +57.5 kg is plausible, autoregulated by RPE and elbow/grip freshness.
+    * Use explicitly tolerated Box Squat to Parallel instead of forcing deeper ROM.
+    * Hip Thrust or Glute Bridge is preferred low-spinal-fatigue posterior-chain assistance.
+    Forbidden/tolerance-gated choices:
+    * One-Arm Pull-up Eccentric/negative as either main OAP exposure for an athlete already owning 2+ strict reps.
+    * Archer Pull-up or generic bilateral pulling as a substitute for either required unilateral OAP exposure.
+    * Freestanding HSPU volume that steals recovery/session time from strict OHP when HSPU is explicitly nice-to-have.
+    * Unrequested hard intervals, threshold, VO2, AMRAP, sprints or hard running when combat sport already supplies high-intensity conditioning.
+    * Deep loaded squatting that reproduces lumbar-flexion symptoms.
+    * Heavy Romanian Deadlift, Good Morning or Back Extension unless tolerance is explicitly established and the row states a tolerance gate.
+    === GOAL-SPECIFIC SPECIALIST RULES ===
+    * SPECIALIST SOURCE: Advanced Gymnastics / skill graph family=one_arm_pull_up.
+    * Universal skill rule: direct exposure to the actual skill family remains the anchor once the athlete can perform a measurable tolerated version. Assistance supports specificity; it does not replace it. Quality stops the set before technically poor attempts accumulate.
+    * Anti-hallucination rule: prescribe only complete named variations that exist in the verified skill graph/exercise library. Never invent a banded, wall, eccentric, partial, one-leg, tuck or deficit variation by wording alone.
+    * Ordering rule: primary skill work is performed after warm-up and any genuinely non-fatiguing primer, before fatigue-producing strength/hypertrophy work.
+    * DETERMINISTIC SKILL-GRAPH SELECTION: {"gated":true,"rungIndex":0,"rung":{"name":"Weighted Pull-Up","criterion":{"type":"benchmark","metric":"weighted_pullup_bw_pct","min":50},"dose":{"sets":5,"reps":"3-5","rest":"3 min","rir":"1","frequency_per_week":2},"complementary":["Scapular Pull-up"]},"demonstratedIndex":-1,"missing":["12+ strict pull-ups","weighted pull-up at BW+30%"],"reason":"Prerequisite gate for One-Arm Pull-Up not met — 12+ strict pull-ups; weighted pull-up at BW+30%"}. Use observed current ability over an arbitrary easier gate.
+    * SPECIALIST SOURCE: Advanced Gymnastics / skill graph family=hspu.
+    * Universal skill rule: direct exposure to the actual skill family remains the anchor once the athlete can perform a measurable tolerated version. Assistance supports specificity; it does not replace it. Quality stops the set before technically poor attempts accumulate.
+    * Anti-hallucination rule: prescribe only complete named variations that exist in the verified skill graph/exercise library. Never invent a banded, wall, eccentric, partial, one-leg, tuck or deficit variation by wording alone.
+    * Ordering rule: primary skill work is performed after warm-up and any genuinely non-fatiguing primer, before fatigue-producing strength/hypertrophy work.
+    * DETERMINISTIC SKILL-GRAPH SELECTION: {"gated":true,"rungIndex":0,"rung":{"name":"Pike Push-Up","criterion":{"type":"reps","metric":"pike_push_up","min":12},"dose":{"sets":4,"reps":"8-12","rest":"90s","rir":"1-2","frequency_per_week":3},"complementary":["Wall Handstand Hold"]},"demonstratedIndex":-1,"missing":["8+ pike push-ups"],"reason":"Prerequisite gate for Freestanding 90-Degree Handstand Push-up not met — 8+ pike push-ups"}. Use observed current ability over an arbitrary easier gate.
+    Session skeleton:
+    * Wed: BOX_SQUAT_REP, OHP_STRENGTH; same-day sport=moderate.
+    * Fri: OAP_STRICT, OHP_VOLUME; no listed sport.
+    * Sat: BOX_SQUAT_HEAVY, OAP_ASSISTED_ADVANCED, ZONE2_A; no listed sport.
+    * Sun: LOW_COST_STRENGTH_SUPPORT, ZONE2_B; same-day sport=moderate.
+    LOW_COST_STRENGTH_SUPPORT means real low-fatigue strength selected from athlete needs, never cardio-only filler.
+    Exercise-name rule: use exact verified canonical names. Never output [REVIEW], support messages, placeholders or invented exercise variations.
+    Model responsibility: choose realistic sets, reps, loads, RPE/RIR, rest, compact warm-up ramps, four-week progression and concise notes around this skeleton. Cut lower-priority work before primary specificity.
+  operator: 'match'
+  stack: |-
+    TestContext.<anonymous> (file:///home/runner/work/raz-coaching-platform/raz-coaching-platform/phase14/test/phase15_planner_regression.test.mjs:58:10)
+    Test.runInAsyncScope (node:async_hooks:206:9)
+    Test.run (node:internal/test_runner/test:796:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:526:18)
+    node:internal/test_runner/harness:255:12
+    node:internal/process/task_queues:140:7
+    AsyncResource.runInAsyncScope (node:async_hooks:206:9)
+    AsyncResource.runMicrotask (node:internal/process/task_queues:137:8)
+  ...
+# Subtest: OAP prescription matches a two-rep strict athlete
+not ok 2 - OAP prescription matches a two-rep strict athlete
+  ---
+  duration_ms: 0.494606
+  location: '/home/runner/work/raz-coaching-platform/raz-coaching-platform/phase14/test/phase15_planner_regression.test.mjs:63:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    The input did not match the regular expression /strict One-Arm Pull-up singles or clusters/i. Input:
+    
+    '=== DETERMINISTIC PROGRAM SKELETON, DO NOT DELETE REQUIRED EXPOSURES ===\n' +
+      'Gym days (4): Wed, Fri, Sat, Sun.\n' +
+      'Hard session cap: 60 minutes INCLUDING warm-up, rests, transitions and any Zone 2 placed inside the session.\n' +
+      'Required coaching constraints:\n' +
+      '* DUAL BOX-SQUAT GOAL: the high-rep target and max target are different outcomes and require different exposures.\n' +
+      '* BOX_SQUAT_HEAVY: one max-strength exposure each week, normally 1-4 reps per set, long rest, no grinding; this serves the 1RM/max side.\n' +
+      '* BOX_SQUAT_REP: separate rep-strength exposure for the 10-rep outcome. Start with repeatable 6-8 rep work and progress toward 8-10 quality reps. Speed doubles/triples do not count.\n' +
+      '* Rep-strength progression is primarily double progression: earn clean reps inside the RPE window, then add 2.5-5 kg and rebuild reps. The distant 180 kg x 10 target is NOT the Week 1 working load.\n' +
+      '* Current tolerated box-squat max anchor is about 210 kg. Initial 6-8 rep work should usually sit around 150-167.5 kg at RPE 7-8; 2-4 rep max-strength work around 172.5-190 kg at roughly RPE 7.5-8.5. Adjust from observed RPE, never from the future target.\n' +
+      '* OAP LEVEL: athlete already owns 2 strict One-Arm Pull-up reps. Program from demonstrated advanced level.\n' +
+      '* OAP exposure A: strict One-Arm Pull-up singles/clusters, multiple high-quality singles per arm, normally at least 1 rep from technical failure.\n' +
+      '* OAP exposure B: Assisted One-Arm Pull-up doubles/triples with the minimum assistance needed for clean symmetrical reps. Progress by less assistance or more clean reps.\n' +
+      '* STRICT OHP IS A PROGRESSION GOAL, not maintenance. Use two meaningful strict Overhead Press exposures on separate days.\n' +
+      '* OHP exposure A: strength-biased strict Overhead Press, usually 3-5 reps per set around RPE 7.5-8.5.\n' +
+      '* OHP exposure B: volume/technique strict Overhead Press, usually 5-8 reps per set around RPE 6.5-8. Push Press is optional overload and does not replace both strict exposures.\n' +
+      '* Current strict OHP anchor is 75 kg x about 4+ reps; prescribe from CURRENT performance, not historical PR or target.\n' +
+      '* Long-term strict OHP target is about 75 kg; use repeatable submaximal progression, not token maintenance or weekly grinders.\n' +
+      '* Two meaningful low-fatigue Zone 2 exposures using canonical Zone-2 Bike or Zone-2 Row, roughly 20-35 minutes each. A 10-12 minute mini-dose does not satisfy this aerobic-base goal.\n' +
+      '* Retain direct Cable Lateral Raise at minimum useful dose.\n' +
+      '* Retain Face Pull at minimum useful dose.\n' +
+      '* Retain one or two very low-volume explosive primers. Use verified canonical Box Jump or Broad Jump unless another exact verified movement exists. Place after warm-up and before heavy strength; stop before velocity loss.\n' +
+      '* ALL 4 listed gym days are genuine strength/full-body sessions. Zone 2 may be appended/separate, but no gym day may be cardio-only. Every gym day needs real strength or advanced-skill work; with full-body preference it should normally include meaningful upper and lower/support work when recovery allows.\n' +
+      'Preferred/support choices:\n' +
+      '* Weighted Chin-up may support OAP once weekly but never replace unilateral specificity. With current +80 kg external-load 1RM, an initial 4-6 rep support range around +45 to +57.5 kg is plausible, autoregulated by RPE and elbow/grip freshness.\n' +
+      '* Use explicitly tolerated Box Squat to Parallel instead of forcing deeper ROM.\n' +
+      '* Hip Thrust or Glute Bridge is preferred low-spinal-fatigue posterior-chain assistance.\n' +
+      'Forbidden/tolerance-gated choices:\n' +
+      '* One-Arm Pull-up Eccentric/negative as either main OAP exposure for an athlete already owning 2+ strict reps.\n' +
+      '* Archer Pull-up or generic bilateral pulling as a substitute for either required unilateral OAP exposure.\n' +
+      '* Freestanding HSPU volume that steals recovery/session time from strict OHP when HSPU is explicitly nice-to-have.\n' +
+      '* Unrequested hard intervals, threshold, VO2, AMRAP, sprints or hard running when combat sport already supplies high-intensity conditioning.\n' +
+      '* Deep loaded squatting that reproduces lumbar-flexion symptoms.\n' +
+      '* Heavy Romanian Deadlift, Good Morning or Back Extension unless tolerance is explicitly established and the row states a tolerance gate.\n' +
+      '=== GOAL-SPECIFIC SPECIALIST RULES ===\n' +
+      '* SPECIALIST SOURCE: Advanced Gymnastics / skill graph family=one_arm_pull_up.\n' +
+      '* Universal skill rule: direct exposure to the actual skill family remains the anchor once the athlete can perform a measurable tolerated version. Assistance supports specificity; it does not replace it. Quality stops the set before technically poor attempts accumulate.\n' +
+      '* Anti-hallucination rule: prescribe only complete named variations that exist in the verified skill graph/exercise library. Never invent a banded, wall, eccentric, partial, one-leg, tuck or deficit variation by wording alone.\n' +
+      '* Ordering rule: primary skill work is performed after warm-up and any genuinely non-fatiguing primer, before fatigue-producing strength/hypertrophy work.\n' +
+      '* DETERMINISTIC SKILL-GRAPH SELECTION: {"gated":true,"rungIndex":0,"rung":{"name":"Weighted Pull-Up","criterion":{"type":"benchmark","metric":"weighted_pullup_bw_pct","min":50},"dose":{"sets":5,"reps":"3-5","rest":"3 min","rir":"1","frequency_per_week":2},"complementary":["Scapular Pull-up"]},"demonstratedIndex":-1,"missing":["12+ strict pull-ups","weighted pull-up at BW+30%"],"reason":"Prerequisite gate for One-Arm Pull-Up not met — 12+ strict pull-ups; weighted pull-up at BW+30%"}. Use observed current ability over an arbitrary easier gate.\n' +
+      '* SPECIALIST SOURCE: Advanced Gymnastics / skill graph family=hspu.\n' +
+      '* Universal skill rule: direct exposure to the actual skill family remains the anchor once the athlete can perform a measurable tolerated version. Assistance supports specificity; it does not replace it. Quality stops the set before technically poor attempts accumulate.\n' +
+      '* Anti-hallucination rule: prescribe only complete named variations that exist in the verified skill graph/exercise library. Never invent a banded, wall, eccentric, partial, one-leg, tuck or deficit variation by wording alone.\n' +
+      '* Ordering rule: primary skill work is performed after warm-up and any genuinely non-fatiguing primer, before fatigue-producing strength/hypertrophy work.\n' +
+      '* DETERMINISTIC SKILL-GRAPH SELECTION: {"gated":true,"rungIndex":0,"rung":{"name":"Pike Push-Up","criterion":{"type":"reps","metric":"pike_push_up","min":12},"dose":{"sets":4,"reps":"8-12","rest":"90s","rir":"1-2","frequency_per_week":3},"complementary":["Wall Handstand Hold"]},"demonstratedIndex":-1,"missing":["8+ pike push-ups"],"reason":"Prerequisite gate for Freestanding 90-Degree Handstand Push-up not met — 8+ pike push-ups"}. Use observed current ability over an arbitrary easier gate.\n' +
+      'Session skeleton:\n' +
+      '* Wed: BOX_SQUAT_REP, OHP_STRENGTH; same-day sport=moderate.\n' +
+      '* Fri: OAP_STRICT, OHP_VOLUME; no listed sport.\n' +
+      '* Sat: BOX_SQUAT_HEAVY, OAP_ASSISTED_ADVANCED, ZONE2_A; no listed sport.\n' +
+      '* Sun: LOW_COST_STRENGTH_SUPPORT, ZONE2_B; same-day sport=moderate.\n' +
+      'LOW_COST_STRENGTH_SUPPORT means real low-fatigue strength selected from athlete needs, never cardio-only filler.\n' +
+      'Exercise-name rule: use exact verified canonical names. Never output [REVIEW], support messages, placeholders or invented exercise variations.\n' +
+      'Model responsibility: choose realistic sets, reps, loads, RPE/RIR, rest, compact warm-up ramps, four-week progression and concise notes around this skeleton. Cut lower-priority work before primary specificity.'
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected:
+  actual: |-
+    === DETERMINISTIC PROGRAM SKELETON, DO NOT DELETE REQUIRED EXPOSURES ===
+    Gym days (4): Wed, Fri, Sat, Sun.
+    Hard session cap: 60 minutes INCLUDING warm-up, rests, transitions and any Zone 2 placed inside the session.
+    Required coaching constraints:
+    * DUAL BOX-SQUAT GOAL: the high-rep target and max target are different outcomes and require different exposures.
+    * BOX_SQUAT_HEAVY: one max-strength exposure each week, normally 1-4 reps per set, long rest, no grinding; this serves the 1RM/max side.
+    * BOX_SQUAT_REP: separate rep-strength exposure for the 10-rep outcome. Start with repeatable 6-8 rep work and progress toward 8-10 quality reps. Speed doubles/triples do not count.
+    * Rep-strength progression is primarily double progression: earn clean reps inside the RPE window, then add 2.5-5 kg and rebuild reps. The distant 180 kg x 10 target is NOT the Week 1 working load.
+    * Current tolerated box-squat max anchor is about 210 kg. Initial 6-8 rep work should usually sit around 150-167.5 kg at RPE 7-8; 2-4 rep max-strength work around 172.5-190 kg at roughly RPE 7.5-8.5. Adjust from observed RPE, never from the future target.
+    * OAP LEVEL: athlete already owns 2 strict One-Arm Pull-up reps. Program from demonstrated advanced level.
+    * OAP exposure A: strict One-Arm Pull-up singles/clusters, multiple high-quality singles per arm, normally at least 1 rep from technical failure.
+    * OAP exposure B: Assisted One-Arm Pull-up doubles/triples with the minimum assistance needed for clean symmetrical reps. Progress by less assistance or more clean reps.
+    * STRICT OHP IS A PROGRESSION GOAL, not maintenance. Use two meaningful strict Overhead Press exposures on separate days.
+    * OHP exposure A: strength-biased strict Overhead Press, usually 3-5 reps per set around RPE 7.5-8.5.
+    * OHP exposure B: volume/technique strict Overhead Press, usually 5-8 reps per set around RPE 6.5-8. Push Press is optional overload and does not replace both strict exposures.
+    * Current strict OHP anchor is 75 kg x about 4+ reps; prescribe from CURRENT performance, not historical PR or target.
+    * Long-term strict OHP target is about 75 kg; use repeatable submaximal progression, not token maintenance or weekly grinders.
+    * Two meaningful low-fatigue Zone 2 exposures using canonical Zone-2 Bike or Zone-2 Row, roughly 20-35 minutes each. A 10-12 minute mini-dose does not satisfy this aerobic-base goal.
+    * Retain direct Cable Lateral Raise at minimum useful dose.
+    * Retain Face Pull at minimum useful dose.
+    * Retain one or two very low-volume explosive primers. Use verified canonical Box Jump or Broad Jump unless another exact verified movement exists. Place after warm-up and before heavy strength; stop before velocity loss.
+    * ALL 4 listed gym days are genuine strength/full-body sessions. Zone 2 may be appended/separate, but no gym day may be cardio-only. Every gym day needs real strength or advanced-skill work; with full-body preference it should normally include meaningful upper and lower/support work when recovery allows.
+    Preferred/support choices:
+    * Weighted Chin-up may support OAP once weekly but never replace unilateral specificity. With current +80 kg external-load 1RM, an initial 4-6 rep support range around +45 to +57.5 kg is plausible, autoregulated by RPE and elbow/grip freshness.
+    * Use explicitly tolerated Box Squat to Parallel instead of forcing deeper ROM.
+    * Hip Thrust or Glute Bridge is preferred low-spinal-fatigue posterior-chain assistance.
+    Forbidden/tolerance-gated choices:
+    * One-Arm Pull-up Eccentric/negative as either main OAP exposure for an athlete already owning 2+ strict reps.
+    * Archer Pull-up or generic bilateral pulling as a substitute for either required unilateral OAP exposure.
+    * Freestanding HSPU volume that steals recovery/session time from strict OHP when HSPU is explicitly nice-to-have.
+    * Unrequested hard intervals, threshold, VO2, AMRAP, sprints or hard running when combat sport already supplies high-intensity conditioning.
+    * Deep loaded squatting that reproduces lumbar-flexion symptoms.
+    * Heavy Romanian Deadlift, Good Morning or Back Extension unless tolerance is explicitly established and the row states a tolerance gate.
+    === GOAL-SPECIFIC SPECIALIST RULES ===
+    * SPECIALIST SOURCE: Advanced Gymnastics / skill graph family=one_arm_pull_up.
+    * Universal skill rule: direct exposure to the actual skill family remains the anchor once the athlete can perform a measurable tolerated version. Assistance supports specificity; it does not replace it. Quality stops the set before technically poor attempts accumulate.
+    * Anti-hallucination rule: prescribe only complete named variations that exist in the verified skill graph/exercise library. Never invent a banded, wall, eccentric, partial, one-leg, tuck or deficit variation by wording alone.
+    * Ordering rule: primary skill work is performed after warm-up and any genuinely non-fatiguing primer, before fatigue-producing strength/hypertrophy work.
+    * DETERMINISTIC SKILL-GRAPH SELECTION: {"gated":true,"rungIndex":0,"rung":{"name":"Weighted Pull-Up","criterion":{"type":"benchmark","metric":"weighted_pullup_bw_pct","min":50},"dose":{"sets":5,"reps":"3-5","rest":"3 min","rir":"1","frequency_per_week":2},"complementary":["Scapular Pull-up"]},"demonstratedIndex":-1,"missing":["12+ strict pull-ups","weighted pull-up at BW+30%"],"reason":"Prerequisite gate for One-Arm Pull-Up not met — 12+ strict pull-ups; weighted pull-up at BW+30%"}. Use observed current ability over an arbitrary easier gate.
+    * SPECIALIST SOURCE: Advanced Gymnastics / skill graph family=hspu.
+    * Universal skill rule: direct exposure to the actual skill family remains the anchor once the athlete can perform a measurable tolerated version. Assistance supports specificity; it does not replace it. Quality stops the set before technically poor attempts accumulate.
+    * Anti-hallucination rule: prescribe only complete named variations that exist in the verified skill graph/exercise library. Never invent a banded, wall, eccentric, partial, one-leg, tuck or deficit variation by wording alone.
+    * Ordering rule: primary skill work is performed after warm-up and any genuinely non-fatiguing primer, before fatigue-producing strength/hypertrophy work.
+    * DETERMINISTIC SKILL-GRAPH SELECTION: {"gated":true,"rungIndex":0,"rung":{"name":"Pike Push-Up","criterion":{"type":"reps","metric":"pike_push_up","min":12},"dose":{"sets":4,"reps":"8-12","rest":"90s","rir":"1-2","frequency_per_week":3},"complementary":["Wall Handstand Hold"]},"demonstratedIndex":-1,"missing":["8+ pike push-ups"],"reason":"Prerequisite gate for Freestanding 90-Degree Handstand Push-up not met — 8+ pike push-ups"}. Use observed current ability over an arbitrary easier gate.
+    Session skeleton:
+    * Wed: BOX_SQUAT_REP, OHP_STRENGTH; same-day sport=moderate.
+    * Fri: OAP_STRICT, OHP_VOLUME; no listed sport.
+    * Sat: BOX_SQUAT_HEAVY, OAP_ASSISTED_ADVANCED, ZONE2_A; no listed sport.
+    * Sun: LOW_COST_STRENGTH_SUPPORT, ZONE2_B; same-day sport=moderate.
+    LOW_COST_STRENGTH_SUPPORT means real low-fatigue strength selected from athlete needs, never cardio-only filler.
+    Exercise-name rule: use exact verified canonical names. Never output [REVIEW], support messages, placeholders or invented exercise variations.
+    Model responsibility: choose realistic sets, reps, loads, RPE/RIR, rest, compact warm-up ramps, four-week progression and concise notes around this skeleton. Cut lower-priority work before primary specificity.
+  operator: 'match'
+  stack: |-
+    TestContext.<anonymous> (file:///home/runner/work/raz-coaching-platform/raz-coaching-platform/phase14/test/phase15_planner_regression.test.mjs:65:10)
+    Test.runInAsyncScope (node:async_hooks:206:9)
+    Test.run (node:internal/test_runner/test:796:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:526:18)
+    Test.postRun (node:internal/test_runner/test:889:19)
+    Test.run (node:internal/test_runner/test:835:12)
+    async Test.processPendingSubtests (node:internal/test_runner/test:526:7)
+  ...
+# Subtest: strict OHP gets two real exposures from the current level
+not ok 3 - strict OHP gets two real exposures from the current level
+  ---
+  duration_ms: 0.402704
+  location: '/home/runner/work/raz-coaching-platform/raz-coaching-platform/phase14/test/phase15_planner_regression.test.mjs:73:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    The input did not match the regular expression /Long-term strict OHP target is about 100 kg/. Input:
+    
+    '=== DETERMINISTIC PROGRAM SKELETON, DO NOT DELETE REQUIRED EXPOSURES ===\n' +
+      'Gym days (4): Wed, Fri, Sat, Sun.\n' +
+      'Hard session cap: 60 minutes INCLUDING warm-up, rests, transitions and any Zone 2 placed inside the session.\n' +
+      'Required coaching constraints:\n' +
+      '* DUAL BOX-SQUAT GOAL: the high-rep target and max target are different outcomes and require different exposures.\n' +
+      '* BOX_SQUAT_HEAVY: one max-strength exposure each week, normally 1-4 reps per set, long rest, no grinding; this serves the 1RM/max side.\n' +
+      '* BOX_SQUAT_REP: separate rep-strength exposure for the 10-rep outcome. Start with repeatable 6-8 rep work and progress toward 8-10 quality reps. Speed doubles/triples do not count.\n' +
+      '* Rep-strength progression is primarily double progression: earn clean reps inside the RPE window, then add 2.5-5 kg and rebuild reps. The distant 180 kg x 10 target is NOT the Week 1 working load.\n' +
+      '* Current tolerated box-squat max anchor is about 210 kg. Initial 6-8 rep work should usually sit around 150-167.5 kg at RPE 7-8; 2-4 rep max-strength work around 172.5-190 kg at roughly RPE 7.5-8.5. Adjust from observed RPE, never from the future target.\n' +
+      '* OAP LEVEL: athlete already owns 2 strict One-Arm Pull-up reps. Program from demonstrated advanced level.\n' +
+      '* OAP exposure A: strict One-Arm Pull-up singles/clusters, multiple high-quality singles per arm, normally at least 1 rep from technical failure.\n' +
+      '* OAP exposure B: Assisted One-Arm Pull-up doubles/triples with the minimum assistance needed for clean symmetrical reps. Progress by less assistance or more clean reps.\n' +
+      '* STRICT OHP IS A PROGRESSION GOAL, not maintenance. Use two meaningful strict Overhead Press exposures on separate days.\n' +
+      '* OHP exposure A: strength-biased strict Overhead Press, usually 3-5 reps per set around RPE 7.5-8.5.\n' +
+      '* OHP exposure B: volume/technique strict Overhead Press, usually 5-8 reps per set around RPE 6.5-8. Push Press is optional overload and does not replace both strict exposures.\n' +
+      '* Current strict OHP anchor is 75 kg x about 4+ reps; prescribe from CURRENT performance, not historical PR or target.\n' +
+      '* Long-term strict OHP target is about 75 kg; use repeatable submaximal progression, not token maintenance or weekly grinders.\n' +
+      '* Two meaningful low-fatigue Zone 2 exposures using canonical Zone-2 Bike or Zone-2 Row, roughly 20-35 minutes each. A 10-12 minute mini-dose does not satisfy this aerobic-base goal.\n' +
+      '* Retain direct Cable Lateral Raise at minimum useful dose.\n' +
+      '* Retain Face Pull at minimum useful dose.\n' +
+      '* Retain one or two very low-volume explosive primers. Use verified canonical Box Jump or Broad Jump unless another exact verified movement exists. Place after warm-up and before heavy strength; stop before velocity loss.\n' +
+      '* ALL 4 listed gym days are genuine strength/full-body sessions. Zone 2 may be appended/separate, but no gym day may be cardio-only. Every gym day needs real strength or advanced-skill work; with full-body preference it should normally include meaningful upper and lower/support work when recovery allows.\n' +
+      'Preferred/support choices:\n' +
+      '* Weighted Chin-up may support OAP once weekly but never replace unilateral specificity. With current +80 kg external-load 1RM, an initial 4-6 rep support range around +45 to +57.5 kg is plausible, autoregulated by RPE and elbow/grip freshness.\n' +
+      '* Use explicitly tolerated Box Squat to Parallel instead of forcing deeper ROM.\n' +
+      '* Hip Thrust or Glute Bridge is preferred low-spinal-fatigue posterior-chain assistance.\n' +
+      'Forbidden/tolerance-gated choices:\n' +
+      '* One-Arm Pull-up Eccentric/negative as either main OAP exposure for an athlete already owning 2+ strict reps.\n' +
+      '* Archer Pull-up or generic bilateral pulling as a substitute for either required unilateral OAP exposure.\n' +
+      '* Freestanding HSPU volume that steals recovery/session time from strict OHP when HSPU is explicitly nice-to-have.\n' +
+      '* Unrequested hard intervals, threshold, VO2, AMRAP, sprints or hard running when combat sport already supplies high-intensity conditioning.\n' +
+      '* Deep loaded squatting that reproduces lumbar-flexion symptoms.\n' +
+      '* Heavy Romanian Deadlift, Good Morning or Back Extension unless tolerance is explicitly established and the row states a tolerance gate.\n' +
+      '=== GOAL-SPECIFIC SPECIALIST RULES ===\n' +
+      '* SPECIALIST SOURCE: Advanced Gymnastics / skill graph family=one_arm_pull_up.\n' +
+      '* Universal skill rule: direct exposure to the actual skill family remains the anchor once the athlete can perform a measurable tolerated version. Assistance supports specificity; it does not replace it. Quality stops the set before technically poor attempts accumulate.\n' +
+      '* Anti-hallucination rule: prescribe only complete named variations that exist in the verified skill graph/exercise library. Never invent a banded, wall, eccentric, partial, one-leg, tuck or deficit variation by wording alone.\n' +
+      '* Ordering rule: primary skill work is performed after warm-up and any genuinely non-fatiguing primer, before fatigue-producing strength/hypertrophy work.\n' +
+      '* DETERMINISTIC SKILL-GRAPH SELECTION: {"gated":true,"rungIndex":0,"rung":{"name":"Weighted Pull-Up","criterion":{"type":"benchmark","metric":"weighted_pullup_bw_pct","min":50},"dose":{"sets":5,"reps":"3-5","rest":"3 min","rir":"1","frequency_per_week":2},"complementary":["Scapular Pull-up"]},"demonstratedIndex":-1,"missing":["12+ strict pull-ups","weighted pull-up at BW+30%"],"reason":"Prerequisite gate for One-Arm Pull-Up not met — 12+ strict pull-ups; weighted pull-up at BW+30%"}. Use observed current ability over an arbitrary easier gate.\n' +
+      '* SPECIALIST SOURCE: Advanced Gymnastics / skill graph family=hspu.\n' +
+      '* Universal skill rule: direct exposure to the actual skill family remains the anchor once the athlete can perform a measurable tolerated version. Assistance supports specificity; it does not replace it. Quality stops the set before technically poor attempts accumulate.\n' +
+      '* Anti-hallucination rule: prescribe only complete named variations that exist in the verified skill graph/exercise library. Never invent a banded, wall, eccentric, partial, one-leg, tuck or deficit variation by wording alone.\n' +
+      '* Ordering rule: primary skill work is performed after warm-up and any genuinely non-fatiguing primer, before fatigue-producing strength/hypertrophy work.\n' +
+      '* DETERMINISTIC SKILL-GRAPH SELECTION: {"gated":true,"rungIndex":0,"rung":{"name":"Pike Push-Up","criterion":{"type":"reps","metric":"pike_push_up","min":12},"dose":{"sets":4,"reps":"8-12","rest":"90s","rir":"1-2","frequency_per_week":3},"complementary":["Wall Handstand Hold"]},"demonstratedIndex":-1,"missing":["8+ pike push-ups"],"reason":"Prerequisite gate for Freestanding 90-Degree Handstand Push-up not met — 8+ pike push-ups"}. Use observed current ability over an arbitrary easier gate.\n' +
+      'Session skeleton:\n' +
+      '* Wed: BOX_SQUAT_REP, OHP_STRENGTH; same-day sport=moderate.\n' +
+      '* Fri: OAP_STRICT, OHP_VOLUME; no listed sport.\n' +
+      '* Sat: BOX_SQUAT_HEAVY, OAP_ASSISTED_ADVANCED, ZONE2_A; no listed sport.\n' +
+      '* Sun: LOW_COST_STRENGTH_SUPPORT, ZONE2_B; same-day sport=moderate.\n' +
+      'LOW_COST_STRENGTH_SUPPORT means real low-fatigue strength selected from athlete needs, never cardio-only filler.\n' +
+      'Exercise-name rule: use exact verified canonical names. Never output [REVIEW], support messages, placeholders or invented exercise variations.\n' +
+      'Model responsibility: choose realistic sets, reps, loads, RPE/RIR, rest, compact warm-up ramps, four-week progression and concise notes around this skeleton. Cut lower-priority work before primary specificity.'
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected:
+  actual: |-
+    === DETERMINISTIC PROGRAM SKELETON, DO NOT DELETE REQUIRED EXPOSURES ===
+    Gym days (4): Wed, Fri, Sat, Sun.
+    Hard session cap: 60 minutes INCLUDING warm-up, rests, transitions and any Zone 2 placed inside the session.
+    Required coaching constraints:
+    * DUAL BOX-SQUAT GOAL: the high-rep target and max target are different outcomes and require different exposures.
+    * BOX_SQUAT_HEAVY: one max-strength exposure each week, normally 1-4 reps per set, long rest, no grinding; this serves the 1RM/max side.
+    * BOX_SQUAT_REP: separate rep-strength exposure for the 10-rep outcome. Start with repeatable 6-8 rep work and progress toward 8-10 quality reps. Speed doubles/triples do not count.
+    * Rep-strength progression is primarily double progression: earn clean reps inside the RPE window, then add 2.5-5 kg and rebuild reps. The distant 180 kg x 10 target is NOT the Week 1 working load.
+    * Current tolerated box-squat max anchor is about 210 kg. Initial 6-8 rep work should usually sit around 150-167.5 kg at RPE 7-8; 2-4 rep max-strength work around 172.5-190 kg at roughly RPE 7.5-8.5. Adjust from observed RPE, never from the future target.
+    * OAP LEVEL: athlete already owns 2 strict One-Arm Pull-up reps. Program from demonstrated advanced level.
+    * OAP exposure A: strict One-Arm Pull-up singles/clusters, multiple high-quality singles per arm, normally at least 1 rep from technical failure.
+    * OAP exposure B: Assisted One-Arm Pull-up doubles/triples with the minimum assistance needed for clean symmetrical reps. Progress by less assistance or more clean reps.
+    * STRICT OHP IS A PROGRESSION GOAL, not maintenance. Use two meaningful strict Overhead Press exposures on separate days.
+    * OHP exposure A: strength-biased strict Overhead Press, usually 3-5 reps per set around RPE 7.5-8.5.
+    * OHP exposure B: volume/technique strict Overhead Press, usually 5-8 reps per set around RPE 6.5-8. Push Press is optional overload and does not replace both strict exposures.
+    * Current strict OHP anchor is 75 kg x about 4+ reps; prescribe from CURRENT performance, not historical PR or target.
+    * Long-term strict OHP target is about 75 kg; use repeatable submaximal progression, not token maintenance or weekly grinders.
+    * Two meaningful low-fatigue Zone 2 exposures using canonical Zone-2 Bike or Zone-2 Row, roughly 20-35 minutes each. A 10-12 minute mini-dose does not satisfy this aerobic-base goal.
+    * Retain direct Cable Lateral Raise at minimum useful dose.
+    * Retain Face Pull at minimum useful dose.
+    * Retain one or two very low-volume explosive primers. Use verified canonical Box Jump or Broad Jump unless another exact verified movement exists. Place after warm-up and before heavy strength; stop before velocity loss.
+    * ALL 4 listed gym days are genuine strength/full-body sessions. Zone 2 may be appended/separate, but no gym day may be cardio-only. Every gym day needs real strength or advanced-skill work; with full-body preference it should normally include meaningful upper and lower/support work when recovery allows.
+    Preferred/support choices:
+    * Weighted Chin-up may support OAP once weekly but never replace unilateral specificity. With current +80 kg external-load 1RM, an initial 4-6 rep support range around +45 to +57.5 kg is plausible, autoregulated by RPE and elbow/grip freshness.
+    * Use explicitly tolerated Box Squat to Parallel instead of forcing deeper ROM.
+    * Hip Thrust or Glute Bridge is preferred low-spinal-fatigue posterior-chain assistance.
+    Forbidden/tolerance-gated choices:
+    * One-Arm Pull-up Eccentric/negative as either main OAP exposure for an athlete already owning 2+ strict reps.
+    * Archer Pull-up or generic bilateral pulling as a substitute for either required unilateral OAP exposure.
+    * Freestanding HSPU volume that steals recovery/session time from strict OHP when HSPU is explicitly nice-to-have.
+    * Unrequested hard intervals, threshold, VO2, AMRAP, sprints or hard running when combat sport already supplies high-intensity conditioning.
+    * Deep loaded squatting that reproduces lumbar-flexion symptoms.
+    * Heavy Romanian Deadlift, Good Morning or Back Extension unless tolerance is explicitly established and the row states a tolerance gate.
+    === GOAL-SPECIFIC SPECIALIST RULES ===
+    * SPECIALIST SOURCE: Advanced Gymnastics / skill graph family=one_arm_pull_up.
+    * Universal skill rule: direct exposure to the actual skill family remains the anchor once the athlete can perform a measurable tolerated version. Assistance supports specificity; it does not replace it. Quality stops the set before technically poor attempts accumulate.
+    * Anti-hallucination rule: prescribe only complete named variations that exist in the verified skill graph/exercise library. Never invent a banded, wall, eccentric, partial, one-leg, tuck or deficit variation by wording alone.
+    * Ordering rule: primary skill work is performed after warm-up and any genuinely non-fatiguing primer, before fatigue-producing strength/hypertrophy work.
+    * DETERMINISTIC SKILL-GRAPH SELECTION: {"gated":true,"rungIndex":0,"rung":{"name":"Weighted Pull-Up","criterion":{"type":"benchmark","metric":"weighted_pullup_bw_pct","min":50},"dose":{"sets":5,"reps":"3-5","rest":"3 min","rir":"1","frequency_per_week":2},"complementary":["Scapular Pull-up"]},"demonstratedIndex":-1,"missing":["12+ strict pull-ups","weighted pull-up at BW+30%"],"reason":"Prerequisite gate for One-Arm Pull-Up not met — 12+ strict pull-ups; weighted pull-up at BW+30%"}. Use observed current ability over an arbitrary easier gate.
+    * SPECIALIST SOURCE: Advanced Gymnastics / skill graph family=hspu.
+    * Universal skill rule: direct exposure to the actual skill family remains the anchor once the athlete can perform a measurable tolerated version. Assistance supports specificity; it does not replace it. Quality stops the set before technically poor attempts accumulate.
+    * Anti-hallucination rule: prescribe only complete named variations that exist in the verified skill graph/exercise library. Never invent a banded, wall, eccentric, partial, one-leg, tuck or deficit variation by wording alone.
+    * Ordering rule: primary skill work is performed after warm-up and any genuinely non-fatiguing primer, before fatigue-producing strength/hypertrophy work.
+    * DETERMINISTIC SKILL-GRAPH SELECTION: {"gated":true,"rungIndex":0,"rung":{"name":"Pike Push-Up","criterion":{"type":"reps","metric":"pike_push_up","min":12},"dose":{"sets":4,"reps":"8-12","rest":"90s","rir":"1-2","frequency_per_week":3},"complementary":["Wall Handstand Hold"]},"demonstratedIndex":-1,"missing":["8+ pike push-ups"],"reason":"Prerequisite gate for Freestanding 90-Degree Handstand Push-up not met — 8+ pike push-ups"}. Use observed current ability over an arbitrary easier gate.
+    Session skeleton:
+    * Wed: BOX_SQUAT_REP, OHP_STRENGTH; same-day sport=moderate.
+    * Fri: OAP_STRICT, OHP_VOLUME; no listed sport.
+    * Sat: BOX_SQUAT_HEAVY, OAP_ASSISTED_ADVANCED, ZONE2_A; no listed sport.
+    * Sun: LOW_COST_STRENGTH_SUPPORT, ZONE2_B; same-day sport=moderate.
+    LOW_COST_STRENGTH_SUPPORT means real low-fatigue strength selected from athlete needs, never cardio-only filler.
+    Exercise-name rule: use exact verified canonical names. Never output [REVIEW], support messages, placeholders or invented exercise variations.
+    Model responsibility: choose realistic sets, reps, loads, RPE/RIR, rest, compact warm-up ramps, four-week progression and concise notes around this skeleton. Cut lower-priority work before primary specificity.
+  operator: 'match'
+  stack: |-
+    TestContext.<anonymous> (file:///home/runner/work/raz-coaching-platform/raz-coaching-platform/phase14/test/phase15_planner_regression.test.mjs:80:10)
+    Test.runInAsyncScope (node:async_hooks:206:9)
+    Test.run (node:internal/test_runner/test:796:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:526:18)
+    Test.postRun (node:internal/test_runner/test:889:19)
+    Test.run (node:internal/test_runner/test:835:12)
+    async Test.processPendingSubtests (node:internal/test_runner/test:526:7)
+  ...
+# Subtest: all four gym days remain strength days and aerobic work stays low fatigue
+ok 4 - all four gym days remain strength days and aerobic work stays low fatigue
+  ---
+  duration_ms: 0.48093
+  ...
+# Subtest: client-facing exercise naming has no review path in the brief
+not ok 5 - client-facing exercise naming has no review path in the brief
+  ---
+  duration_ms: 0.383618
+  location: '/home/runner/work/raz-coaching-platform/raz-coaching-platform/phase14/test/phase15_planner_regression.test.mjs:97:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    The input did not match the regular expression /Never output \[REVIEW\], support messages or placeholder exercise rows/. Input:
+    
+    '=== DETERMINISTIC PROGRAM SKELETON, DO NOT DELETE REQUIRED EXPOSURES ===\n' +
+      'Gym days (4): Wed, Fri, Sat, Sun.\n' +
+      'Hard session cap: 60 minutes INCLUDING warm-up, rests, transitions and any Zone 2 placed inside the session.\n' +
+      'Required coaching constraints:\n' +
+      '* DUAL BOX-SQUAT GOAL: the high-rep target and max target are different outcomes and require different exposures.\n' +
+      '* BOX_SQUAT_HEAVY: one max-strength exposure each week, normally 1-4 reps per set, long rest, no grinding; this serves the 1RM/max side.\n' +
+      '* BOX_SQUAT_REP: separate rep-strength exposure for the 10-rep outcome. Start with repeatable 6-8 rep work and progress toward 8-10 quality reps. Speed doubles/triples do not count.\n' +
+      '* Rep-strength progression is primarily double progression: earn clean reps inside the RPE window, then add 2.5-5 kg and rebuild reps. The distant 180 kg x 10 target is NOT the Week 1 working load.\n' +
+      '* Current tolerated box-squat max anchor is about 210 kg. Initial 6-8 rep work should usually sit around 150-167.5 kg at RPE 7-8; 2-4 rep max-strength work around 172.5-190 kg at roughly RPE 7.5-8.5. Adjust from observed RPE, never from the future target.\n' +
+      '* OAP LEVEL: athlete already owns 2 strict One-Arm Pull-up reps. Program from demonstrated advanced level.\n' +
+      '* OAP exposure A: strict One-Arm Pull-up singles/clusters, multiple high-quality singles per arm, normally at least 1 rep from technical failure.\n' +
+      '* OAP exposure B: Assisted One-Arm Pull-up doubles/triples with the minimum assistance needed for clean symmetrical reps. Progress by less assistance or more clean reps.\n' +
+      '* STRICT OHP IS A PROGRESSION GOAL, not maintenance. Use two meaningful strict Overhead Press exposures on separate days.\n' +
+      '* OHP exposure A: strength-biased strict Overhead Press, usually 3-5 reps per set around RPE 7.5-8.5.\n' +
+      '* OHP exposure B: volume/technique strict Overhead Press, usually 5-8 reps per set around RPE 6.5-8. Push Press is optional overload and does not replace both strict exposures.\n' +
+      '* Current strict OHP anchor is 75 kg x about 4+ reps; prescribe from CURRENT performance, not historical PR or target.\n' +
+      '* Long-term strict OHP target is about 75 kg; use repeatable submaximal progression, not token maintenance or weekly grinders.\n' +
+      '* Two meaningful low-fatigue Zone 2 exposures using canonical Zone-2 Bike or Zone-2 Row, roughly 20-35 minutes each. A 10-12 minute mini-dose does not satisfy this aerobic-base goal.\n' +
+      '* Retain direct Cable Lateral Raise at minimum useful dose.\n' +
+      '* Retain Face Pull at minimum useful dose.\n' +
+      '* Retain one or two very low-volume explosive primers. Use verified canonical Box Jump or Broad Jump unless another exact verified movement exists. Place after warm-up and before heavy strength; stop before velocity loss.\n' +
+      '* ALL 4 listed gym days are genuine strength/full-body sessions. Zone 2 may be appended/separate, but no gym day may be cardio-only. Every gym day needs real strength or advanced-skill work; with full-body preference it should normally include meaningful upper and lower/support work when recovery allows.\n' +
+      'Preferred/support choices:\n' +
+      '* Weighted Chin-up may support OAP once weekly but never replace unilateral specificity. With current +80 kg external-load 1RM, an initial 4-6 rep support range around +45 to +57.5 kg is plausible, autoregulated by RPE and elbow/grip freshness.\n' +
+      '* Use explicitly tolerated Box Squat to Parallel instead of forcing deeper ROM.\n' +
+      '* Hip Thrust or Glute Bridge is preferred low-spinal-fatigue posterior-chain assistance.\n' +
+      'Forbidden/tolerance-gated choices:\n' +
+      '* One-Arm Pull-up Eccentric/negative as either main OAP exposure for an athlete already owning 2+ strict reps.\n' +
+      '* Archer Pull-up or generic bilateral pulling as a substitute for either required unilateral OAP exposure.\n' +
+      '* Freestanding HSPU volume that steals recovery/session time from strict OHP when HSPU is explicitly nice-to-have.\n' +
+      '* Unrequested hard intervals, threshold, VO2, AMRAP, sprints or hard running when combat sport already supplies high-intensity conditioning.\n' +
+      '* Deep loaded squatting that reproduces lumbar-flexion symptoms.\n' +
+      '* Heavy Romanian Deadlift, Good Morning or Back Extension unless tolerance is explicitly established and the row states a tolerance gate.\n' +
+      '=== GOAL-SPECIFIC SPECIALIST RULES ===\n' +
+      '* SPECIALIST SOURCE: Advanced Gymnastics / skill graph family=one_arm_pull_up.\n' +
+      '* Universal skill rule: direct exposure to the actual skill family remains the anchor once the athlete can perform a measurable tolerated version. Assistance supports specificity; it does not replace it. Quality stops the set before technically poor attempts accumulate.\n' +
+      '* Anti-hallucination rule: prescribe only complete named variations that exist in the verified skill graph/exercise library. Never invent a banded, wall, eccentric, partial, one-leg, tuck or deficit variation by wording alone.\n' +
+      '* Ordering rule: primary skill work is performed after warm-up and any genuinely non-fatiguing primer, before fatigue-producing strength/hypertrophy work.\n' +
+      '* DETERMINISTIC SKILL-GRAPH SELECTION: {"gated":true,"rungIndex":0,"rung":{"name":"Weighted Pull-Up","criterion":{"type":"benchmark","metric":"weighted_pullup_bw_pct","min":50},"dose":{"sets":5,"reps":"3-5","rest":"3 min","rir":"1","frequency_per_week":2},"complementary":["Scapular Pull-up"]},"demonstratedIndex":-1,"missing":["12+ strict pull-ups","weighted pull-up at BW+30%"],"reason":"Prerequisite gate for One-Arm Pull-Up not met — 12+ strict pull-ups; weighted pull-up at BW+30%"}. Use observed current ability over an arbitrary easier gate.\n' +
+      '* SPECIALIST SOURCE: Advanced Gymnastics / skill graph family=hspu.\n' +
+      '* Universal skill rule: direct exposure to the actual skill family remains the anchor once the athlete can perform a measurable tolerated version. Assistance supports specificity; it does not replace it. Quality stops the set before technically poor attempts accumulate.\n' +
+      '* Anti-hallucination rule: prescribe only complete named variations that exist in the verified skill graph/exercise library. Never invent a banded, wall, eccentric, partial, one-leg, tuck or deficit variation by wording alone.\n' +
+      '* Ordering rule: primary skill work is performed after warm-up and any genuinely non-fatiguing primer, before fatigue-producing strength/hypertrophy work.\n' +
+      '* DETERMINISTIC SKILL-GRAPH SELECTION: {"gated":true,"rungIndex":0,"rung":{"name":"Pike Push-Up","criterion":{"type":"reps","metric":"pike_push_up","min":12},"dose":{"sets":4,"reps":"8-12","rest":"90s","rir":"1-2","frequency_per_week":3},"complementary":["Wall Handstand Hold"]},"demonstratedIndex":-1,"missing":["8+ pike push-ups"],"reason":"Prerequisite gate for Freestanding 90-Degree Handstand Push-up not met — 8+ pike push-ups"}. Use observed current ability over an arbitrary easier gate.\n' +
+      'Session skeleton:\n' +
+      '* Wed: BOX_SQUAT_REP, OHP_STRENGTH; same-day sport=moderate.\n' +
+      '* Fri: OAP_STRICT, OHP_VOLUME; no listed sport.\n' +
+      '* Sat: BOX_SQUAT_HEAVY, OAP_ASSISTED_ADVANCED, ZONE2_A; no listed sport.\n' +
+      '* Sun: LOW_COST_STRENGTH_SUPPORT, ZONE2_B; same-day sport=moderate.\n' +
+      'LOW_COST_STRENGTH_SUPPORT means real low-fatigue strength selected from athlete needs, never cardio-only filler.\n' +
+      'Exercise-name rule: use exact verified canonical names. Never output [REVIEW], support messages, placeholders or invented exercise variations.\n' +
+      'Model responsibility: choose realistic sets, reps, loads, RPE/RIR, rest, compact warm-up ramps, four-week progression and concise notes around this skeleton. Cut lower-priority work before primary specificity.'
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected:
+  actual: |-
+    === DETERMINISTIC PROGRAM SKELETON, DO NOT DELETE REQUIRED EXPOSURES ===
+    Gym days (4): Wed, Fri, Sat, Sun.
+    Hard session cap: 60 minutes INCLUDING warm-up, rests, transitions and any Zone 2 placed inside the session.
+    Required coaching constraints:
+    * DUAL BOX-SQUAT GOAL: the high-rep target and max target are different outcomes and require different exposures.
+    * BOX_SQUAT_HEAVY: one max-strength exposure each week, normally 1-4 reps per set, long rest, no grinding; this serves the 1RM/max side.
+    * BOX_SQUAT_REP: separate rep-strength exposure for the 10-rep outcome. Start with repeatable 6-8 rep work and progress toward 8-10 quality reps. Speed doubles/triples do not count.
+    * Rep-strength progression is primarily double progression: earn clean reps inside the RPE window, then add 2.5-5 kg and rebuild reps. The distant 180 kg x 10 target is NOT the Week 1 working load.
+    * Current tolerated box-squat max anchor is about 210 kg. Initial 6-8 rep work should usually sit around 150-167.5 kg at RPE 7-8; 2-4 rep max-strength work around 172.5-190 kg at roughly RPE 7.5-8.5. Adjust from observed RPE, never from the future target.
+    * OAP LEVEL: athlete already owns 2 strict One-Arm Pull-up reps. Program from demonstrated advanced level.
+    * OAP exposure A: strict One-Arm Pull-up singles/clusters, multiple high-quality singles per arm, normally at least 1 rep from technical failure.
+    * OAP exposure B: Assisted One-Arm Pull-up doubles/triples with the minimum assistance needed for clean symmetrical reps. Progress by less assistance or more clean reps.
+    * STRICT OHP IS A PROGRESSION GOAL, not maintenance. Use two meaningful strict Overhead Press exposures on separate days.
+    * OHP exposure A: strength-biased strict Overhead Press, usually 3-5 reps per set around RPE 7.5-8.5.
+    * OHP exposure B: volume/technique strict Overhead Press, usually 5-8 reps per set around RPE 6.5-8. Push Press is optional overload and does not replace both strict exposures.
+    * Current strict OHP anchor is 75 kg x about 4+ reps; prescribe from CURRENT performance, not historical PR or target.
+    * Long-term strict OHP target is about 75 kg; use repeatable submaximal progression, not token maintenance or weekly grinders.
+    * Two meaningful low-fatigue Zone 2 exposures using canonical Zone-2 Bike or Zone-2 Row, roughly 20-35 minutes each. A 10-12 minute mini-dose does not satisfy this aerobic-base goal.
+    * Retain direct Cable Lateral Raise at minimum useful dose.
+    * Retain Face Pull at minimum useful dose.
+    * Retain one or two very low-volume explosive primers. Use verified canonical Box Jump or Broad Jump unless another exact verified movement exists. Place after warm-up and before heavy strength; stop before velocity loss.
+    * ALL 4 listed gym days are genuine strength/full-body sessions. Zone 2 may be appended/separate, but no gym day may be cardio-only. Every gym day needs real strength or advanced-skill work; with full-body preference it should normally include meaningful upper and lower/support work when recovery allows.
+    Preferred/support choices:
+    * Weighted Chin-up may support OAP once weekly but never replace unilateral specificity. With current +80 kg external-load 1RM, an initial 4-6 rep support range around +45 to +57.5 kg is plausible, autoregulated by RPE and elbow/grip freshness.
+    * Use explicitly tolerated Box Squat to Parallel instead of forcing deeper ROM.
+    * Hip Thrust or Glute Bridge is preferred low-spinal-fatigue posterior-chain assistance.
+    Forbidden/tolerance-gated choices:
+    * One-Arm Pull-up Eccentric/negative as either main OAP exposure for an athlete already owning 2+ strict reps.
+    * Archer Pull-up or generic bilateral pulling as a substitute for either required unilateral OAP exposure.
+    * Freestanding HSPU volume that steals recovery/session time from strict OHP when HSPU is explicitly nice-to-have.
+    * Unrequested hard intervals, threshold, VO2, AMRAP, sprints or hard running when combat sport already supplies high-intensity conditioning.
+    * Deep loaded squatting that reproduces lumbar-flexion symptoms.
+    * Heavy Romanian Deadlift, Good Morning or Back Extension unless tolerance is explicitly established and the row states a tolerance gate.
+    === GOAL-SPECIFIC SPECIALIST RULES ===
+    * SPECIALIST SOURCE: Advanced Gymnastics / skill graph family=one_arm_pull_up.
+    * Universal skill rule: direct exposure to the actual skill family remains the anchor once the athlete can perform a measurable tolerated version. Assistance supports specificity; it does not replace it. Quality stops the set before technically poor attempts accumulate.
+    * Anti-hallucination rule: prescribe only complete named variations that exist in the verified skill graph/exercise library. Never invent a banded, wall, eccentric, partial, one-leg, tuck or deficit variation by wording alone.
+    * Ordering rule: primary skill work is performed after warm-up and any genuinely non-fatiguing primer, before fatigue-producing strength/hypertrophy work.
+    * DETERMINISTIC SKILL-GRAPH SELECTION: {"gated":true,"rungIndex":0,"rung":{"name":"Weighted Pull-Up","criterion":{"type":"benchmark","metric":"weighted_pullup_bw_pct","min":50},"dose":{"sets":5,"reps":"3-5","rest":"3 min","rir":"1","frequency_per_week":2},"complementary":["Scapular Pull-up"]},"demonstratedIndex":-1,"missing":["12+ strict pull-ups","weighted pull-up at BW+30%"],"reason":"Prerequisite gate for One-Arm Pull-Up not met — 12+ strict pull-ups; weighted pull-up at BW+30%"}. Use observed current ability over an arbitrary easier gate.
+    * SPECIALIST SOURCE: Advanced Gymnastics / skill graph family=hspu.
+    * Universal skill rule: direct exposure to the actual skill family remains the anchor once the athlete can perform a measurable tolerated version. Assistance supports specificity; it does not replace it. Quality stops the set before technically poor attempts accumulate.
+    * Anti-hallucination rule: prescribe only complete named variations that exist in the verified skill graph/exercise library. Never invent a banded, wall, eccentric, partial, one-leg, tuck or deficit variation by wording alone.
+    * Ordering rule: primary skill work is performed after warm-up and any genuinely non-fatiguing primer, before fatigue-producing strength/hypertrophy work.
+    * DETERMINISTIC SKILL-GRAPH SELECTION: {"gated":true,"rungIndex":0,"rung":{"name":"Pike Push-Up","criterion":{"type":"reps","metric":"pike_push_up","min":12},"dose":{"sets":4,"reps":"8-12","rest":"90s","rir":"1-2","frequency_per_week":3},"complementary":["Wall Handstand Hold"]},"demonstratedIndex":-1,"missing":["8+ pike push-ups"],"reason":"Prerequisite gate for Freestanding 90-Degree Handstand Push-up not met — 8+ pike push-ups"}. Use observed current ability over an arbitrary easier gate.
+    Session skeleton:
+    * Wed: BOX_SQUAT_REP, OHP_STRENGTH; same-day sport=moderate.
+    * Fri: OAP_STRICT, OHP_VOLUME; no listed sport.
+    * Sat: BOX_SQUAT_HEAVY, OAP_ASSISTED_ADVANCED, ZONE2_A; no listed sport.
+    * Sun: LOW_COST_STRENGTH_SUPPORT, ZONE2_B; same-day sport=moderate.
+    LOW_COST_STRENGTH_SUPPORT means real low-fatigue strength selected from athlete needs, never cardio-only filler.
+    Exercise-name rule: use exact verified canonical names. Never output [REVIEW], support messages, placeholders or invented exercise variations.
+    Model responsibility: choose realistic sets, reps, loads, RPE/RIR, rest, compact warm-up ramps, four-week progression and concise notes around this skeleton. Cut lower-priority work before primary specificity.
+  operator: 'match'
+  stack: |-
+    TestContext.<anonymous> (file:///home/runner/work/raz-coaching-platform/raz-coaching-platform/phase14/test/phase15_planner_regression.test.mjs:98:10)
+    Test.runInAsyncScope (node:async_hooks:206:9)
+    Test.run (node:internal/test_runner/test:796:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:526:18)
+    Test.postRun (node:internal/test_runner/test:889:19)
+    Test.run (node:internal/test_runner/test:835:12)
+    async Test.processPendingSubtests (node:internal/test_runner/test:526:7)
+  ...
+1..5
+# tests 5
+# suites 0
+# pass 1
+# fail 4
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 75.815851
+EXIT=1
+===== specialist_rules =====
+TAP version 13
+# Subtest: planche goal activates authored Article N2 and observed-level rule
+ok 1 - planche goal activates authored Article N2 and observed-level rule
+  ---
+  duration_ms: 7.614775
+  ...
+# Subtest: weighted chin-up 1RM goal routes to maximal-strength Article N8
+ok 2 - weighted chin-up 1RM goal routes to maximal-strength Article N8
+  ---
+  duration_ms: 0.910184
+  ...
+# Subtest: weighted dip fixed-load rep goal routes to two-track loaded endurance
+ok 3 - weighted dip fixed-load rep goal routes to two-track loaded endurance
+  ---
+  duration_ms: 0.575959
+  ...
+# Subtest: street lifting classifier does not confuse max and endurance expressions
+ok 4 - street lifting classifier does not confuse max and endurance expressions
+  ---
+  duration_ms: 0.164247
+  ...
+1..4
+# tests 4
+# suites 0
+# pass 4
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 68.121364
+EXIT=0
+===== build_runtime =====
+built server.phase15.js with deterministic skeleton v3 + canonical repair + fast new-client persistence
+EXIT=0
+===== syntax_runtime =====
+EXIT=0
+===== syntax_planner =====
+EXIT=0
+===== syntax_specialist =====
+EXIT=0
+===== syntax_program_qa =====
+EXIT=0
+===== syntax_quality =====
+EXIT=0
+===== grep_v3 =====
+EXIT=0
+===== grep_normalizer =====
+EXIT=0
+===== grep_fast_path =====
+EXIT=0
+===== grep_specialist =====
+EXIT=0
