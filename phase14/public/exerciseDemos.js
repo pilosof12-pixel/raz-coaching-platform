@@ -1,7 +1,5 @@
 // public/exerciseDemos.js
-// Browser-side exercise demo resolver. Client-facing spreadsheets use ONLY
-// curated direct YouTube URLs. Missing coverage stays visibly missing so QA can
-// catch it; we never hide a library gap behind a YouTube search-results link.
+// Browser-side direct-only exercise demo resolver.
 
 (function () {
   let demos = null;
@@ -10,13 +8,16 @@
   function load() {
     if (demos) return Promise.resolve(demos);
     if (loadPromise) return loadPromise;
-    loadPromise = fetch("data/exercise_demos.json", { cache: "no-cache" })
-      .then((res) => {
+    loadPromise = Promise.all([
+      fetch("data/exercise_demos.json", { cache: "no-cache" }).then(res => {
         if (!res.ok) throw new Error("Failed to load exercise_demos.json: " + res.status);
         return res.json();
-      })
-      .then((json) => { demos = json; return demos; })
-      .catch((err) => { loadPromise = null; throw err; });
+      }),
+      fetch("data/exercise_demo_overrides.json", { cache: "no-cache" }).then(res => res.ok ? res.json() : ({ entries:{} })).catch(() => ({ entries:{} }))
+    ]).then(([base, overrides]) => {
+      demos = { ...base, entries: { ...(base.entries || {}), ...(overrides.entries || {}) } };
+      return demos;
+    }).catch((err) => { loadPromise = null; throw err; });
     return loadPromise;
   }
 
@@ -44,22 +45,16 @@
 
   function resolveExerciseDemo(name) {
     if (!name || !demos?.entries) return null;
-    const lookupName = canonicalLookupName(name);
-    const key = normalizeExerciseName(lookupName);
+    const lookupName = canonicalLookupName(name), key = normalizeExerciseName(lookupName);
     const direct = demos.entries[key];
     if (direct?.demo_url) return { url: direct.demo_url, source: "curated", channel: direct.channel, canonical: direct.canonical };
-    for (const k in demos.entries) {
-      const v = demos.entries[k];
+    for (const v of Object.values(demos.entries)) {
       if (v.aliases?.includes(key) && v.demo_url) return { url: v.demo_url, source: "curated", channel: v.channel, canonical: v.canonical };
     }
     return null;
   }
 
-  function getPrivacyDisclosure() {
-    return (demos?.policy?.privacy_disclosure) || "Exercise demos open in YouTube.";
-  }
-
+  function getPrivacyDisclosure() { return (demos?.policy?.privacy_disclosure) || "Exercise demos open in YouTube."; }
   function hasCuratedDemo(name) { return !!resolveExerciseDemo(name); }
-
   window.ExerciseDemos = { load, normalizeExerciseName, resolveExerciseDemo, hasCuratedDemo, getPrivacyDisclosure };
 })();
