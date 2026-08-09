@@ -31,9 +31,12 @@ function field(intake, names, fallback = null) {
 function sessionLimit(intake) {
   const raw = field(intake, ["session_duration_minutes","session_duration_min","session_minutes","time_per_session","available_minutes","session_length"]);
   if (Number.isFinite(Number(raw))) return Number(raw);
+  const nums = [...String(raw || '').matchAll(/\d{2,3}/g)].map(m => Number(m[0])).filter(Number.isFinite);
+  if (nums.length) return Math.max(...nums);
   const text = JSON.stringify(intake || {});
-  const m = text.match(/(?:session|gym|training)[^\d]{0,30}(\d{2,3})\s*(?:min|minutes)/i);
-  return m ? Number(m[1]) : null;
+  const m = text.match(/(?:session|gym|training)[^\d]{0,30}(\d{2,3})(?:\s*(?:-|–|to)\s*(\d{2,3}))?\s*(?:min|minutes)/i);
+  if (!m) return null;
+  return Number(m[2] || m[1]);
 }
 
 function currentOapReps(intake) {
@@ -106,7 +109,7 @@ export function phase15PromptRules(intake = {}) {
     "Treat materially different performance outcomes as distinct trainable qualities. A max/1RM target and a high-rep target on the same lift need distinct specific exposures.",
     "Current demonstrated skill level controls skill programming. Do not regress an athlete who already owns multiple strict reps to eccentric work as a main weekly exposure.",
     "A real secondary strength progression goal needs meaningful weekly dose rather than token maintenance when recovery permits.",
-    "Session duration is a hard programming constraint. Remove low-priority accessories before cutting primary specificity.",
+    "Session duration is a ceiling, not a target to fill. Remove low-priority accessories before cutting primary specificity.",
     "Judge total day stress from gym plus sport plus recovery.",
     "Power work goes after preparation and before fatigue-producing heavy strength when power quality is the intent.",
     "Pain history is a tolerance gate, not a diagnosis. Preserve tolerated training and gate provocative spinal-loading accessories.",
@@ -116,12 +119,12 @@ export function phase15PromptRules(intake = {}) {
     rules.push("DUAL BOX-SQUAT HARD RULE: Week 1 needs (A) max-strength box-squat work at 1-5 reps and (B) separate rep-strength box-squat work at >=6 reps or explicit high-rep back-off progression. Speed doubles do not satisfy the rep target.");
   }
   if (oap != null && oap >= 2) rules.push(`ADVANCED OAP HARD RULE: athlete owns ${oap} strict reps. Week 1 needs two advanced unilateral-specific exposures with strict OAP present; assisted doubles/triples may be the second. Eccentrics cannot be a main exposure.`);
-  if (ohp) rules.push(`OHP HARD RULE: current about ${ohp.current} kg, target ${ohp.target} kg. Use two meaningful overhead-strength exposures. If the stated goal is STRICT OHP, two separate strict Overhead Press exposures are preferred; Push Press is optional overload, not a replacement for the strict pattern.`);
+  if (ohp) rules.push(`OHP HARD RULE: current about ${ohp.current} kg, target ${ohp.target} kg. Use at least one direct strict Overhead Press exposure plus a second meaningful vertical-press exposure. Purposeful Push Press or another verified press variation may provide overload/power/volume; variation must have a clear job and may not remove direct strict-OHP practice.`);
   if (asksLowFatigueAerobicOnly(intake)) rules.push("AEROBIC HARD RULE: use 2-3 low-fatigue Zone 2 exposures, normally >=20 min for a meaningful dedicated exposure. No unrequested intervals, threshold, VO2, AMRAP or sprint conditioning.");
   if (asksStrengthDays(intake) && Number(intake.days_per_week) > 0) rules.push(`STRENGTH-DAY HARD RULE: all ${Number(intake.days_per_week)} requested gym days must contain real strength or advanced-skill work. A cardio-only gym day does not count.`);
   rules.push(`Derived goal qualities: ${JSON.stringify(decomposed)}.`);
   rules.push(oap == null ? "No reliable strict OAP benchmark parsed." : `Parsed strict OAP capacity: ${oap}. Stage guidance: ${JSON.stringify(advancedOapPrescription(oap))}.`);
-  rules.push(limit == null ? "No numeric session cap parsed." : `Hard session cap: ${limit} minutes.`);
+  rules.push(limit == null ? "No numeric session ceiling parsed." : `Session ceiling: ${limit} minutes.`);
   rules.push(pain ? `Pain/limitation context: ${pain}.` : "No pain context supplied.");
   return rules.join("\n");
 }
@@ -142,12 +145,10 @@ export function validatePhase15Program(program, intake = {}) {
   if (!parsed) throw new Phase15QualityError([{ code:"TSV_PARSE_FAIL", message:"Week 1 TSV could not be parsed." }]);
   const flags = [];
 
-  // Product-level hard guard. Internal review/support text may never reach storage/client output.
   if (/\[REVIEW\]|contact\s+support|placeholder(?:\s+exercise|\s+row)?|could not be safely generated/i.test(raw)) {
     flags.push({ code:"CLIENT_OUTPUT_NOT_READY", message:"Program contains unresolved review/support/placeholder text. Reject rather than exposing it to a client." });
   }
 
-  // Four-week structural contract: exactly one block per week.
   for (let w=1; w<=4; w++) {
     const starts = (raw.match(new RegExp(`START_WEEK${w}_TSV`, "g")) || []).length;
     const ends = (raw.match(new RegExp(`END_WEEK${w}_TSV`, "g")) || []).length;
@@ -157,7 +158,7 @@ export function validatePhase15Program(program, intake = {}) {
   const limit = sessionLimit(intake);
   if (limit) for (const [day, rows] of Object.entries(rowsByDay(parsed))) {
     const minutes = estimateSessionMinutes(rows);
-    if (minutes > Math.ceil(limit * 1.10)) flags.push({ code:"SESSION_TIME_BUDGET_EXCEEDED", message:`${day} estimates to about ${minutes} min against ${limit} min cap.` });
+    if (minutes > Math.ceil(limit * 1.10)) flags.push({ code:"SESSION_TIME_BUDGET_EXCEEDED", message:`${day} estimates to about ${minutes} min against ${limit} min ceiling.` });
   }
 
   const primary = goalText(intake, "primary_goals"), secondary = goalText(intake, "secondary_goals"), all = `${primary} | ${secondary}`;
@@ -184,16 +185,13 @@ export function validatePhase15Program(program, intake = {}) {
 
   const ohp=farOhpGoal(intake);
   if (ohp) {
-    const overheadDays=countExposure(parsed,/overhead press|standing barbell overhead press|push press/i);
-    if (overheadDays<2) flags.push({ code:"FAR_SECONDARY_STRENGTH_TOKEN_DOSE", message:`OHP target ${ohp.current} -> ${ohp.target} kg receives fewer than two weekly exposures.` });
-    if (/strict overhead press/i.test(secondary)) {
-      const strictDays=countExposure(parsed,/\b(overhead press|standing barbell overhead press)\b/i,/push press/i);
-      if (strictDays<2) flags.push({ code:"STRICT_OHP_SPECIFICITY_UNDERDOSED", message:"Strict OHP is the stated goal but fewer than two separate strict Overhead Press exposures are programmed." });
-    }
+    const overheadDays=countExposure(parsed,/overhead press|standing barbell overhead press|push press|z press|dumbbell shoulder press/i);
+    const strictDays=countExposure(parsed,/\b(overhead press|standing barbell overhead press)\b/i,/push press/i);
+    if (overheadDays<2) flags.push({ code:"FAR_SECONDARY_STRENGTH_TOKEN_DOSE", message:`OHP target ${ohp.current} -> ${ohp.target} kg receives fewer than two meaningful vertical-press exposures.` });
+    if (/strict overhead press/i.test(secondary) && strictDays<1) flags.push({ code:"STRICT_OHP_SPECIFICITY_UNDERDOSED", message:"Strict OHP is the stated goal but no direct strict Overhead Press exposure is programmed." });
   }
   if (ohp&&/overhead press[\s\S]{0,200}(maintain|maintained|later block|not progress)/i.test(raw)) flags.push({ code:"SECONDARY_GOAL_NARRATIVE_CONTRADICTION", message:"OHP is a progression goal but narrative describes maintenance/postponement." });
 
-  // Every requested strength day must actually have strength/advanced-skill work.
   if (asksStrengthDays(intake) && Number(intake.days_per_week)>0) {
     const e=parsed.idx.exercise, d=parsed.idx.day;
     const allDays=new Set(parsed.rows.map(r=>r.cells[d]).filter(Boolean));
