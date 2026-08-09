@@ -5,6 +5,7 @@ on:
     paths:
       - 'phase14/engine/phase15_planner.js'
       - 'phase14/engine/phase15_specialist_rules.js'
+      - 'phase14/engine/overcoming_gravity_rules.js'
       - 'phase14/engine/skill_progressions.js'
       - 'phase14/engine/phase15_program_qa.js'
       - 'phase14/engine/phase15_final_qa.js'
@@ -54,6 +55,7 @@ jobs:
           runcheck syntax_runtime node --check server.phase15.js
           runcheck syntax_planner node --check engine/phase15_planner.js
           runcheck syntax_specialist node --check engine/phase15_specialist_rules.js
+          runcheck syntax_overcoming_gravity node --check engine/overcoming_gravity_rules.js
           runcheck syntax_program_qa node --check engine/phase15_program_qa.js
           runcheck syntax_final_qa node --check engine/phase15_final_qa.js
           runcheck syntax_quality node --check engine/phase15_quality_rules.js
@@ -63,6 +65,7 @@ jobs:
           runcheck grep_normalizer grep -q 'normalizeOpenAIExerciseNames' server.phase15.js
           runcheck grep_fast_path grep -q 'fast new-client intake persist' server.phase15.js
           runcheck grep_specialist grep -q 'buildSpecialistRules' engine/phase15_planner.js
+          runcheck grep_og grep -q 'overcomingGravityRulesForFamily' engine/phase15_specialist_rules.js
           exit "$failed"
       - name: Write static QA result
         if: always()
