@@ -16,7 +16,7 @@ permissions:
 jobs:
   benchmark:
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -32,16 +32,12 @@ jobs:
           node - <<'NODE'
           const fs = require('fs');
           const runtime = fs.readFileSync('server.phase15.js', 'utf8');
-          const engine = fs.readFileSync('engine/engine_instructions.txt', 'utf8');
           if (runtime.includes('instructions: ENGINE')) throw new Error('Legacy oversized OpenAI instructions field still present');
-          if (!runtime.includes('role: "developer"')) throw new Error('Chunked developer-message architecture missing');
-          const chunk = 450000;
-          const chunks = Math.ceil(engine.length / chunk);
-          if (chunk > 450000) throw new Error('Chunk character ceiling exceeded');
-          console.log(JSON.stringify({engine_chars: engine.length, chunk_chars: chunk, engine_chunks: chunks, instructions_field: false}));
+          if (runtime.includes('ENGINE.slice(')) throw new Error('Legacy giant-engine chunk path still present');
+          if (!runtime.includes('OPENAI_COMPACT_DEVELOPER')) throw new Error('Compact OpenAI developer prompt missing');
+          if (!runtime.includes('legacy_engine_chars_not_sent')) throw new Error('Compact-path telemetry missing');
+          console.log(JSON.stringify({execution_path:'compact-rule-packet', giant_engine_sent:false}));
           NODE
-      - name: Allow Render deploy to settle
-        run: sleep 180
       - name: Run OpenAI live benchmark
         env:
           BASE_URL: https://raz-coaching-platform.onrender.com
