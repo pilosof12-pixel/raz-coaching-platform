@@ -22,6 +22,24 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '20'
+      - name: Verify generated Phase 15 runtime
+        run: |
+          cd phase14
+          node scripts/build_phase15_runtime.mjs
+          node --check server.phase15.js
+          node --check engine/phase15_program_qa.js
+          node --check engine/phase15_quality_rules.js
+          node - <<'NODE'
+          const fs = require('fs');
+          const runtime = fs.readFileSync('server.phase15.js', 'utf8');
+          const engine = fs.readFileSync('engine/engine_instructions.txt', 'utf8');
+          if (runtime.includes('instructions: ENGINE')) throw new Error('Legacy oversized OpenAI instructions field still present');
+          if (!runtime.includes('role: "developer"')) throw new Error('Chunked developer-message architecture missing');
+          const chunk = 450000;
+          const chunks = Math.ceil(engine.length / chunk);
+          if (chunk > 450000) throw new Error('Chunk character ceiling exceeded');
+          console.log(JSON.stringify({engine_chars: engine.length, chunk_chars: chunk, engine_chunks: chunks, instructions_field: false}));
+          NODE
       - name: Allow Render deploy to settle
         run: sleep 180
       - name: Run OpenAI live benchmark
