@@ -1,0 +1,90 @@
+{
+  "timestamp": "2026-08-09T07:31:18.995Z",
+  "base": "https://raz-coaching-platform.onrender.com",
+  "provider_expected": "openai",
+  "model_expected": "gpt-5.4",
+  "intake": {
+    "language": "en",
+    "primary_goals": [
+      "Box squat to parallel: progress toward 180 kg x 10, with nearer term goal exceeding 210 kg max",
+      "One arm pull up: progress from 2 strict reps to 4 strict reps"
+    ],
+    "secondary_goals": [
+      "Strict overhead press: progress from current 75 kg x 4 to 5 toward 100 kg",
+      "Improve aerobic conditioning and day to day energy without reducing strength or BJJ/MMA performance"
+    ],
+    "maintenance_goals": [
+      "Maintain strength transfer to grappling and MMA",
+      "Maintain muscle mass with direct cable lateral raises and face pulls",
+      "Maintain low fatigue explosive work",
+      "Freestanding HSPU is nice to have only and must not take resources from OHP, conditioning, recovery, or mat performance"
+    ],
+    "current_numbers": "Box squat to parallel: 205 kg confirmed; approximately 210 kg current max\nSpeed box squat: 100 to 105 kg explosive and well tolerated\nOne arm pull up: 2 strict reps maximum\nWeighted chin up: +80 kg external load 1RM\nStrict overhead press: 75 kg x 4 to 5; historical 1RM approximately 90 kg\nPush press: 80 kg x 3 at RPE 9 to 9.5 while fatigued",
+    "days_per_week": 4,
+    "session_duration_minutes": 60,
+    "gym_availability_mode": "flexible",
+    "available_gym_days": [],
+    "sport": "BJJ / MMA",
+    "sport_schedule": [
+      {
+        "day": "Sun",
+        "intensity": "moderate"
+      },
+      {
+        "day": "Mon",
+        "intensity": "hard"
+      },
+      {
+        "day": "Tue",
+        "intensity": "hard"
+      },
+      {
+        "day": "Wed",
+        "intensity": "moderate"
+      },
+      {
+        "day": "Thu",
+        "intensity": "hard"
+      }
+    ],
+    "same_day_gap_hours": 6,
+    "training_location": "commercial_gym",
+    "equipment": "barbell, plates, rack, bench, dumbbells, cable stack, machines, pull-up bar, dip bars, bike, rower, med balls, sled, bands",
+    "split_preference": "full_body",
+    "pain": "Recurrent lower back sensitivity with sciatica tendencies. Deep loaded squatting with lumbar flexion and heavy RDLs can flare it. Box squats to parallel and speed box squats are well tolerated. OAP, weighted pulling, OHP and push press generally tolerated. Hip thrusts are well tolerated. Prefer lower spinal fatigue posterior chain assistance.",
+    "mobility": {
+      "active": false
+    },
+    "sleep_hours": "6-7",
+    "recovery_rating": "Average",
+    "notes": "Advanced concurrent strength and combat athlete. Recovery varies. Prefer low volume full body training. Prioritize strength return per unit fatigue. OAP should use two unilateral specific exposures, not maximal work every day. Weighted chin work must respect +80 kg 1RM. OHP outranks HSPU. Keep low volume jumps or med ball throws if low fatigue and stop before velocity loss. Two to three Zone 2 sessions desirable. Do not add hard running or hard conditioning unnecessarily."
+  },
+  "checks": [
+    {
+      "name": "health",
+      "ok": true,
+      "detail": "{\"ok\":true,\"mode\":\"gemini\",\"model\":\"gemini-2.5-flash\",\"storage\":\"supabase\",\"storage_ok\":true,\"ai_configured\":true,\"thinking_budget\":8192,\"cache\":{\"enabled\":true,\"ttl_seconds\":1800,\"active\":false}}"
+    },
+    {
+      "name": "OpenAI provider active",
+      "ok": false,
+      "detail": "{\"mode\":\"gemini\",\"model\":\"gemini-2.5-flash\"}"
+    }
+  ],
+  "ok": false,
+  "health_before": {
+    "ok": true,
+    "mode": "gemini",
+    "model": "gemini-2.5-flash",
+    "storage": "supabase",
+    "storage_ok": true,
+    "ai_configured": true,
+    "thinking_budget": 8192,
+    "cache": {
+      "enabled": true,
+      "ttl_seconds": 1800,
+      "active": false
+    }
+  },
+  "error": "Error: OpenAI not active: mode=gemini model=gemini-2.5-flash. Refusing paid benchmark until deploy is ready.\n    at file:///home/runner/work/raz-coaching-platform/raz-coaching-platform/.github/phase15-live-benchmark.mjs:56:54\n    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)"
+}
