@@ -1,5 +1,7 @@
 // public/exerciseDemos.js
-// Browser-side exercise demo resolver.
+// Browser-side exercise demo resolver. Client-facing spreadsheets use ONLY
+// curated direct YouTube URLs. Missing coverage stays visibly missing so QA can
+// catch it; we never hide a library gap behind a YouTube search-results link.
 
 (function () {
   let demos = null;
@@ -18,72 +20,46 @@
     return loadPromise;
   }
 
-
   const HEBREW_TO_ENGLISH = {
-    "סקוואט אחורי": "Back Squat",
-    "סקוואט קדמי": "Front Squat",
-    "דדליפט": "Deadlift",
-    "דדליפט רומני": "Romanian Deadlift",
-    "לחיצת חזה": "Bench Press",
-    "לחיצת כתפיים": "Overhead Press",
-    "מתח": "Pull-up",
-    "דיפ": "Dip",
-    "לחיצת עמידת ידיים על הקיר": "Wall Handstand Push-up",
-    "לחיצת עמידת ידיים חופשית": "Freestanding Handstand Push-up",
-    "פרונט לבר": "Front Lever",
-    "דגל אנושי": "Human Flag",
-    "פלאנץ": "Planche",
-    "מאסל-אפ": "Muscle-up",
-    "מאסל אפ": "Muscle-up",
+    "סקוואט אחורי": "Back Squat", "סקוואט קדמי": "Front Squat", "דדליפט": "Deadlift",
+    "דדליפט רומני": "Romanian Deadlift", "לחיצת חזה": "Bench Press", "לחיצת כתפיים": "Overhead Press",
+    "מתח": "Pull-up", "דיפ": "Dip", "לחיצת עמידת ידיים על הקיר": "Wall Handstand Push-up",
+    "לחיצת עמידת ידיים חופשית": "Freestanding Handstand Push-up", "פרונט לבר": "Front Lever",
+    "דגל אנושי": "Human Flag", "פלאנץ": "Planche", "מאסל-אפ": "Muscle-up", "מאסל אפ": "Muscle-up",
     "מתח יד אחת": "One-Arm Pull-up"
   };
 
   function canonicalLookupName(name) {
     const raw = String(name || "").trim();
-    // Hebrew-first bilingual output uses "עברית (English Canonical)". Prefer
-    // the Latin parenthetical for curated demo lookup instead of discarding it.
     const bilingual = raw.match(/^(.+?)\s*\(([^)]+)\)\s*$/);
-    if (bilingual && /[\u0590-\u05FF]/.test(bilingual[1]) && /[A-Za-z]/.test(bilingual[2])) {
-      return bilingual[2].trim();
-    }
+    if (bilingual && /[\u0590-\u05FF]/.test(bilingual[1]) && /[A-Za-z]/.test(bilingual[2])) return bilingual[2].trim();
     const noAnnotation = raw.replace(/\s*\([^)]*(?:reps?|sec|hold|rir|rpe|kg|min)[^)]*\)\s*$/i, "").trim();
     if (HEBREW_TO_ENGLISH[noAnnotation]) return HEBREW_TO_ENGLISH[noAnnotation];
     return raw;
   }
 
   function normalizeExerciseName(name) {
-    return String(name || "")
-      .toLowerCase()
-      .replace(/\([^)]*\)/g, "")
-      .replace(/[^a-z0-9]+/g, "_")
-      .replace(/_+/g, "_")
-      .replace(/^_|_$/g, "");
+    return String(name || "").toLowerCase().replace(/\([^)]*\)/g, "").replace(/[^a-z0-9]+/g, "_").replace(/_+/g, "_").replace(/^_|_$/g, "");
   }
 
   function resolveExerciseDemo(name) {
-    if (!name) return null;
+    if (!name || !demos?.entries) return null;
     const lookupName = canonicalLookupName(name);
     const key = normalizeExerciseName(lookupName);
-    if (demos && demos.entries) {
-      const direct = demos.entries[key];
-      if (direct && direct.demo_url) {
-        return { url: direct.demo_url, source: "curated", channel: direct.channel, canonical: direct.canonical };
-      }
-      for (const k in demos.entries) {
-        const v = demos.entries[k];
-        if (v.aliases && v.aliases.indexOf(key) !== -1 && v.demo_url) {
-          return { url: v.demo_url, source: "curated", channel: v.channel, canonical: v.canonical };
-        }
-      }
+    const direct = demos.entries[key];
+    if (direct?.demo_url) return { url: direct.demo_url, source: "curated", channel: direct.channel, canonical: direct.canonical };
+    for (const k in demos.entries) {
+      const v = demos.entries[k];
+      if (v.aliases?.includes(key) && v.demo_url) return { url: v.demo_url, source: "curated", channel: v.channel, canonical: v.canonical };
     }
-    const q = encodeURIComponent(lookupName + " exercise demo");
-    return { url: "https://www.youtube.com/results?search_query=" + q, source: "search", channel: null, canonical: lookupName };
+    return null;
   }
 
   function getPrivacyDisclosure() {
-    return (demos && demos.policy && demos.policy.privacy_disclosure) ||
-      "Exercise demos open in YouTube. To keep them out of your watch history, open them in incognito/private mode.";
+    return (demos?.policy?.privacy_disclosure) || "Exercise demos open in YouTube.";
   }
 
-  window.ExerciseDemos = { load, normalizeExerciseName, resolveExerciseDemo, getPrivacyDisclosure };
+  function hasCuratedDemo(name) { return !!resolveExerciseDemo(name); }
+
+  window.ExerciseDemos = { load, normalizeExerciseName, resolveExerciseDemo, hasCuratedDemo, getPrivacyDisclosure };
 })();
