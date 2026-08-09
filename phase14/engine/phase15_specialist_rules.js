@@ -11,7 +11,10 @@ import {
 function arr(v) { return Array.isArray(v) ? v : v ? [v] : []; }
 function str(v) { return typeof v === 'string' ? v : JSON.stringify(v || ''); }
 function goals(intake) {
-  return [...arr(intake.primary_goals), ...arr(intake.secondary_goals), ...arr(intake.maintenance_goals)]
+  // Specialist progression routers are for actual progression goals. A maintenance or
+  // nice-to-have mention must not activate a lower-rung skill prescription that competes
+  // with higher-priority goals.
+  return [...arr(intake.primary_goals), ...arr(intake.secondary_goals)]
     .map(str).filter(Boolean);
 }
 
@@ -40,6 +43,14 @@ function currentExternal1rm(intake, movement) {
   return m ? Number(m[1]) : null;
 }
 
+function currentOapStrict(intake) {
+  const src = JSON.stringify(intake || {});
+  for (const re of [/(?:one.?arm pull.?up|oap)[^\d]{0,60}(\d+)\s*(?:strict\s*)?(?:reps?|rep|maximum|max)/i, /(\d+)\s*strict\s*(?:one.?arm pull.?ups?|oaps?)/i]) {
+    const m = src.match(re); if (m) return Number(m[1]);
+  }
+  return null;
+}
+
 function gymnasticsRules(intake) {
   const out = [];
   let benchmarks = {};
@@ -56,7 +67,13 @@ function gymnasticsRules(intake) {
     out.push('Universal skill rule: direct exposure to the actual skill family remains the anchor once the athlete can perform a measurable tolerated version. Assistance supports specificity; it does not replace it. Quality stops the set before technically poor attempts accumulate.');
     out.push('Anti-hallucination rule: prescribe only complete named variations that exist in the verified skill graph/exercise library. Never invent a banded, wall, eccentric, partial, one-leg, tuck or deficit variation by wording alone.');
     out.push('Ordering rule: primary skill work is performed after warm-up and any genuinely non-fatiguing primer, before fatigue-producing strength/hypertrophy work.');
-    if (selection) out.push(`DETERMINISTIC SKILL-GRAPH SELECTION: ${JSON.stringify(selection)}. Use observed current ability over an arbitrary easier gate.`);
+
+    const explicitOap = family === 'one_arm_pull_up' ? currentOapStrict(intake) : null;
+    if (explicitOap != null && explicitOap >= 1) {
+      out.push(`DEMONSTRATED-LEVEL OVERRIDE: athlete reports ${explicitOap} strict One-Arm Pull-up rep${explicitOap === 1 ? '' : 's'}. This direct performance evidence overrides any lower prerequisite gate that could not be parsed from the intake. Do not regress to Weighted Pull-up, Archer Pull-up or eccentrics as the main skill exposure.`);
+    } else if (selection) {
+      out.push(`DETERMINISTIC SKILL-GRAPH SELECTION: ${JSON.stringify(selection)}. Use observed current ability over an arbitrary easier gate.`);
+    }
 
     if (family === 'planche') {
       out.push('Article N2 Planche rule: use the verified route Planche Lean -> Tuck Planche -> Advanced Tuck Planche -> Straddle Planche -> Full Planche, but do NOT regress an athlete who already demonstrates a harder clean rung.');
