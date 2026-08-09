@@ -1,5 +1,5 @@
 {
-  "version": "1.0.0",
+  "version": "1.1.0",
   "policy": "Direct YouTube watch URLs only. These override/fill gaps in exercise_demos.json. No search-result URLs.",
   "entries": {
     "box_squat_to_parallel": { "canonical": "Box Squat to Parallel", "demo_url": "https://www.youtube.com/watch?v=r1LMzfShloQ", "channel": "Verified coaching source", "aliases": ["box_squat"] },
@@ -15,6 +15,10 @@
     "advanced_tuck_planche": { "canonical": "Advanced Tuck Planche", "demo_url": "https://www.youtube.com/watch?v=f30rLg3yBug", "channel": "FitnessFAQs", "aliases": ["adv_tuck_planche"] },
     "straddle_planche": { "canonical": "Straddle Planche", "demo_url": "https://www.youtube.com/watch?v=f30rLg3yBug", "channel": "FitnessFAQs", "aliases": [] },
     "full_planche": { "canonical": "Full Planche", "demo_url": "https://www.youtube.com/watch?v=f30rLg3yBug", "channel": "FitnessFAQs", "aliases": [] },
-    "pseudo_planche_push_up": { "canonical": "Pseudo Planche Push-up", "demo_url": "https://www.youtube.com/watch?v=f30rLg3yBug", "channel": "FitnessFAQs", "aliases": ["pseudo_planche_pushup", "ppp"] }
+    "pseudo_planche_push_up": { "canonical": "Pseudo Planche Push-up", "demo_url": "https://www.youtube.com/watch?v=f30rLg3yBug", "channel": "FitnessFAQs", "aliases": ["pseudo_planche_pushup", "ppp"] },
+    "pallof_press": { "canonical": "Pallof Press", "demo_url": "https://www.youtube.com/watch?v=axgv7H_VQOo", "channel": "BarBend exercise guide", "aliases": ["cable_pallof_press"] },
+    "farmer_carry": { "canonical": "Farmer Carry", "demo_url": "https://www.youtube.com/watch?v=rt17lmnaLSM", "channel": "Farmer carry tutorial", "aliases": ["farmers_walk", "loaded_carry"] },
+    "suitcase_carry": { "canonical": "Suitcase Carry", "demo_url": "https://www.youtube.com/watch?v=DOS_71iADhI", "channel": "Suitcase carry tutorial", "aliases": ["single_arm_carry", "one_arm_carry"] },
+    "bulgarian_split_squat": { "canonical": "Bulgarian Split Squat", "demo_url": "https://www.youtube.com/watch?v=_Mf2n71dNZ8", "channel": "Bulgarian split squat tutorial", "aliases": ["rear_foot_elevated_split_squat", "rfess"] }
   }
 }
