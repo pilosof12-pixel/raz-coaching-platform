@@ -1,9 +1,9 @@
 {
-  "timestamp": "2026-08-09T09:27:37.872Z",
+  "timestamp": "2026-08-09T09:41:35.697Z",
   "base": "https://raz-coaching-platform.onrender.com",
   "provider_expected": "openai",
   "model_expected": "gpt-5.4",
-  "execution_path_expected": "deterministic-skeleton-v2",
+  "execution_path_expected": "deterministic-skeleton-v3",
   "intake": {
     "language": "en",
     "primary_goals": [
@@ -58,13 +58,13 @@
     },
     "sleep_hours": "6-7",
     "recovery_rating": "Average",
-    "notes": "Advanced concurrent strength and combat athlete. Recovery varies. Prefer low volume full body training. Prioritize strength return per unit fatigue. OAP should use two unilateral specific exposures, not maximal work every day. Weighted chin work must respect +80 kg 1RM. OHP outranks HSPU. Keep low volume jumps or med ball throws if low fatigue and stop before velocity loss. Two to three Zone 2 sessions desirable. Do not add hard running or hard conditioning unnecessarily."
+    "notes": "Advanced concurrent strength and combat athlete. Recovery varies. Prefer low volume full body training. Four strength sessions per week. Prioritize strength return per unit fatigue. OAP should use two unilateral specific exposures, not maximal work every day. Weighted chin work must respect +80 kg 1RM. OHP outranks HSPU. Keep low volume jumps or med ball throws if low fatigue and stop before velocity loss. Two to three Zone 2 sessions desirable. Do not add hard running or hard conditioning unnecessarily."
   },
   "checks": [
     {
       "name": "health",
       "ok": true,
-      "detail": "{\"ok\":true,\"mode\":\"openai\",\"model\":\"gpt-5.4\",\"openai_execution_path\":\"deterministic-skeleton-v2\",\"openai_legacy_engine_chars_not_sent\":1494152,\"openai_compact_developer_chars\":1767,\"last_ai_usage\":null,\"storage\":\"supabase\",\"storage_ok\":true,\"ai_configured\":true,\"thinking_budget\":8192,\"cache\":{\"enabled\":true,\"ttl_seconds\":1800,\"active\":false}}"
+      "detail": "{\"ok\":true,\"mode\":\"openai\",\"model\":\"gpt-5.4\",\"openai_execution_path\":\"deterministic-skeleton-v3\",\"openai_legacy_engine_chars_not_sent\":1494152,\"openai_compact_developer_chars\":2213,\"last_ai_usage\":null,\"last_build_timing\":null,\"storage\":\"supabase\",\"storage_ok\":true,\"ai_configured\":true,\"thinking_budget\":8192,\"cache\":{\"enabled\":true,\"ttl_seconds\":1800,\"active\":false}}"
     },
     {
       "name": "OpenAI provider active",
@@ -72,24 +72,19 @@
       "detail": "{\"mode\":\"openai\",\"model\":\"gpt-5.4\"}"
     },
     {
-      "name": "deterministic skeleton v2 live",
+      "name": "deterministic skeleton v3 live",
       "ok": true,
-      "detail": "{\"path\":\"deterministic-skeleton-v2\"}"
+      "detail": "{\"path\":\"deterministic-skeleton-v3\"}"
     },
     {
       "name": "build accepted",
       "ok": true,
-      "detail": "{\"job_id\":\"9e1a109c561aaf0930a4b8ecc6207fb3\",\"token\":\"36d8a8de9a520652d0785b3d86801514\",\"status\":\"pending\"}"
+      "detail": "{\"job_id\":\"283cc4c733a65de1dc0a8675c566917b\",\"token\":\"5e2539bdea9b1d7d6cf1b40d3e0a572c\",\"status\":\"pending\"}"
     },
     {
       "name": "program generated",
       "ok": true,
-      "detail": "chars=9377; seconds=322"
-    },
-    {
-      "name": "latency under 180s",
-      "ok": false,
-      "detail": "seconds=322"
+      "detail": "chars=8337; seconds=232"
     },
     {
       "name": "single paid pass telemetry",
@@ -99,7 +94,7 @@
     {
       "name": "compact prompt actually sent",
       "ok": true,
-      "detail": "{\"provider\":\"openai\",\"model\":\"gpt-5.4\",\"reasoning_effort\":\"low\",\"input_tokens\":2509,\"cached_input_tokens\":0,\"output_tokens\":3659,\"reasoning_tokens\":859,\"developer_chars\":1767,\"source_user_prompt_chars\":65533,\"sent_user_prompt_chars\":9587,\"legacy_engine_chars_not_sent\":1494152,\"execution_path\":\"deterministic-skeleton-v2\",\"elapsed_ms\":32783}"
+      "detail": "{\"provider\":\"openai\",\"model\":\"gpt-5.4\",\"reasoning_effort\":\"low\",\"input_tokens\":2890,\"cached_input_tokens\":0,\"output_tokens\":4097,\"reasoning_tokens\":1230,\"developer_chars\":2213,\"source_user_prompt_chars\":65566,\"sent_user_prompt_chars\":10778,\"legacy_engine_chars_not_sent\":1494152,\"execution_path\":\"deterministic-skeleton-v3\",\"elapsed_ms\":36325}"
     },
     {
       "name": "one block per week",
@@ -112,19 +107,29 @@
       "detail": "[\"Wed\",\"Fri\",\"Sat\",\"Sun\"]"
     },
     {
+      "name": "all four gym days contain strength work",
+      "ok": true,
+      "detail": "{\"days\":[\"Wed\",\"Fri\",\"Sat\",\"Sun\"],\"strengthDays\":[\"Wed\",\"Fri\",\"Sat\",\"Sun\"]}"
+    },
+    {
       "name": "squat max plus rep-strength coverage",
       "ok": true,
-      "detail": "[[\"Wed\",\"Box squat to parallel\",\"6\",\"7.5\"],[\"Sat\",\"Box squat to parallel\",\"3\",\"7.5\"]]"
+      "detail": "[[\"Wed\",\"Box Squat to Parallel\",\"155 kg\",\"6\",\"7.5\"],[\"Sat\",\"Box Squat to Parallel\",\"175 kg\",\"3\",\"8\"]]"
+    },
+    {
+      "name": "box squat loads calibrated to current 210 kg max",
+      "ok": true,
+      "detail": "[{\"reps\":6,\"kg\":155},{\"reps\":3,\"kg\":175}]"
     },
     {
       "name": "OAP advanced stage",
-      "ok": true,
-      "detail": "[[\"Fri\",\"One-arm pull-up\",\"5\",\"1 each side\"],[\"Sat\",\"Assisted one-arm pull-up\",\"3\",\"2 each side\"]]"
+      "ok": false,
+      "detail": "[]"
     },
     {
       "name": "OHP meaningful frequency",
       "ok": true,
-      "detail": "[[\"Wed\",\"[REVIEW] Strict overhead press\",\"3\",\"4\"],[\"Fri\",\"[REVIEW] Strict overhead press\",\"4\",\"5\"]]"
+      "detail": "[[\"Wed\",\"Standing Barbell Overhead Press\",\"67.5 kg\",\"5\",\"3\"],[\"Fri\",\"Push Press\",\"72.5 kg\",\"5\",\"3\"]]"
     },
     {
       "name": "pain tolerance acknowledged",
@@ -139,29 +144,47 @@
     {
       "name": "conditioning interference",
       "ok": true,
-      "detail": "{\"hard\":[],\"zone2\":[[\"Sat\",\"[REVIEW] Stationary bike Zone 2\",\"12 min\"],[\"Sun\",\"[REVIEW] Stationary bike Zone 2\",\"30 min\"]]}"
+      "detail": "{\"hard\":[],\"zone2\":[[\"Wed\",\"[WARMUP] Zone-2 Row\",\"5 min\"],[\"Fri\",\"[WARMUP] Zone-2 Bike\",\"5 min\"],[\"Sat\",\"[WARMUP] Zone-2 Row\",\"5 min\"],[\"Sat\",\"Zone-2 Bike\",\"22 min\"],[\"Sun\",\"[WARMUP] Zone-2 Bike\",\"4 min\"],[\"Sun\",\"Zone-2 Row\",\"20 min\"]]}"
+    },
+    {
+      "name": "Zone 2 doses are meaningful",
+      "ok": true,
+      "detail": "[5,5,5,22,4,20]"
     },
     {
       "name": "maintenance accessories retained",
       "ok": true,
-      "detail": "{\"lateral\":[\"Wed\"],\"face\":[\"Fri\"]}"
+      "detail": "{\"lateral\":[\"Fri\"],\"face\":[\"Sun\"]}"
     },
     {
       "name": "no unresolved review/support markers",
       "ok": false,
-      "detail": "[[\"Wed\",\"[REVIEW] Med ball chest throw\"],[\"Wed\",\"[REVIEW] Strict overhead press\"],[\"Fri\",\"[REVIEW] Strict overhead press\"],[\"Sat\",\"[REVIEW] Stationary bike Zone 2\"],[\"Sun\",\"[REVIEW] Stationary bike Zone 2\"]]"
+      "detail": "[[\"Sat\",\"[REVIEW] duplicate skill row removed\"]]"
+    }
+  ],
+  "latency_checks": [
+    {
+      "name": "total build under 180s",
+      "ok": false,
+      "detail": "seconds=232"
+    },
+    {
+      "name": "OpenAI call under 60s",
+      "ok": true,
+      "detail": "{\"provider\":\"openai\",\"model\":\"gpt-5.4\",\"reasoning_effort\":\"low\",\"input_tokens\":2890,\"cached_input_tokens\":0,\"output_tokens\":4097,\"reasoning_tokens\":1230,\"developer_chars\":2213,\"source_user_prompt_chars\":65566,\"sent_user_prompt_chars\":10778,\"legacy_engine_chars_not_sent\":1494152,\"execution_path\":\"deterministic-skeleton-v3\",\"elapsed_ms\":36325}"
     }
   ],
   "ok": false,
-  "deploy_wait_seconds": 23,
+  "deploy_wait_seconds": 22,
   "health_before": {
     "ok": true,
     "mode": "openai",
     "model": "gpt-5.4",
-    "openai_execution_path": "deterministic-skeleton-v2",
+    "openai_execution_path": "deterministic-skeleton-v3",
     "openai_legacy_engine_chars_not_sent": 1494152,
-    "openai_compact_developer_chars": 1767,
+    "openai_compact_developer_chars": 2213,
     "last_ai_usage": null,
+    "last_build_timing": null,
     "storage": "supabase",
     "storage_ok": true,
     "ai_configured": true,
@@ -172,37 +195,43 @@
       "active": false
     }
   },
-  "job_id": "9e1a109c561aaf0930a4b8ecc6207fb3",
-  "token": "36d8a8de9a520652d0785b3d86801514",
+  "job_id": "283cc4c733a65de1dc0a8675c566917b",
+  "token": "5e2539bdea9b1d7d6cf1b40d3e0a572c",
   "last_job": {
     "status": "done",
     "stage": "finalizing",
     "attempt": 0,
     "detail": "saving program"
   },
-  "generation_seconds": 322,
-  "program": "Keep everything crisp and submaximal around your mat load: box squat gets one rep-strength day and one max-strength day, One-Arm Pull-up gets one strict day and one lightly assisted day, and OHP gets one heavy day plus one volume day. Zone 2 stays easy enough to leave you feeling better, not flatter.\n\nWeeks 2-4: small load bumps on successful work, or keep load and beat bar speed/cleanliness if recovery is rough. One-Arm Pull-up assistance should get slightly lighter each week, but never at the cost of elbow/shoulder quality.\n\nPain guidance: stay on the same parallel box every week, brace hard, and stop any squat set if position shifts into lumbar flexion or sciatic symptoms. If back feels touchy on a given day, keep the box squat load at the low end of the range and shorten Zone 2. For One-Arm Pull-up, if elbow or biceps tendon gets cranky, swap assisted reps to single-arm lat pulldown with the same sets/reps that day.\n\nSTART_WEEK1_TSV\nDay\tExercise\tWeight\tSets\tReps\tRest\tTarget RPE\tNotes\tResults\nWed\t[WARMUP] Assault bike + box squat/OHP ramp\tEasy + empty bar to work sets\t1\t6-8 min\t0\t4\t2 min easy bike, hip openers, 3-4 squat ramps, 3 OHP ramps\t\nWed\t[REVIEW] Med ball chest throw\t4-6 kg\t3\t3\t45 sec\t5\tThis exercise slot could not be safely generated — please contact support.\t\nWed\tBox squat to parallel\t145 kg\t3\t6\t3 min\t7.5\tSit back to the same box, brief settle, drive fast up\t\nWed\t[REVIEW] Strict overhead press\t72.5 kg\t3\t4\t2-3 min\t8\tThis exercise slot could not be safely generated — please contact support.\t\nWed\tCable lateral raise\tModerate\t2\t12-15\t60 sec\t8\tSmooth, slight pause at top\t\nFri\t[WARMUP] Rower + shoulder/scap prep + pull-up/OHP ramp\tEasy + bodyweight to work sets\t1\t6-8 min\t0\t4\t2 min easy row, band shoulder work, 3 pull-up ramps, 3 OHP ramps\t\nFri\tOne-arm pull-up\tBodyweight\t5\t1 each side\t75 sec\t8\tAlternate arms; strict singles, no grinding\t\nFri\t[REVIEW] Strict overhead press\t62.5 kg\t4\t5\t2 min\t7\tThis exercise slot could not be safely generated — please contact support.\t\nFri\tFace pull\tModerate\t2\t15-20\t60 sec\t8\tElbows high, pause and spread at face level\t\nSat\t[WARMUP] Bike + box squat/One-Arm Pull-up ramp\tEasy + empty bar to work sets\t1\t6-8 min\t0\t4\t2 min easy bike, ankle/hip prep, 4 squat ramps, 2 assisted One-Arm Pull-up ramps\t\nSat\tBox jump\tBodyweight\t3\t2\t45 sec\t5\tLow box, crisp landing, no fatigue chasing\t\nSat\tBox squat to parallel\t170 kg\t5\t3\t3 min\t7.5\tHeavy strength exposure; same box, no grind reps\t\nSat\tAssisted one-arm pull-up\tBodyweight + light band/2-finger assist\t3\t2 each side\t90 sec\t7.5\tUse the least help that keeps both reps strict\t\nSat\t[REVIEW] Stationary bike Zone 2\tEasy-moderate\t1\t12 min\t0\t6\tThis exercise slot could not be safely generated — please contact support.\t\nSun\t[WARMUP] Easy bike\tEasy\t1\t3 min\t0\t3\tSettle in, then start the steady work\t\nSun\t[REVIEW] Stationary bike Zone 2\tEasy-moderate\t1\t30 min\t0\t6\tThis exercise slot could not be safely generated — please contact support.\t\nEND_WEEK1_TSV\nSTART_WEEK2_TSV\nDay\tExercise\tWeight\tSets\tReps\tRest\tTarget RPE\tNotes\tResults\nWed\t[WARMUP] Assault bike + box squat/OHP ramp\tEasy + empty bar to work sets\t1\t6-8 min\t0\t4\t2 min easy bike, hip openers, 3-4 squat ramps, 3 OHP ramps\t\nWed\t[REVIEW] Med ball chest throw\t4-6 kg\t3\t3\t45 sec\t5\tThis exercise slot could not be safely generated — please contact support.\t\nWed\tBox squat to parallel\t150 kg\t3\t6\t3 min\t8\tSit back to the same box, brief settle, drive fast up\t\nWed\t[REVIEW] Strict overhead press\t75 kg\t3\t4\t2-3 min\t8.5\tThis exercise slot could not be safely generated — please contact support.\t\nWed\tCable lateral raise\tModerate\t2\t12-15\t60 sec\t8\tSmooth, slight pause at top\t\nFri\t[WARMUP] Rower + shoulder/scap prep + pull-up/OHP ramp\tEasy + bodyweight to work sets\t1\t6-8 min\t0\t4\t2 min easy row, band shoulder work, 3 pull-up ramps, 3 OHP ramps\t\nFri\tOne-arm pull-up\tBodyweight\t6\t1 each side\t75 sec\t8\tAlternate arms; strict singles, no grinding\t\nFri\t[REVIEW] Strict overhead press\t65 kg\t4\t5\t2 min\t7.5\tThis exercise slot could not be safely generated — please contact support.\t\nFri\tFace pull\tModerate\t2\t15-20\t60 sec\t8\tElbows high, pause and spread at face level\t\nSat\t[WARMUP] Bike + box squat/One-Arm Pull-up ramp\tEasy + empty bar to work sets\t1\t6-8 min\t0\t4\t2 min easy bike, ankle/hip prep, 4 squat ramps, 2 assisted One-Arm Pull-up ramps\t\nSat\tBox jump\tBodyweight\t3\t2\t45 sec\t5\tLow box, crisp landing, no fatigue chasing\t\nSat\tBox squat to parallel\t175 kg\t5\t3\t3 min\t8\tHeavy strength exposure; same box, no grind reps\t\nSat\tAssisted one-arm pull-up\tBodyweight + very light band/1-2 finger assist\t3\t2 each side\t90 sec\t8\tUse slightly less help than week 1 if quality stays high\t\nSat\t[REVIEW] Stationary bike Zone 2\tEasy-moderate\t1\t12 min\t0\t6\tThis exercise slot could not be safely generated — please contact support.\t\nSun\t[WARMUP] Easy bike\tEasy\t1\t3 min\t0\t3\tSettle in, then start the steady work\t\nSun\t[REVIEW] Stationary bike Zone 2\tEasy-moderate\t1\t32 min\t0\t6\tThis exercise slot could not be safely generated — please contact support.\t\nEND_WEEK2_TSV\nSTART_WEEK3_TSV\nDay\tExercise\tWeight\tSets\tReps\tRest\tTarget RPE\tNotes\tResults\nWed\t[WARMUP] Assault bike + box squat/OHP ramp\tEasy + empty bar to work sets\t1\t6-8 min\t0\t4\t2 min easy bike, hip openers, 3-4 squat ramps, 3 OHP ramps\t\nWed\t[REVIEW] Med ball chest throw\t4-6 kg\t3\t3\t45 sec\t5\tThis exercise slot could not be safely generated — please contact support.\t\nWed\tBox squat to parallel\t155 kg\t3\t6\t3 min\t8.5\tSit back to the same box, brief settle, drive fast up\t\nWed\t[REVIEW] Strict overhead press\t75 kg\t4\t4\t2-3 min\t8.5\tThis exercise slot could not be safely generated — please contact support.\t\nWed\tCable lateral raise\tModerate\t2\t12-15\t60 sec\t8\tSmooth, slight pause at top\t\nFri\t[WARMUP] Rower + shoulder/scap prep + pull-up/OHP ramp\tEasy + bodyweight to work sets\t1\t6-8 min\t0\t4\t2 min easy row, band shoulder work, 3 pull-up ramps, 3 OHP ramps\t\nFri\tOne-arm pull-up\tBodyweight\t3\t1 each side\t20 sec\t8\tCluster 1: 1 rep each arm, then 20 sec between arms\t\nFri\tOne-arm pull-up\tBodyweight\t3\t1 each side\t90 sec\t8\tRepeat 3 total clusters; keep every rep crisp and strict\t\nFri\t[REVIEW] Strict overhead press\t67.5 kg\t4\t5\t2 min\t8\tThis exercise slot could not be safely generated — please contact support.\t\nFri\tFace pull\tModerate\t2\t15-20\t60 sec\t8\tElbows high, pause and spread at face level\t\nSat\t[WARMUP] Bike + box squat/One-Arm Pull-up ramp\tEasy + empty bar to work sets\t1\t6-8 min\t0\t4\t2 min easy bike, ankle/hip prep, 4 squat ramps, 2 assisted One-Arm Pull-up ramps\t\nSat\tBox jump\tBodyweight\t3\t2\t45 sec\t5\tLow box, crisp landing, no fatigue chasing\t\nSat\tBox squat to parallel\t180 kg\t4\t3\t3 min\t8.5\tHeavy strength exposure; stop one set early if back feels off\t\nSat\tAssisted one-arm pull-up\tBodyweight + very light band/1 finger assist\t4\t2 each side\t90 sec\t8\tMinimal help, strict shoulder position, no twist\t\nSat\t[REVIEW] Stationary bike Zone 2\tEasy-moderate\t1\t12 min\t0\t6\tThis exercise slot could not be safely generated — please contact support.\t\nSun\t[WARMUP] Easy bike\tEasy\t1\t3 min\t0\t3\tSettle in, then start the steady work\t\nSun\t[REVIEW] Stationary bike Zone 2\tEasy-moderate\t1\t35 min\t0\t6\tThis exercise slot could not be safely generated — please contact support.\t\nEND_WEEK3_TSV\nSTART_WEEK4_TSV\nDay\tExercise\tWeight\tSets\tReps\tRest\tTarget RPE\tNotes\tResults\nWed\t[WARMUP] Assault bike + box squat/OHP ramp\tEasy + empty bar to work sets\t1\t6-8 min\t0\t4\t2 min easy bike, hip openers, 3-4 squat ramps, 3 OHP ramps\t\nWed\t[REVIEW] Med ball chest throw\t4-6 kg\t3\t3\t45 sec\t5\tThis exercise slot could not be safely generated — please contact support.\t\nWed\tBox squat to parallel\t157.5 kg\t3\t6\t3 min\t8.5\tRep-strength exposure; same box and same bracing every set\t\nWed\t[REVIEW] Strict overhead press\t77.5 kg\t3\t4\t2-3 min\t9\tThis exercise slot could not be safely generated — please contact support.\t\nWed\tCable lateral raise\tModerate\t2\t12-15\t60 sec\t8\tSmooth, slight pause at top\t\nFri\t[WARMUP] Rower + shoulder/scap prep + pull-up/OHP ramp\tEasy + bodyweight to work sets\t1\t6-8 min\t0\t4\t2 min easy row, band shoulder work, 3 pull-up ramps, 3 OHP ramps\t\nFri\tOne-arm pull-up\tBodyweight\t6\t1 each side\t60-75 sec\t8.5\tStrict singles; if exceptionally fresh, make the last set a controlled second rep on stronger side only\t\nFri\t[REVIEW] Strict overhead press\t67.5 kg\t5\t4\t2 min\t8\tThis exercise slot could not be safely generated — please contact support.\t\nFri\tFace pull\tModerate\t2\t15-20\t60 sec\t8\tElbows high, pause and spread at face level\t\nSat\t[WARMUP] Bike + box squat/One-Arm Pull-up ramp\tEasy + empty bar to work sets\t1\t6-8 min\t0\t4\t2 min easy bike, ankle/hip prep, 4 squat ramps, 2 assisted One-Arm Pull-up ramps\t\nSat\tBox jump\tBodyweight\t3\t2\t45 sec\t5\tLow box, crisp landing, no fatigue chasing\t\nSat\tBox squat to parallel\t185 kg\t1\t2\t3 min\t8.5\tTop set; only take this if week feels good and position is solid\t\nSat\tBox squat to parallel\t177.5 kg\t3\t3\t3 min\t8\tBack-off triples after the top set; same box and clean brace\t\nSat\tAssisted one-arm pull-up\tBodyweight + minimal assist\t4\t2 each side\t90 sec\t8-8.5\tUse the least help that preserves two strict reps per arm\t\nSat\t[REVIEW] Stationary bike Zone 2\tEasy-moderate\t1\t12 min\t0\t6\tThis exercise slot could not be safely generated — please contact support.\t\nSun\t[WARMUP] Easy bike\tEasy\t1\t3 min\t0\t3\tSettle in, then start the steady work\t\nSun\t[REVIEW] Stationary bike Zone 2\tEasy-moderate\t1\t35 min\t0\t6\tThis exercise slot could not be safely generated — please contact support.\t\nEND_WEEK4_TSV",
+  "generation_seconds": 232,
   "health_after": {
     "ok": true,
     "mode": "openai",
     "model": "gpt-5.4",
-    "openai_execution_path": "deterministic-skeleton-v2",
+    "openai_execution_path": "deterministic-skeleton-v3",
     "openai_legacy_engine_chars_not_sent": 1494152,
-    "openai_compact_developer_chars": 1767,
+    "openai_compact_developer_chars": 2213,
     "last_ai_usage": {
       "provider": "openai",
       "model": "gpt-5.4",
       "reasoning_effort": "low",
-      "input_tokens": 2509,
+      "input_tokens": 2890,
       "cached_input_tokens": 0,
-      "output_tokens": 3659,
-      "reasoning_tokens": 859,
-      "developer_chars": 1767,
-      "source_user_prompt_chars": 65533,
-      "sent_user_prompt_chars": 9587,
+      "output_tokens": 4097,
+      "reasoning_tokens": 1230,
+      "developer_chars": 2213,
+      "source_user_prompt_chars": 65566,
+      "sent_user_prompt_chars": 10778,
       "legacy_engine_chars_not_sent": 1494152,
-      "execution_path": "deterministic-skeleton-v2",
-      "elapsed_ms": 32783
+      "execution_path": "deterministic-skeleton-v3",
+      "elapsed_ms": 36325
+    },
+    "last_build_timing": {
+      "total_ms": 163084,
+      "pre_persist_ms": 43448,
+      "generation_and_qa_ms": 59124,
+      "openai_ms": 36325,
+      "save_to_visible_ms": 49116
     },
     "storage": "supabase",
     "storage_ok": true,
@@ -218,19 +247,31 @@
     "provider": "openai",
     "model": "gpt-5.4",
     "reasoning_effort": "low",
-    "input_tokens": 2509,
+    "input_tokens": 2890,
     "cached_input_tokens": 0,
-    "output_tokens": 3659,
-    "reasoning_tokens": 859,
-    "developer_chars": 1767,
-    "source_user_prompt_chars": 65533,
-    "sent_user_prompt_chars": 9587,
+    "output_tokens": 4097,
+    "reasoning_tokens": 1230,
+    "developer_chars": 2213,
+    "source_user_prompt_chars": 65566,
+    "sent_user_prompt_chars": 10778,
     "legacy_engine_chars_not_sent": 1494152,
-    "execution_path": "deterministic-skeleton-v2",
-    "elapsed_ms": 32783
+    "execution_path": "deterministic-skeleton-v3",
+    "elapsed_ms": 36325
+  },
+  "build_timing": {
+    "total_ms": 163084,
+    "pre_persist_ms": 43448,
+    "generation_and_qa_ms": 59124,
+    "openai_ms": 36325,
+    "save_to_visible_ms": 49116
   },
   "score": {
-    "passed": 16,
-    "total": 18
+    "passed": 18,
+    "total": 20
+  },
+  "quality_percent": 90,
+  "latency_score": {
+    "passed": 1,
+    "total": 2
   }
 }
