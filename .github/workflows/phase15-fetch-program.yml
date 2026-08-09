@@ -1,0 +1,51 @@
+name: Phase 15 Fetch Latest Program
+
+on:
+  push:
+    paths:
+      - '.github/phase15-fetch-program-trigger.txt'
+
+permissions:
+  contents: write
+
+jobs:
+  fetch-program:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Fetch completed benchmark program
+        run: |
+          JOB_ID=$(cat .github/phase15-fetch-program-trigger.txt | tr -d '\r\n ')
+          JOB_ID="$JOB_ID" node - <<'NODE'
+          const fs=require('fs');
+          const job=process.env.JOB_ID;
+          const url='https://raz-coaching-platform.onrender.com/api/job/'+encodeURIComponent(job);
+          const sleep=ms=>new Promise(r=>setTimeout(r,ms));
+          (async()=>{
+            let data=null;
+            for(let i=0;i<8;i++){
+              try{
+                const r=await fetch(url);
+                const text=await r.text();
+                if(r.ok && text.trim().startsWith('{')){ data=JSON.parse(text); break; }
+              }catch(e){}
+              await sleep(1500);
+            }
+            if(!data) throw new Error('Could not fetch completed job');
+            if(data.status!=='done' || !data.program) throw new Error('Job has no completed program: '+JSON.stringify({status:data.status,stage:data.stage,error:data.error}));
+            fs.writeFileSync('.github/phase15-latest-program.txt', data.program);
+          })().catch(e=>{console.error(e);process.exit(1)});
+          NODE
+      - name: Commit program snapshot
+        run: |
+          git config user.name 'RAZ benchmark bot'
+          git config user.email 'actions@users.noreply.github.com'
+          git pull --rebase origin main || true
+          git add .github/phase15-latest-program.txt
+          if git diff --cached --quiet; then exit 0; fi
+          git commit -m 'Record Phase 15 benchmark program snapshot'
+          git push
