@@ -3,27 +3,27 @@ TAP version 13
 # Subtest: dual box squat outcomes stay distinct
 ok 1 - dual box squat outcomes stay distinct
   ---
-  duration_ms: 1.366238
+  duration_ms: 1.412854
   ...
 # Subtest: OAP prescription matches a two-rep strict athlete and separates direct from support work
 ok 2 - OAP prescription matches a two-rep strict athlete and separates direct from support work
   ---
-  duration_ms: 0.414481
+  duration_ms: 0.419305
   ...
 # Subtest: strict OHP keeps direct specificity while allowing purposeful variation
 ok 3 - strict OHP keeps direct specificity while allowing purposeful variation
   ---
-  duration_ms: 0.304166
+  duration_ms: 0.335387
   ...
 # Subtest: all four gym days remain strength days and aerobic work stays low fatigue
 ok 4 - all four gym days remain strength days and aerobic work stays low fatigue
   ---
-  duration_ms: 0.360089
+  duration_ms: 0.353792
   ...
 # Subtest: client-facing exercise naming has no review path in the brief
 ok 5 - client-facing exercise naming has no review path in the brief
   ---
-  duration_ms: 0.889483
+  duration_ms: 0.93005
   ...
 1..5
 # tests 5
@@ -33,29 +33,29 @@ ok 5 - client-facing exercise naming has no review path in the brief
 # cancelled 0
 # skipped 0
 # todo 0
-# duration_ms 68.537718
+# duration_ms 69.92121
 EXIT=0
 ===== specialist_rules =====
 TAP version 13
 # Subtest: planche goal activates authored Article N2 and observed-level rule
 ok 1 - planche goal activates authored Article N2 and observed-level rule
   ---
-  duration_ms: 7.892597
+  duration_ms: 7.745633
   ...
 # Subtest: weighted chin-up 1RM goal routes to maximal-strength Article N8
 ok 2 - weighted chin-up 1RM goal routes to maximal-strength Article N8
   ---
-  duration_ms: 0.910274
+  duration_ms: 0.930411
   ...
 # Subtest: weighted dip fixed-load rep goal routes to two-track loaded endurance
 ok 3 - weighted dip fixed-load rep goal routes to two-track loaded endurance
   ---
-  duration_ms: 0.556844
+  duration_ms: 0.64678
   ...
 # Subtest: street lifting classifier does not confuse max and endurance expressions
 ok 4 - street lifting classifier does not confuse max and endurance expressions
   ---
-  duration_ms: 0.191527
+  duration_ms: 0.170118
   ...
 1..4
 # tests 4
@@ -65,14 +65,14 @@ ok 4 - street lifting classifier does not confuse max and endurance expressions
 # cancelled 0
 # skipped 0
 # todo 0
-# duration_ms 69.516033
+# duration_ms 73.295915
 EXIT=0
 ===== demo_coverage =====
 TAP version 13
 # Subtest: every Phase 15 client-facing critical exercise resolves to a direct curated video
 ok 1 - every Phase 15 client-facing critical exercise resolves to a direct curated video
   ---
-  duration_ms: 2.202451
+  duration_ms: 2.234131
   ...
 1..1
 # tests 1
@@ -82,7 +82,7 @@ ok 1 - every Phase 15 client-facing critical exercise resolves to a direct curat
 # cancelled 0
 # skipped 0
 # todo 0
-# duration_ms 58.159726
+# duration_ms 58.67094
 EXIT=0
 ===== build_runtime =====
 built server.phase15.js with deterministic skeleton v4 + direct-skill protection + variation-aware final QA
@@ -95,10 +95,16 @@ EXIT=0
 EXIT=0
 ===== syntax_program_qa =====
 EXIT=0
+===== syntax_final_qa =====
+EXIT=0
 ===== syntax_quality =====
 EXIT=0
-===== grep_v3 =====
-EXIT=1
+===== grep_v4 =====
+EXIT=0
+===== grep_final_qa =====
+EXIT=0
+===== grep_direct_skill_protection =====
+EXIT=0
 ===== grep_normalizer =====
 EXIT=0
 ===== grep_fast_path =====
