@@ -10,13 +10,22 @@ on:
       - 'phase14/engine/phase15_program_qa.js'
       - 'phase14/engine/phase15_final_qa.js'
       - 'phase14/engine/phase15_quality_rules.js'
+      - 'phase14/storage.js'
+      - 'phase14/admin_qa_routes.js'
       - 'phase14/scripts/build_phase15_runtime.mjs'
+      - 'phase14/scripts/apply_product_polish.mjs'
       - 'phase14/test/phase15_planner_regression.test.mjs'
       - 'phase14/test/phase15_specialist_rules.test.mjs'
       - 'phase14/test/exercise_demo_coverage.test.mjs'
       - 'phase14/public/exerciseDemos.js'
+      - 'phase14/public/spreadsheet.js'
+      - 'phase14/public/index.html'
+      - 'phase14/public/privacy.html'
+      - 'phase14/public/terms.html'
       - 'phase14/data/lib/exerciseDemos.js'
       - 'phase14/data/exercise_demos.json'
+      - 'phase14/data/exercise_demo_overrides.json'
+      - 'phase14/public/data/exercise_demo_overrides.json'
       - '.github/workflows/phase15-static-qa.yml'
   workflow_dispatch:
 
@@ -26,12 +35,14 @@ permissions:
 jobs:
   static-qa:
     runs-on: ubuntu-latest
-    timeout-minutes: 5
+    timeout-minutes: 6
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
           node-version: '20'
+      - name: Apply deterministic product polish
+        run: node phase14/scripts/apply_product_polish.mjs
       - id: qa
         name: Run deterministic coaching regressions
         continue-on-error: true
@@ -53,6 +64,10 @@ jobs:
           if [ -f test/exercise_demo_coverage.test.mjs ]; then runcheck demo_coverage node --test test/exercise_demo_coverage.test.mjs; fi
           runcheck build_runtime node scripts/build_phase15_runtime.mjs
           runcheck syntax_runtime node --check server.phase15.js
+          runcheck syntax_server node --check server.js
+          runcheck syntax_storage node --check storage.js
+          runcheck syntax_admin node --check admin_qa_routes.js
+          runcheck syntax_spreadsheet node --check public/spreadsheet.js
           runcheck syntax_planner node --check engine/phase15_planner.js
           runcheck syntax_specialist node --check engine/phase15_specialist_rules.js
           runcheck syntax_overcoming_gravity node --check engine/overcoming_gravity_rules.js
@@ -66,6 +81,9 @@ jobs:
           runcheck grep_fast_path grep -q 'fast new-client intake persist' server.phase15.js
           runcheck grep_specialist grep -q 'buildSpecialistRules' engine/phase15_planner.js
           runcheck grep_og grep -q 'overcomingGravityRulesForFamily' engine/phase15_specialist_rules.js
+          runcheck grep_admin_route grep -q 'registerAdminQaRoutes' server.phase15.js
+          runcheck grep_warmup_tab grep -q 'Warm-Up Protocol' public/spreadsheet.js
+          runcheck grep_privacy grep -q '/privacy.html' public/index.html
           exit "$failed"
       - name: Write static QA result
         if: always()
@@ -82,15 +100,15 @@ jobs:
             ok:process.env.QA_OUTCOME==='success'
           },null,2));
           NODE
-      - name: Commit static QA result
+      - name: Commit polish and QA result
         if: always()
         run: |
           git config user.name 'RAZ static QA bot'
           git config user.email 'actions@users.noreply.github.com'
-          git pull --rebase origin main || true
-          git add .github/phase15-static-qa-result.json .github/phase15-static-qa-log.txt
+          git add phase14/server.js phase14/public/spreadsheet.js phase14/public/index.html phase14/scripts/build_phase15_runtime.mjs .github/phase15-static-qa-result.json .github/phase15-static-qa-log.txt
           if git diff --cached --quiet; then exit 0; fi
-          git commit -m 'Record Phase 15 static QA result'
+          git commit -m 'Record Phase 15 product polish and static QA result'
+          git pull --rebase origin main || true
           git push
       - name: Fail if QA failed
         if: steps.qa.outcome != 'success'
