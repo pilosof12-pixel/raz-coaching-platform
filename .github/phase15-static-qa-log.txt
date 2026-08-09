@@ -3,27 +3,27 @@ TAP version 13
 # Subtest: dual box squat outcomes stay distinct
 ok 1 - dual box squat outcomes stay distinct
   ---
-  duration_ms: 1.361906
+  duration_ms: 1.311871
   ...
 # Subtest: OAP prescription matches a two-rep strict athlete
 ok 2 - OAP prescription matches a two-rep strict athlete
   ---
-  duration_ms: 0.41163
+  duration_ms: 0.433067
   ...
 # Subtest: strict OHP gets two real exposures from the current level
 ok 3 - strict OHP gets two real exposures from the current level
   ---
-  duration_ms: 0.180949
+  duration_ms: 0.174892
   ...
 # Subtest: all four gym days remain strength days and aerobic work stays low fatigue
 ok 4 - all four gym days remain strength days and aerobic work stays low fatigue
   ---
-  duration_ms: 0.377355
+  duration_ms: 0.361631
   ...
 # Subtest: client-facing exercise naming has no review path in the brief
 ok 5 - client-facing exercise naming has no review path in the brief
   ---
-  duration_ms: 0.761414
+  duration_ms: 0.979363
   ...
 1..5
 # tests 5
@@ -33,29 +33,29 @@ ok 5 - client-facing exercise naming has no review path in the brief
 # cancelled 0
 # skipped 0
 # todo 0
-# duration_ms 68.501745
+# duration_ms 72.195376
 EXIT=0
 ===== specialist_rules =====
 TAP version 13
 # Subtest: planche goal activates authored Article N2 and observed-level rule
 ok 1 - planche goal activates authored Article N2 and observed-level rule
   ---
-  duration_ms: 7.852471
+  duration_ms: 7.5135
   ...
 # Subtest: weighted chin-up 1RM goal routes to maximal-strength Article N8
 ok 2 - weighted chin-up 1RM goal routes to maximal-strength Article N8
   ---
-  duration_ms: 0.936591
+  duration_ms: 0.989669
   ...
 # Subtest: weighted dip fixed-load rep goal routes to two-track loaded endurance
 ok 3 - weighted dip fixed-load rep goal routes to two-track loaded endurance
   ---
-  duration_ms: 0.601796
+  duration_ms: 0.600097
   ...
 # Subtest: street lifting classifier does not confuse max and endurance expressions
 ok 4 - street lifting classifier does not confuse max and endurance expressions
   ---
-  duration_ms: 0.177312
+  duration_ms: 0.169683
   ...
 1..4
 # tests 4
@@ -65,52 +65,25 @@ ok 4 - street lifting classifier does not confuse max and endurance expressions
 # cancelled 0
 # skipped 0
 # todo 0
-# duration_ms 71.089693
+# duration_ms 70.260403
 EXIT=0
 ===== demo_coverage =====
 TAP version 13
 # Subtest: every Phase 15 client-facing critical exercise resolves to a direct curated video
-not ok 1 - every Phase 15 client-facing critical exercise resolves to a direct curated video
+ok 1 - every Phase 15 client-facing critical exercise resolves to a direct curated video
   ---
-  duration_ms: 4.24708
-  location: '/home/runner/work/raz-coaching-platform/raz-coaching-platform/phase14/test/exercise_demo_coverage.test.mjs:28:1'
-  failureType: 'testCodeFailure'
-  error: |-
-    Missing direct demo URLs: Broad Jump, Glute Bridge
-    + actual - expected
-    
-    + [
-    +   'Broad Jump',
-    +   'Glute Bridge'
-    + ]
-    - []
-  code: 'ERR_ASSERTION'
-  name: 'AssertionError'
-  expected:
-  actual:
-    0: 'Broad Jump'
-    1: 'Glute Bridge'
-  operator: 'deepStrictEqual'
-  stack: |-
-    TestContext.<anonymous> (file:///home/runner/work/raz-coaching-platform/raz-coaching-platform/phase14/test/exercise_demo_coverage.test.mjs:37:10)
-    Test.runInAsyncScope (node:async_hooks:206:9)
-    Test.run (node:internal/test_runner/test:796:25)
-    Test.processPendingSubtests (node:internal/test_runner/test:526:18)
-    node:internal/test_runner/harness:255:12
-    node:internal/process/task_queues:140:7
-    AsyncResource.runInAsyncScope (node:async_hooks:206:9)
-    AsyncResource.runMicrotask (node:internal/process/task_queues:137:8)
+  duration_ms: 2.365075
   ...
 1..1
 # tests 1
 # suites 0
-# pass 0
-# fail 1
+# pass 1
+# fail 0
 # cancelled 0
 # skipped 0
 # todo 0
-# duration_ms 66.949793
-EXIT=1
+# duration_ms 68.318496
+EXIT=0
 ===== build_runtime =====
 built server.phase15.js with deterministic skeleton v3 + canonical repair + fast new-client persistence
 EXIT=0
