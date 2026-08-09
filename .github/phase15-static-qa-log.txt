@@ -3,27 +3,27 @@ TAP version 13
 # Subtest: dual box squat outcomes stay distinct
 ok 1 - dual box squat outcomes stay distinct
   ---
-  duration_ms: 1.412854
+  duration_ms: 1.281617
   ...
 # Subtest: OAP prescription matches a two-rep strict athlete and separates direct from support work
 ok 2 - OAP prescription matches a two-rep strict athlete and separates direct from support work
   ---
-  duration_ms: 0.419305
+  duration_ms: 0.464709
   ...
 # Subtest: strict OHP keeps direct specificity while allowing purposeful variation
 ok 3 - strict OHP keeps direct specificity while allowing purposeful variation
   ---
-  duration_ms: 0.335387
+  duration_ms: 0.302925
   ...
 # Subtest: all four gym days remain strength days and aerobic work stays low fatigue
 ok 4 - all four gym days remain strength days and aerobic work stays low fatigue
   ---
-  duration_ms: 0.353792
+  duration_ms: 1.103669
   ...
 # Subtest: client-facing exercise naming has no review path in the brief
 ok 5 - client-facing exercise naming has no review path in the brief
   ---
-  duration_ms: 0.93005
+  duration_ms: 0.242514
   ...
 1..5
 # tests 5
@@ -33,46 +33,100 @@ ok 5 - client-facing exercise naming has no review path in the brief
 # cancelled 0
 # skipped 0
 # todo 0
-# duration_ms 69.92121
+# duration_ms 68.305332
 EXIT=0
 ===== specialist_rules =====
 TAP version 13
 # Subtest: planche goal activates authored Article N2 and observed-level rule
-ok 1 - planche goal activates authored Article N2 and observed-level rule
+not ok 1 - planche goal activates authored Article N2 and observed-level rule
   ---
-  duration_ms: 7.745633
+  duration_ms: 5.989144
+  location: '/home/runner/work/raz-coaching-platform/raz-coaching-platform/phase14/test/phase15_specialist_rules.test.mjs:19:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    The input did not match the regular expression /Advanced Gymnastics/. Input:
+    
+    '=== GOAL-SPECIFIC SPECIALIST RULES ===\n' +
+      '* SPECIALIST SOURCE: Overcoming Gravity decision layer + verified skill graph, family=planche.\n' +
+      '* OVERCOMING GRAVITY FRAMEWORK: demonstrated clean ability controls the starting level. Progression charts are maps, not reasons to regress an athlete who already owns a harder variation.\n' +
+      '* Competency heuristics: roughly 6 seconds of clean control is meaningful evidence for a static rung; roughly 3 clean repetitions is meaningful evidence for a dynamic rung. These are coaching heuristics, not universal pass/fail gates.\n' +
+      '* Exercise order: warm-up/position prep -> skill/technique while fresh -> difficult strength/isometrics/eccentrics/concentrics -> conditioning if required -> low-cost prehab/mobility/accessories.\n' +
+      '* Quality rule: stop skill sets before technical breakdown. Most difficult strength work stays short of technical failure so enough clean volume can accumulate.\n' +
+      '* Advanced programming: vary difficulty, reps/hold duration or volume across exposures when useful instead of forcing identical work every day. A harder low-volume exposure plus a slightly easier volume exposure is valid.\n' +
+      '* Support rule: easier progressions, weighted basics, antagonist work and structural-balance accessories can support the target but do not replace direct practice once the athlete can perform a measurable version.\n' +
+      '* Concurrent-sport rule: judge gymnastics dose against the whole training week. Reduce secondary volume before reducing primary skill quality when sport stress is high.\n' +
+      '* GPP rule: small doses of trunk, carry, neck, elbow/arm, scapular or local hypertrophy work are legitimate when they address a sport need, weak link or robustness goal and there is real time/recovery headroom. They are first to be cut when primary work or sport recovery suffers.\n' +
+      "* Planche: anchor work at the athlete's demonstrated clean rung. Do not regress a clean Advanced Tuck/Straddle athlete to Planche Lean or Tuck except as low-cost warm-up/back-off.\n" +
+      '* Planche quality: locked elbows, strong scapular protraction, controlled shoulder position and rigid pelvis/body line. Stop before position degrades.\n' +
+      '* Primary Planche goal: normally use at least two weekly specific exposures when recovery permits. One may bias harder intensity/shorter holds and another slightly easier accumulated-quality volume.\n' +
+      '* Anti-hallucination rule: prescribe only complete named variations that exist in the verified skill graph/exercise library. Never invent a banded, wall, eccentric, partial, one-leg, tuck or deficit variation by wording alone.\n' +
+      '* DETERMINISTIC SKILL-GRAPH SELECTION: {"gated":true,"rungIndex":0,"rung":{"name":"Planche Lean","criterion":{"type":"hold_seconds","metric":"planche_lean_hold_s","min":20,"quality":"shoulders_over_wrists"},"dose":{"sets":4,"reps":"10-20s","rest":"90s","rir":"1-2","frequency_per_week":3},"complementary":["Pseudo Planche Push-up","Wrist Prep"]},"demonstratedIndex":-1,"missing":["2+ years training"],"reason":"Prerequisite gate for Full Planche not met — 2+ years training"}. Use observed current ability over an arbitrary easier gate.\n' +
+      '* Authored Planche route remains verified: Planche Lean -> Tuck Planche -> Advanced Tuck Planche -> Straddle Planche -> Full Planche, but demonstrated ability overrides a forced regression to an easier rung.\n' +
+      '* Planche readiness numbers are heuristics only. Technique quality, clean hold duration, pain tolerance and repeatability decide progression.'
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected:
+  actual: |-
+    === GOAL-SPECIFIC SPECIALIST RULES ===
+    * SPECIALIST SOURCE: Overcoming Gravity decision layer + verified skill graph, family=planche.
+    * OVERCOMING GRAVITY FRAMEWORK: demonstrated clean ability controls the starting level. Progression charts are maps, not reasons to regress an athlete who already owns a harder variation.
+    * Competency heuristics: roughly 6 seconds of clean control is meaningful evidence for a static rung; roughly 3 clean repetitions is meaningful evidence for a dynamic rung. These are coaching heuristics, not universal pass/fail gates.
+    * Exercise order: warm-up/position prep -> skill/technique while fresh -> difficult strength/isometrics/eccentrics/concentrics -> conditioning if required -> low-cost prehab/mobility/accessories.
+    * Quality rule: stop skill sets before technical breakdown. Most difficult strength work stays short of technical failure so enough clean volume can accumulate.
+    * Advanced programming: vary difficulty, reps/hold duration or volume across exposures when useful instead of forcing identical work every day. A harder low-volume exposure plus a slightly easier volume exposure is valid.
+    * Support rule: easier progressions, weighted basics, antagonist work and structural-balance accessories can support the target but do not replace direct practice once the athlete can perform a measurable version.
+    * Concurrent-sport rule: judge gymnastics dose against the whole training week. Reduce secondary volume before reducing primary skill quality when sport stress is high.
+    * GPP rule: small doses of trunk, carry, neck, elbow/arm, scapular or local hypertrophy work are legitimate when they address a sport need, weak link or robustness goal and there is real time/recovery headroom. They are first to be cut when primary work or sport recovery suffers.
+    * Planche: anchor work at the athlete's demonstrated clean rung. Do not regress a clean Advanced Tuck/Straddle athlete to Planche Lean or Tuck except as low-cost warm-up/back-off.
+    * Planche quality: locked elbows, strong scapular protraction, controlled shoulder position and rigid pelvis/body line. Stop before position degrades.
+    * Primary Planche goal: normally use at least two weekly specific exposures when recovery permits. One may bias harder intensity/shorter holds and another slightly easier accumulated-quality volume.
+    * Anti-hallucination rule: prescribe only complete named variations that exist in the verified skill graph/exercise library. Never invent a banded, wall, eccentric, partial, one-leg, tuck or deficit variation by wording alone.
+    * DETERMINISTIC SKILL-GRAPH SELECTION: {"gated":true,"rungIndex":0,"rung":{"name":"Planche Lean","criterion":{"type":"hold_seconds","metric":"planche_lean_hold_s","min":20,"quality":"shoulders_over_wrists"},"dose":{"sets":4,"reps":"10-20s","rest":"90s","rir":"1-2","frequency_per_week":3},"complementary":["Pseudo Planche Push-up","Wrist Prep"]},"demonstratedIndex":-1,"missing":["2+ years training"],"reason":"Prerequisite gate for Full Planche not met — 2+ years training"}. Use observed current ability over an arbitrary easier gate.
+    * Authored Planche route remains verified: Planche Lean -> Tuck Planche -> Advanced Tuck Planche -> Straddle Planche -> Full Planche, but demonstrated ability overrides a forced regression to an easier rung.
+    * Planche readiness numbers are heuristics only. Technique quality, clean hold duration, pain tolerance and repeatability decide progression.
+  operator: 'match'
+  stack: |-
+    TestContext.<anonymous> (file:///home/runner/work/raz-coaching-platform/raz-coaching-platform/phase14/test/phase15_specialist_rules.test.mjs:25:10)
+    Test.runInAsyncScope (node:async_hooks:206:9)
+    Test.run (node:internal/test_runner/test:796:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:526:18)
+    node:internal/test_runner/harness:255:12
+    node:internal/process/task_queues:140:7
+    AsyncResource.runInAsyncScope (node:async_hooks:206:9)
+    AsyncResource.runMicrotask (node:internal/process/task_queues:137:8)
   ...
 # Subtest: weighted chin-up 1RM goal routes to maximal-strength Article N8
 ok 2 - weighted chin-up 1RM goal routes to maximal-strength Article N8
   ---
-  duration_ms: 0.930411
+  duration_ms: 2.289823
   ...
 # Subtest: weighted dip fixed-load rep goal routes to two-track loaded endurance
 ok 3 - weighted dip fixed-load rep goal routes to two-track loaded endurance
   ---
-  duration_ms: 0.64678
+  duration_ms: 0.599711
   ...
 # Subtest: street lifting classifier does not confuse max and endurance expressions
 ok 4 - street lifting classifier does not confuse max and endurance expressions
   ---
-  duration_ms: 0.170118
+  duration_ms: 0.16605
   ...
 1..4
 # tests 4
 # suites 0
-# pass 4
-# fail 0
+# pass 3
+# fail 1
 # cancelled 0
 # skipped 0
 # todo 0
-# duration_ms 73.295915
-EXIT=0
+# duration_ms 71.499739
+EXIT=1
 ===== demo_coverage =====
 TAP version 13
 # Subtest: every Phase 15 client-facing critical exercise resolves to a direct curated video
 ok 1 - every Phase 15 client-facing critical exercise resolves to a direct curated video
   ---
-  duration_ms: 2.234131
+  duration_ms: 2.095932
   ...
 1..1
 # tests 1
@@ -82,7 +136,7 @@ ok 1 - every Phase 15 client-facing critical exercise resolves to a direct curat
 # cancelled 0
 # skipped 0
 # todo 0
-# duration_ms 58.67094
+# duration_ms 59.147734
 EXIT=0
 ===== build_runtime =====
 built server.phase15.js with deterministic skeleton v4 + direct-skill protection + variation-aware final QA

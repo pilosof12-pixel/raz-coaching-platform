@@ -1,6 +1,6 @@
 {
-  "timestamp": "2026-08-09T12:05:04.429Z",
-  "tested_sha": "9749076d17c10f13f5cdc35715d13fa630db450a",
-  "outcome": "success",
-  "ok": true
+  "timestamp": "2026-08-09T13:30:58.358Z",
+  "tested_sha": "f728856c671153ec9de4f30115217498e8c97ad3",
+  "outcome": "failure",
+  "ok": false
 }
