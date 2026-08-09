@@ -19,7 +19,7 @@ jobs:
           node-version: '20'
       - name: Fetch completed benchmark program
         run: |
-          JOB_ID=$(cat .github/phase15-fetch-program-trigger.txt | tr -d '\r\n ')
+          JOB_ID=$(head -n1 .github/phase15-fetch-program-trigger.txt | tr -d '\r\n ')
           JOB_ID="$JOB_ID" node - <<'NODE'
           const fs=require('fs');
           const job=process.env.JOB_ID;
