@@ -3,27 +3,27 @@ TAP version 13
 # Subtest: dual box squat outcomes stay distinct
 ok 1 - dual box squat outcomes stay distinct
   ---
-  duration_ms: 1.307821
+  duration_ms: 1.379612
   ...
 # Subtest: OAP prescription matches a two-rep strict athlete
 ok 2 - OAP prescription matches a two-rep strict athlete
   ---
-  duration_ms: 0.386904
+  duration_ms: 0.370123
   ...
 # Subtest: strict OHP gets two real exposures from the current level
 ok 3 - strict OHP gets two real exposures from the current level
   ---
-  duration_ms: 0.171218
+  duration_ms: 0.18142
   ...
 # Subtest: all four gym days remain strength days and aerobic work stays low fatigue
 ok 4 - all four gym days remain strength days and aerobic work stays low fatigue
   ---
-  duration_ms: 1.000578
+  duration_ms: 0.389218
   ...
 # Subtest: client-facing exercise naming has no review path in the brief
 ok 5 - client-facing exercise naming has no review path in the brief
   ---
-  duration_ms: 0.173221
+  duration_ms: 0.879836
   ...
 1..5
 # tests 5
@@ -33,29 +33,29 @@ ok 5 - client-facing exercise naming has no review path in the brief
 # cancelled 0
 # skipped 0
 # todo 0
-# duration_ms 67.015717
+# duration_ms 68.208655
 EXIT=0
 ===== specialist_rules =====
 TAP version 13
 # Subtest: planche goal activates authored Article N2 and observed-level rule
 ok 1 - planche goal activates authored Article N2 and observed-level rule
   ---
-  duration_ms: 7.55785
+  duration_ms: 7.752429
   ...
 # Subtest: weighted chin-up 1RM goal routes to maximal-strength Article N8
 ok 2 - weighted chin-up 1RM goal routes to maximal-strength Article N8
   ---
-  duration_ms: 0.971233
+  duration_ms: 0.91883
   ...
 # Subtest: weighted dip fixed-load rep goal routes to two-track loaded endurance
 ok 3 - weighted dip fixed-load rep goal routes to two-track loaded endurance
   ---
-  duration_ms: 0.607486
+  duration_ms: 0.548536
   ...
 # Subtest: street lifting classifier does not confuse max and endurance expressions
 ok 4 - street lifting classifier does not confuse max and endurance expressions
   ---
-  duration_ms: 0.158209
+  duration_ms: 0.174005
   ...
 1..4
 # tests 4
@@ -65,7 +65,7 @@ ok 4 - street lifting classifier does not confuse max and endurance expressions
 # cancelled 0
 # skipped 0
 # todo 0
-# duration_ms 69.815241
+# duration_ms 70.943797
 EXIT=0
 ===== build_runtime =====
 built server.phase15.js with deterministic skeleton v3 + canonical repair + fast new-client persistence
