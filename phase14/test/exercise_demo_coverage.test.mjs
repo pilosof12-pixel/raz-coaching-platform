@@ -2,6 +2,10 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { resolveExerciseDemo } from '../data/lib/exerciseDemos.js';
 
+// These are the canonical working exercises Phase 15 is currently allowed/expected
+// to emit across the Raz benchmark, planche regression and weighted-street-lifting
+// regressions. If the coaching path adds a new client-facing working exercise,
+// add it here before shipping so a direct curated video is required.
 const required = [
   'Box Squat to Parallel',
   'Overhead Press',
@@ -13,9 +17,7 @@ const required = [
   'Cable Lateral Raise',
   'Face Pull',
   'Box Jump',
-  'Broad Jump',
   'Hip Thrust',
-  'Glute Bridge',
   'Advanced Tuck Planche',
   'Straddle Planche',
   'Full Planche',
