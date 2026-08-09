@@ -1,9 +1,9 @@
 {
-  "timestamp": "2026-08-09T11:41:02.939Z",
+  "timestamp": "2026-08-09T12:11:11.247Z",
   "base": "https://raz-coaching-platform.onrender.com",
   "provider_expected": "openai",
   "model_expected": "gpt-5.4",
-  "execution_path_expected": "deterministic-skeleton-v3",
+  "execution_path_expected": "deterministic-skeleton-v4",
   "intake": {
     "language": "en",
     "primary_goals": [
@@ -58,13 +58,13 @@
     },
     "sleep_hours": "6-7",
     "recovery_rating": "Average",
-    "notes": "Advanced concurrent strength and combat athlete. Recovery varies. Prefer low volume full body training. Four strength sessions per week. Prioritize strength return per unit fatigue. OAP should use two unilateral specific exposures, not maximal work every day. Weighted chin work must respect +80 kg 1RM. OHP outranks HSPU. Keep low volume jumps or med ball throws if low fatigue and stop before velocity loss. Two to three Zone 2 sessions desirable. Do not add hard running or hard conditioning unnecessarily."
+    "notes": "Advanced concurrent strength and combat athlete. Recovery varies. Prefer low volume full body training. Four strength sessions per week. Prioritize strength return per unit fatigue. OAP should use two unilateral specific exposures, not maximal work every day. Weighted chin work must respect +80 kg 1RM and may support but not replace direct OAP practice. OHP outranks HSPU. Purposeful overhead variation is acceptable when at least one direct strict OHP exposure remains. Keep low volume jumps or med ball throws if low fatigue and stop before velocity loss. Two to three Zone 2 sessions desirable. Do not add hard running or hard conditioning unnecessarily."
   },
   "checks": [
     {
       "name": "health",
       "ok": true,
-      "detail": "{\"ok\":true,\"mode\":\"openai\",\"model\":\"gpt-5.4\",\"openai_execution_path\":\"deterministic-skeleton-v3\",\"openai_legacy_engine_chars_not_sent\":1494152,\"openai_compact_developer_chars\":2213,\"last_ai_usage\":null,\"last_build_timing\":null,\"storage\":\"supabase\",\"storage_ok\":true,\"ai_configured\":true,\"thinking_budget\":8192,\"cache\":{\"enabled\":true,\"ttl_seconds\":1800,\"active\":false}}"
+      "detail": "{\"ok\":true,\"mode\":\"openai\",\"model\":\"gpt-5.4\",\"openai_execution_path\":\"deterministic-skeleton-v4\",\"openai_legacy_engine_chars_not_sent\":1494152,\"openai_compact_developer_chars\":2687,\"last_ai_usage\":null,\"last_build_timing\":null,\"storage\":\"supabase\",\"storage_ok\":true,\"ai_configured\":true,\"thinking_budget\":8192,\"cache\":{\"enabled\":true,\"ttl_seconds\":1800,\"active\":false}}"
     },
     {
       "name": "OpenAI provider active",
@@ -72,19 +72,19 @@
       "detail": "{\"mode\":\"openai\",\"model\":\"gpt-5.4\"}"
     },
     {
-      "name": "deterministic skeleton v3 live",
+      "name": "deterministic skeleton v4 live",
       "ok": true,
-      "detail": "{\"path\":\"deterministic-skeleton-v3\"}"
+      "detail": "{\"path\":\"deterministic-skeleton-v4\"}"
     },
     {
       "name": "build accepted",
       "ok": true,
-      "detail": "{\"job_id\":\"6c561d1424f865851f90675261118fe0\",\"token\":\"76e4c8d61cd240f8a840e0baf68048e0\",\"status\":\"pending\"}"
+      "detail": "{\"job_id\":\"96baa721c0f9598ef5fc50134cd2f619\",\"token\":\"f37024eadcc7691adf201ac5e6b65b34\",\"status\":\"pending\"}"
     },
     {
       "name": "program generated",
       "ok": true,
-      "detail": "chars=9151; seconds=232"
+      "detail": "chars=9303; seconds=231"
     },
     {
       "name": "single paid pass telemetry",
@@ -94,7 +94,7 @@
     {
       "name": "compact prompt actually sent",
       "ok": true,
-      "detail": "{\"provider\":\"openai\",\"model\":\"gpt-5.4\",\"reasoning_effort\":\"low\",\"input_tokens\":3286,\"cached_input_tokens\":0,\"output_tokens\":4536,\"reasoning_tokens\":1243,\"developer_chars\":2213,\"source_user_prompt_chars\":64877,\"sent_user_prompt_chars\":12371,\"legacy_engine_chars_not_sent\":1494152,\"execution_path\":\"deterministic-skeleton-v3\",\"elapsed_ms\":36156}"
+      "detail": "{\"provider\":\"openai\",\"model\":\"gpt-5.4\",\"reasoning_effort\":\"low\",\"input_tokens\":3519,\"cached_input_tokens\":0,\"output_tokens\":4847,\"reasoning_tokens\":1655,\"developer_chars\":2687,\"source_user_prompt_chars\":65027,\"sent_user_prompt_chars\":13140,\"legacy_engine_chars_not_sent\":1494152,\"execution_path\":\"deterministic-skeleton-v4\",\"elapsed_ms\":41267}"
     },
     {
       "name": "one block per week",
@@ -114,22 +114,27 @@
     {
       "name": "squat max plus rep-strength coverage",
       "ok": true,
-      "detail": "[[\"Wed\",\"Box Squat to Parallel\",\"155 kg\",\"6\",\"7\"],[\"Sat\",\"Box Squat to Parallel\",\"180 kg\",\"3\",\"8\"]]"
+      "detail": "[[\"Wed\",\"Box Squat to Parallel\",\"155 kg\",\"6\",\"7.5\"],[\"Sat\",\"Box Squat to Parallel\",\"180 kg\",\"2\",\"8\"]]"
     },
     {
       "name": "box squat loads calibrated to current 210 kg max",
       "ok": true,
-      "detail": "[{\"reps\":6,\"kg\":155},{\"reps\":3,\"kg\":180}]"
+      "detail": "[{\"reps\":6,\"kg\":155},{\"reps\":2,\"kg\":180}]"
     },
     {
-      "name": "OAP advanced stage",
-      "ok": false,
-      "detail": "[]"
-    },
-    {
-      "name": "two strict OHP exposures",
+      "name": "OAP direct advanced exposures",
       "ok": true,
-      "detail": "{\"strict\":[[\"Wed\",\"Overhead Press\",\"67.5 kg\",\"4\",\"4\"],[\"Fri\",\"Overhead Press\",\"60 kg\",\"4\",\"6\"]],\"push\":[]}"
+      "detail": "[[\"Fri\",\"One-Arm Pull-up\",\"5\",\"1/arm\"],[\"Sat\",\"Assisted One-Arm Pull-up\",\"4\",\"2/arm\"]]"
+    },
+    {
+      "name": "bilateral pulling is support not OAP replacement",
+      "ok": true,
+      "detail": "{\"direct\":[[\"Fri\",\"One-Arm Pull-up\"],[\"Sat\",\"Assisted One-Arm Pull-up\"]],\"support\":[[\"Sun\",\"Weighted Chin-up\",\"+50 kg\",\"4\"]]}"
+    },
+    {
+      "name": "OHP specificity plus purposeful variation",
+      "ok": true,
+      "detail": "{\"strict\":[[\"Wed\",\"Overhead Press\",\"70 kg\",\"4\",\"4\"]],\"variation\":[[\"Fri\",\"Push Press\",\"77.5 kg\",\"4\",\"3\"]]}"
     },
     {
       "name": "pain tolerance acknowledged",
@@ -144,50 +149,50 @@
     {
       "name": "conditioning interference",
       "ok": true,
-      "detail": "{\"hard\":[],\"zone2\":[[\"Sat\",\"Zone-2 Bike\",\"22 min\"],[\"Sun\",\"Zone-2 Row\",\"20 min\"]]}"
+      "detail": "{\"hard\":[],\"zone2\":[[\"Sat\",\"Zone-2 Row\",\"25 min\"],[\"Sun\",\"Zone-2 Bike\",\"25 min\"]]}"
     },
     {
       "name": "Zone 2 doses are meaningful",
       "ok": true,
-      "detail": "[22,20]"
+      "detail": "[25,25]"
     },
     {
       "name": "maintenance accessories retained",
       "ok": true,
-      "detail": "{\"lateral\":[\"Fri\",\"Sun\"],\"face\":[\"Wed\",\"Sun\"]}"
+      "detail": "{\"lateral\":[\"Fri\"],\"face\":[\"Sun\"]}"
     },
     {
       "name": "no unresolved review/support markers",
-      "ok": false,
-      "detail": "[[\"Sat\",\"[REVIEW] duplicate skill row removed\"]]"
+      "ok": true,
+      "detail": "[]"
     },
     {
       "name": "every client working exercise has direct curated demo",
-      "ok": false,
-      "detail": "{\"missing\":[\"Broad Jump\",\"Scapular Pull-up\",\"[REVIEW] duplicate skill row removed\"],\"checked\":[\"Broad Jump\",\"Box Squat to Parallel\",\"Overhead Press\",\"Face Pull\",\"Weighted Pull-Up\",\"Scapular Pull-up\",\"Hip Thrust\",\"Cable Lateral Raise\",\"[REVIEW] duplicate skill row removed\",\"Zone-2 Bike\",\"Weighted Chin-up\",\"Zone-2 Row\"]}"
+      "ok": true,
+      "detail": "{\"missing\":[],\"checked\":[\"Box Jump\",\"Box Squat to Parallel\",\"Overhead Press\",\"One-Arm Pull-up\",\"Push Press\",\"Cable Lateral Raise\",\"Assisted One-Arm Pull-up\",\"Zone-2 Row\",\"Weighted Chin-up\",\"Hip Thrust\",\"Face Pull\",\"Zone-2 Bike\"]}"
     }
   ],
   "latency_checks": [
     {
       "name": "total build under 180s",
       "ok": false,
-      "detail": "seconds=232"
+      "detail": "seconds=231"
     },
     {
       "name": "OpenAI call under 60s",
       "ok": true,
-      "detail": "{\"provider\":\"openai\",\"model\":\"gpt-5.4\",\"reasoning_effort\":\"low\",\"input_tokens\":3286,\"cached_input_tokens\":0,\"output_tokens\":4536,\"reasoning_tokens\":1243,\"developer_chars\":2213,\"source_user_prompt_chars\":64877,\"sent_user_prompt_chars\":12371,\"legacy_engine_chars_not_sent\":1494152,\"execution_path\":\"deterministic-skeleton-v3\",\"elapsed_ms\":36156}"
+      "detail": "{\"provider\":\"openai\",\"model\":\"gpt-5.4\",\"reasoning_effort\":\"low\",\"input_tokens\":3519,\"cached_input_tokens\":0,\"output_tokens\":4847,\"reasoning_tokens\":1655,\"developer_chars\":2687,\"source_user_prompt_chars\":65027,\"sent_user_prompt_chars\":13140,\"legacy_engine_chars_not_sent\":1494152,\"execution_path\":\"deterministic-skeleton-v4\",\"elapsed_ms\":41267}"
     }
   ],
-  "ok": false,
+  "ok": true,
   "deploy_wait_seconds": 22,
   "health_before": {
     "ok": true,
     "mode": "openai",
     "model": "gpt-5.4",
-    "openai_execution_path": "deterministic-skeleton-v3",
+    "openai_execution_path": "deterministic-skeleton-v4",
     "openai_legacy_engine_chars_not_sent": 1494152,
-    "openai_compact_developer_chars": 2213,
+    "openai_compact_developer_chars": 2687,
     "last_ai_usage": null,
     "last_build_timing": null,
     "storage": "supabase",
@@ -200,43 +205,43 @@
       "active": false
     }
   },
-  "job_id": "6c561d1424f865851f90675261118fe0",
-  "token": "76e4c8d61cd240f8a840e0baf68048e0",
+  "job_id": "96baa721c0f9598ef5fc50134cd2f619",
+  "token": "f37024eadcc7691adf201ac5e6b65b34",
   "last_job": {
     "status": "done",
     "stage": "finalizing",
     "attempt": 0,
     "detail": "saving program"
   },
-  "generation_seconds": 232,
+  "generation_seconds": 231,
   "health_after": {
     "ok": true,
     "mode": "openai",
     "model": "gpt-5.4",
-    "openai_execution_path": "deterministic-skeleton-v3",
+    "openai_execution_path": "deterministic-skeleton-v4",
     "openai_legacy_engine_chars_not_sent": 1494152,
-    "openai_compact_developer_chars": 2213,
+    "openai_compact_developer_chars": 2687,
     "last_ai_usage": {
       "provider": "openai",
       "model": "gpt-5.4",
       "reasoning_effort": "low",
-      "input_tokens": 3286,
+      "input_tokens": 3519,
       "cached_input_tokens": 0,
-      "output_tokens": 4536,
-      "reasoning_tokens": 1243,
-      "developer_chars": 2213,
-      "source_user_prompt_chars": 64877,
-      "sent_user_prompt_chars": 12371,
+      "output_tokens": 4847,
+      "reasoning_tokens": 1655,
+      "developer_chars": 2687,
+      "source_user_prompt_chars": 65027,
+      "sent_user_prompt_chars": 13140,
       "legacy_engine_chars_not_sent": 1494152,
-      "execution_path": "deterministic-skeleton-v3",
-      "elapsed_ms": 36156
+      "execution_path": "deterministic-skeleton-v4",
+      "elapsed_ms": 41267
     },
     "last_build_timing": {
-      "total_ms": 162996,
-      "pre_persist_ms": 43438,
-      "generation_and_qa_ms": 59049,
-      "openai_ms": 36156,
-      "save_to_visible_ms": 49105
+      "total_ms": 168194,
+      "pre_persist_ms": 43435,
+      "generation_and_qa_ms": 64247,
+      "openai_ms": 41267,
+      "save_to_visible_ms": 49125
     },
     "storage": "supabase",
     "storage_ok": true,
@@ -252,29 +257,29 @@
     "provider": "openai",
     "model": "gpt-5.4",
     "reasoning_effort": "low",
-    "input_tokens": 3286,
+    "input_tokens": 3519,
     "cached_input_tokens": 0,
-    "output_tokens": 4536,
-    "reasoning_tokens": 1243,
-    "developer_chars": 2213,
-    "source_user_prompt_chars": 64877,
-    "sent_user_prompt_chars": 12371,
+    "output_tokens": 4847,
+    "reasoning_tokens": 1655,
+    "developer_chars": 2687,
+    "source_user_prompt_chars": 65027,
+    "sent_user_prompt_chars": 13140,
     "legacy_engine_chars_not_sent": 1494152,
-    "execution_path": "deterministic-skeleton-v3",
-    "elapsed_ms": 36156
+    "execution_path": "deterministic-skeleton-v4",
+    "elapsed_ms": 41267
   },
   "build_timing": {
-    "total_ms": 162996,
-    "pre_persist_ms": 43438,
-    "generation_and_qa_ms": 59049,
-    "openai_ms": 36156,
-    "save_to_visible_ms": 49105
+    "total_ms": 168194,
+    "pre_persist_ms": 43435,
+    "generation_and_qa_ms": 64247,
+    "openai_ms": 41267,
+    "save_to_visible_ms": 49125
   },
   "score": {
-    "passed": 18,
-    "total": 21
+    "passed": 22,
+    "total": 22
   },
-  "quality_percent": 86,
+  "quality_percent": 100,
   "latency_score": {
     "passed": 1,
     "total": 2
