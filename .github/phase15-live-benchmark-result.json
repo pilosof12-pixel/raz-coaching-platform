@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-08-09T07:31:18.995Z",
+  "timestamp": "2026-08-09T07:49:36.358Z",
   "base": "https://raz-coaching-platform.onrender.com",
   "provider_expected": "openai",
   "model_expected": "gpt-5.4",
@@ -86,5 +86,5 @@
       "active": false
     }
   },
-  "error": "Error: OpenAI not active: mode=gemini model=gemini-2.5-flash. Refusing paid benchmark until deploy is ready.\n    at file:///home/runner/work/raz-coaching-platform/raz-coaching-platform/.github/phase15-live-benchmark.mjs:56:54\n    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)"
+  "error": "Error: OpenAI not active: mode=gemini model=gemini-2.5-flash. Refusing paid benchmark until deploy is ready.\n    at file:///home/runner/work/raz-coaching-platform/raz-coaching-platform/.github/phase15-live-benchmark.mjs:57:54\n    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)"
 }
