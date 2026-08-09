@@ -7,6 +7,7 @@ on:
       - 'phase14/engine/phase15_specialist_rules.js'
       - 'phase14/engine/skill_progressions.js'
       - 'phase14/engine/phase15_program_qa.js'
+      - 'phase14/engine/phase15_final_qa.js'
       - 'phase14/engine/phase15_quality_rules.js'
       - 'phase14/scripts/build_phase15_runtime.mjs'
       - 'phase14/test/phase15_planner_regression.test.mjs'
@@ -54,8 +55,11 @@ jobs:
           runcheck syntax_planner node --check engine/phase15_planner.js
           runcheck syntax_specialist node --check engine/phase15_specialist_rules.js
           runcheck syntax_program_qa node --check engine/phase15_program_qa.js
+          runcheck syntax_final_qa node --check engine/phase15_final_qa.js
           runcheck syntax_quality node --check engine/phase15_quality_rules.js
-          runcheck grep_v3 grep -q 'deterministic-skeleton-v3' server.phase15.js
+          runcheck grep_v4 grep -q 'deterministic-skeleton-v4' server.phase15.js
+          runcheck grep_final_qa grep -q 'validatePhase15FinalProgram' server.phase15.js
+          runcheck grep_direct_skill_protection grep -q 'if (!OPENAI_API_KEY)' server.phase15.js
           runcheck grep_normalizer grep -q 'normalizeOpenAIExerciseNames' server.phase15.js
           runcheck grep_fast_path grep -q 'fast new-client intake persist' server.phase15.js
           runcheck grep_specialist grep -q 'buildSpecialistRules' engine/phase15_planner.js
