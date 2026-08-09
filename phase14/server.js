@@ -16,6 +16,7 @@ import path from "node:path";
 import crypto from "node:crypto";
 import { fileURLToPath } from "node:url";
 import { makeStorage } from "./storage.js";
+import { registerAdminQaRoutes } from "./admin_qa_routes.js";
 // Engine v19: deterministic post-generation validators (dependency-free module,
 // also imported directly by test/v19_validators.test.js).
 import {
@@ -1438,6 +1439,7 @@ function privacyScrub(text, intake) {
 
 // ---------- App ----------
 const app = express();
+registerAdminQaRoutes(app, store);
 // Render and most production hosts sit behind a reverse proxy. Trust the first
 // proxy hop so rate limiting sees the real client IP instead of the proxy IP.
 app.set("trust proxy", 1);

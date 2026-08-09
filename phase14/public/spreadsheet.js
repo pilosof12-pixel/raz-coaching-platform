@@ -250,7 +250,7 @@
     // Data rows grouped by Day
     let groupStart = excelRow;
     let currentDay = null;
-    const dataRows = wk.rows.slice(1);
+    const dataRows = wk.rows.slice(1).filter((row) => !/^\s*\[WARMUP\]/i.test(row[1] || ""));
     // Apply a thick teal bottom border across all 9 columns of the given row
     // to visually separate one training day from the next.
     const applyDayBottomBorder = (excelRowNum) => {
@@ -399,16 +399,40 @@
     readme.getRow(row).height = 60;
   }
 
+  function renderWarmupProtocol(ws, week, options = {}) {
+    const isHebrew = !!options.isHebrew;
+    ws.views = [{ showGridLines: false, rightToLeft: isHebrew }];
+    ws.getColumn(1).width = 14; ws.getColumn(2).width = 72; ws.getColumn(3).width = 46;
+    ws.mergeCells('A1:C2');
+    const title=ws.getCell('A1'); title.value=isHebrew?'פרוטוקול חימום':'WARM-UP PROTOCOL';
+    styleCell(title,{fill:'FF000000',font:{name:'Calibri',size:18,bold:true,color:{argb:'FF18D3C5'}},alignment:{horizontal:isHebrew?'right':'left',vertical:'middle'},border:'FF000000'});
+    ws.getCell('A4').value=isHebrew?'יום':'Day'; ws.getCell('B4').value=isHebrew?'חימום / רמפה':'Warm-up / Ramp'; ws.getCell('C4').value=isHebrew?'הערות':'Notes';
+    for(let c=1;c<=3;c++) styleCell(ws.getRow(4).getCell(c),{fill:'FF18D3C5',font:{name:'Calibri',size:10,bold:true,color:{argb:'FF000000'}},border:'FF18D3C5'});
+    const rows=(week?.rows||[]).slice(1).filter(r=>/^\s*\[WARMUP\]/i.test(r[1]||''));
+    let er=5;
+    for(const row of rows){
+      setTextCell(ws.getRow(er).getCell(1),row[0]||'');
+      setTextCell(ws.getRow(er).getCell(2),String(row[1]||'').replace(/^\s*\[WARMUP\]\s*/i,''));
+      setTextCell(ws.getRow(er).getCell(3),row[7]||'');
+      for(let c=1;c<=3;c++) styleCell(ws.getRow(er).getCell(c),{fill:'FF111515',font:{name:'Calibri',size:9,color:{argb:'FFFFFFFF'}},alignment:{horizontal:c===1?'center':(isHebrew?'right':'left'),vertical:'middle',wrapText:true},border:'FF293332'});
+      ws.getRow(er).height=42; er++;
+    }
+    if(!rows.length){ws.getCell('A5').value=isHebrew?'לא נדרש פרוטוקול חימום נפרד.':'No separate warm-up rows were generated for this block.'; ws.mergeCells('A5:C6');}
+  }
+
   async function buildStrengthSpreadsheet(text, intake = {}) {
     if (!window.ExcelJS) throw new Error("Spreadsheet engine did not load. Check your connection and try again.");
     if (window.ExerciseDemos && window.ExerciseDemos.load) {
-      try { await window.ExerciseDemos.load(); } catch (e) { console.warn("Exercise demos failed to load, falling back to search:", e); }
+      try { await window.ExerciseDemos.load(); } catch (e) { console.warn("Exercise demos failed to load; direct links will remain unavailable:", e); }
     }
     const weeks = extractAllWeeks(text);
     const isHebrew = isHebrewProgram(text);
     const workbook = new ExcelJS.Workbook();
     workbook.creator = "Raz Pilosof Strength Program Coaching Engine";
     workbook.created = new Date();
+
+    const warmup = workbook.addWorksheet(isHebrew ? "פרוטוקול חימום" : "Warm-Up Protocol", { views: [{ showGridLines: false, rightToLeft: isHebrew }] });
+    renderWarmupProtocol(warmup, weeks[0], { isHebrew });
 
     // One styled sheet per week. No PASTE tabs.
     weeks.forEach((wk) => {
