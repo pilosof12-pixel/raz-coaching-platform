@@ -99,6 +99,7 @@ export function buildDeterministicBrief(intake = {}) {
     required.push(`OAP LEVEL: athlete already owns ${oap} strict One-Arm Pull-up reps. Program from demonstrated advanced level.`);
     required.push('OAP exposure A: strict One-Arm Pull-up singles or clusters, multiple high-quality singles per arm, normally at least 1 rep from technical failure.');
     required.push('OAP exposure B: Assisted One-Arm Pull-up doubles or triples with the minimum assistance needed for clean symmetrical reps. Progress by less assistance or more clean reps.');
+    required.push('OAP SPECIFICITY HIERARCHY: direct unilateral practice drives the skill. Weighted Chin-up or Weighted Pull-up is valuable base strength support, like wall HSPU supporting freestanding HSPU, but it never counts as either required direct OAP exposure.');
     forbidden.push('One-Arm Pull-up Eccentric/negative as either main OAP exposure for an athlete already owning 2+ strict reps.');
     forbidden.push('Archer Pull-up or generic bilateral pulling as a substitute for either required unilateral OAP exposure.');
     if (chin1rm) optional.push(`Weighted Chin-up may be used once weekly as bilateral support for OAP but never replace unilateral specificity. With current +${chin1rm} kg external-load 1RM, an initial 4-6 rep support range around +${round25(chin1rm*.55)} to +${round25(chin1rm*.72)} kg is plausible, autoregulated by RPE and elbow/grip freshness.`);
@@ -106,10 +107,10 @@ export function buildDeterministicBrief(intake = {}) {
 
   const strictOhpGoal = /overhead press|\bohp\b/i.test(secondary);
   if (strictOhpGoal) {
-    required.push('STRICT OHP IS A PROGRESSION GOAL, not maintenance. Use two meaningful strict Overhead Press exposures on separate days.');
-    required.push('OHP exposure A: strength-biased strict Overhead Press, usually 3-5 reps per set around RPE 7.5-8.5.');
-    required.push('OHP exposure B: volume/technique strict Overhead Press, usually 5-8 reps per set around RPE 6.5-8.');
-    required.push('Push Press may be an optional explosive overload, but it does not replace both strict OHP exposures.');
+    required.push('STRICT OHP IS A PROGRESSION GOAL, not maintenance. Keep at least one direct strict Overhead Press exposure every week.');
+    required.push('Use at least two meaningful vertical-press exposures on separate days. One should be direct strict Overhead Press. The second may deliberately vary the stimulus, for example a volume strict Overhead Press or Push Press overload, when that better manages fatigue and transfer.');
+    required.push('Variation is a tool, not random exercise rotation. The secondary press must have a clear job: strength reserve, overload, power, technique or volume, and must not reduce direct strict-OHP practice below one meaningful weekly exposure.');
+    required.push('OHP direct exposure: usually 3-6 reps per set around RPE 7-8.5. Secondary overhead exposure may use a different rep range or Push Press while staying submaximal enough to coexist with sport.');
     if (ohpCurrent) required.push(`Current strict OHP anchor is ${ohpCurrent.kg} kg${ohpCurrent.reps ? ` x about ${ohpCurrent.reps}+ reps` : ''}; prescribe from CURRENT performance, not historical PR or target.`);
     if (ohpGoal) required.push(`Long-term strict OHP target is about ${ohpGoal} kg; use repeatable submaximal progression, not token maintenance or weekly grinders.`);
     forbidden.push('Freestanding HSPU volume that steals recovery/session time from strict OHP when HSPU is explicitly nice-to-have.');
@@ -129,7 +130,7 @@ export function buildDeterministicBrief(intake = {}) {
   if (/hip thrust/i.test(pain) && /tolerat/i.test(pain)) optional.push('Hip Thrust or Glute Bridge is preferred low-spinal-fatigue posterior-chain assistance.');
   if (/cable lateral/i.test(maintenance)) required.push('Retain direct Cable Lateral Raise at minimum useful dose.');
   if (/face pull/i.test(maintenance)) required.push('Retain Face Pull at minimum useful dose.');
-  if (/explosive|jump|med ball|medicine ball/i.test(`${maintenance} ${notes}`)) required.push('Retain one or two very low-volume explosive primers. Use verified canonical Box Jump or Broad Jump unless another exact verified movement exists. Place after warm-up and before heavy strength; stop before velocity loss.');
+  if (/explosive|jump|med ball|medicine ball/i.test(`${maintenance} ${notes}`)) required.push('Retain one or two very low-volume explosive primers. For the current verified demo path use Box Jump. Place after warm-up and before heavy strength; stop before velocity loss.');
 
   const strengthDaysRequested = Number(intake.days_per_week)>=1 && (/strength sessions?|strength days?|strength/i.test(`${notes} ${primary} ${secondary}`) || String(intake.split_preference||'').toLowerCase()==='full_body');
   if (strengthDaysRequested) required.push(`ALL ${days.length} listed gym days are genuine strength/full-body sessions. Zone 2 may be appended/separate, but no gym day may be cardio-only. Every gym day needs real strength or advanced-skill work; with full-body preference it should normally include meaningful upper and lower/support work when recovery allows.`);
@@ -137,7 +138,7 @@ export function buildDeterministicBrief(intake = {}) {
   const labels=[];
   if (squatDual) labels.push('BOX_SQUAT_REP','BOX_SQUAT_HEAVY'); else if (squatGoal) labels.push('SQUAT_SPECIFIC');
   if (oapGoal && oap!=null && oap>=2) labels.push('OAP_ASSISTED_ADVANCED','OAP_STRICT'); else if (oapGoal) labels.push('OAP_SPECIFIC');
-  if (strictOhpGoal) labels.push('OHP_STRENGTH','OHP_VOLUME');
+  if (strictOhpGoal) labels.push('OHP_DIRECT','OHP_SECONDARY_VARIATION');
   if (zone2Goal) labels.push('ZONE2_A','ZONE2_B');
   const sessions=distribute(days,labels), cleanDays=days.filter(d=>!sport[d]);
   if (squatDual && cleanDays.length) { const d=cleanDays.at(-1); for (const x of days) sessions[x]=sessions[x].filter(v=>v!=='BOX_SQUAT_HEAVY'); sessions[d].unshift('BOX_SQUAT_HEAVY'); }
