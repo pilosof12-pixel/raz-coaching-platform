@@ -3,27 +3,27 @@ TAP version 13
 # Subtest: dual box squat outcomes stay distinct
 ok 1 - dual box squat outcomes stay distinct
   ---
-  duration_ms: 1.347956
+  duration_ms: 1.546531
   ...
 # Subtest: OAP prescription matches a two-rep strict athlete
 ok 2 - OAP prescription matches a two-rep strict athlete
   ---
-  duration_ms: 0.373169
+  duration_ms: 0.370423
   ...
 # Subtest: strict OHP gets two real exposures from the current level
 ok 3 - strict OHP gets two real exposures from the current level
   ---
-  duration_ms: 0.180779
+  duration_ms: 0.222887
   ...
 # Subtest: all four gym days remain strength days and aerobic work stays low fatigue
 ok 4 - all four gym days remain strength days and aerobic work stays low fatigue
   ---
-  duration_ms: 0.378388
+  duration_ms: 0.353431
   ...
 # Subtest: client-facing exercise naming has no review path in the brief
 ok 5 - client-facing exercise naming has no review path in the brief
   ---
-  duration_ms: 0.173755
+  duration_ms: 0.906235
   ...
 1..5
 # tests 5
@@ -33,29 +33,29 @@ ok 5 - client-facing exercise naming has no review path in the brief
 # cancelled 0
 # skipped 0
 # todo 0
-# duration_ms 68.112975
+# duration_ms 68.673906
 EXIT=0
 ===== specialist_rules =====
 TAP version 13
 # Subtest: planche goal activates authored Article N2 and observed-level rule
 ok 1 - planche goal activates authored Article N2 and observed-level rule
   ---
-  duration_ms: 7.907642
+  duration_ms: 7.887055
   ...
 # Subtest: weighted chin-up 1RM goal routes to maximal-strength Article N8
 ok 2 - weighted chin-up 1RM goal routes to maximal-strength Article N8
   ---
-  duration_ms: 0.918981
+  duration_ms: 0.949875
   ...
 # Subtest: weighted dip fixed-load rep goal routes to two-track loaded endurance
 ok 3 - weighted dip fixed-load rep goal routes to two-track loaded endurance
   ---
-  duration_ms: 0.577752
+  duration_ms: 0.556691
   ...
 # Subtest: street lifting classifier does not confuse max and endurance expressions
 ok 4 - street lifting classifier does not confuse max and endurance expressions
   ---
-  duration_ms: 0.211296
+  duration_ms: 0.163937
   ...
 1..4
 # tests 4
@@ -65,8 +65,47 @@ ok 4 - street lifting classifier does not confuse max and endurance expressions
 # cancelled 0
 # skipped 0
 # todo 0
-# duration_ms 72.880559
+# duration_ms 73.777003
 EXIT=0
+===== demo_coverage =====
+TAP version 13
+# file:///home/runner/work/raz-coaching-platform/raz-coaching-platform/phase14/data/lib/exerciseDemos.js:3
+# const fs = require('fs');
+#            ^
+# ReferenceError: require is not defined in ES module scope, you can use import instead
+# This file is being treated as an ES module because it has a '.js' file extension and '/home/runner/work/raz-coaching-platform/raz-coaching-platform/phase14/package.json' contains "type": "module". To treat it as a CommonJS script, rename it to use the '.cjs' file extension.
+#     at file:///home/runner/work/raz-coaching-platform/raz-coaching-platform/phase14/data/lib/exerciseDemos.js:3:12
+#     at ModuleJobSync.runSync (node:internal/modules/esm/module_job:437:37)
+#     at ModuleLoader.importSyncForRequire (node:internal/modules/esm/loader:389:47)
+#     at loadESMFromCJS (node:internal/modules/cjs/loader:1363:24)
+#     at Module._compile (node:internal/modules/cjs/loader:1503:5)
+#     at Module._extensions..js (node:internal/modules/cjs/loader:1623:10)
+#     at Module.load (node:internal/modules/cjs/loader:1266:32)
+#     at Module._load (node:internal/modules/cjs/loader:1091:12)
+#     at Module.require (node:internal/modules/cjs/loader:1289:19)
+#     at require (node:internal/modules/helpers:182:18)
+# Node.js v20.20.2
+# Subtest: /home/runner/work/raz-coaching-platform/raz-coaching-platform/phase14/test/exercise_demo_coverage.test.mjs
+not ok 1 - /home/runner/work/raz-coaching-platform/raz-coaching-platform/phase14/test/exercise_demo_coverage.test.mjs
+  ---
+  duration_ms: 43.775218
+  location: '/home/runner/work/raz-coaching-platform/raz-coaching-platform/phase14/test/exercise_demo_coverage.test.mjs:1:1'
+  failureType: 'testCodeFailure'
+  exitCode: 1
+  signal: ~
+  error: 'test failed'
+  code: 'ERR_TEST_FAILURE'
+  ...
+1..1
+# tests 1
+# suites 0
+# pass 0
+# fail 1
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 48.795023
+EXIT=1
 ===== build_runtime =====
 built server.phase15.js with deterministic skeleton v3 + canonical repair + fast new-client persistence
 EXIT=0
