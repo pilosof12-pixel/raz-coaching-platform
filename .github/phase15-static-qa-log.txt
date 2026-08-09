@@ -3,27 +3,27 @@ TAP version 13
 # Subtest: dual box squat outcomes stay distinct
 ok 1 - dual box squat outcomes stay distinct
   ---
-  duration_ms: 1.022212
+  duration_ms: 1.453345
   ...
 # Subtest: OAP prescription matches a two-rep strict athlete and separates direct from support work
 ok 2 - OAP prescription matches a two-rep strict athlete and separates direct from support work
   ---
-  duration_ms: 0.345658
+  duration_ms: 0.422573
   ...
 # Subtest: strict OHP keeps direct specificity while allowing purposeful variation
 ok 3 - strict OHP keeps direct specificity while allowing purposeful variation
   ---
-  duration_ms: 0.742452
+  duration_ms: 1.068353
   ...
 # Subtest: all four gym days remain strength days and aerobic work stays low fatigue
 ok 4 - all four gym days remain strength days and aerobic work stays low fatigue
   ---
-  duration_ms: 0.284907
+  duration_ms: 0.354475
   ...
 # Subtest: client-facing exercise naming has no review path in the brief
 ok 5 - client-facing exercise naming has no review path in the brief
   ---
-  duration_ms: 0.158007
+  duration_ms: 0.203352
   ...
 1..5
 # tests 5
@@ -33,39 +33,39 @@ ok 5 - client-facing exercise naming has no review path in the brief
 # cancelled 0
 # skipped 0
 # todo 0
-# duration_ms 58.800297
+# duration_ms 72.478062
 EXIT=0
 ===== specialist_rules =====
 TAP version 13
 # Subtest: planche goal activates Overcoming Gravity and observed-level rule
 ok 1 - planche goal activates Overcoming Gravity and observed-level rule
   ---
-  duration_ms: 5.968232
+  duration_ms: 7.924249
   ...
 # Subtest: gymnastics framework separates direct skill from support strength
 ok 2 - gymnastics framework separates direct skill from support strength
   ---
-  duration_ms: 0.404025
+  duration_ms: 0.550863
   ...
 # Subtest: session range uses upper end as ceiling and GPP remains optional
 ok 3 - session range uses upper end as ceiling and GPP remains optional
   ---
-  duration_ms: 1.40206
+  duration_ms: 1.71695
   ...
 # Subtest: weighted chin-up 1RM goal routes to maximal-strength Article N8
 ok 4 - weighted chin-up 1RM goal routes to maximal-strength Article N8
   ---
-  duration_ms: 0.706548
+  duration_ms: 0.974647
   ...
 # Subtest: weighted dip fixed-load rep goal routes to two-track loaded endurance
 ok 5 - weighted dip fixed-load rep goal routes to two-track loaded endurance
   ---
-  duration_ms: 0.415993
+  duration_ms: 0.50616
   ...
 # Subtest: street lifting classifier does not confuse max and endurance expressions
 ok 6 - street lifting classifier does not confuse max and endurance expressions
   ---
-  duration_ms: 0.101282
+  duration_ms: 0.146454
   ...
 1..6
 # tests 6
@@ -75,14 +75,14 @@ ok 6 - street lifting classifier does not confuse max and endurance expressions
 # cancelled 0
 # skipped 0
 # todo 0
-# duration_ms 57.620099
+# duration_ms 75.14098
 EXIT=0
 ===== demo_coverage =====
 TAP version 13
 # Subtest: every Phase 15 client-facing critical exercise resolves to a direct curated video
 ok 1 - every Phase 15 client-facing critical exercise resolves to a direct curated video
   ---
-  duration_ms: 1.668921
+  duration_ms: 2.338845
   ...
 1..1
 # tests 1
@@ -92,7 +92,7 @@ ok 1 - every Phase 15 client-facing critical exercise resolves to a direct curat
 # cancelled 0
 # skipped 0
 # todo 0
-# duration_ms 44.693482
+# duration_ms 63.785551
 EXIT=0
 ===== build_runtime =====
 built server.phase15.js with deterministic skeleton v4 + direct-skill protection + variation-aware final QA
@@ -102,6 +102,8 @@ EXIT=0
 ===== syntax_planner =====
 EXIT=0
 ===== syntax_specialist =====
+EXIT=0
+===== syntax_overcoming_gravity =====
 EXIT=0
 ===== syntax_program_qa =====
 EXIT=0
@@ -120,4 +122,6 @@ EXIT=0
 ===== grep_fast_path =====
 EXIT=0
 ===== grep_specialist =====
+EXIT=0
+===== grep_og =====
 EXIT=0
