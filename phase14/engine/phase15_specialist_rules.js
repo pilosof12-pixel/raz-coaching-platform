@@ -1,19 +1,17 @@
 // Goal-specific specialist rule router for the compact Phase 15 path.
-// These are distilled decision rules from the authored coaching clusters. They are
-// injected only when the intake calls for them, keeping the OpenAI prompt compact.
+// These are distilled decision rules from authored coaching clusters plus the
+// Overcoming Gravity gymnastics decision layer. They are injected only when relevant.
 
 import {
   getGoalFamily,
   parseSkillBenchmarks,
   selectRungForSkill,
 } from './skill_progressions.js';
+import { overcomingGravityRulesForFamily } from './overcoming_gravity_rules.js';
 
 function arr(v) { return Array.isArray(v) ? v : v ? [v] : []; }
 function str(v) { return typeof v === 'string' ? v : JSON.stringify(v || ''); }
 function goals(intake) {
-  // Specialist progression routers are for actual progression goals. A maintenance or
-  // nice-to-have mention must not activate a lower-rung skill prescription that competes
-  // with higher-priority goals.
   return [...arr(intake.primary_goals), ...arr(intake.secondary_goals)]
     .map(str).filter(Boolean);
 }
@@ -63,10 +61,9 @@ function gymnasticsRules(intake) {
 
     let selection = null;
     try { selection = selectRungForSkill(family, benchmarks, intake); } catch (_) {}
-    out.push(`SPECIALIST SOURCE: Advanced Gymnastics / skill graph family=${family}.`);
-    out.push('Universal skill rule: direct exposure to the actual skill family remains the anchor once the athlete can perform a measurable tolerated version. Assistance supports specificity; it does not replace it. Quality stops the set before technically poor attempts accumulate.');
+    out.push(`SPECIALIST SOURCE: Overcoming Gravity decision layer + verified skill graph, family=${family}.`);
+    out.push(...overcomingGravityRulesForFamily(family));
     out.push('Anti-hallucination rule: prescribe only complete named variations that exist in the verified skill graph/exercise library. Never invent a banded, wall, eccentric, partial, one-leg, tuck or deficit variation by wording alone.');
-    out.push('Ordering rule: primary skill work is performed after warm-up and any genuinely non-fatiguing primer, before fatigue-producing strength/hypertrophy work.');
 
     const explicitOap = family === 'one_arm_pull_up' ? currentOapStrict(intake) : null;
     if (explicitOap != null && explicitOap >= 1) {
@@ -76,10 +73,8 @@ function gymnasticsRules(intake) {
     }
 
     if (family === 'planche') {
-      out.push('Article N2 Planche rule: use the verified route Planche Lean -> Tuck Planche -> Advanced Tuck Planche -> Straddle Planche -> Full Planche, but do NOT regress an athlete who already demonstrates a harder clean rung.');
-      out.push('Planche readiness heuristics are quality-based: roughly 20s clean lean supports tuck work; about 10-15s clean tuck supports advanced tuck; about 10-15s clean advanced tuck supports meaningful straddle work. These are heuristics, not mandatory gates.');
-      out.push('Planche technique standard: locked elbows, strong protraction, controlled shoulder position, posterior pelvic tilt, active glutes and rigid body line. Bent-elbow or large-lumbar-extension holds do not count as progression evidence.');
-      out.push('Planche programming: give at least two weekly high-quality specific exposures when it is a primary goal and recovery permits. Use short repeatable quality holds/attempts and verified planche-family support work rather than fatigue-chasing.');
+      out.push('Authored Planche route remains verified: Planche Lean -> Tuck Planche -> Advanced Tuck Planche -> Straddle Planche -> Full Planche, but demonstrated ability overrides a forced regression to an easier rung.');
+      out.push('Planche readiness numbers are heuristics only. Technique quality, clean hold duration, pain tolerance and repeatability decide progression.');
     }
   }
   return out;
