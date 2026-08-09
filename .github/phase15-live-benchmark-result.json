@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-08-09T09:41:35.697Z",
+  "timestamp": "2026-08-09T11:41:02.939Z",
   "base": "https://raz-coaching-platform.onrender.com",
   "provider_expected": "openai",
   "model_expected": "gpt-5.4",
@@ -79,12 +79,12 @@
     {
       "name": "build accepted",
       "ok": true,
-      "detail": "{\"job_id\":\"283cc4c733a65de1dc0a8675c566917b\",\"token\":\"5e2539bdea9b1d7d6cf1b40d3e0a572c\",\"status\":\"pending\"}"
+      "detail": "{\"job_id\":\"6c561d1424f865851f90675261118fe0\",\"token\":\"76e4c8d61cd240f8a840e0baf68048e0\",\"status\":\"pending\"}"
     },
     {
       "name": "program generated",
       "ok": true,
-      "detail": "chars=8337; seconds=232"
+      "detail": "chars=9151; seconds=232"
     },
     {
       "name": "single paid pass telemetry",
@@ -94,7 +94,7 @@
     {
       "name": "compact prompt actually sent",
       "ok": true,
-      "detail": "{\"provider\":\"openai\",\"model\":\"gpt-5.4\",\"reasoning_effort\":\"low\",\"input_tokens\":2890,\"cached_input_tokens\":0,\"output_tokens\":4097,\"reasoning_tokens\":1230,\"developer_chars\":2213,\"source_user_prompt_chars\":65566,\"sent_user_prompt_chars\":10778,\"legacy_engine_chars_not_sent\":1494152,\"execution_path\":\"deterministic-skeleton-v3\",\"elapsed_ms\":36325}"
+      "detail": "{\"provider\":\"openai\",\"model\":\"gpt-5.4\",\"reasoning_effort\":\"low\",\"input_tokens\":3286,\"cached_input_tokens\":0,\"output_tokens\":4536,\"reasoning_tokens\":1243,\"developer_chars\":2213,\"source_user_prompt_chars\":64877,\"sent_user_prompt_chars\":12371,\"legacy_engine_chars_not_sent\":1494152,\"execution_path\":\"deterministic-skeleton-v3\",\"elapsed_ms\":36156}"
     },
     {
       "name": "one block per week",
@@ -114,12 +114,12 @@
     {
       "name": "squat max plus rep-strength coverage",
       "ok": true,
-      "detail": "[[\"Wed\",\"Box Squat to Parallel\",\"155 kg\",\"6\",\"7.5\"],[\"Sat\",\"Box Squat to Parallel\",\"175 kg\",\"3\",\"8\"]]"
+      "detail": "[[\"Wed\",\"Box Squat to Parallel\",\"155 kg\",\"6\",\"7\"],[\"Sat\",\"Box Squat to Parallel\",\"180 kg\",\"3\",\"8\"]]"
     },
     {
       "name": "box squat loads calibrated to current 210 kg max",
       "ok": true,
-      "detail": "[{\"reps\":6,\"kg\":155},{\"reps\":3,\"kg\":175}]"
+      "detail": "[{\"reps\":6,\"kg\":155},{\"reps\":3,\"kg\":180}]"
     },
     {
       "name": "OAP advanced stage",
@@ -127,9 +127,9 @@
       "detail": "[]"
     },
     {
-      "name": "OHP meaningful frequency",
+      "name": "two strict OHP exposures",
       "ok": true,
-      "detail": "[[\"Wed\",\"Standing Barbell Overhead Press\",\"67.5 kg\",\"5\",\"3\"],[\"Fri\",\"Push Press\",\"72.5 kg\",\"5\",\"3\"]]"
+      "detail": "{\"strict\":[[\"Wed\",\"Overhead Press\",\"67.5 kg\",\"4\",\"4\"],[\"Fri\",\"Overhead Press\",\"60 kg\",\"4\",\"6\"]],\"push\":[]}"
     },
     {
       "name": "pain tolerance acknowledged",
@@ -144,22 +144,27 @@
     {
       "name": "conditioning interference",
       "ok": true,
-      "detail": "{\"hard\":[],\"zone2\":[[\"Wed\",\"[WARMUP] Zone-2 Row\",\"5 min\"],[\"Fri\",\"[WARMUP] Zone-2 Bike\",\"5 min\"],[\"Sat\",\"[WARMUP] Zone-2 Row\",\"5 min\"],[\"Sat\",\"Zone-2 Bike\",\"22 min\"],[\"Sun\",\"[WARMUP] Zone-2 Bike\",\"4 min\"],[\"Sun\",\"Zone-2 Row\",\"20 min\"]]}"
+      "detail": "{\"hard\":[],\"zone2\":[[\"Sat\",\"Zone-2 Bike\",\"22 min\"],[\"Sun\",\"Zone-2 Row\",\"20 min\"]]}"
     },
     {
       "name": "Zone 2 doses are meaningful",
       "ok": true,
-      "detail": "[5,5,5,22,4,20]"
+      "detail": "[22,20]"
     },
     {
       "name": "maintenance accessories retained",
       "ok": true,
-      "detail": "{\"lateral\":[\"Fri\"],\"face\":[\"Sun\"]}"
+      "detail": "{\"lateral\":[\"Fri\",\"Sun\"],\"face\":[\"Wed\",\"Sun\"]}"
     },
     {
       "name": "no unresolved review/support markers",
       "ok": false,
       "detail": "[[\"Sat\",\"[REVIEW] duplicate skill row removed\"]]"
+    },
+    {
+      "name": "every client working exercise has direct curated demo",
+      "ok": false,
+      "detail": "{\"missing\":[\"Broad Jump\",\"Scapular Pull-up\",\"[REVIEW] duplicate skill row removed\"],\"checked\":[\"Broad Jump\",\"Box Squat to Parallel\",\"Overhead Press\",\"Face Pull\",\"Weighted Pull-Up\",\"Scapular Pull-up\",\"Hip Thrust\",\"Cable Lateral Raise\",\"[REVIEW] duplicate skill row removed\",\"Zone-2 Bike\",\"Weighted Chin-up\",\"Zone-2 Row\"]}"
     }
   ],
   "latency_checks": [
@@ -171,7 +176,7 @@
     {
       "name": "OpenAI call under 60s",
       "ok": true,
-      "detail": "{\"provider\":\"openai\",\"model\":\"gpt-5.4\",\"reasoning_effort\":\"low\",\"input_tokens\":2890,\"cached_input_tokens\":0,\"output_tokens\":4097,\"reasoning_tokens\":1230,\"developer_chars\":2213,\"source_user_prompt_chars\":65566,\"sent_user_prompt_chars\":10778,\"legacy_engine_chars_not_sent\":1494152,\"execution_path\":\"deterministic-skeleton-v3\",\"elapsed_ms\":36325}"
+      "detail": "{\"provider\":\"openai\",\"model\":\"gpt-5.4\",\"reasoning_effort\":\"low\",\"input_tokens\":3286,\"cached_input_tokens\":0,\"output_tokens\":4536,\"reasoning_tokens\":1243,\"developer_chars\":2213,\"source_user_prompt_chars\":64877,\"sent_user_prompt_chars\":12371,\"legacy_engine_chars_not_sent\":1494152,\"execution_path\":\"deterministic-skeleton-v3\",\"elapsed_ms\":36156}"
     }
   ],
   "ok": false,
@@ -195,8 +200,8 @@
       "active": false
     }
   },
-  "job_id": "283cc4c733a65de1dc0a8675c566917b",
-  "token": "5e2539bdea9b1d7d6cf1b40d3e0a572c",
+  "job_id": "6c561d1424f865851f90675261118fe0",
+  "token": "76e4c8d61cd240f8a840e0baf68048e0",
   "last_job": {
     "status": "done",
     "stage": "finalizing",
@@ -215,23 +220,23 @@
       "provider": "openai",
       "model": "gpt-5.4",
       "reasoning_effort": "low",
-      "input_tokens": 2890,
+      "input_tokens": 3286,
       "cached_input_tokens": 0,
-      "output_tokens": 4097,
-      "reasoning_tokens": 1230,
+      "output_tokens": 4536,
+      "reasoning_tokens": 1243,
       "developer_chars": 2213,
-      "source_user_prompt_chars": 65566,
-      "sent_user_prompt_chars": 10778,
+      "source_user_prompt_chars": 64877,
+      "sent_user_prompt_chars": 12371,
       "legacy_engine_chars_not_sent": 1494152,
       "execution_path": "deterministic-skeleton-v3",
-      "elapsed_ms": 36325
+      "elapsed_ms": 36156
     },
     "last_build_timing": {
-      "total_ms": 163084,
-      "pre_persist_ms": 43448,
-      "generation_and_qa_ms": 59124,
-      "openai_ms": 36325,
-      "save_to_visible_ms": 49116
+      "total_ms": 162996,
+      "pre_persist_ms": 43438,
+      "generation_and_qa_ms": 59049,
+      "openai_ms": 36156,
+      "save_to_visible_ms": 49105
     },
     "storage": "supabase",
     "storage_ok": true,
@@ -247,29 +252,29 @@
     "provider": "openai",
     "model": "gpt-5.4",
     "reasoning_effort": "low",
-    "input_tokens": 2890,
+    "input_tokens": 3286,
     "cached_input_tokens": 0,
-    "output_tokens": 4097,
-    "reasoning_tokens": 1230,
+    "output_tokens": 4536,
+    "reasoning_tokens": 1243,
     "developer_chars": 2213,
-    "source_user_prompt_chars": 65566,
-    "sent_user_prompt_chars": 10778,
+    "source_user_prompt_chars": 64877,
+    "sent_user_prompt_chars": 12371,
     "legacy_engine_chars_not_sent": 1494152,
     "execution_path": "deterministic-skeleton-v3",
-    "elapsed_ms": 36325
+    "elapsed_ms": 36156
   },
   "build_timing": {
-    "total_ms": 163084,
-    "pre_persist_ms": 43448,
-    "generation_and_qa_ms": 59124,
-    "openai_ms": 36325,
-    "save_to_visible_ms": 49116
+    "total_ms": 162996,
+    "pre_persist_ms": 43438,
+    "generation_and_qa_ms": 59049,
+    "openai_ms": 36156,
+    "save_to_visible_ms": 49105
   },
   "score": {
     "passed": 18,
-    "total": 20
+    "total": 21
   },
-  "quality_percent": 90,
+  "quality_percent": 86,
   "latency_score": {
     "passed": 1,
     "total": 2
