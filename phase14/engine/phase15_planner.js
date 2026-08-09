@@ -36,9 +36,18 @@ function currentOap(intake) {
 }
 
 function currentBoxSquatMax(intake) {
-  const lines = txt(intake.current_numbers || intake.performance_markers || intake.current_strength).split(/\n|\||;/).map(x=>x.trim()).filter(Boolean);
+  const lines = txt(intake.current_numbers || intake.performance_markers || intake.current_strength).split(/\n|\|/).map(x=>x.trim()).filter(Boolean);
   const relevant = lines.filter(x => /box squat/i.test(x) && !/speed box squat/i.test(x));
-  const nums = relevant.flatMap(line => [...line.matchAll(/(\d+(?:\.\d+)?)\s*kg/gi)].map(m=>Number(m[1]))).filter(Number.isFinite);
+  const candidates = [];
+  for (const line of relevant) {
+    // Current-number lines often contain e.g. "205 kg confirmed; approximately 210 current max".
+    // Parse both explicitly unit-labelled loads and a max/1RM number even when "kg" is omitted on the second number.
+    for (const m of line.matchAll(/(\d+(?:\.\d+)?)\s*kg/gi)) candidates.push(Number(m[1]));
+    for (const re of [/(?:approximately|approx(?:imately)?|current|confirmed)[^\d]{0,25}(\d+(?:\.\d+)?)(?:\s*kg)?[^\n]{0,25}(?:max|1\s*rm|1rm)/i, /(\d+(?:\.\d+)?)(?:\s*kg)?\s*(?:current\s*)?(?:max|1\s*rm|1rm)/i]) {
+      const m = line.match(re); if (m) candidates.push(Number(m[1]));
+    }
+  }
+  const nums = candidates.filter(x => Number.isFinite(x) && x >= 20 && x <= 500);
   return nums.length ? Math.max(...nums) : null;
 }
 
@@ -52,7 +61,7 @@ function currentOhp(intake) {
 
 function ohpTarget(intake) {
   const s = txt(intake.secondary_goals || intake.primary_goals);
-  const m = s.match(/(?:overhead press|ohp)[^\d]{0,80}(?:toward|towards|to|target)[^\d]{0,20}(\d+(?:\.\d+)?)\s*kg/i) || s.match(/(?:overhead press|ohp)[^\d]{0,80}(\d+(?:\.\d+)?)\s*kg/i);
+  const m = s.match(/(?:overhead press|ohp)[^\d]{0,100}(?:toward|towards|target)[^\d]{0,20}(\d+(?:\.\d+)?)\s*kg/i) || s.match(/(?:overhead press|ohp)[^\d]{0,80}(\d+(?:\.\d+)?)\s*kg/i);
   return m ? Number(m[1]) : null;
 }
 
