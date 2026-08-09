@@ -1,8 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { createRequire } from 'node:module';
-const require = createRequire(import.meta.url);
-const { resolveExerciseDemo } = require('../data/lib/exerciseDemos.js');
+import { resolveExerciseDemo } from '../data/lib/exerciseDemos.js';
 
 const required = [
   'Box Squat to Parallel',
