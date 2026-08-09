@@ -1,11 +1,12 @@
 // data/lib/exerciseDemos.js
-// Node-side direct-only resolver for curated client demo links.
-const fs = require('fs');
-const path = require('path');
+// ESM direct-only resolver for curated client demo links.
+import fs from 'node:fs';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 
-const demos = JSON.parse(
-  fs.readFileSync(path.join(__dirname, '..', 'exercise_demos.json'), 'utf8')
-);
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+const demos = JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'exercise_demos.json'), 'utf8'));
 const overridePath = path.join(__dirname, '..', 'exercise_demo_overrides.json');
 const overrides = fs.existsSync(overridePath)
   ? JSON.parse(fs.readFileSync(overridePath, 'utf8'))
@@ -13,11 +14,11 @@ const overrides = fs.existsSync(overridePath)
 
 const mergedEntries = { ...(demos.entries || {}), ...(overrides.entries || {}) };
 
-function normalizeExerciseName(name) {
+export function normalizeExerciseName(name) {
   return String(name || '').toLowerCase().replace(/\([^)]*\)/g, '').replace(/[^a-z0-9]+/g, '_').replace(/_+/g, '_').replace(/^_|_$/g, '');
 }
 
-function resolveExerciseDemo(name) {
+export function resolveExerciseDemo(name) {
   if (!name) return null;
   const key = normalizeExerciseName(name);
   const direct = mergedEntries[key];
@@ -28,7 +29,7 @@ function resolveExerciseDemo(name) {
   return null;
 }
 
-function getPrivacyDisclosure() { return demos.policy?.privacy_disclosure || null; }
-function hasCuratedDemo(name) { return !!resolveExerciseDemo(name); }
-
-module.exports = { normalizeExerciseName, resolveExerciseDemo, hasCuratedDemo, getPrivacyDisclosure, demos: { ...demos, entries: mergedEntries } };
+export function getPrivacyDisclosure() { return demos.policy?.privacy_disclosure || null; }
+export function hasCuratedDemo(name) { return !!resolveExerciseDemo(name); }
+export { mergedEntries as entries };
+export const exerciseDemos = { ...demos, entries: mergedEntries };
