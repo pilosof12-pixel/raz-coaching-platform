@@ -13,12 +13,13 @@ on:
       - 'phase14/test/phase15_specialist_rules.test.mjs'
       - 'phase14/test/exercise_demo_coverage.test.mjs'
       - 'phase14/public/exerciseDemos.js'
+      - 'phase14/data/lib/exerciseDemos.js'
       - 'phase14/data/exercise_demos.json'
       - '.github/workflows/phase15-static-qa.yml'
   workflow_dispatch:
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
   static-qa:
@@ -29,8 +30,11 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '20'
-      - name: Run deterministic coaching regressions
+      - id: qa
+        name: Run deterministic coaching regressions
+        continue-on-error: true
         run: |
+          set -e
           cd phase14
           node --test test/phase15_planner_regression.test.mjs
           node --test test/phase15_specialist_rules.test.mjs
@@ -45,3 +49,31 @@ jobs:
           grep -q 'normalizeOpenAIExerciseNames' server.phase15.js
           grep -q 'fast new-client intake persist' server.phase15.js
           grep -q 'buildSpecialistRules' engine/phase15_planner.js
+      - name: Write static QA result
+        if: always()
+        env:
+          QA_OUTCOME: ${{ steps.qa.outcome }}
+          SHA: ${{ github.sha }}
+        run: |
+          node - <<'NODE'
+          const fs=require('fs');
+          fs.writeFileSync('.github/phase15-static-qa-result.json', JSON.stringify({
+            timestamp:new Date().toISOString(),
+            tested_sha:process.env.SHA,
+            outcome:process.env.QA_OUTCOME,
+            ok:process.env.QA_OUTCOME==='success'
+          },null,2));
+          NODE
+      - name: Commit static QA result
+        if: always()
+        run: |
+          git config user.name 'RAZ static QA bot'
+          git config user.email 'actions@users.noreply.github.com'
+          git pull --rebase origin main || true
+          git add .github/phase15-static-qa-result.json
+          if git diff --cached --quiet; then exit 0; fi
+          git commit -m 'Record Phase 15 static QA result'
+          git push
+      - name: Fail if QA failed
+        if: steps.qa.outcome != 'success'
+        run: exit 1
