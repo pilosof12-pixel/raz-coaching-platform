@@ -1,0 +1,91 @@
+Keep every main set crisp and leave 1-2 reps in reserve unless the note says otherwise. The priority is strong practice with low spillover into BJJ/MMA, not grinders.
+
+Weeks 2-4: add reps first on the rep box squat, add small load only when bar speed and position stay clean, build One-Arm Pull-up quality by more total clean singles or less assistance, and progress Overhead Press/Push Press in small steps without forcing misses.
+
+If low back symptoms rise, keep box height strict to parallel, brace harder, and reduce box squat load 5-10%. If elbow or biceps tendon gets irritated on One-Arm Pull-up work, keep the strict exposure but cut 1-2 sets and use slightly more help on Assisted One-Arm Pull-up. Skip any rep that shifts hard through the spine or loses shoulder position.
+
+START_WEEK1_TSV
+Day	Exercise	Weight	Sets	Reps	Rest	Target RPE	Notes	Results
+Wed	[WARMUP]	Bodyweight + empty bar	1	1	—	—	5-7 min total: bike 2 min, hip/shoulder prep, then Box Squat to Parallel ramp 20x5 60x5 100x3 130x2 and Overhead Press ramp 20x8 40x5 55x3	
+Wed	Box Jump	Bodyweight	3	2	60 sec	5	Low box, reset each rep, stop well before any slowdown	
+Wed	Box Squat to Parallel	155 kg	3	6	3-4 min	7.5	Sit back to consistent parallel box, vertical shin tolerance okay, no lumbar flexion	
+Wed	Overhead Press	70 kg	4	4	2-3 min	7.5	Strict standing reps, glutes and abs locked, no layback grind	
+Fri	[WARMUP]	Bodyweight + empty bar	1	1	—	—	5-6 min total: row 2 min, scap prep, hanging shoulder set, then Push Press ramp 20x5 40x3 60x2	
+Fri	One-Arm Pull-up	Bodyweight	5	1/arm	75-90 sec between arms	8	High-quality singles only, start from dead hang, stop at least 1 rep before technical failure	
+Fri	Push Press	77.5 kg	4	3	2-3 min	7.5	Use leg drive to overload lockout, smooth dip and vertical drive	
+Fri	Cable Lateral Raise	Moderate	2	12-15	60 sec	8	Direct delt work, controlled top position	
+Sat	[WARMUP]	Bodyweight + empty bar	1	1	—	—	6-7 min total: bike 2 min, hip brace prep, then Box Squat to Parallel ramp 20x5 60x5 100x3 140x2 165x1	
+Sat	Box Jump	Bodyweight	3	2	60 sec	5	Low fatigue primer, full reset each rep	
+Sat	Box Squat to Parallel	180 kg	4	2	4 min	8	Heavy but non-grinding doubles, sit to box under control and drive up fast	
+Sat	Assisted One-Arm Pull-up	Bodyweight, minimal assistance	4	2/arm	75-90 sec between arms	7.5	Use the least help needed for symmetrical clean doubles	
+Sat	Zone-2 Row	Easy-moderate	1	25 min	—	6	Nasal-breathing pace if possible, conversational effort	
+Sun	[WARMUP]	Bodyweight + empty bar	1	1	—	—	5-6 min total: bike 2 min, glute activation, scap prep, then Hip Thrust ramp 60x6 100x4	
+Sun	Weighted Chin-up	+50 kg	4	4	2-3 min	7.5	Support strength for One-Arm Pull-up, full hang to chin clearly over bar, no grind	
+Sun	Hip Thrust	120 kg	3	8	2 min	7	Low spinal fatigue posterior-chain work, full lockout pause	
+Sun	Face Pull	Moderate	2	15	60 sec	7	Direct upper-back/rear-delt maintenance, smooth scap motion	
+Sun	Zone-2 Bike	Easy-moderate	1	25 min	—	6	Steady pace, keep legs fresh for mat work	
+END_WEEK1_TSV
+START_WEEK2_TSV
+Day	Exercise	Weight	Sets	Reps	Rest	Target RPE	Notes	Results
+Wed	[WARMUP]	Bodyweight + empty bar	1	1	—	—	5-7 min total: bike 2 min, hip/shoulder prep, then Box Squat to Parallel ramp 20x5 60x5 100x3 130x2 and Overhead Press ramp 20x8 40x5 55x3	
+Wed	Box Jump	Bodyweight	3	2	60 sec	5	Same box as week 1 unless jumps feel unusually sharp	
+Wed	Box Squat to Parallel	155 kg	3	7	3-4 min	7.5	Earn extra reps before load jump, same clean box contact every rep	
+Wed	Overhead Press	72.5 kg	4	4	2-3 min	8	Strict standing reps, no push press bleedover	
+Fri	[WARMUP]	Bodyweight + empty bar	1	1	—	—	5-6 min total: row 2 min, scap prep, hanging shoulder set, then Push Press ramp 20x5 40x3 60x2	
+Fri	One-Arm Pull-up	Bodyweight	6	1/arm	75-90 sec between arms	8	Add one clean single per arm only if week 1 stayed crisp	
+Fri	Push Press	80 kg	4	3	2-3 min	8	Strong but submaximal overload, no press-out grind	
+Fri	Cable Lateral Raise	Moderate	2	12-15	60 sec	8	Same or slightly heavier than week 1 if form stays clean	
+Sat	[WARMUP]	Bodyweight + empty bar	1	1	—	—	6-7 min total: bike 2 min, hip brace prep, then Box Squat to Parallel ramp 20x5 60x5 100x3 140x2 170x1	
+Sat	Box Jump	Bodyweight	3	2	60 sec	5	Stop if jump height drops	
+Sat	Box Squat to Parallel	182.5 kg	4	2	4 min	8	Heavy doubles, bar speed should still look athletic	
+Sat	Assisted One-Arm Pull-up	Bodyweight, slightly less assistance	4	2/arm	75-90 sec between arms	7.5	Reduce help a touch if week 1 was very clean	
+Sat	Zone-2 Row	Easy-moderate	1	25 min	—	6	Steady aerobic work, not a fitness test	
+Sun	[WARMUP]	Bodyweight + empty bar	1	1	—	—	5-6 min total: bike 2 min, glute activation, scap prep, then Hip Thrust ramp 60x6 100x4	
+Sun	Weighted Chin-up	+52.5 kg	4	4	2-3 min	7.5	If elbows feel beat up, keep +50 kg and match quality instead	
+Sun	Hip Thrust	125 kg	3	8	2 min	7.5	Smooth lockout, no lumbar overextension	
+Sun	Face Pull	Moderate	2	15	60 sec	7	Add a small weight jump only if scap control stays perfect	
+Sun	Zone-2 Bike	Easy-moderate	1	25 min	—	6	Conversational pace, finish feeling better than you started	
+END_WEEK2_TSV
+START_WEEK3_TSV
+Day	Exercise	Weight	Sets	Reps	Rest	Target RPE	Notes	Results
+Wed	[WARMUP]	Bodyweight + empty bar	1	1	—	—	5-7 min total: bike 2 min, hip/shoulder prep, then Box Squat to Parallel ramp 20x5 60x5 100x3 135x2 and Overhead Press ramp 20x8 40x5 57.5x3	
+Wed	Box Jump	Bodyweight	3	2	60 sec	5	Same low-fatigue primer, full reset	
+Wed	Box Squat to Parallel	157.5 kg	3	7	3-4 min	8	Load rises only after clean week 2 reps	
+Wed	Overhead Press	72.5 kg	5	4	2-3 min	8	Extra set for meaningful direct press volume if recovery is okay	
+Fri	[WARMUP]	Bodyweight + empty bar	1	1	—	—	5-6 min total: row 2 min, scap prep, hanging shoulder set, then Push Press ramp 20x5 40x3 60x2	
+Fri	One-Arm Pull-up	Bodyweight	6	1/arm	75-90 sec between arms	8	Keep every single identical; stop early if elbow or shoulder quality drops	
+Fri	Push Press	80 kg	5	3	2-3 min	8	Volume overload for vertical press without turning it into a grind	
+Fri	Cable Lateral Raise	Moderate	2	12-15	60 sec	8	Direct delt maintenance, strict tempo	
+Sat	[WARMUP]	Bodyweight + empty bar	1	1	—	—	6-7 min total: bike 2 min, hip brace prep, then Box Squat to Parallel ramp 20x5 60x5 100x3 140x2 170x1	
+Sat	Box Jump	Bodyweight	3	2	60 sec	5	Explosive but easy, no fatigue chasing	
+Sat	Box Squat to Parallel	185 kg	4	2	4 min	8.5	Still no grinding; if bar speed is off, hold at 182.5 kg	
+Sat	Assisted One-Arm Pull-up	Bodyweight, minimal assistance	4	3/arm	75-90 sec between arms	8	Move to triples only if doubles were clean and symmetrical last week	
+Sat	Zone-2 Row	Easy-moderate	1	27 min	—	6	Slightly longer steady work, keep it relaxed	
+Sun	[WARMUP]	Bodyweight + empty bar	1	1	—	—	5-6 min total: bike 2 min, glute activation, scap prep, then Hip Thrust ramp 60x6 100x4	
+Sun	Weighted Chin-up	+55 kg	4	4	2-3 min	8	Support strength only; preserve elbows and grip for One-Arm Pull-up work	
+Sun	Hip Thrust	130 kg	3	8	2 min	7.5	Pause at top, controlled lower	
+Sun	Face Pull	Moderate	2	15	60 sec	7	Keep shoulders down and back, no shrugging	
+Sun	Zone-2 Bike	Easy-moderate	1	27 min	—	6	Steady base work, low fatigue finish	
+END_WEEK3_TSV
+START_WEEK4_TSV
+Day	Exercise	Weight	Sets	Reps	Rest	Target RPE	Notes	Results
+Wed	[WARMUP]	Bodyweight + empty bar	1	1	—	—	5-7 min total: bike 2 min, hip/shoulder prep, then Box Squat to Parallel ramp 20x5 60x5 100x3 135x2 and Overhead Press ramp 20x8 40x5 57.5x3	
+Wed	Box Jump	Bodyweight	3	2	60 sec	5	Same easy primer, sharp contacts only	
+Wed	Box Squat to Parallel	157.5 kg	3	8	3-4 min	8	Complete all reps clean before moving load next block	
+Wed	Overhead Press	75 kg	4	4	2-3 min	8.5	This is the key direct press week; no missed reps	
+Fri	[WARMUP]	Bodyweight + empty bar	1	1	—	—	5-6 min total: row 2 min, scap prep, hanging shoulder set, then Push Press ramp 20x5 40x3 60x2	
+Fri	One-Arm Pull-up	Bodyweight	7	1/arm	75-90 sec between arms	8	Accumulate more crisp singles, never chase a sloppy rep	
+Fri	Push Press	82.5 kg	4	3	2-3 min	8	Small overload increase, keep timing smooth and vertical	
+Fri	Cable Lateral Raise	Moderate	2	12-15	60 sec	8	Same load or slight bump if shoulders feel good	
+Sat	[WARMUP]	Bodyweight + empty bar	1	1	—	—	6-7 min total: bike 2 min, hip brace prep, then Box Squat to Parallel ramp 20x5 60x5 100x3 140x2 175x1	
+Sat	Box Jump	Bodyweight	3	2	60 sec	5	Stop while jumps are still snappy	
+Sat	Box Squat to Parallel	187.5 kg	4	2	4 min	8.5	Heavy doubles to push max-strength side without spilling fatigue	
+Sat	Assisted One-Arm Pull-up	Bodyweight, slightly less assistance	4	3/arm	75-90 sec between arms	8	Keep the least help that still allows crisp full-range triples	
+Sat	Zone-2 Row	Easy-moderate	1	30 min	—	6	Steady row, low enough effort to aid recovery	
+Sun	[WARMUP]	Bodyweight + empty bar	1	1	—	—	5-6 min total: bike 2 min, glute activation, scap prep, then Hip Thrust ramp 60x6 100x4	
+Sun	Weighted Chin-up	+57.5 kg	4	4	2-3 min	8	If elbows are irritated, hold week 3 load and keep quality high	
+Sun	Hip Thrust	135 kg	3	8	2 min	8	Low-spinal-fatigue lower work, hard glute lockout	
+Sun	Face Pull	Moderate	2	15	60 sec	7	Smooth reps, no momentum	
+Sun	Zone-2 Bike	Easy-moderate	1	30 min	—	6	Recovery-positive pace, finish with energy left	
+END_WEEK4_TSV
+<!-- QA_FORMULA_VIOLATION_COUNT: 1 -->
