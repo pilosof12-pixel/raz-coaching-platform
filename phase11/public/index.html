@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>RAZ Performance — Training Built Around Your Real Week</title>
+  <style>
+    :root{
+      --bg:#080909; --panel:#121414; --panel2:#181b1b; --line:#2a3030;
+      --teal:#18d3c5; --teal-dim:#0fa99e; --text:#f4f5f5; --muted:#b8c0c0;
+      --red:#ff5454; --ok:#66e38a; --radius:18px;
+      --font:Arial,Calibri,'Helvetica Neue',Helvetica,sans-serif;
+    }
+    *{box-sizing:border-box}
+    html,body{margin:0;padding:0}
+    body{background:radial-gradient(circle at top left, rgba(24,211,197,0.12), transparent 38%), var(--bg);color:var(--text);font-family:var(--font);line-height:1.55;-webkit-font-smoothing:antialiased}
+    a{color:var(--teal)}
+    .wrap{max-width:880px;margin:0 auto;padding:32px 20px 80px}
+    header.brand{display:flex;align-items:center;gap:12px;margin-bottom:8px}
+    .logo{width:34px;height:34px;flex:0 0 auto}
+    .brand h1{font-size:19px;margin:0;font-weight:700;letter-spacing:-.01em}
+    .brand .sub{color:var(--muted);font-size:13px;margin-top:2px}
+    .hero{margin:26px 0 22px}
+    .hero h2{font-size:27px;line-height:1.2;margin:0 0 8px;font-weight:800;letter-spacing:-.02em}
+    .hero p{color:var(--muted);margin:0;font-size:15px;max-width:60ch}
+    .card{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:22px;margin:18px 0}
+    .card h3{margin:0 0 4px;font-size:17px;font-weight:700}
+    .card .hint{color:var(--muted);font-size:13px;margin:0 0 16px}
+    label{display:block;font-size:13px;font-weight:600;margin:14px 0 6px;color:#cfe0dd}
+    .req{color:var(--teal)}
+    input[type=text],input[type=number],select,textarea{
+      width:100%;background:var(--panel2);border:1px solid var(--line);color:var(--text);
+      border-radius:10px;padding:11px 12px;font-size:14px;font-family:inherit;outline:none;transition:border-color .15s}
+    input:focus,select:focus,textarea:focus{border-color:var(--teal)}
+    textarea{resize:vertical;min-height:74px}
+    .grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+    @media(max-width:560px){.grid2{grid-template-columns:1fr}}
+    .row-help{font-size:12px;color:var(--muted);margin-top:5px}
+    /* sport-day chips */
+    .sport-grid{display:flex;flex-direction:column;gap:8px}
+    .sport-day{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+    .sport-day .daybtn{flex:0 0 64px;background:var(--panel2);border:1px solid var(--line);color:var(--muted);
+      border-radius:9px;padding:9px 0;font-size:13px;font-weight:600;cursor:pointer;text-align:center;font-family:inherit;transition:all .12s;user-select:none}
+    .sport-day .daybtn.on{background:rgba(24,211,197,.14);border-color:var(--teal);color:var(--teal)}
+    .sport-day .intensity{display:flex;gap:6px}
+    .sport-day .intensity.hidden{display:none}
+    .sport-day .ibtn{background:var(--panel2);border:1px solid var(--line);color:var(--muted);
+      border-radius:8px;padding:7px 12px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;transition:all .12s;user-select:none}
+    .sport-day .ibtn.on{background:var(--teal);border-color:var(--teal);color:#04211f}
+    .btn{display:inline-flex;align-items:center;gap:9px;background:var(--teal);color:#04211f;border:none;
+      border-radius:11px;padding:13px 22px;font-size:15px;font-weight:700;cursor:pointer;font-family:inherit;
+      transition:filter .15s, transform .05s}
+    .btn:hover{filter:brightness(1.07)}
+    .btn:active{transform:translateY(1px)}
+    .btn[disabled]{opacity:.5;cursor:not-allowed;filter:none}
+    .btn.secondary{background:transparent;color:var(--teal);border:1px solid var(--teal-dim)}
+    .btn.ghost{background:var(--panel2);color:var(--text);border:1px solid var(--line)}
+    .btn-row{display:flex;flex-wrap:wrap;gap:10px;margin-top:8px}
+    .center{display:flex;justify-content:center;margin-top:22px}
+    .status{margin-top:12px;font-size:13.5px;min-height:18px}
+    .status.err{color:var(--red)} .status.ok{color:var(--ok)}
+    .hidden{display:none!important}
+
+    /* Language toggle (intake + program card) */
+    .lang-toggle{display:inline-flex;gap:0;background:var(--panel2);border:1px solid var(--line);
+      border-radius:10px;padding:4px;margin:6px 0 2px}
+    .lang-btn{background:transparent;color:var(--muted);border:none;padding:9px 18px;
+      font-size:14px;font-weight:600;border-radius:7px;cursor:pointer;letter-spacing:.2px;
+      transition:background .15s ease,color .15s ease}
+    .lang-btn:hover{color:var(--text)}
+    .lang-btn.active{background:var(--teal);color:#04211f}
+    .lang-btn[disabled]{opacity:.5;cursor:not-allowed}
+    .lang-toggle-compact .lang-btn{padding:6px 12px;font-size:13px}
+    .program-head{display:flex;align-items:flex-start;justify-content:space-between;gap:14px;flex-wrap:wrap;margin-bottom:12px}
+    /* Right-to-left rendering when program is Hebrew */
+    #program-render[dir="rtl"] table{direction:rtl}
+    #program-render[dir="rtl"] th,#program-render[dir="rtl"] td{text-align:right}
+    /* program display */
+    /* legacy raw block (fallback only) — clean sans-serif, readable */
+    #program-card pre{white-space:pre-wrap;word-break:break-word;background:var(--panel2);border:1px solid var(--line);
+      border-radius:10px;padding:18px;font-size:14.5px;line-height:1.65;font-family:var(--font);color:#eef3f2;overflow-x:auto}
+    /* readable program: narrative blocks + real table */
+    #program-render{font-family:var(--font);color:#eef3f2;font-size:14.5px;line-height:1.65}
+    #program-render .prog-narrative{word-break:break-word;margin:0 0 18px;color:#dfe8e6}
+    #program-render .prog-narrative.after{margin:20px 0 0}
+    /* rendered markdown inside the coaching narrative */
+    #program-render .prog-narrative p{margin:0 0 12px;color:#dfe8e6}
+    #program-render .prog-narrative h4.prog-h{font-size:17px;font-weight:800;letter-spacing:-.01em;
+      margin:24px 0 10px;padding-bottom:6px;border-bottom:1px solid var(--line);color:#fff}
+    #program-render .prog-narrative h4.prog-h:first-child{margin-top:0}
+    #program-render .prog-narrative h5.prog-h{font-size:14.5px;font-weight:800;margin:18px 0 8px;color:var(--teal)}
+    #program-render .prog-narrative h6.prog-h{font-size:13.5px;font-weight:700;margin:14px 0 6px;color:#cfe6e2}
+    #program-render .prog-narrative ul,
+    #program-render .prog-narrative ol{margin:0 0 14px;padding-left:22px;color:#dfe8e6}
+    #program-render .prog-narrative li{margin:0 0 6px;line-height:1.6}
+    #program-render .prog-narrative strong{color:#fff;font-weight:700}
+    #program-render .prog-narrative em{color:#e7efee;font-style:italic}
+    #program-render h4.prog-week{font-size:15px;font-weight:800;letter-spacing:-.01em;margin:6px 0 10px;color:#fff}
+    .prog-table-wrap{border:1px solid var(--line);border-radius:12px;overflow:auto;background:var(--panel2)}
+    table.prog-table{border-collapse:collapse;width:100%;min-width:680px;font-size:13.5px}
+    table.prog-table th{position:sticky;top:0;background:var(--teal);color:#04211f;font-weight:800;text-align:left;
+      padding:10px 12px;font-size:12.5px;letter-spacing:.01em;white-space:nowrap;border-bottom:1px solid var(--teal-dim)}
+    table.prog-table td{padding:10px 12px;border-bottom:1px solid var(--line);color:#e7efee;vertical-align:top}
+    table.prog-table tbody tr:nth-child(even){background:rgba(255,255,255,.022)}
+    table.prog-table tbody tr.day-start td{border-top:2px solid var(--teal-dim)}
+    table.prog-table td.col-day{font-weight:800;color:var(--teal);white-space:nowrap}
+    table.prog-table td.col-ex{font-weight:600;color:#fff;min-width:200px}
+    table.prog-table td.col-rpe{color:var(--teal);font-weight:700}
+    table.prog-table td.col-notes{color:var(--muted);font-size:12.5px;min-width:220px}
+    .spinner{width:18px;height:18px;border:2.5px solid rgba(4,33,31,.35);border-top-color:#04211f;border-radius:50%;
+      animation:spin .7s linear infinite;display:inline-block}
+    .spinner.teal{border-color:rgba(24,211,197,.25);border-top-color:var(--teal)}
+    @keyframes spin{to{transform:rotate(360deg)}}
+    .pill{display:inline-block;background:var(--panel2);border:1px solid var(--line);border-radius:999px;
+      padding:3px 11px;font-size:12px;color:var(--muted);margin-left:8px}
+    .save-note{background:rgba(24,211,197,.08);border:1px solid var(--teal-dim);border-radius:10px;padding:12px 14px;font-size:13px;color:#bfeee9;margin-top:14px}
+    .save-note code{background:#04211f;padding:2px 7px;border-radius:6px;color:var(--teal);font-size:12px;word-break:break-all}
+    .save-note-strong{background:rgba(24,211,197,.13);border:2px solid var(--teal);box-shadow:0 0 0 4px rgba(24,211,197,.07);padding:16px 18px;margin:6px 0 18px}
+    .save-note-strong .save-title{font-size:15px;font-weight:800;color:var(--teal);margin-bottom:6px}
+    .save-note-strong .save-why{margin:0 0 12px;font-size:13px;color:#d6efec;line-height:1.5}
+    .save-note-strong code{display:inline-block;font-size:14px;padding:6px 11px;font-weight:700}
+    .divider{height:1px;background:var(--line);margin:26px 0}
+    footer{color:var(--muted);font-size:12px;text-align:center;margin-top:40px}
+
+    /* Interactive intake wizard */
+    .trust-row{display:flex;flex-wrap:wrap;gap:8px;margin-top:16px}.trust-row span{font-size:12px;color:#c9dcda;background:rgba(24,211,197,.07);border:1px solid rgba(24,211,197,.2);padding:6px 9px;border-radius:999px}
+    .intake-shell{padding:0;overflow:hidden}.intake-topline{display:flex;justify-content:space-between;gap:16px;align-items:flex-start;padding:22px 22px 14px}.eyebrow{text-transform:uppercase;letter-spacing:.12em;font-size:10px;font-weight:800;color:var(--teal);margin-bottom:4px}.step-count{font-size:12px;font-weight:800;color:var(--muted);background:var(--panel2);border:1px solid var(--line);padding:6px 9px;border-radius:999px;white-space:nowrap}.progress-track{height:4px;background:var(--panel2)}.progress-fill{height:100%;width:20%;background:var(--teal);transition:width .25s ease}.wizard-step{display:none;padding:18px 22px 8px;animation:stepIn .18s ease}.wizard-step.active{display:block}@keyframes stepIn{from{opacity:.35;transform:translateY(5px)}to{opacity:1;transform:none}}.wizard-actions{display:flex;justify-content:space-between;gap:10px;padding:18px 22px 22px;border-top:1px solid var(--line);margin-top:14px}.wizard-actions .btn:last-child{margin-left:auto}.goal-stack{display:grid;gap:12px;margin-top:14px}.priority-block{border:1px solid var(--line);background:var(--panel2);border-radius:14px;padding:14px}.priority-block.main-priority{border-color:rgba(24,211,197,.55);box-shadow:inset 0 0 0 1px rgba(24,211,197,.08)}.priority-block label{margin-top:6px}.priority-badge{display:inline-block;font-size:10px;letter-spacing:.08em;font-weight:900;color:#04211f;background:var(--teal);padding:4px 7px;border-radius:6px}.muted-badge{background:#27302f;color:#bed0cd}.sport-key{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0 12px}.sport-key span{font-size:11.5px;color:var(--muted);border:1px solid var(--line);background:var(--panel2);border-radius:9px;padding:7px 9px}.sport-key b{color:#eef5f4}.intake-summary{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:18px}.summary-item{border:1px solid var(--line);background:var(--panel2);border-radius:10px;padding:10px}.summary-item small{display:block;color:var(--muted);font-size:10.5px;text-transform:uppercase;letter-spacing:.06em;margin-bottom:3px}.summary-item strong{display:block;color:#fff;font-size:13px}.build-expectation{display:flex;flex-direction:column;gap:4px;margin-top:14px;background:rgba(24,211,197,.07);border:1px solid rgba(24,211,197,.22);border-radius:12px;padding:13px}.build-expectation strong{color:var(--teal);font-size:12px}.build-expectation span{font-size:12.5px;color:#d7e7e4}.generation-stage{color:var(--muted)}.mini-link{margin-top:8px;padding:0;border:0;background:none;color:var(--teal);font:inherit;font-size:12px;font-weight:800;cursor:pointer}.choice-row{display:flex;gap:8px;margin-top:8px}.choice-btn{border:1px solid var(--line);background:var(--panel2);color:var(--muted);border-radius:10px;padding:9px 14px;font-weight:800;cursor:pointer}.choice-btn.active{background:rgba(24,211,197,.14);border-color:var(--teal);color:var(--teal)}.conditional-panel{margin-top:12px;padding:13px;border:1px solid var(--line);border-radius:12px;background:rgba(255,255,255,.02)}.performance-rows{display:grid;gap:8px;margin-top:8px}.performance-row{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr) auto;gap:8px}.performance-row button{border:1px solid var(--line);background:var(--panel2);color:var(--muted);border-radius:9px;padding:0 10px;cursor:pointer}@media(max-width:560px){.performance-row{grid-template-columns:1fr 1fr}.performance-row button{grid-column:2;justify-self:end;padding:7px 10px}}
+    @media(max-width:560px){.wrap{padding:20px 14px 60px}.hero{margin:20px 2px 16px}.hero h2{font-size:25px}.card{border-radius:15px}.intake-topline,.wizard-step,.wizard-actions{padding-left:16px;padding-right:16px}.intake-summary{grid-template-columns:1fr}.sport-day{align-items:flex-start}.sport-day .daybtn{flex-basis:58px}.sport-day .intensity{flex:1}.sport-day .ibtn{padding:7px 9px}.trust-row span{font-size:11px}}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header class="brand">
+      <svg class="logo" viewBox="0 0 40 40" fill="none" aria-label="Coaching Engine logo">
+        <rect x="2" y="2" width="36" height="36" rx="9" stroke="currentColor" stroke-width="2" style="color:var(--teal)"/>
+        <path d="M11 26 L17 14 L23 26 M13.5 21 H20.5" stroke="var(--teal)" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
+        <circle cx="28.5" cy="15" r="3" fill="var(--teal)"/>
+      </svg>
+      <div>
+        <h1>RAZ Performance</h1>
+        <div class="sub">Strength programming that understands the rest of your week</div>
+      </div>
+    </header>
+
+    <section class="hero">
+      <h2>Your lifting program should not pretend the rest of your training does not exist.</h2>
+      <p>Build a four week strength and hypertrophy plan around your goals, schedule, equipment, recovery, and sport workload. The coaching engine accounts for the training you already do before it adds more.</p>
+      <div class="trust-row"><span>Goal prioritization</span><span>Sport aware scheduling</span><span>Progression rules</span><span>Fatigue constraints</span></div>
+    </section>
+
+    <!-- RETURNING CLIENT -->
+    <section class="card" id="returning-card">
+      <h3>Returning?</h3>
+      <p class="hint">Already built a program? Paste the personal code you saved to load it back and make adjustments.</p>
+      <div class="grid2">
+        <input type="text" id="return-token" placeholder="Your personal code" />
+        <button class="btn ghost" id="load-btn" type="button">Load my program</button>
+      </div>
+      <div class="status" id="return-status"></div>
+    </section>
+
+    <!-- QUESTIONNAIRE -->
+    <section class="card intake-shell" id="intake-card">
+      <div class="intake-topline">
+        <div>
+          <div class="eyebrow">Program intake</div>
+          <h3 id="step-title">What are we building toward?</h3>
+          <p class="hint" id="step-hint">Start with the result that matters most. The coach will protect this priority when goals compete.</p>
+        </div>
+        <div class="step-count" id="step-count">1 / 5</div>
+      </div>
+      <div class="progress-track" aria-hidden="true"><div class="progress-fill" id="progress-fill"></div></div>
+
+      <div class="wizard-step active" data-step="0" data-title="What are we building toward?" data-hint="Start with the result that matters most. The coach will protect this priority when goals compete.">
+        <label>Program language <span class="req">*</span></label>
+        <div class="lang-toggle" role="radiogroup" aria-label="Program language">
+          <button type="button" class="lang-btn active" data-lang="en" id="lang-en">English</button>
+          <button type="button" class="lang-btn" data-lang="he" id="lang-he">עברית · Hebrew</button>
+        </div>
+        <select id="language" class="hidden" aria-hidden="true"><option value="en" selected>English</option><option value="he">עברית (Hebrew)</option></select>
+
+        <div class="goal-stack">
+          <div class="priority-block main-priority">
+            <div class="priority-badge">PRIMARY GOALS</div>
+            <label for="goal_primary_1">What must this block move forward? <span class="req">*</span></label>
+            <input type="text" id="goal_primary_1" placeholder="e.g. 200 kg back squat" />
+            <div id="goal-primary-2-wrap" class="hidden" style="margin-top:8px"><input type="text" id="goal_primary_2" placeholder="Second equal priority goal, e.g. 90 kg strict press" /></div>
+            <button type="button" class="mini-link" id="add-primary-goal">+ Add a second equal priority goal</button>
+            <div class="row-help">Up to two goals can share top priority. If they compete for recovery, the engine balances them rather than silently choosing one.</div>
+          </div>
+          <div class="priority-block">
+            <div class="priority-badge muted-badge">SECONDARY GOALS</div>
+            <label for="goal_secondary_1">Important, but allowed to take less training budget</label>
+            <input type="text" id="goal_secondary_1" placeholder="e.g. improve 5 km time" />
+            <div id="goal-secondary-2-wrap" class="hidden" style="margin-top:8px"><input type="text" id="goal_secondary_2" placeholder="Second secondary goal" /></div>
+            <button type="button" class="mini-link" id="add-secondary-goal">+ Add another secondary goal</button>
+          </div>
+          <div class="priority-block">
+            <div class="priority-badge muted-badge">MAINTENANCE</div>
+            <label for="goal_maintenance">What should we preserve while the main goals progress?</label>
+            <input type="text" id="goal_maintenance" placeholder="e.g. weighted chin strength and upper body size" />
+          </div>
+        </div>
+        <textarea id="goal_primary" class="hidden" aria-hidden="true"></textarea>
+        <textarea id="goal_secondary" class="hidden" aria-hidden="true"></textarea>
+        <textarea id="goal_maintenance_hidden" class="hidden" aria-hidden="true"></textarea>
+      </div>
+
+      <div class="wizard-step" data-step="1" data-title="Where are you starting from?" data-hint="This stops the engine from treating training age as the same thing as demonstrated ability.">
+        <div class="grid2">
+          <div>
+            <label>Experience level <span class="req">*</span></label>
+            <select id="experience"><option value="">Select…</option><option>Beginner (under 1 year)</option><option>Intermediate (1–3 years)</option><option>Advanced (3+ years)</option><option>Elite / competitive</option></select>
+          </div>
+          <div>
+            <label>Bodyweight</label>
+            <input type="text" id="bodyweight" placeholder="e.g. 85 kg" />
+          </div>
+        </div>
+        <div id="performance-block">
+          <label>Current performance markers</label>
+          <div id="performance-rows" class="performance-rows"></div>
+          <button type="button" class="mini-link" id="add-performance">+ Add another current marker</button>
+          <div class="row-help">Use what you can do now, not old PRs or target numbers. Examples: Back squat → 170 kg × 4; Tuck planche → 8 s; 5 km run → 24 min.</div>
+        </div>
+
+        <label>Any current pain or injury that changes training?</label>
+        <div class="choice-row" id="pain-choice"><button type="button" class="choice-btn active" data-value="no">No</button><button type="button" class="choice-btn" data-value="yes">Yes</button></div>
+        <input type="hidden" id="has_pain" value="no" />
+        <div id="pain-details" class="hidden conditional-panel">
+          <label>Describe the area and the movement that currently bothers it</label>
+          <input type="text" id="pain_description" placeholder="e.g. right elbow during full one arm pull up" />
+          <div class="grid2">
+            <div><label>Typical pain during that movement</label><select id="pain_severity"><option value="">Select…</option><option value="0-2">0–2 / 10</option><option value="3-4">3–4 / 10</option><option value="5-6">5–6 / 10</option><option value="7-10">7–10 / 10</option></select></div>
+            <div><label>Symptom character</label><select id="pain_character"><option value="">Select…</option><option value="dull_ache">Dull ache / local discomfort</option><option value="sharp">Sharp pain</option><option value="radiating">Radiating / numbness / tingling</option><option value="unstable">Locking / giving way / unstable</option><option value="other">Other / unsure</option></select></div>
+          </div>
+          <label>Does it settle back to your normal baseline by the next day?</label>
+          <select id="pain_next_day"><option value="">Not sure</option><option value="yes">Yes</option><option value="no">No, it stays worse</option></select>
+          <label>What related versions can you currently do comfortably?</label>
+          <input type="text" id="tolerated_movements" placeholder="e.g. band assisted OAP is 1/10, one arm lat pulldown is pain free" />
+        </div>
+        <label>Does a mobility or range-of-motion limitation currently block a goal?</label>
+        <div class="choice-row" id="mobility-choice"><button type="button" class="choice-btn active" data-value="no">No</button><button type="button" class="choice-btn" data-value="yes">Yes</button></div>
+        <input type="hidden" id="has_mobility_limit" value="no" />
+        <div id="mobility-details" class="hidden conditional-panel">
+          <label>Which position or movement is limited?</label>
+          <input type="text" id="mobility_limit" placeholder="e.g. ankle dorsiflexion limits deep squat; shoulder flexion limits overhead position" />
+          <div class="row-help">Only add a mobility issue if it changes a real strength, sport, or skill goal. The program will not add generic stretching by default.</div>
+        </div>
+        <textarea id="current_numbers" class="hidden" aria-hidden="true"></textarea>
+        <textarea id="injuries" class="hidden" aria-hidden="true"></textarea>
+      </div>
+
+      <div class="wizard-step" data-step="2" data-title="What does your real training week look like?" data-hint="We schedule the gym around the stress you already have, rather than pretending every day starts fresh.">
+        <div class="grid2">
+          <div>
+            <label>Strength training days <span class="req">*</span></label>
+            <select id="days"><option value="">Select…</option><option>2</option><option>3</option><option>4</option><option>5</option><option>6</option></select>
+          </div>
+          <div>
+            <label>Session length</label>
+            <select id="session_length"><option value="">Any</option><option>30 min</option><option>45 min</option><option>60 min</option><option>75–90 min</option></select>
+          </div>
+        </div>
+        <label>Which days can you realistically lift?</label>
+        <div class="choice-row" id="gym-availability-choice"><button type="button" class="choice-btn active" data-value="flexible">Any days are flexible</button><button type="button" class="choice-btn" data-value="limited">I have specific days</button></div>
+        <input type="hidden" id="gym_availability_mode" value="flexible" />
+        <div id="gym-availability-details" class="hidden conditional-panel">
+          <div id="gym-available-days" class="sport-grid"></div>
+          <div class="row-help">Select every day you could train. The engine will choose the best combination around your sport week.</div>
+        </div>
+        <label>Do you train another sport or conditioning outside the gym?</label>
+        <div class="choice-row" id="sport-choice"><button type="button" class="choice-btn active" data-value="no">No</button><button type="button" class="choice-btn" data-value="yes">Yes</button></div>
+        <input type="hidden" id="has_sport" value="no" />
+        <div id="sport-details" class="hidden conditional-panel">
+          <label>Sport or activity</label>
+          <input type="text" id="sport" placeholder="e.g. BJJ, MMA, running, climbing" />
+          <div class="sport-key"><span><b>Light</b> technique, drilling, easy aerobic</span><span><b>Moderate</b> normal class, rolling, normal run</span><span><b>Hard</b> hard rounds, sparring, intervals, demanding session</span></div>
+          <div id="sport-days" class="sport-grid"></div>
+          <div class="row-help">Select the days you normally do it. The engine treats this as training load before it adds gym work.</div>
+          <label>If gym and sport land on the same day, how much separation is usually possible?</label>
+          <select id="same_day_gap"><option value="">Varies / not sure</option><option value="2">Less than 4 hours</option><option value="6">4–8 hours</option><option value="9">8+ hours</option></select>
+        </div>
+      </div>
+
+      <div class="wizard-step" data-step="3" data-title="What can we actually use?" data-hint="Exercise selection is constrained to your environment, equipment, and preferences.">
+        <label>Where will you train? <span class="req">*</span></label>
+        <select id="training_location"><option value="commercial_gym">Commercial gym</option><option value="home_gym">Home gym / garage</option><option value="outdoor_park">Outdoor park / calisthenics bars</option><option value="hotel_room">Hotel room / travel</option><option value="home_bodyweight">Home, bodyweight only</option></select>
+        <label>Equipment available <span class="req">*</span></label>
+        <select id="equipment_type"><option value="full_gym">Full commercial gym</option><option value="specify">Let me specify what I have</option></select>
+        <div id="equipment_specify_wrap" class="hidden" style="margin-top:10px"><textarea id="equipment" placeholder="e.g. barbell + rack + plates to 180 kg, adjustable dumbbells to 40 kg, pull up bar, bench, bands. No machines."></textarea><div class="row-help">Only list equipment you actually have access to.</div></div>
+        <label>Training split preference</label>
+        <select id="split_pref"><option value="coach_decide">Let the coach decide (recommended)</option><option value="full_body">Full body</option><option value="ppl">Push / Pull / Legs</option><option value="upper_lower">Upper / Lower</option></select>
+      </div>
+
+      <div class="wizard-step" data-step="4" data-title="Final coaching context" data-hint="Add constraints or preferences that would change a good coach's decision, then review what the engine understood.">
+        <div class="grid2">
+          <div><label>Typical sleep</label><select id="sleep_hours"><option value="">Not specified</option><option>Under 6 hours</option><option>6–7 hours</option><option>7–8 hours</option><option>8+ hours</option></select></div>
+          <div><label>Current recovery</label><select id="recovery_rating"><option value="">Not specified</option><option>Poor</option><option>Average</option><option>Good</option><option>Excellent</option></select></div>
+        </div>
+        <label>Anything else your coach should know?</label>
+        <textarea id="notes" placeholder="Exercise preferences, work schedule, competition date, what has or has not worked before…"></textarea>
+        <div class="intake-summary" id="intake-summary"></div>
+        <div class="build-expectation"><strong>What happens next</strong><span>The engine checks your priorities, weekly stress, equipment, loading constraints, progression, and recovery overlap before building the four week block.</span></div>
+      </div>
+
+      <div class="wizard-actions">
+        <button class="btn ghost hidden" id="wizard-back" type="button">Back</button>
+        <button class="btn" id="wizard-next" type="button">Continue</button>
+        <button class="btn hidden" id="build-btn" type="button"><span id="build-label">Build my program</span></button>
+      </div>
+      <div class="status" id="build-status" style="text-align:center"></div>
+    </section>
+
+    <!-- PROGRAM -->
+    <section class="card hidden" id="program-card">
+      <div class="program-head">
+        <div>
+          <h3 style="margin:0">Your program <span class="pill" id="prog-pill">Week 1</span></h3>
+          <p class="hint" id="prog-sub" style="margin:6px 0 0">Your individualized plan. Scroll the table, then make a spreadsheet or adjust it below.</p>
+        </div>
+        <div class="lang-toggle lang-toggle-compact" role="radiogroup" aria-label="Program language">
+          <button type="button" class="lang-btn active" data-lang="en" id="prog-lang-en">EN</button>
+          <button type="button" class="lang-btn" data-lang="he" id="prog-lang-he">עברית</button>
+        </div>
+      </div>
+      <div class="status" id="prog-lang-status" style="margin-top:6px"></div>
+
+      <!-- SAVE CODE — shown FIRST, before the program, so it can't be missed -->
+      <div class="save-note save-note-strong" id="save-note">
+        <div class="save-title">Save this code before you go</div>
+        <p class="save-why">This is the only way back to your program. Copy it somewhere safe (notes app, screenshot, or email it to yourself). Without it you'll have to start a brand new program from scratch, and you won't be able to load this one or adjust it later.</p>
+        <code id="token-display"></code>
+        <div style="margin-top:10px"><button class="btn" id="copy-token" type="button" style="padding:9px 16px;font-size:13.5px">Copy my code</button></div>
+        <div class="status" id="token-status" style="margin-top:8px"></div>
+      </div>
+
+      <div id="program-render"></div>
+      <pre id="program-text" class="hidden"></pre>
+
+      <div class="btn-row">
+        <button class="btn" id="sheet-btn" type="button">Create spreadsheet</button>
+        <button class="btn secondary" id="copy-btn" type="button">Copy program</button>
+      </div>
+      <div class="status" id="sheet-status"></div>
+
+      <div class="divider"></div>
+
+      <h3>Adjust your program</h3>
+      <p class="hint">Tell the engine in plain English what changed. It updates only what's needed — everything else stays the same.</p>
+      <textarea id="adjust-input" placeholder="e.g. My knee feels good now, let's load squats fuller. And I only have 30 minutes on day 2 this week."></textarea>
+      <div class="btn-row">
+        <button class="btn" id="adjust-btn" type="button">Update my program</button>
+      </div>
+      <div class="status" id="adjust-status"></div>
+    </section>
+
+    <footer>
+      RAZ Performance · Your data stays private to your program. &copy; <span id="yr"></span> Raz Pilosof
+    </footer>
+  </div>
+
+  <script src="exceljs.lib.js"></script>
+  <script src="exerciseDemos.js"></script>
+  <script src="spreadsheet.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
