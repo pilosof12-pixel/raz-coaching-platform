@@ -16,21 +16,45 @@ function base(overrides={}) {
   };
 }
 
-test('planche goal activates authored Article N2 and observed-level rule', () => {
+test('planche goal activates Overcoming Gravity and observed-level rule', () => {
   const intake=base({
     primary_goals:['Full Planche'],
     current_numbers:'Advanced Tuck Planche 12s clean; Pseudo Planche Push-up 12 reps; training age 5 years'
   });
   const rules=buildSpecialistRules(intake);
-  assert.match(rules,/Advanced Gymnastics/);
-  assert.match(rules,/Article N2 Planche rule/);
-  assert.match(rules,/Planche Lean -> Tuck Planche -> Advanced Tuck Planche -> Straddle Planche -> Full Planche/);
-  assert.match(rules,/do NOT regress an athlete who already demonstrates a harder clean rung/i);
+  assert.match(rules,/Overcoming Gravity decision layer/i);
+  assert.match(rules,/demonstrated clean ability controls the starting level/i);
   assert.match(rules,/DETERMINISTIC SKILL-GRAPH SELECTION/);
-  assert.match(rules,/two weekly high-quality specific exposures/i);
+  assert.match(rules,/two weekly specific exposures/i);
+  assert.match(rules,/Do not regress a clean Advanced Tuck\/Straddle athlete/i);
   const brief=buildDeterministicBrief(intake);
   assert.match(brief,/GOAL-SPECIFIC SPECIALIST RULES/);
-  assert.match(brief,/Article N2 Planche rule/);
+  assert.match(brief,/Overcoming Gravity/i);
+});
+
+test('gymnastics framework separates direct skill from support strength', () => {
+  const rules=buildSpecialistRules(base({
+    primary_goals:['Human Flag: progress from Tuck Human Flag to Straddle Human Flag'],
+    current_numbers:'Tuck Human Flag 12 seconds clean per side'
+  }));
+  assert.match(rules,/Human Flag: direct side-specific flag holds/i);
+  assert.match(rules,/Pulling, pressing, carries and trunk work support but do not replace direct flag practice/i);
+  assert.match(rules,/skill\/technique while fresh/i);
+});
+
+test('session range uses upper end as ceiling and GPP remains optional', () => {
+  const brief=buildDeterministicBrief(base({
+    session_duration_minutes:undefined,
+    session_length:'45-70 min',
+    sport:'BJJ',
+    maintenance_goals:['Maintain general robustness']
+  }));
+  assert.match(brief,/Session-time preference: 45-70 min/i);
+  assert.match(brief,/70 minutes as the ceiling, not a target to fill/i);
+  assert.match(brief,/OPTIONAL GPP HEURISTIC/i);
+  assert.match(brief,/Pallof Press/i);
+  assert.match(brief,/Neck Isometric/i);
+  assert.match(brief,/first to be removed/i);
 });
 
 test('weighted chin-up 1RM goal routes to maximal-strength Article N8', () => {
