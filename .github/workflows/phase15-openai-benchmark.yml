@@ -1,0 +1,40 @@
+name: Phase 15 OpenAI Raz Benchmark
+
+on:
+  push:
+    paths:
+      - '.github/workflows/phase15-openai-benchmark.yml'
+      - '.github/phase15-live-benchmark.mjs'
+      - 'phase14/scripts/build_phase15_runtime.mjs'
+      - 'phase14/engine/phase15_program_qa.js'
+      - 'phase14/engine/phase15_quality_rules.js'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  benchmark:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Allow Render deploy to settle
+        run: sleep 180
+      - name: Run OpenAI live benchmark
+        env:
+          BASE_URL: https://raz-coaching-platform.onrender.com
+        run: node .github/phase15-live-benchmark.mjs
+      - name: Commit benchmark result
+        if: always()
+        run: |
+          git config user.name 'RAZ benchmark bot'
+          git config user.email 'actions@users.noreply.github.com'
+          git pull --rebase origin main || true
+          git add .github/phase15-live-benchmark-result.json 2>/dev/null || true
+          if git diff --cached --quiet; then exit 0; fi
+          git commit -m 'Record OpenAI Phase 15 benchmark result'
+          git push
