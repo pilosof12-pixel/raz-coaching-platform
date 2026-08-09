@@ -34,21 +34,32 @@ jobs:
         name: Run deterministic coaching regressions
         continue-on-error: true
         run: |
-          set -e
+          set +e
           cd phase14
-          node --test test/phase15_planner_regression.test.mjs
-          node --test test/phase15_specialist_rules.test.mjs
-          if [ -f test/exercise_demo_coverage.test.mjs ]; then node --test test/exercise_demo_coverage.test.mjs; fi
-          node scripts/build_phase15_runtime.mjs
-          node --check server.phase15.js
-          node --check engine/phase15_planner.js
-          node --check engine/phase15_specialist_rules.js
-          node --check engine/phase15_program_qa.js
-          node --check engine/phase15_quality_rules.js
-          grep -q 'deterministic-skeleton-v3' server.phase15.js
-          grep -q 'normalizeOpenAIExerciseNames' server.phase15.js
-          grep -q 'fast new-client intake persist' server.phase15.js
-          grep -q 'buildSpecialistRules' engine/phase15_planner.js
+          : > ../.github/phase15-static-qa-log.txt
+          failed=0
+          runcheck() {
+            label="$1"; shift
+            echo "===== $label =====" | tee -a ../.github/phase15-static-qa-log.txt
+            "$@" >> ../.github/phase15-static-qa-log.txt 2>&1
+            code=$?
+            echo "EXIT=$code" | tee -a ../.github/phase15-static-qa-log.txt
+            if [ "$code" -ne 0 ]; then failed=1; fi
+          }
+          runcheck planner_regression node --test test/phase15_planner_regression.test.mjs
+          runcheck specialist_rules node --test test/phase15_specialist_rules.test.mjs
+          if [ -f test/exercise_demo_coverage.test.mjs ]; then runcheck demo_coverage node --test test/exercise_demo_coverage.test.mjs; fi
+          runcheck build_runtime node scripts/build_phase15_runtime.mjs
+          runcheck syntax_runtime node --check server.phase15.js
+          runcheck syntax_planner node --check engine/phase15_planner.js
+          runcheck syntax_specialist node --check engine/phase15_specialist_rules.js
+          runcheck syntax_program_qa node --check engine/phase15_program_qa.js
+          runcheck syntax_quality node --check engine/phase15_quality_rules.js
+          runcheck grep_v3 grep -q 'deterministic-skeleton-v3' server.phase15.js
+          runcheck grep_normalizer grep -q 'normalizeOpenAIExerciseNames' server.phase15.js
+          runcheck grep_fast_path grep -q 'fast new-client intake persist' server.phase15.js
+          runcheck grep_specialist grep -q 'buildSpecialistRules' engine/phase15_planner.js
+          exit "$failed"
       - name: Write static QA result
         if: always()
         env:
@@ -70,7 +81,7 @@ jobs:
           git config user.name 'RAZ static QA bot'
           git config user.email 'actions@users.noreply.github.com'
           git pull --rebase origin main || true
-          git add .github/phase15-static-qa-result.json
+          git add .github/phase15-static-qa-result.json .github/phase15-static-qa-log.txt
           if git diff --cached --quiet; then exit 0; fi
           git commit -m 'Record Phase 15 static QA result'
           git push
