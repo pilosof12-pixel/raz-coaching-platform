@@ -1,0 +1,37 @@
+name: Phase 15 Static Coaching QA
+
+on:
+  push:
+    paths:
+      - 'phase14/engine/phase15_planner.js'
+      - 'phase14/engine/phase15_program_qa.js'
+      - 'phase14/engine/phase15_quality_rules.js'
+      - 'phase14/scripts/build_phase15_runtime.mjs'
+      - 'phase14/test/phase15_planner_regression.test.mjs'
+      - '.github/workflows/phase15-static-qa.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  static-qa:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Run deterministic coaching regressions
+        run: |
+          cd phase14
+          node --test test/phase15_planner_regression.test.mjs
+          node scripts/build_phase15_runtime.mjs
+          node --check server.phase15.js
+          node --check engine/phase15_planner.js
+          node --check engine/phase15_program_qa.js
+          node --check engine/phase15_quality_rules.js
+          grep -q 'deterministic-skeleton-v3' server.phase15.js
+          grep -q 'normalizeOpenAIExerciseNames' server.phase15.js
+          grep -q 'fast new-client intake persist' server.phase15.js
