@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-08-09T07:49:36.358Z",
+  "timestamp": "2026-08-09T08:13:48.333Z",
   "base": "https://raz-coaching-platform.onrender.com",
   "provider_expected": "openai",
   "model_expected": "gpt-5.4",
@@ -63,19 +63,25 @@
     {
       "name": "health",
       "ok": true,
-      "detail": "{\"ok\":true,\"mode\":\"gemini\",\"model\":\"gemini-2.5-flash\",\"storage\":\"supabase\",\"storage_ok\":true,\"ai_configured\":true,\"thinking_budget\":8192,\"cache\":{\"enabled\":true,\"ttl_seconds\":1800,\"active\":false}}"
+      "detail": "{\"ok\":true,\"mode\":\"openai\",\"model\":\"gpt-5.4\",\"last_ai_usage\":null,\"storage\":\"supabase\",\"storage_ok\":true,\"ai_configured\":true,\"thinking_budget\":8192,\"cache\":{\"enabled\":true,\"ttl_seconds\":1800,\"active\":false}}"
     },
     {
       "name": "OpenAI provider active",
-      "ok": false,
-      "detail": "{\"mode\":\"gemini\",\"model\":\"gemini-2.5-flash\"}"
+      "ok": true,
+      "detail": "{\"mode\":\"openai\",\"model\":\"gpt-5.4\"}"
+    },
+    {
+      "name": "build accepted",
+      "ok": true,
+      "detail": "{\"job_id\":\"e47c9967b66b55a37bfb708092aa3068\",\"token\":\"50a002b0b982206be683240aca63aac4\",\"status\":\"pending\"}"
     }
   ],
   "ok": false,
   "health_before": {
     "ok": true,
-    "mode": "gemini",
-    "model": "gemini-2.5-flash",
+    "mode": "openai",
+    "model": "gpt-5.4",
+    "last_ai_usage": null,
     "storage": "supabase",
     "storage_ok": true,
     "ai_configured": true,
@@ -86,5 +92,14 @@
       "active": false
     }
   },
-  "error": "Error: OpenAI not active: mode=gemini model=gemini-2.5-flash. Refusing paid benchmark until deploy is ready.\n    at file:///home/runner/work/raz-coaching-platform/raz-coaching-platform/.github/phase15-live-benchmark.mjs:57:54\n    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)"
+  "job_id": "e47c9967b66b55a37bfb708092aa3068",
+  "token": "50a002b0b982206be683240aca63aac4",
+  "last_job": {
+    "status": "error",
+    "stage": "generating",
+    "attempt": 1,
+    "detail": "initial generation",
+    "error": "Invalid 'instructions': string too long. Expected a string with maximum length 1048576, but got a string with length 1494152 instead."
+  },
+  "error": "Error: Invalid 'instructions': string too long. Expected a string with maximum length 1048576, but got a string with length 1494152 instead.\n    at file:///home/runner/work/raz-coaching-platform/raz-coaching-platform/.github/phase15-live-benchmark.mjs:69:34\n    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)"
 }
