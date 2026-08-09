@@ -40,8 +40,6 @@ function currentBoxSquatMax(intake) {
   const relevant = lines.filter(x => /box squat/i.test(x) && !/speed box squat/i.test(x));
   const candidates = [];
   for (const line of relevant) {
-    // Current-number lines often contain e.g. "205 kg confirmed; approximately 210 current max".
-    // Parse both explicitly unit-labelled loads and a max/1RM number even when "kg" is omitted on the second number.
     for (const m of line.matchAll(/(\d+(?:\.\d+)?)\s*kg/gi)) candidates.push(Number(m[1]));
     for (const re of [/(?:approximately|approx(?:imately)?|current|confirmed)[^\d]{0,25}(\d+(?:\.\d+)?)(?:\s*kg)?[^\n]{0,25}(?:max|1\s*rm|1rm)/i, /(\d+(?:\.\d+)?)(?:\s*kg)?\s*(?:current\s*)?(?:max|1\s*rm|1rm)/i]) {
       const m = line.match(re); if (m) candidates.push(Number(m[1]));
@@ -60,9 +58,16 @@ function currentOhp(intake) {
 }
 
 function ohpTarget(intake) {
-  const s = txt(intake.secondary_goals || intake.primary_goals);
-  const m = s.match(/(?:overhead press|ohp)[^\d]{0,100}(?:toward|towards|target)[^\d]{0,20}(\d+(?:\.\d+)?)\s*kg/i) || s.match(/(?:overhead press|ohp)[^\d]{0,80}(\d+(?:\.\d+)?)\s*kg/i);
-  return m ? Number(m[1]) : null;
+  const goals = [...(Array.isArray(intake.secondary_goals) ? intake.secondary_goals : [intake.secondary_goals]), ...(Array.isArray(intake.primary_goals) ? intake.primary_goals : [intake.primary_goals])]
+    .filter(Boolean).map(String).filter(x => /overhead press|\bohp\b/i.test(x));
+  for (const line of goals) {
+    const explicit = line.match(/(?:toward|towards|target(?:ing)?|goal(?:\s+of)?|progress(?:ing)?\s+to)[^\d]{0,30}(\d+(?:\.\d+)?)\s*kg/i);
+    if (explicit) return Number(explicit[1]);
+    const nums = [...line.matchAll(/(\d+(?:\.\d+)?)\s*kg/gi)].map(m=>Number(m[1])).filter(Number.isFinite);
+    if (nums.length >= 2) return Math.max(...nums);
+    if (nums.length === 1 && !/current|from/i.test(line)) return nums[0];
+  }
+  return null;
 }
 
 function weightedChin1rm(intake) {
@@ -85,25 +90,26 @@ export function buildDeterministicBrief(intake = {}) {
     required.push('DUAL BOX-SQUAT GOAL: the high-rep target and max target are different outcomes and require different exposures.');
     required.push('BOX_SQUAT_HEAVY: one max-strength exposure each week, normally 1-4 reps per set, long rest, no grinding; this serves the 1RM/max side.');
     required.push('BOX_SQUAT_REP: separate rep-strength exposure for the 10-rep outcome. Start with repeatable 6-8 rep work and progress toward 8-10 quality reps. Speed doubles/triples do not count.');
-    required.push('Rep-strength progression is primarily double progression: earn clean reps inside the RPE window, then add 2.5-5 kg and rebuild reps. The distant 180 kg x 10 target is NOT the Week 1 working load.');
+    required.push('Rep-strength progression uses double-progression logic: earn clean reps inside the RPE window, then add 2.5-5 kg and rebuild reps. The distant 180 kg x 10 target is NOT the Week 1 working load.');
     if (boxMax) required.push(`Current tolerated box-squat max anchor is about ${boxMax} kg. Initial 6-8 rep work should usually sit around ${round25(boxMax*.72)}-${round25(boxMax*.80)} kg at RPE 7-8; 2-4 rep max-strength work around ${round25(boxMax*.82)}-${round25(boxMax*.90)} kg at roughly RPE 7.5-8.5. Adjust from observed RPE, never from the future target.`);
   } else if (squatGoal) required.push('One direct squat-specific progression exposure matching the stated squat goal.');
 
   const oapGoal = /one.?arm pull|\boap\b/i.test(`${primary} ${secondary}`);
   if (oapGoal && oap != null && oap >= 2) {
     required.push(`OAP LEVEL: athlete already owns ${oap} strict One-Arm Pull-up reps. Program from demonstrated advanced level.`);
-    required.push('OAP exposure A: strict One-Arm Pull-up singles/clusters, multiple high-quality singles per arm, normally at least 1 rep from technical failure.');
-    required.push('OAP exposure B: Assisted One-Arm Pull-up doubles/triples with the minimum assistance needed for clean symmetrical reps. Progress by less assistance or more clean reps.');
+    required.push('OAP exposure A: strict One-Arm Pull-up singles or clusters, multiple high-quality singles per arm, normally at least 1 rep from technical failure.');
+    required.push('OAP exposure B: Assisted One-Arm Pull-up doubles or triples with the minimum assistance needed for clean symmetrical reps. Progress by less assistance or more clean reps.');
     forbidden.push('One-Arm Pull-up Eccentric/negative as either main OAP exposure for an athlete already owning 2+ strict reps.');
     forbidden.push('Archer Pull-up or generic bilateral pulling as a substitute for either required unilateral OAP exposure.');
-    if (chin1rm) optional.push(`Weighted Chin-up may support OAP once weekly but never replace unilateral specificity. With current +${chin1rm} kg external-load 1RM, an initial 4-6 rep support range around +${round25(chin1rm*.55)} to +${round25(chin1rm*.72)} kg is plausible, autoregulated by RPE and elbow/grip freshness.`);
+    if (chin1rm) optional.push(`Weighted Chin-up may be used once weekly as bilateral support for OAP but never replace unilateral specificity. With current +${chin1rm} kg external-load 1RM, an initial 4-6 rep support range around +${round25(chin1rm*.55)} to +${round25(chin1rm*.72)} kg is plausible, autoregulated by RPE and elbow/grip freshness.`);
   } else if (oapGoal) required.push('One or two unilateral-specific OAP exposures matched to demonstrated level.');
 
   const strictOhpGoal = /overhead press|\bohp\b/i.test(secondary);
   if (strictOhpGoal) {
     required.push('STRICT OHP IS A PROGRESSION GOAL, not maintenance. Use two meaningful strict Overhead Press exposures on separate days.');
     required.push('OHP exposure A: strength-biased strict Overhead Press, usually 3-5 reps per set around RPE 7.5-8.5.');
-    required.push('OHP exposure B: volume/technique strict Overhead Press, usually 5-8 reps per set around RPE 6.5-8. Push Press is optional overload and does not replace both strict exposures.');
+    required.push('OHP exposure B: volume/technique strict Overhead Press, usually 5-8 reps per set around RPE 6.5-8.');
+    required.push('Push Press may be an optional explosive overload, but it does not replace both strict OHP exposures.');
     if (ohpCurrent) required.push(`Current strict OHP anchor is ${ohpCurrent.kg} kg${ohpCurrent.reps ? ` x about ${ohpCurrent.reps}+ reps` : ''}; prescribe from CURRENT performance, not historical PR or target.`);
     if (ohpGoal) required.push(`Long-term strict OHP target is about ${ohpGoal} kg; use repeatable submaximal progression, not token maintenance or weekly grinders.`);
     forbidden.push('Freestanding HSPU volume that steals recovery/session time from strict OHP when HSPU is explicitly nice-to-have.');
@@ -149,7 +155,7 @@ export function buildDeterministicBrief(intake = {}) {
     specialist,
     'Session skeleton:', ...days.map(d=>`* ${d}: ${sessions[d].length?sessions[d].join(', '):'low-cost strength/support only'}; ${sport[d]?`same-day sport=${sport[d]}`:'no listed sport'}.`),
     'LOW_COST_STRENGTH_SUPPORT means real low-fatigue strength selected from athlete needs, never cardio-only filler.',
-    'Exercise-name rule: use exact verified canonical names. Never output [REVIEW], support messages, placeholders or invented exercise variations.',
+    'Exercise-name rule: use exact verified canonical names. Never output [REVIEW], support messages or placeholder exercise rows. Never invent exercise variations.',
     'Model responsibility: choose realistic sets, reps, loads, RPE/RIR, rest, compact warm-up ramps, four-week progression and concise notes around this skeleton. Cut lower-priority work before primary specificity.'
   ].filter(Boolean).join('\n');
 }
