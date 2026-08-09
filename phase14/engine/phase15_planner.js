@@ -13,8 +13,6 @@ function allText(intake) {
   return JSON.stringify(intake || {}).toLowerCase();
 }
 
-function has(re, intake) { return re.test(allText(intake)); }
-
 function sportMap(intake) {
   const out = {};
   for (const s of (intake?.sport_schedule || [])) {
@@ -38,8 +36,6 @@ function chooseDays(intake) {
     if (s === 'moderate') return 2;
     return 4;
   };
-  // Preserve at least one clean day for the highest-quality strength exposure.
-  // Then allow deliberate stress consolidation rather than scattering fatigue everywhere.
   return canonical
     .map((d,i) => ({d,i,s:score(d)}))
     .sort((a,b) => a.s-b.s || a.i-b.i)
@@ -61,15 +57,29 @@ function currentOap(intake) {
   return m ? Number(m[1]) : null;
 }
 
+function currentBoxSquatMax(intake) {
+  const s = JSON.stringify(intake || {});
+  const vals = [...s.matchAll(/(?:box squat|box-squat)[^\d]{0,45}(\d+(?:\.\d+)?)\s*kg/gi)].map(m => Number(m[1])).filter(Number.isFinite);
+  if (!vals.length) return null;
+  // Intake often includes both a confirmed current value and an approximate max.
+  // Use the highest CURRENT-looking benchmark, but never a distant goal value.
+  const goalText = txt(intake.primary_goals).toLowerCase();
+  const goalVals = [...goalText.matchAll(/(\d+(?:\.\d+)?)\s*kg/g)].map(m => Number(m[1]));
+  const filtered = vals.filter(v => !goalVals.includes(v) || /current|confirmed|approximately|approx|max/i.test(s));
+  return Math.max(...(filtered.length ? filtered : vals));
+}
+
 export function buildDeterministicBrief(intake = {}) {
   const days = chooseDays(intake);
   const sport = sportMap(intake);
   const primary = txt(intake.primary_goals);
   const secondary = txt(intake.secondary_goals);
   const maintenance = txt(intake.maintenance_goals);
+  const notes = txt(intake.notes);
   const pain = txt(intake.pain || intake.limitations);
   const limit = Number(intake.session_duration_minutes || intake.session_minutes || 0) || null;
   const oap = currentOap(intake);
+  const boxMax = currentBoxSquatMax(intake);
 
   const required = [];
   const optional = [];
@@ -80,24 +90,27 @@ export function buildDeterministicBrief(intake = {}) {
   if (squatDual) {
     required.push('Box squat MAX-STRENGTH exposure: working sets in the 1-5 rep range, specific to the tolerated box height.');
     required.push('Box squat REP-STRENGTH exposure: separate working exposure with >=6 reps per set or an explicit high-rep/back-off progression aimed at the stated rep goal. Speed doubles do not count.');
+    if (boxMax) {
+      required.push(`Load calibration anchor for current box squat max about ${boxMax} kg: initial 6-8 rep work should normally live around 72-80% (${Math.round(boxMax*0.72/2.5)*2.5}-${Math.round(boxMax*0.80/2.5)*2.5} kg) at honest RPE 7-8, and 2-4 rep max-strength work around 82-90% (${Math.round(boxMax*0.82/2.5)*2.5}-${Math.round(boxMax*0.90/2.5)*2.5} kg), adjusted by observed RPE. Do not pair an obviously too-light load with a high RPE label.`);
+    }
   } else if (squatGoal) required.push('One direct squat-specific progression exposure matching the stated squat goal.');
 
   const oapGoal = /one.?arm pull|\boap\b/i.test(`${primary} ${secondary}`);
   if (oapGoal && oap != null && oap >= 2) {
     required.push(`Advanced OAP exposure A: strict One-Arm Pull-up singles/clusters. Current demonstrated max is ${oap} strict reps, so do not regress to eccentrics as the main work.`);
-    required.push('Advanced OAP exposure B: lightly assisted One-Arm Pull-up doubles/triples or another advanced unilateral-specific exposure.');
-    forbidden.push('One-Arm Pull-up eccentric/negative as either of the two main OAP exposures.');
+    required.push('Advanced OAP exposure B: lightly Assisted One-Arm Pull-up doubles/triples or another advanced unilateral-specific exposure.');
+    forbidden.push('One-Arm Pull-up Eccentric/negative as either of the two main OAP exposures.');
   } else if (oapGoal) required.push('One or two unilateral-specific OAP progression exposures matched to demonstrated level.');
 
   const ohpGoal = /overhead press|\bohp\b/i.test(secondary);
   if (ohpGoal) {
-    required.push('OHP exposure A: meaningful strict Overhead Press strength work.');
-    required.push('OHP exposure B on a separate day: strict OHP volume/technique or Push Press overload. This is progression, not token maintenance.');
+    required.push('OHP exposure A: meaningful Overhead Press strength work. Use canonical exercise name Overhead Press or Standing Barbell Overhead Press.');
+    required.push('OHP exposure B on a separate day: Overhead Press volume/technique or Push Press overload. This is progression, not token maintenance.');
   }
 
-  const zone2Goal = /zone\s*2|aerobic|day.to.day energy|conditioning/i.test(`${secondary} ${maintenance} ${txt(intake.notes)}`);
+  const zone2Goal = /zone\s*2|aerobic|day.to.day energy|conditioning/i.test(`${secondary} ${maintenance} ${notes}`);
   if (zone2Goal) {
-    required.push('Two low-fatigue Zone 2 exposures, preferably bike, easy rower, or incline walk.');
+    required.push('Two meaningful low-fatigue Zone 2 exposures. Use canonical names Zone-2 Bike or Zone-2 Row. Target roughly 20-35 minutes each unless the session cap requires moving one to a separate easy session. Twelve minutes is a warm-up/mini-dose, not a full dedicated Zone 2 exposure for this goal.');
     forbidden.push('Unrequested hard intervals, threshold, VO2, AMRAP, sprints, or hard running when BJJ/MMA already supplies high-intensity conditioning.');
   }
 
@@ -106,14 +119,17 @@ export function buildDeterministicBrief(intake = {}) {
     forbidden.push('Heavy RDL / good morning / back-extension loading unless the intake explicitly establishes tolerance and the row states a tolerance gate.');
   }
   if (/box squat/i.test(pain) && /tolerat/i.test(pain)) optional.push('Use the explicitly tolerated parallel box squat rather than forcing deeper squat ROM.');
-  if (/hip thrust/i.test(pain) && /tolerat/i.test(pain)) optional.push('Hip thrust or glute bridge is a preferred low-spinal-fatigue posterior-chain assistance option.');
+  if (/hip thrust/i.test(pain) && /tolerat/i.test(pain)) optional.push('Hip Thrust or Glute Bridge is a preferred low-spinal-fatigue posterior-chain assistance option.');
 
   if (/cable lateral/i.test(maintenance)) required.push('Retain direct Cable Lateral Raise at minimum useful dose.');
   if (/face pull/i.test(maintenance)) required.push('Retain Face Pull at minimum useful dose.');
-  if (/explosive|jump|med ball|medicine ball/i.test(`${maintenance} ${txt(intake.notes)}`)) required.push('One or two very low-volume explosive primer exposures. Place throws/jumps after warm-up and before heavy strength. Stop before velocity loss.');
+  if (/explosive|jump|med ball|medicine ball/i.test(`${maintenance} ${notes}`)) required.push('One or two very low-volume explosive primer exposures. Prefer canonical Box Jump or Broad Jump unless another exact canonical exercise name is known. Place primers after warm-up and before heavy strength. Stop before velocity loss.');
 
-  // Deterministic session skeleton. We assign high-value exposures across the available days,
-  // then the LLM calibrates exact sets/reps/load without being allowed to delete them.
+  const strengthDaysRequested = /strength sessions?|strength days?|4 strength|four strength/i.test(`${notes} ${primary} ${secondary}`) || (Number(intake.days_per_week) >= 3 && /strength/i.test(`${primary} ${secondary} ${notes}`));
+  if (strengthDaysRequested) {
+    required.push(`All ${days.length} listed gym days are strength-training sessions. Zone 2 may be appended or separate, but no listed gym day may be cardio-only. Every gym day needs at least one real strength/skill working exposure.`);
+  }
+
   const exposureLabels = [];
   if (squatDual) exposureLabels.push('BOX_SQUAT_REP', 'BOX_SQUAT_HEAVY');
   else if (squatGoal) exposureLabels.push('SQUAT_SPECIFIC');
@@ -122,7 +138,6 @@ export function buildDeterministicBrief(intake = {}) {
   if (ohpGoal) exposureLabels.push('OHP_HEAVY', 'OHP_SECOND');
   if (zone2Goal) exposureLabels.push('ZONE2_A', 'ZONE2_B');
 
-  // Spread key exposures while keeping the last clean/no-sport day attractive for heavy strength.
   const sessions = distribute(days, exposureLabels);
   const cleanDays = days.filter(d => !sport[d]);
   if (squatDual && cleanDays.length) {
@@ -134,6 +149,14 @@ export function buildDeterministicBrief(intake = {}) {
     const strictDay = cleanDays[0];
     for (const d of days) sessions[d] = sessions[d].filter(x => x !== 'OAP_STRICT');
     sessions[strictDay].unshift('OAP_STRICT');
+  }
+
+  // Prevent a requested strength day from collapsing into cardio only.
+  if (strengthDaysRequested) {
+    for (const d of days) {
+      const hasStrength = sessions[d].some(x => !/^ZONE2_/.test(x));
+      if (!hasStrength) sessions[d].unshift('LOW_COST_STRENGTH_SUPPORT');
+    }
   }
 
   const dayLines = days.map(d => {
@@ -154,6 +177,7 @@ export function buildDeterministicBrief(intake = {}) {
     ...forbidden.map(x => `* ${x}`),
     'Session skeleton:',
     ...dayLines.map(x => `* ${x}`),
+    'LOW_COST_STRENGTH_SUPPORT means a real low-fatigue strength slot chosen from the athlete needs, for example Weighted Chin-up, Hip Thrust, a supported row, or another specific tolerated strength exercise. It does not mean a cardio-only filler day.',
     'Model responsibility: choose realistic exact exercises, sets, reps, load ranges, RPE/RIR, rest, warm-up ramps, four-week progression and concise coaching notes around this skeleton. Do not move or delete a required exposure unless the intake makes it unsafe; if so state the substitution explicitly.',
   ].filter(Boolean).join('\n');
 }
