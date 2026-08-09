@@ -3,12 +3,7 @@ name: Phase 15 OpenAI Raz Benchmark
 on:
   push:
     paths:
-      - '.github/workflows/phase15-openai-benchmark.yml'
-      - '.github/phase15-live-benchmark.mjs'
-      - 'phase14/scripts/build_phase15_runtime.mjs'
-      - 'phase14/engine/phase15_planner.js'
-      - 'phase14/engine/phase15_program_qa.js'
-      - 'phase14/engine/phase15_quality_rules.js'
+      - '.github/phase15-live-benchmark-trigger.txt'
   workflow_dispatch:
 
 permissions:
@@ -26,6 +21,7 @@ jobs:
       - name: Verify generated Phase 15 runtime
         run: |
           cd phase14
+          node --test test/phase15_planner_regression.test.mjs
           node scripts/build_phase15_runtime.mjs
           node --check server.phase15.js
           node --check engine/phase15_planner.js
