@@ -27,6 +27,17 @@ function distribute(days, labels) {
   return out;
 }
 
+function sessionRange(intake) {
+  const numeric = Number(intake?.session_duration_minutes || intake?.session_minutes || 0);
+  if (Number.isFinite(numeric) && numeric > 0) return { min:null, max:numeric, label:`up to ${numeric} min` };
+  const raw = String(intake?.session_length || intake?.time_per_session || '').trim();
+  if (!raw) return null;
+  const nums = [...raw.matchAll(/\d{2,3}/g)].map(m=>Number(m[0])).filter(Number.isFinite);
+  if (!nums.length) return null;
+  if (nums.length >= 2) return { min:Math.min(...nums), max:Math.max(...nums), label:`${Math.min(...nums)}-${Math.max(...nums)} min` };
+  return { min:null, max:nums[0], label:`up to ${nums[0]} min` };
+}
+
 function currentOap(intake) {
   const s = JSON.stringify(intake || {});
   for (const re of [/(?:one.?arm pull.?up|oap)[^\d]{0,60}(\d+)\s*(?:strict\s*)?(?:reps?|rep|maximum|max)/i, /(\d+)\s*strict\s*(?:one.?arm pull.?ups?|oaps?)/i]) {
@@ -78,9 +89,9 @@ function weightedChin1rm(intake) {
 const round25 = x => Math.round(x/2.5)*2.5;
 
 export function buildDeterministicBrief(intake = {}) {
-  const days = chooseDays(intake), sport = sportMap(intake);
+  const days = chooseDays(intake), sport = sportMap(intake), time = sessionRange(intake);
   const primary = txt(intake.primary_goals), secondary = txt(intake.secondary_goals), maintenance = txt(intake.maintenance_goals), notes = txt(intake.notes);
-  const pain = txt(intake.pain || intake.limitations), limit = Number(intake.session_duration_minutes || intake.session_minutes || 0) || null;
+  const pain = txt(intake.pain || intake.limitations), limit = time?.max || null;
   const oap = currentOap(intake), boxMax = currentBoxSquatMax(intake), ohpCurrent = currentOhp(intake), ohpGoal = ohpTarget(intake), chin1rm = weightedChin1rm(intake);
   const required = [], optional = [], forbidden = [];
 
@@ -132,6 +143,11 @@ export function buildDeterministicBrief(intake = {}) {
   if (/face pull/i.test(maintenance)) required.push('Retain Face Pull at minimum useful dose.');
   if (/explosive|jump|med ball|medicine ball/i.test(`${maintenance} ${notes}`)) required.push('Retain one or two very low-volume explosive primers. For the current verified demo path use Box Jump. Place after warm-up and before heavy strength; stop before velocity loss.');
 
+  const sportText = `${txt(intake.sport)} ${maintenance} ${notes}`.toLowerCase();
+  optional.push('OPTIONAL GPP HEURISTIC: if primary/secondary work is fully covered and there is about 5-10 minutes of real time/recovery headroom, add at most 1-2 low-cost accessory micro-doses across the week. They are optional and first to be removed when session length, recovery or sport quality suffers.');
+  if (/bjj|jiu.?jitsu|grappl|mma|wrestl/.test(sportText)) optional.push('Combat/grappling GPP menu when justified: Pallof Press or Side Plank for trunk stiffness, Suitcase/Farmer Carry for bracing/grip, Copenhagen/hip-adductor work when groin robustness is relevant, Neck Isometric for neck capacity, and a small curl/arm-hypertrophy dose when elbow-flexor strength or local robustness is useful. Choose needs-based items, not all of them.');
+  else optional.push('General GPP menu when justified: Pallof Press/Side Plank, Suitcase or Farmer Carry, Glute Bridge, Neck Isometric, calves or a small local hypertrophy dose matched to the athlete and sport. Choose 1-2 needs-based items, not a checklist.');
+
   const strengthDaysRequested = Number(intake.days_per_week)>=1 && (/strength sessions?|strength days?|strength/i.test(`${notes} ${primary} ${secondary}`) || String(intake.split_preference||'').toLowerCase()==='full_body');
   if (strengthDaysRequested) required.push(`ALL ${days.length} listed gym days are genuine strength/full-body sessions. Zone 2 may be appended/separate, but no gym day may be cardio-only. Every gym day needs real strength or advanced-skill work; with full-body preference it should normally include meaningful upper and lower/support work when recovery allows.`);
 
@@ -149,7 +165,7 @@ export function buildDeterministicBrief(intake = {}) {
   return [
     '=== DETERMINISTIC PROGRAM SKELETON, DO NOT DELETE REQUIRED EXPOSURES ===',
     `Gym days (${days.length}): ${days.join(', ')}.`,
-    limit ? `Hard session cap: ${limit} minutes INCLUDING warm-up, rests, transitions and any Zone 2 placed inside the session.` : 'Keep sessions realistically time-bounded.',
+    time ? `Session-time preference: ${time.label}. Treat ${limit} minutes as the ceiling, not a target to fill. A shorter excellent session inside the selected range is preferred to filler.` : 'Keep sessions realistically time-bounded.',
     'Required coaching constraints:', ...required.map(x=>`* ${x}`),
     optional.length ? 'Preferred/support choices:' : '', ...optional.map(x=>`* ${x}`),
     forbidden.length ? 'Forbidden/tolerance-gated choices:' : '', ...forbidden.map(x=>`* ${x}`),
