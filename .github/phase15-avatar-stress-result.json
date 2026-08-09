@@ -1,0 +1,538 @@
+{
+  "timestamp": "2026-08-09T12:39:50.911Z",
+  "base": "https://raz-coaching-platform.onrender.com",
+  "execution_path_expected": "deterministic-skeleton-v4",
+  "avatars": [
+    {
+      "id": "gymnastics_fighter",
+      "name": "Advanced gymnastics + BJJ hybrid",
+      "intake": {
+        "language": "en",
+        "primary_goals": [
+          "Planche: progress from a clean Advanced Tuck Planche 12 second hold toward a controlled Straddle Planche",
+          "Weighted dip loaded endurance: progress from +60 kg x 8 clean reps toward +60 kg x 15 clean reps"
+        ],
+        "secondary_goals": [
+          "Improve lower body strength without adding excessive fatigue around BJJ",
+          "Improve aerobic base with low fatigue Zone 2 work"
+        ],
+        "maintenance_goals": [
+          "Maintain pulling strength and shoulder health",
+          "Maintain modest trunk and hip general physical preparation when time allows"
+        ],
+        "current_numbers": "Advanced Tuck Planche: 12 seconds clean on parallettes\nTuck Planche: 25 seconds clean\nWeighted Dip: +60 kg x 8 clean reps\nWeighted Dip external load 1RM: +90 kg\nFront Squat: 150 kg x 3\nWeighted Chin-up: +55 kg x 5",
+        "days_per_week": 3,
+        "session_duration_minutes": 70,
+        "gym_availability_mode": "flexible",
+        "available_gym_days": [],
+        "sport": "BJJ",
+        "sport_schedule": [
+          {
+            "day": "Tue",
+            "intensity": "hard"
+          },
+          {
+            "day": "Thu",
+            "intensity": "moderate"
+          },
+          {
+            "day": "Sat",
+            "intensity": "hard"
+          }
+        ],
+        "same_day_gap_hours": 6,
+        "training_location": "commercial_gym",
+        "equipment": "barbell, plates, rack, bench, dumbbells, cable stack, dip bars, pull-up bar, parallettes, bands, bike, rower",
+        "split_preference": "full_body",
+        "pain": "Mild recurrent wrist irritation in deep wrist extension. Planche on parallettes is well tolerated. Barbell pressing and dips are well tolerated. No current lower back pain.",
+        "mobility": {
+          "active": false
+        },
+        "sleep_hours": "7-8",
+        "recovery_rating": "Good",
+        "notes": "Advanced athlete. Do not regress planche below demonstrated Advanced Tuck level. Primary goals are equal priority. Weighted dip goal is fixed-load rep performance, not only 1RM. Keep sessions concise and compatible with BJJ. Two Zone 2 exposures are desirable. Optional low-cost GPP is welcome only if it does not displace primary work."
+      },
+      "checks": [
+        {
+          "name": "build accepted",
+          "ok": true,
+          "detail": {
+            "job_id": "13238e77ef4645a8d97f6723065909e9",
+            "token": "d3f59161257211e2da8347d272c6c5a5",
+            "status": "pending"
+          }
+        },
+        {
+          "name": "program generated",
+          "ok": true,
+          "detail": "chars=8146; seconds=231"
+        },
+        {
+          "name": "four complete week blocks",
+          "ok": true,
+          "detail": [
+            [
+              1,
+              18
+            ],
+            [
+              2,
+              18
+            ],
+            [
+              3,
+              18
+            ],
+            [
+              4,
+              18
+            ]
+          ]
+        },
+        {
+          "name": "no review/internal placeholders",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "name": "requested gym-day count present",
+          "ok": true,
+          "detail": [
+            "Mon",
+            "Wed",
+            "Fri"
+          ]
+        },
+        {
+          "name": "every gym day has real strength or skill work",
+          "ok": true,
+          "detail": [
+            "Mon",
+            "Wed",
+            "Fri"
+          ]
+        },
+        {
+          "name": "all client working exercises have direct curated demos",
+          "ok": false,
+          "detail": {
+            "missing": [
+              "Bulgarian Split Squat",
+              "Planche Push-up"
+            ],
+            "checked": [
+              "Box Jump",
+              "Advanced Tuck Planche",
+              "Weighted Dip",
+              "Front Squat",
+              "Zone-2 Bike",
+              "Weighted Chin-up",
+              "Bulgarian Split Squat",
+              "Planche Push-up",
+              "Zone-2 Row",
+              "Dip"
+            ]
+          }
+        },
+        {
+          "name": "Zone 2 is meaningful when requested",
+          "ok": true,
+          "detail": [
+            22,
+            22
+          ]
+        },
+        {
+          "name": "no unnecessary hard conditioning interference",
+          "ok": true,
+          "detail": []
+        },
+        {
+          "name": "planche stays at demonstrated advanced level",
+          "ok": true,
+          "detail": [
+            [
+              "Mon",
+              "Advanced Tuck Planche",
+              "4",
+              "10-12s"
+            ],
+            [
+              "Wed",
+              "Planche Push-up",
+              "3",
+              "4"
+            ],
+            [
+              "Fri",
+              "Advanced Tuck Planche",
+              "4",
+              "8-10s"
+            ]
+          ]
+        },
+        {
+          "name": "primary planche gets at least two direct weekly exposures",
+          "ok": true,
+          "detail": [
+            [
+              "Mon",
+              "Advanced Tuck Planche"
+            ],
+            [
+              "Wed",
+              "Planche Push-up"
+            ],
+            [
+              "Fri",
+              "Advanced Tuck Planche"
+            ]
+          ]
+        },
+        {
+          "name": "weighted dip fixed-load endurance remains specific",
+          "ok": false,
+          "detail": [
+            [
+              "Mon",
+              "Weighted Dip",
+              "+60 kg",
+              "5",
+              "4",
+              "7"
+            ],
+            [
+              "Wed",
+              "Weighted Dip",
+              "+72.5 kg",
+              "5",
+              "3",
+              "7.5"
+            ]
+          ]
+        },
+        {
+          "name": "weighted dip uses strength reserve plus volume tracks",
+          "ok": false,
+          "detail": [
+            [
+              "Mon",
+              "+60 kg",
+              "4"
+            ],
+            [
+              "Wed",
+              "+72.5 kg",
+              "3"
+            ]
+          ]
+        },
+        {
+          "name": "wrist limitation respected",
+          "ok": true,
+          "detail": []
+        }
+      ],
+      "program": "Keep planche quality high and repeatable, and build the dip goal from both ends: one heavy reserve day and one specific +60 kg volume day. Lower body stays productive but low-cost for BJJ, and Zone 2 is kept easy enough to recover from.\n\nWeeks 2-4: add a little hold time, a little density, or a small load bump only if positions stay clean. Week 4 consolidates with slightly harder top work, not a full deload.\n\nPain/substitutions: keep all planche work on parallettes. If wrists feel irritated, shorten the hold slightly before changing the shape, and use an extra warm-up set. If front squat feels unusually beat-up from BJJ, swap that day to Goblet Squat at similar effort. Avoid adding any extra hard conditioning.\n\nSTART_WEEK1_TSV\nDay\tExercise\tWeight\tSets\tReps\tRest\tTarget RPE\tNotes\tResults\nMon\t[WARMUP]\tBodyweight\t1\t6-8 min\t—\t—\t2 min easy bike then wrists on parallettes, scap push-up 2x10, front squat ramp-up, dip ramp-up\t\nMon\tBox Jump\tBodyweight\t3\t3\t60 sec\t5\tNon-fatiguing primer; crisp landings before strength\t\nMon\tAdvanced Tuck Planche\tBodyweight\t4\t10-12s\t2 min\t8\tParallettes only; locked elbows, protraction, PPT; stop before form breaks\t\nMon\tWeighted Dip\t+60 kg\t5\t4\t2-3 min\t7\tLoaded-endurance track; all reps clean with 1 sec support at top\t\nMon\tFront Squat\t115 kg\t3\t5\t2-3 min\t6.5\tSmooth bracing; leave reps in reserve; low fatigue intent\t\nMon\tZone-2 Bike\tEasy sustainable pace\t1\t22 min\t—\t4\tNasal-breathing conversational effort; keep cadence smooth\t\nWed\t[WARMUP]\tBodyweight\t1\t6-8 min\t—\t—\t3 min easy row then shoulders, scap pulls, dip ramp-up, chin ramp-up\t\nWed\tWeighted Dip\t+72.5 kg\t5\t3\t3 min\t7.5\tHeavy reserve track; strong lockout, no grinders\t\nWed\tWeighted Chin-up\t+42.5 kg\t4\t4\t2-3 min\t7\tMaintain pulling strength; full hang to chin over bar\t\nWed\tBulgarian Split Squat\tDumbbells 24 kg each\t3\t6 each leg\t90 sec\t7\tControlled, upright torso; low-cost lower body work\t\nWed\tPlanche Push-up\tBodyweight\t3\t4\t2 min\t7\tParallettes; quality reps only; stop if scap position degrades\t\nWed\tZone-2 Row\tEasy sustainable pace\t1\t22 min\t—\t4\tSteady aerobic work; no hard surges\t\nFri\t[WARMUP]\tBodyweight\t1\t6-8 min\t—\t—\t2 min easy bike then wrists on parallettes, squat ramp-up, chin ramp-up\t\nFri\tBox Jump\tBodyweight\t3\t3\t60 sec\t5\tCrisp and low fatigue\t\nFri\tAdvanced Tuck Planche\tBodyweight\t4\t8-10s\t2 min\t8\tSlightly shorter holds than Monday if needed; pristine position first\t\nFri\tFront Squat\t122.5 kg\t4\t3\t2-3 min\t7\tModerate strength exposure; no grind reps\t\nFri\tWeighted Chin-up\t+47.5 kg\t5\t3\t2-3 min\t7.5\tMaintain upper pulling strength with low volume\t\nFri\tDip\tBodyweight\t2\t12\t90 sec\t6\tEasy blood flow and patterning; stop well short of fatigue\t\nEND_WEEK1_TSV\nSTART_WEEK2_TSV\nDay\tExercise\tWeight\tSets\tReps\tRest\tTarget RPE\tNotes\tResults\nMon\t[WARMUP]\tBodyweight\t1\t6-8 min\t—\t—\t2 min easy bike then wrists on parallettes, scap push-up 2x10, front squat ramp-up, dip ramp-up\t\nMon\tBox Jump\tBodyweight\t3\t3\t60 sec\t5\tNon-fatiguing primer; crisp landings before strength\t\nMon\tAdvanced Tuck Planche\tBodyweight\t4\t11-13s\t2 min\t8\tParallettes only; locked elbows, protraction, PPT; stop before form breaks\t\nMon\tWeighted Dip\t+60 kg\t5\t5\t2-3 min\t7.5\tLoaded-endurance track; same load, add clean reps\t\nMon\tFront Squat\t117.5 kg\t3\t5\t2-3 min\t7\tSmooth bracing; still submaximal\t\nMon\tZone-2 Bike\tEasy sustainable pace\t1\t24 min\t—\t4\tConversational effort; keep it easy enough to recover\t\nWed\t[WARMUP]\tBodyweight\t1\t6-8 min\t—\t—\t3 min easy row then shoulders, scap pulls, dip ramp-up, chin ramp-up\t\nWed\tWeighted Dip\t+75 kg\t5\t3\t3 min\t8\tHeavy reserve track; strong lockout, no grinders\t\nWed\tWeighted Chin-up\t+45 kg\t4\t4\t2-3 min\t7.5\tMaintain pulling strength; full ROM\t\nWed\tBulgarian Split Squat\tDumbbells 26 kg each\t3\t6 each leg\t90 sec\t7\tControlled, upright torso; low-cost lower body work\t\nWed\tPlanche Push-up\tBodyweight\t3\t5\t2 min\t7.5\tParallettes; quality reps only\t\nWed\tZone-2 Row\tEasy sustainable pace\t1\t24 min\t—\t4\tSteady aerobic work; no hard surges\t\nFri\t[WARMUP]\tBodyweight\t1\t6-8 min\t—\t—\t2 min easy bike then wrists on parallettes, squat ramp-up, chin ramp-up\t\nFri\tBox Jump\tBodyweight\t3\t3\t60 sec\t5\tCrisp and low fatigue\t\nFri\tAdvanced Tuck Planche\tBodyweight\t4\t9-11s\t2 min\t8\tAdd a touch of lean only if holds stay clean\t\nFri\tFront Squat\t125 kg\t4\t3\t2-3 min\t7.5\tModerate strength exposure; no grind reps\t\nFri\tWeighted Chin-up\t+50 kg\t5\t3\t2-3 min\t8\tMaintain upper pulling strength with low volume\t\nFri\tDip\tBodyweight\t2\t14\t90 sec\t6\tEasy blood flow and patterning; stop well short of fatigue\t\nEND_WEEK2_TSV\nSTART_WEEK3_TSV\nDay\tExercise\tWeight\tSets\tReps\tRest\tTarget RPE\tNotes\tResults\nMon\t[WARMUP]\tBodyweight\t1\t6-8 min\t—\t—\t2 min easy bike then wrists on parallettes, scap push-up 2x10, front squat ramp-up, dip ramp-up\t\nMon\tBox Jump\tBodyweight\t3\t3\t60 sec\t5\tNon-fatiguing primer; crisp landings before strength\t\nMon\tAdvanced Tuck Planche\tBodyweight\t4\t12-14s\t2 min\t8.5\tParallettes only; quality stops before elbow bend or lumbar extension\t\nMon\tWeighted Dip\t+60 kg\t6\t4\t2-3 min\t7.5\tLoaded-endurance density progression; 24 total clean reps\t\nMon\tFront Squat\t120 kg\t3\t5\t2-3 min\t7\tLow-fatigue lower strength support\t\nMon\tZone-2 Bike\tEasy sustainable pace\t1\t25 min\t—\t4\tConversational effort only\t\nWed\t[WARMUP]\tBodyweight\t1\t6-8 min\t—\t—\t3 min easy row then shoulders, scap pulls, dip ramp-up, chin ramp-up\t\nWed\tWeighted Dip\t+77.5 kg\t5\t3\t3 min\t8\tHeavy reserve track; clean bar path and lockout\t\nWed\tWeighted Chin-up\t+47.5 kg\t4\t4\t2-3 min\t8\tMaintain pulling strength; full ROM\t\nWed\tBulgarian Split Squat\tDumbbells 28 kg each\t3\t6 each leg\t90 sec\t7.5\tControlled, upright torso\t\nWed\tPlanche Push-up\tBodyweight\t4\t4\t2 min\t8\tParallettes; stop first rep that slows noticeably\t\nWed\tZone-2 Row\tEasy sustainable pace\t1\t25 min\t—\t4\tSteady aerobic work; no hard surges\t\nFri\t[WARMUP]\tBodyweight\t1\t6-8 min\t—\t—\t2 min easy bike then wrists on parallettes, squat ramp-up, chin ramp-up\t\nFri\tBox Jump\tBodyweight\t3\t3\t60 sec\t5\tCrisp and low fatigue\t\nFri\tAdvanced Tuck Planche\tBodyweight\t4\t10-12s\t2 min\t8.5\tSlightly more intent toward straddle shape, but do not chase ugly attempts\t\nFri\tFront Squat\t127.5 kg\t4\t3\t2-3 min\t8\tModerate strength exposure; still no grind reps\t\nFri\tWeighted Chin-up\t+52.5 kg\t5\t3\t2-3 min\t8\tMaintain upper pulling strength with low volume\t\nFri\tDip\tBodyweight\t2\t15\t90 sec\t6\tEasy blood flow and patterning; stop well short of fatigue\t\nEND_WEEK3_TSV\nSTART_WEEK4_TSV\nDay\tExercise\tWeight\tSets\tReps\tRest\tTarget RPE\tNotes\tResults\nMon\t[WARMUP]\tBodyweight\t1\t6-8 min\t—\t—\t2 min easy bike then wrists on parallettes, scap push-up 2x10, front squat ramp-up, dip ramp-up\t\nMon\tBox Jump\tBodyweight\t3\t3\t60 sec\t5\tNon-fatiguing primer; crisp landings before strength\t\nMon\tAdvanced Tuck Planche\tBodyweight\t4\t12-15s\t2 min\t8.5\tBest-quality week; keep shape strict and repeatable\t\nMon\tWeighted Dip\t+60 kg\t5\t5\t2-3 min\t8\tMatch week 2 reps with cleaner execution and shorter total session time if possible\t\nMon\tFront Squat\t122.5 kg\t3\t5\t2-3 min\t7.5\tSolid reps; no need to push harder with BJJ load\t\nMon\tZone-2 Bike\tEasy sustainable pace\t1\t26 min\t—\t4\tConversational effort only\t\nWed\t[WARMUP]\tBodyweight\t1\t6-8 min\t—\t—\t3 min easy row then shoulders, scap pulls, dip ramp-up, chin ramp-up\t\nWed\tWeighted Dip\t+80 kg\t4\t3\t3 min\t8.5\tHeavy reserve track; strong triples, no failed reps\t\nWed\tWeighted Chin-up\t+50 kg\t4\t4\t2-3 min\t8\tMaintain pulling strength; full ROM\t\nWed\tBulgarian Split Squat\tDumbbells 30 kg each\t3\t6 each leg\t90 sec\t7.5\tControlled, upright torso\t\nWed\tPlanche Push-up\tBodyweight\t3\t5\t2 min\t8\tParallettes; quality reps only\t\nWed\tZone-2 Row\tEasy sustainable pace\t1\t26 min\t—\t4\tSteady aerobic work; no hard surges\t\nFri\t[WARMUP]\tBodyweight\t1\t6-8 min\t—\t—\t2 min easy bike then wrists on parallettes, squat ramp-up, chin ramp-up\t\nFri\tBox Jump\tBodyweight\t3\t3\t60 sec\t5\tCrisp and low fatigue\t\nFri\tAdvanced Tuck Planche\tBodyweight\t4\t10-12s\t2 min\t8\tTidy exposure; finish fresher rather than forcing misses\t\nFri\tFront Squat\t130 kg\t4\t3\t2-3 min\t8\tModerate strength exposure; keep bar speed honest\t\nFri\tWeighted Chin-up\t+55 kg\t4\t3\t2-3 min\t8.5\tTop maintenance week; stop before grindy form\t\nFri\tDip\tBodyweight\t2\t15\t90 sec\t6\tEasy blood flow and patterning; stop well short of fatigue\t\nEND_WEEK4_TSV\n<!-- QA_FORMULA_VIOLATION_COUNT: 1 -->",
+      "ok": false,
+      "job_id": "13238e77ef4645a8d97f6723065909e9",
+      "token": "d3f59161257211e2da8347d272c6c5a5",
+      "seconds": 231,
+      "score": {
+        "passed": 11,
+        "total": 14
+      },
+      "quality_percent": 79
+    },
+    {
+      "id": "street_lifter_mma",
+      "name": "Street lifting + human flag + MMA hybrid",
+      "intake": {
+        "language": "en",
+        "primary_goals": [
+          "Weighted Chin-up maximum strength: progress current +70 kg external-load 1RM toward +90 kg 1RM",
+          "Human Flag: progress from a clean Tuck Human Flag 12 second hold toward a controlled Straddle Human Flag"
+        ],
+        "secondary_goals": [
+          "Improve aerobic conditioning and day to day energy with low fatigue Zone 2",
+          "Maintain lower body strength and power for MMA without chasing squat PRs"
+        ],
+        "maintenance_goals": [
+          "Maintain weighted dip strength around +55 kg x 5",
+          "Maintain shoulder and trunk robustness with minimal useful accessory work"
+        ],
+        "current_numbers": "Weighted Chin-up external load 1RM: +70 kg\nWeighted Chin-up: +50 kg x 4 clean reps\nTuck Human Flag: 12 seconds clean per side\nWeighted Dip: +55 kg x 5\nFront Squat: 140 kg x 5\nBroad jump: 2.55 m",
+        "days_per_week": 4,
+        "session_duration_minutes": 70,
+        "gym_availability_mode": "flexible",
+        "available_gym_days": [],
+        "sport": "MMA / kickboxing",
+        "sport_schedule": [
+          {
+            "day": "Mon",
+            "intensity": "hard"
+          },
+          {
+            "day": "Wed",
+            "intensity": "moderate"
+          },
+          {
+            "day": "Fri",
+            "intensity": "hard"
+          },
+          {
+            "day": "Sat",
+            "intensity": "moderate"
+          }
+        ],
+        "same_day_gap_hours": 6,
+        "training_location": "commercial_gym",
+        "equipment": "barbell, plates, rack, bench, dumbbells, cable stack, pull-up bar, dip bars, stall bars, bands, bike, rower, boxes",
+        "split_preference": "full_body",
+        "pain": "Occasional medial elbow irritation if weighted pulling volume becomes excessive. Heavy chin-ups are tolerated when volume is controlled. No current back or shoulder pain.",
+        "mobility": {
+          "active": false
+        },
+        "sleep_hours": "6-7",
+        "recovery_rating": "Average",
+        "notes": "Concurrent advanced athlete. Weighted Chin-up is a true max-strength goal and should remain the anchor lift. Human Flag needs direct skill exposure matched to demonstrated Tuck level, not generic pulling only. Keep MMA interference low. Two meaningful Zone 2 sessions are desirable. Low-cost trunk or carry work may be used if there is recovery and time headroom."
+      },
+      "checks": [
+        {
+          "name": "build accepted",
+          "ok": true,
+          "detail": {
+            "job_id": "bde7cf92c96e23e6048fba85c988b94c",
+            "token": "398a8a676614dcb936315f82324fc3ac",
+            "status": "pending"
+          }
+        },
+        {
+          "name": "program generated",
+          "ok": true,
+          "detail": "chars=10976; seconds=231"
+        },
+        {
+          "name": "four complete week blocks",
+          "ok": true,
+          "detail": [
+            [
+              1,
+              26
+            ],
+            [
+              2,
+              26
+            ],
+            [
+              3,
+              26
+            ],
+            [
+              4,
+              26
+            ]
+          ]
+        },
+        {
+          "name": "no review/internal placeholders",
+          "ok": false,
+          "detail": ""
+        },
+        {
+          "name": "requested gym-day count present",
+          "ok": true,
+          "detail": [
+            "Tue",
+            "Wed",
+            "Thu",
+            "Sun"
+          ]
+        },
+        {
+          "name": "every gym day has real strength or skill work",
+          "ok": true,
+          "detail": [
+            "Tue",
+            "Wed",
+            "Thu",
+            "Sun"
+          ]
+        },
+        {
+          "name": "all client working exercises have direct curated demos",
+          "ok": false,
+          "detail": {
+            "missing": [
+              "One-Leg Tuck Human Flag",
+              "Farmer Carry",
+              "Standing Barbell Overhead Press",
+              "Walking Lunge",
+              "[REVIEW] Ab Wheel",
+              "Side Plank"
+            ],
+            "checked": [
+              "One-Leg Tuck Human Flag",
+              "Box Jump",
+              "Front Squat",
+              "Weighted Dip",
+              "Farmer Carry",
+              "Zone-2 Bike",
+              "Standing Barbell Overhead Press",
+              "Romanian Deadlift",
+              "Walking Lunge",
+              "Zone-2 Row",
+              "Weighted Chin-up",
+              "[REVIEW] Ab Wheel",
+              "Side Plank"
+            ]
+          }
+        },
+        {
+          "name": "Zone 2 is meaningful when requested",
+          "ok": true,
+          "detail": [
+            22,
+            20
+          ]
+        },
+        {
+          "name": "no unnecessary hard conditioning interference",
+          "ok": true,
+          "detail": []
+        },
+        {
+          "name": "weighted chin max-strength anchor is present",
+          "ok": true,
+          "detail": [
+            [
+              "Thu",
+              "+57.5 kg",
+              "5",
+              "1",
+              "8"
+            ],
+            [
+              "Thu",
+              "+50 kg",
+              "3",
+              "2",
+              "7.5"
+            ],
+            [
+              "Sun",
+              "+47.5 kg",
+              "5",
+              "2",
+              "7"
+            ]
+          ]
+        },
+        {
+          "name": "weighted chin volume is controlled for elbow recovery",
+          "ok": false,
+          "detail": [
+            [
+              "Thu",
+              "5",
+              "1"
+            ],
+            [
+              "Thu",
+              "3",
+              "2"
+            ],
+            [
+              "Sun",
+              "5",
+              "2"
+            ]
+          ]
+        },
+        {
+          "name": "human flag gets direct skill exposure",
+          "ok": true,
+          "detail": [
+            [
+              "Tue",
+              "One-Leg Tuck Human Flag",
+              "4",
+              "5-6s/side"
+            ],
+            [
+              "Thu",
+              "One-Leg Tuck Human Flag",
+              "4",
+              "6-8s/side"
+            ]
+          ]
+        },
+        {
+          "name": "human flag is not replaced by generic pulling",
+          "ok": true,
+          "detail": [
+            [
+              "Tue",
+              "One-Leg Tuck Human Flag"
+            ],
+            [
+              "Thu",
+              "One-Leg Tuck Human Flag"
+            ]
+          ]
+        }
+      ],
+      "program": "Keep every rep crisp and stop skill sets before shape breaks. Weighted Chin-up stays the anchor; Human Flag gets direct practice twice weekly; lower body work is enough to maintain MMA useful strength/power without extra fatigue.\n\nWeeks 2-4: make the small jumps shown if bar speed and positions stay solid. If a day feels suppressed from MMA, keep the same load and hit the lower end of the rep target rather than forcing progression.\n\nElbow guidance: use a fully warmed supinated or slightly angled grip that feels best, avoid extra pulling volume beyond what is written, and stop any Weighted Chin-up set if medial elbow pain rises above mild discomfort. If flag side-pressure irritates the elbow or shoulder, swap that day to Assisted One-Arm Pull-up is not appropriate here; instead reduce hold time on One-Leg Tuck Human Flag by 1-2 seconds and keep shape strict. If Front Squat wrists feel beaten up, use straps on the bar.\n\nSTART_WEEK1_TSV\nDay\tExercise\tWeight\tSets\tReps\tRest\tTarget RPE\tNotes\tResults\nTue\t[WARMUP] 5 min easy bike + shoulders/hips + 2 progressive flag position rehearsals\tbodyweight\t1\t5-7 min\t—\t—\tKeep prep moving; no fatigue\t\nTue\tOne-Leg Tuck Human Flag\tbodyweight\t4\t5-6s/side\t2-3 min\t8-9\tPrimary skill; clean stacked shape; stop before swing or elbow collapse\t\nTue\tBox Jump\tbodyweight\t3\t3\t60-90 sec\t6\tReset each rep; explosive, quiet landing\t\nTue\tFront Squat\t100 kg\t3\t4\t2-3 min\t6.5\tLow-fatigue strength support; fast concentric\t\nTue\tWeighted Dip\t+40 kg\t3\t4\t2 min\t7\tMaintain strength; shoulders down and stable\t\nTue\tFarmer Carry\t32 kg each hand\t3\t30 m\t60-90 sec\t7\tBraced ribs-down walk\t\nTue\tZone-2 Bike\teasy-moderate\t1\t22 min\t—\t6\tNasal-breathing pace or conversational pace\t\nWed\t[WARMUP] 4 min easy row + shoulders/T-spine + bar warm-up\tlight\t1\t5-6 min\t—\t—\tKeep this day easy before MMA\t\nWed\tBox Jump\tbodyweight\t3\t2\t60 sec\t5\tPrimer only; full recovery between reps\t\nWed\tStanding Barbell Overhead Press\t50 kg\t3\t5\t2 min\t6.5\tStrict reps; no grind\t\nWed\tRomanian Deadlift\t100 kg\t3\t5\t2 min\t6.5\tHamstring tension; leave 3 reps in reserve\t\nWed\tWalking Lunge\t20 kg dumbbells\t2\t8/leg\t90 sec\t7\tControlled steps; trunk tall\t\nWed\tZone-2 Row\teasy-moderate\t1\t20 min\t—\t6\tLow fatigue; should finish fresher, not cooked\t\nThu\t[WARMUP] 5 min easy bike + scap pull-ups + chin-up ramp sets\tlight\t1\t6-8 min\t—\t—\tInclude 3-4 progressive chin-up warm-up sets\t\nThu\tOne-Leg Tuck Human Flag\tbodyweight\t4\t6-8s/side\t2-3 min\t8-9\tDirect skill; own the start and finish positions\t\nThu\tBox Jump\tbodyweight\t3\t3\t60-90 sec\t6\tExplosive primer before heavy pulling\t\nThu\tWeighted Chin-up\t+57.5 kg\t5\t1\t3-4 min\t8\tHeavy crisp singles; no grindy lockouts\t\nThu\tWeighted Chin-up\t+50 kg\t3\t2\t3 min\t7.5\tBack-off doubles; same bar path as singles\t\nThu\tFront Squat\t110 kg\t3\t3\t2-3 min\t7\tStrength maintenance only\t\nThu\t[REVIEW] Ab Wheel\tbodyweight\t3\t6\t60-90 sec\t7\tThis exercise slot could not be safely generated — please contact support.\t\nSun\t[WARMUP] 5 min easy row + hips/shoulders + chin-up ramp sets\tlight\t1\t6-8 min\t—\t—\tPrepare elbows and upper back well\t\nSun\tBox Jump\tbodyweight\t3\t3\t60-90 sec\t6\tPrimer; stop if pop drops\t\nSun\tWeighted Chin-up\t+47.5 kg\t5\t2\t3 min\t7\tSecondary specific exposure; fast reps\t\nSun\tWeighted Dip\t+45 kg\t3\t5\t2 min\t7.5\tMaintain dip strength without fatigue spillover\t\nSun\tRomanian Deadlift\t110 kg\t3\t5\t2 min\t7\tSolid hinge; no straps unless grip limits position\t\nSun\tSide Plank\tbodyweight\t3\t30s/side\t45-60 sec\t6\tLow-cost trunk stiffness\t\nEND_WEEK1_TSV\nSTART_WEEK2_TSV\nDay\tExercise\tWeight\tSets\tReps\tRest\tTarget RPE\tNotes\tResults\nTue\t[WARMUP] 5 min easy bike + shoulders/hips + 2 progressive flag position rehearsals\tbodyweight\t1\t5-7 min\t—\t—\tKeep prep moving; no fatigue\t\nTue\tOne-Leg Tuck Human Flag\tbodyweight\t4\t6s/side\t2-3 min\t8-9\tAdd time only if shape stays clean\t\nTue\tBox Jump\tbodyweight\t3\t3\t60-90 sec\t6\tReset each rep; explosive, quiet landing\t\nTue\tFront Squat\t102.5 kg\t3\t4\t2-3 min\t6.5\tLow-fatigue strength support; fast concentric\t\nTue\tWeighted Dip\t+42.5 kg\t3\t4\t2 min\t7\tMaintain strength; shoulders down and stable\t\nTue\tFarmer Carry\t34 kg each hand\t3\t30 m\t60-90 sec\t7\tBraced ribs-down walk\t\nTue\tZone-2 Bike\teasy-moderate\t1\t24 min\t—\t6\tNasal-breathing pace or conversational pace\t\nWed\t[WARMUP] 4 min easy row + shoulders/T-spine + bar warm-up\tlight\t1\t5-6 min\t—\t—\tKeep this day easy before MMA\t\nWed\tBox Jump\tbodyweight\t3\t2\t60 sec\t5\tPrimer only; full recovery between reps\t\nWed\tStanding Barbell Overhead Press\t52.5 kg\t3\t5\t2 min\t6.5\tStrict reps; no grind\t\nWed\tRomanian Deadlift\t102.5 kg\t3\t5\t2 min\t6.5\tHamstring tension; leave 3 reps in reserve\t\nWed\tWalking Lunge\t22 kg dumbbells\t2\t8/leg\t90 sec\t7\tControlled steps; trunk tall\t\nWed\tZone-2 Row\teasy-moderate\t1\t22 min\t—\t6\tLow fatigue; should finish fresher, not cooked\t\nThu\t[WARMUP] 5 min easy bike + scap pull-ups + chin-up ramp sets\tlight\t1\t6-8 min\t—\t—\tInclude 3-4 progressive chin-up warm-up sets\t\nThu\tOne-Leg Tuck Human Flag\tbodyweight\t4\t6-8s/side\t2-3 min\t8-9\tDirect skill; own the start and finish positions\t\nThu\tBox Jump\tbodyweight\t3\t3\t60-90 sec\t6\tExplosive primer before heavy pulling\t\nThu\tWeighted Chin-up\t+60 kg\t5\t1\t3-4 min\t8.5\tHeavy crisp singles; no grindy lockouts\t\nThu\tWeighted Chin-up\t+51.25 kg\t3\t2\t3 min\t7.5\tBack-off doubles; same bar path as singles\t\nThu\tFront Squat\t112.5 kg\t3\t3\t2-3 min\t7\tStrength maintenance only\t\nThu\t[REVIEW] Ab Wheel\tbodyweight\t3\t7\t60-90 sec\t7\tThis exercise slot could not be safely generated — please contact support.\t\nSun\t[WARMUP] 5 min easy row + hips/shoulders + chin-up ramp sets\tlight\t1\t6-8 min\t—\t—\tPrepare elbows and upper back well\t\nSun\tBox Jump\tbodyweight\t3\t3\t60-90 sec\t6\tPrimer; stop if pop drops\t\nSun\tWeighted Chin-up\t+50 kg\t5\t2\t3 min\t7.5\tSecondary specific exposure; fast reps\t\nSun\tWeighted Dip\t+47.5 kg\t3\t5\t2 min\t7.5\tMaintain dip strength without fatigue spillover\t\nSun\tRomanian Deadlift\t112.5 kg\t3\t5\t2 min\t7\tSolid hinge; no straps unless grip limits position\t\nSun\tSide Plank\tbodyweight\t3\t35s/side\t45-60 sec\t6\tLow-cost trunk stiffness\t\nEND_WEEK2_TSV\nSTART_WEEK3_TSV\nDay\tExercise\tWeight\tSets\tReps\tRest\tTarget RPE\tNotes\tResults\nTue\t[WARMUP] 5 min easy bike + shoulders/hips + 2 progressive flag position rehearsals\tbodyweight\t1\t5-7 min\t—\t—\tKeep prep moving; no fatigue\t\nTue\tOne-Leg Tuck Human Flag\tbodyweight\t4\t6-7s/side\t2-3 min\t8-9\tAdd time only if shape stays clean\t\nTue\tBox Jump\tbodyweight\t3\t3\t60-90 sec\t6\tReset each rep; explosive, quiet landing\t\nTue\tFront Squat\t105 kg\t3\t4\t2-3 min\t7\tLow-fatigue strength support; fast concentric\t\nTue\tWeighted Dip\t+45 kg\t3\t4\t2 min\t7.5\tMaintain strength; shoulders down and stable\t\nTue\tFarmer Carry\t36 kg each hand\t3\t30 m\t60-90 sec\t7\tBraced ribs-down walk\t\nTue\tZone-2 Bike\teasy-moderate\t1\t25 min\t—\t6\tNasal-breathing pace or conversational pace\t\nWed\t[WARMUP] 4 min easy row + shoulders/T-spine + bar warm-up\tlight\t1\t5-6 min\t—\t—\tKeep this day easy before MMA\t\nWed\tBox Jump\tbodyweight\t3\t2\t60 sec\t5\tPrimer only; full recovery between reps\t\nWed\tStanding Barbell Overhead Press\t55 kg\t3\t5\t2 min\t7\tStrict reps; no grind\t\nWed\tRomanian Deadlift\t105 kg\t3\t5\t2 min\t6.5\tHamstring tension; leave 3 reps in reserve\t\nWed\tWalking Lunge\t24 kg dumbbells\t2\t8/leg\t90 sec\t7\tControlled steps; trunk tall\t\nWed\tZone-2 Row\teasy-moderate\t1\t24 min\t—\t6\tLow fatigue; should finish fresher, not cooked\t\nThu\t[WARMUP] 5 min easy bike + scap pull-ups + chin-up ramp sets\tlight\t1\t6-8 min\t—\t—\tInclude 3-4 progressive chin-up warm-up sets\t\nThu\tOne-Leg Tuck Human Flag\tbodyweight\t4\t7-8s/side\t2-3 min\t9\tDirect skill; own the start and finish positions\t\nThu\tBox Jump\tbodyweight\t3\t3\t60-90 sec\t6\tExplosive primer before heavy pulling\t\nThu\tWeighted Chin-up\t+62.5 kg\t4\t1\t3-4 min\t8.5-9\tHeavy crisp singles; stop at 4 if speed drops\t\nThu\tWeighted Chin-up\t+52.5 kg\t3\t2\t3 min\t8\tBack-off doubles; same bar path as singles\t\nThu\tFront Squat\t115 kg\t3\t3\t2-3 min\t7\tStrength maintenance only\t\nThu\t[REVIEW] Ab Wheel\tbodyweight\t3\t8\t60-90 sec\t7\tThis exercise slot could not be safely generated — please contact support.\t\nSun\t[WARMUP] 5 min easy row + hips/shoulders + chin-up ramp sets\tlight\t1\t6-8 min\t—\t—\tPrepare elbows and upper back well\t\nSun\tBox Jump\tbodyweight\t3\t3\t60-90 sec\t6\tPrimer; stop if pop drops\t\nSun\tWeighted Chin-up\t+52.5 kg\t5\t2\t3 min\t8\tSecondary specific exposure; fast reps\t\nSun\tWeighted Dip\t+50 kg\t3\t5\t2 min\t8\tMaintain dip strength without fatigue spillover\t\nSun\tRomanian Deadlift\t115 kg\t3\t5\t2 min\t7\tSolid hinge; no straps unless grip limits position\t\nSun\tSide Plank\tbodyweight\t3\t40s/side\t45-60 sec\t6\tLow-cost trunk stiffness\t\nEND_WEEK3_TSV\nSTART_WEEK4_TSV\nDay\tExercise\tWeight\tSets\tReps\tRest\tTarget RPE\tNotes\tResults\nTue\t[WARMUP] 5 min easy bike + shoulders/hips + 2 progressive flag position rehearsals\tbodyweight\t1\t5-7 min\t—\t—\tKeep prep moving; no fatigue\t\nTue\tOne-Leg Tuck Human Flag\tbodyweight\t4\t7s/side\t2-3 min\t8-9\tHold quality over duration; no twisting\t\nTue\tBox Jump\tbodyweight\t3\t3\t60-90 sec\t6\tReset each rep; explosive, quiet landing\t\nTue\tFront Squat\t107.5 kg\t3\t4\t2-3 min\t7\tLow-fatigue strength support; fast concentric\t\nTue\tWeighted Dip\t+47.5 kg\t3\t4\t2 min\t7.5\tMaintain strength; shoulders down and stable\t\nTue\tFarmer Carry\t38 kg each hand\t3\t30 m\t60-90 sec\t7\tBraced ribs-down walk\t\nTue\tZone-2 Bike\teasy-moderate\t1\t25 min\t—\t6\tNasal-breathing pace or conversational pace\t\nWed\t[WARMUP] 4 min easy row + shoulders/T-spine + bar warm-up\tlight\t1\t5-6 min\t—\t—\tKeep this day easy before MMA\t\nWed\tBox Jump\tbodyweight\t3\t2\t60 sec\t5\tPrimer only; full recovery between reps\t\nWed\tStanding Barbell Overhead Press\t55 kg\t3\t5\t2 min\t7\tHold week 3 load if sport fatigue is high\t\nWed\tRomanian Deadlift\t107.5 kg\t3\t5\t2 min\t6.5\tHamstring tension; leave 3 reps in reserve\t\nWed\tWalking Lunge\t24 kg dumbbells\t2\t8/leg\t90 sec\t7\tControlled steps; trunk tall\t\nWed\tZone-2 Row\teasy-moderate\t1\t25 min\t—\t6\tLow fatigue; should finish fresher, not cooked\t\nThu\t[WARMUP] 5 min easy bike + scap pull-ups + chin-up ramp sets\tlight\t1\t6-8 min\t—\t—\tInclude 3-4 progressive chin-up warm-up sets\t\nThu\tOne-Leg Tuck Human Flag\tbodyweight\t4\t7-8s/side\t2-3 min\t9\tDirect skill; only clean attempts count\t\nThu\tBox Jump\tbodyweight\t3\t3\t60-90 sec\t6\tExplosive primer before heavy pulling\t\nThu\tWeighted Chin-up\t+63.75 kg\t4\t1\t3-4 min\t8.5-9\tHeavy crisp singles; stop before grind\t\nThu\tWeighted Chin-up\t+53.75 kg\t3\t2\t3 min\t8\tBack-off doubles; same bar path as singles\t\nThu\tFront Squat\t117.5 kg\t3\t3\t2-3 min\t7-7.5\tStrength maintenance only\t\nThu\t[REVIEW] Ab Wheel\tbodyweight\t3\t8\t60-90 sec\t7\tThis exercise slot could not be safely generated — please contact support.\t\nSun\t[WARMUP] 5 min easy row + hips/shoulders + chin-up ramp sets\tlight\t1\t6-8 min\t—\t—\tPrepare elbows and upper back well\t\nSun\tBox Jump\tbodyweight\t3\t3\t60-90 sec\t6\tPrimer; stop if pop drops\t\nSun\tWeighted Chin-up\t+53.75 kg\t5\t2\t3 min\t8\tSecondary specific exposure; fast reps\t\nSun\tWeighted Dip\t+52.5 kg\t3\t5\t2 min\t8\tMaintain dip strength without fatigue spillover\t\nSun\tRomanian Deadlift\t117.5 kg\t3\t5\t2 min\t7\tSolid hinge; no straps unless grip limits position\t\nSun\tSide Plank\tbodyweight\t3\t45s/side\t45-60 sec\t6\tLow-cost trunk stiffness\t\nEND_WEEK4_TSV\n<!-- QA_FORMULA_VIOLATION_COUNT: 1 -->",
+      "ok": false,
+      "job_id": "bde7cf92c96e23e6048fba85c988b94c",
+      "token": "398a8a676614dcb936315f82324fc3ac",
+      "seconds": 231,
+      "score": {
+        "passed": 10,
+        "total": 13
+      },
+      "quality_percent": 77
+    }
+  ],
+  "ok": false,
+  "health": {
+    "ok": true,
+    "mode": "openai",
+    "model": "gpt-5.4",
+    "openai_execution_path": "deterministic-skeleton-v4",
+    "openai_legacy_engine_chars_not_sent": 1494152,
+    "openai_compact_developer_chars": 2687,
+    "last_ai_usage": {
+      "provider": "openai",
+      "model": "gpt-5.4",
+      "reasoning_effort": "low",
+      "input_tokens": 3519,
+      "cached_input_tokens": 0,
+      "output_tokens": 4847,
+      "reasoning_tokens": 1655,
+      "developer_chars": 2687,
+      "source_user_prompt_chars": 65027,
+      "sent_user_prompt_chars": 13140,
+      "legacy_engine_chars_not_sent": 1494152,
+      "execution_path": "deterministic-skeleton-v4",
+      "elapsed_ms": 41267
+    },
+    "last_build_timing": {
+      "total_ms": 168194,
+      "pre_persist_ms": 43435,
+      "generation_and_qa_ms": 64247,
+      "openai_ms": 41267,
+      "save_to_visible_ms": 49125
+    },
+    "storage": "supabase",
+    "storage_ok": true,
+    "ai_configured": true,
+    "thinking_budget": 8192,
+    "cache": {
+      "enabled": true,
+      "ttl_seconds": 1800,
+      "active": false
+    }
+  },
+  "average_quality_percent": 78
+}

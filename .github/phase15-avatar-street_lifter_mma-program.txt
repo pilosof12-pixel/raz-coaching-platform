@@ -1,0 +1,123 @@
+Keep every rep crisp and stop skill sets before shape breaks. Weighted Chin-up stays the anchor; Human Flag gets direct practice twice weekly; lower body work is enough to maintain MMA useful strength/power without extra fatigue.
+
+Weeks 2-4: make the small jumps shown if bar speed and positions stay solid. If a day feels suppressed from MMA, keep the same load and hit the lower end of the rep target rather than forcing progression.
+
+Elbow guidance: use a fully warmed supinated or slightly angled grip that feels best, avoid extra pulling volume beyond what is written, and stop any Weighted Chin-up set if medial elbow pain rises above mild discomfort. If flag side-pressure irritates the elbow or shoulder, swap that day to Assisted One-Arm Pull-up is not appropriate here; instead reduce hold time on One-Leg Tuck Human Flag by 1-2 seconds and keep shape strict. If Front Squat wrists feel beaten up, use straps on the bar.
+
+START_WEEK1_TSV
+Day	Exercise	Weight	Sets	Reps	Rest	Target RPE	Notes	Results
+Tue	[WARMUP] 5 min easy bike + shoulders/hips + 2 progressive flag position rehearsals	bodyweight	1	5-7 min	—	—	Keep prep moving; no fatigue	
+Tue	One-Leg Tuck Human Flag	bodyweight	4	5-6s/side	2-3 min	8-9	Primary skill; clean stacked shape; stop before swing or elbow collapse	
+Tue	Box Jump	bodyweight	3	3	60-90 sec	6	Reset each rep; explosive, quiet landing	
+Tue	Front Squat	100 kg	3	4	2-3 min	6.5	Low-fatigue strength support; fast concentric	
+Tue	Weighted Dip	+40 kg	3	4	2 min	7	Maintain strength; shoulders down and stable	
+Tue	Farmer Carry	32 kg each hand	3	30 m	60-90 sec	7	Braced ribs-down walk	
+Tue	Zone-2 Bike	easy-moderate	1	22 min	—	6	Nasal-breathing pace or conversational pace	
+Wed	[WARMUP] 4 min easy row + shoulders/T-spine + bar warm-up	light	1	5-6 min	—	—	Keep this day easy before MMA	
+Wed	Box Jump	bodyweight	3	2	60 sec	5	Primer only; full recovery between reps	
+Wed	Standing Barbell Overhead Press	50 kg	3	5	2 min	6.5	Strict reps; no grind	
+Wed	Romanian Deadlift	100 kg	3	5	2 min	6.5	Hamstring tension; leave 3 reps in reserve	
+Wed	Walking Lunge	20 kg dumbbells	2	8/leg	90 sec	7	Controlled steps; trunk tall	
+Wed	Zone-2 Row	easy-moderate	1	20 min	—	6	Low fatigue; should finish fresher, not cooked	
+Thu	[WARMUP] 5 min easy bike + scap pull-ups + chin-up ramp sets	light	1	6-8 min	—	—	Include 3-4 progressive chin-up warm-up sets	
+Thu	One-Leg Tuck Human Flag	bodyweight	4	6-8s/side	2-3 min	8-9	Direct skill; own the start and finish positions	
+Thu	Box Jump	bodyweight	3	3	60-90 sec	6	Explosive primer before heavy pulling	
+Thu	Weighted Chin-up	+57.5 kg	5	1	3-4 min	8	Heavy crisp singles; no grindy lockouts	
+Thu	Weighted Chin-up	+50 kg	3	2	3 min	7.5	Back-off doubles; same bar path as singles	
+Thu	Front Squat	110 kg	3	3	2-3 min	7	Strength maintenance only	
+Thu	[REVIEW] Ab Wheel	bodyweight	3	6	60-90 sec	7	This exercise slot could not be safely generated — please contact support.	
+Sun	[WARMUP] 5 min easy row + hips/shoulders + chin-up ramp sets	light	1	6-8 min	—	—	Prepare elbows and upper back well	
+Sun	Box Jump	bodyweight	3	3	60-90 sec	6	Primer; stop if pop drops	
+Sun	Weighted Chin-up	+47.5 kg	5	2	3 min	7	Secondary specific exposure; fast reps	
+Sun	Weighted Dip	+45 kg	3	5	2 min	7.5	Maintain dip strength without fatigue spillover	
+Sun	Romanian Deadlift	110 kg	3	5	2 min	7	Solid hinge; no straps unless grip limits position	
+Sun	Side Plank	bodyweight	3	30s/side	45-60 sec	6	Low-cost trunk stiffness	
+END_WEEK1_TSV
+START_WEEK2_TSV
+Day	Exercise	Weight	Sets	Reps	Rest	Target RPE	Notes	Results
+Tue	[WARMUP] 5 min easy bike + shoulders/hips + 2 progressive flag position rehearsals	bodyweight	1	5-7 min	—	—	Keep prep moving; no fatigue	
+Tue	One-Leg Tuck Human Flag	bodyweight	4	6s/side	2-3 min	8-9	Add time only if shape stays clean	
+Tue	Box Jump	bodyweight	3	3	60-90 sec	6	Reset each rep; explosive, quiet landing	
+Tue	Front Squat	102.5 kg	3	4	2-3 min	6.5	Low-fatigue strength support; fast concentric	
+Tue	Weighted Dip	+42.5 kg	3	4	2 min	7	Maintain strength; shoulders down and stable	
+Tue	Farmer Carry	34 kg each hand	3	30 m	60-90 sec	7	Braced ribs-down walk	
+Tue	Zone-2 Bike	easy-moderate	1	24 min	—	6	Nasal-breathing pace or conversational pace	
+Wed	[WARMUP] 4 min easy row + shoulders/T-spine + bar warm-up	light	1	5-6 min	—	—	Keep this day easy before MMA	
+Wed	Box Jump	bodyweight	3	2	60 sec	5	Primer only; full recovery between reps	
+Wed	Standing Barbell Overhead Press	52.5 kg	3	5	2 min	6.5	Strict reps; no grind	
+Wed	Romanian Deadlift	102.5 kg	3	5	2 min	6.5	Hamstring tension; leave 3 reps in reserve	
+Wed	Walking Lunge	22 kg dumbbells	2	8/leg	90 sec	7	Controlled steps; trunk tall	
+Wed	Zone-2 Row	easy-moderate	1	22 min	—	6	Low fatigue; should finish fresher, not cooked	
+Thu	[WARMUP] 5 min easy bike + scap pull-ups + chin-up ramp sets	light	1	6-8 min	—	—	Include 3-4 progressive chin-up warm-up sets	
+Thu	One-Leg Tuck Human Flag	bodyweight	4	6-8s/side	2-3 min	8-9	Direct skill; own the start and finish positions	
+Thu	Box Jump	bodyweight	3	3	60-90 sec	6	Explosive primer before heavy pulling	
+Thu	Weighted Chin-up	+60 kg	5	1	3-4 min	8.5	Heavy crisp singles; no grindy lockouts	
+Thu	Weighted Chin-up	+51.25 kg	3	2	3 min	7.5	Back-off doubles; same bar path as singles	
+Thu	Front Squat	112.5 kg	3	3	2-3 min	7	Strength maintenance only	
+Thu	[REVIEW] Ab Wheel	bodyweight	3	7	60-90 sec	7	This exercise slot could not be safely generated — please contact support.	
+Sun	[WARMUP] 5 min easy row + hips/shoulders + chin-up ramp sets	light	1	6-8 min	—	—	Prepare elbows and upper back well	
+Sun	Box Jump	bodyweight	3	3	60-90 sec	6	Primer; stop if pop drops	
+Sun	Weighted Chin-up	+50 kg	5	2	3 min	7.5	Secondary specific exposure; fast reps	
+Sun	Weighted Dip	+47.5 kg	3	5	2 min	7.5	Maintain dip strength without fatigue spillover	
+Sun	Romanian Deadlift	112.5 kg	3	5	2 min	7	Solid hinge; no straps unless grip limits position	
+Sun	Side Plank	bodyweight	3	35s/side	45-60 sec	6	Low-cost trunk stiffness	
+END_WEEK2_TSV
+START_WEEK3_TSV
+Day	Exercise	Weight	Sets	Reps	Rest	Target RPE	Notes	Results
+Tue	[WARMUP] 5 min easy bike + shoulders/hips + 2 progressive flag position rehearsals	bodyweight	1	5-7 min	—	—	Keep prep moving; no fatigue	
+Tue	One-Leg Tuck Human Flag	bodyweight	4	6-7s/side	2-3 min	8-9	Add time only if shape stays clean	
+Tue	Box Jump	bodyweight	3	3	60-90 sec	6	Reset each rep; explosive, quiet landing	
+Tue	Front Squat	105 kg	3	4	2-3 min	7	Low-fatigue strength support; fast concentric	
+Tue	Weighted Dip	+45 kg	3	4	2 min	7.5	Maintain strength; shoulders down and stable	
+Tue	Farmer Carry	36 kg each hand	3	30 m	60-90 sec	7	Braced ribs-down walk	
+Tue	Zone-2 Bike	easy-moderate	1	25 min	—	6	Nasal-breathing pace or conversational pace	
+Wed	[WARMUP] 4 min easy row + shoulders/T-spine + bar warm-up	light	1	5-6 min	—	—	Keep this day easy before MMA	
+Wed	Box Jump	bodyweight	3	2	60 sec	5	Primer only; full recovery between reps	
+Wed	Standing Barbell Overhead Press	55 kg	3	5	2 min	7	Strict reps; no grind	
+Wed	Romanian Deadlift	105 kg	3	5	2 min	6.5	Hamstring tension; leave 3 reps in reserve	
+Wed	Walking Lunge	24 kg dumbbells	2	8/leg	90 sec	7	Controlled steps; trunk tall	
+Wed	Zone-2 Row	easy-moderate	1	24 min	—	6	Low fatigue; should finish fresher, not cooked	
+Thu	[WARMUP] 5 min easy bike + scap pull-ups + chin-up ramp sets	light	1	6-8 min	—	—	Include 3-4 progressive chin-up warm-up sets	
+Thu	One-Leg Tuck Human Flag	bodyweight	4	7-8s/side	2-3 min	9	Direct skill; own the start and finish positions	
+Thu	Box Jump	bodyweight	3	3	60-90 sec	6	Explosive primer before heavy pulling	
+Thu	Weighted Chin-up	+62.5 kg	4	1	3-4 min	8.5-9	Heavy crisp singles; stop at 4 if speed drops	
+Thu	Weighted Chin-up	+52.5 kg	3	2	3 min	8	Back-off doubles; same bar path as singles	
+Thu	Front Squat	115 kg	3	3	2-3 min	7	Strength maintenance only	
+Thu	[REVIEW] Ab Wheel	bodyweight	3	8	60-90 sec	7	This exercise slot could not be safely generated — please contact support.	
+Sun	[WARMUP] 5 min easy row + hips/shoulders + chin-up ramp sets	light	1	6-8 min	—	—	Prepare elbows and upper back well	
+Sun	Box Jump	bodyweight	3	3	60-90 sec	6	Primer; stop if pop drops	
+Sun	Weighted Chin-up	+52.5 kg	5	2	3 min	8	Secondary specific exposure; fast reps	
+Sun	Weighted Dip	+50 kg	3	5	2 min	8	Maintain dip strength without fatigue spillover	
+Sun	Romanian Deadlift	115 kg	3	5	2 min	7	Solid hinge; no straps unless grip limits position	
+Sun	Side Plank	bodyweight	3	40s/side	45-60 sec	6	Low-cost trunk stiffness	
+END_WEEK3_TSV
+START_WEEK4_TSV
+Day	Exercise	Weight	Sets	Reps	Rest	Target RPE	Notes	Results
+Tue	[WARMUP] 5 min easy bike + shoulders/hips + 2 progressive flag position rehearsals	bodyweight	1	5-7 min	—	—	Keep prep moving; no fatigue	
+Tue	One-Leg Tuck Human Flag	bodyweight	4	7s/side	2-3 min	8-9	Hold quality over duration; no twisting	
+Tue	Box Jump	bodyweight	3	3	60-90 sec	6	Reset each rep; explosive, quiet landing	
+Tue	Front Squat	107.5 kg	3	4	2-3 min	7	Low-fatigue strength support; fast concentric	
+Tue	Weighted Dip	+47.5 kg	3	4	2 min	7.5	Maintain strength; shoulders down and stable	
+Tue	Farmer Carry	38 kg each hand	3	30 m	60-90 sec	7	Braced ribs-down walk	
+Tue	Zone-2 Bike	easy-moderate	1	25 min	—	6	Nasal-breathing pace or conversational pace	
+Wed	[WARMUP] 4 min easy row + shoulders/T-spine + bar warm-up	light	1	5-6 min	—	—	Keep this day easy before MMA	
+Wed	Box Jump	bodyweight	3	2	60 sec	5	Primer only; full recovery between reps	
+Wed	Standing Barbell Overhead Press	55 kg	3	5	2 min	7	Hold week 3 load if sport fatigue is high	
+Wed	Romanian Deadlift	107.5 kg	3	5	2 min	6.5	Hamstring tension; leave 3 reps in reserve	
+Wed	Walking Lunge	24 kg dumbbells	2	8/leg	90 sec	7	Controlled steps; trunk tall	
+Wed	Zone-2 Row	easy-moderate	1	25 min	—	6	Low fatigue; should finish fresher, not cooked	
+Thu	[WARMUP] 5 min easy bike + scap pull-ups + chin-up ramp sets	light	1	6-8 min	—	—	Include 3-4 progressive chin-up warm-up sets	
+Thu	One-Leg Tuck Human Flag	bodyweight	4	7-8s/side	2-3 min	9	Direct skill; only clean attempts count	
+Thu	Box Jump	bodyweight	3	3	60-90 sec	6	Explosive primer before heavy pulling	
+Thu	Weighted Chin-up	+63.75 kg	4	1	3-4 min	8.5-9	Heavy crisp singles; stop before grind	
+Thu	Weighted Chin-up	+53.75 kg	3	2	3 min	8	Back-off doubles; same bar path as singles	
+Thu	Front Squat	117.5 kg	3	3	2-3 min	7-7.5	Strength maintenance only	
+Thu	[REVIEW] Ab Wheel	bodyweight	3	8	60-90 sec	7	This exercise slot could not be safely generated — please contact support.	
+Sun	[WARMUP] 5 min easy row + hips/shoulders + chin-up ramp sets	light	1	6-8 min	—	—	Prepare elbows and upper back well	
+Sun	Box Jump	bodyweight	3	3	60-90 sec	6	Primer; stop if pop drops	
+Sun	Weighted Chin-up	+53.75 kg	5	2	3 min	8	Secondary specific exposure; fast reps	
+Sun	Weighted Dip	+52.5 kg	3	5	2 min	8	Maintain dip strength without fatigue spillover	
+Sun	Romanian Deadlift	117.5 kg	3	5	2 min	7	Solid hinge; no straps unless grip limits position	
+Sun	Side Plank	bodyweight	3	45s/side	45-60 sec	6	Low-cost trunk stiffness	
+END_WEEK4_TSV
+<!-- QA_FORMULA_VIOLATION_COUNT: 1 -->

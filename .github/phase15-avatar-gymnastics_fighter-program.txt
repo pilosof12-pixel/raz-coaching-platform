@@ -1,0 +1,91 @@
+Keep planche quality high and repeatable, and build the dip goal from both ends: one heavy reserve day and one specific +60 kg volume day. Lower body stays productive but low-cost for BJJ, and Zone 2 is kept easy enough to recover from.
+
+Weeks 2-4: add a little hold time, a little density, or a small load bump only if positions stay clean. Week 4 consolidates with slightly harder top work, not a full deload.
+
+Pain/substitutions: keep all planche work on parallettes. If wrists feel irritated, shorten the hold slightly before changing the shape, and use an extra warm-up set. If front squat feels unusually beat-up from BJJ, swap that day to Goblet Squat at similar effort. Avoid adding any extra hard conditioning.
+
+START_WEEK1_TSV
+Day	Exercise	Weight	Sets	Reps	Rest	Target RPE	Notes	Results
+Mon	[WARMUP]	Bodyweight	1	6-8 min	—	—	2 min easy bike then wrists on parallettes, scap push-up 2x10, front squat ramp-up, dip ramp-up	
+Mon	Box Jump	Bodyweight	3	3	60 sec	5	Non-fatiguing primer; crisp landings before strength	
+Mon	Advanced Tuck Planche	Bodyweight	4	10-12s	2 min	8	Parallettes only; locked elbows, protraction, PPT; stop before form breaks	
+Mon	Weighted Dip	+60 kg	5	4	2-3 min	7	Loaded-endurance track; all reps clean with 1 sec support at top	
+Mon	Front Squat	115 kg	3	5	2-3 min	6.5	Smooth bracing; leave reps in reserve; low fatigue intent	
+Mon	Zone-2 Bike	Easy sustainable pace	1	22 min	—	4	Nasal-breathing conversational effort; keep cadence smooth	
+Wed	[WARMUP]	Bodyweight	1	6-8 min	—	—	3 min easy row then shoulders, scap pulls, dip ramp-up, chin ramp-up	
+Wed	Weighted Dip	+72.5 kg	5	3	3 min	7.5	Heavy reserve track; strong lockout, no grinders	
+Wed	Weighted Chin-up	+42.5 kg	4	4	2-3 min	7	Maintain pulling strength; full hang to chin over bar	
+Wed	Bulgarian Split Squat	Dumbbells 24 kg each	3	6 each leg	90 sec	7	Controlled, upright torso; low-cost lower body work	
+Wed	Planche Push-up	Bodyweight	3	4	2 min	7	Parallettes; quality reps only; stop if scap position degrades	
+Wed	Zone-2 Row	Easy sustainable pace	1	22 min	—	4	Steady aerobic work; no hard surges	
+Fri	[WARMUP]	Bodyweight	1	6-8 min	—	—	2 min easy bike then wrists on parallettes, squat ramp-up, chin ramp-up	
+Fri	Box Jump	Bodyweight	3	3	60 sec	5	Crisp and low fatigue	
+Fri	Advanced Tuck Planche	Bodyweight	4	8-10s	2 min	8	Slightly shorter holds than Monday if needed; pristine position first	
+Fri	Front Squat	122.5 kg	4	3	2-3 min	7	Moderate strength exposure; no grind reps	
+Fri	Weighted Chin-up	+47.5 kg	5	3	2-3 min	7.5	Maintain upper pulling strength with low volume	
+Fri	Dip	Bodyweight	2	12	90 sec	6	Easy blood flow and patterning; stop well short of fatigue	
+END_WEEK1_TSV
+START_WEEK2_TSV
+Day	Exercise	Weight	Sets	Reps	Rest	Target RPE	Notes	Results
+Mon	[WARMUP]	Bodyweight	1	6-8 min	—	—	2 min easy bike then wrists on parallettes, scap push-up 2x10, front squat ramp-up, dip ramp-up	
+Mon	Box Jump	Bodyweight	3	3	60 sec	5	Non-fatiguing primer; crisp landings before strength	
+Mon	Advanced Tuck Planche	Bodyweight	4	11-13s	2 min	8	Parallettes only; locked elbows, protraction, PPT; stop before form breaks	
+Mon	Weighted Dip	+60 kg	5	5	2-3 min	7.5	Loaded-endurance track; same load, add clean reps	
+Mon	Front Squat	117.5 kg	3	5	2-3 min	7	Smooth bracing; still submaximal	
+Mon	Zone-2 Bike	Easy sustainable pace	1	24 min	—	4	Conversational effort; keep it easy enough to recover	
+Wed	[WARMUP]	Bodyweight	1	6-8 min	—	—	3 min easy row then shoulders, scap pulls, dip ramp-up, chin ramp-up	
+Wed	Weighted Dip	+75 kg	5	3	3 min	8	Heavy reserve track; strong lockout, no grinders	
+Wed	Weighted Chin-up	+45 kg	4	4	2-3 min	7.5	Maintain pulling strength; full ROM	
+Wed	Bulgarian Split Squat	Dumbbells 26 kg each	3	6 each leg	90 sec	7	Controlled, upright torso; low-cost lower body work	
+Wed	Planche Push-up	Bodyweight	3	5	2 min	7.5	Parallettes; quality reps only	
+Wed	Zone-2 Row	Easy sustainable pace	1	24 min	—	4	Steady aerobic work; no hard surges	
+Fri	[WARMUP]	Bodyweight	1	6-8 min	—	—	2 min easy bike then wrists on parallettes, squat ramp-up, chin ramp-up	
+Fri	Box Jump	Bodyweight	3	3	60 sec	5	Crisp and low fatigue	
+Fri	Advanced Tuck Planche	Bodyweight	4	9-11s	2 min	8	Add a touch of lean only if holds stay clean	
+Fri	Front Squat	125 kg	4	3	2-3 min	7.5	Moderate strength exposure; no grind reps	
+Fri	Weighted Chin-up	+50 kg	5	3	2-3 min	8	Maintain upper pulling strength with low volume	
+Fri	Dip	Bodyweight	2	14	90 sec	6	Easy blood flow and patterning; stop well short of fatigue	
+END_WEEK2_TSV
+START_WEEK3_TSV
+Day	Exercise	Weight	Sets	Reps	Rest	Target RPE	Notes	Results
+Mon	[WARMUP]	Bodyweight	1	6-8 min	—	—	2 min easy bike then wrists on parallettes, scap push-up 2x10, front squat ramp-up, dip ramp-up	
+Mon	Box Jump	Bodyweight	3	3	60 sec	5	Non-fatiguing primer; crisp landings before strength	
+Mon	Advanced Tuck Planche	Bodyweight	4	12-14s	2 min	8.5	Parallettes only; quality stops before elbow bend or lumbar extension	
+Mon	Weighted Dip	+60 kg	6	4	2-3 min	7.5	Loaded-endurance density progression; 24 total clean reps	
+Mon	Front Squat	120 kg	3	5	2-3 min	7	Low-fatigue lower strength support	
+Mon	Zone-2 Bike	Easy sustainable pace	1	25 min	—	4	Conversational effort only	
+Wed	[WARMUP]	Bodyweight	1	6-8 min	—	—	3 min easy row then shoulders, scap pulls, dip ramp-up, chin ramp-up	
+Wed	Weighted Dip	+77.5 kg	5	3	3 min	8	Heavy reserve track; clean bar path and lockout	
+Wed	Weighted Chin-up	+47.5 kg	4	4	2-3 min	8	Maintain pulling strength; full ROM	
+Wed	Bulgarian Split Squat	Dumbbells 28 kg each	3	6 each leg	90 sec	7.5	Controlled, upright torso	
+Wed	Planche Push-up	Bodyweight	4	4	2 min	8	Parallettes; stop first rep that slows noticeably	
+Wed	Zone-2 Row	Easy sustainable pace	1	25 min	—	4	Steady aerobic work; no hard surges	
+Fri	[WARMUP]	Bodyweight	1	6-8 min	—	—	2 min easy bike then wrists on parallettes, squat ramp-up, chin ramp-up	
+Fri	Box Jump	Bodyweight	3	3	60 sec	5	Crisp and low fatigue	
+Fri	Advanced Tuck Planche	Bodyweight	4	10-12s	2 min	8.5	Slightly more intent toward straddle shape, but do not chase ugly attempts	
+Fri	Front Squat	127.5 kg	4	3	2-3 min	8	Moderate strength exposure; still no grind reps	
+Fri	Weighted Chin-up	+52.5 kg	5	3	2-3 min	8	Maintain upper pulling strength with low volume	
+Fri	Dip	Bodyweight	2	15	90 sec	6	Easy blood flow and patterning; stop well short of fatigue	
+END_WEEK3_TSV
+START_WEEK4_TSV
+Day	Exercise	Weight	Sets	Reps	Rest	Target RPE	Notes	Results
+Mon	[WARMUP]	Bodyweight	1	6-8 min	—	—	2 min easy bike then wrists on parallettes, scap push-up 2x10, front squat ramp-up, dip ramp-up	
+Mon	Box Jump	Bodyweight	3	3	60 sec	5	Non-fatiguing primer; crisp landings before strength	
+Mon	Advanced Tuck Planche	Bodyweight	4	12-15s	2 min	8.5	Best-quality week; keep shape strict and repeatable	
+Mon	Weighted Dip	+60 kg	5	5	2-3 min	8	Match week 2 reps with cleaner execution and shorter total session time if possible	
+Mon	Front Squat	122.5 kg	3	5	2-3 min	7.5	Solid reps; no need to push harder with BJJ load	
+Mon	Zone-2 Bike	Easy sustainable pace	1	26 min	—	4	Conversational effort only	
+Wed	[WARMUP]	Bodyweight	1	6-8 min	—	—	3 min easy row then shoulders, scap pulls, dip ramp-up, chin ramp-up	
+Wed	Weighted Dip	+80 kg	4	3	3 min	8.5	Heavy reserve track; strong triples, no failed reps	
+Wed	Weighted Chin-up	+50 kg	4	4	2-3 min	8	Maintain pulling strength; full ROM	
+Wed	Bulgarian Split Squat	Dumbbells 30 kg each	3	6 each leg	90 sec	7.5	Controlled, upright torso	
+Wed	Planche Push-up	Bodyweight	3	5	2 min	8	Parallettes; quality reps only	
+Wed	Zone-2 Row	Easy sustainable pace	1	26 min	—	4	Steady aerobic work; no hard surges	
+Fri	[WARMUP]	Bodyweight	1	6-8 min	—	—	2 min easy bike then wrists on parallettes, squat ramp-up, chin ramp-up	
+Fri	Box Jump	Bodyweight	3	3	60 sec	5	Crisp and low fatigue	
+Fri	Advanced Tuck Planche	Bodyweight	4	10-12s	2 min	8	Tidy exposure; finish fresher rather than forcing misses	
+Fri	Front Squat	130 kg	4	3	2-3 min	8	Moderate strength exposure; keep bar speed honest	
+Fri	Weighted Chin-up	+55 kg	4	3	2-3 min	8.5	Top maintenance week; stop before grindy form	
+Fri	Dip	Bodyweight	2	15	90 sec	6	Easy blood flow and patterning; stop well short of fatigue	
+END_WEEK4_TSV
+<!-- QA_FORMULA_VIOLATION_COUNT: 1 -->
