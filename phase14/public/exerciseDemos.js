@@ -2,6 +2,18 @@
 // Browser-side direct-only exercise demo resolver.
 
 (function () {
+  // Intake compatibility patch: the engine treats the upper end as the session
+  // ceiling and never tries to fill the range with junk volume.
+  const sessionSelect = document.getElementById('session_length');
+  if (sessionSelect) {
+    sessionSelect.innerHTML = [
+      ['','Any / coach decides'],
+      ['30-45 min','30–45 min'],
+      ['45-70 min','45–70 min'],
+      ['70-90 min','70–90 min']
+    ].map(([value,label]) => `<option value="${value}">${label}</option>`).join('');
+  }
+
   let demos = null;
   let loadPromise = null;
 
