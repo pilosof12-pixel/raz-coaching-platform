@@ -1,4 +1,5 @@
 // Phase 15 attack QA for the deterministic-skeleton-v2 OpenAI runtime.
+// Trigger: confirmed Render live deploy on 2026-08-09.
 import fs from 'node:fs';
 const base = process.env.BASE_URL || 'https://raz-coaching-platform.onrender.com';
 const intake = {
@@ -50,7 +51,6 @@ const check=(name,ok,detail='')=>report.checks.push({name,ok,detail});
 const sleep=ms=>new Promise(r=>setTimeout(r,ms));
 
 try {
-  // Wait for Render to expose the NEW runtime before spending on a generation.
   let hb=null, hStatus=0;
   const deployWaitStarted=Date.now();
   for(let i=0;i<90;i++){
