@@ -1,4 +1,4 @@
-// Triggered after confirmed Render deploy: OpenAI Phase 15 attack QA (compact execution path live)
+// Phase 15 attack QA for the deterministic-skeleton-v2 OpenAI runtime.
 import fs from 'node:fs';
 const base = process.env.BASE_URL || 'https://raz-coaching-platform.onrender.com';
 const intake = {
@@ -45,39 +45,65 @@ const intake = {
   notes:'Advanced concurrent strength and combat athlete. Recovery varies. Prefer low volume full body training. Prioritize strength return per unit fatigue. OAP should use two unilateral specific exposures, not maximal work every day. Weighted chin work must respect +80 kg 1RM. OHP outranks HSPU. Keep low volume jumps or med ball throws if low fatigue and stop before velocity loss. Two to three Zone 2 sessions desirable. Do not add hard running or hard conditioning unnecessarily.'
 };
 
-const report={timestamp:new Date().toISOString(),base,provider_expected:'openai',model_expected:'gpt-5.4',intake,checks:[],ok:false};
+const report={timestamp:new Date().toISOString(),base,provider_expected:'openai',model_expected:'gpt-5.4',execution_path_expected:'deterministic-skeleton-v2',intake,checks:[],ok:false};
 const check=(name,ok,detail='')=>report.checks.push({name,ok,detail});
-const started=Date.now();
-try {
-  const h=await fetch(base+'/api/health'); const hb=await h.json();
-  report.health_before=hb;
-  check('health',h.ok&&hb.ok===true,JSON.stringify(hb));
-  check('OpenAI provider active',hb.mode==='openai'&&hb.model==='gpt-5.4',JSON.stringify({mode:hb.mode,model:hb.model}));
-  if(!h.ok||hb.ok!==true) throw new Error('health failed');
-  if(hb.mode!=='openai'||hb.model!=='gpt-5.4') throw new Error(`OpenAI not active: mode=${hb.mode} model=${hb.model}. Refusing paid benchmark until deploy is ready.`);
+const sleep=ms=>new Promise(r=>setTimeout(r,ms));
 
+try {
+  // Wait for Render to expose the NEW runtime before spending on a generation.
+  let hb=null, hStatus=0;
+  const deployWaitStarted=Date.now();
+  for(let i=0;i<90;i++){
+    try {
+      const h=await fetch(base+'/api/health'); hStatus=h.status; hb=await h.json();
+      if(h.ok && hb?.ok===true && hb?.mode==='openai' && hb?.model==='gpt-5.4' && hb?.openai_execution_path==='deterministic-skeleton-v2') break;
+    } catch(_e) {}
+    await sleep(2000);
+  }
+  report.deploy_wait_seconds=Math.round((Date.now()-deployWaitStarted)/1000);
+  report.health_before=hb;
+  check('health',hStatus===200&&hb?.ok===true,JSON.stringify(hb));
+  check('OpenAI provider active',hb?.mode==='openai'&&hb?.model==='gpt-5.4',JSON.stringify({mode:hb?.mode,model:hb?.model}));
+  check('deterministic skeleton v2 live',hb?.openai_execution_path==='deterministic-skeleton-v2',JSON.stringify({path:hb?.openai_execution_path}));
+  if(hb?.openai_execution_path!=='deterministic-skeleton-v2') throw new Error(`New runtime not live after wait. path=${hb?.openai_execution_path}`);
+
+  const started=Date.now();
   const b=await fetch(base+'/api/build',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({intake})});
-  const bj=await b.json(); check('build accepted',b.status===202&&!!bj.job_id,JSON.stringify(bj));
+  const bj=await b.json();
+  check('build accepted',b.status===202&&!!bj.job_id,JSON.stringify(bj));
   if(!bj.job_id) throw new Error('build not accepted');
   report.job_id=bj.job_id; report.token=bj.token;
+
   let p='';
-  for(let i=0;i<300;i++){
-    await new Promise(r=>setTimeout(r,2000));
-    const jr=await fetch(base+'/api/job/'+encodeURIComponent(bj.job_id)); const j=await jr.json();
+  for(let i=0;i<95;i++){
+    await sleep(2000);
+    const jr=await fetch(base+'/api/job/'+encodeURIComponent(bj.job_id));
+    const j=await jr.json();
     report.last_job={status:j.status,stage:j.stage,attempt:j.attempt,detail:j.detail,error:j.error};
     if(j.status==='done'){p=j.program||'';break;}
     if(j.status==='error') throw new Error(j.error||'engine error');
   }
   report.generation_seconds=Math.round((Date.now()-started)/1000);
-  report.program=p; check('program generated',p.length>500,`chars=${p.length}; seconds=${report.generation_seconds}`);
-  if(!p) throw new Error('generation timed out');
+  report.program=p;
+  check('program generated',p.length>500,`chars=${p.length}; seconds=${report.generation_seconds}`);
+  check('latency under 180s',report.generation_seconds<=180,`seconds=${report.generation_seconds}`);
+  if(!p) throw new Error('generation exceeded bounded benchmark window');
 
   const h2=await fetch(base+'/api/health'); const hb2=await h2.json().catch(()=>({}));
   report.health_after=hb2;
   report.ai_usage=hb2.last_ai_usage||null;
+  check('single paid pass telemetry',Number(report.last_job?.attempt||0)<=1,JSON.stringify(report.last_job));
+  check('compact prompt actually sent',Number(report.ai_usage?.sent_user_prompt_chars||999999)<30000,JSON.stringify(report.ai_usage));
+
+  const markerCount=(name)=>((p.match(new RegExp(name,'g')))||[]).length;
+  const structureOk=[1,2,3,4].every(w=>markerCount(`START_WEEK${w}_TSV`)===1&&markerCount(`END_WEEK${w}_TSV`)===1);
+  check('one block per week',structureOk,JSON.stringify([1,2,3,4].map(w=>({w,start:markerCount(`START_WEEK${w}_TSV`),end:markerCount(`END_WEEK${w}_TSV`)}))));
 
   const block=(p.match(/START_WEEK1_TSV\s*\n([\s\S]*?)\nEND_WEEK1_TSV/i)||[])[1]||'';
-  const lines=block.split('\n').filter(Boolean); const rows=lines.slice(1).map(x=>x.split('\t'));
+  const lines=block.split('\n').filter(Boolean);
+  const rows=lines.slice(1).map(x=>x.split('\t'));
+  const dayCount=new Set(rows.map(r=>r[0]).filter(Boolean)).size;
+  check('four Week 1 gym days',dayCount===4,JSON.stringify([...new Set(rows.map(r=>r[0]).filter(Boolean))]));
 
   const squat=rows.filter(r=>/box squat/i.test(r[1]||'')&&!/^\[WARMUP\]/i.test(r[1]||''));
   const squatReps=squat.map(r=>Number(((r[4]||'').match(/\d+/)||[])[0])).filter(Boolean);
@@ -108,12 +134,19 @@ try {
   const zone2=rows.filter(r=>/zone.?2/i.test(`${r[1]||''} ${r[7]||''}`));
   check('conditioning interference',hardConditioning.length===0&&zone2.length>=2,JSON.stringify({hard:hardConditioning.map(r=>[r[0],r[1],r[4]]),zone2:zone2.map(r=>[r[0],r[1],r[4]])}));
 
-  const reviewRows=rows.filter(r=>/\[REVIEW\]/i.test(r[1]||''));
-  check('no unresolved exercise review markers',reviewRows.length===0,JSON.stringify(reviewRows.map(r=>[r[0],r[1]])));
+  const lateral=rows.filter(r=>/cable lateral raise/i.test(r[1]||''));
+  const face=rows.filter(r=>/face pull/i.test(r[1]||''));
+  check('maintenance accessories retained',lateral.length>=1&&face.length>=1,JSON.stringify({lateral:lateral.map(r=>r[0]),face:face.map(r=>r[0])}));
+
+  const reviewRows=rows.filter(r=>/\[REVIEW\]|support|placeholder/i.test(`${r[1]||''} ${r[7]||''}`));
+  check('no unresolved review/support markers',reviewRows.length===0,JSON.stringify(reviewRows.map(r=>[r[0],r[1]])));
 
   report.score={passed:report.checks.filter(x=>x.ok).length,total:report.checks.length};
   report.ok=report.checks.every(x=>x.ok);
-} catch(e){report.error=String(e?.stack||e);}
+} catch(e){
+  report.error=String(e?.stack||e);
+  report.score={passed:report.checks.filter(x=>x.ok).length,total:report.checks.length};
+}
 fs.writeFileSync('.github/phase15-live-benchmark-result.json',JSON.stringify(report,null,2));
 console.log(JSON.stringify(report,null,2));
 if(!report.ok) process.exitCode=1;
