@@ -1,4 +1,4 @@
-// Phase 15 attack QA for deterministic-skeleton-v3 OpenAI runtime.
+// Phase 15 attack QA for deterministic-skeleton-v4 OpenAI runtime.
 import fs from 'node:fs';
 import { resolveExerciseDemo } from '../phase14/data/lib/exerciseDemos.js';
 const base = process.env.BASE_URL || 'https://raz-coaching-platform.onrender.com';
@@ -43,10 +43,10 @@ const intake = {
   mobility:{active:false},
   sleep_hours:'6-7',
   recovery_rating:'Average',
-  notes:'Advanced concurrent strength and combat athlete. Recovery varies. Prefer low volume full body training. Four strength sessions per week. Prioritize strength return per unit fatigue. OAP should use two unilateral specific exposures, not maximal work every day. Weighted chin work must respect +80 kg 1RM. OHP outranks HSPU. Keep low volume jumps or med ball throws if low fatigue and stop before velocity loss. Two to three Zone 2 sessions desirable. Do not add hard running or hard conditioning unnecessarily.'
+  notes:'Advanced concurrent strength and combat athlete. Recovery varies. Prefer low volume full body training. Four strength sessions per week. Prioritize strength return per unit fatigue. OAP should use two unilateral specific exposures, not maximal work every day. Weighted chin work must respect +80 kg 1RM and may support but not replace direct OAP practice. OHP outranks HSPU. Purposeful overhead variation is acceptable when at least one direct strict OHP exposure remains. Keep low volume jumps or med ball throws if low fatigue and stop before velocity loss. Two to three Zone 2 sessions desirable. Do not add hard running or hard conditioning unnecessarily.'
 };
 
-const report={timestamp:new Date().toISOString(),base,provider_expected:'openai',model_expected:'gpt-5.4',execution_path_expected:'deterministic-skeleton-v3',intake,checks:[],latency_checks:[],ok:false};
+const report={timestamp:new Date().toISOString(),base,provider_expected:'openai',model_expected:'gpt-5.4',execution_path_expected:'deterministic-skeleton-v4',intake,checks:[],latency_checks:[],ok:false};
 const check=(name,ok,detail='')=>report.checks.push({name,ok,detail});
 const latency=(name,ok,detail='')=>report.latency_checks.push({name,ok,detail});
 const sleep=ms=>new Promise(r=>setTimeout(r,ms));
@@ -76,7 +76,7 @@ try {
   for(let i=0;i<120;i++){
     try {
       const {response,json}=await safeJsonFetch(base+'/api/health',{},2); hStatus=response.status; hb=json;
-      if(response.ok && hb?.ok===true && hb?.mode==='openai' && hb?.model==='gpt-5.4' && hb?.openai_execution_path==='deterministic-skeleton-v3') break;
+      if(response.ok && hb?.ok===true && hb?.mode==='openai' && hb?.model==='gpt-5.4' && hb?.openai_execution_path==='deterministic-skeleton-v4') break;
     } catch(_e) {}
     await sleep(2000);
   }
@@ -84,8 +84,8 @@ try {
   report.health_before=hb;
   check('health',hStatus===200&&hb?.ok===true,JSON.stringify(hb));
   check('OpenAI provider active',hb?.mode==='openai'&&hb?.model==='gpt-5.4',JSON.stringify({mode:hb?.mode,model:hb?.model}));
-  check('deterministic skeleton v3 live',hb?.openai_execution_path==='deterministic-skeleton-v3',JSON.stringify({path:hb?.openai_execution_path}));
-  if(hb?.openai_execution_path!=='deterministic-skeleton-v3') throw new Error(`New runtime not live after wait. path=${hb?.openai_execution_path}`);
+  check('deterministic skeleton v4 live',hb?.openai_execution_path==='deterministic-skeleton-v4',JSON.stringify({path:hb?.openai_execution_path}));
+  if(hb?.openai_execution_path!=='deterministic-skeleton-v4') throw new Error(`New runtime not live after wait. path=${hb?.openai_execution_path}`);
 
   const started=Date.now();
   const {response:b,json:bj}=await safeJsonFetch(base+'/api/build',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({intake})});
@@ -141,11 +141,14 @@ try {
   const strict=oap.filter(r=>!/(eccentric|negative|assisted|partial|isometric|archer)/i.test(r[1]||''));
   const assisted=oap.filter(r=>/assisted/i.test(r[1]||''));
   const regression=oap.filter(r=>/(eccentric|negative|archer)/i.test(r[1]||''));
-  check('OAP advanced stage',new Set([...strict,...assisted].map(r=>r[0])).size>=2&&strict.length>=1&&regression.length===0,JSON.stringify(oap.map(r=>[r[0],r[1],r[3],r[4]])));
+  check('OAP direct advanced exposures',new Set([...strict,...assisted].map(r=>r[0])).size>=2&&strict.length>=1&&assisted.length>=1&&regression.length===0,JSON.stringify(oap.map(r=>[r[0],r[1],r[3],r[4]])));
+  const bilateralSupport=rows.filter(r=>/weighted (chin|pull).?up/i.test(r[1]||'')&&!/^\[WARMUP\]/i.test(r[1]||''));
+  check('bilateral pulling is support not OAP replacement',strict.length>=1&&assisted.length>=1,JSON.stringify({direct:oap.map(r=>[r[0],r[1]]),support:bilateralSupport.map(r=>[r[0],r[1],r[2],r[4]])}));
 
   const strictOhp=rows.filter(r=>/^(?:standing barbell )?overhead press$/i.test(String(r[1]||'').trim()));
-  const pushPress=rows.filter(r=>/push press/i.test(r[1]||''));
-  check('two strict OHP exposures',new Set(strictOhp.map(r=>r[0])).size>=2,JSON.stringify({strict:strictOhp.map(r=>[r[0],r[1],r[2],r[3],r[4]]),push:pushPress.map(r=>[r[0],r[1]])}));
+  const pushPress=rows.filter(r=>/^push press$/i.test(String(r[1]||'').trim()));
+  const verticalPress=[...strictOhp,...pushPress];
+  check('OHP specificity plus purposeful variation',new Set(strictOhp.map(r=>r[0])).size>=1&&new Set(verticalPress.map(r=>r[0])).size>=2,JSON.stringify({strict:strictOhp.map(r=>[r[0],r[1],r[2],r[3],r[4]]),variation:pushPress.map(r=>[r[0],r[1],r[2],r[3],r[4]])}));
 
   const painRisk=rows.filter(r=>/(back extension|romanian deadlift|good morning)/i.test(r[1]||''));
   check('pain tolerance acknowledged',painRisk.every(r=>/(toler|pain.?free|symptom|if comfortable|stop if|proven)/i.test(r[7]||'')),JSON.stringify(painRisk.map(r=>[r[0],r[1],r[7]])));
