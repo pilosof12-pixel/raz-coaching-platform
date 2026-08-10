@@ -7,6 +7,7 @@ import crypto from "node:crypto";
 import { makeStorage } from "./storage.js";
 import { makeEntitlementStore } from "./entitlements.js";
 import { makeAnalyticsStore, isAllowedAnalyticsEvent } from "./analytics.js";
+import { validateLaunchIntake } from "./intake_validation.js";
 
 const TOKEN_RE = /^[a-f0-9]{32}$/i;
 const JOB_RE = /^[a-f0-9]{32}$/i;
@@ -144,7 +145,8 @@ function securityMiddleware(req, res, next) {
 
   if (req.method === "POST" && req.path === "/api/build") {
     const intake = req.body?.intake;
-    if (!intake || typeof intake !== "object") return res.status(400).json({ error: "Missing intake." });
+    const intakeError = validateLaunchIntake(intake);
+    if (intakeError) return res.status(400).json({ error: intakeError });
     if (!validConsent(intake)) return res.status(400).json({ error: "Privacy consent is required before program generation." });
     let serialized = "";
     try { serialized = JSON.stringify(intake); } catch (_e) {}
