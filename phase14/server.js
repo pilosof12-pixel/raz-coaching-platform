@@ -1468,6 +1468,31 @@ function phase15LastMileTsv(tsv, intake) {
       cells[7] = 'Use a brisk walk or very easy jog that keeps breathing conversational; do not turn this into intervals.';
       ex = cells[1];
     }
+    if (/\[REVIEW\].*Short Sprint|^Short Sprint$/i.test(ex)) {
+      cells[1] = 'Sprint';
+      cells[7] = 'Maximum-quality short sprint. Accelerate hard, recover fully, and stop if speed drops noticeably.';
+      ex = cells[1];
+    }
+    if (/\[REVIEW\].*Ring Chin-up|^Ring Chin-up$/i.test(ex)) {
+      cells[1] = 'Chin-up';
+      cells[7] = 'Use the pull-up bar or rings with a supinated/neutral grip; keep reps strict and leave 1-2 reps in reserve.';
+      ex = cells[1];
+    }
+    if (parkOnly && !hasBoxOrBench && /^Box Jump$/i.test(ex)) {
+      cells[1] = 'Broad Jump';
+      cells[7] = 'Maximum-quality horizontal jump. Reset fully between reps and stop as soon as distance or landing quality drops.';
+      ex = cells[1];
+    }
+    if (parkOnly && !hasBike && /^Zone-2 Bike$/i.test(ex)) {
+      cells[1] = 'Zone-2 Run';
+      cells[7] = 'Use a brisk walk or very easy jog that keeps breathing conversational; do not turn this into intervals.';
+      ex = cells[1];
+    }
+    if (parkOnly && !hasRower && /^Zone-2 Row$/i.test(ex)) {
+      cells[1] = 'Zone-2 Run';
+      cells[7] = 'Use a brisk walk or very easy jog that keeps breathing conversational; do not turn this into intervals.';
+      ex = cells[1];
+    }
     if (!hasAdvancedTuckPlanche && /^Straddle Planche$/i.test(ex)) continue;
     if (hasAdvancedTuckFrontLever && !hasSingleLegFrontLever && /^Straddle Front Lever$/i.test(ex)) {
       cells[1] = 'Single-Leg Front Lever';
