@@ -26,6 +26,8 @@ Status date: 2026-08-10
 - [x] Program Pass entitlement regression tests added and passing in GitHub Actions.
 - [x] `server_secure.js`, `storage.js` and `entitlements.js` launch-layer syntax checks pass in GitHub Actions.
 - [x] Root regression tests pass with the Program Pass changes.
+- [x] Phase 15 source-grounding regression fixture corrected without changing production coaching logic.
+- [x] Full GitHub Actions regression workflow passes on the hardening branch.
 
 ## Program Pass rollout — environment work still required
 
@@ -100,14 +102,13 @@ Your pass includes one personalised 4-week training block, 8 weeks of access and
 ## Remaining launch workstreams
 
 1. Finish staging/deployment checks for privacy, RLS and Program Pass enforcement.
-2. Resolve or explicitly quarantine the unrelated Phase 15 generated-runtime regression currently failing the broader GitHub workflow.
-3. Run adversarial customer journey: purchase -> code -> intake -> generation -> download -> leave -> return -> adjust -> language -> delete.
-4. Review adaptive intake sufficiency on several deliberately incomplete/contradictory avatars.
-5. Add lightweight funnel analytics: landing CTA click, intake start, build started, build success, spreadsheet download, return, adjust success, purchase/re-purchase attribution where available.
-6. Final mobile UX pass.
-7. Final launch video and social campaign assets.
-8. Launch validation: first 10 paying users, then review conversion, generation cost, adjustment usage and repurchase rate before changing price/allowances.
+2. Run adversarial customer journey: purchase -> code -> intake -> generation -> download -> leave -> return -> adjust -> language -> delete.
+3. Review adaptive intake sufficiency on several deliberately incomplete/contradictory avatars.
+4. Add lightweight funnel analytics: landing CTA click, intake start, build started, build success, spreadsheet download, return, adjust success, purchase/re-purchase attribution where available.
+5. Final mobile UX pass.
+6. Final launch video and social campaign assets.
+7. Launch validation: first 10 paying users, then review conversion, generation cost, adjustment usage and repurchase rate before changing price/allowances.
 
-## CI note
+## CI status
 
-The current GitHub Actions run verifies the launch-layer syntax checks, Program Pass entitlement regression tests and the normal root regression suite successfully. The repository's broader workflow still fails later in the separate Phase 15 generated-runtime source-grounding test because its generated canonical catalog contains placeholder exercise names and does not contain `Reverse Lunge`. Treat that as a separate existing runtime/engine issue rather than a Program Pass failure.
+The complete GitHub Actions regression workflow is green on the hardening branch. This includes root tests, Program Pass entitlement tests, launch-layer syntax checks, Phase 15 source-grounding tests, generated-runtime validation, planner regression tests and specialist-rule tests.
