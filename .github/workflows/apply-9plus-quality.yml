@@ -1,0 +1,66 @@
+name: Apply 9+ quality patch
+
+on:
+  push:
+    branches:
+      - agent/quality-9plus-pass
+    paths:
+      - 'scripts/apply_9plus_quality_patch.mjs'
+      - '.github/workflows/apply-9plus-quality.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  patch-and-test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: agent/quality-9plus-pass
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Apply patch
+        run: node scripts/apply_9plus_quality_patch.mjs
+      - name: Validate generated Phase 15 runtime
+        run: |
+          npm ci
+          npm test
+          node --check server.js
+          node --check engine/exercise_dictionary.js
+          node --check phase14/engine/exercise_dictionary.js
+          node --check phase14/engine/phase15_planner.js
+          node --check phase14/engine/phase15_program_qa.js
+          node --check phase14/engine/phase15_final_qa.js
+          node phase14/scripts/build_phase15_runtime.mjs
+          node --check phase14/server.phase15.js
+          node --test phase14/test/phase15_planner_regression.test.mjs
+          node --test phase14/test/phase15_specialist_rules.test.mjs
+          node - <<'NODE'
+          const fs = require('fs');
+          const runtime = fs.readFileSync('phase14/server.phase15.js','utf8');
+          const planner = fs.readFileSync('phase14/engine/phase15_planner.js','utf8');
+          const qa = fs.readFileSync('phase14/engine/phase15_final_qa.js','utf8');
+          const dict = fs.readFileSync('phase14/engine/exercise_dictionary.js','utf8');
+          for (const token of ['RPE-selected load','next-rung bridge','low-cost/recovery-contingent']) {
+            if (!runtime.includes(token) && !planner.includes(token)) throw new Error('Missing quality rule: '+token);
+          }
+          for (const token of ['CLIENT_OUTPUT_NOT_READY','ZERO_WORK_PLACEHOLDER_ROW','TSV_ROW_MALFORMED']) {
+            if (!qa.includes(token)) throw new Error('Missing final QA rule: '+token);
+          }
+          for (const token of ['Dumbbell Overhead Press','Dumbbell Floor Press']) {
+            if (!dict.includes(token)) throw new Error('Missing canonical exercise: '+token);
+          }
+          console.log('9+ quality static assertions passed');
+          NODE
+      - name: Commit patched sources
+        run: |
+          git config user.name 'RAZ QA bot'
+          git config user.email 'actions@users.noreply.github.com'
+          git add engine/exercise_dictionary.js phase14/engine/exercise_dictionary.js phase14/engine/phase15_planner.js phase14/engine/phase15_program_qa.js phase14/engine/phase15_final_qa.js phase14/scripts/build_phase15_runtime.mjs
+          if git diff --cached --quiet; then echo 'No source changes'; exit 0; fi
+          git commit -m 'Raise program quality gate toward 9 plus'
+          git push origin HEAD:agent/quality-9plus-pass
