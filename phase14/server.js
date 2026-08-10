@@ -1393,11 +1393,30 @@ function phase15LastMileTsv(tsv, intake) {
   const hasAdvancedTuckPlanche = /advanced tuck planche/.test(benchmark);
   const hasAdvancedTuckFrontLever = /advanced tuck front lever/.test(benchmark);
   const hasSingleLegFrontLever = /single[- ]leg front lever/.test(benchmark);
+  const location = String(intake?.training_location || '').toLowerCase();
+  const equipmentText = JSON.stringify(intake?.equipment || '').toLowerCase();
+  const parkOnly = /outdoor|park/.test(location);
+  const hasBoxOrBench = /\bbox\b|\bbench\b/.test(equipmentText);
+  const hasBike = /bike|airbike|assault|echo/.test(equipmentText);
+  const hasRower = /rower|rowing machine|concept ?2/.test(equipmentText);
+  const availableDays = Array.isArray(intake?.available_gym_days) ? intake.available_gym_days.map((d) => String(d || '').trim()).filter(Boolean) : [];
+  const requestedDays = Number(intake?.days_per_week || 0);
+  let dayMap = new Map();
   const out = [];
   for (const line of String(tsv).split('\n')) {
-    if (!line.includes('\t')) { out.push(line); continue; }
+    if (!line.includes('\t')) {
+      if (/START_WEEK\d+_TSV/.test(line)) dayMap = new Map();
+      out.push(line); continue;
+    }
     const cells = line.split('\t');
     if (cells.length !== 9 || /^Day$/i.test(cells[0])) { out.push(line); continue; }
+    if (availableDays.length === requestedDays && requestedDays > 0) {
+      const rawDay = String(cells[0] || '').trim();
+      if (rawDay) {
+        if (!dayMap.has(rawDay)) dayMap.set(rawDay, availableDays[dayMap.size] || rawDay);
+        cells[0] = dayMap.get(rawDay);
+      }
+    }
     let ex = String(cells[1] || '').trim();
     if (/\[REVIEW\].*Paused Back Squat|^Paused Back Squat$/i.test(ex)) {
       cells[1] = 'Pause Squat';
@@ -1432,6 +1451,21 @@ function phase15LastMileTsv(tsv, intake) {
     if (/\[REVIEW\].*Hanging Knee Raise|^Hanging Knee Raise$/i.test(ex)) {
       cells[1] = 'Hanging Knee Raise';
       cells[7] = 'Control the pelvis, avoid swinging, and raise the knees with the trunk braced.';
+      ex = cells[1];
+    }
+    if (parkOnly && !hasBoxOrBench && /^Box Jump$/i.test(ex)) {
+      cells[1] = 'Broad Jump';
+      cells[7] = 'Maximum-quality horizontal jump. Reset fully between reps and stop as soon as distance or landing quality drops.';
+      ex = cells[1];
+    }
+    if (parkOnly && !hasBike && /^Zone-2 Bike$/i.test(ex)) {
+      cells[1] = 'Zone-2 Run';
+      cells[7] = 'Use a brisk walk or very easy jog that keeps breathing conversational; do not turn this into intervals.';
+      ex = cells[1];
+    }
+    if (parkOnly && !hasRower && /^Zone-2 Row$/i.test(ex)) {
+      cells[1] = 'Zone-2 Run';
+      cells[7] = 'Use a brisk walk or very easy jog that keeps breathing conversational; do not turn this into intervals.';
       ex = cells[1];
     }
     if (!hasAdvancedTuckPlanche && /^Straddle Planche$/i.test(ex)) continue;
