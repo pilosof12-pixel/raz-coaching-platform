@@ -21,7 +21,7 @@ function sourceCorpus(engineText) {
   return start >= 0 ? full.slice(start) : full;
 }
 
-function chunkCorpus(engineText, maxChunkChars = 3200) {
+function chunkCorpus(engineText, maxChunkChars = 1800) {
   const paras = sourceCorpus(engineText).split(/\n{2,}/).map(x => x.trim()).filter(x => x.length >= 80);
   const chunks = [];
   let buf = '';
@@ -64,8 +64,9 @@ function scoreChunk(chunk, terms) {
 }
 
 export function retrieveCuratedCoachingExcerpts(engineText, intake = {}, options = {}) {
-  const maxChars = Number(options.maxChars || 16000);
-  const maxChunks = Number(options.maxChunks || 7);
+  // Keep enough authored evidence to ground the decision while preserving the compact-path cap.
+  const maxChars = Number(options.maxChars || 5200);
+  const maxChunks = Number(options.maxChunks || 3);
   const terms = sourceRoutingTerms(intake);
   const scored = chunkCorpus(engineText).map((text, index) => ({ text, index, score: scoreChunk(text, terms) }))
     .filter(x => x.score > 0)
@@ -74,7 +75,7 @@ export function retrieveCuratedCoachingExcerpts(engineText, intake = {}, options
   let used = 0;
   for (const item of scored) {
     if (selected.length >= maxChunks) break;
-    if (used + item.text.length > maxChars && selected.length >= 3) continue;
+    if (used + item.text.length > maxChars && selected.length >= 2) continue;
     selected.push(item);
     used += item.text.length;
   }
