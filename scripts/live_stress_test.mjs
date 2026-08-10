@@ -41,22 +41,30 @@ async function waitForDeployment() {
 }
 
 const AVATARS = {
-  gymnastics_advanced: {
-    primary_goals: ["Full Planche", "Full Front Lever", "One-Arm Pull-Up"],
-    secondary_goals: ["Maintain general lower-body strength"],
-    experience: "advanced",
-    days_per_week: "5",
-    session_length: "75",
-    bodyweight: "78 kg",
-    equipment: "Full commercial gym with pull-up bars, cable stacks, free weights, rings and parallettes.",
-    training_location: "commercial_gym",
+  warrior_client: {
+    primary_goals: [
+      "Build a Batman-style warrior physique: muscular, strong, athletic, explosive and capable",
+      "Hypertrophy with strong weighted calisthenics",
+      "Develop useful athletic skills, power, trunk strength, grip and work capacity"
+    ],
+    secondary_goals: [
+      "Improve body composition while preserving strength",
+      "Make outdoor training challenging and enjoyable without gimmicky random circuits"
+    ],
+    experience: "intermediate",
+    days_per_week: "3",
+    session_length: "60-75",
+    bodyweight: "100 kg",
+    height: "180 cm",
+    equipment: "Outdoor calisthenics park with pull-up bar, parallel dip bars, gymnastic rings, and a weighted dip/pull-up belt with load plates allowing up to 37 kg added weight. No barbell, no dumbbells, no cables, no machines.",
+    training_location: "outdoor_park",
     language: "en",
     split_preference: "coach_decide",
-    current_numbers: "Tuck planche 15s. Advanced tuck front lever 10s. 18 strict pull-ups. Weighted pull-up +45 kg x3. Assisted one-arm pull-up with light assistance. 10 strict ring dips. Back squat 150 kg x3.",
+    current_numbers: "Weighted dip: +20 kg x12 reps and +35 kg x2 reps. Weighted pull-up: +20 kg x6 reps. Historical back squat around 100 kg, showing relatively strong legs, but no barbell is available now.",
     injuries: "none",
-    sport: "BJJ",
-    sport_schedule: [{ day: "Tue", intensity: "moderate" }, { day: "Sat", intensity: "moderate" }],
-    notes: "Gymnastics skills are the priority. Do not waste time on beginner progressions. Wants strength work alongside skill work, but recovery for skill quality matters most.",
+    sport: "none",
+    sport_schedule: [],
+    notes: "Real client. Overweight/chubby at about 100 kg but naturally strong. He does not train combat sports. He likes a Batman/warrior training identity. Translate that vibe into serious programming: hypertrophy, relative strength, weighted pull-ups and dips, athletic lower-body work, jumps or short sprints where appropriate, trunk, grip and structured conditioning. Do NOT turn warrior style into random burpees, bear crawls or meaningless AMRAP circus. Exactly two sessions are mandatory. The third weekly session must be explicitly OPTIONAL and lower-cost/recovery-contingent, so missing it does not break progression. Use unilateral lower-body methods, tempo, ROM and athletic power to overcome the 37 kg external-load ceiling. Respect the park-only equipment hard stop.",
   },
 };
 
