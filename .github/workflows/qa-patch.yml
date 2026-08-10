@@ -4,6 +4,9 @@ on:
   push:
     branches:
       - agent/qa-openai-primary
+  pull_request:
+    branches:
+      - main
 
 permissions:
   contents: write
@@ -28,6 +31,7 @@ jobs:
       - name: Syntax check production server
         run: node --check server.js
       - name: Commit generated production changes
+        if: github.event_name == 'push'
         run: |
           if git diff --quiet -- server.js package.json; then
             echo "No generated changes to commit"
