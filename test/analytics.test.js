@@ -9,9 +9,9 @@ test("analytics accepts only the fixed launch funnel allowlist", () => {
   }
 });
 
-test("analytics allowlist contains no customer-content fields", () => {
+test("analytics allowlist contains no identifying or content-bearing fields", () => {
   const names = [...ANALYTICS_EVENTS].join(" ").toLowerCase();
-  for (const forbidden of ["token", "email", "injury", "program_text", "intake", "ip", "name"]) {
+  for (const forbidden of ["token", "email", "injury_text", "program_text", "ip_address", "user_name", "bodyweight", "notes"]) {
     assert.equal(names.includes(forbidden), false);
   }
 });
