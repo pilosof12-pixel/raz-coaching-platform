@@ -26,12 +26,8 @@ function chunkCorpus(engineText, maxChunkChars = 1800) {
   const chunks = [];
   let buf = '';
   for (const p of paras) {
-    if (buf && buf.length + p.length + 2 > maxChunkChars) {
-      chunks.push(buf);
-      buf = p;
-    } else {
-      buf = buf ? buf + '\n\n' + p : p;
-    }
+    if (buf && buf.length + p.length + 2 > maxChunkChars) { chunks.push(buf); buf = p; }
+    else buf = buf ? buf + '\n\n' + p : p;
   }
   if (buf) chunks.push(buf);
   return chunks;
@@ -53,40 +49,57 @@ export function sourceRoutingTerms(intake = {}) {
 }
 
 function scoreChunk(chunk, terms) {
-  const low = chunk.toLowerCase();
-  let score = 0;
-  for (const term of terms) {
-    if (!low.includes(term)) continue;
-    score += term.includes(' ') ? 5 : term.length >= 9 ? 3 : 1;
-  }
+  const low = chunk.toLowerCase(); let score = 0;
+  for (const term of terms) if (low.includes(term)) score += term.includes(' ') ? 5 : term.length >= 9 ? 3 : 1;
   if (/article\s+n\d+|source|evidence|knowledge layer/i.test(chunk)) score += 1;
   return score;
 }
 
 export function retrieveCuratedCoachingExcerpts(engineText, intake = {}, options = {}) {
-  // Keep enough authored evidence to ground the decision while preserving the compact-path cap.
   const maxChars = Number(options.maxChars || 5200);
   const maxChunks = Number(options.maxChunks || 3);
   const terms = sourceRoutingTerms(intake);
-  const scored = chunkCorpus(engineText).map((text, index) => ({ text, index, score: scoreChunk(text, terms) }))
-    .filter(x => x.score > 0)
-    .sort((a, b) => b.score - a.score || a.index - b.index);
-  const selected = [];
-  let used = 0;
+  const scored = chunkCorpus(engineText).map((text,index)=>({text,index,score:scoreChunk(text,terms)})).filter(x=>x.score>0).sort((a,b)=>b.score-a.score||a.index-b.index);
+  const selected=[]; let used=0;
   for (const item of scored) {
     if (selected.length >= maxChunks) break;
     if (used + item.text.length > maxChars && selected.length >= 2) continue;
-    selected.push(item);
-    used += item.text.length;
+    selected.push(item); used += item.text.length;
   }
   if (!selected.length) throw new Error('SOURCE_GROUNDING_NO_RELEVANT_EXCERPTS');
-  return selected.map((x, i) => 'SOURCE EXCERPT ' + (i + 1) + '\n' + x.text).join('\n\n');
+  return selected.map((x,i)=>'SOURCE EXCERPT '+(i+1)+'\n'+x.text).join('\n\n');
 }
 
-export function canonicalExerciseCatalog(exerciseDictionary) {
-  const names = [...(exerciseDictionary || [])].map(String).filter(Boolean).sort((a, b) => a.localeCompare(b));
-  if (names.length < 50) throw new Error('SOURCE_GROUNDING_EXERCISE_CATALOG_TOO_SMALL');
-  return names.join(' | ');
+function exerciseFamilyTerms(intake = {}) {
+  const raw = normalizeText(intake).toLowerCase();
+  const terms = new Set(['warm-up','plank','dead bug','pallof','carry','row','push-up','pull-up','chin-up']);
+  const add = xs => xs.forEach(x => terms.add(x));
+  if (/one-arm|oap|weighted chin|weighted pull/.test(raw)) add(['one-arm','weighted pull-up','weighted chin-up','archer pull-up','pull-up','chin-up']);
+  if (/squat|box squat|lower body|leg/.test(raw)) add(['squat','box squat','split squat','lunge','hip thrust','leg press','hamstring curl','calf raise']);
+  if (/overhead press|\bohp\b|push press|shoulder/.test(raw)) add(['overhead press','push press','dumbbell shoulder press','lateral raise','face pull']);
+  if (/zone\s*2|aerobic|conditioning/.test(raw)) add(['zone-2','bike','row','run','treadmill','assault bike']);
+  if (/bjj|mma|wrestl|combat/.test(raw)) add(['neck','pallof','carry','row','hip thrust','copenhagen','side plank']);
+  if (/planche/.test(raw)) add(['planche']);
+  if (/front lever/.test(raw)) add(['front lever']);
+  if (/handstand|hspu/.test(raw)) add(['handstand','pike push-up']);
+  if (/dip/.test(raw)) add(['dip']);
+  if (/park|rings/.test(raw)) add(['ring','dip','pull-up','chin-up','sprint','broad jump','split squat']);
+  return [...terms];
+}
+
+export function canonicalExerciseCatalog(exerciseDictionary, intake = {}) {
+  const all = [...(exerciseDictionary || [])].map(String).filter(Boolean);
+  if (all.length < 50) throw new Error('SOURCE_GROUNDING_EXERCISE_CATALOG_TOO_SMALL');
+  const terms = exerciseFamilyTerms(intake);
+  const selected = all.filter(name => {
+    const low = name.toLowerCase();
+    return terms.some(term => low.includes(term));
+  });
+  // Keep a compact, deterministic closed set. If routing becomes too narrow, fall back to the first
+  // canonical names rather than sending the entire library and breaking prompt-size limits.
+  const unique = [...new Set(selected)].sort((a,b)=>a.localeCompare(b));
+  const fallback = all.filter(x=>!unique.includes(x)).slice(0, Math.max(0, 60-unique.length));
+  return [...unique, ...fallback].slice(0, 120).join(' | ');
 }
 
 export function buildPhase15SourceGrounding(engineText, intake, exerciseDictionary) {
@@ -97,6 +110,6 @@ export function buildPhase15SourceGrounding(engineText, intake, exerciseDictiona
     '',
     '=== CANONICAL EXERCISE CATALOG ===',
     'Exercise-column names must come from this catalog exactly. Do not paraphrase, pluralize, rename or invent exercise names. Aliases are handled by the deterministic server, not by the model.',
-    canonicalExerciseCatalog(exerciseDictionary),
+    canonicalExerciseCatalog(exerciseDictionary, intake),
   ].join('\n');
 }
