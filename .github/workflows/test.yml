@@ -38,10 +38,13 @@ jobs:
           node --check phase14/engine/phase15_final_qa.js
           node --test phase14/test/phase15_planner_regression.test.mjs
           node --test phase14/test/phase15_specialist_rules.test.mjs
-          grep -q 'deterministic-skeleton-v5.2-benchmark-anchored' phase14/server.phase15.js
+          grep -q 'deterministic-skeleton-v5.2.1-warrior-approved' phase14/server.phase15.js
           grep -q 'WEIGHTED CALISTHENICS BENCHMARK ANCHOR' phase14/server.phase15.js
           grep -q 'phase15LastMileTsv' phase14/server.phase15.js
           grep -q 'UNRESOLVED_CLIENT_REVIEW' phase14/server.phase15.js
+          grep -q 'Ring Push-up' phase14/server.js
+          grep -q 'Ring Hamstring Curl' phase14/server.js
+          grep -q 'Pistol Squat to Box or Bench' phase14/server.js
           grep -q 'RPE-selected load' phase14/server.phase15.js
           grep -q 'Pseudo Planche Push-up' phase14/server.phase15.js
           grep -q '0-set or 0-rep explanatory placeholder row' phase14/server.phase15.js
@@ -53,5 +56,5 @@ jobs:
           git config user.email 'actions@users.noreply.github.com'
           git add phase14/server.js phase14/scripts/build_phase15_runtime.mjs
           if git diff --cached --quiet; then echo 'No source patch to commit'; exit 0; fi
-          git commit -m 'Apply benchmark-anchored Phase 15 runtime'
+          git commit -m 'Apply Warrior-approved Phase 15 runtime'
           git push origin HEAD:${TARGET_BRANCH}
