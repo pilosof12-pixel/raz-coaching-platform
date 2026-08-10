@@ -30,8 +30,9 @@ BEGIN
 END $$;
 
 -- Data minimisation helper.
--- The client's current intake/program remain until the client requests deletion,
--- because lifetime access requires them. Operational copies should not live forever.
+-- The client's active intake/program should remain only while the purchased access
+-- window requires them, or until the client requests deletion. Operational copies
+-- have substantially shorter retention and should not live forever.
 CREATE OR REPLACE FUNCTION public.purge_expired_operational_data()
 RETURNS void
 LANGUAGE plpgsql
@@ -45,7 +46,7 @@ BEGIN
   DELETE FROM public.jobs
   WHERE created_at < now_ms - (7::bigint * 24 * 60 * 60 * 1000);
 
-  -- Adjustment/build history is useful for troubleshooting but contains sensitive
+  -- Adjustment/build history can help with troubleshooting but contains sensitive
   -- intake and health-related text. Keep a bounded window rather than indefinitely.
   DELETE FROM public.history
   WHERE created_at < now_ms - (180::bigint * 24 * 60 * 60 * 1000);
@@ -57,6 +58,7 @@ END;
 $$;
 
 REVOKE ALL ON FUNCTION public.purge_expired_operational_data() FROM PUBLIC;
+GRANT EXECUTE ON FUNCTION public.purge_expired_operational_data() TO service_role;
 
 -- Optional scheduled cleanup when pg_cron is enabled in the Supabase project:
 -- SELECT cron.schedule(
