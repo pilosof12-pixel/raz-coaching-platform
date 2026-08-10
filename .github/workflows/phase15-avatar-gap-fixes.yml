@@ -1,0 +1,36 @@
+name: Phase 15 Apply Avatar Gap Fixes
+
+on:
+  push:
+    paths:
+      - 'phase14/scripts/apply_avatar_gap_fixes.mjs'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Apply deterministic fixes
+        run: node phase14/scripts/apply_avatar_gap_fixes.mjs
+      - name: Verify syntax
+        run: |
+          node --check phase14/engine/exercise_dictionary.js
+          node --check phase14/scripts/build_phase15_runtime.mjs
+          cd phase14 && node scripts/build_phase15_runtime.mjs && node --check server.phase15.js
+      - name: Commit patched sources
+        run: |
+          git config user.name 'RAZ avatar QA bot'
+          git config user.email 'actions@users.noreply.github.com'
+          git add phase14/engine/exercise_dictionary.js phase14/scripts/build_phase15_runtime.mjs
+          if git diff --cached --quiet; then exit 0; fi
+          git commit -m 'Phase 15: close avatar naming and review gaps'
+          git pull --rebase origin main || true
+          git push
