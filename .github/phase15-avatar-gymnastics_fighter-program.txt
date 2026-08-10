@@ -1,91 +1,99 @@
-Keep planche quality high and repeatable, and build the dip goal from both ends: one heavy reserve day and one specific +60 kg volume day. Lower body stays productive but low-cost for BJJ, and Zone 2 is kept easy enough to recover from.
+Keep every rep and hold crisp. Planche stays on parallettes to respect the wrist, and all skill sets stop before shape breaks. Weighted Dip uses two tracks each week: one specific +60 kg volume exposure and one heavier strength-reserve exposure to make +60 kg feel easier.
 
-Weeks 2-4: add a little hold time, a little density, or a small load bump only if positions stay clean. Week 4 consolidates with slightly harder top work, not a full deload.
+Weeks 2-4: build by small rep or set additions first, then small load bumps where noted. If BJJ fatigue runs high, keep the listed load but stop 1 rep earlier on the final set rather than grinding.
 
-Pain/substitutions: keep all planche work on parallettes. If wrists feel irritated, shorten the hold slightly before changing the shape, and use an extra warm-up set. If front squat feels unusually beat-up from BJJ, swap that day to Goblet Squat at similar effort. Avoid adding any extra hard conditioning.
+Pain/substitutions: if wrists feel irritated, shorten planche holds by 1-2 seconds and keep perfect protraction on parallettes; do not switch to floor planche work. If elbows or shoulders feel beat up on dips, use the same load with slightly lower reps and longer rest. If front rack or knees are irritated, Front Squat can become Paused Front Squat at 5-10 kg less for the same reps.
 
 START_WEEK1_TSV
 Day	Exercise	Weight	Sets	Reps	Rest	Target RPE	Notes	Results
-Mon	[WARMUP]	Bodyweight	1	6-8 min	—	—	2 min easy bike then wrists on parallettes, scap push-up 2x10, front squat ramp-up, dip ramp-up	
-Mon	Box Jump	Bodyweight	3	3	60 sec	5	Non-fatiguing primer; crisp landings before strength	
-Mon	Advanced Tuck Planche	Bodyweight	4	10-12s	2 min	8	Parallettes only; locked elbows, protraction, PPT; stop before form breaks	
-Mon	Weighted Dip	+60 kg	5	4	2-3 min	7	Loaded-endurance track; all reps clean with 1 sec support at top	
-Mon	Front Squat	115 kg	3	5	2-3 min	6.5	Smooth bracing; leave reps in reserve; low fatigue intent	
-Mon	Zone-2 Bike	Easy sustainable pace	1	22 min	—	4	Nasal-breathing conversational effort; keep cadence smooth	
-Wed	[WARMUP]	Bodyweight	1	6-8 min	—	—	3 min easy row then shoulders, scap pulls, dip ramp-up, chin ramp-up	
-Wed	Weighted Dip	+72.5 kg	5	3	3 min	7.5	Heavy reserve track; strong lockout, no grinders	
-Wed	Weighted Chin-up	+42.5 kg	4	4	2-3 min	7	Maintain pulling strength; full hang to chin over bar	
-Wed	Bulgarian Split Squat	Dumbbells 24 kg each	3	6 each leg	90 sec	7	Controlled, upright torso; low-cost lower body work	
-Wed	Planche Push-up	Bodyweight	3	4	2 min	7	Parallettes; quality reps only; stop if scap position degrades	
-Wed	Zone-2 Row	Easy sustainable pace	1	22 min	—	4	Steady aerobic work; no hard surges	
-Fri	[WARMUP]	Bodyweight	1	6-8 min	—	—	2 min easy bike then wrists on parallettes, squat ramp-up, chin ramp-up	
-Fri	Box Jump	Bodyweight	3	3	60 sec	5	Crisp and low fatigue	
-Fri	Advanced Tuck Planche	Bodyweight	4	8-10s	2 min	8	Slightly shorter holds than Monday if needed; pristine position first	
-Fri	Front Squat	122.5 kg	4	3	2-3 min	7	Moderate strength exposure; no grind reps	
-Fri	Weighted Chin-up	+47.5 kg	5	3	2-3 min	7.5	Maintain upper pulling strength with low volume	
-Fri	Dip	Bodyweight	2	12	90 sec	6	Easy blood flow and patterning; stop well short of fatigue	
+Mon	[WARMUP]	Bodyweight	1	5-7 min	—	—	2 rounds: scap push-up x10, band pull-apart x15, wrist circles x20, goblet squat pry x6, 2-3 ramp sets for first lifts	
+Mon	Advanced Tuck Planche	Bodyweight	5	8-10s	120 sec	8	Parallettes; locked elbows, protract hard, stop before pelvis or shoulder position slips	
+Mon	Box Jump	Bodyweight	3	3	60 sec	6	Snap and stick landing; low fatigue primer	
+Mon	Weighted Dip	+60 kg	4	5	150 sec	7.5	Clean straight sets; slight pause at top to reset each rep	
+Mon	Front Squat	120 kg	4	4	150 sec	7	Strong bracing, no grind; leave 2 reps in reserve	
+Mon	[REVIEW] Chest Supported Row	32.5 kg DBs	3	8	90 sec	7	This exercise slot could not be safely generated — please contact support.	
+Mon	Zone-2 Bike	—	1	25 min	—	4	Nasal-breathing pace or easy conversational effort	
+Wed	[WARMUP]	Bodyweight	1	5-7 min	—	—	2 rounds: band shoulder external rotation x12, scap pull-up x8, split squat x6/side, empty-bar dip and squat ramps	
+Wed	Box Jump	Bodyweight	3	3	60 sec	6	Crisp takeoff; stop if jumps slow down	
+Wed	Weighted Dip	+72.5 kg	5	3	180 sec	8	Heavy reserve work; all reps clean, no grinding	
+Wed	Weighted Chin-up	+35 kg	4	4	150 sec	7.5	Full hang to chin clearly over bar	
+Wed	Bulgarian Split Squat	30 kg DBs	3	6/side	90 sec	7	Controlled eccentric; moderate effort only	
+Wed	Face Pull	27.5 kg	2	15	60 sec	6	Shoulder-health pump; smooth scap movement	
+Wed	Zone-2 Row	—	1	20 min	—	4	Easy sustainable pace; keep stroke relaxed	
+Fri	[WARMUP]	Bodyweight	1	5-7 min	—	—	2 rounds: scap push-up x10, band pull-apart x15, wrist circles x20, cossack squat x5/side, barbell ramp sets	
+Fri	Advanced Tuck Planche	Bodyweight	4	10-12s	120 sec	8	Slightly longer quality holds than Monday; stop before elbow bend or loss of protraction	
+Fri	Front Squat	110 kg	5	3	120 sec	6.5	Speed-focused clean triples; low fatigue before Saturday BJJ	
+Fri	Weighted Chin-up	+25 kg	3	6	120 sec	7	Smooth reps; keep 2 reps in reserve	
+Fri	Weighted Dip	+50 kg	2	8	120 sec	7	Back-off volume; leave reps in tank, no grind	
+Fri	Side Plank	Bodyweight	2	30s/side	45 sec	6	Brace ribs down and stay long through the body	
 END_WEEK1_TSV
 START_WEEK2_TSV
 Day	Exercise	Weight	Sets	Reps	Rest	Target RPE	Notes	Results
-Mon	[WARMUP]	Bodyweight	1	6-8 min	—	—	2 min easy bike then wrists on parallettes, scap push-up 2x10, front squat ramp-up, dip ramp-up	
-Mon	Box Jump	Bodyweight	3	3	60 sec	5	Non-fatiguing primer; crisp landings before strength	
-Mon	Advanced Tuck Planche	Bodyweight	4	11-13s	2 min	8	Parallettes only; locked elbows, protraction, PPT; stop before form breaks	
-Mon	Weighted Dip	+60 kg	5	5	2-3 min	7.5	Loaded-endurance track; same load, add clean reps	
-Mon	Front Squat	117.5 kg	3	5	2-3 min	7	Smooth bracing; still submaximal	
-Mon	Zone-2 Bike	Easy sustainable pace	1	24 min	—	4	Conversational effort; keep it easy enough to recover	
-Wed	[WARMUP]	Bodyweight	1	6-8 min	—	—	3 min easy row then shoulders, scap pulls, dip ramp-up, chin ramp-up	
-Wed	Weighted Dip	+75 kg	5	3	3 min	8	Heavy reserve track; strong lockout, no grinders	
-Wed	Weighted Chin-up	+45 kg	4	4	2-3 min	7.5	Maintain pulling strength; full ROM	
-Wed	Bulgarian Split Squat	Dumbbells 26 kg each	3	6 each leg	90 sec	7	Controlled, upright torso; low-cost lower body work	
-Wed	Planche Push-up	Bodyweight	3	5	2 min	7.5	Parallettes; quality reps only	
-Wed	Zone-2 Row	Easy sustainable pace	1	24 min	—	4	Steady aerobic work; no hard surges	
-Fri	[WARMUP]	Bodyweight	1	6-8 min	—	—	2 min easy bike then wrists on parallettes, squat ramp-up, chin ramp-up	
-Fri	Box Jump	Bodyweight	3	3	60 sec	5	Crisp and low fatigue	
-Fri	Advanced Tuck Planche	Bodyweight	4	9-11s	2 min	8	Add a touch of lean only if holds stay clean	
-Fri	Front Squat	125 kg	4	3	2-3 min	7.5	Moderate strength exposure; no grind reps	
-Fri	Weighted Chin-up	+50 kg	5	3	2-3 min	8	Maintain upper pulling strength with low volume	
-Fri	Dip	Bodyweight	2	14	90 sec	6	Easy blood flow and patterning; stop well short of fatigue	
+Mon	[WARMUP]	Bodyweight	1	5-7 min	—	—	2 rounds: scap push-up x10, band pull-apart x15, wrist circles x20, goblet squat pry x6, 2-3 ramp sets for first lifts	
+Mon	Advanced Tuck Planche	Bodyweight	5	9-11s	120 sec	8	Parallettes; locked elbows, protract hard, stop before pelvis or shoulder position slips	
+Mon	Box Jump	Bodyweight	3	3	60 sec	6	Snap and stick landing; low fatigue primer	
+Mon	Weighted Dip	+60 kg	4	6	150 sec	8	Clean straight sets; if last set slows, cap at 5 clean reps	
+Mon	Front Squat	122.5 kg	4	4	150 sec	7.5	Strong bracing, no grind; leave 1-2 reps in reserve	
+Mon	[REVIEW] Chest Supported Row	35 kg DBs	3	8	90 sec	7	This exercise slot could not be safely generated — please contact support.	
+Mon	Zone-2 Bike	—	1	25 min	—	4	Nasal-breathing pace or easy conversational effort	
+Wed	[WARMUP]	Bodyweight	1	5-7 min	—	—	2 rounds: band shoulder external rotation x12, scap pull-up x8, split squat x6/side, empty-bar dip and squat ramps	
+Wed	Box Jump	Bodyweight	3	3	60 sec	6	Crisp takeoff; stop if jumps slow down	
+Wed	Weighted Dip	+75 kg	5	3	180 sec	8	Heavy reserve work; all reps clean, no grinding	
+Wed	Weighted Chin-up	+37.5 kg	4	4	150 sec	8	Full hang to chin clearly over bar	
+Wed	Bulgarian Split Squat	32.5 kg DBs	3	6/side	90 sec	7	Controlled eccentric; moderate effort only	
+Wed	Face Pull	30 kg	2	15	60 sec	6	Shoulder-health pump; smooth scap movement	
+Wed	Zone-2 Row	—	1	22 min	—	4	Easy sustainable pace; keep stroke relaxed	
+Fri	[WARMUP]	Bodyweight	1	5-7 min	—	—	2 rounds: scap push-up x10, band pull-apart x15, wrist circles x20, cossack squat x5/side, barbell ramp sets	
+Fri	Advanced Tuck Planche	Bodyweight	4	11-12s	120 sec	8	Slightly longer quality holds than Monday; stop before elbow bend or loss of protraction	
+Fri	Front Squat	112.5 kg	5	3	120 sec	6.5	Speed-focused clean triples; low fatigue before Saturday BJJ	
+Fri	Weighted Chin-up	+27.5 kg	3	6	120 sec	7.5	Smooth reps; keep 1-2 reps in reserve	
+Fri	Weighted Dip	+50 kg	2	9	120 sec	7.5	Back-off volume; leave reps in tank, no grind	
+Fri	Side Plank	Bodyweight	2	35s/side	45 sec	6	Brace ribs down and stay long through the body	
 END_WEEK2_TSV
 START_WEEK3_TSV
 Day	Exercise	Weight	Sets	Reps	Rest	Target RPE	Notes	Results
-Mon	[WARMUP]	Bodyweight	1	6-8 min	—	—	2 min easy bike then wrists on parallettes, scap push-up 2x10, front squat ramp-up, dip ramp-up	
-Mon	Box Jump	Bodyweight	3	3	60 sec	5	Non-fatiguing primer; crisp landings before strength	
-Mon	Advanced Tuck Planche	Bodyweight	4	12-14s	2 min	8.5	Parallettes only; quality stops before elbow bend or lumbar extension	
-Mon	Weighted Dip	+60 kg	6	4	2-3 min	7.5	Loaded-endurance density progression; 24 total clean reps	
-Mon	Front Squat	120 kg	3	5	2-3 min	7	Low-fatigue lower strength support	
-Mon	Zone-2 Bike	Easy sustainable pace	1	25 min	—	4	Conversational effort only	
-Wed	[WARMUP]	Bodyweight	1	6-8 min	—	—	3 min easy row then shoulders, scap pulls, dip ramp-up, chin ramp-up	
-Wed	Weighted Dip	+77.5 kg	5	3	3 min	8	Heavy reserve track; clean bar path and lockout	
-Wed	Weighted Chin-up	+47.5 kg	4	4	2-3 min	8	Maintain pulling strength; full ROM	
-Wed	Bulgarian Split Squat	Dumbbells 28 kg each	3	6 each leg	90 sec	7.5	Controlled, upright torso	
-Wed	Planche Push-up	Bodyweight	4	4	2 min	8	Parallettes; stop first rep that slows noticeably	
-Wed	Zone-2 Row	Easy sustainable pace	1	25 min	—	4	Steady aerobic work; no hard surges	
-Fri	[WARMUP]	Bodyweight	1	6-8 min	—	—	2 min easy bike then wrists on parallettes, squat ramp-up, chin ramp-up	
-Fri	Box Jump	Bodyweight	3	3	60 sec	5	Crisp and low fatigue	
-Fri	Advanced Tuck Planche	Bodyweight	4	10-12s	2 min	8.5	Slightly more intent toward straddle shape, but do not chase ugly attempts	
-Fri	Front Squat	127.5 kg	4	3	2-3 min	8	Moderate strength exposure; still no grind reps	
-Fri	Weighted Chin-up	+52.5 kg	5	3	2-3 min	8	Maintain upper pulling strength with low volume	
-Fri	Dip	Bodyweight	2	15	90 sec	6	Easy blood flow and patterning; stop well short of fatigue	
+Mon	[WARMUP]	Bodyweight	1	5-7 min	—	—	2 rounds: scap push-up x10, band pull-apart x15, wrist circles x20, goblet squat pry x6, 2-3 ramp sets for first lifts	
+Mon	Advanced Tuck Planche	Bodyweight	5	10-12s	120 sec	8.5	Parallettes; locked elbows, protract hard, stop before pelvis or shoulder position slips	
+Mon	Box Jump	Bodyweight	3	3	60 sec	6	Snap and stick landing; low fatigue primer	
+Mon	Weighted Dip	+60 kg	5	5	150 sec	8	Accumulate more clean reps at goal load; all sets crisp	
+Mon	Front Squat	125 kg	4	4	150 sec	8	Strong bracing, no grind; leave about 1 rep in reserve	
+Mon	[REVIEW] Chest Supported Row	35 kg DBs	3	9	90 sec	7.5	This exercise slot could not be safely generated — please contact support.	
+Mon	Zone-2 Bike	—	1	27 min	—	4	Nasal-breathing pace or easy conversational effort	
+Wed	[WARMUP]	Bodyweight	1	5-7 min	—	—	2 rounds: band shoulder external rotation x12, scap pull-up x8, split squat x6/side, empty-bar dip and squat ramps	
+Wed	Box Jump	Bodyweight	3	3	60 sec	6	Crisp takeoff; stop if jumps slow down	
+Wed	Weighted Dip	+77.5 kg	5	3	180 sec	8.5	Heavy reserve work; all reps clean, no grinding	
+Wed	Weighted Chin-up	+40 kg	4	4	150 sec	8	Full hang to chin clearly over bar	
+Wed	Bulgarian Split Squat	35 kg DBs	3	6/side	90 sec	7.5	Controlled eccentric; moderate effort only	
+Wed	Face Pull	30 kg	2	15	60 sec	6	Shoulder-health pump; smooth scap movement	
+Wed	Zone-2 Row	—	1	25 min	—	4	Easy sustainable pace; keep stroke relaxed	
+Fri	[WARMUP]	Bodyweight	1	5-7 min	—	—	2 rounds: scap push-up x10, band pull-apart x15, wrist circles x20, cossack squat x5/side, barbell ramp sets	
+Fri	Advanced Tuck Planche	Bodyweight	4	12s	120 sec	8.5	Own each hold; if all sets are solid, begin thinking straddle intent without forcing it	
+Fri	Front Squat	115 kg	5	3	120 sec	7	Speed-focused clean triples; low fatigue before Saturday BJJ	
+Fri	Weighted Chin-up	+30 kg	3	6	120 sec	7.5	Smooth reps; keep 1-2 reps in reserve	
+Fri	Weighted Dip	+50 kg	3	8	120 sec	7.5	Back-off volume; steady tempo, no grind	
+Fri	Side Plank	Bodyweight	2	40s/side	45 sec	6	Brace ribs down and stay long through the body	
 END_WEEK3_TSV
 START_WEEK4_TSV
 Day	Exercise	Weight	Sets	Reps	Rest	Target RPE	Notes	Results
-Mon	[WARMUP]	Bodyweight	1	6-8 min	—	—	2 min easy bike then wrists on parallettes, scap push-up 2x10, front squat ramp-up, dip ramp-up	
-Mon	Box Jump	Bodyweight	3	3	60 sec	5	Non-fatiguing primer; crisp landings before strength	
-Mon	Advanced Tuck Planche	Bodyweight	4	12-15s	2 min	8.5	Best-quality week; keep shape strict and repeatable	
-Mon	Weighted Dip	+60 kg	5	5	2-3 min	8	Match week 2 reps with cleaner execution and shorter total session time if possible	
-Mon	Front Squat	122.5 kg	3	5	2-3 min	7.5	Solid reps; no need to push harder with BJJ load	
-Mon	Zone-2 Bike	Easy sustainable pace	1	26 min	—	4	Conversational effort only	
-Wed	[WARMUP]	Bodyweight	1	6-8 min	—	—	3 min easy row then shoulders, scap pulls, dip ramp-up, chin ramp-up	
-Wed	Weighted Dip	+80 kg	4	3	3 min	8.5	Heavy reserve track; strong triples, no failed reps	
-Wed	Weighted Chin-up	+50 kg	4	4	2-3 min	8	Maintain pulling strength; full ROM	
-Wed	Bulgarian Split Squat	Dumbbells 30 kg each	3	6 each leg	90 sec	7.5	Controlled, upright torso	
-Wed	Planche Push-up	Bodyweight	3	5	2 min	8	Parallettes; quality reps only	
-Wed	Zone-2 Row	Easy sustainable pace	1	26 min	—	4	Steady aerobic work; no hard surges	
-Fri	[WARMUP]	Bodyweight	1	6-8 min	—	—	2 min easy bike then wrists on parallettes, squat ramp-up, chin ramp-up	
-Fri	Box Jump	Bodyweight	3	3	60 sec	5	Crisp and low fatigue	
-Fri	Advanced Tuck Planche	Bodyweight	4	10-12s	2 min	8	Tidy exposure; finish fresher rather than forcing misses	
-Fri	Front Squat	130 kg	4	3	2-3 min	8	Moderate strength exposure; keep bar speed honest	
-Fri	Weighted Chin-up	+55 kg	4	3	2-3 min	8.5	Top maintenance week; stop before grindy form	
-Fri	Dip	Bodyweight	2	15	90 sec	6	Easy blood flow and patterning; stop well short of fatigue	
+Mon	[WARMUP]	Bodyweight	1	5-7 min	—	—	2 rounds: scap push-up x10, band pull-apart x15, wrist circles x20, goblet squat pry x6, 2-3 ramp sets for first lifts	
+Mon	Advanced Tuck Planche	Bodyweight	5	10-12s	120 sec	8.5	Aim to make every set look identical; if one set slips, cut the hold there	
+Mon	Box Jump	Bodyweight	3	3	60 sec	6	Snap and stick landing; low fatigue primer	
+Mon	Weighted Dip	+60 kg	4	7	180 sec	8.5	Primary test-building week; only count clean reps with stable depth and lockout	
+Mon	Front Squat	127.5 kg	4	4	150 sec	8	Strong bracing, no grind; stop if bar speed drops sharply	
+Mon	[REVIEW] Chest Supported Row	37.5 kg DBs	3	8	90 sec	7.5	This exercise slot could not be safely generated — please contact support.	
+Mon	Zone-2 Bike	—	1	30 min	—	4	Nasal-breathing pace or easy conversational effort	
+Wed	[WARMUP]	Bodyweight	1	5-7 min	—	—	2 rounds: band shoulder external rotation x12, scap pull-up x8, split squat x6/side, empty-bar dip and squat ramps	
+Wed	Box Jump	Bodyweight	3	3	60 sec	6	Crisp takeoff; stop if jumps slow down	
+Wed	Weighted Dip	+80 kg	5	2	180 sec	8.5	Heavier reserve work; doubles only, keep shoulders happy and reps sharp	
+Wed	Weighted Chin-up	+42.5 kg	4	4	150 sec	8	Full hang to chin clearly over bar	
+Wed	Bulgarian Split Squat	35 kg DBs	3	7/side	90 sec	7.5	Controlled eccentric; moderate effort only	
+Wed	Face Pull	32.5 kg	2	15	60 sec	6	Shoulder-health pump; smooth scap movement	
+Wed	Zone-2 Row	—	1	25 min	—	4	Easy sustainable pace; keep stroke relaxed	
+Fri	[WARMUP]	Bodyweight	1	5-7 min	—	—	2 rounds: scap push-up x10, band pull-apart x15, wrist circles x20, cossack squat x5/side, barbell ramp sets	
+Fri	Advanced Tuck Planche	Bodyweight	4	12-14s	120 sec	8.5	If all holds are clean, finish with the feeling of having one more good set available	
+Fri	Front Squat	117.5 kg	4	3	120 sec	7	Speed-focused clean triples; low fatigue before Saturday BJJ	
+Fri	Weighted Chin-up	+30 kg	3	7	120 sec	7.5	Smooth reps; keep 1-2 reps in reserve	
+Fri	Weighted Dip	+52.5 kg	2	8	120 sec	7.5	Back-off volume; moderate only, do not chase fatigue	
+Fri	Side Plank	Bodyweight	2	40s/side	45 sec	6	Brace ribs down and stay long through the body	
 END_WEEK4_TSV
 <!-- QA_FORMULA_VIOLATION_COUNT: 1 -->
