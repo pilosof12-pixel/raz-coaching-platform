@@ -1409,6 +1409,21 @@ function phase15LastMileTsv(tsv, intake) {
       cells[7] = 'Brace hard and keep hips stacked; stop before position degrades.';
       ex = cells[1];
     }
+    if (/\[REVIEW\].*Ring Push-up|^Ring Push-up$/i.test(ex)) {
+      cells[1] = 'Ring Push-up';
+      cells[7] = 'Keep the rings stable, body rigid, and stop 1-2 reps before form breaks.';
+      ex = cells[1];
+    }
+    if (/\[REVIEW\].*Ring Hamstring Curl|^Ring Hamstring Curl$/i.test(ex)) {
+      cells[1] = 'Ring Hamstring Curl';
+      cells[7] = 'Keep hips extended and curl the heels toward you under control; shorten the lever if needed.';
+      ex = cells[1];
+    }
+    if (/\[REVIEW\].*Pistol Squat to Box or Bench|^Pistol Squat to Box or Bench$/i.test(ex)) {
+      cells[1] = 'Pistol Squat to Box or Bench';
+      cells[7] = 'Use a controlled box/bench height that allows stable single-leg mechanics; lower the target over time.';
+      ex = cells[1];
+    }
     if (!hasAdvancedTuckPlanche && /^Straddle Planche$/i.test(ex)) continue;
     if (hasAdvancedTuckFrontLever && !hasSingleLegFrontLever && /^Straddle Front Lever$/i.test(ex)) {
       cells[1] = 'Single-Leg Front Lever';
