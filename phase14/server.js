@@ -1429,6 +1429,11 @@ function phase15LastMileTsv(tsv, intake) {
       cells[7] = 'Brace hard, keep ribs down, and only extend as far as you can control without lumbar extension.';
       ex = cells[1];
     }
+    if (/\[REVIEW\].*Hanging Knee Raise|^Hanging Knee Raise$/i.test(ex)) {
+      cells[1] = 'Hanging Knee Raise';
+      cells[7] = 'Control the pelvis, avoid swinging, and raise the knees with the trunk braced.';
+      ex = cells[1];
+    }
     if (!hasAdvancedTuckPlanche && /^Straddle Planche$/i.test(ex)) continue;
     if (hasAdvancedTuckFrontLever && !hasSingleLegFrontLever && /^Straddle Front Lever$/i.test(ex)) {
       cells[1] = 'Single-Leg Front Lever';
