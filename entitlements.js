@@ -1,6 +1,6 @@
 // Program Pass entitlement storage.
-// Separate from coaching data so the commercial access model can be enforced
-// without coupling payment logic to the coaching engine.
+// Separate from coaching data so commercial access survives coaching-data deletion
+// and cannot be reset by deleting sensitive history.
 
 import path from "path";
 import fs from "fs";
@@ -39,6 +39,8 @@ function makeSupabaseEntitlements() {
         activated_at: null,
         expires_at: null,
         adjustment_limit: adjustmentLimit,
+        adjustment_count: 0,
+        initial_build_completed_at: null,
       });
       if (error) throw error;
       return this.getPass(code);
@@ -74,11 +76,33 @@ function makeSupabaseEntitlements() {
       return this.getPass(code);
     },
 
-    async successfulAdjustmentCount(token) {
+    async markInitialBuildCompleted(token, now) {
       const s = await sb();
-      const { data, error } = await s.from("history").select("request").eq("token", token).eq("kind", "adjust");
+      const { error } = await s.from("program_passes")
+        .update({ initial_build_completed_at: now })
+        .eq("activated_token", token)
+        .is("initial_build_completed_at", null);
       if (error) throw error;
-      return (data || []).filter((r) => !String(r.request || "").startsWith("[language:")).length;
+      return this.getPassForToken(token);
+    },
+
+    async incrementAdjustment(token) {
+      const s = await sb();
+      // Read/update is sufficient for current low-volume launch. The API serialises
+      // customer adjustment requests in normal use; limits are also checked before generation.
+      const pass = await this.getPassForToken(token);
+      if (!pass) return null;
+      const next = Number(pass.adjustment_count || 0) + 1;
+      const { error } = await s.from("program_passes")
+        .update({ adjustment_count: next })
+        .eq("code", pass.code);
+      if (error) throw error;
+      return this.getPass(pass.code);
+    },
+
+    async successfulAdjustmentCount(token) {
+      const pass = await this.getPassForToken(token);
+      return pass ? Number(pass.adjustment_count || 0) : 0;
     },
   };
 }
@@ -97,16 +121,27 @@ async function makeSqliteEntitlements() {
       created_at INTEGER NOT NULL,
       activated_at INTEGER,
       expires_at INTEGER,
-      adjustment_limit INTEGER NOT NULL DEFAULT 6
+      adjustment_limit INTEGER NOT NULL DEFAULT 6,
+      adjustment_count INTEGER NOT NULL DEFAULT 0,
+      initial_build_completed_at INTEGER
     );
   `);
+
+  // Safe local migration for databases created by earlier branch revisions.
+  const cols = db.prepare("PRAGMA table_info(program_passes)").all().map((r) => r.name);
+  if (!cols.includes("adjustment_count")) {
+    db.exec("ALTER TABLE program_passes ADD COLUMN adjustment_count INTEGER NOT NULL DEFAULT 0");
+  }
+  if (!cols.includes("initial_build_completed_at")) {
+    db.exec("ALTER TABLE program_passes ADD COLUMN initial_build_completed_at INTEGER");
+  }
 
   return {
     backend: "sqlite",
 
     async issuePass(code, now, adjustmentLimit = 6) {
       db.prepare(
-        "INSERT INTO program_passes (code,status,activated_token,created_at,activated_at,expires_at,adjustment_limit) VALUES (?,'issued',NULL,?,NULL,NULL,?)"
+        "INSERT INTO program_passes (code,status,activated_token,created_at,activated_at,expires_at,adjustment_limit,adjustment_count,initial_build_completed_at) VALUES (?,'issued',NULL,?,NULL,NULL,?,0,NULL)"
       ).run(code, now, adjustmentLimit);
       return this.getPass(code);
     },
@@ -130,9 +165,23 @@ async function makeSqliteEntitlements() {
       return this.getPass(code);
     },
 
+    async markInitialBuildCompleted(token, now) {
+      db.prepare(
+        "UPDATE program_passes SET initial_build_completed_at=COALESCE(initial_build_completed_at,?) WHERE activated_token=?"
+      ).run(now, token);
+      return this.getPassForToken(token);
+    },
+
+    async incrementAdjustment(token) {
+      db.prepare(
+        "UPDATE program_passes SET adjustment_count=adjustment_count+1 WHERE activated_token=?"
+      ).run(token);
+      return this.getPassForToken(token);
+    },
+
     async successfulAdjustmentCount(token) {
-      const rows = db.prepare("SELECT request FROM history WHERE token=? AND kind='adjust'").all(token);
-      return rows.filter((r) => !String(r.request || "").startsWith("[language:")).length;
+      const pass = await this.getPassForToken(token);
+      return pass ? Number(pass.adjustment_count || 0) : 0;
     },
   };
 }
