@@ -28,10 +28,12 @@ Status date: 2026-08-11
 - [x] First-party aggregate funnel analytics implemented with only UTC day + allowlisted event + count. No tokens, IPs, intake text, injury details or program content are stored.
 - [x] Admin-only aggregate analytics summary endpoint added.
 - [x] Mobile-only launch stylesheet added: iOS-safe input sizing, full-width mobile buttons, compact cards, touch-friendly tables and sport controls.
+- [x] Server-side deterministic intake preflight rejects incomplete/malformed payloads before Program Pass activation and before any AI call.
 - [x] Privacy policy aligned with the fixed-term Program Pass, post-expiry cleanup and aggregate analytics model.
-- [x] Program Pass and analytics regression tests added.
+- [x] Program Pass, analytics and adversarial intake regression tests added.
 - [x] `server_secure.js`, `storage.js`, `entitlements.js`, `analytics.js` and launch client scripts are syntax-checked in GitHub Actions.
 - [x] Phase 15 source-grounding regression fixture corrected without changing production coaching logic.
+- [x] Full GitHub Actions regression workflow passes with the combined privacy, Program Pass, analytics, retention, mobile and intake-preflight changes.
 
 ## Program Pass rollout — environment work still required
 
@@ -109,7 +111,7 @@ Your pass includes one personalised 4-week training block, 8 weeks of access and
 
 1. Finish staging/deployment checks for Supabase, RLS, analytics persistence and Program Pass enforcement.
 2. Run the real adversarial customer journey: Newie purchase -> Program Pass -> intake -> generation -> spreadsheet -> leave -> return -> adjust -> language -> delete.
-3. Review adaptive intake sufficiency on deliberately incomplete/contradictory avatars.
+3. Review adaptive intake sufficiency on deliberately incomplete/contradictory real generation avatars. Deterministic malformed-input preflight is already implemented.
 4. Add landing-page CTA and Newie purchase/re-purchase attribution where those platforms expose a clean integration. App-side funnel analytics are implemented.
 5. Verify mobile UX on a real iPhone. Code-side mobile safeguards are implemented.
 6. Final launch video and social campaign assets.
@@ -117,4 +119,4 @@ Your pass includes one personalised 4-week training block, 8 weeks of access and
 
 ## CI status
 
-The branch should not be treated as code-verified after a new commit until the latest GitHub Actions run completes successfully. The last fully green run covered root tests, Program Pass tests, launch-layer syntax checks and the Phase 15 generated runtime. New analytics/retention additions are now included in CI and must remain green before merge.
+The complete GitHub Actions regression workflow is green after the combined launch changes. This includes root tests, Program Pass tests, analytics tests, adversarial intake-preflight tests, launch-layer syntax checks and the full Phase 15 generated-runtime validation.
