@@ -1,0 +1,41 @@
+name: Apply last-mile client clean gate
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'scripts/apply_lastmile_clean.mjs'
+
+permissions:
+  contents: write
+
+jobs:
+  patch-test-commit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: node scripts/apply_lastmile_clean.mjs
+      - run: |
+          npm ci
+          npm test
+          node --check phase14/server.js
+          node --check phase14/scripts/build_phase15_runtime.mjs
+          node phase14/scripts/build_phase15_runtime.mjs
+          node --check phase14/server.phase15.js
+          grep -q 'deterministic-skeleton-v5.1-client-clean' phase14/server.phase15.js
+          grep -q 'phase15LastMileTsv' phase14/server.phase15.js
+          grep -q 'UNRESOLVED_CLIENT_REVIEW' phase14/server.phase15.js
+      - name: Commit production patch
+        run: |
+          git config user.name 'RAZ QA bot'
+          git config user.email 'actions@users.noreply.github.com'
+          git add phase14/server.js phase14/scripts/build_phase15_runtime.mjs
+          if git diff --cached --quiet; then echo 'No changes'; exit 0; fi
+          git commit -m 'Add fail-closed last-mile client QA'
+          git push origin main
