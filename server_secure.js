@@ -6,6 +6,7 @@ import express from "express";
 import crypto from "node:crypto";
 import { makeStorage } from "./storage.js";
 import { makeEntitlementStore } from "./entitlements.js";
+import { makeAnalyticsStore, isAllowedAnalyticsEvent } from "./analytics.js";
 
 const TOKEN_RE = /^[a-f0-9]{32}$/i;
 const JOB_RE = /^[a-f0-9]{32}$/i;
@@ -22,6 +23,7 @@ const ADMIN_PROVISION_KEY = process.env.ADMIN_PROVISION_KEY || "";
 
 const privacyStore = await makeStorage();
 const passStore = await makeEntitlementStore();
+const analyticsStore = await makeAnalyticsStore();
 const counters = new Map();
 
 function clientIp(req) {
@@ -91,8 +93,6 @@ async function guardProgramPass(req, res, next) {
             error: "This Program Pass has already created its training block. Use Adjust for changes, or purchase a new Program Pass for a completely new block.",
           });
         }
-        // No successful first build has been recorded yet, so a failed/unfinished
-        // generation can retry with the same token without consuming another pass.
         return next();
       }
 
@@ -102,9 +102,6 @@ async function guardProgramPass(req, res, next) {
       const pass = await passStore.getPass(passCode);
       if (!pass) return res.status(403).json({ error: "That Program Pass code is not valid." });
 
-      // Resilience: if activation already happened but the browser never received
-      // the first 202 response (network/server failure), the same pass code can
-      // recover its bound token until a successful initial block exists.
       if (pass.activated_token) {
         if (pass.status === "active" && !passExpired(pass) && !pass.initial_build_completed_at) {
           req.body.token = pass.activated_token;
@@ -263,6 +260,37 @@ express.application.listen = function (...args) {
       } catch (e) {
         console.error("program pass status failed:", e && e.message);
         return res.status(500).json({ error: "Could not load Program Pass status." });
+      }
+    });
+
+    // Public endpoint accepts only a fixed event name. It deliberately ignores
+    // all customer identifiers/content and stores only day + event + aggregate count.
+    this.post("/api/analytics-event", async (req, res) => {
+      try {
+        const event = String(req.body?.event || "").trim();
+        if (!isAllowedAnalyticsEvent(event)) {
+          return res.status(400).json({ error: "Invalid analytics event." });
+        }
+        await analyticsStore.record(event);
+        return res.status(204).end();
+      } catch (e) {
+        console.warn("analytics event failed:", e && e.message);
+        // Analytics must never block the paid customer flow.
+        return res.status(204).end();
+      }
+    });
+
+    this.get("/api/admin/analytics-summary", async (req, res) => {
+      try {
+        if (!ADMIN_PROVISION_KEY || req.get("x-admin-provision-key") !== ADMIN_PROVISION_KEY) {
+          return res.status(404).json({ error: "Not found." });
+        }
+        const days = Math.max(1, Math.min(365, Number(req.query?.days || 30)));
+        const rows = await analyticsStore.summary(days);
+        return res.json({ days, rows });
+      } catch (e) {
+        console.error("analytics summary failed:", e && e.message);
+        return res.status(500).json({ error: "Could not load analytics summary." });
       }
     });
 
