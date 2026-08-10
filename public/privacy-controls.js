@@ -10,6 +10,7 @@
   const buildStatus = document.getElementById("build-status");
   let passEnforced = false;
   let passInput = null;
+  let passStatusBox = null;
 
   function setStatus(el, msg, kind) {
     if (!el) return;
@@ -39,9 +40,9 @@
     passInput.placeholder = "Paste your 32-character Program Pass code";
 
     const help = document.createElement("div");
-    help.className = "small";
+    help.className = "row-help";
     help.style.marginTop = "6px";
-    help.textContent = `One Program Pass creates one 4-week block, stays active for ${config.access_days || 56} days, and includes up to ${config.adjustments || 6} program adjustments.`;
+    help.textContent = `One Program Pass creates one 4-week block, stays active for ${config.access_days || 56} days, and includes up to ${config.adjustments || 6} substantive program adjustments.`;
 
     wrap.appendChild(label);
     wrap.appendChild(passInput);
@@ -49,29 +50,67 @@
     buildBtn.parentNode.insertBefore(wrap, buildBtn);
   }
 
-  // Fetch public commercial configuration. When enforcement is OFF, testing and
-  // existing avatars continue to work exactly as before and no pass field is shown.
+  function ensurePassStatusBox() {
+    if (passStatusBox) return passStatusBox;
+    const saveNote = document.getElementById("save-note");
+    if (!saveNote) return null;
+    const box = document.createElement("div");
+    box.id = "program-pass-status-box";
+    box.className = "save-note";
+    box.style.marginTop = "0";
+    box.style.marginBottom = "18px";
+    box.style.display = "none";
+    saveNote.insertAdjacentElement("afterend", box);
+    passStatusBox = box;
+    return box;
+  }
+
+  async function refreshPassStatus(token) {
+    if (!passEnforced || !TOKEN_RE.test(token)) return;
+    const box = ensurePassStatusBox();
+    if (!box) return;
+    try {
+      const resp = await fetch("/api/program-pass-status", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ token }),
+        cache: "no-store",
+      });
+      const data = await resp.json().catch(() => ({}));
+      if (!resp.ok) return;
+      const expiry = data.expires_at ? new Date(Number(data.expires_at)) : null;
+      const dateText = expiry && !Number.isNaN(expiry.getTime())
+        ? expiry.toLocaleDateString(undefined, { year: "numeric", month: "short", day: "numeric" })
+        : "unknown";
+      const remaining = Number(data.adjustments_remaining || 0);
+      const limit = Number(data.adjustment_limit || 0);
+      box.textContent = `Program Pass active until ${dateText}. ${remaining} of ${limit} substantive adjustments remaining. Language switching does not use an adjustment.`;
+      box.style.display = "block";
+    } catch (_e) {
+      // Status display is informational only; never block coaching actions.
+    }
+  }
+
   fetch("/api/program-pass-config", { cache: "no-store" })
     .then((r) => (r.ok ? r.json() : null))
-    .then((config) => installPassField(config))
+    .then((config) => {
+      installPassField(config);
+      if (config && config.enforced) {
+        const token = String(document.getElementById("token-display")?.textContent || "").trim();
+        if (TOKEN_RE.test(token)) refreshPassStatus(token);
+      }
+    })
     .catch(() => {});
 
-  // Capture phase means this runs before the existing app.js click handler.
   if (buildBtn) {
     buildBtn.addEventListener("click", function (event) {
       if (consent && !consent.checked) {
         event.preventDefault();
         event.stopImmediatePropagation();
-        setStatus(
-          buildStatus,
-          "Please confirm the privacy consent before generating your program.",
-          "err"
-        );
+        setStatus(buildStatus, "Please confirm the privacy consent before generating your program.", "err");
         consent.focus();
         return;
       }
-      // Only the FIRST build needs the purchase code. Rebuilds after a failed
-      // generation use the already-linked personal code and do not need it again.
       const loadedToken = String(document.getElementById("token-display")?.textContent || "").trim();
       if (passEnforced && !TOKEN_RE.test(loadedToken)) {
         const code = String(passInput?.value || "").trim();
@@ -85,8 +124,6 @@
     }, true);
   }
 
-  // Attach consent and, for a first build, the Program Pass code to the payload.
-  // The server independently validates both.
   const nativeFetch = window.fetch.bind(window);
   window.fetch = function (input, init) {
     try {
@@ -108,11 +145,30 @@
         }
       }
     } catch (_e) {
-      // The server independently validates consent and Program Pass access.
-      // Never break an unrelated fetch.
+      // Server independently validates consent and Program Pass access.
     }
     return nativeFetch(input, init);
   };
+
+  // The legacy controller updates token-display whenever a program is built or loaded.
+  // Observing that single element keeps Program Pass status in sync without coupling
+  // this launch layer to app.js internals.
+  const tokenDisplay = document.getElementById("token-display");
+  if (tokenDisplay) {
+    const observer = new MutationObserver(() => {
+      const token = String(tokenDisplay.textContent || "").trim();
+      if (TOKEN_RE.test(token)) window.setTimeout(() => refreshPassStatus(token), 250);
+    });
+    observer.observe(tokenDisplay, { childList: true, characterData: true, subtree: true });
+  }
+
+  const adjustBtn = document.getElementById("adjust-btn");
+  if (adjustBtn) {
+    adjustBtn.addEventListener("click", () => {
+      const token = String(document.getElementById("token-display")?.textContent || "").trim();
+      if (TOKEN_RE.test(token)) window.setTimeout(() => refreshPassStatus(token), 2500);
+    });
+  }
 
   const deleteBtn = document.getElementById("delete-data-btn");
   const deleteStatus = document.getElementById("delete-data-status");
@@ -124,7 +180,7 @@
         return;
       }
       const ok = window.confirm(
-        "Permanently delete this saved intake, program and related coaching data? This cannot be undone."
+        "Permanently delete your saved intake, program and coaching history? This cannot be undone. Your purchase/Program Pass entitlement record is kept separately and deletion does not create another program credit."
       );
       if (!ok) return;
 
