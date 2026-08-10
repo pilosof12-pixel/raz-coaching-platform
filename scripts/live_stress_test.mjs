@@ -19,19 +19,19 @@ async function jsonFetch(path, init = {}) {
 }
 
 async function waitForDeployment() {
-  const deadline = Date.now() + 8 * 60 * 1000;
+  const deadline = Date.now() + 3 * 60 * 1000;
   let last = null;
   while (Date.now() < deadline) {
     try {
       last = await jsonFetch("/api/health");
       console.log("health", JSON.stringify(last));
-      if (last?.ok && last?.mode === "openai" && /gpt-5\.6-luna/i.test(String(last?.model || ""))) return last;
+      if (last?.ok && last?.mode === "openai" && /^gpt-/i.test(String(last?.model || "")) && last?.ai_configured !== false) return last;
     } catch (e) {
       console.log("health wait:", e.message);
     }
-    await sleep(10_000);
+    await sleep(5000);
   }
-  throw new Error(`Live deployment did not report OpenAI Luna in time. Last health: ${JSON.stringify(last)}`);
+  throw new Error(`Live deployment did not report a healthy OpenAI provider in time. Last health: ${JSON.stringify(last)}`);
 }
 
 const AVATARS = {
