@@ -150,9 +150,6 @@
     return nativeFetch(input, init);
   };
 
-  // The legacy controller updates token-display whenever a program is built or loaded.
-  // Observing that single element keeps Program Pass status in sync without coupling
-  // this launch layer to app.js internals.
   const tokenDisplay = document.getElementById("token-display");
   if (tokenDisplay) {
     const observer = new MutationObserver(() => {
@@ -205,4 +202,11 @@
       }
     });
   }
+
+  // Load the anonymous funnel tracker after all existing fetch wrappers are installed.
+  // It sends event names only and is intentionally separate from coaching data.
+  const analyticsScript = document.createElement("script");
+  analyticsScript.src = "analytics-client.js";
+  analyticsScript.defer = true;
+  document.body.appendChild(analyticsScript);
 })();
