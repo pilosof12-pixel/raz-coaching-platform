@@ -24,9 +24,9 @@ const stepRepair = `    if (parkOnly && !hasBoxOrBench && /^Step-up$/i.test(ex))
 `;
 const stepAnchor = "    if (parkOnly && !hasBoxOrBench && /^Box Jump$/i.test(ex)) {";
 if (!s.includes("Ground-based unilateral leg work")) {
-  const n = s.split(stepAnchor).length - 1;
-  if (n !== 1) throw new Error(`step-up repair anchor expected once, found ${n}`);
-  s = s.replace(stepAnchor, stepRepair + stepAnchor);
+  const idx = s.indexOf(stepAnchor);
+  if (idx < 0) throw new Error('step-up repair anchor missing');
+  s = s.slice(0, idx) + stepRepair + s.slice(idx);
 }
 
 if (s !== originalServer) fs.writeFileSync(serverPath, s);
