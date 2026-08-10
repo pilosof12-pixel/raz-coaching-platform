@@ -88,8 +88,6 @@ function makeSupabaseEntitlements() {
 
     async incrementAdjustment(token) {
       const s = await sb();
-      // Read/update is sufficient for current low-volume launch. The API serialises
-      // customer adjustment requests in normal use; limits are also checked before generation.
       const pass = await this.getPassForToken(token);
       if (!pass) return null;
       const next = Number(pass.adjustment_count || 0) + 1;
@@ -109,7 +107,7 @@ function makeSupabaseEntitlements() {
 
 async function makeSqliteEntitlements() {
   const { default: Database } = await import("better-sqlite3");
-  const DB_PATH = path.join(__dirname, "data", "data.db");
+  const DB_PATH = process.env.ENTITLEMENTS_SQLITE_DB_PATH || path.join(__dirname, "data", "data.db");
   fs.mkdirSync(path.dirname(DB_PATH), { recursive: true });
   const db = new Database(DB_PATH);
   db.pragma("journal_mode = WAL");
@@ -127,7 +125,6 @@ async function makeSqliteEntitlements() {
     );
   `);
 
-  // Safe local migration for databases created by earlier branch revisions.
   const cols = db.prepare("PRAGMA table_info(program_passes)").all().map((r) => r.name);
   if (!cols.includes("adjustment_count")) {
     db.exec("ALTER TABLE program_passes ADD COLUMN adjustment_count INTEGER NOT NULL DEFAULT 0");
