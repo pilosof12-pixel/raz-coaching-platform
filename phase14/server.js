@@ -1475,6 +1475,16 @@ function phase15LastMileTsv(tsv, intake) {
       cells[7] = 'Use a brisk walk or very easy jog that keeps breathing conversational; do not turn this into intervals.';
       ex = cells[1];
     }
+    if (/\[REVIEW\].*Ring Leg Curl|^Ring Leg Curl$/i.test(ex)) {
+      cells[1] = 'Ring Hamstring Curl';
+      cells[7] = 'Keep hips extended and control the eccentric. Adjust body position to stay 1-2 reps in reserve.';
+      ex = cells[1];
+    }
+    if (/\[REVIEW\].*Rings Push-up|^Rings Push-up$/i.test(ex)) {
+      cells[1] = 'Ring Push-up';
+      cells[7] = 'Keep the rings stable, body rigid and shoulders controlled. Progress range or loading only while reps stay clean.';
+      ex = cells[1];
+    }
     if (/\[REVIEW\].*Short Sprint|^Short Sprint$/i.test(ex)) {
       cells[1] = 'Sprint';
       cells[7] = 'Maximum-quality short sprint. Accelerate hard, recover fully, and stop if speed drops noticeably.';
