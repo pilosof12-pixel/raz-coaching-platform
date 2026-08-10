@@ -1,1 +1,3 @@
-trigger 2026-08-09T19:31+07:00
+trigger 2026-08-10T11:38+07:00
+post-Overcoming-Gravity live validation
+latency + demo coverage + two gymnastics-heavy avatars
