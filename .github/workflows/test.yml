@@ -38,7 +38,7 @@ jobs:
           node --check phase14/server.phase15.js
           node --test phase14/test/phase15_planner_regression.test.mjs
           node --test phase14/test/phase15_specialist_rules.test.mjs
-          grep -q 'deterministic-skeleton-v5.2.9-source-grounded' phase14/server.phase15.js
+          grep -q 'deterministic-skeleton-v5.2.10-source-grounded' phase14/server.phase15.js
           grep -q 'SOURCE-GROUNDING HARD CONTRACT' phase14/server.phase15.js
           grep -q 'EXERCISE CLOSED SET' phase14/server.phase15.js
           grep -q 'CURATED COACHING SOURCE EXCERPTS' phase14/server.phase15.js
@@ -56,5 +56,5 @@ jobs:
           git config user.email 'actions@users.noreply.github.com'
           git add phase14/server.js phase14/scripts/build_phase15_runtime.mjs
           if git diff --cached --quiet; then echo 'No source patch to commit'; exit 0; fi
-          git commit -m 'Apply source-grounded Phase 15 runtime'
+          git commit -m 'Apply source-grounded Phase 15 v5.2.10 runtime'
           git push origin HEAD:${TARGET_BRANCH}
