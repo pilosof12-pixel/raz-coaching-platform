@@ -23,3 +23,16 @@ jobs:
       - run: npm ci
       - run: npm test
       - run: node --check server.js
+      - name: Validate Phase 15 generated runtime
+        run: |
+          node --check phase14/scripts/build_phase15_runtime.mjs
+          node phase14/scripts/build_phase15_runtime.mjs
+          node --check phase14/server.phase15.js
+          node --check phase14/engine/phase15_program_qa.js
+          node --check phase14/engine/phase15_final_qa.js
+          node --test phase14/test/phase15_planner_regression.test.mjs
+          node --test phase14/test/phase15_specialist_rules.test.mjs
+          grep -q 'deterministic-skeleton-v5-quality' phase14/server.phase15.js
+          grep -q 'RPE-selected load' phase14/server.phase15.js
+          grep -q 'Pseudo Planche Push-up' phase14/server.phase15.js
+          grep -q '0-set or 0-rep explanatory placeholder row' phase14/server.phase15.js
