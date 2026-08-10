@@ -1,5 +1,6 @@
 import fs from 'node:fs';
 
+// Triggered after the workflow exists so the one-shot source patch is applied.
 function patchFile(path, transforms) {
   let s = fs.readFileSync(path, 'utf8');
   let changed = false;
