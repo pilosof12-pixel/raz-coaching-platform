@@ -79,8 +79,6 @@ async function guardProgramPass(req, res, next) {
   try {
     if (!PROGRAM_PASS_ENFORCEMENT) return next();
 
-    // First build: require an unused Program Pass code. We generate the client
-    // token here so the pass can be bound before the legacy build route executes.
     if (req.method === "POST" && req.path === "/api/build") {
       let token = String(req.body?.token || "").trim();
       const passCode = String(req.body?.pass_code || "").trim();
@@ -88,14 +86,13 @@ async function guardProgramPass(req, res, next) {
       if (token) {
         const active = await requireActivePassForToken(token);
         if (active.error) return res.status(active.status).json({ error: active.error });
-        const client = await privacyStore.getClient(token);
-        // Failed/unfinished first builds remain retryable with the SAME Program Pass.
-        // Once a good program exists, another /api/build would be a new block.
-        if (client && String(client.program || "").trim()) {
+        if (active.pass.initial_build_completed_at) {
           return res.status(403).json({
             error: "This Program Pass has already created its training block. Use Adjust for changes, or purchase a new Program Pass for a completely new block.",
           });
         }
+        // No successful first build has been recorded yet, so a failed/unfinished
+        // generation can retry with the same token without consuming another pass.
         return next();
       }
 
@@ -104,8 +101,18 @@ async function guardProgramPass(req, res, next) {
       }
       const pass = await passStore.getPass(passCode);
       if (!pass) return res.status(403).json({ error: "That Program Pass code is not valid." });
+
+      // Resilience: if activation already happened but the browser never received
+      // the first 202 response (network/server failure), the same pass code can
+      // recover its bound token until a successful initial block exists.
       if (pass.activated_token) {
-        return res.status(403).json({ error: "That Program Pass has already been activated. Use the personal code created with it to return to your program." });
+        if (pass.status === "active" && !passExpired(pass) && !pass.initial_build_completed_at) {
+          req.body.token = pass.activated_token;
+          return next();
+        }
+        return res.status(403).json({
+          error: "That Program Pass has already been activated. Use the personal code created with it to return to your program.",
+        });
       }
       if (pass.status !== "issued") {
         return res.status(403).json({ error: "That Program Pass is not available for activation." });
@@ -117,7 +124,6 @@ async function guardProgramPass(req, res, next) {
       return next();
     }
 
-    // Program retrieval is part of the paid 8-week access window.
     const programMatch = req.path.match(/^\/api\/program\/([^/]+)$/);
     if (req.method === "GET" && programMatch) {
       const token = programMatch[1];
@@ -131,10 +137,8 @@ async function guardProgramPass(req, res, next) {
       const active = await requireActivePassForToken(token);
       if (active.error) return res.status(active.status).json({ error: active.error });
 
-      // Language switching is included support and does not consume one of the six
-      // substantive program adjustments. /api/adjust does.
       if (req.path === "/api/adjust") {
-        const used = await passStore.successfulAdjustmentCount(token);
+        const used = Number(active.pass.adjustment_count || 0);
         const limit = Number(active.pass.adjustment_limit || PROGRAM_PASS_ADJUSTMENTS);
         if (used >= limit) {
           return res.status(403).json({
@@ -167,7 +171,6 @@ function securityMiddleware(req, res, next) {
     res.setHeader("Pragma", "no-cache");
   }
 
-  // Public production health checks should reveal only availability.
   if (NODE_ENV === "production" && req.path === "/api/health") {
     const json = res.json.bind(res);
     res.json = () => json({ ok: true });
@@ -217,9 +220,6 @@ function securityMiddleware(req, res, next) {
   return guardProgramPass(req, res, next);
 }
 
-// server.js first installs express.json(). Add our middleware immediately after
-// that first app.use call, so request bodies are available for validation and the
-// middleware still runs before static files and all API routes.
 const originalUse = express.application.use;
 let middlewareInjected = false;
 express.application.use = function (...args) {
@@ -231,7 +231,6 @@ express.application.use = function (...args) {
   return result;
 };
 
-// Add launch routes immediately before the existing server begins listening.
 const originalListen = express.application.listen;
 express.application.listen = function (...args) {
   if (!this.__privacyRoutesInstalled) {
@@ -251,11 +250,12 @@ express.application.listen = function (...args) {
         if (!TOKEN_RE.test(token)) return res.status(400).json({ error: "Invalid personal code." });
         const pass = await passStore.getPassForToken(token);
         if (!pass) return res.status(404).json({ error: "No Program Pass is linked to this code." });
-        const used = await passStore.successfulAdjustmentCount(token);
+        const used = Number(pass.adjustment_count || 0);
         const limit = Number(pass.adjustment_limit || PROGRAM_PASS_ADJUSTMENTS);
         return res.json({
           status: pass.status,
           expires_at: pass.expires_at,
+          initial_build_completed: Boolean(pass.initial_build_completed_at),
           adjustments_used: used,
           adjustments_remaining: Math.max(0, limit - used),
           adjustment_limit: limit,
@@ -266,9 +266,6 @@ express.application.listen = function (...args) {
       }
     });
 
-    // Temporary launch provisioning path for Newie sales. Keep the admin key only
-    // in Render environment variables. This can later be replaced by Newie automation
-    // without changing Program Pass semantics or customer codes.
     this.post("/api/admin/program-pass", async (req, res) => {
       try {
         if (!ADMIN_PROVISION_KEY || req.get("x-admin-provision-key") !== ADMIN_PROVISION_KEY) {
