@@ -1419,7 +1419,8 @@ function phase15LastMileTsv(tsv, intake) {
   }
   const cleaned = out.join('\n');
   if (/\[REVIEW\]|contact\s+support|could not be safely generated/i.test(cleaned)) {
-    const err = new Error('Final client QA blocked unresolved review/support text.');
+    const leaked = cleaned.split('\n').filter((line) => /\[REVIEW\]|contact\s+support|could not be safely generated/i.test(line)).slice(0, 5).join(' || ');
+    const err = new Error('Final client QA blocked unresolved review/support text: ' + leaked);
     err.code = 'UNRESOLVED_CLIENT_REVIEW';
     throw err;
   }
