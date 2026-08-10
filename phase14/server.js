@@ -1396,7 +1396,9 @@ function phase15LastMileTsv(tsv, intake) {
   const location = String(intake?.training_location || '').toLowerCase();
   const equipmentText = JSON.stringify(intake?.equipment || '').toLowerCase();
   const parkOnly = /outdoor|park/.test(location);
-  const hasBoxOrBench = /\bbox\b|\bbench\b/.test(equipmentText);
+  const explicitNoBox = /\bno\s+(?:plyo\s+)?box\b/.test(equipmentText);
+  const explicitNoBench = /\bno\s+bench\b/.test(equipmentText);
+  const hasBoxOrBench = (/\bbox\b/.test(equipmentText) && !explicitNoBox) || (/\bbench\b/.test(equipmentText) && !explicitNoBench);
   const hasBike = /bike|airbike|assault|echo/.test(equipmentText);
   const hasRower = /rower|rowing machine|concept ?2/.test(equipmentText);
   const availableDays = Array.isArray(intake?.available_gym_days) ? intake.available_gym_days.map((d) => String(d || '').trim()).filter(Boolean) : [];
@@ -1451,6 +1453,11 @@ function phase15LastMileTsv(tsv, intake) {
     if (/\[REVIEW\].*Hanging Knee Raise|^Hanging Knee Raise$/i.test(ex)) {
       cells[1] = 'Hanging Knee Raise';
       cells[7] = 'Control the pelvis, avoid swinging, and raise the knees with the trunk braced.';
+      ex = cells[1];
+    }
+    if (parkOnly && !hasBoxOrBench && /^Step-up$/i.test(ex)) {
+      cells[1] = 'Reverse Lunge';
+      cells[7] = 'Ground-based unilateral leg work. Use a controlled 3-second eccentric and add belt load only if the setup stays stable.';
       ex = cells[1];
     }
     if (parkOnly && !hasBoxOrBench && /^Box Jump$/i.test(ex)) {
