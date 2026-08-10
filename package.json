@@ -3,9 +3,9 @@
   "version": "1.0.0",
   "description": "AI Coaching Engine platform — questionnaire to program to spreadsheet",
   "type": "module",
-  "main": "server.js",
+  "main": "server_secure.js",
   "scripts": {
-    "start": "node server.js",
+    "start": "node server_secure.js",
     "test": "node --test test/*.test.js"
   },
   "dependencies": {
