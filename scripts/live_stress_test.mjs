@@ -30,14 +30,15 @@ async function waitForDeployment() {
         last?.mode === "openai" &&
         /^gpt-/i.test(String(last?.model || "")) &&
         last?.ai_configured !== false &&
-        last?.openai_execution_path === "deterministic-skeleton-v5-quality"
+        last?.openai_execution_path === "deterministic-skeleton-v5-quality" &&
+        Number(last?.openai_compact_developer_chars || 0) > 4334
       ) return last;
     } catch (e) {
       console.log("health wait:", e.message);
     }
     await sleep(5000);
   }
-  throw new Error(`Live deployment did not report deterministic-skeleton-v5-quality in time. Last health: ${JSON.stringify(last)}`);
+  throw new Error(`Live deployment did not report the Copenhagen-safe v5 build in time. Last health: ${JSON.stringify(last)}`);
 }
 
 const AVATARS = {
