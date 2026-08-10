@@ -49,6 +49,12 @@ function currentOapStrict(intake) {
   return null;
 }
 
+function hasMedialElbowPullingSensitivity(intake) {
+  const pain = str(intake?.pain || intake?.limitations || '').toLowerCase();
+  return /(medial\s+elbow|golfer.?s elbow|inner\s+elbow)/i.test(pain)
+    && /(pull|chin|curl|elbow)/i.test(pain);
+}
+
 function gymnasticsRules(intake) {
   const out = [];
   let benchmarks = {};
@@ -83,6 +89,7 @@ function gymnasticsRules(intake) {
 function streetLiftingRules(intake) {
   const out = [];
   const seen = new Set();
+  const elbowSensitive = hasMedialElbowPullingSensitivity(intake);
   for (const g of goals(intake)) {
     const parsed = parseStreetGoal(g);
     if (!parsed) continue;
@@ -96,6 +103,9 @@ function streetLiftingRules(intake) {
     if (parsed.expression === 'max_strength') {
       out.push(`${parsed.movement} MAX-STRENGTH rule: keep the goal movement as the anchor lift, use low-rep heavy specific work with enough rest for rep quality, keep most work short of grinding failure, and retain a modest low-rep back-off dose. Reduce secondary volume before sacrificing anchor-lift quality.`);
       out.push('For an advanced street lifter, prefer small load jumps and exposure quality over repeated true-max attempts. A Westside/max-effort template is optional, never forced.');
+      if (elbowSensitive && /Chin-up|Pull-up/.test(parsed.movement)) {
+        out.push('MEDIAL-ELBOW LOAD MANAGEMENT: cap direct weighted Chin-up/Pull-up work at roughly 8-10 working sets per week across all exposures. Keep the heavy anchor and trim back-off/secondary sets first. Do not add optional hammer curls or other elbow-flexor isolation on top unless the athlete explicitly prioritizes arm hypertrophy and the elbow is quiet. Pain sensitivity is a volume constraint, not a reason to remove tolerated heavy pulling.');
+      }
     } else if (parsed.expression === 'loaded_endurance') {
       out.push(`${parsed.movement} LOADED-ENDURANCE rule: this is NOT a 1RM-only problem. Use two tracks: (1) a heavier low-rep strength-reserve exposure and (2) a specific clean-volume exposure at or near the goal external load using straight sets, ladders, clusters or density work.`);
       out.push('Dose the loaded-endurance track from CURRENT clean capacity at the relevant load whenever available. Do not prescribe the future target rep count as current working-set reps. Progress accumulated clean reps/density before forcing load increases when the goal is fixed-load endurance.');
