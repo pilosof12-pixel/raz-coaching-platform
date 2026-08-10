@@ -1424,6 +1424,11 @@ function phase15LastMileTsv(tsv, intake) {
       cells[7] = 'Use a controlled box/bench height that allows stable single-leg mechanics; lower the target over time.';
       ex = cells[1];
     }
+    if (/\[REVIEW\].*Ring Rollout|^Ring Rollout$/i.test(ex)) {
+      cells[1] = 'Ring Rollout';
+      cells[7] = 'Brace hard, keep ribs down, and only extend as far as you can control without lumbar extension.';
+      ex = cells[1];
+    }
     if (!hasAdvancedTuckPlanche && /^Straddle Planche$/i.test(ex)) continue;
     if (hasAdvancedTuckFrontLever && !hasSingleLegFrontLever && /^Straddle Front Lever$/i.test(ex)) {
       cells[1] = 'Single-Leg Front Lever';
