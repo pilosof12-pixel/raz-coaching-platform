@@ -1,0 +1,43 @@
+/* Launch mobile UX layer. Desktop remains unchanged. */
+@media (max-width: 560px) {
+  .wrap { padding: 18px 12px 56px; }
+  header.brand { align-items: flex-start; }
+  .hero { margin: 20px 2px 16px; }
+  .hero h2 { font-size: 24px; }
+  .card { padding: 16px; margin: 14px 0; border-radius: 14px; }
+
+  input[type=text], input[type=number], select, textarea {
+    font-size: 16px; /* prevents iOS input zoom */
+    padding: 12px;
+  }
+
+  .btn-row { display: grid; grid-template-columns: 1fr; gap: 9px; }
+  .btn-row .btn, .center .btn { width: 100%; justify-content: center; }
+  .center { margin-top: 18px; }
+
+  .lang-toggle { display: grid; grid-template-columns: 1fr 1fr; width: 100%; }
+  .lang-toggle .lang-btn { width: 100%; padding: 10px 8px; }
+  .lang-toggle-compact { width: auto; min-width: 130px; }
+
+  .program-head { gap: 10px; }
+  .program-head > div:first-child { min-width: 0; flex: 1 1 100%; }
+  .save-note-strong { padding: 14px; }
+  .save-note-strong code { display: block; width: 100%; overflow-wrap: anywhere; }
+
+  .prog-table-wrap {
+    margin-left: -4px;
+    margin-right: -4px;
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior-x: contain;
+  }
+  table.prog-table { min-width: 720px; }
+  table.prog-table th, table.prog-table td { padding: 9px 10px; }
+
+  .sport-day { align-items: flex-start; }
+  .sport-day .daybtn { flex-basis: 58px; }
+  .sport-day .intensity { flex: 1 1 210px; display: grid; grid-template-columns: repeat(3, 1fr); }
+  .sport-day .ibtn { padding: 8px 4px; }
+
+  .danger-zone { padding: 13px; }
+  .danger-zone .btn { width: 100%; justify-content: center; }
+}
