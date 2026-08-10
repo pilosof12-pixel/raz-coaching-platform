@@ -12,6 +12,13 @@
   let passInput = null;
   let passStatusBox = null;
 
+  // Keep launch-only responsive fixes isolated from the base page so desktop
+  // styling and the coaching renderer remain untouched.
+  const mobileCss = document.createElement("link");
+  mobileCss.rel = "stylesheet";
+  mobileCss.href = "launch-mobile.css";
+  document.head.appendChild(mobileCss);
+
   function setStatus(el, msg, kind) {
     if (!el) return;
     el.className = "status" + (kind ? " " + kind : "");
