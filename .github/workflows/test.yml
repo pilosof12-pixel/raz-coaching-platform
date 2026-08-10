@@ -28,6 +28,11 @@ jobs:
       - run: npm ci
       - run: npm test
       - run: node --check server.js
+      - name: Validate launch security and Program Pass wrapper
+        run: |
+          node --check server_secure.js
+          node --check entitlements.js
+          node --check public/privacy-controls.js
       - name: Validate Phase 15 generated runtime
         run: |
           node --check phase14/server.js
