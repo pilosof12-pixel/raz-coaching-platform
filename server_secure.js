@@ -1,19 +1,27 @@
-// Security and privacy bootstrap for the existing server.
-// It patches Express before server.js creates the app so hardening can remain
-// isolated from the coaching engine while we validate the launch wrapper.
+// Security, privacy and commercial-access bootstrap for the existing server.
+// It patches Express before server.js creates the app so launch hardening can remain
+// isolated from the coaching engine while we validate the wrapper.
 
 import express from "express";
+import crypto from "node:crypto";
 import { makeStorage } from "./storage.js";
+import { makeEntitlementStore } from "./entitlements.js";
 
 const TOKEN_RE = /^[a-f0-9]{32}$/i;
 const JOB_RE = /^[a-f0-9]{32}$/i;
+const PASS_RE = /^[a-f0-9]{32}$/i;
 const NODE_ENV = process.env.NODE_ENV || "development";
 const GENERATION_BUILDS_PER_HOUR = Number(process.env.GENERATION_BUILDS_PER_HOUR || 4);
 const GENERATION_ADJUSTS_PER_HOUR = Number(process.env.GENERATION_ADJUSTS_PER_HOUR || 12);
 const MAX_INTAKE_CHARS = Number(process.env.MAX_INTAKE_CHARS || 30000);
 const MAX_FIELD_CHARS = Number(process.env.MAX_FIELD_CHARS || 5000);
+const PROGRAM_PASS_ENFORCEMENT = process.env.PROGRAM_PASS_ENFORCEMENT === "1";
+const PROGRAM_PASS_DAYS = Number(process.env.PROGRAM_PASS_DAYS || 56);
+const PROGRAM_PASS_ADJUSTMENTS = Number(process.env.PROGRAM_PASS_ADJUSTMENTS || 6);
+const ADMIN_PROVISION_KEY = process.env.ADMIN_PROVISION_KEY || "";
 
 const privacyStore = await makeStorage();
+const passStore = await makeEntitlementStore();
 const counters = new Map();
 
 function clientIp(req) {
@@ -54,6 +62,96 @@ function validConsent(intake) {
   );
 }
 
+function passExpired(pass) {
+  return !pass || !pass.expires_at || Date.now() >= Number(pass.expires_at);
+}
+
+async function requireActivePassForToken(token) {
+  const pass = await passStore.getPassForToken(token);
+  if (!pass) return { error: "No active Program Pass is linked to this personal code.", status: 403 };
+  if (pass.status !== "active" || passExpired(pass)) {
+    return { error: "This Program Pass has expired. Purchase a new Program Pass to continue.", status: 403 };
+  }
+  return { pass };
+}
+
+async function guardProgramPass(req, res, next) {
+  try {
+    if (!PROGRAM_PASS_ENFORCEMENT) return next();
+
+    // First build: require an unused Program Pass code. We generate the client
+    // token here so the pass can be bound before the legacy build route executes.
+    if (req.method === "POST" && req.path === "/api/build") {
+      let token = String(req.body?.token || "").trim();
+      const passCode = String(req.body?.pass_code || "").trim();
+
+      if (token) {
+        const active = await requireActivePassForToken(token);
+        if (active.error) return res.status(active.status).json({ error: active.error });
+        const client = await privacyStore.getClient(token);
+        // Failed/unfinished first builds remain retryable with the SAME Program Pass.
+        // Once a good program exists, another /api/build would be a new block.
+        if (client && String(client.program || "").trim()) {
+          return res.status(403).json({
+            error: "This Program Pass has already created its training block. Use Adjust for changes, or purchase a new Program Pass for a completely new block.",
+          });
+        }
+        return next();
+      }
+
+      if (!PASS_RE.test(passCode)) {
+        return res.status(403).json({ error: "Enter the Program Pass code from your purchase before building your program." });
+      }
+      const pass = await passStore.getPass(passCode);
+      if (!pass) return res.status(403).json({ error: "That Program Pass code is not valid." });
+      if (pass.activated_token) {
+        return res.status(403).json({ error: "That Program Pass has already been activated. Use the personal code created with it to return to your program." });
+      }
+      if (pass.status !== "issued") {
+        return res.status(403).json({ error: "That Program Pass is not available for activation." });
+      }
+
+      token = crypto.randomBytes(16).toString("hex");
+      await passStore.activatePass(passCode, token, Date.now(), PROGRAM_PASS_DAYS);
+      req.body.token = token;
+      return next();
+    }
+
+    // Program retrieval is part of the paid 8-week access window.
+    const programMatch = req.path.match(/^\/api\/program\/([^/]+)$/);
+    if (req.method === "GET" && programMatch) {
+      const token = programMatch[1];
+      const active = await requireActivePassForToken(token);
+      if (active.error) return res.status(active.status).json({ error: active.error });
+      return next();
+    }
+
+    if (req.method === "POST" && (req.path === "/api/adjust" || req.path === "/api/set-language")) {
+      const token = String(req.body?.token || "").trim();
+      const active = await requireActivePassForToken(token);
+      if (active.error) return res.status(active.status).json({ error: active.error });
+
+      // Language switching is included support and does not consume one of the six
+      // substantive program adjustments. /api/adjust does.
+      if (req.path === "/api/adjust") {
+        const used = await passStore.successfulAdjustmentCount(token);
+        const limit = Number(active.pass.adjustment_limit || PROGRAM_PASS_ADJUSTMENTS);
+        if (used >= limit) {
+          return res.status(403).json({
+            error: `You've used all ${limit} included Program Pass adjustments. Purchase a new Program Pass for a new training block.`,
+          });
+        }
+      }
+      return next();
+    }
+
+    next();
+  } catch (e) {
+    console.error("program pass guard failed:", e && e.message);
+    res.status(500).json({ error: "Could not verify Program Pass access. Please try again." });
+  }
+}
+
 function securityMiddleware(req, res, next) {
   res.setHeader("X-Content-Type-Options", "nosniff");
   res.setHeader("Referrer-Policy", "no-referrer");
@@ -75,8 +173,6 @@ function securityMiddleware(req, res, next) {
     res.json = () => json({ ok: true });
   }
 
-  // Capability tokens are the authentication credential. Reject malformed values
-  // before they ever reach storage lookups or mutation routes.
   const bodyToken = typeof req.body?.token === "string" ? req.body.token.trim() : "";
   if (bodyToken && !TOKEN_RE.test(bodyToken)) {
     return res.status(400).json({ error: "Invalid personal code." });
@@ -118,7 +214,7 @@ function securityMiddleware(req, res, next) {
     }
   }
 
-  next();
+  return guardProgramPass(req, res, next);
 }
 
 // server.js first installs express.json(). Add our middleware immediately after
@@ -135,18 +231,68 @@ express.application.use = function (...args) {
   return result;
 };
 
-// Add privacy routes immediately before the existing server begins listening.
+// Add launch routes immediately before the existing server begins listening.
 const originalListen = express.application.listen;
 express.application.listen = function (...args) {
   if (!this.__privacyRoutesInstalled) {
     this.__privacyRoutesInstalled = true;
+
+    this.get("/api/program-pass-config", (_req, res) => {
+      return res.json({
+        enforced: PROGRAM_PASS_ENFORCEMENT,
+        access_days: PROGRAM_PASS_DAYS,
+        adjustments: PROGRAM_PASS_ADJUSTMENTS,
+      });
+    });
+
+    this.post("/api/program-pass-status", async (req, res) => {
+      try {
+        const token = String(req.body?.token || "").trim();
+        if (!TOKEN_RE.test(token)) return res.status(400).json({ error: "Invalid personal code." });
+        const pass = await passStore.getPassForToken(token);
+        if (!pass) return res.status(404).json({ error: "No Program Pass is linked to this code." });
+        const used = await passStore.successfulAdjustmentCount(token);
+        const limit = Number(pass.adjustment_limit || PROGRAM_PASS_ADJUSTMENTS);
+        return res.json({
+          status: pass.status,
+          expires_at: pass.expires_at,
+          adjustments_used: used,
+          adjustments_remaining: Math.max(0, limit - used),
+          adjustment_limit: limit,
+        });
+      } catch (e) {
+        console.error("program pass status failed:", e && e.message);
+        return res.status(500).json({ error: "Could not load Program Pass status." });
+      }
+    });
+
+    // Temporary launch provisioning path for Newie sales. Keep the admin key only
+    // in Render environment variables. This can later be replaced by Newie automation
+    // without changing Program Pass semantics or customer codes.
+    this.post("/api/admin/program-pass", async (req, res) => {
+      try {
+        if (!ADMIN_PROVISION_KEY || req.get("x-admin-provision-key") !== ADMIN_PROVISION_KEY) {
+          return res.status(404).json({ error: "Not found." });
+        }
+        const count = Math.max(1, Math.min(20, Number(req.body?.count || 1)));
+        const codes = [];
+        for (let i = 0; i < count; i++) {
+          const code = crypto.randomBytes(16).toString("hex");
+          await passStore.issuePass(code, Date.now(), PROGRAM_PASS_ADJUSTMENTS);
+          codes.push(code);
+        }
+        return res.json({ ok: true, codes, access_days: PROGRAM_PASS_DAYS, adjustments: PROGRAM_PASS_ADJUSTMENTS });
+      } catch (e) {
+        console.error("program pass provisioning failed:", e && e.message);
+        return res.status(500).json({ error: "Could not issue Program Pass." });
+      }
+    });
 
     this.delete("/api/client-data", async (req, res) => {
       try {
         const token = String(req.body?.token || "").trim();
         if (!TOKEN_RE.test(token)) return res.status(400).json({ error: "Invalid personal code." });
         await privacyStore.deleteClientData(token);
-        // Generic success avoids confirming whether a guessed code existed.
         return res.json({ ok: true });
       } catch (e) {
         console.error("client data deletion failed:", e && e.message);
@@ -155,8 +301,6 @@ express.application.listen = function (...args) {
     });
   }
 
-  // Best-effort cleanup at boot and twice daily. The Supabase SQL migration can
-  // also schedule its database-side purge function for defense in depth.
   privacyStore.purgeExpiredOperationalData().catch((e) => {
     console.warn("retention cleanup failed:", e && e.message);
   });
