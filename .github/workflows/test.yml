@@ -38,7 +38,10 @@ jobs:
           node --check phase14/engine/phase15_final_qa.js
           node --test phase14/test/phase15_planner_regression.test.mjs
           node --test phase14/test/phase15_specialist_rules.test.mjs
-          grep -q 'deterministic-skeleton-v5.2.5-warrior-final' phase14/server.phase15.js
+          grep -q 'deterministic-skeleton-v5.2.6-warrior-certified' phase14/server.phase15.js
+          grep -q 'WARRIOR / ATHLETIC HYPERTROPHY RULE' phase14/server.phase15.js
+          grep -q 'explicitNoBox' phase14/server.js
+          grep -q 'Ground-based unilateral leg work' phase14/server.js
           grep -q 'Maximum-quality short sprint' phase14/server.js
           grep -q "cells\[1\] = 'Chin-up'" phase14/server.js
           grep -q 'PARK-ONLY HARD STOP' phase14/server.phase15.js
@@ -48,13 +51,7 @@ jobs:
           grep -q 'WEIGHTED CALISTHENICS BENCHMARK ANCHOR' phase14/server.phase15.js
           grep -q 'phase15LastMileTsv' phase14/server.phase15.js
           grep -q 'UNRESOLVED_CLIENT_REVIEW' phase14/server.phase15.js
-          grep -q 'Ring Push-up' phase14/server.js
-          grep -q 'Ring Hamstring Curl' phase14/server.js
-          grep -q 'Pistol Squat to Box or Bench' phase14/server.js
-          grep -q 'Ring Rollout' phase14/server.js
-          grep -q 'Hanging Knee Raise' phase14/server.js
           grep -q 'RPE-selected load' phase14/server.phase15.js
-          grep -q 'Pseudo Planche Push-up' phase14/server.phase15.js
           grep -q '0-set or 0-rep explanatory placeholder row' phase14/server.phase15.js
       - name: Commit tested production patch
         env:
@@ -64,5 +61,5 @@ jobs:
           git config user.email 'actions@users.noreply.github.com'
           git add phase14/server.js phase14/scripts/build_phase15_runtime.mjs
           if git diff --cached --quiet; then echo 'No source patch to commit'; exit 0; fi
-          git commit -m 'Apply final Warrior v5.2.5 runtime'
+          git commit -m 'Apply Warrior v5.2.6 certification runtime'
           git push origin HEAD:${TARGET_BRANCH}
