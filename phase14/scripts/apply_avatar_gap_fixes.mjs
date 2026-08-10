@@ -36,7 +36,7 @@ patchFile('phase14/engine/exercise_dictionary.js', [
 patchFile('phase14/scripts/build_phase15_runtime.mjs', [
   [
     '    [/\\tBroad Jump\\t/gi, "\\tBox Jump\\t"],\n',
-    '    [/\\tBroad Jump\\t/gi, "\\tBox Jump\\t"],\n    [/\\tChest Supported Row\\t/gi, "\\tChest-Supported Row\\t"],\n    [/\\tChest-Supported DB Row\\t/gi, "\\tChest-Supported Row\\t"],\n    [/\\tDumbbell Hammer Curl\\t/gi, "\\tHammer Curl\\t"],\n',
+    '    [/\\tBroad Jump\\t/gi, "\\tBox Jump\\t"],\n    [/\\tCopenhagen Plank\\t/gi, "\\tSide Plank\\t"],\n    [/\\tChest Supported Row\\t/gi, "\\tChest-Supported Row\\t"],\n    [/\\tChest-Supported DB Row\\t/gi, "\\tChest-Supported Row\\t"],\n    [/\\tDumbbell Hammer Curl\\t/gi, "\\tHammer Curl\\t"],\n',
     'OpenAI canonical row normalization'
   ]
 ]);
