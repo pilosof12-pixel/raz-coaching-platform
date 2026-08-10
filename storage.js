@@ -3,25 +3,39 @@
 //   - SQLite (better-sqlite3) otherwise (local dev / fallback)
 //
 // All methods are async so routes work the same regardless of backend.
-//
-// Tables (Supabase schema lives in supabase_migration.sql):
-//   clients (token PK, intake, program, created_at, updated_at)
-//   history (id PK, token, kind, request, program, created_at)
-//   usage   (token, day, builds, adjusts; PK = token+day)
 
 import path from "path";
 import fs from "fs";
 import { fileURLToPath } from "url";
+import { makeEntitlementStore } from "./entitlements.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 const SUPABASE_URL = process.env.SUPABASE_URL || "";
 const SUPABASE_SERVICE_ROLE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY || "";
 const SUPABASE_ANON_KEY = process.env.SUPABASE_ANON_KEY || "";
-// Prefer service_role (backend-only, bypasses RLS). Fall back to anon for local dev.
 const SUPABASE_KEY = SUPABASE_SERVICE_ROLE_KEY || SUPABASE_ANON_KEY;
 export const USING_SUPABASE = Boolean(SUPABASE_URL && SUPABASE_KEY);
 export const SUPABASE_KEY_MODE = SUPABASE_SERVICE_ROLE_KEY ? "service_role" : (SUPABASE_ANON_KEY ? "anon" : "none");
+const PROGRAM_PASS_ENFORCEMENT = process.env.PROGRAM_PASS_ENFORCEMENT === "1";
+
+let entitlementStorePromise = null;
+function entitlementStore() {
+  if (!entitlementStorePromise) entitlementStorePromise = makeEntitlementStore();
+  return entitlementStorePromise;
+}
+
+async function recordSuccessfulCommercialUsage(token, kind, request, now) {
+  if (!PROGRAM_PASS_ENFORCEMENT) return;
+  const entitlements = await entitlementStore();
+  if (kind === "build") {
+    await entitlements.markInitialBuildCompleted(token, now);
+    return;
+  }
+  if (kind === "adjust" && !String(request || "").startsWith("[language:")) {
+    await entitlements.incrementAdjustment(token);
+  }
+}
 
 function todayUTC() {
   return new Date().toISOString().slice(0, 10);
@@ -36,9 +50,6 @@ function retentionCutoffs(now = Date.now()) {
   };
 }
 
-// ---------------------------------------------------------------------------
-// Supabase backend
-// ---------------------------------------------------------------------------
 function makeSupabaseStorage() {
   let client;
   async function sb() {
@@ -59,12 +70,7 @@ function makeSupabaseStorage() {
     async getUsage(token) {
       const day = todayUTC();
       const s = await sb();
-      let { data } = await s
-        .from("usage")
-        .select("*")
-        .eq("token", token)
-        .eq("day", day)
-        .maybeSingle();
+      let { data } = await s.from("usage").select("*").eq("token", token).eq("day", day).maybeSingle();
       if (!data) {
         await s.from("usage").insert({ token, day, builds: 0, adjusts: 0 });
         data = { token, day, builds: 0, adjusts: 0 };
@@ -78,29 +84,16 @@ function makeSupabaseStorage() {
       const cur = await this.getUsage(token);
       const builds = cur.builds + (kind === "build" ? 1 : 0);
       const adjusts = cur.adjusts + (kind === "adjust" ? 1 : 0);
-      await s
-        .from("usage")
-        .update({ builds, adjusts })
-        .eq("token", token)
-        .eq("day", day);
+      await s.from("usage").update({ builds, adjusts }).eq("token", token).eq("day", day);
     },
 
     async upsertClient(token, intakeJSON, program, now) {
       const s = await sb();
-      const { data: existing } = await s
-        .from("clients")
-        .select("token")
-        .eq("token", token)
-        .maybeSingle();
+      const { data: existing } = await s.from("clients").select("token").eq("token", token).maybeSingle();
       if (existing) {
-        await s
-          .from("clients")
-          .update({ intake: intakeJSON, program, updated_at: now })
-          .eq("token", token);
+        await s.from("clients").update({ intake: intakeJSON, program, updated_at: now }).eq("token", token);
       } else {
-        await s
-          .from("clients")
-          .insert({ token, intake: intakeJSON, program, created_at: now, updated_at: now });
+        await s.from("clients").insert({ token, intake: intakeJSON, program, created_at: now, updated_at: now });
       }
     },
 
@@ -111,19 +104,17 @@ function makeSupabaseStorage() {
 
     async getClient(token) {
       const s = await sb();
-      const { data } = await s
-        .from("clients")
-        .select("*")
-        .eq("token", token)
-        .maybeSingle();
+      const { data } = await s.from("clients").select("*").eq("token", token).maybeSingle();
       return data || null;
     },
 
     async addHistory(token, kind, request, program, now) {
       const s = await sb();
-      await s
-        .from("history")
-        .insert({ token, kind, request, program, created_at: now });
+      const { error } = await s.from("history").insert({ token, kind, request, program, created_at: now });
+      if (error) throw error;
+      // Commercial usage is recorded only after the successful generation has
+      // been persisted to history. Failed model/API attempts never consume paid usage.
+      await recordSuccessfulCommercialUsage(token, kind, request, now);
     },
 
     async createJob(id, token, kind, now) {
@@ -136,10 +127,7 @@ function makeSupabaseStorage() {
 
     async finishJob(id, status, program, error, now) {
       const s = await sb();
-      await s
-        .from("jobs")
-        .update({ status, program: program || null, error: error || null, updated_at: now })
-        .eq("id", id);
+      await s.from("jobs").update({ status, program: program || null, error: error || null, updated_at: now }).eq("id", id);
     },
 
     async getJob(id) {
@@ -150,11 +138,12 @@ function makeSupabaseStorage() {
 
     async deleteClientData(token) {
       const s = await sb();
-      // Delete dependent/operational data first, then the primary client record.
       await s.from("jobs").delete().eq("token", token);
       await s.from("history").delete().eq("token", token);
       await s.from("usage").delete().eq("token", token);
       await s.from("clients").delete().eq("token", token);
+      // Program Pass entitlement intentionally remains. Deleting sensitive coaching
+      // data must not recreate a paid block or reset paid adjustment usage.
       return true;
     },
 
@@ -169,9 +158,6 @@ function makeSupabaseStorage() {
   };
 }
 
-// ---------------------------------------------------------------------------
-// SQLite backend (local dev / fallback)
-// ---------------------------------------------------------------------------
 async function makeSqliteStorage() {
   const { default: Database } = await import("better-sqlite3");
   const DB_PATH = path.join(__dirname, "data", "data.db");
@@ -233,9 +219,9 @@ async function makeSqliteStorage() {
     },
 
     async addHistory(token, kind, request, program, now) {
-      db.prepare(
-        "INSERT INTO history (token, kind, request, program, created_at) VALUES (?,?,?,?,?)"
-      ).run(token, kind, request, program, now);
+      db.prepare("INSERT INTO history (token, kind, request, program, created_at) VALUES (?,?,?,?,?)")
+        .run(token, kind, request, program, now);
+      await recordSuccessfulCommercialUsage(token, kind, request, now);
     },
 
     async createJob(id, token, kind, now) {
@@ -245,9 +231,8 @@ async function makeSqliteStorage() {
     },
 
     async finishJob(id, status, program, error, now) {
-      db.prepare(
-        "UPDATE jobs SET status=?, program=?, error=?, updated_at=? WHERE id=?"
-      ).run(status, program || null, error || null, now, id);
+      db.prepare("UPDATE jobs SET status=?, program=?, error=?, updated_at=? WHERE id=?")
+        .run(status, program || null, error || null, now, id);
     },
 
     async getJob(id) {
