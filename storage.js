@@ -1,13 +1,9 @@
 // Storage abstraction with two backends:
-//   - Supabase (Postgres) when SUPABASE_URL + SUPABASE_ANON_KEY are set (production / persistent)
-//   - SQLite (better-sqlite3) otherwise (local dev / fallback)
+//   - Supabase (Postgres) in production
+//   - SQLite otherwise for local development
 //
-// All methods are async so routes work the same regardless of backend.
-//
-// Tables (Supabase schema lives in supabase_migration.sql):
-//   clients (token PK, intake, program, created_at, updated_at)
-//   history (id PK, token, kind, request, program, created_at)
-//   usage   (token, day, builds, adjusts; PK = token+day)
+// Program Pass defaults are enforced by the server wrapper. Storage owns the
+// durable entitlement record and records successful program/adjustment usage.
 
 import path from "path";
 import fs from "fs";
@@ -18,7 +14,6 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const SUPABASE_URL = process.env.SUPABASE_URL || "";
 const SUPABASE_SERVICE_ROLE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY || "";
 const SUPABASE_ANON_KEY = process.env.SUPABASE_ANON_KEY || "";
-// Prefer service_role (backend-only, bypasses RLS). Fall back to anon for local dev.
 const SUPABASE_KEY = SUPABASE_SERVICE_ROLE_KEY || SUPABASE_ANON_KEY;
 export const USING_SUPABASE = Boolean(SUPABASE_URL && SUPABASE_KEY);
 export const SUPABASE_KEY_MODE = SUPABASE_SERVICE_ROLE_KEY ? "service_role" : (SUPABASE_ANON_KEY ? "anon" : "none");
@@ -33,6 +28,20 @@ function retentionCutoffs(now = Date.now()) {
     jobs: now - 7 * DAY,
     history: now - 180 * DAY,
     usageDay: new Date(now - 90 * DAY).toISOString().slice(0, 10),
+  };
+}
+
+function normalizePass(row) {
+  if (!row) return null;
+  const now = Date.now();
+  const expired = Number(row.expires_at || 0) <= now;
+  const status = expired && row.status === "active" ? "expired" : row.status;
+  return {
+    ...row,
+    status,
+    active: status === "active" && !expired,
+    programs_remaining: Math.max(0, Number(row.program_credits || 0) - Number(row.programs_used || 0)),
+    adjustments_remaining: Math.max(0, Number(row.adjustments_total || 0) - Number(row.adjustments_used || 0)),
   };
 }
 
@@ -53,18 +62,32 @@ function makeSupabaseStorage() {
     return client;
   }
 
+  async function recordPassUse(token, kind, now) {
+    const s = await sb();
+    const { data } = await s.from("program_passes").select("*").eq("token", token).maybeSingle();
+    if (!data) return;
+    const pass = normalizePass(data);
+    if (!pass?.active) return;
+    if (kind === "build") {
+      if (pass.programs_remaining <= 0) return;
+      await s.from("program_passes")
+        .update({ programs_used: Number(pass.programs_used || 0) + 1, updated_at: now })
+        .eq("token", token);
+    } else if (kind === "adjust") {
+      if (pass.adjustments_remaining <= 0) return;
+      await s.from("program_passes")
+        .update({ adjustments_used: Number(pass.adjustments_used || 0) + 1, updated_at: now })
+        .eq("token", token);
+    }
+  }
+
   return {
     backend: "supabase",
 
     async getUsage(token) {
       const day = todayUTC();
       const s = await sb();
-      let { data } = await s
-        .from("usage")
-        .select("*")
-        .eq("token", token)
-        .eq("day", day)
-        .maybeSingle();
+      let { data } = await s.from("usage").select("*").eq("token", token).eq("day", day).maybeSingle();
       if (!data) {
         await s.from("usage").insert({ token, day, builds: 0, adjusts: 0 });
         data = { token, day, builds: 0, adjusts: 0 };
@@ -78,29 +101,16 @@ function makeSupabaseStorage() {
       const cur = await this.getUsage(token);
       const builds = cur.builds + (kind === "build" ? 1 : 0);
       const adjusts = cur.adjusts + (kind === "adjust" ? 1 : 0);
-      await s
-        .from("usage")
-        .update({ builds, adjusts })
-        .eq("token", token)
-        .eq("day", day);
+      await s.from("usage").update({ builds, adjusts }).eq("token", token).eq("day", day);
     },
 
     async upsertClient(token, intakeJSON, program, now) {
       const s = await sb();
-      const { data: existing } = await s
-        .from("clients")
-        .select("token")
-        .eq("token", token)
-        .maybeSingle();
+      const { data: existing } = await s.from("clients").select("token").eq("token", token).maybeSingle();
       if (existing) {
-        await s
-          .from("clients")
-          .update({ intake: intakeJSON, program, updated_at: now })
-          .eq("token", token);
+        await s.from("clients").update({ intake: intakeJSON, program, updated_at: now }).eq("token", token);
       } else {
-        await s
-          .from("clients")
-          .insert({ token, intake: intakeJSON, program, created_at: now, updated_at: now });
+        await s.from("clients").insert({ token, intake: intakeJSON, program, created_at: now, updated_at: now });
       }
     },
 
@@ -111,19 +121,14 @@ function makeSupabaseStorage() {
 
     async getClient(token) {
       const s = await sb();
-      const { data } = await s
-        .from("clients")
-        .select("*")
-        .eq("token", token)
-        .maybeSingle();
+      const { data } = await s.from("clients").select("*").eq("token", token).maybeSingle();
       return data || null;
     },
 
     async addHistory(token, kind, request, program, now) {
       const s = await sb();
-      await s
-        .from("history")
-        .insert({ token, kind, request, program, created_at: now });
+      await s.from("history").insert({ token, kind, request, program, created_at: now });
+      await recordPassUse(token, kind, now);
     },
 
     async createJob(id, token, kind, now) {
@@ -136,10 +141,9 @@ function makeSupabaseStorage() {
 
     async finishJob(id, status, program, error, now) {
       const s = await sb();
-      await s
-        .from("jobs")
-        .update({ status, program: program || null, error: error || null, updated_at: now })
-        .eq("id", id);
+      await s.from("jobs").update({
+        status, program: program || null, error: error || null, updated_at: now,
+      }).eq("id", id);
     },
 
     async getJob(id) {
@@ -148,13 +152,56 @@ function makeSupabaseStorage() {
       return data || null;
     },
 
+    async hasPendingJob(token, kind) {
+      const s = await sb();
+      const { data } = await s.from("jobs")
+        .select("id")
+        .eq("token", token)
+        .eq("kind", kind)
+        .eq("status", "pending")
+        .limit(1);
+      return Boolean(data && data.length);
+    },
+
+    async getProgramPass(token) {
+      const s = await sb();
+      const { data } = await s.from("program_passes").select("*").eq("token", token).maybeSingle();
+      if (!data) return null;
+      const pass = normalizePass(data);
+      if (pass.status === "expired" && data.status === "active") {
+        await s.from("program_passes").update({ status: "expired", updated_at: Date.now() }).eq("token", token);
+      }
+      return pass;
+    },
+
+    async createProgramPass({ token, paymentRef, purchasedAt, expiresAt, programCredits = 1, adjustmentsTotal = 6 }) {
+      const s = await sb();
+      const now = Date.now();
+      const row = {
+        token,
+        payment_ref: paymentRef || null,
+        status: "active",
+        purchased_at: purchasedAt,
+        expires_at: expiresAt,
+        program_credits: programCredits,
+        programs_used: 0,
+        adjustments_total: adjustmentsTotal,
+        adjustments_used: 0,
+        created_at: now,
+        updated_at: now,
+      };
+      const { data, error } = await s.from("program_passes").insert(row).select("*").single();
+      if (error) throw error;
+      return normalizePass(data);
+    },
+
     async deleteClientData(token) {
       const s = await sb();
-      // Delete dependent/operational data first, then the primary client record.
       await s.from("jobs").delete().eq("token", token);
       await s.from("history").delete().eq("token", token);
       await s.from("usage").delete().eq("token", token);
       await s.from("clients").delete().eq("token", token);
+      await s.from("program_passes").delete().eq("token", token);
       return true;
     },
 
@@ -164,13 +211,14 @@ function makeSupabaseStorage() {
       await s.from("jobs").delete().lt("created_at", c.jobs);
       await s.from("history").delete().lt("created_at", c.history);
       await s.from("usage").delete().lt("day", c.usageDay);
+      try { await s.rpc("expire_program_passes"); } catch (_e) {}
       return true;
     },
   };
 }
 
 // ---------------------------------------------------------------------------
-// SQLite backend (local dev / fallback)
+// SQLite backend
 // ---------------------------------------------------------------------------
 async function makeSqliteStorage() {
   const { default: Database } = await import("better-sqlite3");
@@ -195,7 +243,40 @@ async function makeSqliteStorage() {
       id TEXT PRIMARY KEY, token TEXT, kind TEXT, status TEXT,
       program TEXT, error TEXT, created_at INTEGER, updated_at INTEGER
     );
+    CREATE TABLE IF NOT EXISTS program_passes (
+      token TEXT PRIMARY KEY,
+      payment_ref TEXT UNIQUE,
+      status TEXT NOT NULL DEFAULT 'active',
+      purchased_at INTEGER NOT NULL,
+      expires_at INTEGER NOT NULL,
+      program_credits INTEGER NOT NULL DEFAULT 1,
+      programs_used INTEGER NOT NULL DEFAULT 0,
+      adjustments_total INTEGER NOT NULL DEFAULT 6,
+      adjustments_used INTEGER NOT NULL DEFAULT 0,
+      created_at INTEGER NOT NULL,
+      updated_at INTEGER NOT NULL
+    );
   `);
+
+  function getPass(token) {
+    const row = db.prepare("SELECT * FROM program_passes WHERE token=?").get(token);
+    if (!row) return null;
+    const pass = normalizePass(row);
+    if (pass.status === "expired" && row.status === "active") {
+      db.prepare("UPDATE program_passes SET status='expired', updated_at=? WHERE token=?").run(Date.now(), token);
+    }
+    return pass;
+  }
+
+  function recordPassUse(token, kind, now) {
+    const pass = getPass(token);
+    if (!pass?.active) return;
+    if (kind === "build" && pass.programs_remaining > 0) {
+      db.prepare("UPDATE program_passes SET programs_used=programs_used+1, updated_at=? WHERE token=?").run(now, token);
+    } else if (kind === "adjust" && pass.adjustments_remaining > 0) {
+      db.prepare("UPDATE program_passes SET adjustments_used=adjustments_used+1, updated_at=? WHERE token=?").run(now, token);
+    }
+  }
 
   return {
     backend: "sqlite",
@@ -233,9 +314,12 @@ async function makeSqliteStorage() {
     },
 
     async addHistory(token, kind, request, program, now) {
-      db.prepare(
-        "INSERT INTO history (token, kind, request, program, created_at) VALUES (?,?,?,?,?)"
-      ).run(token, kind, request, program, now);
+      const tx = db.transaction(() => {
+        db.prepare("INSERT INTO history (token, kind, request, program, created_at) VALUES (?,?,?,?,?)")
+          .run(token, kind, request, program, now);
+        recordPassUse(token, kind, now);
+      });
+      tx();
     },
 
     async createJob(id, token, kind, now) {
@@ -245,13 +329,30 @@ async function makeSqliteStorage() {
     },
 
     async finishJob(id, status, program, error, now) {
-      db.prepare(
-        "UPDATE jobs SET status=?, program=?, error=?, updated_at=? WHERE id=?"
-      ).run(status, program || null, error || null, now, id);
+      db.prepare("UPDATE jobs SET status=?, program=?, error=?, updated_at=? WHERE id=?")
+        .run(status, program || null, error || null, now, id);
     },
 
     async getJob(id) {
       return db.prepare("SELECT * FROM jobs WHERE id=?").get(id) || null;
+    },
+
+    async hasPendingJob(token, kind) {
+      return Boolean(db.prepare("SELECT id FROM jobs WHERE token=? AND kind=? AND status='pending' LIMIT 1").get(token, kind));
+    },
+
+    async getProgramPass(token) {
+      return getPass(token);
+    },
+
+    async createProgramPass({ token, paymentRef, purchasedAt, expiresAt, programCredits = 1, adjustmentsTotal = 6 }) {
+      const now = Date.now();
+      db.prepare(
+        `INSERT INTO program_passes
+         (token, payment_ref, status, purchased_at, expires_at, program_credits, programs_used, adjustments_total, adjustments_used, created_at, updated_at)
+         VALUES (?,?,'active',?,?,?,0,?,0,?,?)`
+      ).run(token, paymentRef || null, purchasedAt, expiresAt, programCredits, adjustmentsTotal, now, now);
+      return getPass(token);
     },
 
     async deleteClientData(token) {
@@ -260,6 +361,7 @@ async function makeSqliteStorage() {
         db.prepare("DELETE FROM history WHERE token=?").run(token);
         db.prepare("DELETE FROM usage WHERE token=?").run(token);
         db.prepare("DELETE FROM clients WHERE token=?").run(token);
+        db.prepare("DELETE FROM program_passes WHERE token=?").run(token);
       });
       tx();
       return true;
@@ -271,6 +373,8 @@ async function makeSqliteStorage() {
         db.prepare("DELETE FROM jobs WHERE created_at < ?").run(c.jobs);
         db.prepare("DELETE FROM history WHERE created_at < ?").run(c.history);
         db.prepare("DELETE FROM usage WHERE day < ?").run(c.usageDay);
+        db.prepare("UPDATE program_passes SET status='expired', updated_at=? WHERE status='active' AND expires_at <= ?")
+          .run(now, now);
       });
       tx();
       return true;
