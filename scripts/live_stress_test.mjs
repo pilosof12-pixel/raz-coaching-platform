@@ -1,5 +1,6 @@
 import fs from "node:fs";
 
+// Diagnostic rerun after fail-closed error detail deployment.
 const BASE = process.env.LIVE_BASE || "https://raz-coaching-platform.onrender.com";
 const outDir = "stress-output";
 fs.mkdirSync(outDir, { recursive: true });
