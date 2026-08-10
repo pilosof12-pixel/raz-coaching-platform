@@ -68,9 +68,14 @@ patchFile('phase14/server.js', [
   ]
 ]);
 
-patchFile('phase14/scripts/build_phase15_runtime.mjs', [
-  ['deterministic-skeleton-v5-quality', 'deterministic-skeleton-v5.1-client-clean', 'execution path marker'],
-  ['raz-phase15-quality-v5', 'raz-phase15-client-clean-v5-1', 'cache key marker']
-]);
+{
+  const path = 'phase14/scripts/build_phase15_runtime.mjs';
+  let s = fs.readFileSync(path, 'utf8');
+  const before = s;
+  s = s.replaceAll('deterministic-skeleton-v5-quality', 'deterministic-skeleton-v5.1-client-clean');
+  s = s.replaceAll('raz-phase15-quality-v5', 'raz-phase15-client-clean-v5-1');
+  if (s !== before) fs.writeFileSync(path, s);
+  console.log(`${path}: ${s !== before ? 'patched' : 'already current'}`);
+}
 
 console.log('last-mile client-clean patch applied');
