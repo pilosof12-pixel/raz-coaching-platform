@@ -1,6 +1,6 @@
 import fs from "node:fs";
 
-// Diagnostic rerun after fail-closed error detail deployment.
+// Warrior v5.2.1 client-ready rerun.
 const BASE = process.env.LIVE_BASE || "https://raz-coaching-platform.onrender.com";
 const outDir = "stress-output";
 fs.mkdirSync(outDir, { recursive: true });
@@ -31,14 +31,14 @@ async function waitForDeployment() {
         last?.mode === "openai" &&
         /^gpt-/i.test(String(last?.model || "")) &&
         last?.ai_configured !== false &&
-        last?.openai_execution_path === "deterministic-skeleton-v5.2-benchmark-anchored"
+        last?.openai_execution_path === "deterministic-skeleton-v5.2.1-warrior-approved"
       ) return last;
     } catch (e) {
       console.log("health wait:", e.message);
     }
     await sleep(5000);
   }
-  throw new Error(`Live deployment did not report deterministic-skeleton-v5.2-benchmark-anchored in time. Last health: ${JSON.stringify(last)}`);
+  throw new Error(`Live deployment did not report deterministic-skeleton-v5.2.1-warrior-approved in time. Last health: ${JSON.stringify(last)}`);
 }
 
 const AVATARS = {
