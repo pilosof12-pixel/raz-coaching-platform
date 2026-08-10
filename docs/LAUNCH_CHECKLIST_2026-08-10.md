@@ -1,6 +1,6 @@
 # RAZ AI Coaching Platform — Launch Checklist
 
-Status date: 2026-08-10
+Status date: 2026-08-11
 
 ## Completed / code-verified
 
@@ -23,23 +23,28 @@ Status date: 2026-08-10
 - [x] Loaded programs show Program Pass expiry and remaining substantive adjustments when enforcement is enabled.
 - [x] Temporary admin provisioning endpoint added for early Newie sales.
 - [x] Supabase migration supports Program Pass status, activation, expiry, adjustment counters and successful initial-block marker.
-- [x] Program Pass entitlement regression tests added and passing in GitHub Actions.
-- [x] `server_secure.js`, `storage.js` and `entitlements.js` launch-layer syntax checks pass in GitHub Actions.
-- [x] Root regression tests pass with the Program Pass changes.
+- [x] Expired Program Passes are discoverable for automatic coaching-data cleanup.
+- [x] Sensitive coaching data is scheduled for automatic deletion after pass expiry plus a configurable grace period; commercial entitlement records remain separate.
+- [x] First-party aggregate funnel analytics implemented with only UTC day + allowlisted event + count. No tokens, IPs, intake text, injury details or program content are stored.
+- [x] Admin-only aggregate analytics summary endpoint added.
+- [x] Mobile-only launch stylesheet added: iOS-safe input sizing, full-width mobile buttons, compact cards, touch-friendly tables and sport controls.
+- [x] Privacy policy aligned with the fixed-term Program Pass, post-expiry cleanup and aggregate analytics model.
+- [x] Program Pass and analytics regression tests added.
+- [x] `server_secure.js`, `storage.js`, `entitlements.js`, `analytics.js` and launch client scripts are syntax-checked in GitHub Actions.
 - [x] Phase 15 source-grounding regression fixture corrected without changing production coaching logic.
-- [x] Full GitHub Actions regression workflow passes on the hardening branch.
 
 ## Program Pass rollout — environment work still required
 
 Do not enable commercial enforcement until the following are complete.
 
-1. Apply `supabase_program_passes.sql` in the production Supabase SQL editor.
+1. Apply `supabase_program_passes.sql` in production Supabase.
 2. Apply `supabase_privacy_hardening.sql` and verify browser roles cannot directly read coaching tables.
-3. Add the final privacy/support email address to `public/privacy.html`.
-4. Set a long random `ADMIN_PROVISION_KEY` in Render. Never put this value in browser code, WordPress or Newie.
-5. Keep `PROGRAM_PASS_ENFORCEMENT=0` while staging/testing.
-6. Deploy the branch to staging and test the complete matrix below.
-7. Only after the tests pass, set `PROGRAM_PASS_ENFORCEMENT=1`.
+3. Apply `supabase_analytics.sql` so anonymous aggregate funnel counters can persist in production.
+4. Add the final privacy/support email address to `public/privacy.html`.
+5. Set a long random `ADMIN_PROVISION_KEY` in Render. Never put this value in browser code, WordPress or Newie.
+6. Keep `PROGRAM_PASS_ENFORCEMENT=0` while staging/testing.
+7. Deploy the branch to staging and test the complete matrix below.
+8. Only after the tests pass, set `PROGRAM_PASS_ENFORCEMENT=1`.
 
 Recommended production environment values:
 
@@ -48,6 +53,7 @@ NODE_ENV=production
 PROGRAM_PASS_ENFORCEMENT=1
 PROGRAM_PASS_DAYS=56
 PROGRAM_PASS_ADJUSTMENTS=6
+PROGRAM_PASS_DATA_GRACE_DAYS=7
 GENERATION_BUILDS_PER_HOUR=4
 GENERATION_ADJUSTS_PER_HOUR=12
 ```
@@ -55,8 +61,6 @@ GENERATION_ADJUSTS_PER_HOUR=12
 ## Temporary Newie fulfilment for first customers
 
 Until Newie purchase completion is automated, issue one unique Program Pass after each confirmed Newie purchase.
-
-Example request from a trusted terminal:
 
 ```bash
 curl -X POST "https://YOUR-APP-HOST/api/admin/program-pass" \
@@ -97,18 +101,20 @@ Your pass includes one personalised 4-week training block, 8 weeks of access and
 - [ ] Program Pass status UI reports expiry and remaining adjustments correctly.
 - [ ] Spreadsheet export still works after adjustments.
 - [ ] Delete My Data removes coaching data without exposing whether another token exists.
-- [ ] Mobile intake and program tables remain usable.
+- [ ] Post-expiry grace cleanup removes coaching data but preserves the entitlement record.
+- [ ] Aggregate analytics counters increment without storing customer data.
+- [ ] Mobile intake and program tables remain usable on a real phone.
 
 ## Remaining launch workstreams
 
-1. Finish staging/deployment checks for privacy, RLS and Program Pass enforcement.
-2. Run adversarial customer journey: purchase -> code -> intake -> generation -> download -> leave -> return -> adjust -> language -> delete.
-3. Review adaptive intake sufficiency on several deliberately incomplete/contradictory avatars.
-4. Add lightweight funnel analytics: landing CTA click, intake start, build started, build success, spreadsheet download, return, adjust success, purchase/re-purchase attribution where available.
-5. Final mobile UX pass.
+1. Finish staging/deployment checks for Supabase, RLS, analytics persistence and Program Pass enforcement.
+2. Run the real adversarial customer journey: Newie purchase -> Program Pass -> intake -> generation -> spreadsheet -> leave -> return -> adjust -> language -> delete.
+3. Review adaptive intake sufficiency on deliberately incomplete/contradictory avatars.
+4. Add landing-page CTA and Newie purchase/re-purchase attribution where those platforms expose a clean integration. App-side funnel analytics are implemented.
+5. Verify mobile UX on a real iPhone. Code-side mobile safeguards are implemented.
 6. Final launch video and social campaign assets.
 7. Launch validation: first 10 paying users, then review conversion, generation cost, adjustment usage and repurchase rate before changing price/allowances.
 
 ## CI status
 
-The complete GitHub Actions regression workflow is green on the hardening branch. This includes root tests, Program Pass entitlement tests, launch-layer syntax checks, Phase 15 source-grounding tests, generated-runtime validation, planner regression tests and specialist-rule tests.
+The branch should not be treated as code-verified after a new commit until the latest GitHub Actions run completes successfully. The last fully green run covered root tests, Program Pass tests, launch-layer syntax checks and the Phase 15 generated runtime. New analytics/retention additions are now included in CI and must remain green before merge.
