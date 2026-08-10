@@ -1475,6 +1475,11 @@ function phase15LastMileTsv(tsv, intake) {
       cells[7] = 'Use a brisk walk or very easy jog that keeps breathing conversational; do not turn this into intervals.';
       ex = cells[1];
     }
+    if (/\[REVIEW\].*Step Back Lunge|^Step Back Lunge$/i.test(ex)) {
+      cells[1] = 'Reverse Lunge';
+      cells[7] = 'Use a controlled step-back lunge with stable knee tracking. Add belt/plate load only while balance and range stay clean.';
+      ex = cells[1];
+    }
     if (/\[REVIEW\].*Ring Leg Curl|^Ring Leg Curl$/i.test(ex)) {
       cells[1] = 'Ring Hamstring Curl';
       cells[7] = 'Keep hips extended and control the eccentric. Adjust body position to stay 1-2 reps in reserve.';
