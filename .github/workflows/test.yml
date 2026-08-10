@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - main
+      - agent/lastmile-run
   pull_request:
     branches:
       - main
@@ -52,4 +53,4 @@ jobs:
           git add phase14/server.js phase14/scripts/build_phase15_runtime.mjs
           if git diff --cached --quiet; then echo 'No source patch to commit'; exit 0; fi
           git commit -m 'Add fail-closed last-mile client QA'
-          git push origin main
+          git push origin HEAD:${GITHUB_REF_NAME}
