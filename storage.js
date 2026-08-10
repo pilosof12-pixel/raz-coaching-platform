@@ -27,6 +27,15 @@ function todayUTC() {
   return new Date().toISOString().slice(0, 10);
 }
 
+function retentionCutoffs(now = Date.now()) {
+  const DAY = 24 * 60 * 60 * 1000;
+  return {
+    jobs: now - 7 * DAY,
+    history: now - 180 * DAY,
+    usageDay: new Date(now - 90 * DAY).toISOString().slice(0, 10),
+  };
+}
+
 // ---------------------------------------------------------------------------
 // Supabase backend
 // ---------------------------------------------------------------------------
@@ -35,9 +44,6 @@ function makeSupabaseStorage() {
   async function sb() {
     if (client) return client;
     const { createClient } = await import("@supabase/supabase-js");
-    // We only use the Postgres REST API (no realtime). On Node < 22 the client
-    // needs an explicit WebSocket transport or it throws at construction time,
-    // so we supply the `ws` package. Render's free tier may also run Node 20.
     const { default: WS } = await import("ws");
     client = createClient(SUPABASE_URL, SUPABASE_KEY, {
       auth: { persistSession: false, autoRefreshToken: false },
@@ -81,7 +87,6 @@ function makeSupabaseStorage() {
 
     async upsertClient(token, intakeJSON, program, now) {
       const s = await sb();
-      // Does it exist?
       const { data: existing } = await s
         .from("clients")
         .select("token")
@@ -121,7 +126,6 @@ function makeSupabaseStorage() {
         .insert({ token, kind, request, program, created_at: now });
     },
 
-    // ---- async job tracking ----
     async createJob(id, token, kind, now) {
       const s = await sb();
       await s.from("jobs").insert({
@@ -129,6 +133,7 @@ function makeSupabaseStorage() {
         created_at: now, updated_at: now,
       });
     },
+
     async finishJob(id, status, program, error, now) {
       const s = await sb();
       await s
@@ -136,10 +141,30 @@ function makeSupabaseStorage() {
         .update({ status, program: program || null, error: error || null, updated_at: now })
         .eq("id", id);
     },
+
     async getJob(id) {
       const s = await sb();
       const { data } = await s.from("jobs").select("*").eq("id", id).maybeSingle();
       return data || null;
+    },
+
+    async deleteClientData(token) {
+      const s = await sb();
+      // Delete dependent/operational data first, then the primary client record.
+      await s.from("jobs").delete().eq("token", token);
+      await s.from("history").delete().eq("token", token);
+      await s.from("usage").delete().eq("token", token);
+      await s.from("clients").delete().eq("token", token);
+      return true;
+    },
+
+    async purgeExpiredOperationalData(now = Date.now()) {
+      const s = await sb();
+      const c = retentionCutoffs(now);
+      await s.from("jobs").delete().lt("created_at", c.jobs);
+      await s.from("history").delete().lt("created_at", c.history);
+      await s.from("usage").delete().lt("day", c.usageDay);
+      return true;
     },
   };
 }
@@ -213,19 +238,42 @@ async function makeSqliteStorage() {
       ).run(token, kind, request, program, now);
     },
 
-    // ---- async job tracking ----
     async createJob(id, token, kind, now) {
       db.prepare(
         "INSERT INTO jobs (id, token, kind, status, program, error, created_at, updated_at) VALUES (?,?,?,?,NULL,NULL,?,?)"
       ).run(id, token, kind, "pending", now, now);
     },
+
     async finishJob(id, status, program, error, now) {
       db.prepare(
         "UPDATE jobs SET status=?, program=?, error=?, updated_at=? WHERE id=?"
       ).run(status, program || null, error || null, now, id);
     },
+
     async getJob(id) {
       return db.prepare("SELECT * FROM jobs WHERE id=?").get(id) || null;
+    },
+
+    async deleteClientData(token) {
+      const tx = db.transaction(() => {
+        db.prepare("DELETE FROM jobs WHERE token=?").run(token);
+        db.prepare("DELETE FROM history WHERE token=?").run(token);
+        db.prepare("DELETE FROM usage WHERE token=?").run(token);
+        db.prepare("DELETE FROM clients WHERE token=?").run(token);
+      });
+      tx();
+      return true;
+    },
+
+    async purgeExpiredOperationalData(now = Date.now()) {
+      const c = retentionCutoffs(now);
+      const tx = db.transaction(() => {
+        db.prepare("DELETE FROM jobs WHERE created_at < ?").run(c.jobs);
+        db.prepare("DELETE FROM history WHERE created_at < ?").run(c.history);
+        db.prepare("DELETE FROM usage WHERE day < ?").run(c.usageDay);
+      });
+      tx();
+      return true;
     },
   };
 }
