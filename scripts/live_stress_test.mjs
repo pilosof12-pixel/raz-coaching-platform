@@ -30,15 +30,14 @@ async function waitForDeployment() {
         last?.mode === "openai" &&
         /^gpt-/i.test(String(last?.model || "")) &&
         last?.ai_configured !== false &&
-        last?.openai_execution_path === "deterministic-skeleton-v5-quality" &&
-        Number(last?.openai_compact_developer_chars || 0) > 4407
+        last?.openai_execution_path === "deterministic-skeleton-v5.1-client-clean"
       ) return last;
     } catch (e) {
       console.log("health wait:", e.message);
     }
     await sleep(5000);
   }
-  throw new Error(`Live deployment did not report the one-rung-safe v5 build in time. Last health: ${JSON.stringify(last)}`);
+  throw new Error(`Live deployment did not report deterministic-skeleton-v5.1-client-clean in time. Last health: ${JSON.stringify(last)}`);
 }
 
 const AVATARS = {
@@ -77,6 +76,9 @@ async function build(name, intake) {
     if (job.status === "done") {
       const secs = Math.round((Date.now() - started) / 100) / 10;
       const program = job.program || "";
+      if (/\[REVIEW\]|contact\s+support|could not be safely generated/i.test(program)) {
+        throw new Error(`${name}: client-clean gate failed; review/support text survived`);
+      }
       const result = { name, secs, token: job.token, violations: job?._meta?.violations ?? null, length: program.length, program };
       fs.writeFileSync(`${outDir}/${name}.txt`, program);
       console.log(`RESULT ${name}: ${secs}s, len=${program.length}, violations=${result.violations}`);
