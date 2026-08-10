@@ -1,5 +1,5 @@
 {
-  "version": "1.1.0",
+  "version": "1.2.0",
   "policy": "Direct YouTube watch URLs only. These override/fill gaps in exercise_demos.json. No search-result URLs.",
   "entries": {
     "box_squat_to_parallel": { "canonical": "Box Squat to Parallel", "demo_url": "https://www.youtube.com/watch?v=r1LMzfShloQ", "channel": "Verified coaching source", "aliases": ["box_squat"] },
@@ -19,6 +19,14 @@
     "pallof_press": { "canonical": "Pallof Press", "demo_url": "https://www.youtube.com/watch?v=axgv7H_VQOo", "channel": "BarBend exercise guide", "aliases": ["cable_pallof_press"] },
     "farmer_carry": { "canonical": "Farmer Carry", "demo_url": "https://www.youtube.com/watch?v=rt17lmnaLSM", "channel": "Farmer carry tutorial", "aliases": ["farmers_walk", "loaded_carry"] },
     "suitcase_carry": { "canonical": "Suitcase Carry", "demo_url": "https://www.youtube.com/watch?v=DOS_71iADhI", "channel": "Suitcase carry tutorial", "aliases": ["single_arm_carry", "one_arm_carry"] },
-    "bulgarian_split_squat": { "canonical": "Bulgarian Split Squat", "demo_url": "https://www.youtube.com/watch?v=_Mf2n71dNZ8", "channel": "Bulgarian split squat tutorial", "aliases": ["rear_foot_elevated_split_squat", "rfess"] }
+    "bulgarian_split_squat": { "canonical": "Bulgarian Split Squat", "demo_url": "https://www.youtube.com/watch?v=_Mf2n71dNZ8", "channel": "Bulgarian split squat tutorial", "aliases": ["rear_foot_elevated_split_squat", "rfess"] },
+    "standing_barbell_overhead_press": { "canonical": "Standing Barbell Overhead Press", "demo_url": "https://www.youtube.com/watch?v=wol7Hko8RhY", "channel": "Alan Thrall / Untamed Strength", "aliases": ["standing_ohp", "barbell_overhead_press"] },
+    "chest_supported_row": { "canonical": "Chest-Supported Row", "demo_url": "https://www.youtube.com/watch?v=H75im9fAUMc", "channel": "Curated row tutorial", "aliases": ["chest_supported_db_row", "chest_supported_row", "chest_supported_dumbbell_row"] },
+    "side_plank": { "canonical": "Side Plank", "demo_url": "https://www.youtube.com/watch?v=44ND4bOB-T0", "channel": "NASM", "aliases": ["forearm_side_plank"] },
+    "hammer_curl": { "canonical": "Hammer Curl", "demo_url": "https://www.youtube.com/watch?v=TwD-YGVP4Bk", "channel": "Arm exercise tutorial", "aliases": ["dumbbell_hammer_curl", "db_hammer_curl"] },
+    "one_leg_tuck_human_flag": { "canonical": "One-Leg Tuck Human Flag", "demo_url": "https://www.youtube.com/watch?v=bG0h7bSfxQI", "channel": "THENX Human Flag tutorial", "aliases": ["one_leg_human_flag", "one_leg_tuck_flag"] },
+    "tuck_human_flag": { "canonical": "Tuck Human Flag", "demo_url": "https://www.youtube.com/watch?v=bG0h7bSfxQI", "channel": "THENX Human Flag tutorial", "aliases": ["tuck_human_flag_hold"] },
+    "straddle_human_flag": { "canonical": "Straddle Human Flag", "demo_url": "https://www.youtube.com/watch?v=bG0h7bSfxQI", "channel": "THENX Human Flag tutorial", "aliases": [] },
+    "full_human_flag": { "canonical": "Full Human Flag", "demo_url": "https://www.youtube.com/watch?v=bG0h7bSfxQI", "channel": "THENX Human Flag tutorial", "aliases": ["human_flag_hold"] }
   }
 }
