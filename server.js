@@ -30,6 +30,7 @@ import {
   hardSubstitute,
   RETRIABLE_CODES,
 } from "./engine/exercise_dictionary.js";
+import { runOpenAIResponse } from "./engine/openai_provider.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const PORT = process.env.PORT || 8000;
@@ -51,6 +52,10 @@ const DAILY_ADJUSTS = Number(process.env.DAILY_ADJUSTS || 8);
 const USE_PPLX_PROXY = process.env.USE_PPLX_PROXY === "1";
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY || "";
 const GEMINI_MODEL = process.env.GEMINI_MODEL || "gemini-2.5-flash";
+const OPENAI_API_KEY = process.env.OPENAI_API_KEY || "";
+const OPENAI_MODEL = process.env.OPENAI_MODEL || "gpt-5.6-luna";
+const OPENAI_REASONING_EFFORT = process.env.OPENAI_REASONING_EFFORT || "medium";
+const AI_PROVIDER = (process.env.AI_PROVIDER || (OPENAI_API_KEY ? "openai" : "gemini")).toLowerCase();
 
 // ---------- Reasoning budget (program QUALITY, env-switchable) ----------
 // 2.5-flash is a thinking model. The engine's GOAL-COVERAGE PRE-FLIGHT GATE is
@@ -152,7 +157,6 @@ function isValidProgram(p) {
 
 async function runEngineRaw(userContent) {
   if (USE_PPLX_PROXY) {
-    // LOCAL DEV ONLY: route through the Perplexity sandbox proxy (Anthropic SDK).
     const { default: Anthropic } = await import("@anthropic-ai/sdk");
     const client = new Anthropic();
     const msg = await client.messages.create({
@@ -163,32 +167,45 @@ async function runEngineRaw(userContent) {
     });
     return msg.content.map((c) => (c.type === "text" ? c.text : "")).join("");
   }
-  // PRODUCTION: your own Gemini API key.
-  if (!GEMINI_API_KEY) {
-    throw new Error("GEMINI_API_KEY is not set. Add your Google AI Studio key to run the engine.");
-  }
-  const ai = await getGenAI();
 
-  // Shared generation params. These are IDENTICAL whether or not caching is used
-  // — caching only changes HOW the engine is supplied (referenced vs. inline),
-  // never the model, temperature, token ceiling, or thinking config. So the
-  // produced program is the same quality either way.
-  // 2.5-flash is a thinking model. We now give it a real thinking budget so it
-  // actually RUNS the Goal-Coverage Pre-Flight Gate (forces 2nd exposures for the
-  // top goals and kills near-empty filler days) instead of skipping that reasoning.
-  // Thinking tokens count against maxOutputTokens, so the ceiling must comfortably
-  // hold BOTH the thinking pass AND the long visible v11 program. With a 4k thinking
-  // budget the old 32768 ceiling could clip a dense program, so we lift it to 40960.
+  // Cost-aware quality path: OpenAI Luna first when configured, Gemini as automatic fallback.
+  if (AI_PROVIDER === "openai" && OPENAI_API_KEY) {
+    try {
+      return await runOpenAIResponse({
+        apiKey: OPENAI_API_KEY,
+        model: OPENAI_MODEL,
+        systemInstruction: ENGINE,
+        userContent,
+        reasoningEffort: OPENAI_REASONING_EFFORT,
+        maxOutputTokens: 49152,
+      });
+    } catch (e) {
+      if (!GEMINI_API_KEY) throw e;
+      console.warn(`OpenAI generation failed, falling back to Gemini: ${e && e.message}`);
+    }
+  }
+
+  if (!GEMINI_API_KEY) {
+    if (OPENAI_API_KEY) {
+      return runOpenAIResponse({
+        apiKey: OPENAI_API_KEY,
+        model: OPENAI_MODEL,
+        systemInstruction: ENGINE,
+        userContent,
+        reasoningEffort: OPENAI_REASONING_EFFORT,
+        maxOutputTokens: 49152,
+      });
+    }
+    throw new Error("No AI provider key is configured. Set OPENAI_API_KEY or GEMINI_API_KEY.");
+  }
+
+  const ai = await getGenAI();
   const genParams = {
     temperature: 0.3,
     maxOutputTokens: 49152,
     thinkingConfig: { thinkingBudget: THINKING_BUDGET },
   };
 
-  // Try the cached-engine path first (cost saving). The cache holds the EXACT
-  // same ENGINE text as systemInstruction, so when we reference it we must NOT
-  // also pass systemInstruction inline (the engine would otherwise be supplied
-  // twice). Same content reaches the model, just billed at the cached rate.
   const cacheName = await getEngineCacheName();
   if (cacheName) {
     try {
@@ -199,15 +216,11 @@ async function runEngineRaw(userContent) {
       });
       return resp.text;
     } catch (e) {
-      // Cache may have expired or been evicted server-side between create and use.
-      // Invalidate and fall through to the inline path so the request still succeeds
-      // with the exact same engine and quality.
       console.warn(`cached generate failed, retrying inline: ${e && e.message}`);
       cacheState = { name: null, expiresAt: 0 };
     }
   }
 
-  // INLINE path (today's exact behaviour): send the full engine as systemInstruction.
   const resp = await ai.models.generateContent({
     model: GEMINI_MODEL,
     contents: userContent,
@@ -1473,8 +1486,8 @@ app.use("/api/", apiLimiter);
 app.get("/api/health", (req, res) => {
   res.json({
     ok: true,
-    mode: USE_PPLX_PROXY ? "pplx-proxy(dev)" : GEMINI_API_KEY ? "gemini" : "no-key",
-    model: USE_PPLX_PROXY ? process.env.PPLX_MODEL || "gemini_3_flash" : GEMINI_MODEL,
+    mode: USE_PPLX_PROXY ? "pplx-proxy(dev)" : AI_PROVIDER === "openai" && OPENAI_API_KEY ? "openai" : GEMINI_API_KEY ? "gemini" : OPENAI_API_KEY ? "openai" : "no-key",
+    model: USE_PPLX_PROXY ? process.env.PPLX_MODEL || "gemini_3_flash" : AI_PROVIDER === "openai" && OPENAI_API_KEY ? OPENAI_MODEL : GEMINI_API_KEY ? GEMINI_MODEL : OPENAI_MODEL,
     storage: store.backend,
     thinking_budget: THINKING_BUDGET,
     cache: {
@@ -1510,9 +1523,8 @@ app.get("/api/health", (req, res) => {
 // amendments ACCUMULATE across attempts (append, never replace). After a given
 // error code has failed 3 times we downgrade to a deterministic hard-substitute
 // pass rather than failing the whole build.
-async function generateValidatedProgram(intake) {
+async function generateValidatedFromPrompt(basePrompt, intake) {
   const MAX_ATTEMPTS = 5;
-  const basePrompt = buildPrompt(intake);
   const amendments = [];
   const failCounts = Object.create(null);
   let lastValid = null;
@@ -1523,54 +1535,56 @@ async function generateValidatedProgram(intake) {
     const raw = await runEngineRaw(userContent);
     if (!isValidProgram(raw)) {
       console.warn(
-        `generateValidatedProgram: invalid/degenerate output attempt ${attempt}/${MAX_ATTEMPTS} ` +
+        `generateValidatedFromPrompt: invalid/degenerate output attempt ${attempt}/${MAX_ATTEMPTS} ` +
           `(len=${raw ? raw.trim().length : 0}); retrying`
       );
       continue;
     }
-    let program = fixInvalidExerciseNames(raw); // step 1
+    let program = fixInvalidExerciseNames(raw);
     try {
-      const dict = validateExercisesAgainstDictionary(program, intake); // step 2
+      const dict = validateExercisesAgainstDictionary(program, intake);
       program = dict.program;
-      const skills = validateAndCalibrateSkills(program, intake); // step 3
+      const skills = validateAndCalibrateSkills(program, intake);
       program = skills.program;
-      validateEquipmentAgainstLocation(program, intake);        // step 4
-      enforceUnilateralIntensityFloor(program, intake);         // step 5
-      program = enforceIntradayConditioningOrder(program, intake); // step 6
-      validateSportDayCoupling(program, intake);                // step 7
-      validateWeeklyVolumeBudget(program, intake);              // step 8
-      program = reformatWarmupCells(program);                   // step 9
+      validateEquipmentAgainstLocation(program, intake);
+      enforceUnilateralIntensityFloor(program, intake);
+      program = enforceIntradayConditioningOrder(program, intake);
+      validateSportDayCoupling(program, intake);
+      validateWeeklyVolumeBudget(program, intake);
+      program = reformatWarmupCells(program);
       return program;
     } catch (err) {
       if (err && err.code && RETRIABLE_CODES.has(err.code)) {
         lastValid = program;
         failCounts[err.code] = (failCounts[err.code] || 0) + 1;
         console.warn(
-          `generateValidatedProgram: ${err.code} on attempt ${attempt}/${MAX_ATTEMPTS} ` +
+          `generateValidatedFromPrompt: ${err.code} on attempt ${attempt}/${MAX_ATTEMPTS} ` +
             `(count=${failCounts[err.code]})`
         );
         if (failCounts[err.code] >= 3) {
-          // Downgrade: deterministic hard-substitute pass so the client still
-          // gets a program instead of a hard failure.
-          console.warn(`generateValidatedProgram: downgrading to hard-substitute for ${err.code}`);
+          console.warn(`generateValidatedFromPrompt: downgrading to hard-substitute for ${err.code}`);
           program = hardSubstitute(err.code, program, intake);
           return reformatWarmupCells(program);
         }
         if (!amendments.includes(err.amendment)) amendments.push(err.amendment);
         continue;
       }
-      throw err; // non-retriable — surface it
+      throw err;
     }
   }
-  // Attempts exhausted. If we ever produced a structurally-valid program, ship
-  // it through a final hard-substitute + warmup split rather than fail outright.
   if (lastValid) {
     for (const code of Object.keys(failCounts)) lastValid = hardSubstitute(code, lastValid, intake);
     return reformatWarmupCells(lastValid);
   }
-  throw new Error(
-    "The program generator returned an unusable result after multiple attempts. Please try again."
-  );
+  throw new Error("The program generator returned an unusable result after multiple attempts. Please try again.");
+}
+
+async function generateValidatedProgram(intake) {
+  return generateValidatedFromPrompt(buildPrompt(intake), intake);
+}
+
+async function generateValidatedAdjustment(intake, currentProgram, changeRequest) {
+  return generateValidatedFromPrompt(adjustPrompt(intake, currentProgram, changeRequest), intake);
 }
 
 async function runBuildJob(jobId, token, intake) {
@@ -1614,7 +1628,7 @@ async function runAdjustJob(jobId, token, changeRequest) {
     const client = await store.getClient(token);
     if (!client) throw new Error("No saved program for this client yet.");
     const intake = JSON.parse(client.intake);
-    const program = privacyScrub(await runEngine(adjustPrompt(intake, client.program, changeRequest)), intake);
+    const program = privacyScrub(await generateValidatedAdjustment(intake, client.program, changeRequest), intake);
     const now = Date.now();
     await store.updateClientProgram(token, program, now);
     await store.addHistory(token, "adjust", changeRequest, program, now);
@@ -1790,5 +1804,5 @@ app.get("/api/program/:token", async (req, res) => {
 });
 
 app.listen(PORT, () => {
-  console.log(`Coaching platform on :${PORT} (mode: ${USE_PPLX_PROXY ? "pplx-proxy" : GEMINI_API_KEY ? "gemini" : "no-key"})`);
+  console.log(`Coaching platform on :${PORT} (mode: ${USE_PPLX_PROXY ? "pplx-proxy" : AI_PROVIDER === "openai" && OPENAI_API_KEY ? "openai" : GEMINI_API_KEY ? "gemini" : OPENAI_API_KEY ? "openai" : "no-key"})`);
 });
