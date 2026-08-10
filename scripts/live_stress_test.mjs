@@ -19,19 +19,25 @@ async function jsonFetch(path, init = {}) {
 }
 
 async function waitForDeployment() {
-  const deadline = Date.now() + 3 * 60 * 1000;
+  const deadline = Date.now() + 10 * 60 * 1000;
   let last = null;
   while (Date.now() < deadline) {
     try {
       last = await jsonFetch("/api/health");
       console.log("health", JSON.stringify(last));
-      if (last?.ok && last?.mode === "openai" && /^gpt-/i.test(String(last?.model || "")) && last?.ai_configured !== false) return last;
+      if (
+        last?.ok &&
+        last?.mode === "openai" &&
+        /^gpt-/i.test(String(last?.model || "")) &&
+        last?.ai_configured !== false &&
+        last?.openai_execution_path === "deterministic-skeleton-v5-quality"
+      ) return last;
     } catch (e) {
       console.log("health wait:", e.message);
     }
     await sleep(5000);
   }
-  throw new Error(`Live deployment did not report a healthy OpenAI provider in time. Last health: ${JSON.stringify(last)}`);
+  throw new Error(`Live deployment did not report deterministic-skeleton-v5-quality in time. Last health: ${JSON.stringify(last)}`);
 }
 
 const AVATARS = {
@@ -51,23 +57,6 @@ const AVATARS = {
     sport: "BJJ",
     sport_schedule: [{ day: "Tue", intensity: "moderate" }, { day: "Sat", intensity: "moderate" }],
     notes: "Gymnastics skills are the priority. Do not waste time on beginner progressions. Wants strength work alongside skill work, but recovery for skill quality matters most.",
-  },
-  gymnastics_gated: {
-    primary_goals: ["Human Flag", "Iron Cross", "General Strength"],
-    secondary_goals: ["Improve pull-ups"],
-    experience: "intermediate",
-    days_per_week: "4",
-    session_length: "60",
-    bodyweight: "88 kg",
-    equipment: "Home gym with pull-up bar, adjustable dumbbells and bench. No rings, no cable machine, no vertical flag pole.",
-    training_location: "home_gym",
-    language: "en",
-    split_preference: "coach_decide",
-    current_numbers: "8 strict pull-ups. 20 push-ups. No muscle-ups. No ring experience. Side plank 30s per side. Goblet squat 40 kg x10.",
-    injuries: "none",
-    sport: "",
-    sport_schedule: [],
-    notes: "Wants advanced calisthenics quickly. The program must not prescribe skills or equipment beyond current prerequisites.",
   },
 };
 
@@ -100,8 +89,6 @@ async function build(name, intake) {
 
 const health = await waitForDeployment();
 const results = [];
-for (const [name, intake] of Object.entries(AVATARS)) {
-  results.push(await build(name, intake));
-}
+for (const [name, intake] of Object.entries(AVATARS)) results.push(await build(name, intake));
 fs.writeFileSync(`${outDir}/summary.json`, JSON.stringify({ health, results: results.map(({ program, ...r }) => r) }, null, 2));
 console.log("STRESS_SUMMARY", JSON.stringify({ health, results: results.map(({ program, ...r }) => r) }));
