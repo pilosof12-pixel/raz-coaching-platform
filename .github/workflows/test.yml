@@ -66,6 +66,132 @@ jobs:
           grep -q 'UNRESOLVED_CLIENT_REVIEW' phase14/server.phase15.js
           grep -q 'launch-controls.js' phase14/public/index.html
           grep -q 'launch-mobile.css' phase14/public/index.html
+      - name: One-off live customer journey smoke test
+        run: |
+          node <<'NODE'
+          const BASE = 'https://raz-coaching-platform.onrender.com';
+          const sleep = (ms) => new Promise(r => setTimeout(r, ms));
+          async function jsonFetch(path, options={}) {
+            const res = await fetch(BASE + path, options);
+            const text = await res.text();
+            let body = null;
+            try { body = text ? JSON.parse(text) : null; } catch { body = { raw: text }; }
+            return { res, body, text };
+          }
+          async function poll(jobId, label, timeoutMs=300000) {
+            const started = Date.now();
+            while (Date.now() - started < timeoutMs) {
+              const {res, body} = await jsonFetch('/api/job/' + jobId);
+              if (!res.ok) throw new Error(`${label} poll HTTP ${res.status}: ${JSON.stringify(body)}`);
+              if (body?.status === 'done') return body;
+              if (body?.status === 'error') throw new Error(`${label} failed: ${body.error || 'unknown error'}`);
+              await sleep(4000);
+            }
+            throw new Error(`${label} timed out after ${timeoutMs}ms`);
+          }
+          const intake = {
+            primary_goals: ['Back squat 200 kg', 'Weighted chin-up +70 kg for 3 reps'],
+            secondary_goals: ['Improve 5 km from 25:00 to 22:30'],
+            maintenance_goals: [],
+            goal_priority_model: 'tiered_equal_primary',
+            experience: 'advanced',
+            days_per_week: 4,
+            gym_availability_mode: 'flexible',
+            available_gym_days: [],
+            same_day_gap_hours: 6,
+            session_length: '60 minutes',
+            bodyweight: '84 kg',
+            equipment: 'Full commercial gym — all standard barbells, dumbbells, racks, machines, cables and bodyweight stations available.',
+            training_location: 'commercial_gym',
+            language: 'en',
+            split_preference: 'No preference. Keep no more than two genuinely hard lower-body sessions per week.',
+            current_numbers: 'Back squat: 170 kg x 3\nWeighted chin-up: +55 kg x 3\nRDL: 190 kg x 5\nOHP: 70 kg x 5\n5 km: 25:00',
+            performance_markers: ['Back squat: 170 kg x 3','Weighted chin-up: +55 kg x 3','RDL: 190 kg x 5','OHP: 70 kg x 5','5 km: 25:00'],
+            injuries: 'Mild recurring low-back irritation after high-volume deep squatting; controlled box squats and RDLs are currently tolerated.',
+            pain: { active: true, description: 'Mild recurring low-back irritation after high-volume deep squatting', severity: 'mild', character: 'ache/tightness', next_day_baseline: 'usually back to baseline', tolerated_movements: 'controlled box squats, RDLs, split squats' },
+            mobility: { active: false, limitation: '' },
+            sport: 'MMA / BJJ',
+            sport_schedule: [
+              {day:'Mon', intensity:'hard', gap_hours:6},
+              {day:'Wed', intensity:'moderate', gap_hours:6},
+              {day:'Fri', intensity:'hard', gap_hours:6},
+              {day:'Sat', intensity:'moderate', gap_hours:6}
+            ],
+            sleep_hours: '6.5',
+            recovery_rating: 'average / variable',
+            notes: 'Avoid hard conditioning within 24 hours before hard MMA. Keep sessions at or under 60 minutes.',
+            privacy_consent: { health_data: true, policy_version: '2026-08-11', consented_at: new Date().toISOString() }
+          };
+          let token = '';
+          try {
+            const cfg = await jsonFetch('/api/program-pass-config');
+            console.log('LIVE config', cfg.res.status, JSON.stringify(cfg.body));
+            if (!cfg.res.ok || cfg.body?.enforced !== false) throw new Error('Live smoke requires Program Pass enforcement OFF');
+
+            const health = await jsonFetch('/api/health');
+            console.log('LIVE health', health.res.status, JSON.stringify(health.body));
+            if (!health.res.ok || JSON.stringify(health.body) !== JSON.stringify({ok:true})) throw new Error('Production health redaction failed');
+
+            const noConsent = structuredClone(intake); delete noConsent.privacy_consent;
+            const consentCheck = await jsonFetch('/api/build', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({intake:noConsent})});
+            console.log('LIVE consent rejection', consentCheck.res.status, JSON.stringify(consentCheck.body));
+            if (consentCheck.res.status !== 400 || !/consent/i.test(String(consentCheck.body?.error||''))) throw new Error('Missing-consent request was not rejected correctly');
+
+            const build = await jsonFetch('/api/build', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({intake})});
+            console.log('LIVE build accepted', build.res.status, JSON.stringify(build.body));
+            if (build.res.status !== 202 || !build.body?.job_id || !build.body?.token) throw new Error('Build was not accepted as an async job');
+            token = build.body.token;
+            const built = await poll(build.body.job_id, 'build');
+            const program = String(built.program || '');
+            console.log('LIVE build done program_len=' + program.length + ' token=' + token);
+            if (program.length < 800 || !program.includes('START_WEEK1_TSV') || !program.includes('END_WEEK1_TSV')) throw new Error('Generated program failed structural contract');
+
+            const tsv = program.match(/START_WEEK1_TSV[\s\S]*?END_WEEK1_TSV/)?.[0] || '';
+            console.log('\n===== LIVE WEEK1 TSV =====\n' + tsv + '\n===== END LIVE WEEK1 TSV =====\n');
+            const forbidden = ['MEV','MAV','MRV','SQS','EVU','LTOS','VCS','[REVIEW]'];
+            const leaks = forbidden.filter(x => program.includes(x));
+            console.log('LIVE client-leak scan', JSON.stringify(leaks));
+            if (leaks.length) throw new Error('Internal labels leaked to client: ' + leaks.join(','));
+
+            const returned = await jsonFetch('/api/program/' + token);
+            console.log('LIVE return', returned.res.status, 'program_len=' + String(returned.body?.program||'').length);
+            if (!returned.res.ok || !returned.body?.program) throw new Error('Return-by-personal-code failed');
+
+            const adjust = await jsonFetch('/api/adjust', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({token, request:'Move the hardest lower-body work away from Friday hard MMA, keep both primary strength goals fully represented, and keep every strength session within 60 minutes.'})});
+            console.log('LIVE adjust accepted', adjust.res.status, JSON.stringify(adjust.body));
+            if (adjust.res.status !== 202 || !adjust.body?.job_id) throw new Error('Adjustment was not accepted');
+            const adjusted = await poll(adjust.body.job_id, 'adjust');
+            console.log('LIVE adjust done program_len=' + String(adjusted.program||'').length);
+            if (!adjusted.program) throw new Error('Adjustment returned no program');
+
+            const lang = await jsonFetch('/api/set-language', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({token, language:'he'})});
+            console.log('LIVE language accepted', lang.res.status, JSON.stringify(lang.body));
+            if (lang.res.status === 202 && lang.body?.job_id) {
+              const translated = await poll(lang.body.job_id, 'language switch');
+              const hp = String(translated.program||'');
+              console.log('LIVE language done program_len=' + hp.length + ' hebrew=' + /[\u0590-\u05FF]/.test(hp));
+              if (!/[\u0590-\u05FF]/.test(hp)) throw new Error('Hebrew switch completed without Hebrew client output');
+            } else if (!lang.res.ok) {
+              throw new Error('Language switch failed to start: ' + JSON.stringify(lang.body));
+            }
+
+            const allowedAnalytics = await jsonFetch('/api/analytics-event', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({event:'return_succeeded'})});
+            console.log('LIVE analytics allowed', allowedAnalytics.res.status);
+            if (allowedAnalytics.res.status !== 204) throw new Error('Allowed analytics event failed');
+            const badAnalytics = await jsonFetch('/api/analytics-event', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({event:'token_or_injury_payload'})});
+            console.log('LIVE analytics rejected', badAnalytics.res.status, JSON.stringify(badAnalytics.body));
+            if (badAnalytics.res.status !== 400) throw new Error('Non-allowlisted analytics event was accepted');
+
+            console.log('LIVE_SMOKE_RESULT=PASS');
+          } finally {
+            if (token) {
+              const del = await jsonFetch('/api/client-data', {method:'DELETE', headers:{'Content-Type':'application/json'}, body:JSON.stringify({token})}).catch(e => ({res:{status:0},body:{error:e.message}}));
+              console.log('LIVE cleanup delete', del.res.status, JSON.stringify(del.body));
+              const after = await jsonFetch('/api/program/' + token).catch(e => ({res:{status:0},body:{error:e.message}}));
+              console.log('LIVE cleanup return-after-delete', after.res.status, JSON.stringify(after.body));
+            }
+          }
+          NODE
       - name: Commit tested production patch
         env:
           TARGET_BRANCH: ${{ github.head_ref || github.ref_name }}
