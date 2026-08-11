@@ -45,6 +45,11 @@ Status date: 2026-08-11
 - [x] Render environment values set for production mode, Program Pass duration/allowance/grace and generation rate limits.
 - [x] Long random `ADMIN_PROVISION_KEY` set server-side in Render.
 - [x] `PROGRAM_PASS_ENFORCEMENT=0` retained while staging verification is incomplete.
+- [x] Latest `privacy-security-hardening` wrapper confirmed live on Render via `/api/program-pass-config`.
+- [x] Production health endpoint confirmed redacted under `NODE_ENV=production`.
+- [x] Live privacy page confirmed loading with Program Pass, retention, deletion and analytics disclosures.
+- [x] Live privacy-consent behavior confirmed working before generation.
+- [ ] Admin Program Pass provisioning route is live but current `ADMIN_PROVISION_KEY` requests return generic `Not found`; temporarily deferred so it does not block the rest of staging.
 
 ## Program Pass rollout — remaining environment / staging work
 
@@ -56,8 +61,10 @@ Do not enable commercial enforcement for customers until the remaining unchecked
 4. [ ] Add the final privacy/support email address to the deployed `phase14/public/privacy.html` and reference copy.
 5. [x] Set a long random `ADMIN_PROVISION_KEY` in Render; keep it server-side only.
 6. [x] Keep `PROGRAM_PASS_ENFORCEMENT=0` while staging/testing.
-7. [ ] Confirm Render has deployed the latest `privacy-security-hardening` commit containing the `phase14` launch wrapper, then test the complete matrix below.
-8. [ ] Only after the tests pass, set `PROGRAM_PASS_ENFORCEMENT=1` for customer launch.
+7. [x] Confirm Render has deployed the latest `privacy-security-hardening` commit containing the `phase14` launch wrapper.
+8. [ ] Run the normal customer journey with enforcement OFF: intake -> generation -> personal code -> spreadsheet -> return -> adjustment -> language switch -> deletion.
+9. [ ] Resolve or replace temporary admin Program Pass provisioning before enabling paid Program Pass sales.
+10. [ ] Only after the Program Pass-specific tests pass, set `PROGRAM_PASS_ENFORCEMENT=1` for customer launch.
 
 Recommended production environment values:
 
@@ -71,7 +78,7 @@ GENERATION_BUILDS_PER_HOUR=4
 GENERATION_ADJUSTS_PER_HOUR=12
 ```
 
-During staging verification, keep `PROGRAM_PASS_ENFORCEMENT=0` until the deployed wrapper is confirmed. Enable it only for the controlled Program Pass acceptance checks, then leave it enabled only when the full matrix passes.
+During staging verification, keep `PROGRAM_PASS_ENFORCEMENT=0` until the baseline customer journey is verified. Enable it only for controlled Program Pass acceptance checks, then leave it enabled only when the full matrix passes.
 
 ## Temporary Newie fulfilment for first customers
 
@@ -122,13 +129,14 @@ Your pass includes one personalised 4-week training block, 8 weeks of access and
 
 ## Remaining launch workstreams
 
-1. Confirm the latest `phase14` launch wrapper is live on Render, then finish Program Pass staging acceptance.
-2. Run the real adversarial customer journey: Newie purchase -> Program Pass -> intake -> generation -> spreadsheet -> leave -> return -> adjust -> language -> delete.
-3. Review adaptive intake sufficiency on deliberately incomplete/contradictory real generation avatars. Deterministic malformed-input preflight is already implemented.
-4. Add landing-page CTA and Newie purchase/re-purchase attribution where those platforms expose a clean integration. App-side funnel analytics are implemented.
-5. Verify mobile UX on a real iPhone. Code-side mobile safeguards are implemented.
-6. Final launch video and social campaign assets.
-7. Launch validation: first 10 paying users, then review conversion, generation cost, adjustment usage and repurchase rate before changing price/allowances.
+1. Finish the enforcement-OFF real customer journey and record any UX/runtime defects.
+2. Resolve or replace the temporary admin provisioning path, then run Program Pass-specific staging acceptance.
+3. Run the real adversarial customer journey: Newie purchase -> Program Pass -> intake -> generation -> spreadsheet -> leave -> return -> adjust -> language -> delete.
+4. Review adaptive intake sufficiency on deliberately incomplete/contradictory real generation avatars. Deterministic malformed-input preflight is already implemented.
+5. Add landing-page CTA and Newie purchase/re-purchase attribution where those platforms expose a clean integration. App-side funnel analytics are implemented.
+6. Verify mobile UX on a real iPhone. Code-side mobile safeguards are implemented.
+7. Final launch video and social campaign assets.
+8. Launch validation: first 10 paying users, then review conversion, generation cost, adjustment usage and repurchase rate before changing price/allowances.
 
 ## CI status
 
