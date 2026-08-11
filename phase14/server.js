@@ -1277,7 +1277,7 @@ function stripAndFlagFormulaViolations(s, intake) {
     // labeled OR the movement clearly has a current rep max we can anchor to.
     const repBenchmark = movement && movement in maxReps ? maxReps[movement] : null;
     if (repBenchmark == null || repBenchmark <= 0) continue; // unparseable -> skip
-    if (!isDensityLabeled && !movement) continue;
+    if (!isDensityLabeled) continue; // ordinary lower-load strength sets may exceed a current rep benchmark; only density/endurance rows use this ceiling
     const repsVal = firstNumber(repsCell);
     if (repsVal == null || repsVal <= 0) continue;
     const isTest = /\b(test|max reps|assessment|amrap)\b/i.test(ctx);
