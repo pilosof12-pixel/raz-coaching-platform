@@ -63,7 +63,7 @@ Status date: 2026-08-11
 The latest adversarial Render generations show that the core coaching engine still produces 9+ work on the established Warrior regression, but the annoying concurrent-strength + 5K avatar exposed a remaining knowledge-gap and validator issue:
 
 - [x] `days_per_week=4` strength-day integrity issue resolved: the latest annoying-avatar program preserved four genuine resistance-training days while scaling their cost around MMA/BJJ recovery.
-- [ ] The 5K goal now receives direct running exposure, but the authored coaching base is not yet deep enough to confidently prescribe event-specific endurance development such as 3K/5K pace improvement, marathon preparation, rowing performance, triathlon or Ironman preparation. Do not solve this by allowing GPT to invent endurance theory from generic model knowledge; build the dedicated Cardio / Endurance knowledge cluster below.
+- [ ] The 5K goal now receives direct running exposure, but the authored coaching base is not yet deep enough to confidently prescribe event-specific endurance development. Do not solve this by allowing GPT to invent endurance theory from generic model knowledge; build the physiology-first Cardio / Endurance knowledge cluster below from the five authoritative books.
 - [ ] The latest live programs still carry `QA_FORMULA_VIOLATION_COUNT: 1`; identify and fix the false-positive validator path so valid prescriptions are not marked as formula violations.
 - [ ] Sprint/power intensity semantics need cleanup: prescriptions such as `90–95% sprint effort` must not be paired with a strength-style RPE value that appears contradictory. Use a source-supported speed/quality prescription and a non-applicable/clearly separated RPE representation for sprint work.
 
@@ -81,22 +81,65 @@ Positive findings from the live generations:
 - [x] No internal coaching labels from the launch leak-scan allowlist appeared in the client program.
 - [x] Generated programs contain the required TSV machine structure and remain retrievable by personal code before deletion.
 
-## Cardio / Endurance coaching-knowledge cluster — required expansion
+## Cardio / Endurance coaching-knowledge cluster — physiology-first architecture
 
-Purpose: give the engine enough authored, source-grounded endurance knowledge to coach explicit performance outcomes rather than merely adding generic aerobic work. This is one coherent cluster, not an attempt to cover every endurance sport exhaustively.
+Purpose: give the engine a compact, authoritative, source-grounded conditioning framework that can reason across running, rowing, cycling, swimming, combat and multisport goals without maintaining separate giant sport libraries.
 
-- [ ] Build a Cardio / Endurance master article/cluster from supplied high-quality sources. GPT must route to this authored cluster and must not substitute generic model memory for missing endurance programming logic.
-- [ ] Cover transferable endurance-programming principles: event demands, aerobic base, threshold/tempo concepts, interval purpose, long-session role, intensity distribution, progression, deload/taper logic, recovery cost and concurrent-training interference.
-- [ ] Add running-specific routing for goals such as 3K, 5K, 10K, half marathon and marathon, including how current performance, target performance, training age, weekly frequency and concurrent sport constrain dose and progression.
-- [ ] Add rowing-specific routing for distance/time/pace goals rather than treating rowing only as interchangeable Zone 2 equipment.
-- [ ] Add cycling and swimming modality logic sufficient for single-sport endurance goals and for multisport integration.
-- [ ] Add triathlon / Ironman routing that can coordinate swim-bike-run exposures, long-session placement, brick-session logic where source-supported, and overall recovery budget.
+### Authoritative five-book source spine
+
+The endurance articles will be manufactured from these five books. They are the source layer; the final app consumes the consolidated RAZ articles rather than asking the model to reconcile full books at runtime.
+
+1. [ ] `Physiology of Sport and Exercise` — Kenney et al.
+2. [ ] `Exercise Physiology: Nutrition, Energy, and Human Performance` — McArdle et al.
+3. [ ] `Science and Application of High-Intensity Interval Training` — Laursen & Buchheit.
+4. [ ] NSCA endurance textbook — replaces the previously considered Mujika source in the core set.
+5. [ ] `Physiological Tests for Elite Athletes` — Tanner & Gore.
+
+Hard source rule: GPT must route to the authored RAZ endurance articles produced from this source spine and must not substitute generic model memory for missing endurance programming logic.
+
+### Eleven consolidated endurance articles
+
+- [ ] Article 1 — Bioenergetics and Energy-System Interaction: ATP-PC, glycolytic and oxidative metabolism; interaction across intensity and duration rather than false on/off energy-system thinking.
+- [ ] Article 2 — Determinants of Aerobic Performance: VO2max, central/peripheral determinants, cardiac output, stroke volume, oxygen extraction, mitochondrial/capillary adaptations, blood volume and economy.
+- [ ] Article 3 — Intensity Domains and Threshold Physiology: moderate/heavy/severe/extreme domains; threshold concepts and how related threshold terms should and should not be interpreted as interchangeable.
+- [ ] Article 4 — Low-Intensity / Aerobic-Base Training: Zone 2/low-intensity work, adaptations, volume, frequency, duration, progression, limitations and prescription without blindly relying on arbitrary percentages.
+- [ ] Article 5 — VO2max and Interval Training: long/short intervals, HIIT structures, work-rest manipulation, interval duration/intensity and accumulated high-oxygen-uptake work.
+- [ ] Article 6 — Anaerobic Capacity, Sprint and Repeated High-Intensity Performance: repeated sprint ability, glycolytic contribution, phosphocreatine recovery, lactate-related concepts and intermittent-sport application.
+- [ ] Article 7 — Endurance Programming and Periodisation: frequency, volume, intensity distribution, overload, progression, deloads, tapering, monitoring and block construction.
+- [ ] Article 8 — Concurrent Strength + Endurance Training: interference, fatigue management, order, spacing, same-day versus separate-day work, modality selection and strength/hypertrophy preservation.
+- [ ] Article 9 — Conditioning for Combat and Intermittent Sports: translate Articles 1-8 into BJJ/MMA/boxing/intermittent-sport demands without redundant conditioning that duplicates sport practice.
+- [ ] Article 10 — Modality Translation: running, cycling, rowing, swimming and multisport/endurance events; preserve modality-specific mechanical/technical constraints while using the same underlying physiology.
+- [ ] Article 11 — Testing, Monitoring and Conditioning Decision System: performance tests, pace/power/HR/RPE monitoring, critical speed/power where source-supported, time trials, recovery/monitoring and the practical decision tree from goal demands to prescription and progression.
+
+### Integration and acceptance
+
 - [ ] Define when cross-training can supplement a named endurance goal and when it cannot replace direct modality exposure.
 - [ ] Define event-specificity progression so a named goal receives more than token exposure, while still allowing the engine to deliberately hold that goal at maintenance/base level when higher-priority goals and recovery constraints make aggressive progression inappropriate.
-- [ ] Define pace/intensity prescription language for each modality so the client receives coherent targets (pace/power/HR/RPE where source-supported) rather than conflicting intensity systems.
-- [ ] Add deterministic QA tests for modality specificity, meaningful dose, recovery/concurrent-sport constraints and event-goal prioritisation without hard-coding coaching numbers that are not present in the authored sources.
-- [ ] Stress-test at least: short-distance running pace avatar, marathon avatar, rowing performance avatar and triathlon/Ironman-style avatar, plus one concurrent strength/combat + endurance avatar.
+- [ ] Define coherent intensity prescription language for each modality (pace/power/HR/RPE only where supported by the authored sources).
+- [ ] Add deterministic QA tests for modality specificity, meaningful dose, recovery/concurrent-sport constraints and event-goal prioritisation without hard-coding coaching numbers absent from the authored articles.
+- [ ] Stress-test at least: short-distance running pace avatar, marathon-style avatar, rowing performance avatar, multisport/triathlon-style avatar, plus one concurrent strength/combat + endurance avatar.
 - [ ] Require 9+/10 coaching-quality acceptance on the annoying concurrent avatar after the new cluster is integrated; passing validators alone is insufficient.
+
+## Adaptive Intake / Ping-Pong clarification — required feature
+
+Purpose: when missing information could materially change programming, stop before generation, ask only the necessary clarification questions, enrich the intake, then generate once.
+
+- [ ] Detect missing high-value benchmarks deterministically before AI generation.
+- [ ] Detect pain/injury ambiguity when exercise selection or ROM depends on whether the goal movement itself is tolerated.
+- [ ] Example: for a back-squat goal with low-back irritation, clarify whether normal/deep ROM, high volume, heavy loading, fatigue/technique breakdown or all squatting aggravates symptoms; ask whether reduced-ROM/box squat or other close variations are tolerated.
+- [ ] Detect unclear equipment/load ceilings, ambiguous skill level and unresolved sport/schedule/recovery conflicts when they materially affect prescription.
+- [ ] Return one compact clarification round containing only high-value questions; permit a second round only if the first answer exposes another genuinely necessary ambiguity.
+- [ ] Do not let GPT guess through unresolved ambiguity; feed clarified answers back into the deterministic/source-grounded coaching path.
+
+### Ping-Pong API-cost protection
+
+- [ ] Clarification detection should be deterministic/local application logic wherever possible.
+- [ ] No OpenAI/Gemini generation call merely to decide which clarification question to ask.
+- [ ] No Program Pass credit, adjustment allowance or generation rate-limit slot consumed during clarification.
+- [ ] Client answers enrich the same intake; only when the intake is generation-ready does the normal program-generation call occur.
+- [ ] Regression test: ambiguous intake -> clarification response -> AI call count remains `0`.
+- [ ] Regression test: clarification answered -> final Build -> exactly one normal generation call.
+- [ ] Verify staging telemetry confirms the ping-pong path does not materially increase AI cost.
 
 ## Program Pass rollout — remaining environment / staging work
 
@@ -106,8 +149,8 @@ Do not enable commercial enforcement for customers until the remaining unchecked
 2. [ ] Add the final privacy/support email address to the deployed `phase14/public/privacy.html` and reference copy.
 3. [x] Set production/staging Render environment values and keep `PROGRAM_PASS_ENFORCEMENT=0` while baseline verification runs.
 4. [x] Verify the live enforcement-OFF server journey: consent -> build -> personal-code return -> adjustment -> language switch -> delete.
-5. [ ] Verify spreadsheet export in the real browser UI; this is client-side and was not exercised by the server/API smoke test.
-6. [ ] Resolve the remaining live coaching-QA findings above, build the Cardio / Endurance cluster, and rerun the adversarial generation to 9+ coaching quality.
+5. [x] Spreadsheet export accepted for launch based on code/path inspection; no additional manual browser QA required unless a later regression suggests an export defect.
+6. [ ] Resolve the remaining live coaching-QA findings, build the physiology-first Cardio / Endurance cluster, implement Adaptive Intake / Ping-Pong, and rerun adversarial coaching QA to 9+.
 7. [ ] Resolve or replace temporary admin Program Pass provisioning before enabling paid Program Pass sales.
 8. [ ] Run the Program Pass-specific acceptance matrix below with controlled enforcement enabled.
 9. [ ] Add the final real-iPhone usability check.
@@ -161,14 +204,15 @@ curl -X POST "https://YOUR-APP-HOST/api/admin/program-pass" \
 
 ## Remaining launch workstreams
 
-1. Build and integrate the Cardio / Endurance coaching-knowledge cluster, fix remaining coaching QA/validator issues, and rerun the annoying avatar to 9+.
-2. Verify browser spreadsheet export and real-iPhone UX.
-3. Add the final privacy/support email.
-4. Resolve or replace the temporary admin provisioning path, then run Program Pass-specific staging acceptance.
-5. Run the real purchase journey: Newie purchase -> Program Pass -> intake -> generation -> spreadsheet -> leave -> return -> adjust -> language -> delete.
-6. Add landing-page CTA and Newie purchase/re-purchase attribution where those platforms expose a clean integration. App-side funnel analytics are implemented.
-7. Final launch video and social campaign assets.
-8. Launch validation: first 10 paying users, then review conversion, generation cost, adjustment usage and repurchase rate before changing price/allowances.
+1. Build and integrate the physiology-first Cardio / Endurance coaching-knowledge cluster from the five-book source spine.
+2. Implement Adaptive Intake / Ping-Pong clarification with zero-extra-AI-call acceptance tests.
+3. Fix remaining coaching QA/validator issues and rerun the annoying avatar to 9+ while preserving Avatar 3 at 9+.
+4. Add the final privacy/support email.
+5. Resolve or replace the temporary admin provisioning path, then run Program Pass-specific staging acceptance.
+6. Run the real purchase journey: Newie purchase -> Program Pass -> intake -> clarification if needed -> generation -> spreadsheet -> leave -> return -> adjust -> language -> delete.
+7. Add landing-page CTA and Newie purchase/re-purchase attribution where those platforms expose a clean integration. App-side funnel analytics are implemented.
+8. Final real-iPhone UX check, launch video and social campaign assets.
+9. Launch validation: first 10 paying users, then review conversion, generation cost, clarification frequency, adjustment usage and repurchase rate before changing price/allowances.
 
 ## CI status
 
