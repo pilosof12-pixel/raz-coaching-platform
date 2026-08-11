@@ -14,20 +14,20 @@ function parsed(rows) {
 }
 const row=(day,ex,weight='RPE-selected load',sets='2',reps='5',notes='')=>[day,ex,weight,sets,reps,'2 min','7',notes,''];
 
-test('material secondary 5K target needs more than one token direct exposure',()=>{
+test('named 5K goal requires at least one meaningful direct running exposure',()=>{
   const intake={secondary_goals:['Improve 5 km from 25:00 to 22:30']};
-  const one=parsed([row('Tue','Run','bodyweight','1','20 min')]);
-  const two=parsed([row('Tue','Run','bodyweight','1','20 min'),row('Sat','Treadmill Run','bodyweight','1','6 x 400 m')]);
-  assert.equal(goalDoseFlags('',intake,one).some(x=>x.code==='GOAL_DOSE_UNDERFLOOR'),true);
-  assert.equal(goalDoseFlags('',intake,two).length,0);
+  const crossOnly=parsed([row('Tue','Rower','RPE-selected load','1','25 min')]);
+  const direct=parsed([row('Tue','Run','bodyweight','1','20 min')]);
+  assert.equal(goalDoseFlags('',intake,crossOnly).some(x=>x.code==='NAMED_GOAL_DIRECT_EXPOSURE_MISSING'),true);
+  assert.equal(goalDoseFlags('',intake,direct).length,0);
 });
 
-test('primary strength goal receives multiple direct exposures',()=>{
+test('named primary strength goal needs direct movement-pattern exposure but guardrail does not invent frequency',()=>{
   const intake={primary_goals:['Weighted chin-up +70 kg for 3 reps']};
+  const none=parsed([row('Tue','Chest-Supported Row','RPE-selected load','3','8')]);
   const one=parsed([row('Tue','Chin-up','+50 kg','4','3')]);
-  const two=parsed([row('Tue','Chin-up','+50 kg','4','3'),row('Sun','Chin-up','+42.5 kg','3','4')]);
-  assert.equal(goalDoseFlags('',intake,one).some(x=>x.code==='GOAL_DOSE_UNDERFLOOR'),true);
-  assert.equal(goalDoseFlags('',intake,two).length,0);
+  assert.equal(goalDoseFlags('',intake,none).some(x=>x.code==='NAMED_GOAL_DIRECT_EXPOSURE_MISSING'),true);
+  assert.equal(goalDoseFlags('',intake,one).length,0);
 });
 
 test('unbenchmarked lift variation cannot inherit assertive fixed loading from related benchmark',()=>{
@@ -38,22 +38,28 @@ test('unbenchmarked lift variation cannot inherit assertive fixed loading from r
   assert.equal(unbenchmarkedVariationLoadFlags(intake,conservative).length,0);
 });
 
-test('high concurrent sport may justify one fewer strength day only when tradeoff is explicit',()=>{
+test('requested strength day cannot silently become cardio/core only',()=>{
   const intake={days_per_week:4,sport:'MMA / BJJ',sport_schedule:[{day:'Mon',intensity:'hard'},{day:'Wed',intensity:'moderate'},{day:'Fri',intensity:'hard'},{day:'Sat',intensity:'moderate'}]};
-  const p=parsed([
+  const missing=parsed([
     row('Tue','Box Squat','RPE-selected load','3','3'),
     row('Wed','Shuttle Run','bodyweight','1','20 min'),
     row('Thu','Chin-up','+40 kg','4','3'),
     row('Sun','Overhead Press','RPE-selected load','3','5'),
   ]);
-  assert.equal(strengthSessionAccountingFlags('No explanation.',intake,p).some(x=>x.code==='REQUESTED_STRENGTH_SESSIONS_UNACCOUNTED'),true);
-  assert.equal(strengthSessionAccountingFlags('Because concurrent MMA/BJJ sport load is high, this block deliberately reduces to three strength sessions for recovery.',intake,p).length,0);
+  const complete=parsed([
+    row('Tue','Box Squat','RPE-selected load','3','3'),
+    row('Wed','Reverse Lunge','RPE-selected load','2','8'),
+    row('Thu','Chin-up','+40 kg','4','3'),
+    row('Sun','Overhead Press','RPE-selected load','3','5'),
+  ]);
+  assert.equal(strengthSessionAccountingFlags('',intake,missing).some(x=>x.code==='REQUESTED_STRENGTH_SESSIONS_UNACCOUNTED'),true);
+  assert.equal(strengthSessionAccountingFlags('',intake,complete).length,0);
 });
 
-test('elite prompt rules are avatar-agnostic principles, not 5K-specific patches',()=>{
-  const rules=elitePromptRules({days_per_week:4});
-  assert.match(rules.join('\n'),/every primary goal needs multiple meaningful direct exposures/i);
-  assert.match(rules.join('\n'),/different variation/i);
-  assert.match(rules.join('\n'),/must be stated explicitly/i);
-  assert.doesNotMatch(rules.join('\n'),/5k/i);
+test('integrity prompt rules explicitly defer coaching dose and progression to authored sources',()=>{
+  const rules=elitePromptRules({days_per_week:4}).join('\n');
+  assert.match(rules,/higher frequency, volume or progression comes only from the deterministic planner, specialist rules and curated RAZ coaching sources/i);
+  assert.match(rules,/exact kilograms require a reliable benchmark/i);
+  assert.match(rules,/cannot silently replace/i);
+  assert.doesNotMatch(rules,/every primary goal needs multiple/i);
 });
