@@ -73,6 +73,11 @@ jobs:
           grep -q 'launch-mobile.css' phase14/public/index.html
           grep -q 'invalidateCoachingDataCache' phase14/storage.js
           grep -q 'invalidateCoachingDataCache' phase14/privacy_store.js
+      - name: One-off live coaching stress regression
+        run: |
+          echo 'Waiting for Render auto-deploy...'
+          sleep 120
+          node scripts/live_coaching_stress_once.mjs
       - name: Commit tested production patch
         env:
           TARGET_BRANCH: ${{ github.head_ref || github.ref_name }}
