@@ -1,6 +1,8 @@
-// Generic high-standard coaching guardrails for Phase 15.
-// These rules are avatar-agnostic: they protect goal dose, loading calibration,
-// and requested strength-session accounting across sports and goal combinations.
+// Generic integrity guardrails for Phase 15.
+// IMPORTANT: this file does not define new coaching theory. It only enforces
+// client/source consistency that is already required by the authored RAZ logic:
+// named goals get direct exposure, exact kg need a reliable exact-lift anchor,
+// and requested strength frequency cannot be silently replaced by cardio/core.
 
 function norm(s) { return String(s || '').toLowerCase().trim(); }
 function num(s) { const m=String(s||'').match(/\d+(?:\.\d+)?/); return m ? Number(m[0]) : null; }
@@ -8,7 +10,8 @@ function num(s) { const m=String(s||'').match(/\d+(?:\.\d+)?/); return m ? Numbe
 function goalList(intake={}) {
   const out=[];
   for (const [priority,key] of [['primary','primary_goals'],['secondary','secondary_goals'],['maintenance','maintenance_goals']]) {
-    for (const raw of (intake?.[key]||[])) {
+    const vals=Array.isArray(intake?.[key])?intake[key]:[intake?.[key]].filter(Boolean);
+    for (const raw of vals) {
       const text=typeof raw==='string'?raw:JSON.stringify(raw);
       if (text.trim()) out.push({priority,text});
     }
@@ -52,20 +55,11 @@ function meaningfulEnduranceDose(cells,idx) {
   return false;
 }
 
-function targetGapIsMaterial(text='') {
-  const s=String(text||'');
-  const nums=[...s.matchAll(/\d+(?:\.\d+)?/g)].map(m=>Number(m[0])).filter(Number.isFinite);
-  if (nums.length<2) return false;
-  // Numeric performance goals with a clear current -> target statement deserve more than token practice.
-  return /(?:to|->|→|from|target|goal|improve|increase|decrease|under|over|exceed)/i.test(s);
-}
-
 export function goalDoseFlags(program, intake={}, parsed=null) {
   if (!parsed) return [];
   const e=parsed.idx.exercise, d=parsed.idx.day, notes=parsed.idx.notes;
   const flags=[];
   for (const goal of goalList(intake)) {
-    if (goal.priority==='maintenance') continue;
     const fam=goalFamily(goal.text);
     if (!fam) continue;
     const days=new Set();
@@ -77,12 +71,12 @@ export function goalDoseFlags(program, intake={}, parsed=null) {
       if (fam.quality==='endurance' && !meaningfulEnduranceDose(row.cells,parsed.idx)) continue;
       days.add(row.cells[d]||'unknown');
     }
-    let floor=goal.priority==='primary'?2:1;
-    if (goal.priority==='secondary' && targetGapIsMaterial(goal.text)) floor=2;
-    if (fam.quality==='endurance' && targetGapIsMaterial(goal.text)) floor=Math.max(floor,2);
-    if (days.size<floor) flags.push({
-      code:'GOAL_DOSE_UNDERFLOOR',
-      message:`${goal.priority} goal '${goal.text}' receives ${days.size} meaningful direct exposure day(s) in Week 1; require at least ${floor}. Cross-training/support work does not replace direct goal practice.`
+    // Source-aligned integrity floor only: every named goal gets at least one
+    // direct exposure. Any higher frequency/dose is dictated by the authored
+    // deterministic planner / specialist rules / source excerpts, not this file.
+    if (days.size<1) flags.push({
+      code:'NAMED_GOAL_DIRECT_EXPOSURE_MISSING',
+      message:`Named ${goal.priority} goal '${goal.text}' has no meaningful direct Week 1 exposure. Support work/cross-training cannot replace the stated goal pattern.`
     });
   }
   return flags;
@@ -104,7 +98,8 @@ function canonicalLift(name='') {
 }
 
 function benchmarkRows(intake={}) {
-  const src=[...(intake.performance_markers||[]),String(intake.current_numbers||'').split(/\n|;/)].flat().map(String).filter(Boolean);
+  const markers=Array.isArray(intake.performance_markers)?intake.performance_markers:[];
+  const src=[...markers,...String(intake.current_numbers||'').split(/\n|;/)].map(String).filter(Boolean);
   const out=[];
   for (const line of src) {
     const loadMatch=line.match(/(?:\+\s*)?(\d+(?:\.\d+)?)\s*kg/i);
@@ -135,7 +130,7 @@ export function unbenchmarkedVariationLoadFlags(intake={}, parsed=null) {
     const autoreg=/rpe-selected|auto.?reg|top set by rpe|work up/i.test(`${row.cells[w]||''} ${notes>=0?row.cells[notes]||'':''}`);
     if (aggressive && !autoreg) flags.push({
       code:'UNBENCHMARKED_VARIATION_LOAD_TOO_ASSERTIVE',
-      message:`${ex} is a different variation from the available ${family} benchmark, yet it is assigned ${load} kg for ${programmedReps} reps. Use an RPE-selected/conservative load until that variation has its own reliable benchmark.`
+      message:`${ex} uses an assertive fixed load derived from a different ${family} variation. Exact kilograms require a reliable exact-lift benchmark; otherwise use the authored RPE/autoregulation path.`
     });
   }
   return flags;
@@ -144,17 +139,10 @@ export function unbenchmarkedVariationLoadFlags(intake={}, parsed=null) {
 function meaningfulStrengthRow(exercise='', cells=[], idx={}) {
   const ex=norm(exercise);
   if (!ex || /^\s*\[warmup\]/i.test(ex)) return false;
-  if (/(zone.?2|bike|rower|run|jog|sprint|shuttle|walk|conditioning|pallof|side plank|plank|dead bug|bird dog|neck isometric|face pull|mobility|stretch)/i.test(ex)) return false;
+  if (/(zone.?2|bike|rower|run|jog|sprint|shuttle|walk|conditioning|pallof|side plank|plank|dead bug|bird dog|neck isometric|mobility|stretch)/i.test(ex)) return false;
   const resistance=/(squat|lunge|deadlift|rdl|hinge|press|bench|row|chin|pull.?up|dip|curl|extension|raise|fly|pulldown|leg press|leg curl|hip thrust|split squat|step.?up|calf|planche|lever|handstand|muscle.?up)/i.test(ex);
   if (!resistance) return false;
-  const sets=num(cells[idx.sets]||'')||1;
-  return sets>=2;
-}
-
-function highConcurrentSportLoad(intake={}) {
-  const sched=Array.isArray(intake.sport_schedule)?intake.sport_schedule:[];
-  const hard=sched.filter(x=>/hard/i.test(String(x?.intensity||''))).length;
-  return sched.length>=4 || hard>=2;
+  return (num(cells[idx.sets]||'')||1)>=2;
 }
 
 export function strengthSessionAccountingFlags(program, intake={}, parsed=null) {
@@ -162,27 +150,21 @@ export function strengthSessionAccountingFlags(program, intake={}, parsed=null) 
   if (!parsed || !requested) return [];
   const d=parsed.idx.day,e=parsed.idx.exercise;
   const strengthDays=new Set();
-  const allDays=new Set();
   for (const row of parsed.rows) {
     const day=row.cells[d]||''; if(!day) continue;
-    allDays.add(day);
     if (meaningfulStrengthRow(row.cells[e]||'',row.cells,parsed.idx)) strengthDays.add(day);
   }
   if (strengthDays.size>=requested) return [];
-  const concurrent=highConcurrentSportLoad(intake);
-  const narrative=String(program||'').replace(/START_WEEK1_TSV[\s\S]*?END_WEEK4_TSV/i,' ');
-  const explained=/\b(reduc(?:e|ed|ing)|three strength|3 strength|fewer strength|recovery trade.?off|sport load|mma|bjj|combat sport|concurrent training)\b/i.test(narrative);
-  if (concurrent && strengthDays.size>=Math.max(2,requested-1) && explained) return [];
   return [{
     code:'REQUESTED_STRENGTH_SESSIONS_UNACCOUNTED',
-    message:`Client requested ${requested} strength sessions; Week 1 contains ${strengthDays.size} meaningful resistance-training day(s). If concurrent sport/recovery justifies fewer, state that trade-off explicitly in the client narrative; otherwise preserve the requested resistance frequency.`
+    message:`Client requested ${requested} strength sessions; Week 1 contains ${strengthDays.size} meaningful resistance-training day(s). The authored planner may choose lower-cost strength work under high sport load, but it may not silently turn a requested strength day into cardio/core only.`
   }];
 }
 
 export function elitePromptRules(intake={}) {
   return [
-    'ELITE GOAL-DOSE RULE: every primary goal needs multiple meaningful direct exposures unless the sport schedule itself supplies them. A secondary goal with a material current-to-target gap also needs more than a token exposure. Support work and cross-training may supplement but cannot masquerade as direct goal dose.',
-    'ELITE LOADING CALIBRATION RULE: never treat a related exercise variation as if it shares an exact benchmark with another lift. If the exact variation has no reliable performance marker, use conservative RPE-selected loading rather than an assertive fixed load near the benchmark of a different variation.',
-    `ELITE SESSION-ACCOUNTING RULE: requested strength frequency is ${Number(intake.days_per_week||0)||'unspecified'}. High concurrent-sport load may justify one fewer meaningful resistance day, but that is a coaching trade-off that must be stated explicitly to the client, not silently substituted with cardio/core work.`,
+    'INTEGRITY RULE: every named goal must retain at least one meaningful direct exposure of its own pattern. Any higher frequency, volume or progression comes only from the deterministic planner, specialist rules and curated RAZ coaching sources.',
+    'INTEGRITY RULE: exact kilograms require a reliable benchmark for that exact loaded variation or another explicit deterministic anchor. Do not infer aggressive fixed loading from a merely related lift variation; use the authored RPE/autoregulation path instead.',
+    `INTEGRITY RULE: the client requested ${Number(intake.days_per_week||0)||'an unspecified number of'} strength sessions. Respect the deterministic planner's session structure; cardio/core work cannot silently replace a requested resistance-training day.`,
   ];
 }
