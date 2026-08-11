@@ -17,11 +17,23 @@ export const SUPABASE_KEY_MODE = SUPABASE_SERVICE_ROLE_KEY ? "service_role" : (S
 
 function todayUTC() { return new Date().toISOString().slice(0, 10); }
 const usageFallback = new Map();
+const coachingCacheInvalidators = new Set();
 function usageFallbackKey(token, day=todayUTC()) { return `${token}:${day}`; }
 function getFallbackUsage(token) {
   const day=todayUTC(), key=usageFallbackKey(token,day);
   if (!usageFallback.has(key)) usageFallback.set(key,{token,day,builds:0,adjusts:0});
   return usageFallback.get(key);
+}
+
+// Privacy deletion must invalidate the same process-local mirrors that make
+// Phase 15 polling resilient. Otherwise Supabase can be empty while the server
+// continues serving a deleted intake/program from memory until the next restart.
+export function invalidateCoachingDataCache(token) {
+  const prefix = `${String(token)}:`;
+  for (const key of usageFallback.keys()) if (key.startsWith(prefix)) usageFallback.delete(key);
+  for (const invalidate of coachingCacheInvalidators) {
+    try { invalidate(String(token)); } catch (e) { console.warn("coaching cache invalidation failed:", e && e.message); }
+  }
 }
 
 function makeSupabaseStorage() {
@@ -30,6 +42,12 @@ function makeSupabaseStorage() {
   const jobFallback = new Map();
   const historyFallback = [];
   const sleep = ms => new Promise(r=>setTimeout(r,ms));
+
+  coachingCacheInvalidators.add((token) => {
+    clientFallback.delete(token);
+    for (const [id,row] of jobFallback.entries()) if (row?.token === token) jobFallback.delete(id);
+    for (let i=historyFallback.length-1;i>=0;i--) if (historyFallback[i]?.token === token) historyFallback.splice(i,1);
+  });
 
   function errorText(err) {
     return [err?.message,err?.details,err?.hint,err?.cause?.message,err?.cause?.code].filter(Boolean).join(" | ");
