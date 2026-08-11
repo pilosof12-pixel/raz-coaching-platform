@@ -116,12 +116,18 @@ export function hasSpecificModalityExposure(program, intake = {}) {
   if (!req || req.externalSatisfied) return true;
   const parsed = parseBlock(program);
   if (!parsed) return false;
-  const e = parsed.idx.exercise, notes = parsed.idx.notes;
+  const e = parsed.idx.exercise, notes = parsed.idx.notes, reps = parsed.idx.reps, weight = parsed.idx.weight;
   return parsed.rows.some(row => {
     const ex = row.cells[e] || '';
     if (/^\s*\[WARMUP\]/i.test(ex)) return false;
-    const ctx = `${ex} ${notes >= 0 ? row.cells[notes] || "" : ""}`;
-    return req.exposure.test(ctx);
+    const note = notes >= 0 ? row.cells[notes] || '' : '';
+    const ctx = `${ex} ${note}`;
+    if (!req.exposure.test(ctx)) return false;
+    const dose = `${reps >= 0 ? row.cells[reps] || "" : ""} ${weight >= 0 ? row.cells[weight] || "" : ""} ${note}`;
+    const minuteValues = [...dose.matchAll(/(\d+(?:\.\d+)?)\s*(?:min|minutes?)\b/gi)].map(m => Number(m[1]));
+    const continuousEnough = minuteValues.some(n => n >= 15);
+    const distanceOrIntervals = /\b\d+(?:\.\d+)?\s*(?:km|m)\b/i.test(dose) || /\b\d+\s*(?:x|×)\s*\d+(?:\.\d+)?\s*(?:m|km|min|minutes?)\b/i.test(dose);
+    return continuousEnough || distanceOrIntervals; // MEANINGFUL-SPECIFIC-DOSE
   });
 }
 
@@ -152,7 +158,7 @@ export function phase15PromptRules(intake = {}) {
   if (ohp) rules.push(`OHP HARD RULE: current about ${ohp.current} kg, target ${ohp.target} kg. Use at least one direct strict Overhead Press exposure plus a second meaningful vertical-press exposure. Purposeful Push Press or another verified press variation may provide overload/power/volume; variation must have a clear job and may not remove direct strict-OHP practice.`);
   if (asksLowFatigueAerobicOnly(intake)) rules.push("AEROBIC HARD RULE: use 2-3 low-fatigue Zone 2 exposures, normally >=20 min for a meaningful dedicated exposure. No unrequested intervals, threshold, VO2, AMRAP or sprint conditioning.");
   const modalityReq = specificModalityRequirement(intake);
-  if (modalityReq && !modalityReq.externalSatisfied) rules.push(`MODALITY-SPECIFIC HARD RULE: ${modalityReq.key} is an explicit performance goal. Include at least one direct ${modalityReq.key} exposure in Week 1 and preserve modality-specific practice across the block. Cross-training may supplement it but cannot replace the named modality.`);
+  if (modalityReq && !modalityReq.externalSatisfied) rules.push(`MODALITY-SPECIFIC HARD RULE: ${modalityReq.key} is an explicit performance goal. Include at least one meaningful direct ${modalityReq.key} exposure in Week 1, not merely a warm-up or token micro-dose, and preserve modality-specific practice across the block. Cross-training may supplement it but cannot replace the named modality.`);
   if (asksStrengthDays(intake) && Number(intake.days_per_week) > 0) rules.push(`STRENGTH-DAY RULE: ${Number(intake.days_per_week)} is the requested/available gym-session count, not a demand that every day be heavy. Low-cost accessory, rehab-oriented resistance, or advanced-skill work can be appropriate when sport load is high. A cardio-only day does not count as a strength day, and the program must not silently replace requested strength work with conditioning; if recovery requires a deliberate reduction, explain that tradeoff plainly.`);
   rules.push(`Derived goal qualities: ${JSON.stringify(decomposed)}.`);
   rules.push(oap == null ? "No reliable strict OAP benchmark parsed." : `Parsed strict OAP capacity: ${oap}. Stage guidance: ${JSON.stringify(advancedOapPrescription(oap))}.`);
@@ -197,7 +203,7 @@ export function validatePhase15Program(program, intake = {}) {
 
   const modalityReq = specificModalityRequirement(intake);
   if (modalityReq && !hasSpecificModalityExposure(raw, intake)) {
-    flags.push({ code:"SPORT_MODALITY_SPECIFICITY_MISSING", message:`${modalityReq.key} is an explicit performance goal but Week 1 contains no direct ${modalityReq.key} exposure. Cross-training cannot fully replace the named modality.` });
+    flags.push({ code:"SPORT_MODALITY_SPECIFICITY_MISSING", message:`${modalityReq.key} is an explicit performance goal but Week 1 contains no meaningful direct ${modalityReq.key} exposure. Cross-training cannot fully replace the named modality.` });
   }
 
   if (/squat/i.test(primary) && /(max|1\s*rm|over\s*\d+|exceed)/i.test(primary) && /(?:x|×)\s*(?:6|7|8|9|10|11|12)\b|(?:6|7|8|9|10|11|12)\s*reps?/i.test(primary)) {
