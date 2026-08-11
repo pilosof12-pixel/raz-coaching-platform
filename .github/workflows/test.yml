@@ -28,21 +28,30 @@ jobs:
       - run: npm ci
       - run: npm test
       - run: node --check server.js
-      - name: Validate launch security, Program Pass and analytics layer
+      - name: Validate root launch reference layer
         run: |
           node --check server_secure.js
           node --check entitlements.js
           node --check analytics.js
           node --check public/privacy-controls.js
           node --check public/analytics-client.js
-      - name: Validate Phase 15 generated runtime
+      - name: Validate deployed Phase 15 runtime and launch layer
         run: |
           node --check phase14/server.js
           node --check phase14/scripts/build_phase15_runtime.mjs
+          node --check phase14/scripts/apply_launch_runtime.mjs
           node --check phase14/engine/phase15_source_router.js
           node --test phase14/test/phase15_source_grounding.test.mjs
           node phase14/scripts/build_phase15_runtime.mjs
+          node phase14/scripts/apply_launch_runtime.mjs
           node --check phase14/server.phase15.js
+          node --check phase14/server_secure.js
+          node --check phase14/entitlements.js
+          node --check phase14/analytics.js
+          node --check phase14/privacy_store.js
+          node --check phase14/intake_validation.js
+          node --check phase14/public/launch-controls.js
+          node --test phase14/test/launch_security_privacy.test.js
           node --test phase14/test/phase15_planner_regression.test.mjs
           node --test phase14/test/phase15_specialist_rules.test.mjs
           grep -q 'deterministic-skeleton-v5.2.10-source-grounded' phase14/server.phase15.js
@@ -55,6 +64,8 @@ jobs:
           grep -q 'PARK-ONLY HARD STOP' phase14/server.phase15.js
           grep -q 'CALENDAR HARD STOP' phase14/server.phase15.js
           grep -q 'UNRESOLVED_CLIENT_REVIEW' phase14/server.phase15.js
+          grep -q 'launch-controls.js' phase14/public/index.html
+          grep -q 'launch-mobile.css' phase14/public/index.html
       - name: Commit tested production patch
         env:
           TARGET_BRANCH: ${{ github.head_ref || github.ref_name }}
