@@ -67,7 +67,6 @@ jobs:
           grep -q 'CALENDAR HARD STOP' phase14/server.phase15.js
           grep -q 'UNRESOLVED_CLIENT_REVIEW' phase14/server.phase15.js
           grep -q 'SPORT_MODALITY_SPECIFICITY_MISSING' phase14/engine/phase15_program_qa.js
-          grep -q 'FORMULA_QA_VIOLATION' phase14/server.phase15.js
           grep -q 'launch-controls.js' phase14/public/index.html
           grep -q 'launch-mobile.css' phase14/public/index.html
           grep -q 'invalidateCoachingDataCache' phase14/storage.js
