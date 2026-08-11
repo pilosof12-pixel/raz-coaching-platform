@@ -6,24 +6,31 @@ import {
   phase15PromptRules,
 } from '../engine/phase15_program_qa.js';
 
-function programWith(exercise='Rower') {
-  const block = (w) => `START_WEEK${w}_TSV\nDay\tExercise\tWeight\tSets\tReps\tRest\tTarget RPE\tNotes\tResults\nTue\t${exercise}\tRPE-selected load\t1\t25 min\tsteady\t5\tSpecific test row.\t\nEND_WEEK${w}_TSV`;
+function programWith(exercise='Rower', reps='25 min', notes='Specific test row.') {
+  const block = (w) => `START_WEEK${w}_TSV\nDay\tExercise\tWeight\tSets\tReps\tRest\tTarget RPE\tNotes\tResults\nTue\t${exercise}\tRPE-selected load\t1\t${reps}\tsteady\t5\t${notes}\t\nEND_WEEK${w}_TSV`;
   return [1,2,3,4].map(block).join('\n');
 }
 
+const fiveKIntake = {
+  primary_goals:['Back squat 200 kg'],
+  secondary_goals:['Improve 5 km from 25:00 to 22:30'],
+  sport:'MMA / BJJ',
+  sport_schedule:[{day:'Mon', intensity:'hard'}],
+};
+
 test('5K goal requires running-specific exposure, not rower cross-training only', () => {
-  const intake = {
-    primary_goals:['Back squat 200 kg'],
-    secondary_goals:['Improve 5 km from 25:00 to 22:30'],
-    sport:'MMA / BJJ',
-    sport_schedule:[{day:'Mon', intensity:'hard'}],
-  };
-  const req = specificModalityRequirement(intake);
+  const req = specificModalityRequirement(fiveKIntake);
   assert.equal(req?.key, 'running');
   assert.equal(req?.externalSatisfied, false);
-  assert.equal(hasSpecificModalityExposure(programWith('Rower'), intake), false);
-  assert.equal(hasSpecificModalityExposure(programWith('Zone-2 Run'), intake), true);
-  assert.match(phase15PromptRules(intake), /MODALITY-SPECIFIC HARD RULE: running/i);
+  assert.equal(hasSpecificModalityExposure(programWith('Rower'), fiveKIntake), false);
+  assert.equal(hasSpecificModalityExposure(programWith('Zone-2 Run', '25 min'), fiveKIntake), true);
+  assert.match(phase15PromptRules(fiveKIntake), /MODALITY-SPECIFIC HARD RULE: running/i);
+});
+
+test('specific endurance exposure must be meaningful, not a token micro-dose', () => {
+  assert.equal(hasSpecificModalityExposure(programWith('Shuttle Run', '12 min', 'Easy continuous running exposure.'), fiveKIntake), false);
+  assert.equal(hasSpecificModalityExposure(programWith('Easy Run', '20 min', 'Conversational pace.'), fiveKIntake), true);
+  assert.equal(hasSpecificModalityExposure(programWith('Track Run', '6 x 400 m', 'Controlled repeats.'), fiveKIntake), true);
 });
 
 test('generic conditioning without a named modality remains engine-selected', () => {
