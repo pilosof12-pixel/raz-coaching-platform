@@ -80,7 +80,13 @@ function liftFamily(name='') {
 }
 
 function canonicalLift(name='') {
-  return norm(name).replace(/\[[^\]]+\]/g,'').replace(/\b(to parallel|parallel|paused?|tempo|speed|box|front|high bar|low bar|deficit|block|rack|close grip|incline|dumbbell|barbell|strict)\b/g,' ').replace(/\s+/g,' ').trim();
+  return norm(name)
+    .replace(/\[[^\]]+\]/g,'')
+    .replace(/[:].*$/,'')
+    .replace(/\b(to parallel|parallel|paused?|tempo|speed)\b/g,' ')
+    .replace(/[^a-z0-9+ -]+/g,' ')
+    .replace(/\s+/g,' ')
+    .trim(); // EXACT-VARIATION-KEY: preserve box/front/high-bar/push-press/etc.
 }
 
 function benchmarkRows(intake={}) {
