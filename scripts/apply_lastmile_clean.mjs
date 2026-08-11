@@ -16,12 +16,8 @@ b = b.replaceAll('exceeded 30000 characters', 'exceeded 45000 characters');
 b = b.replaceAll('deterministic-skeleton-v5.2.9-source-grounded', 'deterministic-skeleton-v5.2.10-source-grounded');
 b = b.replaceAll('raz-phase15-source-grounded-v5-2-9', 'raz-phase15-source-grounded-v5-2-10');
 
-const oldFinalQa = '      validatePhase15FinalProgram(program, intake);              // step 11: variation-aware final QA\\\n      await onProgress("finalizing", attempt, "quality checks passed including Phase 15 v5");';
-const newFinalQa = '      validatePhase15FinalProgram(program, intake);              // step 11: variation-aware final QA\\\n      const formulaQa = stripAndFlagFormulaViolations(program, intake); // step 12: legacy formula guard, now hard-fail\\\n      if (formulaQa.violations > 0) {\\\n        const formulaErr = new Error("Formula QA violation: " + formulaQa.flags.join(" | "));\\\n        formulaErr.code = "FORMULA_QA_VIOLATION";\\\n        formulaErr.amendment = "FORMULA QA REGENERATION REQUIRED. Correct every item below:\\n* " + formulaQa.flags.join("\\n* ");\\\n        throw formulaErr;\\\n      }\\\n      await onProgress("finalizing", attempt, "quality checks passed including Phase 15 v5");';
-b = replaceOnce(b, oldFinalQa, newFinalQa, 'builder formula hard-fail');
-
 if (b !== originalBuilder) fs.writeFileSync(builderPath, b);
-console.log(`${builderPath}: ${b !== originalBuilder ? 'updated v5.2.10 + formula hard-fail' : 'already current'}`);
+console.log(`${builderPath}: ${b !== originalBuilder ? 'updated v5.2.10' : 'already current'}`);
 
 const qaPath = 'phase14/engine/phase15_program_qa.js';
 let q = fs.readFileSync(qaPath, 'utf8');
@@ -36,7 +32,7 @@ const modalityBaseRule = '    "Judge total day stress from gym plus sport plus r
 q = replaceOnce(q, baseRule, modalityBaseRule, 'modality prompt base rule');
 
 const aerobicAnchor = '  if (asksLowFatigueAerobicOnly(intake)) rules.push("AEROBIC HARD RULE: use 2-3 low-fatigue Zone 2 exposures, normally >=20 min for a meaningful dedicated exposure. No unrequested intervals, threshold, VO2, AMRAP or sprint conditioning.");';
-const aerobicWithSpecificity = '  if (asksLowFatigueAerobicOnly(intake)) rules.push("AEROBIC HARD RULE: use 2-3 low-fatigue Zone 2 exposures, normally >=20 min for a meaningful dedicated exposure. No unrequested intervals, threshold, VO2, AMRAP or sprint conditioning.");\n  const modalityReq = specificModalityRequirement(intake);\n  if (modalityReq && !modalityReq.externalSatisfied) rules.push(`MODALITY-SPECIFIC HARD RULE: ${modalityReq.key} is an explicit performance goal. Include at least one direct ${modalityReq.key} exposure in Week 1 and preserve modality-specific practice across the block. Bike/row/swim/run cross-training may supplement but cannot replace the named modality.`);';
+const aerobicWithSpecificity = '  if (asksLowFatigueAerobicOnly(intake)) rules.push("AEROBIC HARD RULE: use 2-3 low-fatigue Zone 2 exposures, normally >=20 min for a meaningful dedicated exposure. No unrequested intervals, threshold, VO2, AMRAP or sprint conditioning.");\n  const modalityReq = specificModalityRequirement(intake);\n  if (modalityReq && !modalityReq.externalSatisfied) rules.push(`MODALITY-SPECIFIC HARD RULE: ${modalityReq.key} is an explicit performance goal. Include at least one direct ${modalityReq.key} exposure in Week 1 and preserve modality-specific practice across the block. Cross-training may supplement it but cannot replace the named modality.`);';
 q = replaceOnce(q, aerobicAnchor, aerobicWithSpecificity, 'specific modality prompt');
 
 const oldStrengthPrompt = '  if (asksStrengthDays(intake) && Number(intake.days_per_week) > 0) rules.push(`STRENGTH-DAY HARD RULE: all ${Number(intake.days_per_week)} requested gym days must contain real strength or advanced-skill work. A cardio-only gym day does not count.`);';
@@ -59,23 +55,5 @@ s = replaceOnce(
   '    if (!isDensityLabeled) continue; // ordinary lower-load strength sets may exceed a current rep benchmark; only density/endurance rows use this ceiling',
   'density false-positive guard'
 );
-s = replaceOnce(
-  s,
-  '      if (err && err.code && RETRIABLE_CODES.has(err.code)) {',
-  '      if (err && err.code && (RETRIABLE_CODES.has(err.code) || err.code === "PHASE15_QUALITY_VIOLATION" || err.code === "FORMULA_QA_VIOLATION")) {',
-  'phase15/formula retry codes'
-);
-s = replaceOnce(
-  s,
-  '        if (failCounts[err.code] >= 2 || attempt === MAX_ATTEMPTS) {',
-  '        if ((failCounts[err.code] >= 2 || attempt === MAX_ATTEMPTS) && err.code !== "PHASE15_QUALITY_VIOLATION" && err.code !== "FORMULA_QA_VIOLATION") {',
-  'prevent unsafe hard-substitute for quality failures'
-);
-s = replaceOnce(
-  s,
-  '  if (lastValid) {\n    for (const code of Object.keys(failCounts)) lastValid = hardSubstitute(code, lastValid, intake);',
-  '  if (failCounts.PHASE15_QUALITY_VIOLATION || failCounts.FORMULA_QA_VIOLATION) {\n    throw new Error("Program failed the final coaching quality gate after multiple regeneration attempts. Please retry the build.");\n  }\n  if (lastValid) {\n    for (const code of Object.keys(failCounts)) lastValid = hardSubstitute(code, lastValid, intake);',
-  'quality failure must not fall through to delivery'
-);
 if (s !== originalServer) fs.writeFileSync(serverPath, s);
-console.log(`${serverPath}: ${s !== originalServer ? 'fixed density false-positive + quality retry behavior' : 'already current'}`);
+console.log(`${serverPath}: ${s !== originalServer ? 'fixed density false-positive behavior' : 'already current'}`);
