@@ -8,6 +8,12 @@ import {
   painToleranceGate,
   estimateSessionMinutes,
 } from "./phase15_quality_rules.js";
+import {
+  elitePromptRules,
+  goalDoseFlags,
+  unbenchmarkedVariationLoadFlags,
+  strengthSessionAccountingFlags,
+} from "./phase15_elite_guardrails.js";
 
 function norm(s) { return String(s || "").toLowerCase().trim(); }
 
@@ -151,6 +157,7 @@ export function phase15PromptRules(intake = {}) {
     "Pain history is a tolerance gate, not a diagnosis. Preserve tolerated training and gate provocative spinal-loading accessories.",
     "CLIENT CLEANLINESS HARD RULE: never output [REVIEW], contact-support text, placeholder rows, QA labels or unresolved internal language. Such output is rejected and never saved to a client.",
   ];
+  rules.push(...elitePromptRules(intake)); // ELITE-GUARDRAILS-PROMPT-WIRED
   if (/squat/i.test(primary) && /(max|1\s*rm|exceed|over\s*\d+)/i.test(primary) && /(?:x|×)\s*(?:6|7|8|9|10|11|12)\b|(?:6|7|8|9|10|11|12)\s*reps?/i.test(primary)) {
     rules.push("DUAL BOX-SQUAT HARD RULE: Week 1 needs (A) max-strength box-squat work at 1-5 reps and (B) separate rep-strength box-squat work at >=6 reps or explicit high-rep back-off progression. Speed doubles do not satisfy the rep target.");
   }
@@ -182,6 +189,11 @@ export function validatePhase15Program(program, intake = {}) {
   const parsed = parseBlock(raw);
   if (!parsed) throw new Phase15QualityError([{ code:"TSV_PARSE_FAIL", message:"Week 1 TSV could not be parsed." }]);
   const flags = [];
+
+  // Avatar-agnostic integrity floor. Coaching dose itself remains source-authored.
+  flags.push(...goalDoseFlags(raw, intake, parsed));
+  flags.push(...unbenchmarkedVariationLoadFlags(intake, parsed));
+  flags.push(...strengthSessionAccountingFlags(raw, intake, parsed)); // ELITE-GUARDRAILS-FINAL-QA-WIRED
 
   if (/\[REVIEW\]|contact\s+support|placeholder(?:\s+exercise|\s+row)?|could not be safely generated/i.test(raw)) {
     flags.push({ code:"CLIENT_OUTPUT_NOT_READY", message:"Program contains unresolved review/support/placeholder text. Reject rather than exposing it to a client." });
