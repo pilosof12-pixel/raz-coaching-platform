@@ -27,26 +27,37 @@ Status date: 2026-08-11
 - [x] Sensitive coaching data is scheduled for automatic deletion after pass expiry plus a configurable grace period; commercial entitlement records remain separate.
 - [x] First-party aggregate funnel analytics implemented with only UTC day + allowlisted event + count. No tokens, IPs, intake text, injury details or program content are stored.
 - [x] Admin-only aggregate analytics summary endpoint added.
-- [x] Mobile-only launch stylesheet added: iOS-safe input sizing, full-width mobile buttons, compact cards, touch-friendly tables and sport controls.
+- [x] Mobile-only launch stylesheet added: iOS-safe input sizing, full-width mobile buttons, compact cards and touch-friendly tables.
 - [x] Server-side deterministic intake preflight rejects incomplete/malformed payloads before Program Pass activation and before any AI call.
 - [x] Privacy policy aligned with the fixed-term Program Pass, post-expiry cleanup and aggregate analytics model.
 - [x] Program Pass, analytics and adversarial intake regression tests added.
-- [x] `server_secure.js`, `storage.js`, `entitlements.js`, `analytics.js` and launch client scripts are syntax-checked in GitHub Actions.
+- [x] Root launch reference layer syntax-checked in GitHub Actions.
+- [x] Launch/security/privacy layer ported into the actual Render deployment root at `phase14/`; Render remains correctly rooted at `phase14`.
+- [x] `phase14/package.json` now builds the Phase 15 runtime, injects launch UI assets, and starts through `phase14/server_secure.js`.
+- [x] Deployed `phase14` security/privacy regression tests cover secure startup, admin/pass routes, intake preflight, analytics allowlist, privacy policy, browser secret exclusion and entitlement persistence.
 - [x] Phase 15 source-grounding regression fixture corrected without changing production coaching logic.
-- [x] Full GitHub Actions regression workflow passes with the combined privacy, Program Pass, analytics, retention, mobile and intake-preflight changes.
+- [x] Latest GitHub Actions regression job passes with the deployed Phase 15 runtime plus privacy, Program Pass, analytics, retention, mobile and intake-preflight changes.
+- [x] Production Supabase `supabase_program_passes.sql` migration applied successfully.
+- [x] Production Supabase privacy/RLS hardening migration applied successfully.
+- [x] Production Supabase analytics migration applied successfully.
+- [x] RLS verified `true` on `clients`, `history`, `usage`, `jobs`, `program_passes` and `analytics_daily`.
+- [x] `anon` and `authenticated` verified to have no direct table privileges on the protected coaching/commercial tables.
+- [x] Render environment values set for production mode, Program Pass duration/allowance/grace and generation rate limits.
+- [x] Long random `ADMIN_PROVISION_KEY` set server-side in Render.
+- [x] `PROGRAM_PASS_ENFORCEMENT=0` retained while staging verification is incomplete.
 
-## Program Pass rollout — environment work still required
+## Program Pass rollout — remaining environment / staging work
 
-Do not enable commercial enforcement until the following are complete.
+Do not enable commercial enforcement for customers until the remaining unchecked items are complete.
 
-1. Apply `supabase_program_passes.sql` in production Supabase.
-2. Apply `supabase_privacy_hardening.sql` and verify browser roles cannot directly read coaching tables.
-3. Apply `supabase_analytics.sql` so anonymous aggregate funnel counters can persist in production.
-4. Add the final privacy/support email address to `public/privacy.html`.
-5. Set a long random `ADMIN_PROVISION_KEY` in Render. Never put this value in browser code, WordPress or Newie.
-6. Keep `PROGRAM_PASS_ENFORCEMENT=0` while staging/testing.
-7. Deploy the branch to staging and test the complete matrix below.
-8. Only after the tests pass, set `PROGRAM_PASS_ENFORCEMENT=1`.
+1. [x] Apply `supabase_program_passes.sql` in production Supabase.
+2. [x] Apply `supabase_privacy_hardening.sql` and verify browser roles cannot directly read coaching tables.
+3. [x] Apply `supabase_analytics.sql` so aggregate funnel counters can persist in production.
+4. [ ] Add the final privacy/support email address to the deployed `phase14/public/privacy.html` and reference copy.
+5. [x] Set a long random `ADMIN_PROVISION_KEY` in Render; keep it server-side only.
+6. [x] Keep `PROGRAM_PASS_ENFORCEMENT=0` while staging/testing.
+7. [ ] Confirm Render has deployed the latest `privacy-security-hardening` commit containing the `phase14` launch wrapper, then test the complete matrix below.
+8. [ ] Only after the tests pass, set `PROGRAM_PASS_ENFORCEMENT=1` for customer launch.
 
 Recommended production environment values:
 
@@ -59,6 +70,8 @@ PROGRAM_PASS_DATA_GRACE_DAYS=7
 GENERATION_BUILDS_PER_HOUR=4
 GENERATION_ADJUSTS_PER_HOUR=12
 ```
+
+During staging verification, keep `PROGRAM_PASS_ENFORCEMENT=0` until the deployed wrapper is confirmed. Enable it only for the controlled Program Pass acceptance checks, then leave it enabled only when the full matrix passes.
 
 ## Temporary Newie fulfilment for first customers
 
@@ -109,7 +122,7 @@ Your pass includes one personalised 4-week training block, 8 weeks of access and
 
 ## Remaining launch workstreams
 
-1. Finish staging/deployment checks for Supabase, RLS, analytics persistence and Program Pass enforcement.
+1. Confirm the latest `phase14` launch wrapper is live on Render, then finish Program Pass staging acceptance.
 2. Run the real adversarial customer journey: Newie purchase -> Program Pass -> intake -> generation -> spreadsheet -> leave -> return -> adjust -> language -> delete.
 3. Review adaptive intake sufficiency on deliberately incomplete/contradictory real generation avatars. Deterministic malformed-input preflight is already implemented.
 4. Add landing-page CTA and Newie purchase/re-purchase attribution where those platforms expose a clean integration. App-side funnel analytics are implemented.
@@ -119,4 +132,4 @@ Your pass includes one personalised 4-week training block, 8 weeks of access and
 
 ## CI status
 
-The complete GitHub Actions regression workflow is green after the combined launch changes. This includes root tests, Program Pass tests, analytics tests, adversarial intake-preflight tests, launch-layer syntax checks and the full Phase 15 generated-runtime validation.
+Latest deployed-runtime regression job is green. It validates the root reference layer and, critically, the actual Render deployment tree under `phase14/`: generated Phase 15 runtime, secure wrapper, Program Pass store, analytics store, privacy deletion/retention store, intake preflight, launch UI injection and privacy/security tests, plus the existing Phase 15 coaching-engine regression suite.
