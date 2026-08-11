@@ -52,23 +52,51 @@ Status date: 2026-08-11
 - [x] Privacy deletion defect fixed by invalidating process-local coaching mirrors after deletion.
 - [x] Live deletion re-verification passed: program returned 200 before deletion, DELETE returned 200, and the same personal code returned 404 immediately afterwards.
 - [x] One-off live-generation smoke steps removed from normal CI after verification so future commits do not create unnecessary paid AI generations.
+- [x] Source-grounding hard contract remains active: authored RAZ coaching knowledge is authoritative and generic model memory must not invent programming principles, progressions, dose or exercise logic.
+- [x] Avatar 3 / Warrior regression remains at elite-program quality (~9.1/10 live QA) after launch hardening and integrity-guardrail work.
+- [x] Requested strength days are now preserved as meaningful resistance-training days, while allowing low-cost accessory/rehab strength sessions when concurrent sport load justifies them.
+- [x] Named sport/endurance goals require direct modality-specific exposure; generic conditioning without a named modality remains engine-selected.
 - [ ] Admin Program Pass provisioning route is live but current `ADMIN_PROVISION_KEY` requests return generic `Not found`; temporarily deferred so it does not block unrelated staging work.
 
 ## Live coaching-QA findings still open
 
-The first real adversarial Render generation exposed three coaching-quality issues that should be resolved before broad launch:
+The latest adversarial Render generations show that the core coaching engine still produces 9+ work on the established Warrior regression, but the annoying concurrent-strength + 5K avatar exposed a remaining knowledge-gap and validator issue:
 
-- [ ] `days_per_week=4` did not produce four genuine strength sessions. The output effectively used Tuesday and Sunday as strength sessions, with Wednesday and Thursday mostly conditioning/accessory work.
-- [ ] The explicit secondary goal `5 km 25:00 -> 22:30` received Zone 2 cross-training on rower/bike but no run-specific exposure, so the output did not sufficiently respect task specificity for the stated performance target.
-- [ ] The final translated program carried `QA_FORMULA_VIOLATION_COUNT: 1`; identify the triggering prescription and either correct the prescription or prove the validator is a false positive before launch.
+- [x] `days_per_week=4` strength-day integrity issue resolved: the latest annoying-avatar program preserved four genuine resistance-training days while scaling their cost around MMA/BJJ recovery.
+- [ ] The 5K goal now receives direct running exposure, but the authored coaching base is not yet deep enough to confidently prescribe event-specific endurance development such as 3K/5K pace improvement, marathon preparation, rowing performance, triathlon or Ironman preparation. Do not solve this by allowing GPT to invent endurance theory from generic model knowledge; build the dedicated Cardio / Endurance knowledge cluster below.
+- [ ] The latest live programs still carry `QA_FORMULA_VIOLATION_COUNT: 1`; identify and fix the false-positive validator path so valid prescriptions are not marked as formula violations.
+- [ ] Sprint/power intensity semantics need cleanup: prescriptions such as `90–95% sprint effort` must not be paired with a strength-style RPE value that appears contradictory. Use a source-supported speed/quality prescription and a non-applicable/clearly separated RPE representation for sprint work.
 
-Positive findings from the same live generation:
+Specificity nuance confirmed during QA:
 
-- [x] Both primary strength goals received direct exposure.
-- [x] Hard lower-body work was placed away from Friday hard MMA.
-- [x] Low-back irritation was handled with controlled box-squat work and conservative posterior-chain loading rather than ignoring the constraint.
+- [x] Exact-goal exercise specificity is not an absolute requirement when the intake identifies a pain mechanism or movement restriction and a close variation preserves the target quality while avoiding the aggravating feature. Example: a controlled box squat may appropriately preserve squat-strength specificity when deep/high-volume squatting aggravates the low back and box squatting is explicitly tolerated.
+- [ ] Final QA should judge painful/restricted goal movements using the hierarchy: preserve the exact target movement when tolerated; otherwise use the closest source-supported variation that preserves the target quality and respects the stated pain mechanism/tolerated movements; do not penalize an appropriate substitution merely because the exercise name differs.
+
+Positive findings from the live generations:
+
+- [x] Primary strength goals receive direct exposure.
+- [x] Hard lower-body work is placed around concurrent MMA/BJJ rather than ignoring sport interference.
+- [x] Low-back irritation changes exercise selection and loading rather than being ignored.
+- [x] Unbenchmarked exercise variations use autoregulated/conservative loading rather than inheriting aggressive fixed loads from a related benchmark.
 - [x] No internal coaching labels from the launch leak-scan allowlist appeared in the client program.
-- [x] Generated program contained the required TSV machine structure and remained retrievable by personal code before deletion.
+- [x] Generated programs contain the required TSV machine structure and remain retrievable by personal code before deletion.
+
+## Cardio / Endurance coaching-knowledge cluster — required expansion
+
+Purpose: give the engine enough authored, source-grounded endurance knowledge to coach explicit performance outcomes rather than merely adding generic aerobic work. This is one coherent cluster, not an attempt to cover every endurance sport exhaustively.
+
+- [ ] Build a Cardio / Endurance master article/cluster from supplied high-quality sources. GPT must route to this authored cluster and must not substitute generic model memory for missing endurance programming logic.
+- [ ] Cover transferable endurance-programming principles: event demands, aerobic base, threshold/tempo concepts, interval purpose, long-session role, intensity distribution, progression, deload/taper logic, recovery cost and concurrent-training interference.
+- [ ] Add running-specific routing for goals such as 3K, 5K, 10K, half marathon and marathon, including how current performance, target performance, training age, weekly frequency and concurrent sport constrain dose and progression.
+- [ ] Add rowing-specific routing for distance/time/pace goals rather than treating rowing only as interchangeable Zone 2 equipment.
+- [ ] Add cycling and swimming modality logic sufficient for single-sport endurance goals and for multisport integration.
+- [ ] Add triathlon / Ironman routing that can coordinate swim-bike-run exposures, long-session placement, brick-session logic where source-supported, and overall recovery budget.
+- [ ] Define when cross-training can supplement a named endurance goal and when it cannot replace direct modality exposure.
+- [ ] Define event-specificity progression so a named goal receives more than token exposure, while still allowing the engine to deliberately hold that goal at maintenance/base level when higher-priority goals and recovery constraints make aggressive progression inappropriate.
+- [ ] Define pace/intensity prescription language for each modality so the client receives coherent targets (pace/power/HR/RPE where source-supported) rather than conflicting intensity systems.
+- [ ] Add deterministic QA tests for modality specificity, meaningful dose, recovery/concurrent-sport constraints and event-goal prioritisation without hard-coding coaching numbers that are not present in the authored sources.
+- [ ] Stress-test at least: short-distance running pace avatar, marathon avatar, rowing performance avatar and triathlon/Ironman-style avatar, plus one concurrent strength/combat + endurance avatar.
+- [ ] Require 9+/10 coaching-quality acceptance on the annoying concurrent avatar after the new cluster is integrated; passing validators alone is insufficient.
 
 ## Program Pass rollout — remaining environment / staging work
 
@@ -79,7 +107,7 @@ Do not enable commercial enforcement for customers until the remaining unchecked
 3. [x] Set production/staging Render environment values and keep `PROGRAM_PASS_ENFORCEMENT=0` while baseline verification runs.
 4. [x] Verify the live enforcement-OFF server journey: consent -> build -> personal-code return -> adjustment -> language switch -> delete.
 5. [ ] Verify spreadsheet export in the real browser UI; this is client-side and was not exercised by the server/API smoke test.
-6. [ ] Resolve the three live coaching-QA findings above and rerun the adversarial generation.
+6. [ ] Resolve the remaining live coaching-QA findings above, build the Cardio / Endurance cluster, and rerun the adversarial generation to 9+ coaching quality.
 7. [ ] Resolve or replace temporary admin Program Pass provisioning before enabling paid Program Pass sales.
 8. [ ] Run the Program Pass-specific acceptance matrix below with controlled enforcement enabled.
 9. [ ] Add the final real-iPhone usability check.
@@ -133,7 +161,7 @@ curl -X POST "https://YOUR-APP-HOST/api/admin/program-pass" \
 
 ## Remaining launch workstreams
 
-1. Fix and retest the three live coaching-quality defects found by the adversarial generation.
+1. Build and integrate the Cardio / Endurance coaching-knowledge cluster, fix remaining coaching QA/validator issues, and rerun the annoying avatar to 9+.
 2. Verify browser spreadsheet export and real-iPhone UX.
 3. Add the final privacy/support email.
 4. Resolve or replace the temporary admin provisioning path, then run Program Pass-specific staging acceptance.
@@ -144,4 +172,4 @@ curl -X POST "https://YOUR-APP-HOST/api/admin/program-pass" \
 
 ## CI status
 
-Static and regression CI remains the normal default. The live Render QA was deliberately executed as temporary one-off workflow steps and then removed. The live tests confirmed the enforcement-OFF customer API path and caught the deletion-cache defect; the follow-up live deletion test confirmed the fix with a post-delete 404.
+Static and regression CI remains the normal default. Live Render QA is executed only as temporary one-off workflow steps so future commits do not create unnecessary paid AI generations. The source-grounding contract remains under regression test, and the established Warrior avatar remains the regression anchor for preserving 9+ coaching quality while new knowledge clusters and integrity rules are added.
