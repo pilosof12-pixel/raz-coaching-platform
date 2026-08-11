@@ -19,7 +19,7 @@ async function runCase(name,intake){
   const started=Date.now();
   const build=await req('/api/build',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({intake})});
   console.log(`\n===== ${name} BUILD =====`);console.log(build.res.status,JSON.stringify(build.body));
-  if(build.res.status!==202||!build.body?.job_id||!build.body?.token) throw new Error(`${name}: build not accepted; status=${build.res.status} body=${JSON.stringify(build.body)}`);
+  if(build.res.status!==202||!build.body?.job_id||!build.body?.token) return {name,ok:false,error:`build not accepted; status=${build.res.status} body=${JSON.stringify(build.body)}`};
   const token=build.body.token;
   try{
     const done=await poll(build.body.job_id);
@@ -27,10 +27,12 @@ async function runCase(name,intake){
     console.log(`${name} generation_seconds=${((Date.now()-started)/1000).toFixed(1)}`);
     console.log(`\n===== ${name} FULL PROGRAM START =====\n${program}\n===== ${name} FULL PROGRAM END =====`);
     const marker=Number((program.match(/QA_FORMULA_VIOLATION_COUNT:\s*(\d+)/)||[])[1]||0);
-    console.log(`${name} formula_marker=${marker}`);
-    if(marker>0) throw new Error(`${name}: formula marker ${marker}`);
-    if(/\[REVIEW\]|contact support|placeholder/i.test(program)) throw new Error(`${name}: client-facing QA leakage`);
-    return program;
+    const leakage=/\[REVIEW\]|contact support|placeholder/i.test(program);
+    console.log(`${name} formula_marker=${marker} leakage=${leakage}`);
+    return {name,ok:marker===0&&!leakage,marker,leakage,program};
+  } catch(err) {
+    console.log(`${name} ERROR=${String(err?.stack||err)}`);
+    return {name,ok:false,error:String(err?.message||err)};
   } finally {
     const del=await req('/api/client-data',{method:'DELETE',headers:{'Content-Type':'application/json'},body:JSON.stringify({token})}).catch(()=>null);
     console.log(`${name} delete_status=${del?.res?.status||'failed'}`);
@@ -60,6 +62,12 @@ const annoying={
   sport_schedule:[{day:'Mon',intensity:'hard',gap_hours:6},{day:'Wed',intensity:'moderate',gap_hours:6},{day:'Fri',intensity:'hard',gap_hours:6},{day:'Sat',intensity:'moderate',gap_hours:6}],sleep_hours:'6.5',recovery_rating:'average / variable',
   notes:'Avoid hard conditioning within 24 hours before hard MMA. Keep sessions at or under 60 minutes. No more than two genuinely hard lower-body sessions per week. Four strength sessions are requested, but low-cost resistance/accessory sessions are acceptable when sport load is high; do not silently replace a strength day with cardio-only work.',privacy_consent:consent()
 };
-await runCase('AVATAR3_WARRIOR',avatar3);
-await runCase('ANNOYING_CONCURRENT',annoying);
-console.log('\nLIVE_COACHING_STRESS_RESULT=PASS');
+const results=[];
+for (const [name,intake] of [['AVATAR3_WARRIOR',avatar3],['ANNOYING_CONCURRENT',annoying]]) {
+  try { results.push(await runCase(name,intake)); }
+  catch (err) { console.log(`${name} FATAL=${String(err?.stack||err)}`); results.push({name,ok:false,error:String(err?.message||err)}); }
+}
+console.log('\n===== LIVE COACHING STRESS SUMMARY =====');
+for(const r of results) console.log(JSON.stringify({name:r.name,ok:r.ok,marker:r.marker??null,leakage:r.leakage??null,error:r.error??null}));
+if(results.every(r=>r.ok)) console.log('LIVE_COACHING_STRESS_RESULT=PASS');
+else { console.log('LIVE_COACHING_STRESS_RESULT=FAIL'); process.exitCode=1; }
