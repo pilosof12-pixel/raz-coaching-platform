@@ -1,0 +1,65 @@
+name: One-off meaningful specificity live check
+
+on:
+  push:
+    branches:
+      - privacy-security-hardening
+
+permissions:
+  contents: read
+
+jobs:
+  live:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Wait for Render and verify meaningful modality-specific dose
+        run: |
+          echo "Waiting for Render auto-deploy of meaningful-specificity guard..."
+          sleep 110
+          node <<'NODE'
+          const BASE='https://raz-coaching-platform.onrender.com';
+          const sleep=ms=>new Promise(r=>setTimeout(r,ms));
+          async function req(path,options={}){const res=await fetch(BASE+path,options);const text=await res.text();let body=null;try{body=text?JSON.parse(text):null}catch{body={raw:text}}return{res,body};}
+          async function poll(id){const started=Date.now();while(Date.now()-started<300000){const x=await req('/api/job/'+id);if(x.body?.status==='done')return x.body;if(x.body?.status==='error')throw new Error(x.body.error||'build failed');await sleep(4000);}throw new Error('build timeout');}
+          const intake={
+            primary_goals:['Back squat 200 kg','Weighted chin-up +70 kg for 3 reps'],
+            secondary_goals:['Improve 5 km from 25:00 to 22:30'],
+            maintenance_goals:[],goal_priority_model:'tiered_equal_primary',experience:'advanced',days_per_week:4,
+            gym_availability_mode:'flexible',available_gym_days:[],same_day_gap_hours:6,session_length:'60 minutes',bodyweight:'84 kg',
+            equipment:'Full commercial gym — all standard barbells, dumbbells, racks, machines, cables and bodyweight stations available.',training_location:'commercial_gym',language:'en',
+            split_preference:'No preference. Keep no more than two genuinely hard lower-body sessions per week.',
+            current_numbers:'Back squat: 170 kg x 3\nWeighted chin-up: +55 kg x 3\nRDL: 190 kg x 5\nOHP: 70 kg x 5\n5 km: 25:00',
+            performance_markers:['Back squat: 170 kg x 3','Weighted chin-up: +55 kg x 3','RDL: 190 kg x 5','OHP: 70 kg x 5','5 km: 25:00'],
+            injuries:'Mild recurring low-back irritation after high-volume deep squatting; controlled box squats and RDLs are currently tolerated.',
+            pain:{active:true,description:'Mild recurring low-back irritation after high-volume deep squatting',severity:'mild',character:'ache/tightness',next_day_baseline:'usually back to baseline',tolerated_movements:'controlled box squats, RDLs, split squats'},
+            mobility:{active:false,limitation:''},sport:'MMA / BJJ',
+            sport_schedule:[{day:'Mon',intensity:'hard',gap_hours:6},{day:'Wed',intensity:'moderate',gap_hours:6},{day:'Fri',intensity:'hard',gap_hours:6},{day:'Sat',intensity:'moderate',gap_hours:6}],
+            sleep_hours:'6.5',recovery_rating:'average / variable',notes:'Avoid hard conditioning within 24 hours before hard MMA. Keep sessions at or under 60 minutes.',
+            privacy_consent:{health_data:true,policy_version:'2026-08-11',consented_at:new Date().toISOString()}
+          };
+          const cfg=await req('/api/program-pass-config');if(cfg.body?.enforced!==false)throw new Error('Program Pass enforcement must remain off');
+          const build=await req('/api/build',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({intake})});
+          console.log('MEANINGFUL LIVE build',build.res.status,JSON.stringify(build.body));
+          if(build.res.status!==202||!build.body?.job_id||!build.body?.token)throw new Error('build not accepted');
+          const token=build.body.token;
+          try{
+            const done=await poll(build.body.job_id);const program=String(done.program||'');
+            const week1=program.match(/START_WEEK1_TSV[\s\S]*?END_WEEK1_TSV/)?.[0]||'';
+            console.log('\n===== MEANINGFUL LIVE WEEK1 =====\n'+week1+'\n===== END MEANINGFUL LIVE WEEK1 =====');
+            const rows=week1.split('\n').filter(x=>x.includes('\t')&&!/^Day\t/i.test(x));
+            const meaningfulRun=rows.some(line=>{
+              const cells=line.split('\t');const ex=String(cells[1]||'');const reps=String(cells[4]||'');const notes=String(cells[7]||'');
+              if(/^\s*\[WARMUP\]/i.test(ex)||!/\b(run|running|jog|jogging|treadmill|sprint)\b/i.test(ex+' '+notes))return false;
+              const dose=reps+' '+notes;
+              const mins=[...dose.matchAll(/(\d+(?:\.\d+)?)\s*(?:min|minutes?)\b/gi)].map(m=>Number(m[1]));
+              return mins.some(n=>n>=15)||/\b\d+(?:\.\d+)?\s*(?:km|m)\b/i.test(dose)||/\b\d+\s*(?:x|×)\s*\d+(?:\.\d+)?\s*(?:m|km|min|minutes?)\b/i.test(dose);
+            });
+            const marker=Number((program.match(/QA_FORMULA_VIOLATION_COUNT:\s*(\d+)/)||[])[1]||0);
+            console.log('MEANINGFUL LIVE meaningful_running='+meaningfulRun+' formula_marker='+marker);
+            if(!meaningfulRun)throw new Error('SPECIFICITY FAILURE: 5K goal has only token/no meaningful running dose');
+            if(marker>0)throw new Error('FORMULA QA reports '+marker+' violation(s)');
+            console.log('LIVE_MEANINGFUL_SPECIFICITY_RESULT=PASS');
+          } finally {
+            await req('/api/client-data',{method:'DELETE',headers:{'Content-Type':'application/json'},body:JSON.stringify({token})}).catch(()=>{});
+          }
+          NODE
