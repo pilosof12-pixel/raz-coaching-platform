@@ -22,37 +22,25 @@ function goalList(intake={}) {
 function goalFamily(text='') {
   const s=norm(text);
   const defs=[
-    ['one_arm_pullup',/(one.?arm pull.?up|\boap\b)/i,/(one.?arm (?:pull|chin).?up)/i,'skill_strength'],
-    ['weighted_chin',/(weighted chin|chin.?up.*\+?\d|\+?\d+\s*kg.*chin)/i,/(weighted chin|chin.?up)/i,'strength'],
-    ['weighted_pullup',/(weighted pull|pull.?up.*\+?\d|\+?\d+\s*kg.*pull)/i,/(weighted pull|pull.?up)/i,'strength'],
-    ['squat',/(back squat|box squat|front squat|\bsquat\b)/i,/(back squat|box squat|front squat|\bsquat\b)/i,'strength'],
-    ['deadlift',/(deadlift|rdl|romanian deadlift)/i,/(deadlift|rdl|romanian deadlift)/i,'strength'],
-    ['ohp',/(overhead press|\bohp\b)/i,/(overhead press|standing barbell overhead press|push press|dumbbell shoulder press|z press)/i,'strength'],
-    ['bench',/(bench press|\bbench\b)/i,/(bench press|incline bench|dumbbell bench)/i,'strength'],
-    ['dip',/(weighted dip|\bdips?\b)/i,/(weighted dip|\bdips?\b)/i,'strength'],
-    ['planche',/planche/i,/planche/i,'skill_strength'],
-    ['front_lever',/front lever/i,/front lever/i,'skill_strength'],
-    ['hspu',/(handstand push|\bhspu\b)/i,/(handstand push|\bhspu\b)/i,'skill_strength'],
-    ['muscle_up',/muscle.?up/i,/muscle.?up/i,'skill_strength'],
-    ['running',/\b(5\s*k(?:m)?|10\s*k(?:m)?|half[- ]?marathon|marathon|mile time|run(?:ning)?|sprint(?:ing)?)\b/i,/\b(run|running|jog|jogging|treadmill|sprint|shuttle run)\b/i,'endurance'],
-    ['swimming',/\b(swim|swimming|freestyle|backstroke|breaststroke|butterfly)\b/i,/\b(swim|swimming|freestyle|backstroke|breaststroke|butterfly)\b/i,'endurance'],
-    ['rowing',/\b(rowing|rower|erg(?:ometer)?|concept ?2|\d+\s*k\s*row)\b/i,/\b(rowing|rower|erg|concept ?2)\b/i,'endurance'],
-    ['cycling',/\b(cycling|cyclist|bike time trial|road bike|criterium)\b/i,/\b(cycling|cycle|bike|stationary bike)\b/i,'endurance'],
+    ['one_arm_pullup',/(one.?arm pull.?up|\boap\b)/i,/(one.?arm (?:pull|chin).?up)/i],
+    ['weighted_chin',/(weighted chin|chin.?up.*\+?\d|\+?\d+\s*kg.*chin)/i,/(weighted chin|chin.?up)/i],
+    ['weighted_pullup',/(weighted pull|pull.?up.*\+?\d|\+?\d+\s*kg.*pull)/i,/(weighted pull|pull.?up)/i],
+    ['squat',/(back squat|box squat|front squat|\bsquat\b)/i,/(back squat|box squat|front squat|\bsquat\b)/i],
+    ['deadlift',/(deadlift|rdl|romanian deadlift)/i,/(deadlift|rdl|romanian deadlift)/i],
+    ['ohp',/(overhead press|\bohp\b)/i,/(overhead press|standing barbell overhead press|push press|dumbbell shoulder press|z press)/i],
+    ['bench',/(bench press|\bbench\b)/i,/(bench press|incline bench|dumbbell bench)/i],
+    ['dip',/(weighted dip|\bdips?\b)/i,/(weighted dip|\bdips?\b)/i],
+    ['planche',/planche/i,/planche/i],
+    ['front_lever',/front lever/i,/front lever/i],
+    ['hspu',/(handstand push|\bhspu\b)/i,/(handstand push|\bhspu\b)/i],
+    ['muscle_up',/muscle.?up/i,/muscle.?up/i],
+    ['running',/\b(5\s*k(?:m)?|10\s*k(?:m)?|half[- ]?marathon|marathon|mile time|run(?:ning)?|sprint(?:ing)?)\b/i,/\b(run|running|jog|jogging|treadmill|sprint|shuttle run)\b/i],
+    ['swimming',/\b(swim|swimming|freestyle|backstroke|breaststroke|butterfly)\b/i,/\b(swim|swimming|freestyle|backstroke|breaststroke|butterfly)\b/i],
+    ['rowing',/\b(rowing|rower|erg(?:ometer)?|concept ?2|\d+\s*k\s*row)\b/i,/\b(rowing|rower|erg|concept ?2)\b/i],
+    ['cycling',/\b(cycling|cyclist|bike time trial|road bike|criterium)\b/i,/\b(cycling|cycle|bike|stationary bike)\b/i],
   ];
   const hit=defs.find(([,g])=>g.test(s));
-  return hit?{key:hit[0],pattern:hit[2],quality:hit[3]}:null;
-}
-
-function meaningfulEnduranceDose(cells,idx) {
-  const reps=idx.reps>=0?cells[idx.reps]||'':'';
-  const weight=idx.weight>=0?cells[idx.weight]||'':'';
-  const notes=idx.notes>=0?cells[idx.notes]||'':'';
-  const text=`${reps} ${weight} ${notes}`;
-  const mins=[...text.matchAll(/(\d+(?:\.\d+)?)\s*(?:min|minutes?)\b/gi)].map(m=>Number(m[1]));
-  if (mins.some(n=>n>=15)) return true;
-  if (/\b\d+(?:\.\d+)?\s*(?:km|m)\b/i.test(text)) return true;
-  if (/\b\d+\s*(?:x|×)\s*\d+(?:\.\d+)?\s*(?:m|km|min|minutes?)\b/i.test(text)) return true;
-  return false;
+  return hit?{key:hit[0],pattern:hit[2]}:null;
 }
 
 export function goalDoseFlags(program, intake={}, parsed=null) {
@@ -67,16 +55,14 @@ export function goalDoseFlags(program, intake={}, parsed=null) {
       const ex=row.cells[e]||'';
       if (/^\s*\[WARMUP\]/i.test(ex)) continue;
       const ctx=`${ex} ${notes>=0?row.cells[notes]||'':''}`;
-      if (!fam.pattern.test(ctx)) continue;
-      if (fam.quality==='endurance' && !meaningfulEnduranceDose(row.cells,parsed.idx)) continue;
-      days.add(row.cells[d]||'unknown');
+      if (fam.pattern.test(ctx)) days.add(row.cells[d]||'unknown');
     }
     // Source-aligned integrity floor only: every named goal gets at least one
     // direct exposure. Any higher frequency/dose is dictated by the authored
     // deterministic planner / specialist rules / source excerpts, not this file.
     if (days.size<1) flags.push({
       code:'NAMED_GOAL_DIRECT_EXPOSURE_MISSING',
-      message:`Named ${goal.priority} goal '${goal.text}' has no meaningful direct Week 1 exposure. Support work/cross-training cannot replace the stated goal pattern.`
+      message:`Named ${goal.priority} goal '${goal.text}' has no direct Week 1 exposure. Support work/cross-training cannot replace the stated goal pattern.`
     });
   }
   return flags;
@@ -163,7 +149,7 @@ export function strengthSessionAccountingFlags(program, intake={}, parsed=null) 
 
 export function elitePromptRules(intake={}) {
   return [
-    'INTEGRITY RULE: every named goal must retain at least one meaningful direct exposure of its own pattern. Any higher frequency, volume or progression comes only from the deterministic planner, specialist rules and curated RAZ coaching sources.',
+    'INTEGRITY RULE: every named goal must retain at least one direct exposure of its own pattern. Any higher frequency, volume or progression comes only from the deterministic planner, specialist rules and curated RAZ coaching sources.',
     'INTEGRITY RULE: exact kilograms require a reliable benchmark for that exact loaded variation or another explicit deterministic anchor. Do not infer aggressive fixed loading from a merely related lift variation; use the authored RPE/autoregulation path instead.',
     `INTEGRITY RULE: the client requested ${Number(intake.days_per_week||0)||'an unspecified number of'} strength sessions. Respect the deterministic planner's session structure; cardio/core work cannot silently replace a requested resistance-training day.`,
   ];
