@@ -1,6 +1,7 @@
 import path from "path";
 import fs from "fs";
 import { fileURLToPath } from "url";
+import { invalidateCoachingDataCache } from "./storage.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const SUPABASE_URL = process.env.SUPABASE_URL || "";
@@ -27,6 +28,7 @@ function makeSupabasePrivacyStore() {
     async deleteClientData(token){
       const s=await sb();
       for(const table of ["jobs","history","usage","clients"]){ const {error}=await s.from(table).delete().eq("token",token); if(error) throw error; }
+      invalidateCoachingDataCache(token);
       return true;
     },
     async purgeExpiredOperationalData(now=Date.now()){
@@ -45,7 +47,12 @@ async function makeSqlitePrivacyStore(){
   const db=new Database(DB_PATH); db.pragma("journal_mode = WAL");
   return {
     backend:"sqlite",
-    async deleteClientData(token){ const tx=db.transaction(()=>{for(const t of ["jobs","history","usage","clients"]) db.prepare(`DELETE FROM ${t} WHERE token=?`).run(token);}); tx(); return true; },
+    async deleteClientData(token){
+      const tx=db.transaction(()=>{for(const t of ["jobs","history","usage","clients"]) db.prepare(`DELETE FROM ${t} WHERE token=?`).run(token);});
+      tx();
+      invalidateCoachingDataCache(token);
+      return true;
+    },
     async purgeExpiredOperationalData(now=Date.now()){ const c=cutoffs(now); const tx=db.transaction(()=>{db.prepare("DELETE FROM jobs WHERE created_at < ?").run(c.jobs);db.prepare("DELETE FROM history WHERE created_at < ?").run(c.history);db.prepare("DELETE FROM usage WHERE day < ?").run(c.usageDay);}); tx(); return true; }
   };
 }
