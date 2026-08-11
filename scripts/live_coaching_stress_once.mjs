@@ -1,14 +1,25 @@
 const BASE='https://raz-coaching-platform.onrender.com';
 const sleep=ms=>new Promise(r=>setTimeout(r,ms));
-async function req(path,options={}){const res=await fetch(BASE+path,options);const text=await res.text();let body=null;try{body=text?JSON.parse(text):null}catch{body={raw:text}}return{res,body};}
+async function req(path,options={}){const res=await fetch(BASE+path,options);const text=await res.text();let body=null;try{body=text?JSON.parse(text):null}catch{body={raw:text}}return{res,body,text};}
 async function poll(id){const started=Date.now();while(Date.now()-started<360000){const x=await req('/api/job/'+id);if(x.body?.status==='done')return x.body;if(x.body?.status==='error')throw new Error(x.body.error||'build failed');await sleep(4000);}throw new Error('build timeout');}
+async function verifyQaConfig(){
+  let last=null;
+  for(let attempt=1;attempt<=6;attempt++){
+    const cfg=await req('/api/program-pass-config').catch(err=>({res:{status:0},body:{network_error:String(err)},text:String(err)}));
+    last=cfg;
+    console.log(`QA config attempt ${attempt}: status=${cfg.res?.status} body=${JSON.stringify(cfg.body)}`);
+    if(cfg.res?.status===200 && cfg.body?.enforced===false) return cfg.body;
+    if(cfg.res?.status===200 && cfg.body?.enforced===true) throw new Error(`Program Pass enforcement is actually ON in live config: ${JSON.stringify(cfg.body)}`);
+    await sleep(5000);
+  }
+  throw new Error(`Could not verify live Program Pass config after retries. Last status=${last?.res?.status} body=${JSON.stringify(last?.body)}`);
+}
 async function runCase(name,intake){
-  const cfg=await req('/api/program-pass-config');
-  if(cfg.body?.enforced!==false) throw new Error('Program Pass enforcement must remain off for live QA');
+  await verifyQaConfig();
   const started=Date.now();
   const build=await req('/api/build',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({intake})});
   console.log(`\n===== ${name} BUILD =====`);console.log(build.res.status,JSON.stringify(build.body));
-  if(build.res.status!==202||!build.body?.job_id||!build.body?.token) throw new Error(`${name}: build not accepted`);
+  if(build.res.status!==202||!build.body?.job_id||!build.body?.token) throw new Error(`${name}: build not accepted; status=${build.res.status} body=${JSON.stringify(build.body)}`);
   const token=build.body.token;
   try{
     const done=await poll(build.body.job_id);
