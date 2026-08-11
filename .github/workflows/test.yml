@@ -23,8 +23,10 @@ jobs:
         with:
           node-version: 22
           cache: npm
-      - name: Apply pending last-mile source patch
-        run: node scripts/apply_lastmile_clean.mjs
+      - name: Apply pending source-aligned QA patches
+        run: |
+          node scripts/apply_lastmile_clean.mjs
+          node scripts/apply_elite_guardrails.mjs
       - run: npm ci
       - run: npm test
       - run: node --check server.js
@@ -42,8 +44,10 @@ jobs:
           node --check phase14/scripts/apply_launch_runtime.mjs
           node --check phase14/engine/phase15_source_router.js
           node --check phase14/engine/phase15_program_qa.js
+          node --check phase14/engine/phase15_elite_guardrails.js
           node --test phase14/test/phase15_source_grounding.test.mjs
           node --test phase14/test/phase15_goal_specificity.test.mjs
+          node --test phase14/test/phase15_elite_guardrails.test.mjs
           node phase14/scripts/build_phase15_runtime.mjs
           node phase14/scripts/apply_launch_runtime.mjs
           node --check phase14/server.phase15.js
@@ -58,15 +62,12 @@ jobs:
           node --test phase14/test/phase15_specialist_rules.test.mjs
           grep -q 'deterministic-skeleton-v5.2.10-source-grounded' phase14/server.phase15.js
           grep -q 'SOURCE-GROUNDING HARD CONTRACT' phase14/server.phase15.js
-          grep -q 'EXERCISE CLOSED SET' phase14/server.phase15.js
+          grep -q 'Do not use generic model memory to invent training principles' phase14/server.phase15.js
           grep -q 'CURATED COACHING SOURCE EXCERPTS' phase14/server.phase15.js
+          grep -q 'EXERCISE CLOSED SET' phase14/server.phase15.js
           grep -q 'CANONICAL EXERCISE CATALOG' phase14/server.phase15.js
           grep -q 'buildPhase15SourceGrounding(ENGINE, intake, EXERCISE_DICTIONARY)' phase14/server.phase15.js
-          grep -q 'WARRIOR / ATHLETIC HYPERTROPHY RULE' phase14/server.phase15.js
-          grep -q 'PARK-ONLY HARD STOP' phase14/server.phase15.js
-          grep -q 'CALENDAR HARD STOP' phase14/server.phase15.js
-          grep -q 'UNRESOLVED_CLIENT_REVIEW' phase14/server.phase15.js
-          grep -q 'SPORT_MODALITY_SPECIFICITY_MISSING' phase14/engine/phase15_program_qa.js
+          grep -q 'ELITE-GUARDRAILS-FINAL-QA-WIRED' phase14/engine/phase15_program_qa.js
           grep -q 'launch-controls.js' phase14/public/index.html
           grep -q 'launch-mobile.css' phase14/public/index.html
           grep -q 'invalidateCoachingDataCache' phase14/storage.js
@@ -79,5 +80,5 @@ jobs:
           git config user.email 'actions@users.noreply.github.com'
           git add phase14/server.js phase14/scripts/build_phase15_runtime.mjs phase14/engine/phase15_program_qa.js
           if git diff --cached --quiet; then echo 'No source patch to commit'; exit 0; fi
-          git commit -m 'Apply Phase 15 specificity and QA hardening'
+          git commit -m 'Apply source-aligned Phase 15 integrity guardrails'
           git push origin HEAD:${TARGET_BRANCH}
