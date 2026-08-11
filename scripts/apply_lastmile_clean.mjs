@@ -54,6 +54,21 @@ if (!q.includes('SPORT_MODALITY_SPECIFICITY_MISSING')) {
   q = replaceOnce(q, anchor, anchor + '\n\n  const modalityReq = specificModalityRequirement(intake);\n  if (modalityReq && !hasSpecificModalityExposure(raw, intake)) {\n    flags.push({ code:"SPORT_MODALITY_SPECIFICITY_MISSING", message:`${modalityReq.key} is an explicit performance goal but Week 1 contains no direct ${modalityReq.key} exposure. Cross-training cannot fully replace the named modality.` });\n  }', 'specific modality validator');
 }
 
+// Tighten "specific exposure" so a warm-up or token micro-dose cannot satisfy a real performance goal.
+if (!q.includes('MEANINGFUL-SPECIFIC-DOSE')) {
+  const oldFn = `export function hasSpecificModalityExposure(program, intake = {}) {\n  const req = specificModalityRequirement(intake);\n  if (!req || req.externalSatisfied) return true;\n  const parsed = parseBlock(program);\n  if (!parsed) return false;\n  const e = parsed.idx.exercise, notes = parsed.idx.notes;\n  return parsed.rows.some(row => {\n    const ex = row.cells[e] || '';\n    if (/^\\s*\\[WARMUP\\]/i.test(ex)) return false;\n    const ctx = \`${'${ex} ${notes >= 0 ? row.cells[notes] || "" : ""}' }\`;\n    return req.exposure.test(ctx);\n  });\n}`;
+  const newFn = `export function hasSpecificModalityExposure(program, intake = {}) {\n  const req = specificModalityRequirement(intake);\n  if (!req || req.externalSatisfied) return true;\n  const parsed = parseBlock(program);\n  if (!parsed) return false;\n  const e = parsed.idx.exercise, notes = parsed.idx.notes, reps = parsed.idx.reps, weight = parsed.idx.weight;\n  return parsed.rows.some(row => {\n    const ex = row.cells[e] || '';\n    if (/^\\s*\\[WARMUP\\]/i.test(ex)) return false;\n    const note = notes >= 0 ? row.cells[notes] || '' : '';\n    const ctx = \`${'${ex} ${note}' }\`;\n    if (!req.exposure.test(ctx)) return false;\n    const dose = \`${'${reps >= 0 ? row.cells[reps] || "" : ""} ${weight >= 0 ? row.cells[weight] || "" : ""} ${note}' }\`;\n    const minuteValues = [...dose.matchAll(/(\\d+(?:\\.\\d+)?)\\s*(?:min|minutes?)\\b/gi)].map(m => Number(m[1]));\n    const continuousEnough = minuteValues.some(n => n >= 15);\n    const distanceOrIntervals = /\\b\\d+(?:\\.\\d+)?\\s*(?:km|m)\\b/i.test(dose) || /\\b\\d+\\s*(?:x|×)\\s*\\d+(?:\\.\\d+)?\\s*(?:m|km|min|minutes?)\\b/i.test(dose);\n    return continuousEnough || distanceOrIntervals; // MEANINGFUL-SPECIFIC-DOSE\n  });\n}`;
+  q = replaceOnce(q, oldFn, newFn, 'meaningful modality dose');
+  q = q.replace(
+    'Include at least one direct ${modalityReq.key} exposure in Week 1 and preserve modality-specific practice across the block.',
+    'Include at least one meaningful direct ${modalityReq.key} exposure in Week 1, not merely a warm-up or token micro-dose, and preserve modality-specific practice across the block.'
+  );
+  q = q.replace(
+    'but Week 1 contains no direct ${modalityReq.key} exposure.',
+    'but Week 1 contains no meaningful direct ${modalityReq.key} exposure.'
+  );
+}
+
 if (q !== originalQa) fs.writeFileSync(qaPath, q);
 console.log(`${qaPath}: ${q !== originalQa ? 'patched' : 'already current'}`);
 
