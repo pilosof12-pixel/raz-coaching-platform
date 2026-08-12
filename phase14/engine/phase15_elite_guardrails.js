@@ -1,22 +1,144 @@
 // Generic integrity guardrails for Phase 15.
-// IMPORTANT: this file does not define new coaching theory. It only enforces
-// client/source consistency that is already required by the authored RAZ logic:
-// named goals get direct exposure, exact kg need a reliable exact-lift anchor,
-// and requested strength frequency cannot be silently replaced by cardio/core.
+// IMPORTANT: this file does not define new coaching theory. It enforces
+// client/source consistency already required by the authored RAZ logic:
+// named goals cannot disappear, an athlete's existing target-modality practice
+// cannot be silently removed, exact kg need an exact-lift anchor, and requested
+// strength frequency cannot silently become cardio/core.
 
 function norm(s) { return String(s || '').toLowerCase().trim(); }
 function num(s) { const m=String(s||'').match(/\d+(?:\.\d+)?/); return m ? Number(m[0]) : null; }
+function list(v) { return Array.isArray(v) ? v : [v].filter(Boolean); }
 
 function goalList(intake={}) {
   const out=[];
   for (const [priority,key] of [['primary','primary_goals'],['secondary','secondary_goals'],['maintenance','maintenance_goals']]) {
-    const vals=Array.isArray(intake?.[key])?intake[key]:[intake?.[key]].filter(Boolean);
-    for (const raw of vals) {
+    for (const raw of list(intake?.[key])) {
       const text=typeof raw==='string'?raw:JSON.stringify(raw);
       if (text.trim()) out.push({priority,text});
     }
   }
   return out;
+}
+
+const MODALITY_DEFS = [
+  {
+    key:'running',
+    goal:/\b(?:mile|3\s*k(?:m)?|5\s*k(?:m)?|10\s*k(?:m)?|half[- ]?marathon|marathon|run(?:ning)?|sprint(?:ing)?)\b/i,
+    exposure:/\b(?:run|running|jog|jogging|treadmill|sprint|shuttle run|zone[- ]?2 run)\b/i,
+    sport:/\b(?:run|running|track|road running)\b/i,
+    current:[
+      /(?:runs?|running)\s*(\d+)\s*(?:sessions?|times?)?\s*(?:per|\/|each)\s*week/i,
+      /(\d+)\s*(?:runs?|running sessions?)\s*(?:per|\/|each)?\s*week/i,
+      /(\d+)\s*runs?\b/i,
+    ],
+  },
+  {
+    key:'rowing',
+    goal:/\b(?:rowing|rower|erg(?:ometer)?|concept ?2|(?:500\s*m|1\s*k|2\s*k|5\s*k)\s*row)\b/i,
+    exposure:/\b(?:rower|rowing|rowing ergometer|erg|concept ?2|zone[- ]?2 row)\b/i,
+    sport:/\b(?:rowing|rower|crew|ergometer)\b/i,
+    current:[
+      /(?:rows?|rowing)\s*(\d+)\s*(?:sessions?|times?)?\s*(?:per|\/|each)\s*week/i,
+      /(\d+)\s*(?:rows?|rowing sessions?)\s*(?:per|\/|each)?\s*week/i,
+      /(\d+)\s*rows?\b/i,
+    ],
+  },
+  {
+    key:'cycling',
+    goal:/\b(?:cycling|cyclist|bike|road bike|bike time trial|criterium|ftp)\b/i,
+    exposure:/\b(?:bike|cycling|cycle|stationary bike|zone[- ]?2 bike|assault bike)\b/i,
+    sport:/\b(?:cycling|cyclist|road bike|bike)\b/i,
+    current:[
+      /(?:rides?|cycling|cycles?)\s*(\d+)\s*(?:sessions?|times?)?\s*(?:per|\/|each)\s*week/i,
+      /(\d+)\s*(?:rides?|cycling sessions?)\s*(?:per|\/|each)?\s*week/i,
+      /(\d+)\s*rides?\b/i,
+    ],
+  },
+  {
+    key:'swimming',
+    goal:/\b(?:swim|swimming|freestyle|backstroke|breaststroke|butterfly)\b/i,
+    exposure:/\b(?:swim|swimming|freestyle|backstroke|breaststroke|butterfly|pool)\b/i,
+    sport:/\b(?:swim|swimming)\b/i,
+    current:[
+      /(?:swims?|swimming)\s*(\d+)\s*(?:sessions?|times?)?\s*(?:per|\/|each)\s*week/i,
+      /(\d+)\s*(?:swims?|swimming sessions?)\s*(?:per|\/|each)?\s*week/i,
+      /(\d+)\s*swims?\b/i,
+    ],
+  },
+];
+
+function explicitModalityGoals(intake={}) {
+  const out=[];
+  for (const goal of goalList(intake)) {
+    if (goal.priority === 'maintenance') continue;
+    for (const def of MODALITY_DEFS) if (def.goal.test(goal.text)) out.push({...goal,def});
+  }
+  const seen=new Set();
+  return out.filter(x=>{const k=`${x.priority}:${x.def.key}:${x.text}`;if(seen.has(k))return false;seen.add(k);return true;});
+}
+
+export function currentTargetModalityExposure(intake={}, key='') {
+  const def=MODALITY_DEFS.find(x=>x.key===key); if(!def) return 0;
+  const evidence=JSON.stringify({notes:intake.notes,clarification_answers:intake.clarification_answers,current:intake.current_training,current_week:intake.current_week,sport:intake.sport}).replace(/\\n/g,' ');
+  let best=0;
+  for (const re of def.current) {
+    for (const m of evidence.matchAll(new RegExp(re.source, re.flags.includes('g')?re.flags:`${re.flags}g`))) {
+      const n=Number(m[1]); if(Number.isFinite(n)&&n>best&&n<=14) best=n;
+    }
+  }
+  const schedule=Array.isArray(intake.sport_schedule)?intake.sport_schedule:[];
+  if (def.sport.test(String(intake.sport||'')) && schedule.length) best=Math.max(best,schedule.length);
+  // A modality-labelled multisport schedule can also provide explicit evidence.
+  const labelled=schedule.filter(s=>def.sport.test(`${s?.sport||''} ${s?.modality||''} ${s?.type||''} ${s?.session||''}`)).length;
+  if(labelled) best=Math.max(best,labelled);
+  return best;
+}
+
+function meaningfulModalityRows(parsed, def) {
+  const e=parsed.idx.exercise,n=parsed.idx.notes,r=parsed.idx.reps,w=parsed.idx.weight,d=parsed.idx.day;
+  const rows=[];
+  for (const row of parsed.rows) {
+    const ex=row.cells[e]||''; if(/^\s*\[WARMUP\]/i.test(ex)) continue;
+    const note=n>=0?row.cells[n]||'':'';
+    const ctx=`${ex} ${note}`; if(!def.exposure.test(ctx)) continue;
+    const dose=`${r>=0?row.cells[r]||'':''} ${w>=0?row.cells[w]||'':''} ${note}`;
+    const mins=[...dose.matchAll(/(\d+(?:\.\d+)?)\s*(?:min|minutes?)\b/gi)].map(m=>Number(m[1]));
+    const meaningful=mins.some(x=>x>=15)||/\b\d+(?:\.\d+)?\s*(?:km|m)\b/i.test(dose)||/\b\d+\s*(?:x|×)\s*\d+(?:\.\d+)?\s*(?:m|km|min|minutes?)\b/i.test(dose);
+    if(meaningful) rows.push({row,day:row.cells[d]||'unknown',ctx,dose});
+  }
+  return rows;
+}
+
+function eventProgressionBearing(item) {
+  const s=`${item.ctx} ${item.dose}`;
+  return /(?:\b(?:interval|threshold|critical speed|critical power|race pace|goal pace|target pace|2k pace|3k pace|5k pace|10k pace|marathon pace|split target|stroke rate|cadence|power target|pace target)\b|\b\d+(?::\d+)?\s*\/\s*km\b|\b\d+(?:\.\d+)?\s*(?:km\/h|kph|watts?|w)\b|\bprogress(?:ion|ively)?\b)/i.test(s);
+}
+
+export function endurancePerformanceIntegrityFlags(program, intake={}, parsed=null) {
+  if(!parsed) return [];
+  const flags=[];
+  const byKey=new Map();
+  for(const g of explicitModalityGoals(intake)) {
+    const prev=byKey.get(g.def.key);
+    // Primary wins over secondary when the same modality appears in both.
+    if(!prev || (g.priority==='primary'&&prev.priority!=='primary')) byKey.set(g.def.key,g);
+  }
+  for(const {priority,text,def} of byKey.values()) {
+    const rows=meaningfulModalityRows(parsed,def);
+    const actualDays=new Set(rows.map(x=>x.day)).size;
+    const existing=currentTargetModalityExposure(intake,def.key);
+    const required=existing>0?existing:1;
+    if(actualDays<required) flags.push({
+      code:'TARGET_MODALITY_EXPOSURE_REDUCED',
+      message:`${def.key} is a named ${priority} performance goal. The intake documents about ${existing||'at least one'} current ${def.key} exposure(s) per week, but Week 1 programs ${actualDays}. Do not silently remove target-modality practice; preserve the athlete's stated current exposure unless the authored plan makes and explains a deliberate recovery tradeoff.`
+    });
+    const eventGoal=/\d|\b(?:mile|3\s*k|5\s*k|10\s*k|half[- ]?marathon|marathon|erg|time trial|triathlon)\b/i.test(text);
+    if(eventGoal && !rows.some(eventProgressionBearing)) flags.push({
+      code:'EVENT_PROGRESSING_SESSION_MISSING',
+      message:`The ${def.key} performance goal '${text}' has no progression-bearing event-specific session in Week 1. At least one direct session needs a source-grounded external target such as an interval/pace/power/split progression; easy cross-training or a generic warm-up is not a performance plan.`
+    });
+  }
+  return flags;
 }
 
 function goalFamily(text='') {
@@ -34,10 +156,10 @@ function goalFamily(text='') {
     ['front_lever',/front lever/i,/front lever/i],
     ['hspu',/(handstand push|\bhspu\b)/i,/(handstand push|\bhspu\b)/i],
     ['muscle_up',/muscle.?up/i,/muscle.?up/i],
-    ['running',/\b(5\s*k(?:m)?|10\s*k(?:m)?|half[- ]?marathon|marathon|mile time|run(?:ning)?|sprint(?:ing)?)\b/i,/\b(run|running|jog|jogging|treadmill|sprint|shuttle run)\b/i],
-    ['swimming',/\b(swim|swimming|freestyle|backstroke|breaststroke|butterfly)\b/i,/\b(swim|swimming|freestyle|backstroke|breaststroke|butterfly)\b/i],
-    ['rowing',/\b(rowing|rower|erg(?:ometer)?|concept ?2|\d+\s*k\s*row)\b/i,/\b(rowing|rower|erg|concept ?2)\b/i],
-    ['cycling',/\b(cycling|cyclist|bike time trial|road bike|criterium)\b/i,/\b(cycling|cycle|bike|stationary bike)\b/i],
+    ['running',MODALITY_DEFS[0].goal,MODALITY_DEFS[0].exposure],
+    ['rowing',MODALITY_DEFS[1].goal,MODALITY_DEFS[1].exposure],
+    ['cycling',MODALITY_DEFS[2].goal,MODALITY_DEFS[2].exposure],
+    ['swimming',MODALITY_DEFS[3].goal,MODALITY_DEFS[3].exposure],
   ];
   const hit=defs.find(([,g])=>g.test(s));
   return hit?{key:hit[0],pattern:hit[2]}:null;
@@ -57,9 +179,6 @@ export function goalDoseFlags(program, intake={}, parsed=null) {
       const ctx=`${ex} ${notes>=0?row.cells[notes]||'':''}`;
       if (fam.pattern.test(ctx)) days.add(row.cells[d]||'unknown');
     }
-    // Source-aligned integrity floor only: every named goal gets at least one
-    // direct exposure. Any higher frequency/dose is dictated by the authored
-    // deterministic planner / specialist rules / source excerpts, not this file.
     if (days.size<1) flags.push({
       code:'NAMED_GOAL_DIRECT_EXPOSURE_MISSING',
       message:`Named ${goal.priority} goal '${goal.text}' has no direct Week 1 exposure. Support work/cross-training cannot replace the stated goal pattern.`
@@ -83,10 +202,11 @@ function canonicalLift(name='') {
   return norm(name)
     .replace(/\[[^\]]+\]/g,'')
     .replace(/[:].*$/,'')
-    .replace(/\b(to parallel|parallel|paused?|tempo|speed)\b/g,' ')
+    .replace(/\brdl\b/g,'romanian deadlift')
+    .replace(/\bohp\b/g,'overhead press')
     .replace(/[^a-z0-9+ -]+/g,' ')
     .replace(/\s+/g,' ')
-    .trim(); // EXACT-VARIATION-KEY: preserve box/front/high-bar/push-press/etc.
+    .trim(); // EXACT-VARIATION-KEY: keep box/front/pause/ROM/push-press/etc distinct.
 }
 
 function benchmarkRows(intake={}) {
@@ -106,23 +226,54 @@ function benchmarkRows(intake={}) {
 export function unbenchmarkedVariationLoadFlags(intake={}, parsed=null) {
   if (!parsed) return [];
   const benches=benchmarkRows(intake); if(!benches.length) return [];
-  const e=parsed.idx.exercise,w=parsed.idx.weight,r=parsed.idx.reps,notes=parsed.idx.notes;
+  const e=parsed.idx.exercise,w=parsed.idx.weight;
   const flags=[];
   for (const row of parsed.rows) {
     const ex=row.cells[e]||''; if(/^\s*\[WARMUP\]/i.test(ex)) continue;
     const family=liftFamily(ex); if(!family) continue;
-    const load=num(row.cells[w]||''); if(load==null) continue;
+    const weight=String(row.cells[w]||'');
+    const fixedKg=/(?:^|\s|\+)\d+(?:\.\d+)?\s*kg\b/i.test(weight);
+    if(!fixedKg) continue;
     const sameFamily=benches.filter(b=>b.family===family); if(!sameFamily.length) continue;
-    const exact=sameFamily.some(b=>norm(ex).includes(b.canonical) || b.canonical.includes(canonicalLift(ex)));
+    const exact=sameFamily.some(b=>canonicalLift(ex)===b.canonical);
     if (exact) continue;
-    const strongest=Math.max(...sameFamily.map(b=>b.load));
-    const programmedReps=num(row.cells[r]||'')||1;
-    const bestRepAtStrongest=Math.max(...sameFamily.filter(b=>b.load===strongest).map(b=>b.reps));
-    const aggressive=load>=strongest*0.90 && programmedReps>=bestRepAtStrongest;
-    const autoreg=/rpe-selected|auto.?reg|top set by rpe|work up/i.test(`${row.cells[w]||''} ${notes>=0?row.cells[notes]||'':''}`);
-    if (aggressive && !autoreg) flags.push({
+    flags.push({
       code:'UNBENCHMARKED_VARIATION_LOAD_TOO_ASSERTIVE',
-      message:`${ex} uses an assertive fixed load derived from a different ${family} variation. Exact kilograms require a reliable exact-lift benchmark; otherwise use the authored RPE/autoregulation path.`
+      message:`${ex} uses exact kilograms without a benchmark for that exact ${family} variation. A related lift benchmark is not an exact-load anchor; use the authored RPE/autoregulation path instead.`
+    });
+  }
+  return flags;
+}
+
+const EXACT_PRIMARY_LIFTS = [
+  {goal:/\bback squat\b/i,ex:/^back squat$/i,label:'Back Squat'},
+  {goal:/\bbox squat\b/i,ex:/^box squat(?: to parallel)?$/i,label:'Box Squat'},
+  {goal:/\bweighted chin[- ]?up\b/i,ex:/^weighted chin[- ]?up$/i,label:'Weighted Chin-up'},
+  {goal:/\bweighted pull[- ]?up\b/i,ex:/^weighted pull[- ]?up$/i,label:'Weighted Pull-up'},
+  {goal:/\b(?:overhead press|ohp)\b/i,ex:/^(?:overhead press|standing barbell overhead press)$/i,label:'Overhead Press'},
+  {goal:/\bbench press\b/i,ex:/^bench press$/i,label:'Bench Press'},
+];
+
+function explicitMovementAvoidance(intake,label) {
+  const s=JSON.stringify({pain:intake.pain,injuries:intake.injuries,limitations:intake.limitations,notes:intake.notes}).toLowerCase();
+  const name=label.toLowerCase().replace(/[- ]/g,'[- ]?');
+  return new RegExp(`(?:avoid|cannot|can't|not tolerated|do not|painful)[^.!]{0,60}${name}|${name}[^.!]{0,60}(?:aggravat|painful|not tolerated|avoid|cannot|can't)`, 'i').test(s);
+}
+
+export function exactPrimaryMovementFlags(program,intake={},parsed=null) {
+  if(!parsed) return [];
+  const primary=list(intake.primary_goals).map(String).join(' | ');
+  const e=parsed.idx.exercise;
+  const flags=[];
+  for(const def of EXACT_PRIMARY_LIFTS) {
+    if(!def.goal.test(primary)||explicitMovementAvoidance(intake,def.label)) continue;
+    const present=parsed.rows.some(row=>{
+      const ex=String(row.cells[e]||'').trim();
+      return !/^\s*\[WARMUP\]/i.test(ex)&&def.ex.test(ex);
+    });
+    if(!present) flags.push({
+      code:'PRIMARY_EXACT_MOVEMENT_MISSING',
+      message:`Primary goal names ${def.label}, but Week 1 contains no direct ${def.label} work and the intake does not explicitly prohibit that movement. A related variation may support the goal but cannot silently replace the exact primary movement; if pain requires temporary substitution, explain and stage that tradeoff explicitly.`
     });
   }
   return flags;
@@ -154,9 +305,17 @@ export function strengthSessionAccountingFlags(program, intake={}, parsed=null) 
 }
 
 export function elitePromptRules(intake={}) {
-  return [
+  const rules=[
     'INTEGRITY RULE: every named goal must retain at least one direct exposure of its own pattern. Any higher frequency, volume or progression comes only from the deterministic planner, specialist rules and curated RAZ coaching sources.',
-    'INTEGRITY RULE: exact kilograms require a reliable benchmark for that exact loaded variation or another explicit deterministic anchor. Do not infer aggressive fixed loading from a merely related lift variation; use the authored RPE/autoregulation path instead.',
+    'INTEGRITY RULE: exact kilograms require a reliable benchmark for that exact loaded variation or another explicit deterministic anchor. Never transfer fixed kilograms from Back Squat to Box/Front/Pause Squat, or between any other merely related variations. Use RPE-selected load when the exact variation is unbenchmarked.',
     `INTEGRITY RULE: the client requested ${Number(intake.days_per_week||0)||'an unspecified number of'} strength sessions. Respect the deterministic planner's session structure; cardio/core work cannot silently replace a requested resistance-training day.`,
   ];
+  for(const {priority,text,def} of explicitModalityGoals(intake)) {
+    const current=currentTargetModalityExposure(intake,def.key);
+    rules.push(`TARGET-MODALITY INTEGRITY: ${def.key} is a named ${priority} performance goal${current?` and the intake documents about ${current} current ${def.key} exposure(s) per week`:''}. Do not silently reduce that existing target-modality practice. Put the target-modality sessions into the four-week deliverable, including non-gym sport days when needed, and use the curated endurance sources to assign their actual purpose/dose. Cross-training may supplement but not replace them.`);
+    if(/\d|\b(?:mile|3\s*k|5\s*k|10\s*k|half[- ]?marathon|marathon|erg|time trial|triathlon)\b/i.test(text)) rules.push(`EVENT-PROGRESSION INTEGRITY: '${text}' needs at least one progression-bearing ${def.key} session with an external event-relevant target (for example source-selected interval, pace, power, split, stroke-rate or equivalent prescription). A warm-up or generic easy session alone is not sufficient. The exact workout design must come from the curated sources, not generic model memory.`);
+  }
+  const primary=list(intake.primary_goals).map(String).join(' | ');
+  for(const def of EXACT_PRIMARY_LIFTS) if(def.goal.test(primary)&&!explicitMovementAvoidance(intake,def.label)) rules.push(`PRIMARY-MOVEMENT INTEGRITY: ${def.label} is named in a primary goal and is not explicitly prohibited by the intake. Keep direct ${def.label} exposure. Related variations may support it but cannot silently replace it.`);
+  return rules;
 }
