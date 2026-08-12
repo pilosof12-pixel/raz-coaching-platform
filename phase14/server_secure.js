@@ -7,6 +7,7 @@ import { makeEntitlementStore } from "./entitlements.js";
 import { makeAnalyticsStore, isAllowedAnalyticsEvent } from "./analytics.js";
 import { makePrivacyStore } from "./privacy_store.js";
 import { validateLaunchIntake } from "./intake_validation.js";
+import { detectIntakeClarifications } from "./intake_clarification.js";
 
 const TOKEN_RE=/^[a-f0-9]{32}$/i, JOB_RE=/^[a-f0-9]{32}$/i, PASS_RE=/^[a-f0-9]{32}$/i;
 const NODE_ENV=process.env.NODE_ENV||"development";
@@ -82,6 +83,11 @@ function securityMiddleware(req,res,next){
   if(req.method==="POST"&&req.path==="/api/build"){
     const intake=req.body?.intake,validation=validateLaunchIntake(intake);if(validation)return res.status(400).json({error:validation});if(!validConsent(intake))return res.status(400).json({error:"Privacy consent is required before program generation."});
     let serialized="";try{serialized=JSON.stringify(intake);}catch{}if(!serialized||serialized.length>MAX_INTAKE_CHARS||tooLarge(intake))return res.status(413).json({error:"The intake contains too much text. Please shorten the entries and try again."});
+    // ZERO-COST PING-PONG GATE: deterministic/local only. It MUST stay before
+    // consumeHourly() and guardProgramPass(), so clarification neither consumes a
+    // generation slot nor activates/uses Program Pass access and no AI call starts.
+    const clarifications=detectIntakeClarifications(intake);
+    if(clarifications.length)return res.status(422).json({error:"A few details are needed before I can build this accurately.",clarification_required:true,clarifications});
     if(!consumeHourly(req,"build",GENERATION_BUILDS_PER_HOUR))return res.status(429).json({error:"Too many program generation requests from this connection. Please try again later."});
   }
   if(req.method==="POST"&&(req.path==="/api/adjust"||req.path==="/api/set-language")){
