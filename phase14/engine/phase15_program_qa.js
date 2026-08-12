@@ -13,6 +13,8 @@ import {
   goalDoseFlags,
   unbenchmarkedVariationLoadFlags,
   strengthSessionAccountingFlags,
+  endurancePerformanceIntegrityFlags,
+  exactPrimaryMovementFlags,
 } from "./phase15_elite_guardrails.js";
 
 function norm(s) { return String(s || "").toLowerCase().trim(); }
@@ -194,6 +196,8 @@ export function validatePhase15Program(program, intake = {}) {
   flags.push(...goalDoseFlags(raw, intake, parsed));
   flags.push(...unbenchmarkedVariationLoadFlags(intake, parsed));
   flags.push(...strengthSessionAccountingFlags(raw, intake, parsed)); // ELITE-GUARDRAILS-FINAL-QA-WIRED
+  flags.push(...endurancePerformanceIntegrityFlags(raw, intake, parsed)); // ENDURANCE-PRESERVATION-FINAL-QA-WIRED
+  flags.push(...exactPrimaryMovementFlags(raw, intake, parsed)); // EXACT-PRIMARY-MOVEMENT-FINAL-QA-WIRED
 
   if (/\[REVIEW\]|contact\s+support|placeholder(?:\s+exercise|\s+row)?|could not be safely generated/i.test(raw)) {
     flags.push({ code:"CLIENT_OUTPUT_NOT_READY", message:"Program contains unresolved review/support/placeholder text. Reject rather than exposing it to a client." });
