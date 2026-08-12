@@ -2,15 +2,24 @@
 // Grounds compact generation in the authored RAZ coaching engine.
 
 import fs from 'node:fs';
-import { gunzipSync } from 'node:zlib';
 
 const STOP = new Set(['about','after','again','also','around','because','before','between','build','client','could','days','from','goal','goals','have','into','like','more','most','only','other','over','program','session','sessions','some','than','that','their','them','then','they','this','training','using','very','want','week','weekly','what','when','where','which','while','with','without','work','would','your']);
 
 function loadEnduranceCorpus() {
-  const p = new URL('./endurance_conditioning_knowledge.md.gz.b64', import.meta.url);
-  const encoded = fs.readFileSync(p, 'utf8').trim();
-  const text = gunzipSync(Buffer.from(encoded, 'base64')).toString('utf8');
-  if (text.length < 80000 || !/ARTICLE 11[\s\S]*Conditioning Decision System/i.test(text)) {
+  const sourceFiles = [
+    './endurance_runtime_parts/part01_foundations.md',
+    './endurance_runtime_parts/part02_programming.md',
+    './endurance_runtime_parts/part03_application.md',
+  ];
+  const text = sourceFiles
+    .map((p) => fs.readFileSync(new URL(p, import.meta.url), 'utf8').trim())
+    .join('\n\n');
+  if (
+    text.length < 12000 ||
+    !/ARTICLE 11[\s\S]*Conditioning Decision System/i.test(text) ||
+    !/ENGINE-WIDE DECISION HIERARCHY/i.test(text) ||
+    !/Do not strengthen a rule beyond what this source pack says/i.test(text)
+  ) {
     throw new Error('ENDURANCE_SOURCE_CORPUS_INVALID');
   }
   return text;
