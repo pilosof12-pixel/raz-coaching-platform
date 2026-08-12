@@ -78,6 +78,7 @@ jobs:
           grep -q 'buildPhase15SourceGrounding(ENGINE, intake, EXERCISE_DICTIONARY)' phase14/server.phase15.js
           grep -q 'source-aligned: only explicit density goals require density rows' phase14/server.phase15.js
           grep -q "cells\[6\] = 'N/A'" phase14/server.phase15.js
+          grep -q 'OpenAI provider unavailable; using source-grounded Gemini fallback' phase14/server.phase15.js
           grep -q 'ELITE-GUARDRAILS-FINAL-QA-WIRED' phase14/engine/phase15_program_qa.js
           grep -q 'EXACT-VARIATION-KEY' phase14/engine/phase15_elite_guardrails.js
           grep -q 'clarification-controls.js' phase14/public/index.html
@@ -85,6 +86,11 @@ jobs:
           grep -q 'launch-mobile.css' phase14/public/index.html
           grep -q 'invalidateCoachingDataCache' phase14/storage.js
           grep -q 'invalidateCoachingDataCache' phase14/privacy_store.js
+      - name: One-off live coaching suite
+        run: |
+          echo 'Waiting for Render auto-deploy of source-grounded fallback...'
+          sleep 180
+          node scripts/live_coaching_stress_once.mjs
       - name: Commit tested production patch
         env:
           TARGET_BRANCH: ${{ github.head_ref || github.ref_name }}
