@@ -38,8 +38,6 @@ if (!q.includes('ENDURANCE-PRESERVATION-FINAL-QA-WIRED')) {
 if (q!==before) fs.writeFileSync(qaPath,q);
 console.log(`${qaPath}: ${q===before?'already current':'elite guardrails wired'}`);
 
-// Keep true lift variants distinct. Back Squat is not an exact benchmark for Box Squat,
-// Front Squat is not Back Squat, Push Press is not strict OHP, etc.
 const elitePath=fileURLToPath(new URL('../phase14/engine/phase15_elite_guardrails.js', import.meta.url));
 let e=fs.readFileSync(elitePath,'utf8');
 const eliteBefore=e;
@@ -76,3 +74,17 @@ if (!d.includes('ENDURANCE-MODALITY-CANONICAL-SET')) {
 }
 if(d!==dictBefore) fs.writeFileSync(dictPath,d);
 console.log(`${dictPath}: ${d===dictBefore?'already current':'endurance modality vocabulary added'}`);
+
+// Ensure the compact catalog exposes those modality names whenever the intake
+// actually names the sport. Without this, a closed-set catalog could contain the
+// canonical names but still hide them from the model on a triathlon/swim build.
+const routerPath=fileURLToPath(new URL('../phase14/engine/phase15_source_router.js', import.meta.url));
+let r=fs.readFileSync(routerPath,'utf8');
+const routerBefore=r;
+if (!r.includes('ENDURANCE-MODALITY-CATALOG-ROUTING')) {
+  const anchor="  if (/cycling|bike/.test(raw)) add(['bike','assault bike']);";
+  if (!r.includes(anchor)) throw new Error('source-router modality anchor missing');
+  r=r.replace(anchor, anchor+"\n  if (/swim|swimming|freestyle|pool/.test(raw)) add(['swim']);\n  if (/triathlon|multisport|ironman/.test(raw)) add(['swim','bike','run']); // ENDURANCE-MODALITY-CATALOG-ROUTING");
+}
+if(r!==routerBefore) fs.writeFileSync(routerPath,r);
+console.log(`${routerPath}: ${r===routerBefore?'already current':'endurance modality catalog routing added'}`);
