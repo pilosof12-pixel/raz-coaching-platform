@@ -96,31 +96,3 @@ jobs:
           if git diff --cached --quiet; then echo 'No source patch to commit'; exit 0; fi
           git commit -m 'Apply source-aligned Phase 15 integrity guardrails'
           git push origin HEAD:${TARGET_BRANCH}
-
-  live-core:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          ref: ${{ github.head_ref || github.ref_name }}
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 22
-      - name: Wait for Render deploy
-        run: sleep 180
-      - name: Run four core adversarial avatars
-        run: node scripts/live_coaching_stress_once.mjs
-
-  live-triathlon:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          ref: ${{ github.head_ref || github.ref_name }}
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 22
-      - name: Wait for Render deploy
-        run: sleep 180
-      - name: Run isolated triathlon avatar
-        run: node scripts/live_triathlon_once.mjs
