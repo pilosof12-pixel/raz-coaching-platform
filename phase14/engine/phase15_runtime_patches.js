@@ -38,10 +38,15 @@ export function patchPhase15RuntimeSource(input) {
 
   // The compact Phase-15 provider originally short-circuited whenever an OpenAI
   // key existed, so a quota/outage/timeout error never reached the existing Gemini
-  // path. Restore fallback only for provider-availability failures. Crucially, pass
-  // the SAME compact deterministic skeleton + curated source grounding into Gemini;
-  // do not fall back to an unsourced generic prompt. Internal source/validation
-  // errors are deliberately re-thrown instead of being masked by provider fallback.
+  // path. Restore fallback only for provider-availability failures. Crucially, the
+  // fallback must use BOTH the same compact user prompt AND the same compact system
+  // contract. Otherwise the old large ENGINE system prompt can re-introduce legacy
+  // exercise naming and compete with the canonical closed-set contract.
+  const fnAnchor = 'async function runEngineRaw(userContent) {\n  if (OPENAI_API_KEY) {';
+  const fnCount = s.split(fnAnchor).length - 1;
+  if (fnCount !== 1) throw new Error(`Expected one runEngineRaw anchor, found ${fnCount}`);
+  s = s.replace(fnAnchor, 'async function runEngineRaw(userContent) {\n  let sourceGroundedGeminiFallback = false;\n  if (OPENAI_API_KEY) {');
+
   const providerAnchor = [
     '    } finally {',
     '      clearTimeout(timer);',
@@ -58,6 +63,7 @@ export function patchPhase15RuntimeSource(input) {
     '      if (!GEMINI_API_KEY || !providerUnavailable) throw e;',
     "      console.warn('OpenAI provider unavailable; using source-grounded Gemini fallback:', providerMessage);",
     '      userContent = buildOpenAICompactUser(userContent);',
+    '      sourceGroundedGeminiFallback = true;',
     '    } finally {',
     '      clearTimeout(timer);',
     '    }',
@@ -65,6 +71,16 @@ export function patchPhase15RuntimeSource(input) {
     '  if (USE_PPLX_PROXY) {',
   ].join('\n');
   s = s.replace(providerAnchor, providerReplacement);
+
+  const cacheAnchor = '  const cacheName = await getEngineCacheName();';
+  const cacheCount = s.split(cacheAnchor).length - 1;
+  if (cacheCount !== 1) throw new Error(`Expected one engine-cache anchor, found ${cacheCount}`);
+  s = s.replace(cacheAnchor, '  const cacheName = sourceGroundedGeminiFallback ? null : await getEngineCacheName();');
+
+  const inlineAnchor = '    config: { ...genParams, systemInstruction: ENGINE },';
+  const inlineCount = s.split(inlineAnchor).length - 1;
+  if (inlineCount !== 1) throw new Error(`Expected one inline Gemini system anchor, found ${inlineCount}`);
+  s = s.replace(inlineAnchor, '    config: { ...genParams, systemInstruction: sourceGroundedGeminiFallback ? OPENAI_COMPACT_DEVELOPER : ENGINE },');
 
   return s;
 }
