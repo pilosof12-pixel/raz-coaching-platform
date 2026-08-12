@@ -41,14 +41,21 @@ jobs:
         run: |
           node --check phase14/server.js
           node --check phase14/scripts/build_phase15_runtime.mjs
+          node --check phase14/scripts/postprocess_phase15_runtime.mjs
           node --check phase14/scripts/apply_launch_runtime.mjs
           node --check phase14/engine/phase15_source_router.js
+          node --check phase14/engine/phase15_runtime_patches.js
           node --check phase14/engine/phase15_program_qa.js
           node --check phase14/engine/phase15_elite_guardrails.js
+          node --check phase14/intake_clarification.js
+          node --check phase14/public/clarification-controls.js
           node --test phase14/test/phase15_source_grounding.test.mjs
+          node --test phase14/test/phase15_runtime_patches.test.mjs
+          node --test phase14/test/intake_clarification.test.mjs
           node --test phase14/test/phase15_goal_specificity.test.mjs
           node --test phase14/test/phase15_elite_guardrails.test.mjs
           node phase14/scripts/build_phase15_runtime.mjs
+          node phase14/scripts/postprocess_phase15_runtime.mjs
           node phase14/scripts/apply_launch_runtime.mjs
           node --check phase14/server.phase15.js
           node --check phase14/server_secure.js
@@ -56,6 +63,8 @@ jobs:
           node --check phase14/analytics.js
           node --check phase14/privacy_store.js
           node --check phase14/intake_validation.js
+          node --check phase14/intake_clarification.js
+          node --check phase14/public/clarification-controls.js
           node --check phase14/public/launch-controls.js
           node --test phase14/test/launch_security_privacy.test.js
           node --test phase14/test/phase15_planner_regression.test.mjs
@@ -67,17 +76,15 @@ jobs:
           grep -q 'EXERCISE CLOSED SET' phase14/server.phase15.js
           grep -q 'CANONICAL EXERCISE CATALOG' phase14/server.phase15.js
           grep -q 'buildPhase15SourceGrounding(ENGINE, intake, EXERCISE_DICTIONARY)' phase14/server.phase15.js
+          grep -q 'source-aligned: only explicit density goals require density rows' phase14/server.phase15.js
+          grep -q "cells\[6\] = 'N/A'" phase14/server.phase15.js
           grep -q 'ELITE-GUARDRAILS-FINAL-QA-WIRED' phase14/engine/phase15_program_qa.js
           grep -q 'EXACT-VARIATION-KEY' phase14/engine/phase15_elite_guardrails.js
+          grep -q 'clarification-controls.js' phase14/public/index.html
           grep -q 'launch-controls.js' phase14/public/index.html
           grep -q 'launch-mobile.css' phase14/public/index.html
           grep -q 'invalidateCoachingDataCache' phase14/storage.js
           grep -q 'invalidateCoachingDataCache' phase14/privacy_store.js
-      - name: One-off live coaching stress regression
-        run: |
-          echo 'Waiting for Render auto-deploy...'
-          sleep 120
-          node scripts/live_coaching_stress_once.mjs
       - name: Commit tested production patch
         env:
           TARGET_BRANCH: ${{ github.head_ref || github.ref_name }}
