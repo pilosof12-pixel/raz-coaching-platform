@@ -150,6 +150,8 @@ function exerciseFamilyTerms(intake = {}) {
   if (/zone\s*2|aerobic|conditioning|cardio|endurance|3\s*k|5\s*k|10\s*k|marathon|run/.test(raw)) add(['zone-2','bike','row','run','treadmill','assault bike','sprint']);
   if (/row(?:ing|er)?|erg/.test(raw)) add(['row','rower']);
   if (/cycling|bike/.test(raw)) add(['bike','assault bike']);
+  if (/swim|swimming|freestyle|pool/.test(raw)) add(['swim']);
+  if (/triathlon|multisport|ironman/.test(raw)) add(['swim','bike','run']); // ENDURANCE-MODALITY-CATALOG-ROUTING
   if (/bjj|mma|wrestl|combat/.test(raw)) add(['neck','pallof','carry','row','hip thrust','copenhagen','side plank']);
   if (/planche/.test(raw)) add(['planche']);
   if (/front lever/.test(raw)) add(['front lever']);

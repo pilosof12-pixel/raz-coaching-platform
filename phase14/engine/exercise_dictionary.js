@@ -140,6 +140,7 @@ const DICTIONARY_LIST = [
   "Weighted Vest Hill Sprint", "Sled Push", "Sled Drag", "Prowler Push",
   "Stair Sprint", "Jump Rope", "Skipping", "Shuttle Run", "Bear Hug Carry",
   "Burpee EMOM", "Sandbag Carry", "Backpack Carry",
+  "Run", "Bike", "Swim", "Rowing Ergometer",
   "Zone-2 Bike", "Zone-2 Row", "Zone-2 Run", "Assault Bike", "Airbike Intervals",
   // --- Warmup / mobility drills (so prep chains land on real names) ---
   "Jumping Jacks", "Arm Circles", "Leg Swings", "Cat-Cow", "Bird-Dog",
@@ -161,7 +162,7 @@ const DICTIONARY_LIST = [
   "Weighted Pistol Squat", "Weighted Push-up", "Weighted Pull-up",
 ];
 
-export const EXERCISE_DICTIONARY = new Set(DICTIONARY_LIST);
+export const EXERCISE_DICTIONARY = new Set(DICTIONARY_LIST); // ENDURANCE-MODALITY-CANONICAL-SET
 
 // ---------------------------------------------------------------------------
 // 2. ALIASES (non-canonical spelling -> canonical). Matching is normalized, so
@@ -344,6 +345,7 @@ const EQUIP_LIST = [
   ["Seated Row Machine", ["machine"]], ["Assault Bike", ["assault_bike"]],
   ["Rower", ["rower"]], ["Treadmill", ["treadmill"]], ["Ski Erg", ["ski_erg"]],
   ["Stationary Bike", ["bike"]], ["Elliptical", ["elliptical"]],
+  ["Bike", ["bike"]], ["Swim", ["pool"]], ["Rowing Ergometer", ["rower"]],
   // sled / conditioning gear
   ["Sled Push", ["sled"]], ["Sled Drag", ["sled"]], ["Prowler Push", ["sled"]],
   ["Weighted Vest Hill Sprint", ["weighted_vest", "hill"]],
@@ -464,6 +466,7 @@ export function normalizeEquipmentTokens(equipment) {
     if (/assault bike|air bike|echo bike|fan bike/.test(s)) add("assault_bike");
     if (/\brower\b|row erg|concept ?2/.test(s)) add("rower");
     if (/treadmill/.test(s)) add("treadmill");
+    if (/\bpool\b|swimming pool|swim access/.test(s)) add("pool");
     if (/ski erg|skierg/.test(s)) add("ski_erg");
     if (/\bbike\b|spin bike|stationary bike/.test(s) && !/assault|air|echo|fan/.test(s)) add("bike");
     if (/weighted vest|weight vest/.test(s)) add("weighted_vest");
