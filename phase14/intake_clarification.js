@@ -99,7 +99,7 @@ export function detectIntakeClarifications(intake = {}) {
   // Injury/pain only triggers clarification when it intersects a named goal and
   // the intake does not already identify the aggravating feature or tolerated ROM/variation.
   const toleranceDetail = /(deep|depth|parallel|range|\brom\b|heavy|load|volume|fatigue|technique|flexion|extension|butt wink|tolerat|comfortable|pain[- ]?free|box squat|reduced range|partial)/i;
-  if (/(?:low back|lower back|lumbar|sciatica)/i.test(pain) && /(?:squat|deadlift|rdl|hinge)/i.test(goals) && !toleranceDetail.test(pain)) {
+  if (/(?:low[- ]back|lower[- ]back|lumbar|sciatica)/i.test(pain) && /(?:squat|deadlift|rdl|hinge)/i.test(goals) && !toleranceDetail.test(pain)) {
     addQuestion(out, intake, {
       id:'lumbar_goal_movement_tolerance',
       prompt:'For the squat/deadlift pattern connected to your goal, what specifically aggravates the lower back and what is currently tolerated?',
