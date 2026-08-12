@@ -5,7 +5,7 @@
   "type": "module",
   "main": "server_secure.js",
   "scripts": {
-    "phase15:build": "node scripts/build_phase15_runtime.mjs && node scripts/postprocess_phase15_runtime.mjs",
+    "phase15:build": "node ../scripts/apply_elite_guardrails.mjs && node scripts/build_phase15_runtime.mjs && node scripts/postprocess_phase15_runtime.mjs",
     "launch:prepare": "node scripts/apply_launch_runtime.mjs",
     "start": "npm run phase15:build && npm run launch:prepare && node server_secure.js",
     "test": "node --test test/*.test.js",
