@@ -5,6 +5,7 @@ import { patchPhase15RuntimeSource } from '../engine/phase15_runtime_patches.js'
 function fixture() {
   return [
     'const OPENAI_COMPACT_DEVELOPER = ["short acceleration sprints use roughly 90-95% quality effort with about 2-3 minutes full recovery and stop before speed drops."];',
+    'function buildOpenAICompactUser(x){ return x; }',
     'function stripAndFlagFormulaViolations(){',
     '  try {',
     '    const DENSITY_DEMANDING_GOAL = /(endurance|conditioning|gas tank|work capacity|cardio|fat loss|lose fat|zone\\s*2|aerobic|emom|amrap|density|threshold|vo2)/;',
@@ -16,6 +17,19 @@ function fixture() {
     '  const cleaned = out.join("\\n"); return cleaned;',
     '}',
     'function privacyScrub() {}',
+    'async function runEngineRaw(userContent) {',
+    '  if (OPENAI_API_KEY) {',
+    '    const timer = setTimeout(() => {}, 1000);',
+    '    try {',
+    "      throw new Error('no credits remaining');",
+    '    } finally {',
+    '      clearTimeout(timer);',
+    '    }',
+    '  }',
+    '  if (USE_PPLX_PROXY) {',
+    '    return userContent;',
+    '  }',
+    '}',
   ].join('\n');
 }
 
@@ -30,4 +44,13 @@ test('Sprint TSV semantics use speed quality rather than strength RPE', () => {
   assert.match(out, /if \(\/\^Sprint\$\/i\.test\(ex\)\)/);
   assert.match(out, /cells\[6\] = 'N\/A'/);
   assert.match(out, /Target RPE is N\/A because speed quality/);
+});
+
+test('OpenAI quota/outage path falls through to Gemini with the same compact source-grounded user prompt', () => {
+  const out = patchPhase15RuntimeSource(fixture());
+  assert.match(out, /OpenAI provider unavailable; using source-grounded Gemini fallback/);
+  assert.match(out, /providerUnavailable/);
+  assert.match(out, /if \(!GEMINI_API_KEY \|\| !providerUnavailable\) throw e/);
+  assert.match(out, /userContent = buildOpenAICompactUser\(userContent\)/);
+  assert.match(out, /no credits remaining/);
 });
