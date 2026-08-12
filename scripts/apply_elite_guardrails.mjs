@@ -11,12 +11,10 @@ if (!q.includes('phase15_elite_guardrails.js')) {
   const anchor='} from "./phase15_quality_rules.js";';
   if (!q.includes(anchor)) throw new Error('quality-rules import anchor missing');
   q=q.replace(anchor, anchor+'\nimport {\n  elitePromptRules,\n  goalDoseFlags,\n  unbenchmarkedVariationLoadFlags,\n  strengthSessionAccountingFlags,\n  endurancePerformanceIntegrityFlags,\n  exactPrimaryMovementFlags,\n} from "./phase15_elite_guardrails.js";');
-} else {
-  if (!q.includes('endurancePerformanceIntegrityFlags')) {
-    const anchor='  strengthSessionAccountingFlags,\n} from "./phase15_elite_guardrails.js";';
-    if (!q.includes(anchor)) throw new Error('elite import expansion anchor missing');
-    q=q.replace(anchor,'  strengthSessionAccountingFlags,\n  endurancePerformanceIntegrityFlags,\n  exactPrimaryMovementFlags,\n} from "./phase15_elite_guardrails.js";');
-  }
+} else if (!q.includes('endurancePerformanceIntegrityFlags')) {
+  const anchor='  strengthSessionAccountingFlags,\n} from "./phase15_elite_guardrails.js";';
+  if (!q.includes(anchor)) throw new Error('elite import expansion anchor missing');
+  q=q.replace(anchor,'  strengthSessionAccountingFlags,\n  endurancePerformanceIntegrityFlags,\n  exactPrimaryMovementFlags,\n} from "./phase15_elite_guardrails.js";');
 }
 
 if (!q.includes('ELITE-GUARDRAILS-PROMPT-WIRED')) {
@@ -41,9 +39,7 @@ if (q!==before) fs.writeFileSync(qaPath,q);
 console.log(`${qaPath}: ${q===before?'already current':'elite guardrails wired'}`);
 
 // Keep true lift variants distinct. Back Squat is not an exact benchmark for Box Squat,
-// Front Squat is not Back Squat, Push Press is not strict OHP, etc. Family matching is
-// only used to detect that a related benchmark exists; exact fixed-load permission needs
-// the actual named variation.
+// Front Squat is not Back Squat, Push Press is not strict OHP, etc.
 const elitePath=fileURLToPath(new URL('../phase14/engine/phase15_elite_guardrails.js', import.meta.url));
 let e=fs.readFileSync(elitePath,'utf8');
 const eliteBefore=e;
@@ -53,3 +49,30 @@ if (e.includes(oldCanonical)) e=e.replace(oldCanonical,legacyReplacement);
 if (!e.includes('EXACT-VARIATION-KEY')) throw new Error('elite exact-variation patch did not apply');
 if (e!==eliteBefore) fs.writeFileSync(elitePath,e);
 console.log(`${elitePath}: ${e===eliteBefore?'already current':'exact-variation matching fixed'}`);
+
+// Event-specific endurance work needs canonical names that describe the actual
+// modality, not a fake strength exercise or a warm-up. This is vocabulary only;
+// workout dose and intensity still come from the authored endurance sources.
+const dictPath=fileURLToPath(new URL('../phase14/engine/exercise_dictionary.js', import.meta.url));
+let d=fs.readFileSync(dictPath,'utf8');
+const dictBefore=d;
+if (!d.includes('"Run", "Bike", "Swim", "Rowing Ergometer"')) {
+  const anchor='  "Zone-2 Bike", "Zone-2 Row", "Zone-2 Run", "Assault Bike", "Airbike Intervals",';
+  if (!d.includes(anchor)) throw new Error('conditioning dictionary anchor missing');
+  d=d.replace(anchor, '  "Run", "Bike", "Swim", "Rowing Ergometer",\n'+anchor);
+}
+if (!d.includes('["Bike", ["bike"]]')) {
+  const anchor='  ["Stationary Bike", ["bike"]], ["Elliptical", ["elliptical"]],';
+  if (!d.includes(anchor)) throw new Error('conditioning equipment anchor missing');
+  d=d.replace(anchor, '  ["Stationary Bike", ["bike"]], ["Elliptical", ["elliptical"]],\n  ["Bike", ["bike"]], ["Swim", ["pool"]], ["Rowing Ergometer", ["rower"]],');
+}
+if (!d.includes('add("pool")')) {
+  const anchor='    if (/treadmill/.test(s)) add("treadmill");';
+  if (!d.includes(anchor)) throw new Error('equipment-token pool anchor missing');
+  d=d.replace(anchor, anchor+'\n    if (/\\bpool\\b|swimming pool|swim access/.test(s)) add("pool");');
+}
+if (!d.includes('ENDURANCE-MODALITY-CANONICAL-SET')) {
+  d=d.replace('export const EXERCISE_DICTIONARY = new Set(DICTIONARY_LIST);','export const EXERCISE_DICTIONARY = new Set(DICTIONARY_LIST); // ENDURANCE-MODALITY-CANONICAL-SET');
+}
+if(d!==dictBefore) fs.writeFileSync(dictPath,d);
+console.log(`${dictPath}: ${d===dictBefore?'already current':'endurance modality vocabulary added'}`);
