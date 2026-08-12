@@ -29,6 +29,13 @@ function fixture() {
     '  if (USE_PPLX_PROXY) {',
     '    return userContent;',
     '  }',
+    '  const cacheName = await getEngineCacheName();',
+    '  if (cacheName) return cacheName;',
+    '  return ai.models.generateContent({',
+    '    model: GEMINI_MODEL,',
+    '    contents: userContent,',
+    '    config: { ...genParams, systemInstruction: ENGINE },',
+    '  });',
     '}',
   ].join('\n');
 }
@@ -46,11 +53,13 @@ test('Sprint TSV semantics use speed quality rather than strength RPE', () => {
   assert.match(out, /Target RPE is N\/A because speed quality/);
 });
 
-test('OpenAI quota/outage path falls through to Gemini with the same compact source-grounded user prompt', () => {
+test('OpenAI quota/outage path falls through to Gemini with the same compact source-grounded user and system prompts', () => {
   const out = patchPhase15RuntimeSource(fixture());
   assert.match(out, /OpenAI provider unavailable; using source-grounded Gemini fallback/);
   assert.match(out, /providerUnavailable/);
   assert.match(out, /if \(!GEMINI_API_KEY \|\| !providerUnavailable\) throw e/);
   assert.match(out, /userContent = buildOpenAICompactUser\(userContent\)/);
-  assert.match(out, /no credits remaining/);
+  assert.match(out, /sourceGroundedGeminiFallback = true/);
+  assert.match(out, /sourceGroundedGeminiFallback \? null : await getEngineCacheName\(\)/);
+  assert.match(out, /systemInstruction: sourceGroundedGeminiFallback \? OPENAI_COMPACT_DEVELOPER : ENGINE/);
 });
