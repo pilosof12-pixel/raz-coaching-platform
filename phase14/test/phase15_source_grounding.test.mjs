@@ -1,6 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { sourceRoutingTerms, isEnduranceRelevant, retrieveCuratedCoachingExcerpts, canonicalExerciseCatalog, buildPhase15SourceGrounding } from '../engine/phase15_source_router.js';
+import { EXERCISE_DICTIONARY, EXERCISE_EQUIPMENT_REQUIREMENTS, normalizeEquipmentTokens } from '../engine/exercise_dictionary.js';
 
 const pad = 'General authored coaching reference about recovery and programming. '.repeat(900);
 const engine = '# EXPANDED KNOWLEDGE LAYER (v10.9)\n\n' +
@@ -66,6 +67,25 @@ test('canonical catalog is closed-set from supplied dictionary', () => {
   assert.match(out, /Reverse Lunge/);
   assert.match(out, /Ring Push-up/);
   assert.doesNotMatch(out, /Step Back Lunge/);
+});
+
+test('triathlon catalog exposes true event modalities instead of hiding them behind generic machines', () => {
+  for (const name of ['Run','Bike','Swim','Rowing Ergometer']) assert.equal(EXERCISE_DICTIONARY.has(name), true);
+  const out = canonicalExerciseCatalog(EXERCISE_DICTIONARY, {
+    primary_goals:['Improve Olympic-distance triathlon swim bike run performance'],
+    equipment:'Pool access, road bike, running routes',
+  });
+  assert.match(out, /\bRun\b/);
+  assert.match(out, /\bBike\b/);
+  assert.match(out, /\bSwim\b/);
+});
+
+test('event modality vocabulary keeps real equipment gates', () => {
+  assert.deepEqual(EXERCISE_EQUIPMENT_REQUIREMENTS.get('Bike'), ['bike']);
+  assert.deepEqual(EXERCISE_EQUIPMENT_REQUIREMENTS.get('Swim'), ['pool']);
+  assert.deepEqual(EXERCISE_EQUIPMENT_REQUIREMENTS.get('Rowing Ergometer'), ['rower']);
+  const tokens=normalizeEquipmentTokens('Pool access, road bike with power meter, Concept2 rower');
+  for(const token of ['pool','bike','rower']) assert.equal(tokens.has(token),true);
 });
 
 test('grounding block contains sources and routed canonical catalog', () => {
