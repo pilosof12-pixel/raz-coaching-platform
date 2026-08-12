@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { sourceRoutingTerms, retrieveCuratedCoachingExcerpts, canonicalExerciseCatalog, buildPhase15SourceGrounding } from '../engine/phase15_source_router.js';
+import { sourceRoutingTerms, isEnduranceRelevant, retrieveCuratedCoachingExcerpts, canonicalExerciseCatalog, buildPhase15SourceGrounding } from '../engine/phase15_source_router.js';
 
 const pad = 'General authored coaching reference about recovery and programming. '.repeat(900);
 const engine = '# EXPANDED KNOWLEDGE LAYER (v10.9)\n\n' +
@@ -15,6 +15,16 @@ const warrior = {
   notes: 'Batman warrior style with jumps and sprints',
 };
 
+const annoyingHybrid = {
+  primary_goals: ['Back squat 200 kg', 'Weighted chin-up +70 kg for 3 reps'],
+  secondary_goals: ['Improve 5 km from 25:00 to 22:30'],
+  current_numbers: ['Back squat 170x3', 'Weighted chin-up +55x3', '5K 25:00'],
+  sport: 'MMA and BJJ',
+  sport_schedule: ['Mon hard MMA', 'Wed moderate BJJ', 'Fri hard MMA', 'Sat moderate BJJ'],
+  days_per_week: 4,
+  notes: 'Strength and 5K both matter. Recovery is average.',
+};
+
 test('source router expands relevant Warrior terms', () => {
   const terms = sourceRoutingTerms(warrior);
   for (const wanted of ['hypertrophy', 'weighted calisthenics', 'power', 'plyometric', 'rings']) assert.ok(terms.includes(wanted));
@@ -25,6 +35,29 @@ test('source router retrieves authored relevant excerpts', () => {
   assert.match(out, /WEIGHTED CALISTHENICS/i);
   assert.match(out, /POWER AND PLYOMETRIC/i);
   assert.match(out, /HYPERTROPHY AND VOLUME/i);
+});
+
+test('5K plus strength plus combat intake activates endurance cluster without crowding out RAZ base', () => {
+  assert.equal(isEnduranceRelevant(annoyingHybrid), true);
+  const terms = sourceRoutingTerms(annoyingHybrid);
+  for (const wanted of ['running', 'event specific', 'concurrent training', 'combat']) assert.ok(terms.includes(wanted));
+  const out = retrieveCuratedCoachingExcerpts(engine, annoyingHybrid);
+  assert.match(out, /ENDURANCE CLUSTER SOURCE EXCERPT/);
+  assert.match(out, /RAZ BASE SOURCE EXCERPT/);
+  assert.match(out, /running|5K|event specific|economy|threshold/i);
+  assert.match(out, /concurrent|combat|recovery|interference/i);
+});
+
+test('marathon, rowing and multisport language activates dedicated source routing', () => {
+  for (const intake of [
+    { primary_goals:['Marathon performance'] },
+    { primary_goals:['Improve 2K rowing time'] },
+    { primary_goals:['Ironman triathlon'] },
+  ]) {
+    assert.equal(isEnduranceRelevant(intake), true);
+    const out = retrieveCuratedCoachingExcerpts(engine, intake);
+    assert.match(out, /ENDURANCE CLUSTER SOURCE EXCERPT/);
+  }
 });
 
 test('canonical catalog is closed-set from supplied dictionary', () => {
@@ -40,8 +73,6 @@ test('grounding block contains sources and routed canonical catalog', () => {
   const out = buildPhase15SourceGrounding(engine, warrior, dict);
   assert.match(out, /CURATED COACHING SOURCE EXCERPTS/);
   assert.match(out, /CANONICAL EXERCISE CATALOG/);
-  // warrior now explicitly contains a lower-body goal, so lunge-family routing
-  // should include the canonical Reverse Lunge without inventing an alias.
   assert.match(out, /Reverse Lunge/);
   assert.doesNotMatch(out, /Step Back Lunge/);
 });
