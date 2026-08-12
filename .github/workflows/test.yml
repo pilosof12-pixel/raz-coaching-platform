@@ -80,7 +80,13 @@ jobs:
           grep -q "cells\[6\] = 'N/A'" phase14/server.phase15.js
           grep -q 'OpenAI provider unavailable; using source-grounded Gemini fallback' phase14/server.phase15.js
           grep -q 'ELITE-GUARDRAILS-FINAL-QA-WIRED' phase14/engine/phase15_program_qa.js
+          grep -q 'ENDURANCE-PRESERVATION-FINAL-QA-WIRED' phase14/engine/phase15_program_qa.js
+          grep -q 'EXACT-PRIMARY-MOVEMENT-FINAL-QA-WIRED' phase14/engine/phase15_program_qa.js
           grep -q 'EXACT-VARIATION-KEY' phase14/engine/phase15_elite_guardrails.js
+          grep -q 'TARGET_MODALITY_EXPOSURE_REDUCED' phase14/engine/phase15_elite_guardrails.js
+          grep -q 'EVENT_PROGRESSING_SESSION_MISSING' phase14/engine/phase15_elite_guardrails.js
+          grep -q 'ENDURANCE-MODALITY-CANONICAL-SET' phase14/engine/exercise_dictionary.js
+          grep -q 'ENDURANCE-MODALITY-CATALOG-ROUTING' phase14/engine/phase15_source_router.js
           grep -q 'clarification-controls.js' phase14/public/index.html
           grep -q 'launch-controls.js' phase14/public/index.html
           grep -q 'launch-mobile.css' phase14/public/index.html
@@ -92,7 +98,7 @@ jobs:
         run: |
           git config user.name 'RAZ regression bot'
           git config user.email 'actions@users.noreply.github.com'
-          git add phase14/server.js phase14/scripts/build_phase15_runtime.mjs phase14/engine/phase15_program_qa.js phase14/engine/phase15_elite_guardrails.js
+          git add phase14/server.js phase14/scripts/build_phase15_runtime.mjs phase14/engine/phase15_program_qa.js phase14/engine/phase15_elite_guardrails.js phase14/engine/exercise_dictionary.js phase14/engine/phase15_source_router.js
           if git diff --cached --quiet; then echo 'No source patch to commit'; exit 0; fi
           git commit -m 'Apply source-aligned Phase 15 integrity guardrails'
           git push origin HEAD:${TARGET_BRANCH}
