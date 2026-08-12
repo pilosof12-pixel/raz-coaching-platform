@@ -36,5 +36,35 @@ export function patchPhase15RuntimeSource(input) {
   const sprintCount = s.split(oldSprint).length - 1;
   if (sprintCount === 1) s = s.replace(oldSprint, newSprint);
 
+  // The compact Phase-15 provider originally short-circuited whenever an OpenAI
+  // key existed, so a quota/outage/timeout error never reached the existing Gemini
+  // path. Restore fallback only for provider-availability failures. Crucially, pass
+  // the SAME compact deterministic skeleton + curated source grounding into Gemini;
+  // do not fall back to an unsourced generic prompt. Internal source/validation
+  // errors are deliberately re-thrown instead of being masked by provider fallback.
+  const providerAnchor = [
+    '    } finally {',
+    '      clearTimeout(timer);',
+    '    }',
+    '  }',
+    '  if (USE_PPLX_PROXY) {',
+  ].join('\n');
+  const providerCount = s.split(providerAnchor).length - 1;
+  if (providerCount !== 1) throw new Error(`Expected one OpenAI provider-finally anchor, found ${providerCount}`);
+  const providerReplacement = [
+    '    } catch (e) {',
+    "      const providerMessage = String(e?.message || e || '');",
+    "      const providerUnavailable = e?.name === 'AbortError' || /(no credits remaining|insufficient[_ -]?quota|quota|rate limit|too many requests|\\b429\\b|\\b5\\d\\d\\b|temporar|timeout|timed out|service unavailable|overloaded)/i.test(providerMessage);",
+    '      if (!GEMINI_API_KEY || !providerUnavailable) throw e;',
+    "      console.warn('OpenAI provider unavailable; using source-grounded Gemini fallback:', providerMessage);",
+    '      userContent = buildOpenAICompactUser(userContent);',
+    '    } finally {',
+    '      clearTimeout(timer);',
+    '    }',
+    '  }',
+    '  if (USE_PPLX_PROXY) {',
+  ].join('\n');
+  s = s.replace(providerAnchor, providerReplacement);
+
   return s;
 }
