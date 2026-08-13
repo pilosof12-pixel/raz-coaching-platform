@@ -53,6 +53,7 @@ jobs:
           node --check phase14/engine/phase15_runtime_patches.js
           node --check phase14/engine/phase15_program_qa.js
           node --check phase14/engine/phase15_elite_guardrails.js
+          node --check phase14/engine/phase15_final_qa.js
           node --check phase14/intake_clarification.js
           node --check phase14/public/clarification-controls.js
           node --test phase14/test/phase15_source_grounding.test.mjs
@@ -60,12 +61,14 @@ jobs:
           node --test phase14/test/intake_clarification.test.mjs
           node --test phase14/test/phase15_goal_specificity.test.mjs
           node --test phase14/test/phase15_elite_guardrails.test.mjs
+          node --test phase14/test/phase15_final_qa.test.mjs
           node --test phase14/test/final_normalization.test.js
           node --test phase14/test/final_pipeline_lock.test.js
           grep -q 'PRODUCTION-RUNTIME-PATCH-WIRED' phase14/scripts/build_phase15_runtime.mjs
           grep -q 'FINAL-LIVE-ALIAS-SET' phase14/engine/exercise_dictionary.js
           grep -q 'RUN-EVENT-PREFIX-NORMALIZATION' phase14/engine/exercise_dictionary.js
           grep -q 'ENDURANCE-TSV-FIELD-CONTRACT' phase14/engine/phase15_runtime_patches.js
+          grep -q 'DEMO-COVERAGE-ADVISORY-NOT-BLOCKING' phase14/engine/phase15_final_qa.js
           node phase14/scripts/build_phase15_runtime.mjs
           node phase14/scripts/final_pipeline_lock.mjs
           # Production parity: apply the same normalization before build, build once,
@@ -127,7 +130,7 @@ jobs:
         run: |
           git config user.name 'RAZ regression bot'
           git config user.email 'actions@users.noreply.github.com'
-          git add phase14/server.js phase14/scripts/build_phase15_runtime.mjs phase14/engine/phase15_program_qa.js phase14/engine/phase15_elite_guardrails.js phase14/engine/exercise_dictionary.js phase14/engine/phase15_source_router.js phase14/engine/phase15_runtime_patches.js
+          git add phase14/server.js phase14/scripts/build_phase15_runtime.mjs phase14/engine/phase15_program_qa.js phase14/engine/phase15_elite_guardrails.js phase14/engine/phase15_final_qa.js phase14/engine/exercise_dictionary.js phase14/engine/phase15_source_router.js phase14/engine/phase15_runtime_patches.js
           if git diff --cached --quiet; then echo 'No source patch to commit'; exit 0; fi
           git commit -m 'Apply source-aligned Phase 15 integrity guardrails'
           git push origin HEAD:${TARGET_BRANCH}
