@@ -1,0 +1,37 @@
+name: Apply Phase 15 quality correction retry
+
+on:
+  push:
+    branches:
+      - privacy-security-hardening
+    paths:
+      - qa/phase15-quality-retry-trigger.txt
+
+permissions:
+  contents: write
+
+jobs:
+  apply-quality-retry:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: privacy-security-hardening
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: node scripts/apply_phase15_quality_retry.mjs
+      - name: Validate quality correction path
+        run: |
+          node --check phase14/server.js
+          node --check phase14/scripts/build_phase15_runtime.mjs
+          node --test test/phase15_quality_retry.test.js
+          cd phase14 && npm run phase15:build && node --check server.phase15.js
+      - name: Commit tested source patch
+        run: |
+          git config user.name 'RAZ regression bot'
+          git config user.email 'actions@users.noreply.github.com'
+          git add phase14/server.js phase14/engine/exercise_dictionary.js phase14/scripts/build_phase15_runtime.mjs
+          if git diff --cached --quiet; then echo 'No source changes'; exit 0; fi
+          git commit -m 'Regenerate source-grounded programs after Phase 15 quality misses'
+          git push origin HEAD:privacy-security-hardening
