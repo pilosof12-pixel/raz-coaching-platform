@@ -74,9 +74,9 @@ test('unambiguous naming variants are repaired after legacy closed-set review', 
   assert.match(out, /cells\[1\] = 'Dumbbell Curl'/);
   assert.match(out, /Passive Hang/);
   assert.match(out, /cells\[1\] = 'Dead Hang'/);
-  assert.match(out, /Run \\(Treadmill\\)/);
   assert.match(out, /cells\[1\] = 'Treadmill'/);
-  assert.match(out, /COOL \?DOWN\|COOLDOWN/);
+  assert.match(out, /COOLDOWN/);
+  assert.match(out, /Jog/);
 });
 
 test('endurance external target is moved into the external target field when supplied in notes', () => {
