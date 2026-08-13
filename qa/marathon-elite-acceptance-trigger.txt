@@ -1,6 +1,0 @@
-Marathon elite acceptance hardening
-2026-08-13
-Apply current-volume Week 1 anchor and all-week TSV row-shape validation.
-Keep the existing single-lever progression, copy-forward correction semantics and maintenance hierarchy.
-Reject a Week 1 running total above an explicitly supplied current km/week baseline.
-Reject any physical TSV row that does not contain exactly nine cells.
