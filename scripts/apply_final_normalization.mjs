@@ -28,6 +28,15 @@ if (!d.includes('["Jog/Walk", "Run"]')) {
   d = d.replace(anchor, anchor + '\n  ["Jog/Walk", "Run"],\n  ["Walk/Jog", "Run"],\n  ["Easy Jog/Walk", "Run"],\n  ["Easy Walk/Jog", "Run"], // STRUCTURAL-COOLDOWN-ALIASES');
 }
 
+// Run warm-up/cool-down describes the purpose of a canonical Run row. Keep this
+// closed to the observed presentation variants so arbitrary suffixes are not
+// accepted as exercise names.
+if (!d.includes('RUN-PURPOSE-SUFFIX-ALIASES')) {
+  const anchor = '  ["Easy Walk/Jog", "Run"], // STRUCTURAL-COOLDOWN-ALIASES';
+  if (!d.includes(anchor)) throw new Error('structural cooldown alias anchor missing');
+  d = d.replace(anchor, anchor + '\n  ["Run Cool-down", "Run"],\n  ["Run Cooldown", "Run"],\n  ["Run Warm-up", "Run"],\n  ["Run Warmup", "Run"], // RUN-PURPOSE-SUFFIX-ALIASES');
+}
+
 // Controlled leading descriptors are presentation/load descriptors, not new
 // exercise inventions, when the exact base movement already exists canonically.
 // Exact canonical weighted movements still win before this fallback.
