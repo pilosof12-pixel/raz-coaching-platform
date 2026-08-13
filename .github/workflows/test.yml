@@ -45,7 +45,7 @@ jobs:
           node --check scripts/apply_final_runtime_integration.mjs
           node --check phase14/server.js
           node --check phase14/scripts/build_phase15_runtime.mjs
-          node --check phase14/scripts/postprocess_phase15_runtime.mjs
+          node --check phase14/scripts/final_pipeline_lock.mjs
           node --check phase14/scripts/apply_launch_runtime.mjs
           node --check phase14/engine/phase15_source_router.js
           node --check phase14/engine/phase15_runtime_patches.js
@@ -58,12 +58,13 @@ jobs:
           node --test phase14/test/intake_clarification.test.mjs
           node --test phase14/test/phase15_goal_specificity.test.mjs
           node --test phase14/test/phase15_elite_guardrails.test.mjs
+          node --test phase14/test/final_pipeline_lock.test.js
           grep -q 'PRODUCTION-RUNTIME-PATCH-WIRED' phase14/scripts/build_phase15_runtime.mjs
           grep -q 'FINAL-LIVE-ALIAS-SET' phase14/engine/exercise_dictionary.js
           grep -q 'ENDURANCE-TSV-FIELD-CONTRACT' phase14/engine/phase15_runtime_patches.js
           node phase14/scripts/build_phase15_runtime.mjs
-          # Production parity: build_phase15_runtime.mjs now owns runtime patching.
-          # Do not run postprocess_phase15_runtime.mjs here a second time.
+          node phase14/scripts/final_pipeline_lock.mjs
+          # Production parity: build once, then apply the final fail-closed pipeline lock.
           node phase14/scripts/apply_launch_runtime.mjs
           node --check phase14/server.phase15.js
           node --check phase14/server_secure.js
@@ -85,6 +86,12 @@ jobs:
           grep -q 'CANONICAL EXERCISE CATALOG' phase14/server.phase15.js
           grep -q 'buildPhase15SourceGrounding(ENGINE, intake, EXERCISE_DICTIONARY)' phase14/server.phase15.js
           grep -q 'source-aligned: only explicit density goals require density rows' phase14/server.phase15.js
+          grep -q 'LEGACY-FORMULA-SCOPE-NARROWED' phase14/server.phase15.js
+          grep -q 'SERVER-OWNED-FORMULA-MARKER' phase14/server.phase15.js
+          grep -q 'FINAL-QA-REGEN-BUDGET' phase14/server.phase15.js
+          grep -q 'PHASE15-FINAL-QA-RETRIABLE' phase14/server.phase15.js
+          grep -q 'FINAL-QA-FAIL-CLOSED' phase14/server.phase15.js
+          grep -q 'SAVE-BOUNDARY-FINAL-QA' phase14/server.phase15.js
           grep -q "cells\[6\] = 'N/A'" phase14/server.phase15.js
           grep -q 'SOURCE-LABEL-CLIENT-SCRUB' phase14/server.phase15.js
           grep -q 'ENDURANCE TARGET ANCHOR' phase14/server.phase15.js
