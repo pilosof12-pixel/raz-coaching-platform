@@ -54,6 +54,39 @@ export function demoCoverageAdvisories(program) {
   return [...missing];
 }
 
+function marathonStackedProgressionFlags(program,intake={}) {
+  const goals=[...(Array.isArray(intake.primary_goals)?intake.primary_goals:[]),...(Array.isArray(intake.secondary_goals)?intake.secondary_goals:[])].map(String).join(' | ');
+  if(!/\bmarathon\b/i.test(goals)) return [];
+  const weekMetrics=[];
+  for(let week=1;week<=4;week++) {
+    const p=parseWeek(program,week); if(!p) continue;
+    const e=p.idx.exercise,r=p.idx.reps,s=p.idx.sets,n=p.idx.notes;
+    let quality=0,easy=0,long=0;
+    for(const row of p.rows) {
+      const ex=String(row[e]||'');
+      if(!/\brun(?:ning)?\b/i.test(ex)) continue;
+      const note=n>=0?String(row[n]||''):'';
+      const dose=String(r>=0?row[r]||'':'')+' '+note;
+      const m=dose.match(/\b(\d+(?:\.\d+)?)\s*km\b/i);
+      if(!m) continue;
+      const km=Number(m[1]) * Math.max(1,Number(row[s]||1)||1);
+      if(/\blong(?:[- ]run)?\b|long aerobic|endurance run/i.test(note)) long+=km;
+      else if(/\binterval|quality|threshold|tempo|race pace|target pace|marathon pace\b/i.test(note)) quality+=km;
+      else if(/\beasy|zone\s*[- ]?2|conversational|recovery/i.test(note)||/^\s*\[WARMUP\]/i.test(ex)) easy+=km;
+    }
+    weekMetrics.push({week,quality,easy,long});
+  }
+  const flags=[];
+  for(let i=1;i<weekMetrics.length;i++) {
+    const a=weekMetrics[i-1],b=weekMetrics[i];
+    if(b.quality>a.quality && b.easy>a.easy && b.long>a.long) flags.push({
+      code:'MARATHON_STACKED_VOLUME_PROGRESSION',
+      message:'Week '+b.week+' simultaneously increases quality-session distance, routine easy-run distance and long-run distance versus Week '+a.week+'. The authored endurance framework says progress the smallest useful variable inside the recovery budget; choose the main progression lever and hold lower-priority volume stable rather than stacking every volume source at once.'
+    });
+  }
+  return flags;
+} // MARATHON-STACKED-PROGRESSION-QA
+
 export function validatePhase15FinalProgram(program, intake={}) {
   let baseResult={ok:true,flags:[]};
   try {
@@ -77,6 +110,9 @@ export function validatePhase15FinalProgram(program, intake={}) {
     const flags=endurancePerformanceIntegrityFlags(program,intake,parsed);
     if(flags.length) throw new Phase15QualityError(flags.map(flag=>({...flag,message:'Week '+week+': '+flag.message})));
   } // ENDURANCE-ALL-WEEKS-FINAL-QA
+
+  const marathonProgressionFlags=marathonStackedProgressionFlags(program,intake);
+  if(marathonProgressionFlags.length) throw new Phase15QualityError(marathonProgressionFlags);
 
   // Direct demo links are supplemental UI metadata, not a coaching-safety gate.
   // The browser resolver remains direct-only: when no curated URL exists it
