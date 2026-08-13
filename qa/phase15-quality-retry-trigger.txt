@@ -1,3 +1,0 @@
-Phase 15 quality correction retry trigger
-2026-08-13
-Make coaching-quality QA failures regenerate from source-grounded amendments rather than return immediately or use deterministic coaching substitutions.
