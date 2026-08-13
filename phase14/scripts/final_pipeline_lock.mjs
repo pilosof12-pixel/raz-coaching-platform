@@ -10,12 +10,13 @@ export function lockFinalPipelineSource(input) {
     s = s.replace(find, replace);
   }
 
-  // One model call remains the normal path. A second call is allowed only when
-  // deterministic coaching QA rejects the first result and supplies a correction
-  // amendment. This prevents a failed QA attempt from becoming a delivered plan.
+  // One model call remains the normal path. Up to two additional calls are
+  // available only when deterministic QA rejects the result. This lets a
+  // correction that accidentally breaks another already-satisfied constraint be
+  // repaired once more, while the final attempt still fails closed.
   once(
     '  const MAX_ATTEMPTS = OPENAI_API_KEY ? 1 : 3;',
-    '  const MAX_ATTEMPTS = OPENAI_API_KEY ? 2 : 3; // FINAL-QA-REGEN-BUDGET',
+    '  const MAX_ATTEMPTS = OPENAI_API_KEY ? 3 : 3; // FINAL-QA-REGEN-BUDGET',
     'OpenAI attempt budget'
   );
 
@@ -29,10 +30,11 @@ export function lockFinalPipelineSource(input) {
   const phase15Handling = [
     progressAnchor,
     '        if (err.code === "PHASE15_QUALITY_VIOLATION") {',
-    '          // Final coaching QA is not a hard-substitution problem. Feed its',
-    '          // source-aligned amendment back to the model once; if the final',
-    '          // attempt still fails, reject the build rather than delivering it.',
-    '          if (err.amendment && !amendments.includes(err.amendment)) amendments.push(err.amendment);',
+    '          // Final coaching QA is not a hard-substitution problem. Feed a',
+    '          // correction-only amendment back to the model, while explicitly',
+    '          // preserving every constraint that the prior attempt already met.',
+    '          const correction = String(err.amendment || "") + "\\nCORRECTION SCOPE HARD RULE: make the smallest surgical changes needed to fix the listed QA failures. Preserve every already-satisfied deterministic skeleton requirement, named primary/secondary goal exposure, requested strength day, pain-aware substitution, sport/recovery constraint, equipment constraint and valid progression from the prior attempt. Do not redesign the program around the latest flag or delete previously correct work.";',
+    '          if (correction.trim() && !amendments.includes(correction)) amendments.push(correction); // SURGICAL-QA-CORRECTION-SCOPE',
     '          if (attempt < MAX_ATTEMPTS) continue;',
     '          throw err; // FINAL-QA-FAIL-CLOSED',
     '        }',
@@ -59,5 +61,5 @@ if (process.argv[1] && fileURLToPath(new URL(`file://${process.argv[1]}`)) === s
   const before = fs.readFileSync(runtimePath, 'utf8');
   const after = lockFinalPipelineSource(before);
   fs.writeFileSync(runtimePath, after);
-  console.log('Phase15 final pipeline locked: QA regeneration + fail-closed save boundary');
+  console.log('Phase15 final pipeline locked: surgical QA regeneration + fail-closed save boundary');
 }
