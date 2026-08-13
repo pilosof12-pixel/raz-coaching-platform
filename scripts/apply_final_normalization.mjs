@@ -13,6 +13,15 @@ if (!d.includes('COOLDOWN-PREFIX-NORMALIZATION')) {
   d = d.replace(anchor, anchor + '\n  s = s.replace(/^\\[(?:COOL[- ]?DOWN|COOLDOWN)\\]\\s*(?:easy\\s+)?/i, ""); // COOLDOWN-PREFIX-NORMALIZATION');
 }
 
+// A distance prefix such as "5 km Run" describes the event/dose, not a new
+// exercise identity. Normalize only numeric distance + Run; do not generalize
+// this to arbitrary sport labels or free-form exercise names.
+if (!d.includes('RUN-EVENT-PREFIX-NORMALIZATION')) {
+  const anchor = '  s = s.replace(/^\\[(?:COOL[- ]?DOWN|COOLDOWN)\\]\\s*(?:easy\\s+)?/i, ""); // COOLDOWN-PREFIX-NORMALIZATION';
+  if (!d.includes(anchor)) throw new Error('cooldown normalization anchor missing');
+  d = d.replace(anchor, anchor + '\n  s = s.replace(/^\\d+(?:\\.\\d+)?\\s*(?:km|k|m)\\s+(?=run\\b)/i, ""); // RUN-EVENT-PREFIX-NORMALIZATION');
+}
+
 if (!d.includes('["Jog/Walk", "Run"]')) {
   const anchor = '  ["Cooldown Jog/Walk", "Run"],';
   if (!d.includes(anchor)) throw new Error('run cooldown alias anchor missing');
