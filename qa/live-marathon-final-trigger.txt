@@ -1,9 +1,9 @@
 Final marathon coaching acceptance
 2026-08-13
-Rerun after elite acceptance hardening.
+Run on strengthened acceptance head d61ca45f67616b47b805cfea48a9275cd88f6305.
 Valid fixture uses days_per_week=2.
 Current weekly volume is the starting workload anchor.
-Quality work cannot progress pace and accumulated work together in one transition.
-Across the week, only one main running category may progress per transition.
+Quality work must change pace/intensity OR accumulated work, never both in one transition.
+Across the week, exactly one main running category may progress per transition and non-selected categories copy forward unchanged.
 Strength maintenance must remain supportive and recoverable rather than becoming a progressive lower-body hypertrophy block.
 QA runner observes up to 15 minutes so server correction retries can finish.
