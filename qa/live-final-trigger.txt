@@ -1,6 +1,6 @@
 Final live acceptance trigger
 2026-08-13
-Target: Avatar 3 + annoying concurrent only
-Production-parity head: 1abc4d6e2631e83c615a87be8666c9232b4457d6
-CI: 31667384048 PASS
-Demo coverage: advisory, direct links only
+Target: annoying concurrent only
+Source-grounded low-intensity pace integrity: enabled
+CI: 31668134379 PASS
+Production source head before trigger: c5d2f0023c46c11eb58f5db0b2ac49c06a7d1d23
