@@ -217,6 +217,13 @@ const ALIAS_LIST = [
   ["Chest Supported DB Row", "Chest-Supported Row"],
   ["Chest-Supported DB Row", "Chest-Supported Row"],
   ["Dumbbell Hammer Curl", "Hammer Curl"],
+  ["Zone-2 Rower", "Zone-2 Row"],
+  ["Bicep Curl", "Dumbbell Curl"],
+  ["Bicep Curl (Dumbbell)", "Dumbbell Curl"],
+  ["Passive Hang", "Dead Hang"],
+  ["Swimming", "Swim"],
+  ["Cycling", "Bike"],
+  ["Running", "Run"], // ENDURANCE-LIVE-ALIAS-SET
   ["DB Overhead Press", "Dumbbell Overhead Press"],
   ["Dumbbell OHP", "Dumbbell Overhead Press"],
   ["DB Floor Press", "Dumbbell Floor Press"],

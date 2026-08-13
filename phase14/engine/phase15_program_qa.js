@@ -124,7 +124,7 @@ export function hasSpecificModalityExposure(program, intake = {}) {
   if (!req || req.externalSatisfied) return true;
   const parsed = parseBlock(program);
   if (!parsed) return false;
-  const e = parsed.idx.exercise, notes = parsed.idx.notes, reps = parsed.idx.reps, weight = parsed.idx.weight;
+  const e = parsed.idx.exercise, notes = parsed.idx.notes, reps = parsed.idx.reps, weight = parsed.idx.weight, sets = parsed.idx.sets;
   return parsed.rows.some(row => {
     const ex = row.cells[e] || '';
     if (/^\s*\[WARMUP\]/i.test(ex)) return false;
@@ -133,7 +133,8 @@ export function hasSpecificModalityExposure(program, intake = {}) {
     if (!req.exposure.test(ctx)) return false;
     const dose = `${reps >= 0 ? row.cells[reps] || "" : ""} ${weight >= 0 ? row.cells[weight] || "" : ""} ${note}`;
     const minuteValues = [...dose.matchAll(/(\d+(?:\.\d+)?)\s*(?:min|minutes?)\b/gi)].map(m => Number(m[1]));
-    const continuousEnough = minuteValues.some(n => n >= 15);
+    const setCount = Math.max(1, Number(sets >= 0 ? row.cells[sets] || 1 : 1) || 1);
+    const continuousEnough = minuteValues.some(n => n >= 15 || n * setCount >= 15); // MEANINGFUL-SPECIFIC-SETS-DURATION
     const distanceOrIntervals = /\b\d+(?:\.\d+)?\s*(?:km|m)\b/i.test(dose) || /\b\d+\s*(?:x|×)\s*\d+(?:\.\d+)?\s*(?:m|km|min|minutes?)\b/i.test(dose);
     return continuousEnough || distanceOrIntervals; // MEANINGFUL-SPECIFIC-DOSE
   });

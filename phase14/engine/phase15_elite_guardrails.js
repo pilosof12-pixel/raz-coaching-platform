@@ -103,7 +103,8 @@ function meaningfulModalityRows(parsed, def) {
     const ctx=`${ex} ${note}`; if(!def.exposure.test(ctx)) continue;
     const dose=`${r>=0?row.cells[r]||'':''} ${w>=0?row.cells[w]||'':''} ${note}`;
     const mins=[...dose.matchAll(/(\d+(?:\.\d+)?)\s*(?:min|minutes?)\b/gi)].map(m=>Number(m[1]));
-    const meaningful=mins.some(x=>x>=15)||/\b\d+(?:\.\d+)?\s*(?:km|m)\b/i.test(dose)||/\b\d+\s*(?:x|×)\s*\d+(?:\.\d+)?\s*(?:m|km|min|minutes?)\b/i.test(dose);
+    const setCount=Math.max(1,Number(row.cells[parsed.idx.sets]||1)||1);
+    const meaningful=mins.some(x=>x>=15||x*setCount>=15)||/\b\d+(?:\.\d+)?\s*(?:km|m)\b/i.test(dose)||/\b\d+\s*(?:x|×)\s*\d+(?:\.\d+)?\s*(?:m|km|min|minutes?)\b/i.test(dose); // MEANINGFUL-INTERVAL-SETS-DURATION
     if(meaningful) rows.push({row,day:row.cells[d]||'unknown',ctx,dose});
   }
   return rows;
@@ -111,7 +112,7 @@ function meaningfulModalityRows(parsed, def) {
 
 function eventProgressionBearing(item) {
   const s=`${item.ctx} ${item.dose}`;
-  return /(?:\b(?:interval|threshold|critical speed|critical power|race pace|goal pace|target pace|2k pace|3k pace|5k pace|10k pace|marathon pace|split target|stroke rate|cadence|power target|pace target)\b|\b\d+(?::\d+)?\s*\/\s*km\b|\b\d+(?:\.\d+)?\s*(?:km\/h|kph|watts?|w)\b|\bprogress(?:ion|ively)?\b)/i.test(s);
+  return /(?:\b(?:interval|threshold|critical speed|critical power|race pace|goal pace|target pace|2k pace|3k pace|5k pace|10k pace|marathon pace|split target|stroke rate|cadence|power target|pace target)\b|\b\d+:\d+(?:-\d+:\d+)?\s*\/\s*500m\b|\b\d+(?::\d+)?\s*\/\s*km\b|\b\d+(?:\.\d+)?\s*(?:km\/h|kph|watts?|w)\b|\bprogress(?:ion|ively)?\b)/i.test(s); // ROWING-500M-SPLIT-PROGRESSION
 }
 
 export function endurancePerformanceIntegrityFlags(program, intake={}, parsed=null) {
@@ -260,6 +261,17 @@ function explicitMovementAvoidance(intake,label) {
   return new RegExp(`(?:avoid|cannot|can't|not tolerated|do not|painful)[^.!]{0,60}${name}|${name}[^.!]{0,60}(?:aggravat|painful|not tolerated|avoid|cannot|can't)`, 'i').test(s);
 }
 
+function painSensitiveCloseVariation(intake,label,parsed=null) {
+  if (label!=='Back Squat') return false;
+  const s=JSON.stringify({pain:intake.pain,injuries:intake.injuries,limitations:intake.limitations,notes:intake.notes}).toLowerCase();
+  const mechanism=/(deep|depth|below parallel|high[- ]?volume|lumbar flexion|butt wink|range of motion|\brom\b)/i.test(s);
+  const boxTolerated=/(?:box squat[^.!]{0,70}(?:tolerat|comfortable|pain.?free)|(?:tolerat|comfortable|pain.?free)[^.!]{0,70}box squat)/i.test(s);
+  if(!(mechanism&&boxTolerated)) return false;
+  if(!parsed) return true;
+  const ex=parsed.idx.exercise;
+  return parsed.rows.some(row=>!/^\s*\[WARMUP\]/i.test(String(row.cells[ex]||''))&&/^Box Squat(?: to Parallel)?$/i.test(String(row.cells[ex]||'').trim()));
+} // PAIN-SENSITIVE-SQUAT-SUBSTITUTION
+
 export function exactPrimaryMovementFlags(program,intake={},parsed=null) {
   if(!parsed) return [];
   const primary=list(intake.primary_goals).map(String).join(' | ');
@@ -267,11 +279,12 @@ export function exactPrimaryMovementFlags(program,intake={},parsed=null) {
   const flags=[];
   for(const def of EXACT_PRIMARY_LIFTS) {
     if(!def.goal.test(primary)||explicitMovementAvoidance(intake,def.label)) continue;
+    const closePainVariation=painSensitiveCloseVariation(intake,def.label,parsed);
     const present=parsed.rows.some(row=>{
       const ex=String(row.cells[e]||'').trim();
       return !/^\s*\[WARMUP\]/i.test(ex)&&def.ex.test(ex);
     });
-    if(!present) flags.push({
+    if(!present && !closePainVariation) flags.push({
       code:'PRIMARY_EXACT_MOVEMENT_MISSING',
       message:`Primary goal names ${def.label}, but Week 1 contains no direct ${def.label} work and the intake does not explicitly prohibit that movement. A related variation may support the goal but cannot silently replace the exact primary movement; if pain requires temporary substitution, explain and stage that tradeoff explicitly.`
     });
@@ -316,6 +329,10 @@ export function elitePromptRules(intake={}) {
     if(/\d|\b(?:mile|3\s*k|5\s*k|10\s*k|half[- ]?marathon|marathon|erg|time trial|triathlon)\b/i.test(text)) rules.push(`EVENT-PROGRESSION INTEGRITY: '${text}' needs at least one progression-bearing ${def.key} session with an external event-relevant target (for example source-selected interval, pace, power, split, stroke-rate or equivalent prescription). A warm-up or generic easy session alone is not sufficient. The exact workout design must come from the curated sources, not generic model memory.`);
   }
   const primary=list(intake.primary_goals).map(String).join(' | ');
-  for(const def of EXACT_PRIMARY_LIFTS) if(def.goal.test(primary)&&!explicitMovementAvoidance(intake,def.label)) rules.push(`PRIMARY-MOVEMENT INTEGRITY: ${def.label} is named in a primary goal and is not explicitly prohibited by the intake. Keep direct ${def.label} exposure. Related variations may support it but cannot silently replace it.`);
+  for(const def of EXACT_PRIMARY_LIFTS) {
+    if(!def.goal.test(primary)||explicitMovementAvoidance(intake,def.label)) continue;
+    if(painSensitiveCloseVariation(intake,def.label)) rules.push(`PAIN-SENSITIVE SPECIFICITY: ${def.label} is the target, but the intake identifies an aggravating squat feature and explicitly tolerates a close box-squat variation. Preserve the squat-strength target with the closest tolerated source-supported variation rather than forcing the provocative feature.`);
+    else rules.push(`PRIMARY-MOVEMENT INTEGRITY: ${def.label} is named in a primary goal and is not explicitly prohibited by the intake. Keep direct ${def.label} exposure. Related variations may support it but cannot silently replace it.`);
+  }
   return rules;
 }
