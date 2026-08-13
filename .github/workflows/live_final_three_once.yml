@@ -1,15 +1,17 @@
-name: Final three unresolved live coaching cases
+name: Final unresolved live coaching acceptance
 
 on:
   push:
     branches:
       - privacy-security-hardening
+    paths:
+      - qa/live-final-trigger.txt
 
 permissions:
   contents: read
 
 jobs:
-  live-final-three:
+  live-final:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -18,14 +20,13 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 22
-      - name: Prepare final-three acceptance script
+      - name: Prepare final-two acceptance script
         run: |
           python - <<'PY'
           p='scripts/live_final_six_acceptance.mjs'
           s=open(p,encoding='utf-8').read()
           s=s.replace("const ambiguous={primary_goals:", "const ambiguous={experience:'advanced',primary_goals:", 1)
-          s=s.replace("const marathon={primary_goals:['Improve marathon from 4:05 to 3:40'],secondary_goals:['Maintain basic strength and stay durable'],maintenance_goals:[],goal_priority_model:'tiered_equal_primary',experience:'intermediate',days_per_week:1,", "const marathon={primary_goals:['Improve marathon from 4:05 to 3:40'],secondary_goals:['Maintain basic strength and stay durable'],maintenance_goals:[],goal_priority_model:'tiered_equal_primary',experience:'intermediate',days_per_week:2,", 1)
-          keep={'AVATAR3_WARRIOR','ANNOYING_CONCURRENT','MARATHON'}
+          keep={'AVATAR3_WARRIOR','ANNOYING_CONCURRENT'}
           lines=[]
           for line in s.splitlines():
               if line.startswith("results.push(await runCase('"):
@@ -33,9 +34,10 @@ jobs:
                   if name not in keep:
                       continue
               lines.append(line)
-          open('scripts/live_final_three.mjs','w',encoding='utf-8').write('\n'.join(lines)+'\n')
+          open('scripts/live_final_two.mjs','w',encoding='utf-8').write('\n'.join(lines)+'\n')
+          print('cases',sorted(keep))
           PY
       - name: Wait for Render deployment
         run: sleep 240
-      - name: Run final three live cases
-        run: node scripts/live_final_three.mjs
+      - name: Run final two live cases
+        run: node scripts/live_final_two.mjs
