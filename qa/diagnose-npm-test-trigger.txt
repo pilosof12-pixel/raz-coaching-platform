@@ -1,0 +1,2 @@
+Capture exact root npm test failure after marathon QA cleanup.
+2026-08-13
