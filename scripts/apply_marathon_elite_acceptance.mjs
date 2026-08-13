@@ -4,14 +4,17 @@ import { fileURLToPath } from 'node:url';
 const finalPath=fileURLToPath(new URL('../phase14/engine/phase15_final_qa.js',import.meta.url));
 let q=fs.readFileSync(finalPath,'utf8');
 
-const fnStart=q.indexOf('function marathonStackedProgressionFlags(program,intake={}) {');
+const fnMarker=q.includes('export function marathonStackedProgressionFlags(program,intake={}) {')
+  ? 'export function marathonStackedProgressionFlags(program,intake={}) {'
+  : 'function marathonStackedProgressionFlags(program,intake={}) {';
+const fnStart=q.indexOf(fnMarker);
 const fnEnd=q.indexOf('} // MARATHON-STACKED-PROGRESSION-QA',fnStart);
 if(fnStart<0||fnEnd<0) throw new Error('marathon progression function anchor missing');
 const fnEndFull=fnEnd+'} // MARATHON-STACKED-PROGRESSION-QA'.length;
 const replacement=`export function marathonStackedProgressionFlags(program,intake={}) {
   const goals=[...(Array.isArray(intake.primary_goals)?intake.primary_goals:[]),...(Array.isArray(intake.secondary_goals)?intake.secondary_goals:[])].map(String).join(' | ');
   if(!/\\bmarathon\\b/i.test(goals)) return [];
-  const paceSeconds=text=>{const m=String(text||'').match(/\\b(\\d{1,2}):([0-5]\\d)\\s*\\/\\s*km\\b/i);return m?Number(m[1])*60+Number(m[2]):null;};
+  const paceSeconds=text=>{const m=String(text||'').match(/\\b(\\d{1,2}):([0-5]\\d)\\s*\/\\s*km\\b/i);return m?Number(m[1])*60+Number(m[2]):null;};
   const maxMinutes=text=>{const a=[...String(text||'').matchAll(/\\b(\\d+(?:\\.\\d+)?)\\s*(?:min|minutes?)\\b/ig)].map(m=>Number(m[1]));return a.length?Math.max(...a):0;};
   const maxKm=text=>{const a=[...String(text||'').matchAll(/\\b(\\d+(?:\\.\\d+)?)\\s*km\\b/ig)].map(m=>Number(m[1]));return a.length?Math.max(...a):0;};
   const weekMetrics=[];
@@ -27,8 +30,6 @@ const replacement=`export function marathonStackedProgressionFlags(program,intak
       const sets=Math.max(1,Number(s>=0?row[s]||1:1)||1);
       const km=maxKm(dose)*sets;
       const minutes=maxMinutes(dose)*sets;
-      // Compare like-for-like dose dimensions. Distance is preferred when supplied;
-      // otherwise duration is the external-volume anchor for that row.
       const volume=km>0?km:minutes;
       if(/\\blong(?:[- ]run)?\\b|long aerobic|endurance run/i.test(note)) metric.long.volume+=volume;
       else if(/\\binterval|quality|threshold|tempo|race pace|target pace|marathon pace\\b/i.test(note)) {
@@ -108,7 +109,7 @@ const elitePath=fileURLToPath(new URL('../phase14/engine/phase15_elite_guardrail
 let e=fs.readFileSync(elitePath,'utf8');
 const old="For each build-week transition, choose ONE main running-volume progression lever: quality-session distance, routine easy-run distance/duration, or long-run distance/duration. Hold the other two categories stable rather than escalating them together. Week 1 should start near the documented current workload rather than creating a large step-change.";
 const neu="For each build-week transition, choose ONE main running progression lever. Within a quality session, do not increase both pace/intensity and accumulated work in the same transition. Across the week, do not progress quality work, routine easy volume and long-run volume together; hold the other running categories stable. Week 1 should start near the documented current workload rather than creating a large step-change.";
-if(!e.includes(neu)) {
+if(!e.includes(neu) && !e.includes('MARATHON SINGLE-LEVER HARD CONTRACT')) {
   if(!e.includes(old)) throw new Error('marathon prompt rule anchor missing');
   e=e.replace(old,neu);
 }
