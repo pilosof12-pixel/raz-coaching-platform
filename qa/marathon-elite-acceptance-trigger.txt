@@ -1,5 +1,6 @@
 Marathon elite acceptance hardening
 2026-08-13
+Rerun after hard-contract regression wording alignment.
 Apply contract strengthening only on the already-validated marathon guards.
 Use explicit copy-forward correction semantics and maintenance hierarchy.
 Catch quality sessions that progress both pace and accumulated work in the same transition.
