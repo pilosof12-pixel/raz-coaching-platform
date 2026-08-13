@@ -127,9 +127,13 @@ export function buildDeterministicBrief(intake = {}) {
     forbidden.push('Freestanding HSPU volume that steals recovery/session time from strict OHP when HSPU is explicitly nice-to-have.');
   }
 
-  const zone2Goal = /zone\s*2|aerobic|day.to.day energy|conditioning/i.test(`${secondary} ${maintenance} ${notes}`);
+  // Source-grounded aerobic-base routing. Do not infer a Zone-2 goal from a
+  // restriction sentence such as "avoid hard conditioning", and do not hard-code
+  // a universal two-session dose. The endurance knowledge layer owns frequency,
+  // duration and modality selection.
+  const zone2Goal = /zone\s*2|aerobic(?:\s+base)?|day.to.day energy/i.test(`${secondary} ${maintenance}`); // SOURCE-ROUTED-ZONE2-GOAL
   if (zone2Goal) {
-    required.push('Two meaningful low-fatigue Zone 2 exposures using canonical Zone-2 Bike or Zone-2 Row, roughly 20-35 minutes each. A 10-12 minute mini-dose does not satisfy this aerobic-base goal.');
+    required.push('Explicit aerobic-base / Zone 2 goal: include meaningful low-intensity work, but choose frequency, duration and modality from the curated endurance sources and the athlete recovery budget rather than a universal fixed dose.');
     forbidden.push('Unrequested hard intervals, threshold, VO2, AMRAP, sprints or hard running when combat sport already supplies high-intensity conditioning.');
   }
 
@@ -155,7 +159,7 @@ export function buildDeterministicBrief(intake = {}) {
   if (squatDual) labels.push('BOX_SQUAT_REP','BOX_SQUAT_HEAVY'); else if (squatGoal) labels.push('SQUAT_SPECIFIC');
   if (oapGoal && oap!=null && oap>=2) labels.push('OAP_ASSISTED_ADVANCED','OAP_STRICT'); else if (oapGoal) labels.push('OAP_SPECIFIC');
   if (strictOhpGoal) labels.push('OHP_DIRECT','OHP_SECONDARY_VARIATION');
-  if (zone2Goal) labels.push('ZONE2_A','ZONE2_B');
+  if (zone2Goal) labels.push('AEROBIC_BASE_SOURCE_SELECTED'); // no universal frequency floor
   const sessions=distribute(days,labels), cleanDays=days.filter(d=>!sport[d]);
   if (squatDual && cleanDays.length) { const d=cleanDays.at(-1); for (const x of days) sessions[x]=sessions[x].filter(v=>v!=='BOX_SQUAT_HEAVY'); sessions[d].unshift('BOX_SQUAT_HEAVY'); }
   if (oapGoal && oap!=null && oap>=2 && cleanDays.length) { const d=cleanDays[0]; for (const x of days) sessions[x]=sessions[x].filter(v=>v!=='OAP_STRICT'); sessions[d].unshift('OAP_STRICT'); }

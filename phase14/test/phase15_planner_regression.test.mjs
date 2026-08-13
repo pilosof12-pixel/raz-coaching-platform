@@ -91,15 +91,15 @@ test('all four gym days remain strength days and aerobic work stays low fatigue'
     assert.ok(line, `missing ${day}`);
     assert.ok(!/^\* \w+: ZONE2_[AB];/.test(line), `${day} collapsed to cardio only`);
   }
-  assert.match(brief, /20-35 minutes each/);
-  assert.match(brief, /10-12 minute mini-dose does not satisfy/);
+  assert.match(brief, /choose frequency, duration and modality from the curated endurance sources/i);
+  assert.doesNotMatch(brief, /20-35 minutes each|Two meaningful low-fatigue Zone 2 exposures/i);
   assert.match(brief, /Unrequested hard intervals/);
 });
 
 test('client-facing exercise naming has no review path in the brief', () => {
   assert.match(brief, /Never output \[REVIEW\], support messages or placeholder exercise rows/);
   assert.match(brief, /Overhead Press/);
-  assert.match(brief, /Zone-2 Bike/);
+  assert.match(brief, /aerobic-base \/ Zone 2 goal/i);
   assert.match(brief, /Assisted One-Arm Pull-up/);
   assert.match(brief, /Box Squat to Parallel/);
   assert.match(brief, /use Box Jump/i);
