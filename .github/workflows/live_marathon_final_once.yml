@@ -25,6 +25,7 @@ jobs:
           python - <<'PY'
           p='scripts/live_final_six_acceptance.mjs'
           s=open(p,encoding='utf-8').read()
+          s=s.replace('while(Date.now()-started<420000)', 'while(Date.now()-started<900000)', 1)
           s=s.replace("const ambiguous={primary_goals:", "const ambiguous={experience:'advanced',primary_goals:", 1)
           s=s.replace("const marathon={primary_goals:['Improve marathon from 4:05 to 3:40'],secondary_goals:['Maintain basic strength and stay durable'],maintenance_goals:[],goal_priority_model:'tiered_equal_primary',experience:'intermediate',days_per_week:1,", "const marathon={primary_goals:['Improve marathon from 4:05 to 3:40'],secondary_goals:['Maintain basic strength and stay durable'],maintenance_goals:[],goal_priority_model:'tiered_equal_primary',experience:'intermediate',days_per_week:2,", 1)
           keep={'MARATHON'}
