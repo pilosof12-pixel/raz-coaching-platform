@@ -13,17 +13,26 @@ if (!d.includes('COOLDOWN-PREFIX-NORMALIZATION')) {
   d = d.replace(anchor, anchor + '\n  s = s.replace(/^\\[(?:COOL[- ]?DOWN|COOLDOWN)\\]\\s*(?:easy\\s+)?/i, ""); // COOLDOWN-PREFIX-NORMALIZATION');
 }
 
-// Known run-cooldown wording resolves to the canonical Run row. This remains a
-// closed alias set; it is not permission for arbitrary exercise synonyms.
 if (!d.includes('["Jog/Walk", "Run"]')) {
   const anchor = '  ["Cooldown Jog/Walk", "Run"],';
   if (!d.includes(anchor)) throw new Error('run cooldown alias anchor missing');
   d = d.replace(anchor, anchor + '\n  ["Jog/Walk", "Run"],\n  ["Walk/Jog", "Run"],\n  ["Easy Jog/Walk", "Run"],\n  ["Easy Walk/Jog", "Run"], // STRUCTURAL-COOLDOWN-ALIASES');
 }
 
+// Controlled leading descriptors are presentation/load descriptors, not new
+// exercise inventions, when the exact base movement already exists canonically.
+// Exact canonical weighted movements still win before this fallback.
+if (!d.includes('LEADING-DESCRIPTOR-CANONICALIZATION')) {
+  const dictAnchor = 'const NORM_DICT = new Set([...EXERCISE_DICTIONARY].map(norm));';
+  if (!d.includes(dictAnchor)) throw new Error('normalized dictionary anchor missing');
+  d = d.replace(dictAnchor, dictAnchor + '\nconst NORM_DICT_CANONICAL = new Map([...EXERCISE_DICTIONARY].map((name) => [norm(name), name])); // LEADING-DESCRIPTOR-CANONICALIZATION');
+  const matchAnchor = '  if (NORM_ALIAS.has(n)) return { status: "alias", canonical: NORM_ALIAS.get(n) };\n  let toks = n.split(" ");';
+  if (!d.includes(matchAnchor)) throw new Error('matchDictionary alias anchor missing');
+  d = d.replace(matchAnchor, '  if (NORM_ALIAS.has(n)) return { status: "alias", canonical: NORM_ALIAS.get(n) };\n  for (const prefix of ["weighted "]) {\n    if (n.startsWith(prefix)) {\n      const base = n.slice(prefix.length).trim();\n      if (NORM_DICT_CANONICAL.has(base)) return { status: "alias", canonical: NORM_DICT_CANONICAL.get(base) };\n    }\n  }\n  let toks = n.split(" ");');
+}
+
 // If the retry loop reaches the hard-substitute stage, canonical aliases must
-// still be repaired before true misses become [REVIEW]. Previously alias fixes
-// found during a throwing validation attempt could be lost with that attempt.
+// still be repaired before true misses become [REVIEW].
 if (!d.includes('HARD-SUBSTITUTE-CANONICALIZES-ALIASES')) {
   const old = [
     '    const core = coreExerciseName(cell, isHebrew);',
@@ -49,8 +58,6 @@ if (!d.includes('HARD-SUBSTITUTE-CANONICALIZES-ALIASES')) {
 if (d !== d0) fs.writeFileSync(dictPath, d);
 console.log(`${dictPath}: ${d === d0 ? 'already current' : 'structural normalization applied'}`);
 
-// The model is never authoritative for internal QA metadata. Remove any marker
-// it may emit before the server calculates its own validator result.
 const serverPath = fileURLToPath(new URL('../phase14/server.js', import.meta.url));
 let s = fs.readFileSync(serverPath, 'utf8');
 const s0 = s;
@@ -61,3 +68,18 @@ if (!s.includes('SERVER-AUTHORITATIVE-FORMULA-MARKER')) {
 }
 if (s !== s0) fs.writeFileSync(serverPath, s);
 console.log(`${serverPath}: ${s === s0 ? 'already current' : 'server-owned formula marker enforced'}`);
+
+// Current direct event-specific frequency stated by the athlete is an intake
+// constraint, not an invented coaching dose. Do not silently reduce it while
+// claiming to improve that event; if recovery requires a reduction, the output
+// must explicitly explain the tradeoff rather than substituting cross-training.
+const buildPath = fileURLToPath(new URL('../phase14/scripts/build_phase15_runtime.mjs', import.meta.url));
+let b = fs.readFileSync(buildPath, 'utf8');
+const b0 = b;
+if (!b.includes('CURRENT-DIRECT-MODALITY-FREQUENCY')) {
+  const anchor = '  "Use realistic current-performance anchors. Goal numbers are targets, not current capacities. Prefer low fatigue and specificity when sport load is high. Do not assign a high RPE to a load that is obviously too light for the athlete\'s current benchmark.",\\n';
+  if (!b.includes(anchor)) throw new Error('compact provider current-performance anchor missing');
+  b = b.replace(anchor, anchor + '  "CURRENT-DIRECT-MODALITY-FREQUENCY: when the intake explicitly states a current weekly frequency for the same named endurance modality the athlete wants to improve, do not silently reduce that direct modality frequency and replace it with cross-training. Preserve the stated direct frequency unless injury/recovery constraints require a deliberate reduction, in which case explain the tradeoff explicitly. Cross-training may supplement but not silently replace those current direct exposures.",\\n');
+}
+if (b !== b0) fs.writeFileSync(buildPath, b);
+console.log(`${buildPath}: ${b === b0 ? 'already current' : 'direct modality frequency integrity added'}`);
