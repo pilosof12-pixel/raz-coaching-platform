@@ -1,0 +1,37 @@
+name: Apply planner endurance source-routing cleanup
+
+on:
+  push:
+    branches:
+      - privacy-security-hardening
+    paths:
+      - qa/planner-endurance-cleanup-trigger.txt
+
+permissions:
+  contents: write
+
+jobs:
+  apply-planner-cleanup:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: privacy-security-hardening
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: node scripts/apply_planner_endurance_cleanup.mjs
+      - name: Validate planner and concurrent integrity
+        run: |
+          node --check phase14/engine/phase15_planner.js
+          node --test test/planner_endurance_source_routing.test.js
+          node --test test/final_concurrent_endurance_integrity.test.js
+          node --test phase14/test/phase15_planner_regression.test.mjs
+      - name: Commit tested planner source patch
+        run: |
+          git config user.name 'RAZ regression bot'
+          git config user.email 'actions@users.noreply.github.com'
+          git add phase14/engine/phase15_planner.js
+          if git diff --cached --quiet; then echo 'No planner source changes'; exit 0; fi
+          git commit -m 'Route aerobic base through authored endurance sources'
+          git push origin HEAD:privacy-security-hardening
