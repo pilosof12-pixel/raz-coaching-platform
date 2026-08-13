@@ -1,9 +1,10 @@
 Final marathon coaching acceptance
 2026-08-13
-Run on strengthened acceptance head d61ca45f67616b47b805cfea48a9275cd88f6305.
+Run on source head 4ede29dcb5eb7c265de8ec6f8db64b49945e05d5 with Week 1 current-volume and all-week TSV-shape guards.
 Valid fixture uses days_per_week=2.
-Current weekly volume is the starting workload anchor.
+Week 1 direct running must remain at or below the supplied ~38 km/week baseline while preserving four run days.
 Quality work must change pace/intensity OR accumulated work, never both in one transition.
 Across the week, exactly one main running category may progress per transition and non-selected categories copy forward unchanged.
-Strength maintenance must remain supportive and recoverable rather than becoming a progressive lower-body hypertrophy block.
+Strength maintenance must remain supportive and recoverable.
+Every physical TSV row must contain exactly nine cells.
 QA runner observes up to 15 minutes so server correction retries can finish.
