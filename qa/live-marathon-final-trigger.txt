@@ -1,7 +1,8 @@
 Final marathon coaching acceptance
 2026-08-13
+Rerun requested after one-main-variable progression hardening.
 Valid fixture uses days_per_week=2.
 Long-run duration/distance is recognized as a marathon event-specific progression anchor.
 Current weekly volume is the starting workload anchor.
-Do not escalate quality, easy and long-run volume together.
+Progress only one main running-volume lever per build-week transition: quality, routine easy, or long run.
 QA runner observes up to 15 minutes so server correction retries can finish.
