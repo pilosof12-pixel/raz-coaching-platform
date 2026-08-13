@@ -1,0 +1,6 @@
+Final concurrent endurance quality patch trigger
+2026-08-13
+Fixes:
+- parse spaced running benchmarks such as 5 km: 25:00
+- enforce current-race continuous-pace integrity
+- require explicit purpose for extra bike/row work in combat + running hybrids
