@@ -22,8 +22,19 @@ if (!e.includes('CONTINUOUS-RACE-BENCHMARK-INTEGRITY')) {
   e=e.replace(promptAnchor,promptAnchor+'\n'+promptAdd);
 }
 
+// Exact kg are a presentation/calibration detail that can be repaired safely when
+// the athlete has only a related-variation benchmark. The authored integrity rule
+// already requires RPE-selected loading in that case; this repair prevents a model
+// retry from wasting a generation on a deterministic cell-level correction.
+if(!e.includes('UNBENCHMARKED-VARIATION-LOAD-REPAIR')) {
+  const anchor='export function unbenchmarkedVariationLoadFlags(intake={}, parsed=null) {';
+  if(!e.includes(anchor)) throw new Error('unbenchmarked variation flag anchor missing');
+  const repair=`export function repairUnbenchmarkedVariationLoads(program, intake={}) {\n  const benches=benchmarkRows(intake);\n  if(!benches.length) return String(program||'');\n  const fixedKg=/(?:^|\\s|\\+)\\d+(?:\\.\\d+)?\\s*kg\\b/i;\n  return String(program||'').split('\\n').map(line=>{\n    if(!line.includes('\\t')) return line;\n    const cells=line.split('\\t');\n    if(cells.length!==9 || /^Day$/i.test(String(cells[0]||'').trim())) return line;\n    const ex=String(cells[1]||'').trim();\n    if(!ex || /^\\s*\\[WARMUP\\]/i.test(ex)) return line;\n    const family=liftFamily(ex);\n    if(!family || !fixedKg.test(String(cells[2]||''))) return line;\n    const sameFamily=benches.filter(b=>b.family===family);\n    if(!sameFamily.length) return line;\n    const exact=sameFamily.some(b=>canonicalLift(ex)===b.canonical);\n    if(exact) return line;\n    cells[2]='RPE-selected load';\n    return cells.join('\\t');\n  }).join('\\n');\n} // UNBENCHMARKED-VARIATION-LOAD-REPAIR\n\n`;
+  e=e.replace(anchor,repair+anchor);
+}
+
 if(e!==eliteBefore) fs.writeFileSync(elitePath,e);
-console.log(`${elitePath}: ${e===eliteBefore?'already current':'race-anchor semantic integrity added'}`);
+console.log(`${elitePath}: ${e===eliteBefore?'already current':'semantic/load integrity added'}`);
 
 const finalPath=fileURLToPath(new URL('../phase14/engine/phase15_final_qa.js', import.meta.url));
 let f=fs.readFileSync(finalPath,'utf8');
