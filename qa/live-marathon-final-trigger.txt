@@ -1,3 +1,4 @@
 Final marathon coaching acceptance
 2026-08-13
+Valid fixture uses days_per_week=2.
 Use current source-grounded endurance runtime and final all-week QA.
