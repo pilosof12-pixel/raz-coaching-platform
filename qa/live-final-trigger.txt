@@ -1,4 +1,5 @@
 Final live acceptance trigger
-2026-08-13
+2026-08-13T14:22+10:00
 Target: Avatar 3 + annoying concurrent only
-Pipeline lock head: 0c605c5b4e2345d83c91c9aaf3312dae210a4ac7
+Production-parity head: a605e18736b25d4cd178c20cadc36352ba2d106c
+CI: 31666765251 PASS
