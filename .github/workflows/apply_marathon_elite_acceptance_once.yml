@@ -21,21 +21,30 @@ jobs:
         with:
           node-version: 22
       - name: Apply source-grounded marathon elite guards
-        run: node scripts/apply_marathon_elite_acceptance.mjs
+        run: |
+          node scripts/apply_marathon_elite_acceptance.mjs
+          node scripts/apply_marathon_contract_strengthening.mjs
       - name: Validate marathon elite acceptance logic
         run: |
           node --check phase14/engine/phase15_final_qa.js
           node --check phase14/engine/phase15_elite_guardrails.js
+          node --check phase14/scripts/build_phase15_runtime.mjs
           node --test test/marathon_elite_acceptance.test.js
           node --test test/marathon_volume_progression_guard.test.js
+          grep -q 'Stable maintenance is valid' phase14/scripts/build_phase15_runtime.mjs
+          grep -q 'MARATHON SINGLE-LEVER HARD CONTRACT' phase14/engine/phase15_elite_guardrails.js
+          grep -q 'copy the non-selected category prescriptions' phase14/engine/phase15_final_qa.js
+          ! grep -q 'while progressing load, reps, sets or assistance conservatively' phase14/scripts/build_phase15_runtime.mjs
           cd phase14
           npm run phase15:build
           node --check server.phase15.js
+          grep -q 'Stable maintenance is valid' server.phase15.js
+          grep -q 'MARATHON SINGLE-LEVER HARD CONTRACT' server.phase15.js
       - name: Commit tested source patch
         run: |
           git config user.name 'RAZ regression bot'
           git config user.email 'actions@users.noreply.github.com'
-          git add phase14/engine/phase15_final_qa.js phase14/engine/phase15_elite_guardrails.js
+          git add phase14/engine/phase15_final_qa.js phase14/engine/phase15_elite_guardrails.js phase14/scripts/build_phase15_runtime.mjs
           if git diff --cached --quiet; then echo 'No source changes'; exit 0; fi
-          git commit -m 'Enforce elite marathon progression and strength maintenance'
+          git commit -m 'Strengthen marathon correction and maintenance hierarchy'
           git push origin HEAD:privacy-security-hardening
