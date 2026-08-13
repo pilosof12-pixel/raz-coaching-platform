@@ -118,7 +118,7 @@ function eventProgressionBearing(item) {
 function currentRunningRaceAnchor(intake={}) {
   const src=[String(intake.current_numbers||''),...list(intake.performance_markers).map(String)].join(' | ');
   const anchors=[];
-  for(const m of src.matchAll(/\b(3|5|10)\s*k(?:m)?\b[^0-9]{0,20}(\d{1,2}):(\d{2})\b/ig)) {
+  for(const m of src.matchAll(/\b(3|5|10)\s*k\s*m?\b[^0-9]{0,20}(\d{1,2}):(\d{2})\b/ig)) { // RUN-DISTANCE-SPACING-ANCHOR
     const distanceKm=Number(m[1]), totalSeconds=Number(m[2])*60+Number(m[3]);
     if(distanceKm>0&&totalSeconds>0) anchors.push({distanceKm,totalSeconds,paceSecPerKm:totalSeconds/distanceKm});
   }
@@ -201,6 +201,32 @@ export function endurancePerformanceIntegrityFlags(program, intake={}, parsed=nu
         }
       }
     } // CONTINUOUS-RACE-BENCHMARK-INTEGRITY
+    if(def.key==='running') {
+      const sportContext=String(intake.sport||'')+' '+JSON.stringify(intake.sport_schedule||[]);
+      const combatConcurrent=/\b(?:bjj|jiu[- ]?jitsu|mma|wrestl(?:e|ing)|boxing|combat)\b/i.test(sportContext);
+      if(combatConcurrent) {
+        const exIdx=parsed.idx.exercise, noteIdx=parsed.idx.notes, repsIdx=parsed.idx.reps, weightIdx=parsed.idx.weight, setsIdx=parsed.idx.sets;
+        const unjustified=[];
+        for(const rr of parsed.rows) {
+          const ex=String(rr.cells[exIdx]||'');
+          if(/^\s*\[WARMUP\]/i.test(ex)) continue;
+          const note=noteIdx>=0?String(rr.cells[noteIdx]||''):'';
+          const ctx=ex+' '+note;
+          if(!/\b(?:bike|cycling|rower|rowing|zone[- ]?2 bike|zone[- ]?2 row)\b/i.test(ctx)) continue;
+          const dose=String(repsIdx>=0?rr.cells[repsIdx]||'':'')+' '+String(weightIdx>=0?rr.cells[weightIdx]||'':'')+' '+note;
+          const mins=maxContinuousMinutes(dose);
+          const sets=Math.max(1,Number(rr.cells[setsIdx]||1)||1);
+          const meaningful=(mins!=null&&mins*sets>=15)||/\b\d+(?:\.\d+)?\s*(?:km|m)\b/i.test(dose);
+          if(!meaningful) continue;
+          const hasPurpose=/\b(?:lower[- ]?impact|impact management|reduce(?:d)? impact|recovery cost|fatigue cost|supplement(?:al)?|replace(?:s|ment)?|because|aerobic volume with less|orthopedic|eccentric cost|missing aerobic|specific purpose)\b/i.test(note);
+          if(!hasPurpose) unjustified.push(ex);
+        }
+        if(unjustified.length) flags.push({
+          code:'CONCURRENT_ENDURANCE_REDUNDANCY_UNJUSTIFIED',
+          message:'The athlete already has concurrent combat practice plus a named running goal, yet Week 1 adds meaningful '+[...new Set(unjustified)].join(', ')+' work without stating the source-grounded purpose. The authored endurance cluster says sport practice must be counted first and supplemental conditioning should fill a defined gap. Preserve the required direct running exposures; use bike/row only when it deliberately reduces mechanical cost, replaces higher-cost volume, or fills an identified missing quality, and state that purpose instead of stacking generic Zone 2 by habit.'
+        });
+      }
+    } // CONCURRENT-ENDURANCE-REDUNDANCY-INTEGRITY
     const eventGoal=/\d|\b(?:mile|3\s*k|5\s*k|10\s*k|half[- ]?marathon|marathon|erg|time trial|triathlon)\b/i.test(text);
     if(eventGoal && !rows.some(eventProgressionBearing)) flags.push({
       code:'EVENT_PROGRESSING_SESSION_MISSING',
@@ -419,6 +445,12 @@ export function elitePromptRules(intake={}) {
       if(race) rules.push('LOW-INTENSITY RUNNING ANCHOR: the intake demonstrates about '+formatPaceSec(race.paceSecPerKm)+'/km for '+race.distanceKm+'K. Any row labelled easy, conversational or Zone 2 must be genuinely below that demonstrated race intensity; never use that race pace or a faster pace as low intensity. If no threshold test exists, use the authored pace + RPE/breathing hierarchy rather than fabricating a precise breakpoint.');
       if(race) rules.push('CURRENT-RACE PERFORMANCE ANCHOR: do not prescribe a continuous non-test run faster than the demonstrated '+race.distanceKm+'K pace for the same race duration or longer; that would assume performance beyond the supplied current benchmark. If faster work is source-appropriate, calibrate its structure from the authored endurance sources rather than treating goal pace as already sustainable. Across the four-week block, progress the smallest useful variable and do not automatically increase both pace and duration together.'); // CONTINUOUS-RACE-BENCHMARK-PROMPT
     }
+    if(def.key==='running') {
+      const sportContext=String(intake.sport||'')+' '+JSON.stringify(intake.sport_schedule||[]);
+      if(/\b(?:bjj|jiu[- ]?jitsu|mma|wrestl(?:e|ing)|boxing|combat)\b/i.test(sportContext)) {
+        rules.push('CONCURRENT ENDURANCE BUDGET: count the existing combat sessions inside the athlete\'s finite weekly recovery budget before adding conditioning. Preserve the stated direct running exposures first because running specificity matters for the named event. Do not automatically add generic Zone 2 bike/row sessions on top. Cross-training may supplement only when the curated endurance sources support a specific reason such as obtaining useful aerobic work with lower mechanical cost, replacing higher-cost running volume, or filling an identified missing quality; if you use it, state that purpose. Poor/variable recovery or high sport load strengthens the case for removing redundant volume before adding more.');
+      }
+    } // CONCURRENT-ENDURANCE-BUDGET-PROMPT
     rules.push(`TARGET-MODALITY INTEGRITY: ${def.key} is a named ${priority} performance goal${current?` and the intake documents about ${current} current ${def.key} exposure(s) per week`:''}. Do not silently reduce that existing target-modality practice. Put the target-modality sessions into the four-week deliverable, including non-gym sport days when needed, and use the curated endurance sources to assign their actual purpose/dose. Cross-training may supplement but not replace them.`);
     if(/\d|\b(?:mile|3\s*k|5\s*k|10\s*k|half[- ]?marathon|marathon|erg|time trial|triathlon)\b/i.test(text)) rules.push(`EVENT-PROGRESSION INTEGRITY: '${text}' needs at least one progression-bearing ${def.key} session with an external event-relevant target (for example source-selected interval, pace, power, split, stroke-rate or equivalent prescription). A warm-up or generic easy session alone is not sufficient. The exact workout design must come from the curated sources, not generic model memory.`);
   }
