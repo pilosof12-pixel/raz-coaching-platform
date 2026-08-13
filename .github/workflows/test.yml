@@ -62,7 +62,8 @@ jobs:
           grep -q 'FINAL-LIVE-ALIAS-SET' phase14/engine/exercise_dictionary.js
           grep -q 'ENDURANCE-TSV-FIELD-CONTRACT' phase14/engine/phase15_runtime_patches.js
           node phase14/scripts/build_phase15_runtime.mjs
-          node phase14/scripts/postprocess_phase15_runtime.mjs
+          # Production parity: build_phase15_runtime.mjs now owns runtime patching.
+          # Do not run postprocess_phase15_runtime.mjs here a second time.
           node phase14/scripts/apply_launch_runtime.mjs
           node --check phase14/server.phase15.js
           node --check phase14/server_secure.js
