@@ -1,0 +1,38 @@
+name: Apply marathon volume progression guard
+
+on:
+  push:
+    branches:
+      - privacy-security-hardening
+    paths:
+      - qa/marathon-volume-guard-trigger.txt
+
+permissions:
+  contents: write
+
+jobs:
+  apply-marathon-volume-guard:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: privacy-security-hardening
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: node scripts/apply_marathon_volume_progression_guard.mjs
+      - name: Validate marathon block progression guard
+        run: |
+          node --check phase14/engine/phase15_elite_guardrails.js
+          node --check phase14/engine/phase15_final_qa.js
+          node --test test/marathon_progression_integrity.test.js
+          node --test test/marathon_volume_progression_guard.test.js
+          node --test test/final_concurrent_endurance_integrity.test.js
+      - name: Commit tested source patch
+        run: |
+          git config user.name 'RAZ regression bot'
+          git config user.email 'actions@users.noreply.github.com'
+          git add phase14/engine/phase15_elite_guardrails.js phase14/engine/phase15_final_qa.js
+          if git diff --cached --quiet; then echo 'No source changes'; exit 0; fi
+          git commit -m 'Anchor marathon blocks to current volume and single-lever progression'
+          git push origin HEAD:privacy-security-hardening
