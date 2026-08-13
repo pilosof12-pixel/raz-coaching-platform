@@ -35,16 +35,13 @@ test('current target-modality exposure is recovered from athlete-specific notes 
 
 test('primary 5K goal cannot silently drop current three-run exposure and needs a progressing event session',()=>{
   const intake={primary_goals:['Improve 5 km from 25:00 to 22:30'],notes:'Currently runs 3 sessions per week, about 20 km/week.'};
-  const inadequate=parsed([
-    row('Tue','Zone-2 Run','N/A','1','30 min','Easy conversational running.'),
-  ]);
+  const inadequate=parsed([row('Tue','Zone-2 Run','N/A','1','30 min','Easy conversational running.')]);
   const flags=endurancePerformanceIntegrityFlags('',intake,inadequate);
   assert.equal(flags.some(x=>x.code==='TARGET_MODALITY_EXPOSURE_REDUCED'),true);
   assert.equal(flags.some(x=>x.code==='EVENT_PROGRESSING_SESSION_MISSING'),true);
-
   const adequate=parsed([
     row('Tue','Zone-2 Run','N/A','1','30 min','Easy conversational running.'),
-    row('Thu','Treadmill','N/A','1','5 x 4 min','5K-pace interval progression; 2 min easy recovery.'),
+    row('Thu','Treadmill','N/A','5','4 min','5K-pace interval progression; 2 min easy recovery.'),
     row('Sun','Run','N/A','1','45 min','Easy aerobic run.'),
   ]);
   assert.equal(endurancePerformanceIntegrityFlags('',intake,adequate).length,0);
@@ -68,14 +65,24 @@ test('rower warm-ups do not satisfy a 2K rowing performance goal',()=>{
   assert.equal(flags.some(x=>x.code==='EVENT_PROGRESSING_SESSION_MISSING'),true);
 });
 
-test('multisport goal preserves each explicitly documented modality exposure',()=>{
+test('rowing 500m split is recognized as a progression-bearing event target',()=>{
+  const intake={primary_goals:['Improve 2 km rowing ergometer from 7:30 to 7:05'],notes:'Currently rows 3 times per week.'};
+  const p=parsed([
+    row('Mon','Rowing Ergometer','N/A','1','45 min','Easy aerobic row.'),
+    row('Wed','Rowing Ergometer','N/A','5','500m','Hold 1:46-1:47/500m; 2:30 recovery.'),
+    row('Sat','Rowing Ergometer','N/A','1','30 min','Moderate sustainable row.'),
+  ]);
+  assert.equal(endurancePerformanceIntegrityFlags('',intake,p).length,0);
+});
+
+test('multisport goal preserves set-duration intervals as meaningful modality exposure',()=>{
   const intake={primary_goals:['Improve Olympic-distance triathlon across swim, bike and 10 km run'],notes:'Currently trains 2 swims, 2 rides and 2 runs each week.'};
   const p=parsed([
     row('Mon','Swim','N/A','1','45 min','Threshold-pace progression.'),
-    row('Thu','Swim','N/A','1','40 min','Easy technique/aerobic swim.'),
-    row('Tue','Bike','N/A','1','60 min','Power-target interval progression.'),
-    row('Sat','Bike','N/A','1','75 min','Easy aerobic ride.'),
-    row('Wed','Run','N/A','1','40 min','10K-pace interval progression.'),
+    row('Thu','Swim','N/A','8','100m','Olympic-distance pace intervals.'),
+    row('Tue','Bike','N/A','3','10 min','Power-target tempo interval progression.'),
+    row('Fri','Bike','N/A','1','60 min','Easy aerobic ride.'),
+    row('Wed','Run','N/A','4','8 min','10K-pace interval progression.'),
     row('Sun','Zone-2 Run','N/A','1','45 min','Easy aerobic run.'),
   ]);
   assert.equal(endurancePerformanceIntegrityFlags('',intake,p).length,0);
@@ -89,12 +96,18 @@ test('named primary strength goal needs direct movement-pattern exposure but gua
   assert.equal(goalDoseFlags('',intake,one).length,0);
 });
 
-test('Back Squat primary goal cannot be silently replaced by Box Squat when Back Squat is not explicitly prohibited',()=>{
+test('Back Squat goal may use tolerated box squat when the intake identifies deep/high-volume aggravation',()=>{
   const intake={primary_goals:['Back squat 200 kg'],injuries:'Low-back irritation after high-volume deep squatting; controlled box squats are tolerated.'};
+  const boxOnly=parsed([row('Tue','Box Squat to Parallel','RPE-selected load','3','3','Use the tolerated parallel depth and stop if back symptoms rise.')]);
+  assert.equal(exactPrimaryMovementFlags('',intake,boxOnly).length,0);
+  const rules=elitePromptRules(intake).join('\n');
+  assert.match(rules,/PAIN-SENSITIVE SPECIFICITY/i);
+});
+
+test('vague low-back irritation does not automatically waive exact Back Squat specificity',()=>{
+  const intake={primary_goals:['Back squat 200 kg'],injuries:'Recurring low-back irritation; exact aggravating feature and tolerated squat variations are unknown.'};
   const boxOnly=parsed([row('Tue','Box Squat to Parallel','RPE-selected load','3','3')]);
   assert.equal(exactPrimaryMovementFlags('',intake,boxOnly).some(x=>x.code==='PRIMARY_EXACT_MOVEMENT_MISSING'),true);
-  const direct=parsed([row('Tue','Back Squat','RPE-selected load','2','3','Use only the currently tolerated depth and low volume.')]);
-  assert.equal(exactPrimaryMovementFlags('',intake,direct).length,0);
 });
 
 test('explicit prohibition allows a primary lift variation to be omitted rather than forced through pain',()=>{
@@ -132,12 +145,7 @@ test('requested strength day cannot silently become cardio/core only',()=>{
 });
 
 test('integrity prompt rules defer workout design to sources while preserving client-specific dose',()=>{
-  const rules=elitePromptRules({
-    days_per_week:4,
-    primary_goals:['Back squat 200 kg'],
-    secondary_goals:['Improve 5 km from 25:00 to 22:30'],
-    notes:'Currently running 2 sessions per week, about 10 km/week.',
-  }).join('\n');
+  const rules=elitePromptRules({days_per_week:4,primary_goals:['Back squat 200 kg'],secondary_goals:['Improve 5 km from 25:00 to 22:30'],notes:'Currently running 2 sessions per week, about 10 km/week.'}).join('\n');
   assert.match(rules,/higher frequency, volume or progression comes only from the deterministic planner, specialist rules and curated RAZ coaching sources/i);
   assert.match(rules,/exact kilograms require a reliable benchmark/i);
   assert.match(rules,/cannot silently replace/i);
