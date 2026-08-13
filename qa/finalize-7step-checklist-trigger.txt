@@ -1,0 +1,5 @@
+Finalize seven-step coaching-engine integration
+2026-08-13
+Marathon final manual acceptance: ~9.1/10.
+Week 1 anchored to supplied current workload, four run days preserved, one main progression lever per transition, stable strength support, and all-week TSV shape validation added.
+Temporary live QA script had a false-negative progression regex for 800 m interval progression; manual coaching acceptance controls.
