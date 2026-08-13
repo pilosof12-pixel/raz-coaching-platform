@@ -21,6 +21,13 @@ test('controlled Weighted descriptor resolves to an existing canonical base move
   assert.equal(m.canonical, 'Glute Bridge');
 });
 
+test('event-distance prefix is not treated as a new exercise identity', () => {
+  assert.equal(coreExerciseName('5 km Run'), 'Run');
+  assert.equal(coreExerciseName('3K Run'), 'Run');
+  assert.equal(coreExerciseName('800 m Run'), 'Run');
+  assert.equal(matchDictionary(coreExerciseName('5 km Run')).status, 'hit');
+});
+
 test('cool-down purpose prefix is removed before canonical run lookup', () => {
   const core = coreExerciseName('[COOL-DOWN] Easy Jog/Walk');
   assert.equal(core, 'Jog/Walk');
@@ -35,13 +42,15 @@ test('hard-substitute canonicalizes known aliases before marking true hallucinat
     'Day\tExercise\tWeight\tSets\tReps\tRest\tTarget RPE\tNotes\tResults',
     'Mon\tDumbbell Reverse Lunge\tRPE-selected\t3\t8\t90 sec\t7\twork\t',
     'Mon\tWeighted Glute Bridge\t+20 kg\t3\t10\t90 sec\t8\twork\t',
+    'Sat\t5 km Run\tN/A\t1\t35 min\tN/A\tN/A\tevent-specific running\t',
     'Mon\tImaginary Dragon Squat\tBodyweight\t3\t8\t90 sec\t7\twork\t',
     'END_WEEK1_TSV',
   ].join('\n');
   const out = hardSubstitute('EXERCISE_HALLUCINATION', program, { language: 'en' });
   assert.match(out, /\tReverse Lunge\t/);
   assert.match(out, /\tGlute Bridge\t\+20 kg\t/);
-  assert.doesNotMatch(out, /\[REVIEW\] (?:Dumbbell Reverse Lunge|Weighted Glute Bridge)/);
+  assert.match(out, /\t5 km Run\tN\/A\t/);
+  assert.doesNotMatch(out, /\[REVIEW\] (?:Dumbbell Reverse Lunge|Weighted Glute Bridge|5 km Run)/);
   assert.match(out, /\[REVIEW\] Imaginary Dragon Squat/);
 });
 
