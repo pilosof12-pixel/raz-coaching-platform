@@ -29,6 +29,7 @@ jobs:
           node scripts/apply_elite_guardrails.mjs
           node scripts/apply_endurance_acceptance_fixes.mjs
           node scripts/apply_final_runtime_integration.mjs
+          node scripts/apply_final_normalization.mjs
       - run: npm ci
       - run: npm test
       - run: node --check server.js
@@ -43,6 +44,7 @@ jobs:
         run: |
           node --check scripts/apply_endurance_acceptance_fixes.mjs
           node --check scripts/apply_final_runtime_integration.mjs
+          node --check scripts/apply_final_normalization.mjs
           node --check phase14/server.js
           node --check phase14/scripts/build_phase15_runtime.mjs
           node --check phase14/scripts/final_pipeline_lock.mjs
@@ -58,13 +60,16 @@ jobs:
           node --test phase14/test/intake_clarification.test.mjs
           node --test phase14/test/phase15_goal_specificity.test.mjs
           node --test phase14/test/phase15_elite_guardrails.test.mjs
+          node --test phase14/test/final_normalization.test.js
           node --test phase14/test/final_pipeline_lock.test.js
           grep -q 'PRODUCTION-RUNTIME-PATCH-WIRED' phase14/scripts/build_phase15_runtime.mjs
           grep -q 'FINAL-LIVE-ALIAS-SET' phase14/engine/exercise_dictionary.js
+          grep -q 'RUN-EVENT-PREFIX-NORMALIZATION' phase14/engine/exercise_dictionary.js
           grep -q 'ENDURANCE-TSV-FIELD-CONTRACT' phase14/engine/phase15_runtime_patches.js
           node phase14/scripts/build_phase15_runtime.mjs
           node phase14/scripts/final_pipeline_lock.mjs
-          # Production parity: build once, then apply the final fail-closed pipeline lock.
+          # Production parity: apply the same normalization before build, build once,
+          # then apply the fail-closed final pipeline lock exactly as phase14/start does.
           node phase14/scripts/apply_launch_runtime.mjs
           node --check phase14/server.phase15.js
           node --check phase14/server_secure.js
