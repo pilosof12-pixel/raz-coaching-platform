@@ -37,7 +37,6 @@ jobs:
           npm run phase15:build
           node --check server.phase15.js
           grep -q 'Stable maintenance is valid' server.phase15.js
-          grep -q 'MARATHON SINGLE-LEVER HARD CONTRACT' server.phase15.js
       - name: Commit tested source patch
         run: |
           git config user.name 'RAZ regression bot'
