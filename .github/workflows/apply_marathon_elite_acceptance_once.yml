@@ -20,10 +20,8 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 22
-      - name: Apply source-grounded marathon elite guards
-        run: |
-          node scripts/apply_marathon_elite_acceptance.mjs
-          node scripts/apply_marathon_contract_strengthening.mjs
+      - name: Strengthen marathon correction contract
+        run: node scripts/apply_marathon_contract_strengthening.mjs
       - name: Validate marathon elite acceptance logic
         run: |
           node --check phase14/engine/phase15_final_qa.js
