@@ -2,5 +2,6 @@ Final live acceptance trigger
 2026-08-13
 Target: annoying concurrent only
 All-week race-anchor endurance integrity: enabled
-CI: 31668774904 PASS
-Production source head before trigger: 6b8542fd7c5e6c1ea602940d8dc73244503acc12
+Surgical QA correction attempts: up to two before fail-closed
+CI: 31669281402 PASS
+Production source head before trigger: e6f0580b1b2e16399ed9c83422c995e8bce4f5d6
