@@ -29,10 +29,13 @@ function fixture() {
   ].join('\n');
 }
 
-test('Phase15 QA gets one correction attempt and fails closed instead of hard-substituting', () => {
+test('Phase15 QA can use two surgical correction attempts and still fails closed', () => {
   const out = lockFinalPipelineSource(fixture());
-  assert.match(out, /OPENAI_API_KEY \? 2 : 3/);
+  assert.match(out, /OPENAI_API_KEY \? 3 : 3/);
   assert.match(out, /PHASE15_QUALITY_VIOLATION/);
+  assert.match(out, /SURGICAL-QA-CORRECTION-SCOPE/);
+  assert.match(out, /smallest surgical changes needed/i);
+  assert.match(out, /Preserve every already-satisfied deterministic skeleton requirement/i);
   assert.match(out, /if \(attempt < MAX_ATTEMPTS\) continue/);
   assert.match(out, /FINAL-QA-FAIL-CLOSED/);
 });
@@ -42,8 +45,9 @@ test('the exact client-visible program is revalidated immediately before persist
   assert.match(out, /validatePhase15FinalProgram\(program, intake\); \/\/ SAVE-BOUNDARY-FINAL-QA/);
 });
 
-test('production package applies the runtime patch once and then the final pipeline lock', () => {
+test('production package applies semantic QA, runtime build and final pipeline lock', () => {
   const pkg = JSON.parse(fs.readFileSync(new URL('../package.json', import.meta.url), 'utf8'));
+  assert.match(pkg.scripts['phase15:build'], /apply_endurance_semantic_guardrails\.mjs/);
   assert.match(pkg.scripts['phase15:build'], /build_phase15_runtime\.mjs/);
   assert.match(pkg.scripts['phase15:build'], /final_pipeline_lock\.mjs/);
   assert.doesNotMatch(pkg.scripts['phase15:build'], /postprocess_phase15_runtime\.mjs/);
