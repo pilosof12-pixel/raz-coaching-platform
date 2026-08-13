@@ -17,3 +17,14 @@ else if(!s.includes('AEROBIC_BASE_SOURCE_SELECTED')) throw new Error('Zone2 labe
 
 if(s!==before) fs.writeFileSync(p,s);
 console.log(`${p}: ${s===before?'already current':'planner endurance cleanup applied'}`);
+
+// Update the old regression assertions that encoded the previous universal
+// 2 x 20-35 minute Bike/Row rule. Those assertions are now contrary to the
+// source-grounding hard contract; test source-routing and low-fatigue intent instead.
+const tp=fileURLToPath(new URL('../phase14/test/phase15_planner_regression.test.mjs', import.meta.url));
+let t=fs.readFileSync(tp,'utf8');
+const tb=t;
+t=t.replace("  assert.match(brief, /20-35 minutes each/);\n  assert.match(brief, /10-12 minute mini-dose does not satisfy/);", "  assert.match(brief, /choose frequency, duration and modality from the curated endurance sources/i);\n  assert.doesNotMatch(brief, /20-35 minutes each|Two meaningful low-fatigue Zone 2 exposures/i);");
+t=t.replace("  assert.match(brief, /Zone-2 Bike/);", "  assert.match(brief, /aerobic-base \\/ Zone 2 goal/i);\n  assert.doesNotMatch(brief, /\\[REVIEW\\]/);");
+if(t!==tb) fs.writeFileSync(tp,t);
+console.log(`${tp}: ${t===tb?'already current':'planner regression expectations updated'}`);
