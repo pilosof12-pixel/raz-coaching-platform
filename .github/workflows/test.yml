@@ -28,6 +28,7 @@ jobs:
           node scripts/apply_lastmile_clean.mjs
           node scripts/apply_elite_guardrails.mjs
           node scripts/apply_endurance_acceptance_fixes.mjs
+          node scripts/apply_final_runtime_integration.mjs
       - run: npm ci
       - run: npm test
       - run: node --check server.js
@@ -41,6 +42,7 @@ jobs:
       - name: Validate deployed Phase 15 runtime and launch layer
         run: |
           node --check scripts/apply_endurance_acceptance_fixes.mjs
+          node --check scripts/apply_final_runtime_integration.mjs
           node --check phase14/server.js
           node --check phase14/scripts/build_phase15_runtime.mjs
           node --check phase14/scripts/postprocess_phase15_runtime.mjs
@@ -56,6 +58,9 @@ jobs:
           node --test phase14/test/intake_clarification.test.mjs
           node --test phase14/test/phase15_goal_specificity.test.mjs
           node --test phase14/test/phase15_elite_guardrails.test.mjs
+          grep -q 'PRODUCTION-RUNTIME-PATCH-WIRED' phase14/scripts/build_phase15_runtime.mjs
+          grep -q 'FINAL-LIVE-ALIAS-SET' phase14/engine/exercise_dictionary.js
+          grep -q 'ENDURANCE-TSV-FIELD-CONTRACT' phase14/engine/phase15_runtime_patches.js
           node phase14/scripts/build_phase15_runtime.mjs
           node phase14/scripts/postprocess_phase15_runtime.mjs
           node phase14/scripts/apply_launch_runtime.mjs
@@ -82,6 +87,7 @@ jobs:
           grep -q "cells\[6\] = 'N/A'" phase14/server.phase15.js
           grep -q 'SOURCE-LABEL-CLIENT-SCRUB' phase14/server.phase15.js
           grep -q 'ENDURANCE TARGET ANCHOR' phase14/server.phase15.js
+          grep -q 'ENDURANCE-TSV-FIELD-CONTRACT' phase14/server.phase15.js
           grep -q 'OpenAI provider unavailable; using source-grounded Gemini fallback' phase14/server.phase15.js
           grep -q 'ELITE-GUARDRAILS-FINAL-QA-WIRED' phase14/engine/phase15_program_qa.js
           grep -q 'ENDURANCE-PRESERVATION-FINAL-QA-WIRED' phase14/engine/phase15_program_qa.js
@@ -95,6 +101,7 @@ jobs:
           grep -q 'ROWING-500M-SPLIT-PROGRESSION' phase14/engine/phase15_elite_guardrails.js
           grep -q 'ENDURANCE-MODALITY-CANONICAL-SET' phase14/engine/exercise_dictionary.js
           grep -q 'ENDURANCE-LIVE-ALIAS-SET' phase14/engine/exercise_dictionary.js
+          grep -q 'FINAL-LIVE-ALIAS-SET' phase14/engine/exercise_dictionary.js
           grep -q 'ENDURANCE-MODALITY-CATALOG-ROUTING' phase14/engine/phase15_source_router.js
           grep -q 'clarification-controls.js' phase14/public/index.html
           grep -q 'launch-controls.js' phase14/public/index.html
@@ -107,7 +114,7 @@ jobs:
         run: |
           git config user.name 'RAZ regression bot'
           git config user.email 'actions@users.noreply.github.com'
-          git add phase14/server.js phase14/scripts/build_phase15_runtime.mjs phase14/engine/phase15_program_qa.js phase14/engine/phase15_elite_guardrails.js phase14/engine/exercise_dictionary.js phase14/engine/phase15_source_router.js
+          git add phase14/server.js phase14/scripts/build_phase15_runtime.mjs phase14/engine/phase15_program_qa.js phase14/engine/phase15_elite_guardrails.js phase14/engine/exercise_dictionary.js phase14/engine/phase15_source_router.js phase14/engine/phase15_runtime_patches.js
           if git diff --cached --quiet; then echo 'No source patch to commit'; exit 0; fi
           git commit -m 'Apply source-aligned Phase 15 integrity guardrails'
           git push origin HEAD:${TARGET_BRANCH}
