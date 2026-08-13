@@ -1,3 +1,0 @@
-Marathon block progression guard trigger
-2026-08-13
-Anchor current weekly volume and reject simultaneous escalation of all major running-volume contributors.
