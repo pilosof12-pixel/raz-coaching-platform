@@ -1,6 +1,6 @@
 Final live acceptance trigger
 2026-08-13
 Target: annoying concurrent only
-Source-grounded low-intensity pace integrity: enabled
-CI: 31668134379 PASS
-Production source head before trigger: c5d2f0023c46c11eb58f5db0b2ac49c06a7d1d23
+All-week race-anchor endurance integrity: enabled
+CI: 31668774904 PASS
+Production source head before trigger: 6b8542fd7c5e6c1ea602940d8dc73244503acc12
