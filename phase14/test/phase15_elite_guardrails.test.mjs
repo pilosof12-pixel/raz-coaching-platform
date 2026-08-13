@@ -53,6 +53,39 @@ test('secondary 5K goal preserves the athlete stated two weekly runs instead of 
   assert.equal(endurancePerformanceIntegrityFlags('',intake,onlyOne).some(x=>x.code==='TARGET_MODALITY_EXPOSURE_REDUCED'),true);
 });
 
+test('low-intensity running cannot be prescribed faster than demonstrated current 5K pace',()=>{
+  const intake={
+    secondary_goals:['Improve 5 km from 25:00 to 22:30'],
+    current_numbers:'5 km: 25:00',
+    performance_markers:['5 km: 25:00'],
+    notes:'Currently running 2 sessions per week, about 10 km/week.'
+  };
+  const impossible=parsed([
+    row('Wed','Run','N/A','1','25 min','Easy conversational pace, Zone 2.'),
+    row('Thu','Run','4:50/km','1','25 min','Target pace 4:50/km, Zone 2 effort; progressive aerobic run.'),
+  ]);
+  const flags=endurancePerformanceIntegrityFlags('',intake,impossible);
+  assert.equal(flags.some(x=>x.code==='LOW_INTENSITY_PACE_CONTRADICTS_CURRENT_PERFORMANCE'),true);
+
+  const plausible=parsed([
+    row('Wed','Run','N/A','1','25 min','Easy conversational pace, Zone 2.'),
+    row('Thu','Run','5:40/km','1','25 min','Progressive low-intensity run; keep breathing controlled.'),
+  ]);
+  assert.equal(endurancePerformanceIntegrityFlags('',intake,plausible).some(x=>x.code==='LOW_INTENSITY_PACE_CONTRADICTS_CURRENT_PERFORMANCE'),false);
+});
+
+test('low-intensity prompt uses current field performance as a ceiling check without inventing a universal zone formula',()=>{
+  const rules=elitePromptRules({
+    secondary_goals:['Improve 5 km from 25:00 to 22:30'],
+    current_numbers:'5 km: 25:00',
+    notes:'Currently running 2 sessions per week.'
+  }).join('\n');
+  assert.match(rules,/LOW-INTENSITY RUNNING ANCHOR/i);
+  assert.match(rules,/about 5:00\/km for 5K/i);
+  assert.match(rules,/never use that race pace or a faster pace as low intensity/i);
+  assert.match(rules,/rather than fabricating a precise breakpoint/i);
+});
+
 test('rower warm-ups do not satisfy a 2K rowing performance goal',()=>{
   const intake={primary_goals:['Improve 2 km rowing ergometer from 7:30 to 7:05'],notes:'Currently rows 3 times per week.'};
   const warmupOnly=parsed([
