@@ -1,0 +1,4 @@
+Final live acceptance trigger
+2026-08-13
+Target: Avatar 3 + annoying concurrent only
+Pipeline lock head: 0c605c5b4e2345d83c91c9aaf3312dae210a4ac7
