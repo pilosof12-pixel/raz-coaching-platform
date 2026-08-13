@@ -29,19 +29,26 @@ jobs:
           node --check phase14/scripts/build_phase15_runtime.mjs
           node --test test/marathon_elite_acceptance.test.js
           node --test test/marathon_volume_progression_guard.test.js
+          node --test test/marathon_week1_anchor_and_tsv.test.js
           grep -q 'Stable maintenance is valid' phase14/scripts/build_phase15_runtime.mjs
           grep -q 'MARATHON SINGLE-LEVER HARD CONTRACT' phase14/engine/phase15_elite_guardrails.js
+          grep -q 'Week 1 total direct running distance MUST NOT exceed' phase14/engine/phase15_elite_guardrails.js
+          grep -q 'ALL-WEEK-TSV-SHAPE-QA' phase14/engine/phase15_final_qa.js
+          grep -q 'MARATHON-WEEK1-CURRENT-VOLUME-QA' phase14/engine/phase15_final_qa.js
           grep -q 'copy the non-selected category prescriptions' phase14/engine/phase15_final_qa.js
+          grep -q 'exactly nine tab-separated cells' phase14/scripts/build_phase15_runtime.mjs
           ! grep -q 'while progressing load, reps, sets or assistance conservatively' phase14/scripts/build_phase15_runtime.mjs
           cd phase14
           npm run phase15:build
           node --check server.phase15.js
           grep -q 'Stable maintenance is valid' server.phase15.js
+          grep -q 'Week 1 direct running distance must not exceed it' server.phase15.js
+          grep -q 'exactly nine tab-separated cells' server.phase15.js
       - name: Commit tested source patch
         run: |
           git config user.name 'RAZ regression bot'
           git config user.email 'actions@users.noreply.github.com'
           git add phase14/engine/phase15_final_qa.js phase14/engine/phase15_elite_guardrails.js phase14/scripts/build_phase15_runtime.mjs
           if git diff --cached --quiet; then echo 'No source changes'; exit 0; fi
-          git commit -m 'Strengthen marathon correction and maintenance hierarchy'
+          git commit -m 'Anchor marathon Week 1 volume and enforce TSV shape'
           git push origin HEAD:privacy-security-hardening
