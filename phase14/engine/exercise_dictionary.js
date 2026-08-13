@@ -228,6 +228,10 @@ const ALIAS_LIST = [
   ["Running Intervals", "Run"],
   ["Cool-down Jog/Walk", "Run"],
   ["Cooldown Jog/Walk", "Run"],
+  ["Jog/Walk", "Run"],
+  ["Walk/Jog", "Run"],
+  ["Easy Jog/Walk", "Run"],
+  ["Easy Walk/Jog", "Run"], // STRUCTURAL-COOLDOWN-ALIASES
   ["Dumbbell Reverse Lunge", "Reverse Lunge"], // FINAL-LIVE-ALIAS-SET
   ["Run (Treadmill)", "Treadmill"], // FINAL-LIVE-ALIAS-SET-2
   ["DB Overhead Press", "Dumbbell Overhead Press"],
@@ -600,6 +604,7 @@ function hebNorm(s) {
 }
 
 const NORM_DICT = new Set([...EXERCISE_DICTIONARY].map(norm));
+const NORM_DICT_CANONICAL = new Map([...EXERCISE_DICTIONARY].map((name) => [norm(name), name])); // LEADING-DESCRIPTOR-CANONICALIZATION
 const NORM_ALIAS = new Map([...EXERCISE_ALIASES].map(([k, v]) => [norm(k), v]));
 
 // The deterministic skill graph is itself a curated authoritative source.
@@ -663,6 +668,8 @@ export function isWarmupCell(cell) {
 export function coreExerciseName(cell, isHebrew = false) {
   let s = String(cell || "").trim().replace(/^"|"$/g, "").trim();
   s = s.replace(/^\[(?:WARMUP|חימום)\]\s*/i, "");
+  s = s.replace(/^\[(?:COOL[- ]?DOWN|COOLDOWN)\]\s*(?:easy\s+)?/i, ""); // COOLDOWN-PREFIX-NORMALIZATION
+  s = s.replace(/^\d+(?:\.\d+)?\s*(?:km|k|m)\s+(?=run\b)/i, ""); // RUN-EVENT-PREFIX-NORMALIZATION
   // Drop a leading label like "General prep:" / "Specific ramp:" / Hebrew equivalents.
   s = s.replace(/^[^:]{0,32}:\s*/, (m) => (/(prep|ramp|primer|הכנה|ראמפ|פריימר|חימום)/i.test(m) ? "" : m));
   // Hebrew-first parenthetical "עברית (English)" OR annotation parenthetical.
@@ -702,6 +709,12 @@ export function matchDictionary(core) {
   if (NORM_DICT.has(n)) return { status: "hit" };
   if (NORM_SKILL_GRAPH.has(n)) return { status: "hit" };
   if (NORM_ALIAS.has(n)) return { status: "alias", canonical: NORM_ALIAS.get(n) };
+  for (const prefix of ["weighted "]) {
+    if (n.startsWith(prefix)) {
+      const base = n.slice(prefix.length).trim();
+      if (NORM_DICT_CANONICAL.has(base)) return { status: "alias", canonical: NORM_DICT_CANONICAL.get(base) };
+    }
+  }
   let toks = n.split(" ");
   while (toks.length > 1 && MODIFIER_SET.has(toks[toks.length - 1])) {
     toks = toks.slice(0, -1);
@@ -858,7 +871,13 @@ export function hardSubstituteHallucinations(program, intake = {}) {
     const cell = cells[ctx.exIdx];
     if (isWarmupCell(cell)) return null;
     const core = coreExerciseName(cell, isHebrew);
-    if (!core || matchDictionary(core).status !== "miss") return null;
+    if (!core) return null;
+    const matched = matchDictionary(core);
+    if (matched.status === "alias") {
+      cells[ctx.exIdx] = cell.replace(core, matched.canonical); // HARD-SUBSTITUTE-CANONICALIZES-ALIASES
+      return cells;
+    }
+    if (matched.status !== "miss") return null;
     cells[ctx.exIdx] = "[REVIEW] " + cell.trim();
     const notesIdx = ctx.header.indexOf("notes");
     if (notesIdx >= 0 && notesIdx < cells.length) cells[notesIdx] = note;

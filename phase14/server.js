@@ -1535,6 +1535,7 @@ function phase15LastMileTsv(tsv, intake) {
 
 function privacyScrub(text, intake) {
   if (!text) return text;
+  text = text.replace(/<!--\s*QA_FORMULA_VIOLATION_COUNT:\s*\d+\s*-->/gi, ""); // SERVER-AUTHORITATIVE-FORMULA-MARKER
 
   // Formula validator (defense-in-depth) runs on the FULL text first, because
   // it must inspect the START_WEEK1_TSV row block. It anchors per-set loads to
