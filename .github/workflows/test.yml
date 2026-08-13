@@ -27,6 +27,7 @@ jobs:
         run: |
           node scripts/apply_lastmile_clean.mjs
           node scripts/apply_elite_guardrails.mjs
+          node scripts/apply_endurance_acceptance_fixes.mjs
       - run: npm ci
       - run: npm test
       - run: node --check server.js
@@ -39,6 +40,7 @@ jobs:
           node --check public/analytics-client.js
       - name: Validate deployed Phase 15 runtime and launch layer
         run: |
+          node --check scripts/apply_endurance_acceptance_fixes.mjs
           node --check phase14/server.js
           node --check phase14/scripts/build_phase15_runtime.mjs
           node --check phase14/scripts/postprocess_phase15_runtime.mjs
@@ -78,14 +80,21 @@ jobs:
           grep -q 'buildPhase15SourceGrounding(ENGINE, intake, EXERCISE_DICTIONARY)' phase14/server.phase15.js
           grep -q 'source-aligned: only explicit density goals require density rows' phase14/server.phase15.js
           grep -q "cells\[6\] = 'N/A'" phase14/server.phase15.js
+          grep -q 'SOURCE-LABEL-CLIENT-SCRUB' phase14/server.phase15.js
+          grep -q 'ENDURANCE TARGET ANCHOR' phase14/server.phase15.js
           grep -q 'OpenAI provider unavailable; using source-grounded Gemini fallback' phase14/server.phase15.js
           grep -q 'ELITE-GUARDRAILS-FINAL-QA-WIRED' phase14/engine/phase15_program_qa.js
           grep -q 'ENDURANCE-PRESERVATION-FINAL-QA-WIRED' phase14/engine/phase15_program_qa.js
           grep -q 'EXACT-PRIMARY-MOVEMENT-FINAL-QA-WIRED' phase14/engine/phase15_program_qa.js
+          grep -q 'MEANINGFUL-SPECIFIC-SETS-DURATION' phase14/engine/phase15_program_qa.js
           grep -q 'EXACT-VARIATION-KEY' phase14/engine/phase15_elite_guardrails.js
           grep -q 'TARGET_MODALITY_EXPOSURE_REDUCED' phase14/engine/phase15_elite_guardrails.js
           grep -q 'EVENT_PROGRESSING_SESSION_MISSING' phase14/engine/phase15_elite_guardrails.js
+          grep -q 'MEANINGFUL-INTERVAL-SETS-DURATION' phase14/engine/phase15_elite_guardrails.js
+          grep -q 'PAIN-SENSITIVE-SQUAT-SUBSTITUTION' phase14/engine/phase15_elite_guardrails.js
+          grep -q 'ROWING-500M-SPLIT-PROGRESSION' phase14/engine/phase15_elite_guardrails.js
           grep -q 'ENDURANCE-MODALITY-CANONICAL-SET' phase14/engine/exercise_dictionary.js
+          grep -q 'ENDURANCE-LIVE-ALIAS-SET' phase14/engine/exercise_dictionary.js
           grep -q 'ENDURANCE-MODALITY-CATALOG-ROUTING' phase14/engine/phase15_source_router.js
           grep -q 'clarification-controls.js' phase14/public/index.html
           grep -q 'launch-controls.js' phase14/public/index.html
