@@ -1,0 +1,24 @@
+name: Final six-avatar live coaching acceptance
+
+on:
+  push:
+    branches:
+      - privacy-security-hardening
+
+permissions:
+  contents: read
+
+jobs:
+  live-final-six:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: privacy-security-hardening
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Wait for Render deployment
+        run: sleep 240
+      - name: Run final six-avatar acceptance
+        run: node scripts/live_final_six_acceptance.mjs
