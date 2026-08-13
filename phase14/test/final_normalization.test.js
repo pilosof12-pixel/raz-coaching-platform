@@ -36,6 +36,14 @@ test('cool-down purpose prefix is removed before canonical run lookup', () => {
   assert.equal(m.canonical, 'Run');
 });
 
+test('run warm-up and cool-down suffixes resolve to canonical Run', () => {
+  for (const label of ['Run Cool-down','Run Cooldown','Run Warm-up','Run Warmup']) {
+    const m=matchDictionary(coreExerciseName(label));
+    assert.equal(m.status,'alias',label);
+    assert.equal(m.canonical,'Run',label);
+  }
+});
+
 test('hard-substitute canonicalizes known aliases before marking true hallucinations for review', () => {
   const program = [
     'START_WEEK1_TSV',
@@ -43,6 +51,7 @@ test('hard-substitute canonicalizes known aliases before marking true hallucinat
     'Mon\tDumbbell Reverse Lunge\tRPE-selected\t3\t8\t90 sec\t7\twork\t',
     'Mon\tWeighted Glute Bridge\t+20 kg\t3\t10\t90 sec\t8\twork\t',
     'Sat\t5 km Run\tN/A\t1\t35 min\tN/A\tN/A\tevent-specific running\t',
+    'Sat\tRun Cool-down\tN/A\t1\t5 min\tN/A\tN/A\tEasy jog/walk\t',
     'Mon\tImaginary Dragon Squat\tBodyweight\t3\t8\t90 sec\t7\twork\t',
     'END_WEEK1_TSV',
   ].join('\n');
@@ -50,7 +59,8 @@ test('hard-substitute canonicalizes known aliases before marking true hallucinat
   assert.match(out, /\tReverse Lunge\t/);
   assert.match(out, /\tGlute Bridge\t\+20 kg\t/);
   assert.match(out, /\t5 km Run\tN\/A\t/);
-  assert.doesNotMatch(out, /\[REVIEW\] (?:Dumbbell Reverse Lunge|Weighted Glute Bridge|5 km Run)/);
+  assert.match(out, /\tRun\tN\/A\t1\t5 min/);
+  assert.doesNotMatch(out, /\[REVIEW\] (?:Dumbbell Reverse Lunge|Weighted Glute Bridge|5 km Run|Run Cool-down)/);
   assert.match(out, /\[REVIEW\] Imaginary Dragon Squat/);
 });
 
