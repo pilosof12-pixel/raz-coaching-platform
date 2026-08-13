@@ -20,13 +20,13 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 22
-      - name: Prepare final-two acceptance script
+      - name: Prepare final concurrent acceptance script
         run: |
           python - <<'PY'
           p='scripts/live_final_six_acceptance.mjs'
           s=open(p,encoding='utf-8').read()
           s=s.replace("const ambiguous={primary_goals:", "const ambiguous={experience:'advanced',primary_goals:", 1)
-          keep={'AVATAR3_WARRIOR','ANNOYING_CONCURRENT'}
+          keep={'ANNOYING_CONCURRENT'}
           lines=[]
           for line in s.splitlines():
               if line.startswith("results.push(await runCase('"):
@@ -34,10 +34,10 @@ jobs:
                   if name not in keep:
                       continue
               lines.append(line)
-          open('scripts/live_final_two.mjs','w',encoding='utf-8').write('\n'.join(lines)+'\n')
+          open('scripts/live_final_concurrent.mjs','w',encoding='utf-8').write('\n'.join(lines)+'\n')
           print('cases',sorted(keep))
           PY
       - name: Wait for Render deployment
         run: sleep 240
-      - name: Run final two live cases
-        run: node scripts/live_final_two.mjs
+      - name: Run final concurrent live case
+        run: node scripts/live_final_concurrent.mjs
