@@ -1,0 +1,21 @@
+name: Live remaining endurance acceptance
+
+on:
+  push:
+    branches:
+      - privacy-security-hardening
+
+jobs:
+  live-remaining:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: privacy-security-hardening
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Wait for Render deploy
+        run: sleep 240
+      - name: Run remaining live coaching acceptance
+        run: node scripts/live_remaining_acceptance.mjs
