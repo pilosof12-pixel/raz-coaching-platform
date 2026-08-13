@@ -1,0 +1,37 @@
+name: Apply marathon progression semantics
+
+on:
+  push:
+    branches:
+      - privacy-security-hardening
+    paths:
+      - qa/marathon-progression-trigger.txt
+
+permissions:
+  contents: write
+
+jobs:
+  apply-marathon-progression:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: privacy-security-hardening
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: node scripts/apply_marathon_progression_semantics.mjs
+      - name: Validate marathon and endurance integrity
+        run: |
+          node --check phase14/engine/phase15_elite_guardrails.js
+          node --test test/marathon_progression_integrity.test.js
+          node --test test/final_concurrent_endurance_integrity.test.js
+          node --test phase14/test/phase15_elite_guardrails.test.mjs
+      - name: Commit tested source patch
+        run: |
+          git config user.name 'RAZ regression bot'
+          git config user.email 'actions@users.noreply.github.com'
+          git add phase14/engine/phase15_elite_guardrails.js
+          if git diff --cached --quiet; then echo 'No source changes'; exit 0; fi
+          git commit -m 'Recognize marathon long-run progression in endurance QA'
+          git push origin HEAD:privacy-security-hardening
