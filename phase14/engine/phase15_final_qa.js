@@ -94,12 +94,12 @@ export function marathonStackedProgressionFlags(program,intake={}) {
     const longUp=b.long.volume>a.long.volume;
     if(qualityVolumeUp&&qualityPaceUp) flags.push({
       code:'MARATHON_QUALITY_DOUBLE_PROGRESSION',
-      message:'Week '+b.week+' makes the quality run both longer/more voluminous and faster than Week '+a.week+'. The authored endurance framework says progress one main variable at a time; choose pace/intensity OR accumulated quality work for this transition, not both.'
+      message:'Week '+b.week+' makes the quality run both longer/more voluminous and faster than Week '+a.week+'. The authored endurance framework says progress one main variable at a time. Choose pace/intensity OR accumulated quality work for this transition, not both. If pace progresses, copy the prior week quality duration/distance unchanged. If accumulated quality work progresses, copy the prior week pace unchanged.'
     });
     const categoryIncreases=[qualityVolumeUp||qualityPaceUp,easyUp,longUp].filter(Boolean).length;
     if(categoryIncreases>1) flags.push({
       code:'MARATHON_STACKED_VOLUME_PROGRESSION',
-      message:'Week '+b.week+' progresses more than one main running category versus Week '+a.week+'. The authored endurance decision system says progress/regress one main variable according to adaptation and recovery. Choose one main progression lever for this transition and hold the other running categories stable.'
+      message:'Week '+b.week+' progresses more than one main running category versus Week '+a.week+'. The authored endurance decision system says progress/regress one main variable according to adaptation and recovery. Choose one main progression lever for this transition and copy the non-selected category prescriptions from Week '+a.week+' unchanged. If long-run volume progresses, keep quality and routine easy volume unchanged; if quality progresses, keep long-run and easy volume unchanged; if easy volume progresses, keep quality and long-run prescriptions unchanged.'
     });
   }
   return flags;
