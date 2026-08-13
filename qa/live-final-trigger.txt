@@ -3,5 +3,6 @@ Final live acceptance trigger
 Target: annoying concurrent only
 All-week race-anchor endurance integrity: enabled
 Surgical QA correction attempts: up to two before fail-closed
-CI: 31669281402 PASS
-Production source head before trigger: e6f0580b1b2e16399ed9c83422c995e8bce4f5d6
+Deterministic unbenchmarked variation load repair: enabled
+CI: 31670078178 PASS
+Production source head before trigger: e7a3255e877d8437ca4166471e7227f97b4517a4
