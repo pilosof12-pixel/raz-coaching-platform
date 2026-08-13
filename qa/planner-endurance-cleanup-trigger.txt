@@ -1,3 +1,0 @@
-Planner endurance cleanup trigger
-2026-08-13
-Third run: apply source-routed aerobic-base planner logic after removing stale literal REVIEW assertion.
