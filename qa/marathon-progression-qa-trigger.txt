@@ -1,3 +1,3 @@
 Endurance event progression QA trigger
 2026-08-13
-Apply the validated event-progression semantics update.
+Run the source-supported long-session progression semantics validation.
