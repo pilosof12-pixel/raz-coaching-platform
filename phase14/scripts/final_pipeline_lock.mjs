@@ -40,11 +40,13 @@ export function lockFinalPipelineSource(input) {
   once(progressAnchor, phase15Handling, 'Phase15 fail-closed handling');
 
   // privacyScrub/last-mile normalization can change TSV cells after the in-loop
-  // final QA. Revalidate the exact client-visible string immediately before it is
-  // persisted. Nothing can bypass this save boundary.
+  // final QA. Revalidate the exact client-visible string immediately after the
+  // scrub assignment. The real runtime may place timing/progress code after this
+  // line, so deliberately anchor only on the unique assignment itself.
+  const saveProgramAnchor = '    const program = privacyScrub(await generateValidatedProgram(intake, progress), intake);';
   once(
-    '    const program = privacyScrub(await generateValidatedProgram(intake, progress), intake);\n    await progress("finalizing", 0, "saving program");',
-    '    const program = privacyScrub(await generateValidatedProgram(intake, progress), intake);\n    validatePhase15FinalProgram(program, intake); // SAVE-BOUNDARY-FINAL-QA\n    await progress("finalizing", 0, "saving program");',
+    saveProgramAnchor,
+    saveProgramAnchor + '\n    validatePhase15FinalProgram(program, intake); // SAVE-BOUNDARY-FINAL-QA',
     'save-boundary final QA'
   );
 
