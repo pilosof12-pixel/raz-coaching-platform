@@ -2,4 +2,6 @@ Final marathon coaching acceptance
 2026-08-13
 Valid fixture uses days_per_week=2.
 Long-run duration/distance is recognized as a marathon event-specific progression anchor.
-Production source head before trigger: 38f1aa22dfdb96474ca25dd9dfdae93cf7efbb8f
+Current weekly volume is the starting workload anchor.
+Do not escalate quality, easy and long-run volume together.
+Production source head before trigger: c756062a702417db00b452db8981ee85345ed9a3
