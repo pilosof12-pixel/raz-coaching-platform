@@ -1,5 +1,6 @@
 Marathon elite acceptance hardening
 2026-08-13
+Rerun after idempotent exported-helper patcher fix.
 Apply explicit copy-forward correction contract and maintenance hierarchy.
 Catch quality sessions that progress both pace and accumulated work in the same transition.
 Catch simultaneous progression across quality/easy/long-run categories.
