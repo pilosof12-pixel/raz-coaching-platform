@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import {
   endurancePerformanceIntegrityFlags,
   elitePromptRules,
+  repairUnbenchmarkedVariationLoads,
 } from '../engine/phase15_elite_guardrails.js';
 import { validatePhase15FinalProgram } from '../engine/phase15_final_qa.js';
 import { Phase15QualityError } from '../engine/phase15_program_qa.js';
@@ -43,6 +44,27 @@ test('running prompt anchors current race performance and smallest-useful-variab
   assert.match(rules,/do not prescribe a continuous non-test run faster than the demonstrated 5K pace/i);
   assert.match(rules,/progress the smallest useful variable/i);
   assert.match(rules,/do not automatically increase both pace and duration together/i);
+});
+
+test('unbenchmarked variation load repair changes only the related unbenchmarked lift',()=>{
+  const loadIntake={
+    current_numbers:'Back squat: 170 kg x 3\nWeighted chin-up: +55 kg x 3\nRDL: 190 kg x 5\nOHP: 70 kg x 5',
+    performance_markers:['Back squat: 170 kg x 3','Weighted chin-up: +55 kg x 3','RDL: 190 kg x 5','OHP: 70 kg x 5'],
+  };
+  const program=[
+    'START_WEEK1_TSV',
+    'Day\tExercise\tWeight\tSets\tReps\tRest\tTarget RPE\tNotes\tResults',
+    'Tue\tBox Squat to Parallel\t160 kg\t3\t3\t3 min\t8\ttolerated variation\t',
+    'Tue\tWeighted Chin-up\t+55 kg\t3\t3\t3 min\t8\texact benchmarked lift\t',
+    'Wed\tRDL\t190 kg\t3\t5\t2 min\t8\texact benchmarked lift\t',
+    'Tue\tOverhead Press\t70 kg\t3\t5\t2 min\t8\texact benchmarked lift\t',
+    'END_WEEK1_TSV',
+  ].join('\n');
+  const repaired=repairUnbenchmarkedVariationLoads(program,loadIntake);
+  assert.match(repaired,/Box Squat to Parallel\tRPE-selected load/);
+  assert.match(repaired,/Weighted Chin-up\t\+55 kg/);
+  assert.match(repaired,/RDL\t190 kg/);
+  assert.match(repaired,/Overhead Press\t70 kg/);
 });
 
 const header='Day\tExercise\tWeight\tSets\tReps\tRest\tTarget RPE\tNotes\tResults';
