@@ -79,9 +79,10 @@ function marathonStackedProgressionFlags(program,intake={}) {
   const flags=[];
   for(let i=1;i<weekMetrics.length;i++) {
     const a=weekMetrics[i-1],b=weekMetrics[i];
-    if(b.quality>a.quality && b.easy>a.easy && b.long>a.long) flags.push({
+    const increases=[b.quality>a.quality,b.easy>a.easy,b.long>a.long].filter(Boolean).length;
+    if(increases>1) flags.push({
       code:'MARATHON_STACKED_VOLUME_PROGRESSION',
-      message:'Week '+b.week+' simultaneously increases quality-session distance, routine easy-run distance and long-run distance versus Week '+a.week+'. The authored endurance framework says progress the smallest useful variable inside the recovery budget; choose the main progression lever and hold lower-priority volume stable rather than stacking every volume source at once.'
+      message:'Week '+b.week+' increases more than one main running-volume category versus Week '+a.week+'. The authored endurance decision system says progress/regress one main variable according to adaptation and recovery. Choose one main progression lever for this transition and hold the other running-volume categories stable.'
     });
   }
   return flags;
