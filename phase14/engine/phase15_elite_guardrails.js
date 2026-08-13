@@ -228,9 +228,15 @@ export function endurancePerformanceIntegrityFlags(program, intake={}, parsed=nu
       }
     } // CONCURRENT-ENDURANCE-REDUNDANCY-INTEGRITY
     const eventGoal=/\d|\b(?:mile|3\s*k|5\s*k|10\s*k|half[- ]?marathon|marathon|erg|time trial|triathlon)\b/i.test(text);
-    if(eventGoal && !rows.some(eventProgressionBearing)) flags.push({
+    const marathonLongRunProgression=/\bmarathon\b/i.test(text) && rows.some(item => {
+      const rowText=String(item.ctx||'')+' '+String(item.dose||'');
+      const longRole=/\blong(?:[- ]run)?\b|long aerobic|endurance run/i.test(rowText);
+      const externalDose=/\b\d+(?:\.\d+)?\s*(?:km|miles?|min|minutes?|hours?|hrs?)\b/i.test(rowText);
+      return longRole && externalDose;
+    }); // MARATHON-LONG-RUN-PROGRESSION
+    if(eventGoal && !rows.some(eventProgressionBearing) && !marathonLongRunProgression) flags.push({
       code:'EVENT_PROGRESSING_SESSION_MISSING',
-      message:`The ${def.key} performance goal '${text}' has no progression-bearing event-specific session in Week 1. At least one direct session needs a source-grounded external target such as an interval/pace/power/split progression; easy cross-training or a generic warm-up is not a performance plan.`
+      message:`The ${def.key} performance goal '${text}' has no progression-bearing event-specific session in Week 1. For marathon preparation, an explicitly identified long run with a prescribed duration/distance is a valid event-specific progression anchor; other events still require their source-supported pace/power/split/interval or equivalent progression.`
     });
   }
   return flags;
@@ -452,7 +458,7 @@ export function elitePromptRules(intake={}) {
       }
     } // CONCURRENT-ENDURANCE-BUDGET-PROMPT
     rules.push(`TARGET-MODALITY INTEGRITY: ${def.key} is a named ${priority} performance goal${current?` and the intake documents about ${current} current ${def.key} exposure(s) per week`:''}. Do not silently reduce that existing target-modality practice. Put the target-modality sessions into the four-week deliverable, including non-gym sport days when needed, and use the curated endurance sources to assign their actual purpose/dose. Cross-training may supplement but not replace them.`);
-    if(/\d|\b(?:mile|3\s*k|5\s*k|10\s*k|half[- ]?marathon|marathon|erg|time trial|triathlon)\b/i.test(text)) rules.push(`EVENT-PROGRESSION INTEGRITY: '${text}' needs at least one progression-bearing ${def.key} session with an external event-relevant target (for example source-selected interval, pace, power, split, stroke-rate or equivalent prescription). A warm-up or generic easy session alone is not sufficient. The exact workout design must come from the curated sources, not generic model memory.`);
+    if(/\d|\b(?:mile|3\s*k|5\s*k|10\s*k|half[- ]?marathon|marathon|erg|time trial|triathlon)\b/i.test(text)) rules.push(`EVENT-PROGRESSION INTEGRITY: '${text}' needs at least one progression-bearing ${def.key} session with an external event-relevant target. For a marathon goal, a clearly identified long run with a prescribed duration or distance is a legitimate event-specific progression anchor; interval/tempo/pace work may also be used only when supported by the curated source and athlete context. For other events use the relevant source-selected interval, pace, power, split, stroke-rate or equivalent prescription. A warm-up or generic easy session alone is not sufficient. The exact workout design must come from the curated sources, not generic model memory.`); // MARATHON-LONG-RUN-PROMPT
   }
   const primary=list(intake.primary_goals).map(String).join(' | ');
   for(const def of EXACT_PRIMARY_LIFTS) {
