@@ -1,3 +1,3 @@
 Planner endurance cleanup trigger
 2026-08-13
-Second run: apply source-routed aerobic-base planner logic and align stale regression expectations.
+Third run: apply source-routed aerobic-base planner logic after removing stale literal REVIEW assertion.
