@@ -1,0 +1,41 @@
+name: Apply marathon elite acceptance
+
+on:
+  push:
+    branches:
+      - privacy-security-hardening
+    paths:
+      - qa/marathon-elite-acceptance-trigger.txt
+
+permissions:
+  contents: write
+
+jobs:
+  apply-marathon-elite-acceptance:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: privacy-security-hardening
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Apply source-grounded marathon elite guards
+        run: node scripts/apply_marathon_elite_acceptance.mjs
+      - name: Validate marathon elite acceptance logic
+        run: |
+          node --check phase14/engine/phase15_final_qa.js
+          node --check phase14/engine/phase15_elite_guardrails.js
+          node --test test/marathon_elite_acceptance.test.js
+          node --test test/marathon_volume_progression_guard.test.js
+          cd phase14
+          npm run phase15:build
+          node --check server.phase15.js
+      - name: Commit tested source patch
+        run: |
+          git config user.name 'RAZ regression bot'
+          git config user.email 'actions@users.noreply.github.com'
+          git add phase14/engine/phase15_final_qa.js phase14/engine/phase15_elite_guardrails.js
+          if git diff --cached --quiet; then echo 'No source changes'; exit 0; fi
+          git commit -m 'Enforce elite marathon progression and strength maintenance'
+          git push origin HEAD:privacy-security-hardening
