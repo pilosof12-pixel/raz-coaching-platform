@@ -1,9 +1,6 @@
 Marathon elite acceptance hardening
 2026-08-13
-Run after correcting the runtime verification assumption.
-Both marathon regression suites are aligned to the hard contract.
-Apply contract strengthening only on the already-validated marathon guards.
-Use explicit copy-forward correction semantics and maintenance hierarchy.
-Catch quality sessions that progress both pace and accumulated work in the same transition.
-Catch simultaneous progression across quality/easy/long-run categories.
-Keep strength maintenance supportive and recoverable rather than a progressive lower-body hypertrophy block.
+Apply current-volume Week 1 anchor and all-week TSV row-shape validation.
+Keep the existing single-lever progression, copy-forward correction semantics and maintenance hierarchy.
+Reject a Week 1 running total above an explicitly supplied current km/week baseline.
+Reject any physical TSV row that does not contain exactly nine cells.
