@@ -1,3 +1,0 @@
-Endurance event progression QA trigger
-2026-08-13
-Second run after matching the current event-progression block.
