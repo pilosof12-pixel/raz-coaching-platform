@@ -19,6 +19,10 @@ const MOVEMENTS = [
   { id:'weighted_pull', goal:/\bweighted (?:chin|pull)[- ]?up\b/i, current:/\bweighted (?:chin|pull)[- ]?up\b/i, label:'weighted chin-up / pull-up' },
   { id:'weighted_dip', goal:/\bweighted dip\b/i, current:/\bweighted dip\b/i, label:'weighted dip' },
   { id:'one_arm_pullup', goal:/\b(?:one[- ]arm pull[- ]?up|oap)\b/i, current:/\b(?:one[- ]arm pull[- ]?up|oap)\b/i, label:'one-arm pull-up' },
+  { id:'planche', goal:/\bplanche\b/i, current:/\bplanche\b/i, label:'planche progression / hold' },
+  { id:'front_lever', goal:/\bfront lever\b/i, current:/\bfront lever\b/i, label:'front lever progression / hold' },
+  { id:'handstand_pushup', goal:/\b(?:handstand push[- ]?up|hspu)\b/i, current:/\b(?:handstand push[- ]?up|hspu)\b/i, label:'handstand push-up progression' },
+  { id:'muscle_up', goal:/\bmuscle[- ]?up\b/i, current:/\bmuscle[- ]?up\b/i, label:'muscle-up' },
 ];
 
 function looksQuantifiedGoal(s) {
@@ -118,6 +122,22 @@ export function detectIntakeClarifications(intake = {}) {
       id:'upper_body_goal_movement_tolerance',
       prompt:'Which part of the goal movement aggravates the upper-body issue, and which close variations/ranges are currently comfortable?',
       help:'Mention grip, ROM, load, volume or specific exercise variations if you know them.',
+    });
+  }
+
+  // Limited-equipment weighted goals need the actual load ceiling when it
+  // materially changes how progression can be written. Commercial/full gyms do
+  // not need this question; park/home/limited setups do when no numeric ceiling
+  // has been supplied.
+  const equipment=text([intake?.equipment,intake?.training_location,intake?.notes]).toLowerCase();
+  const limitedSetup=/(?:park|home|limited|minimal|rings|pull[- ]?up bar|weight(?:ed)? belt|plates? only|outdoor)/i.test(equipment) && !/(?:commercial gym|full gym|fully equipped)/i.test(equipment);
+  const weightedGoal=/\b(?:weighted (?:chin|pull)[- ]?up|weighted dip|belt load|added load)\b/i.test(goals);
+  const numericCeiling=/(?:up to|max(?:imum)?|ceiling|available)[^.!]{0,25}\d+(?:\.\d+)?\s*(?:kg|lb)|\d+(?:\.\d+)?\s*(?:kg|lb)[^.!]{0,25}(?:available|max|plates?|belt)/i.test(equipment);
+  if(limitedSetup && weightedGoal && !numericCeiling) {
+    addQuestion(out,intake,{
+      id:'equipment_load_ceiling',
+      prompt:'What is the maximum external load you can actually add with your current setup?',
+      help:'For example: weighted belt with up to 25 kg of plates. If there is no practical ceiling, say that.',
     });
   }
 
