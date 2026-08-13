@@ -16,9 +16,9 @@ test('marathon prompt anchors supplied current weekly volume and one authored ma
   assert.match(rules,/about 38 km\/week currently/i);
   assert.match(rules,/starting anchor/i);
   assert.match(rules,/progress\/regress one main variable/i);
-  assert.match(rules,/choose ONE main running progression lever/i);
-  assert.match(rules,/do not increase both pace\/intensity and accumulated work/i);
-  assert.match(rules,/hold the other running categories stable/i);
+  assert.match(rules,/choose exactly ONE main running progression lever/i);
+  assert.match(rules,/change pace\/intensity OR accumulated work, never both/i);
+  assert.match(rules,/COPY the prior-week quality and routine-easy prescriptions unchanged/i);
 });
 
 test('final QA owns one-main-variable marathon block protection',()=>{
