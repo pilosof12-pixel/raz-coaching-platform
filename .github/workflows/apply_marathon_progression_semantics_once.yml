@@ -5,7 +5,7 @@ on:
     branches:
       - privacy-security-hardening
     paths:
-      - qa/marathon-progression-trigger.txt
+      - qa/marathon-progression-qa-trigger.txt
 
 permissions:
   contents: write
