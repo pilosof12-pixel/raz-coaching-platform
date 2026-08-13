@@ -53,6 +53,20 @@ test('Sprint TSV semantics use speed quality rather than strength RPE', () => {
   assert.match(out, /Target RPE is N\/A because speed quality/);
 });
 
+test('unambiguous endurance naming variants are repaired after legacy closed-set review', () => {
+  const out = patchPhase15RuntimeSource(fixture());
+  assert.match(out, /ENDURANCE-ALIAS-LASTMILE/);
+  assert.match(out, /Zone-2 Rower/);
+  assert.match(out, /cells\[1\] = 'Zone-2 Row'/);
+  assert.match(out, /Bicep Curl/);
+  assert.match(out, /cells\[1\] = 'Dumbbell Curl'/);
+  assert.match(out, /cells\[1\] = 'Swim'/);
+  assert.match(out, /cells\[1\] = 'Bike'/);
+  assert.match(out, /cells\[1\] = 'Run'/);
+  assert.match(out, /COOLDOWN/);
+  assert.match(out, /Easy Walk\$\/i\.test\(ex\)\) continue/);
+});
+
 test('OpenAI quota/outage path falls through to Gemini with the same compact source-grounded user and system prompts', () => {
   const out = patchPhase15RuntimeSource(fixture());
   assert.match(out, /OpenAI provider unavailable; using source-grounded Gemini fallback/);
