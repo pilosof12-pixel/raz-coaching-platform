@@ -10,8 +10,10 @@ export function patchPhase15RuntimeSource(input) {
   if (densityMatches.length !== 1) throw new Error(`Expected one DENSITY_DEMANDING_GOAL line, found ${densityMatches.length}`);
   s = s.replace(densityLine, '    const DENSITY_DEMANDING_GOAL = /(?:emom|amrap|density)/; // source-aligned: only explicit density goals require density rows');
 
-  // Sprint intensity uses speed/quality language, not strength-set RPE. Preserve
-  // the speed prescription in Notes and make the TSV Target RPE semantically N/A.
+  // Final TSV normalization happens after the legacy closed-set validator. The
+  // validator may mark harmless naming variants as [REVIEW] even when the intended
+  // movement is already canonical in the authored endurance path. Resolve only
+  // exact, unambiguous aliases here; do not broaden the exercise closed set.
   const fnStart = s.indexOf('function phase15LastMileTsv');
   const fnEnd = s.indexOf('\nfunction privacyScrub', fnStart);
   if (fnStart < 0 || fnEnd < 0) throw new Error('phase15LastMileTsv block not found');
@@ -20,6 +22,14 @@ export function patchPhase15RuntimeSource(input) {
   const pushCount = block.split(pushAnchor).length - 1;
   if (pushCount !== 1) throw new Error(`Expected one phase15LastMileTsv push anchor, found ${pushCount}`);
   block = block.replace(pushAnchor, [
+    "    // ENDURANCE-ALIAS-LASTMILE: exact aliases only, never free-form exercise invention.",
+    "    if (/^(?:\\[REVIEW\\]\\s*)?Zone-2 Rower$/i.test(ex)) { cells[1] = 'Zone-2 Row'; cells[7] = 'Low-intensity rowing. Keep output controlled and repeatable, and use pace or power as the external anchor.'; ex = cells[1]; }",
+    "    if (/^(?:\\[REVIEW\\]\\s*)?Bicep Curl \\(Dumbbell\\)$/i.test(ex)) { cells[1] = 'Dumbbell Curl'; cells[7] = 'Controlled accessory work. Keep the prescribed effort and stop before form deteriorates.'; ex = cells[1]; }",
+    "    if (/^(?:\\[REVIEW\\]\\s*)?Swimming$/i.test(ex)) { cells[1] = 'Swim'; cells[7] = 'Use swim pace and technique quality as the primary external anchors for this session.'; ex = cells[1]; }",
+    "    if (/^(?:\\[REVIEW\\]\\s*)?Cycling$/i.test(ex)) { cells[1] = 'Bike'; cells[7] = 'Use cycling power or pace as the primary external anchor and keep the prescribed session intent.'; ex = cells[1]; }",
+    "    if (/^(?:\\[REVIEW\\]\\s*)?Running$/i.test(ex)) { cells[1] = 'Run'; cells[7] = 'Use running pace as the primary external anchor and keep the prescribed session intent.'; ex = cells[1]; }",
+    "    if (/^(?:\\[REVIEW\\]\\s*)?\\[COOLDOWN\\]\\s*Easy Walk$/i.test(ex)) continue;",
+    "    // Sprint intensity uses speed/quality language, not strength-set RPE.",
     "    if (/^Sprint$/i.test(ex)) {",
     "      cells[6] = 'N/A';",
     "      const sprintNote = String(cells[7] || '').trim();",
