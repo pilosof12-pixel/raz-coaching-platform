@@ -39,7 +39,7 @@ function overheadVariationPass(program, intake) {
   return strictDays.size >= 1 && verticalDays.size >= 2;
 }
 
-function demoCoverageFailures(program) {
+export function demoCoverageAdvisories(program) {
   const missing = new Set();
   for (let w=1; w<=4; w++) {
     const p=parseWeek(program,w); if (!p) continue;
@@ -66,9 +66,11 @@ export function validatePhase15FinalProgram(program, intake={}) {
     if (flags.length) throw new Phase15QualityError(flags);
   }
 
-  const missing=demoCoverageFailures(program);
-  if (missing.length) {
-    throw new Phase15QualityError([{code:'MISSING_DIRECT_EXERCISE_DEMO',message:`Client exercise rows lack direct curated demo links: ${missing.join(', ')}. Replace with verified equivalents or add curated demos before delivery.`}]);
-  }
-  return baseResult;
+  // Direct demo links are supplemental UI metadata, not a coaching-safety gate.
+  // The browser resolver remains direct-only: when no curated URL exists it
+  // simply renders no demo link. Never replace a valid coaching program with a
+  // different exercise merely to satisfy video coverage, and never fall back to
+  // a search-results URL. DEMO-COVERAGE-ADVISORY-NOT-BLOCKING
+  const missingDemoExercises=demoCoverageAdvisories(program);
+  return {...baseResult,missing_demo_exercises:missingDemoExercises};
 }
