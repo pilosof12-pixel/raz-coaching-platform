@@ -1,0 +1,37 @@
+name: Apply final concurrent endurance quality patch
+
+on:
+  push:
+    branches:
+      - privacy-security-hardening
+    paths:
+      - qa/final-concurrent-quality-trigger.txt
+
+permissions:
+  contents: write
+
+jobs:
+  apply-final-concurrent-quality:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: privacy-security-hardening
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Apply source-grounded concurrent endurance integrity patch
+        run: node scripts/apply_final_concurrent_quality.mjs
+      - name: Validate final concurrent endurance logic
+        run: |
+          node --check phase14/engine/phase15_elite_guardrails.js
+          node --test test/final_concurrent_endurance_integrity.test.js
+          node --test phase14/test/phase15_elite_guardrails.test.mjs
+      - name: Commit tested source patch
+        run: |
+          git config user.name 'RAZ regression bot'
+          git config user.email 'actions@users.noreply.github.com'
+          git add phase14/engine/phase15_elite_guardrails.js
+          if git diff --cached --quiet; then echo 'No source changes'; exit 0; fi
+          git commit -m 'Fix concurrent endurance race calibration and recovery budget'
+          git push origin HEAD:privacy-security-hardening
