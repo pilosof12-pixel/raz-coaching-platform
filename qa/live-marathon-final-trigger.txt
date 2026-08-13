@@ -4,4 +4,4 @@ Valid fixture uses days_per_week=2.
 Long-run duration/distance is recognized as a marathon event-specific progression anchor.
 Current weekly volume is the starting workload anchor.
 Do not escalate quality, easy and long-run volume together.
-Production source head before trigger: c756062a702417db00b452db8981ee85345ed9a3
+QA runner observes up to 15 minutes so server correction retries can finish.
