@@ -1,6 +1,7 @@
 Marathon elite acceptance hardening
 2026-08-13
-Run after both marathon regression suites were aligned to the hard contract.
+Run after correcting the runtime verification assumption.
+Both marathon regression suites are aligned to the hard contract.
 Apply contract strengthening only on the already-validated marathon guards.
 Use explicit copy-forward correction semantics and maintenance hierarchy.
 Catch quality sessions that progress both pace and accumulated work in the same transition.
