@@ -14,6 +14,13 @@ export function patchPhase15RuntimeSource(input) {
     "  return { violations: formulaOnlyFlags.length, flags: formulaOnlyFlags }; // LEGACY-FORMULA-SCOPE-NARROWED",
   ].join('\n'));
 
+  // _meta.violations must come from server-side QA only. Never trust a marker that
+  // the generation model itself happened to emit or copy.
+  const privacyAnchor = 'function privacyScrub(text, intake) {\n  if (!text) return text;';
+  const privacyCount = s.split(privacyAnchor).length - 1;
+  if (privacyCount !== 1) throw new Error(`Expected one privacyScrub anchor, found ${privacyCount}`);
+  s = s.replace(privacyAnchor, privacyAnchor + "\n  text = text.replace(/\\n?<!--\\s*QA_FORMULA_VIOLATION_COUNT:[\\s\\S]*?-->/gi, ''); // SERVER-OWNED-FORMULA-MARKER");
+
   const fnStart = s.indexOf('function phase15LastMileTsv');
   const fnEnd = s.indexOf('\nfunction privacyScrub', fnStart);
   if (fnStart < 0 || fnEnd < 0) throw new Error('phase15LastMileTsv block not found');
