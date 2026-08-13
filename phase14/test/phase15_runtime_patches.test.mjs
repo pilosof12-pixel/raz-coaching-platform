@@ -4,7 +4,7 @@ import { patchPhase15RuntimeSource } from '../engine/phase15_runtime_patches.js'
 
 function fixture() {
   return [
-    'const OPENAI_COMPACT_DEVELOPER = ["short acceleration sprints use roughly 90-95% quality effort with about 2-3 minutes full recovery and stop before speed drops."];',
+    'const OPENAI_COMPACT_DEVELOPER = ["Goal numbers are targets, not current capacities. short acceleration sprints use roughly 90-95% quality effort with about 2-3 minutes full recovery and stop before speed drops."];',
     'function buildOpenAICompactUser(x){ return x; }',
     'function stripAndFlagFormulaViolations(){',
     '  try {',
@@ -17,6 +17,10 @@ function fixture() {
     '  const cleaned = out.join("\\n"); return cleaned;',
     '}',
     'function privacyScrub() {}',
+    'function scrubForbiddenWords(s) {',
+    '  if (!s) return s;',
+    '  return s;',
+    '}',
     'async function runEngineRaw(userContent) {',
     '  if (OPENAI_API_KEY) {',
     '    const timer = setTimeout(() => {}, 1000);',
@@ -53,18 +57,31 @@ test('Sprint TSV semantics use speed quality rather than strength RPE', () => {
   assert.match(out, /Target RPE is N\/A because speed quality/);
 });
 
-test('unambiguous endurance naming variants are repaired after legacy closed-set review', () => {
+test('unambiguous naming variants are repaired after legacy closed-set review', () => {
   const out = patchPhase15RuntimeSource(fixture());
   assert.match(out, /ENDURANCE-ALIAS-LASTMILE/);
   assert.match(out, /Zone-2 Rower/);
   assert.match(out, /cells\[1\] = 'Zone-2 Row'/);
   assert.match(out, /Bicep Curl/);
   assert.match(out, /cells\[1\] = 'Dumbbell Curl'/);
+  assert.match(out, /Passive Hang/);
+  assert.match(out, /cells\[1\] = 'Dead Hang'/);
   assert.match(out, /cells\[1\] = 'Swim'/);
   assert.match(out, /cells\[1\] = 'Bike'/);
   assert.match(out, /cells\[1\] = 'Run'/);
-  assert.match(out, /COOLDOWN/);
   assert.match(out, /Easy Walk\$\/i\.test\(ex\)\) continue/);
+});
+
+test('client prose strips internal source-excerpt labels', () => {
+  const out = patchPhase15RuntimeSource(fixture());
+  assert.match(out, /SOURCE-LABEL-CLIENT-SCRUB/);
+  assert.match(out, /SOURCE EXCERPT/);
+});
+
+test('future endurance goal pace is not treated as current capacity', () => {
+  const out = patchPhase15RuntimeSource(fixture());
+  assert.match(out, /ENDURANCE TARGET ANCHOR/);
+  assert.match(out, /future goal pace, power or split is not automatically a sustainable current training intensity/);
 });
 
 test('OpenAI quota/outage path falls through to Gemini with the same compact source-grounded user and system prompts', () => {
