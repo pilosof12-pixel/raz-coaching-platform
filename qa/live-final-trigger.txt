@@ -1,9 +1,9 @@
 Final live acceptance trigger
 2026-08-13
 Target: annoying concurrent only
-All-week race-anchor endurance integrity: enabled
-Surgical QA correction attempts: up to two before fail-closed
-Deterministic unbenchmarked variation load repair: enabled
-Run warm-up/cool-down presentation aliases: enabled
-CI: 31670625330 PASS
-Production source head before trigger: a87f0b6e63a7360be96c8114e9ba98afcdfe162d
+Spaced 5 km current-performance anchor: enabled
+Continuous faster-than-current-race integrity: enabled
+Concurrent combat + endurance recovery-budget integrity: enabled
+Purpose-required supplemental bike/row logic: enabled
+Source patch validation workflow: 31678149390 PASS
+Production source head before trigger: 22789c47dbc9416f1e7d0096d658e3d473f9716f
