@@ -54,7 +54,9 @@ test('marathon strength-maintenance QA allows stable supportive strength',()=>{
 
 test('marathon prompt states single-variable quality progression and supportive strength',()=>{
   const rules=elitePromptRules(intake).join('\n');
-  assert.match(rules,/do not increase both pace\/intensity and accumulated work in the same transition/i);
+  assert.match(rules,/MARATHON SINGLE-LEVER HARD CONTRACT/i);
+  assert.match(rules,/change pace\/intensity OR accumulated work, never both in the same transition/i);
+  assert.match(rules,/COPY the prior-week quality and routine-easy prescriptions unchanged/i);
   assert.match(rules,/MARATHON STRENGTH-MAINTENANCE SUPPORT RULE/i);
   assert.match(rules,/do not turn several assistance lifts into a progressive hypertrophy block/i);
 });
