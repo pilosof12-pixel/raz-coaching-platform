@@ -1,0 +1,3 @@
+Adaptive clarification completion trigger
+2026-08-13
+Add advanced-skill baseline and limited-equipment load-ceiling clarifications.
