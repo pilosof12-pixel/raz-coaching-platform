@@ -54,6 +54,51 @@ export function demoCoverageAdvisories(program) {
   return [...missing];
 }
 
+export function allWeekTsvShapeFlags(program) {
+  const expected=['day','exercise','weight','sets','reps','rest','target rpe','notes','results'];
+  const flags=[];
+  for(let week=1;week<=4;week++) {
+    const m=String(program||'').match(new RegExp('START_WEEK'+week+'_TSV\\s*\\n([\\s\\S]*?)\\nEND_WEEK'+week+'_TSV','i'));
+    if(!m) { flags.push({code:'TSV_WEEK_BLOCK_MISSING',message:'Week '+week+' TSV block is missing. Return all four complete TSV blocks.'}); continue; }
+    const lines=m[1].split('\n').filter(x=>x.trim());
+    if(!lines.length) { flags.push({code:'TSV_SCHEMA_VIOLATION',message:'Week '+week+' TSV block is empty.'}); continue; }
+    const header=lines[0].split('\t').map(x=>x.trim().toLowerCase());
+    if(header.length!==9 || expected.some((x,i)=>header[i]!==x)) flags.push({code:'TSV_SCHEMA_VIOLATION',message:'Week '+week+' TSV header must have exactly the nine required columns in the required order.'});
+    for(let i=1;i<lines.length;i++) {
+      const cells=lines[i].split('\t');
+      if(cells.length!==9) flags.push({code:'TSV_ROW_COLUMN_COUNT_MISMATCH',message:'Week '+week+' row '+i+' has '+cells.length+' TSV cells instead of exactly 9. Rewrite that physical row with exactly Day, Exercise, Weight, Sets, Reps, Rest, Target RPE, Notes, Results and no embedded tab.'});
+    }
+  }
+  return flags;
+} // ALL-WEEK-TSV-SHAPE-QA
+
+export function weekOneRunningVolumeFlags(program,intake={}) {
+  const goals=[goalText(intake,'primary_goals'),goalText(intake,'secondary_goals')].join(' | ');
+  if(!/\bmarathon\b/i.test(goals)) return [];
+  const source=[intake.notes,intake.current_numbers,intake.performance_markers,intake.current_endurance].map(x=>typeof x==='string'?x:JSON.stringify(x||'')).join(' ');
+  const vm=source.match(/\b(?:about|around|roughly|approximately|~)?\s*(\d+(?:\.\d+)?)\s*km\s*(?:\/|per)\s*week\b/i);
+  if(!vm) return [];
+  const currentKm=Number(vm[1]); if(!Number.isFinite(currentKm)||currentKm<=0) return [];
+  const p=parseWeek(program,1); if(!p) return [];
+  const e=p.idx.exercise,r=p.idx.reps,s=p.idx.sets;
+  let total=0,runRows=0,measurable=0;
+  for(const row of p.rows) {
+    const ex=String(row[e]||''); if(!/\brun(?:ning)?\b/i.test(ex)||/^\s*\[WARMUP\]/i.test(ex)) continue;
+    runRows++;
+    const dose=String(r>=0?row[r]||'':'');
+    const km=[...dose.matchAll(/\b(\d+(?:\.\d+)?)\s*km\b/ig)].map(m=>Number(m[1]));
+    if(!km.length) continue;
+    measurable++;
+    total+=Math.max(...km)*Math.max(1,Number(s>=0?row[s]||1:1)||1);
+  }
+  if(!runRows||measurable!==runRows) return [];
+  if(total>currentKm) return [{
+    code:'MARATHON_WEEK1_VOLUME_ABOVE_CURRENT',
+    message:'Week 1 totals about '+total+' km of direct running while the intake reports about '+currentKm+' km/week currently. The authored endurance framework treats established workload as the starting anchor. Keep Week 1 at or below the supplied current weekly distance, preserve the required run frequency, and begin the selected progression lever from a later week rather than creating an immediate workload jump.'
+  }];
+  return [];
+} // MARATHON-WEEK1-CURRENT-VOLUME-QA
+
 export function marathonStackedProgressionFlags(program,intake={}) {
   const goals=[...(Array.isArray(intake.primary_goals)?intake.primary_goals:[]),...(Array.isArray(intake.secondary_goals)?intake.secondary_goals:[])].map(String).join(' | ');
   if(!/\bmarathon\b/i.test(goals)) return [];
@@ -138,6 +183,9 @@ export function marathonStrengthMaintenanceFlags(program,intake={}) {
 } // MARATHON-STRENGTH-MAINTENANCE-QA
 
 export function validatePhase15FinalProgram(program, intake={}) {
+  const tsvShapeFlags=allWeekTsvShapeFlags(program);
+  if(tsvShapeFlags.length) throw new Phase15QualityError(tsvShapeFlags);
+
   let baseResult={ok:true,flags:[]};
   try {
     baseResult=validatePhase15Program(program,intake);
@@ -160,6 +208,9 @@ export function validatePhase15FinalProgram(program, intake={}) {
     const flags=endurancePerformanceIntegrityFlags(program,intake,parsed);
     if(flags.length) throw new Phase15QualityError(flags.map(flag=>({...flag,message:'Week '+week+': '+flag.message})));
   } // ENDURANCE-ALL-WEEKS-FINAL-QA
+
+  const weekOneVolumeFlags=weekOneRunningVolumeFlags(program,intake);
+  if(weekOneVolumeFlags.length) throw new Phase15QualityError(weekOneVolumeFlags);
 
   const marathonProgressionFlags=marathonStackedProgressionFlags(program,intake);
   if(marathonProgressionFlags.length) throw new Phase15QualityError(marathonProgressionFlags);
