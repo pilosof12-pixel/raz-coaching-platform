@@ -4,6 +4,8 @@ Target: annoying concurrent only
 Spaced 5 km current-performance anchor: enabled
 Continuous faster-than-current-race integrity: enabled
 Concurrent combat + endurance recovery-budget integrity: enabled
+False conditioning-to-Zone2 planner trigger removed
+Explicit aerobic-base dose routed to authored endurance sources
 Purpose-required supplemental bike/row logic: enabled
-Source patch validation workflow: 31678149390 PASS
-Production source head before trigger: 22789c47dbc9416f1e7d0096d658e3d473f9716f
+Planner cleanup workflow: 31679736297 PASS
+Production source head before trigger: 251adf83c1c5fd422af4562fb93c8e7df36cb9fb
