@@ -57,7 +57,7 @@ export function patchPhase15RuntimeSource(input) {
   // Goal performance is not current capacity. This is an integrity rule from the
   // authored endurance decision system, not a new numerical training prescription.
   const targetAnchor = 'Goal numbers are targets, not current capacities.';
-  const targetReplacement = 'Goal numbers are targets, not current capacities. ENDURANCE TARGET ANCHOR: a future goal pace, power or split is not automatically a sustainable current training intensity. Calibrate endurance sessions from supplied current performance plus the routed authored sources; use goal pace only in a dose the athlete can plausibly execute from current capacity.';
+  const targetReplacement = 'Goal numbers are targets, not current capacities. ENDURANCE TARGET ANCHOR: a future goal pace, power or split is not automatically a sustainable current training intensity. Calibrate endurance sessions from supplied current performance plus the routed authored sources; use goal pace only in a dose the athlete can plausibly execute from current capacity. ENDURANCE-TSV-FIELD-CONTRACT: for interval rows, Sets is interval count, Reps is work distance or duration, Weight carries the external pace/power/split target when one is prescribed, Rest is actual between-interval recovery duration, Target RPE is internal effort only when useful, and Notes explains execution. Never put target pace or split in the Rest column. For continuous endurance rows, Reps is total duration/distance and Rest is N/A.';
   const targetCount = s.split(targetAnchor).length - 1;
   if (targetCount === 1) s = s.replace(targetAnchor, targetReplacement);
 

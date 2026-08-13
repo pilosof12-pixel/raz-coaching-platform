@@ -1,5 +1,6 @@
 // Build the Phase 15 runtime from the readable Phase 14 server source.
 import fs from "node:fs";
+import { patchPhase15RuntimeSource } from "../engine/phase15_runtime_patches.js";
 
 const sourcePath = new URL("../server.js", import.meta.url);
 const outPath = new URL("../server.phase15.js", import.meta.url);
@@ -88,5 +89,6 @@ once(
   "new client fast path call"
 );
 
+s = patchPhase15RuntimeSource(s); // PRODUCTION-RUNTIME-PATCH-WIRED
 fs.writeFileSync(outPath, s);
 console.log("built server.phase15.js with deterministic skeleton v5 quality hardening + direct-skill protection + variation-aware final QA");

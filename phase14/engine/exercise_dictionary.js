@@ -224,6 +224,11 @@ const ALIAS_LIST = [
   ["Swimming", "Swim"],
   ["Cycling", "Bike"],
   ["Running", "Run"], // ENDURANCE-LIVE-ALIAS-SET
+  ["Run (Intervals)", "Run"],
+  ["Running Intervals", "Run"],
+  ["Cool-down Jog/Walk", "Run"],
+  ["Cooldown Jog/Walk", "Run"],
+  ["Dumbbell Reverse Lunge", "Reverse Lunge"], // FINAL-LIVE-ALIAS-SET
   ["DB Overhead Press", "Dumbbell Overhead Press"],
   ["Dumbbell OHP", "Dumbbell Overhead Press"],
   ["DB Floor Press", "Dumbbell Floor Press"],
