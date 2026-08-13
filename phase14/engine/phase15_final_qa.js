@@ -54,39 +54,88 @@ export function demoCoverageAdvisories(program) {
   return [...missing];
 }
 
-function marathonStackedProgressionFlags(program,intake={}) {
+export function marathonStackedProgressionFlags(program,intake={}) {
   const goals=[...(Array.isArray(intake.primary_goals)?intake.primary_goals:[]),...(Array.isArray(intake.secondary_goals)?intake.secondary_goals:[])].map(String).join(' | ');
   if(!/\bmarathon\b/i.test(goals)) return [];
+  const paceSeconds=text=>{const m=String(text||'').match(/\b(\d{1,2}):([0-5]\d)\s*\/\s*km\b/i);return m?Number(m[1])*60+Number(m[2]):null;};
+  const maxMinutes=text=>{const a=[...String(text||'').matchAll(/\b(\d+(?:\.\d+)?)\s*(?:min|minutes?)\b/ig)].map(m=>Number(m[1]));return a.length?Math.max(...a):0;};
+  const maxKm=text=>{const a=[...String(text||'').matchAll(/\b(\d+(?:\.\d+)?)\s*km\b/ig)].map(m=>Number(m[1]));return a.length?Math.max(...a):0;};
   const weekMetrics=[];
   for(let week=1;week<=4;week++) {
     const p=parseWeek(program,week); if(!p) continue;
-    const e=p.idx.exercise,r=p.idx.reps,s=p.idx.sets,n=p.idx.notes;
-    let quality=0,easy=0,long=0;
+    const e=p.idx.exercise,r=p.idx.reps,s=p.idx.sets,n=p.idx.notes,w=p.idx.weight;
+    const metric={week,quality:{volume:0,pace:null},easy:{volume:0},long:{volume:0}};
     for(const row of p.rows) {
       const ex=String(row[e]||'');
       if(!/\brun(?:ning)?\b/i.test(ex)) continue;
       const note=n>=0?String(row[n]||''):'';
-      const dose=String(r>=0?row[r]||'':'')+' '+note;
-      const m=dose.match(/\b(\d+(?:\.\d+)?)\s*km\b/i);
-      if(!m) continue;
-      const km=Number(m[1]) * Math.max(1,Number(row[s]||1)||1);
-      if(/\blong(?:[- ]run)?\b|long aerobic|endurance run/i.test(note)) long+=km;
-      else if(/\binterval|quality|threshold|tempo|race pace|target pace|marathon pace\b/i.test(note)) quality+=km;
-      else if(/\beasy|zone\s*[- ]?2|conversational|recovery/i.test(note)||/^\s*\[WARMUP\]/i.test(ex)) easy+=km;
+      const dose=[r>=0?row[r]||'':'',w>=0?row[w]||'':'',note].join(' ');
+      const sets=Math.max(1,Number(s>=0?row[s]||1:1)||1);
+      const km=maxKm(dose)*sets;
+      const minutes=maxMinutes(dose)*sets;
+      // Compare like-for-like dose dimensions. Distance is preferred when supplied;
+      // otherwise duration is the external-volume anchor for that row.
+      const volume=km>0?km:minutes;
+      if(/\blong(?:[- ]run)?\b|long aerobic|endurance run/i.test(note)) metric.long.volume+=volume;
+      else if(/\binterval|quality|threshold|tempo|race pace|target pace|marathon pace\b/i.test(note)) {
+        metric.quality.volume+=volume;
+        const psec=paceSeconds(dose); if(psec!=null) metric.quality.pace=metric.quality.pace==null?psec:Math.min(metric.quality.pace,psec);
+      }
+      else if(/\beasy|zone\s*[- ]?2|conversational|recovery/i.test(note)) metric.easy.volume+=volume;
     }
-    weekMetrics.push({week,quality,easy,long});
+    weekMetrics.push(metric);
   }
   const flags=[];
   for(let i=1;i<weekMetrics.length;i++) {
     const a=weekMetrics[i-1],b=weekMetrics[i];
-    const increases=[b.quality>a.quality,b.easy>a.easy,b.long>a.long].filter(Boolean).length;
-    if(increases>1) flags.push({
+    const qualityVolumeUp=b.quality.volume>a.quality.volume;
+    const qualityPaceUp=a.quality.pace!=null&&b.quality.pace!=null&&b.quality.pace<a.quality.pace;
+    const easyUp=b.easy.volume>a.easy.volume;
+    const longUp=b.long.volume>a.long.volume;
+    if(qualityVolumeUp&&qualityPaceUp) flags.push({
+      code:'MARATHON_QUALITY_DOUBLE_PROGRESSION',
+      message:'Week '+b.week+' makes the quality run both longer/more voluminous and faster than Week '+a.week+'. The authored endurance framework says progress one main variable at a time; choose pace/intensity OR accumulated quality work for this transition, not both.'
+    });
+    const categoryIncreases=[qualityVolumeUp||qualityPaceUp,easyUp,longUp].filter(Boolean).length;
+    if(categoryIncreases>1) flags.push({
       code:'MARATHON_STACKED_VOLUME_PROGRESSION',
-      message:'Week '+b.week+' increases more than one main running-volume category versus Week '+a.week+'. The authored endurance decision system says progress/regress one main variable according to adaptation and recovery. Choose one main progression lever for this transition and hold the other running-volume categories stable.'
+      message:'Week '+b.week+' progresses more than one main running category versus Week '+a.week+'. The authored endurance decision system says progress/regress one main variable according to adaptation and recovery. Choose one main progression lever for this transition and hold the other running categories stable.'
     });
   }
   return flags;
 } // MARATHON-STACKED-PROGRESSION-QA
+
+export function marathonStrengthMaintenanceFlags(program,intake={}) {
+  const primary=goalText(intake,'primary_goals');
+  const secondary=goalText(intake,'secondary_goals');
+  if(!/\bmarathon\b/i.test(primary)||!/(?:maintain|maintenance)[^|]{0,40}strength|stay durable|durability/i.test(secondary)) return [];
+  const lower=/\b(?:back squat|front squat|box squat|deadlift|romanian deadlift|rdl|lunge|split squat|hip thrust|leg press|step-up)\b/i;
+  const repHigh=x=>{const a=[...String(x||'').matchAll(/\d+(?:\.\d+)?/g)].map(m=>Number(m[0]));return a.length?Math.max(...a):null;};
+  const rpeHigh=x=>{const a=[...String(x||'').matchAll(/\d+(?:\.\d+)?/g)].map(m=>Number(m[0]));return a.length?Math.max(...a):null;};
+  const weeks=[];
+  for(let week=1;week<=4;week++) {
+    const p=parseWeek(program,week); if(!p) continue;
+    const map=new Map();
+    for(const row of p.rows) {
+      const ex=String(row[p.idx.exercise]||'').trim(); if(!lower.test(ex)) continue;
+      map.set(ex.toLowerCase(),{ex,reps:repHigh(row[p.idx.reps]),rpe:rpeHigh(row[p.idx['target rpe']])});
+    }
+    weeks.push({week,map});
+  }
+  if(weeks.length<2) return [];
+  const first=weeks[0].map,last=weeks[weeks.length-1].map;
+  const progressed=[];
+  for(const [key,a] of first) {
+    const b=last.get(key); if(!b||a.reps==null||b.reps==null||a.rpe==null||b.rpe==null) continue;
+    if(b.reps>a.reps&&b.rpe>a.rpe) progressed.push(a.ex);
+  }
+  const totalComparable=[...first.keys()].filter(k=>last.has(k)).length;
+  if(progressed.length>=2 && progressed.length>=Math.ceil(totalComparable/2)) return [{
+    code:'MARATHON_STRENGTH_MAINTENANCE_OVERLOAD',
+    message:'Strength is a maintenance/support goal behind marathon performance, but multiple lower-body support movements increase both rep demand and RPE across the block ('+progressed.join(', ')+'). The authored concurrent-training source says endurance-priority athletes should protect key endurance work and use strength supportively at a recoverable dose. Keep the maintenance dose stable/low-cost rather than turning several lower-body accessories into a simultaneous progressive overload block.'
+  }];
+  return [];
+} // MARATHON-STRENGTH-MAINTENANCE-QA
 
 export function validatePhase15FinalProgram(program, intake={}) {
   let baseResult={ok:true,flags:[]};
@@ -114,6 +163,9 @@ export function validatePhase15FinalProgram(program, intake={}) {
 
   const marathonProgressionFlags=marathonStackedProgressionFlags(program,intake);
   if(marathonProgressionFlags.length) throw new Phase15QualityError(marathonProgressionFlags);
+
+  const marathonStrengthFlags=marathonStrengthMaintenanceFlags(program,intake);
+  if(marathonStrengthFlags.length) throw new Phase15QualityError(marathonStrengthFlags);
 
   // Direct demo links are supplemental UI metadata, not a coaching-safety gate.
   // The browser resolver remains direct-only: when no curated URL exists it
