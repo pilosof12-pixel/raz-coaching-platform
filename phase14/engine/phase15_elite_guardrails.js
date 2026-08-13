@@ -292,6 +292,27 @@ function benchmarkRows(intake={}) {
   return out;
 }
 
+export function repairUnbenchmarkedVariationLoads(program, intake={}) {
+  const benches=benchmarkRows(intake);
+  if(!benches.length) return String(program||'');
+  const fixedKg=/(?:^|\s|\+)\d+(?:\.\d+)?\s*kg\b/i;
+  return String(program||'').split('\n').map(line=>{
+    if(!line.includes('\t')) return line;
+    const cells=line.split('\t');
+    if(cells.length!==9 || /^Day$/i.test(String(cells[0]||'').trim())) return line;
+    const ex=String(cells[1]||'').trim();
+    if(!ex || /^\s*\[WARMUP\]/i.test(ex)) return line;
+    const family=liftFamily(ex);
+    if(!family || !fixedKg.test(String(cells[2]||''))) return line;
+    const sameFamily=benches.filter(b=>b.family===family);
+    if(!sameFamily.length) return line;
+    const exact=sameFamily.some(b=>canonicalLift(ex)===b.canonical);
+    if(exact) return line;
+    cells[2]='RPE-selected load';
+    return cells.join('\t');
+  }).join('\n');
+} // UNBENCHMARKED-VARIATION-LOAD-REPAIR
+
 export function unbenchmarkedVariationLoadFlags(intake={}, parsed=null) {
   if (!parsed) return [];
   const benches=benchmarkRows(intake); if(!benches.length) return [];
