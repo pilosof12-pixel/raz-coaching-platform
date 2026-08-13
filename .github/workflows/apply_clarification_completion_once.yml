@@ -1,0 +1,36 @@
+name: Apply adaptive clarification completion
+
+on:
+  push:
+    branches:
+      - privacy-security-hardening
+    paths:
+      - qa/clarification-completion-trigger.txt
+
+permissions:
+  contents: write
+
+jobs:
+  apply-clarification-completion:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: privacy-security-hardening
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: node scripts/apply_clarification_completion.mjs
+      - name: Validate adaptive clarification completion
+        run: |
+          node --check phase14/intake_clarification.js
+          node --test test/adaptive_clarification_completion.test.js
+          node --test phase14/test/intake_clarification.test.mjs
+      - name: Commit tested clarification source patch
+        run: |
+          git config user.name 'RAZ regression bot'
+          git config user.email 'actions@users.noreply.github.com'
+          git add phase14/intake_clarification.js
+          if git diff --cached --quiet; then echo 'No source changes'; exit 0; fi
+          git commit -m 'Complete deterministic adaptive intake clarifications'
+          git push origin HEAD:privacy-security-hardening
