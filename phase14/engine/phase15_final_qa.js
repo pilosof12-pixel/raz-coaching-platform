@@ -1,4 +1,5 @@
 import { validatePhase15Program, Phase15QualityError } from './phase15_program_qa.js';
+import { endurancePerformanceIntegrityFlags } from './phase15_elite_guardrails.js';
 import { resolveExerciseDemo } from '../data/lib/exerciseDemos.js';
 
 function goalText(intake, key) {
@@ -65,6 +66,17 @@ export function validatePhase15FinalProgram(program, intake={}) {
     }
     if (flags.length) throw new Phase15QualityError(flags);
   }
+
+  // Week 1 is covered by validatePhase15Program above. Re-run the authored
+  // endurance integrity floor on Weeks 2-4 so a later-week pace/frequency
+  // regression cannot bypass client-visible final QA.
+  for(let week=2;week<=4;week++) {
+    const p=parseWeek(program,week);
+    if(!p) continue;
+    const parsed={idx:p.idx,rows:p.rows.map(cells=>({cells}))};
+    const flags=endurancePerformanceIntegrityFlags(program,intake,parsed);
+    if(flags.length) throw new Phase15QualityError(flags.map(flag=>({...flag,message:'Week '+week+': '+flag.message})));
+  } // ENDURANCE-ALL-WEEKS-FINAL-QA
 
   // Direct demo links are supplemental UI metadata, not a coaching-safety gate.
   // The browser resolver remains direct-only: when no curated URL exists it

@@ -127,8 +127,19 @@ function currentRunningRaceAnchor(intake={}) {
 }
 
 function prescribedPaceSecPerKm(text='') {
-  const m=String(text||'').match(/\b(\d{1,2}):([0-5]\d)\s*\/\s*km\b/i);
-  return m ? Number(m[1])*60+Number(m[2]) : null;
+  const m=String(text||'').match(/\b(\d{1,2}):([0-5]\d)(?:\s*(?:-|–|to)\s*(\d{1,2}):([0-5]\d))?\s*\/\s*km\b/i);
+  if(!m) return null;
+  const first=Number(m[1])*60+Number(m[2]);
+  const second=m[3]!=null ? Number(m[3])*60+Number(m[4]) : first;
+  return Math.min(first,second);
+}
+
+function maxContinuousMinutes(text='') {
+  const values=[];
+  for(const m of String(text||'').matchAll(/\b(\d+(?:\.\d+)?)(?:\s*(?:-|–|to)\s*(\d+(?:\.\d+)?))?\s*(?:min|minutes?)\b/ig)) {
+    values.push(Number(m[2]||m[1]));
+  }
+  return values.length ? Math.max(...values) : null;
 }
 
 function formatPaceSec(sec) {
@@ -171,6 +182,25 @@ export function endurancePerformanceIntegrityFlags(program, intake={}, parsed=nu
         }
       }
     } // LOW-INTENSITY-RACE-PACE-INTEGRITY
+    if(def.key==='running') {
+      const race=currentRunningRaceAnchor(intake);
+      if(race) {
+        for(const item of rows) {
+          const rowText=String(item.ctx||'')+' '+String(item.dose||'');
+          if(/\b(?:test|race|time trial|assessment)\b/i.test(rowText)) continue;
+          const pace=prescribedPaceSecPerKm(rowText);
+          const durationMin=maxContinuousMinutes(rowText);
+          const setCount=Math.max(1,Number(item.row?.cells?.[parsed.idx.sets]||1)||1);
+          if(setCount===1 && pace!=null && durationMin!=null && pace<race.paceSecPerKm && durationMin*60>=race.totalSeconds) {
+            flags.push({
+              code:'CONTINUOUS_RUN_EXCEEDS_CURRENT_RACE_BENCHMARK',
+              message:"A continuous running prescription asks for "+durationMin+" minutes at about "+formatPaceSec(pace)+"/km, while the athlete's demonstrated "+race.distanceKm+"K is "+Math.round(race.totalSeconds/60)+" minutes at about "+formatPaceSec(race.paceSecPerKm)+"/km. That would imply sustaining a faster-than-current race pace for current-race duration or longer. Re-anchor from current field performance and the authored endurance sources; do not assume future/goal pace is already continuously sustainable. Across the block, progress the smallest useful variable rather than automatically increasing pace and duration together."
+            });
+            break;
+          }
+        }
+      }
+    } // CONTINUOUS-RACE-BENCHMARK-INTEGRITY
     const eventGoal=/\d|\b(?:mile|3\s*k|5\s*k|10\s*k|half[- ]?marathon|marathon|erg|time trial|triathlon)\b/i.test(text);
     if(eventGoal && !rows.some(eventProgressionBearing)) flags.push({
       code:'EVENT_PROGRESSING_SESSION_MISSING',
@@ -366,6 +396,7 @@ export function elitePromptRules(intake={}) {
     if(def.key==='running') {
       const race=currentRunningRaceAnchor(intake);
       if(race) rules.push('LOW-INTENSITY RUNNING ANCHOR: the intake demonstrates about '+formatPaceSec(race.paceSecPerKm)+'/km for '+race.distanceKm+'K. Any row labelled easy, conversational or Zone 2 must be genuinely below that demonstrated race intensity; never use that race pace or a faster pace as low intensity. If no threshold test exists, use the authored pace + RPE/breathing hierarchy rather than fabricating a precise breakpoint.');
+      if(race) rules.push('CURRENT-RACE PERFORMANCE ANCHOR: do not prescribe a continuous non-test run faster than the demonstrated '+race.distanceKm+'K pace for the same race duration or longer; that would assume performance beyond the supplied current benchmark. If faster work is source-appropriate, calibrate its structure from the authored endurance sources rather than treating goal pace as already sustainable. Across the four-week block, progress the smallest useful variable and do not automatically increase both pace and duration together.'); // CONTINUOUS-RACE-BENCHMARK-PROMPT
     }
     rules.push(`TARGET-MODALITY INTEGRITY: ${def.key} is a named ${priority} performance goal${current?` and the intake documents about ${current} current ${def.key} exposure(s) per week`:''}. Do not silently reduce that existing target-modality practice. Put the target-modality sessions into the four-week deliverable, including non-gym sport days when needed, and use the curated endurance sources to assign their actual purpose/dose. Cross-training may supplement but not replace them.`);
     if(/\d|\b(?:mile|3\s*k|5\s*k|10\s*k|half[- ]?marathon|marathon|erg|time trial|triathlon)\b/i.test(text)) rules.push(`EVENT-PROGRESSION INTEGRITY: '${text}' needs at least one progression-bearing ${def.key} session with an external event-relevant target (for example source-selected interval, pace, power, split, stroke-rate or equivalent prescription). A warm-up or generic easy session alone is not sufficient. The exact workout design must come from the curated sources, not generic model memory.`);
