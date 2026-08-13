@@ -10,6 +10,20 @@ export function lockFinalPipelineSource(input) {
     s = s.replace(find, replace);
   }
 
+  // Load-cell normalization is integrity/autoregulation, not coaching theory:
+  // an exact kg may remain only when that exact variation has its own benchmark.
+  once(
+    'import { EXERCISE_DICTIONARY } from "./engine/exercise_dictionary.js";',
+    'import { EXERCISE_DICTIONARY } from "./engine/exercise_dictionary.js";\nimport { repairUnbenchmarkedVariationLoads } from "./engine/phase15_elite_guardrails.js"; // UNBENCHMARKED-VARIATION-REPAIR-WIRED',
+    'variation-load repair import'
+  );
+
+  once(
+    '    let program = fixInvalidExerciseNames(raw); // step 1',
+    '    let program = repairUnbenchmarkedVariationLoads(fixInvalidExerciseNames(raw), intake); // step 1: DETERMINISTIC-UNBENCHMARKED-LOAD-REPAIR',
+    'variation-load repair before QA'
+  );
+
   // One model call remains the normal path. Up to two additional calls are
   // available only when deterministic QA rejects the result. This lets a
   // correction that accidentally breaks another already-satisfied constraint be
@@ -61,5 +75,5 @@ if (process.argv[1] && fileURLToPath(new URL(`file://${process.argv[1]}`)) === s
   const before = fs.readFileSync(runtimePath, 'utf8');
   const after = lockFinalPipelineSource(before);
   fs.writeFileSync(runtimePath, after);
-  console.log('Phase15 final pipeline locked: surgical QA regeneration + fail-closed save boundary');
+  console.log('Phase15 final pipeline locked: deterministic load repair + surgical QA regeneration + fail-closed save boundary');
 }
