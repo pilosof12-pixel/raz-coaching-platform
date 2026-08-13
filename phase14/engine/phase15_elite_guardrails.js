@@ -115,6 +115,27 @@ function eventProgressionBearing(item) {
   return /(?:\b(?:interval|threshold|critical speed|critical power|race pace|goal pace|target pace|2k pace|3k pace|5k pace|10k pace|marathon pace|split target|stroke rate|cadence|power target|pace target)\b|\b\d+:\d+(?:-\d+:\d+)?\s*\/\s*500m\b|\b\d+(?::\d+)?\s*\/\s*km\b|\b\d+(?:\.\d+)?\s*(?:km\/h|kph|watts?|w)\b|\bprogress(?:ion|ively)?\b)/i.test(s); // ROWING-500M-SPLIT-PROGRESSION
 }
 
+function currentRunningRaceAnchor(intake={}) {
+  const src=[String(intake.current_numbers||''),...list(intake.performance_markers).map(String)].join(' | ');
+  const anchors=[];
+  for(const m of src.matchAll(/\b(3|5|10)\s*k(?:m)?\b[^0-9]{0,20}(\d{1,2}):(\d{2})\b/ig)) {
+    const distanceKm=Number(m[1]), totalSeconds=Number(m[2])*60+Number(m[3]);
+    if(distanceKm>0&&totalSeconds>0) anchors.push({distanceKm,totalSeconds,paceSecPerKm:totalSeconds/distanceKm});
+  }
+  if(!anchors.length) return null;
+  return anchors.sort((a,b)=>b.paceSecPerKm-a.paceSecPerKm)[0];
+}
+
+function prescribedPaceSecPerKm(text='') {
+  const m=String(text||'').match(/\b(\d{1,2}):([0-5]\d)\s*\/\s*km\b/i);
+  return m ? Number(m[1])*60+Number(m[2]) : null;
+}
+
+function formatPaceSec(sec) {
+  const s=Math.round(Number(sec)||0);
+  return Math.floor(s/60)+':'+String(s%60).padStart(2,'0');
+}
+
 export function endurancePerformanceIntegrityFlags(program, intake={}, parsed=null) {
   if(!parsed) return [];
   const flags=[];
@@ -133,6 +154,23 @@ export function endurancePerformanceIntegrityFlags(program, intake={}, parsed=nu
       code:'TARGET_MODALITY_EXPOSURE_REDUCED',
       message:`${def.key} is a named ${priority} performance goal. The intake documents about ${existing||'at least one'} current ${def.key} exposure(s) per week, but Week 1 programs ${actualDays}. Do not silently remove target-modality practice; preserve the athlete's stated current exposure unless the authored plan makes and explains a deliberate recovery tradeoff.`
     });
+    if(def.key==='running') {
+      const race=currentRunningRaceAnchor(intake);
+      if(race) {
+        for(const item of rows) {
+          const rowText=String(item.ctx||'')+' '+String(item.dose||'');
+          if(!/\b(?:zone\s*[- ]?2|easy|conversational|low[- ]?intensity)\b/i.test(rowText)) continue;
+          const prescribed=prescribedPaceSecPerKm(rowText);
+          if(prescribed!=null && prescribed<=race.paceSecPerKm) {
+            flags.push({
+              code:'LOW_INTENSITY_PACE_CONTRADICTS_CURRENT_PERFORMANCE',
+              message:"A low-intensity/Zone-2 running row uses "+formatPaceSec(prescribed)+"/km, while the athlete's demonstrated "+race.distanceKm+"K performance is about "+formatPaceSec(race.paceSecPerKm)+"/km. Zone 2 is explicitly below the first major threshold; do not label current race pace or faster as easy. Re-anchor from the authored field-performance + RPE/breathing hierarchy without inventing a universal zone formula."
+            });
+            break;
+          }
+        }
+      }
+    } // LOW-INTENSITY-RACE-PACE-INTEGRITY
     const eventGoal=/\d|\b(?:mile|3\s*k|5\s*k|10\s*k|half[- ]?marathon|marathon|erg|time trial|triathlon)\b/i.test(text);
     if(eventGoal && !rows.some(eventProgressionBearing)) flags.push({
       code:'EVENT_PROGRESSING_SESSION_MISSING',
@@ -325,6 +363,10 @@ export function elitePromptRules(intake={}) {
   ];
   for(const {priority,text,def} of explicitModalityGoals(intake)) {
     const current=currentTargetModalityExposure(intake,def.key);
+    if(def.key==='running') {
+      const race=currentRunningRaceAnchor(intake);
+      if(race) rules.push('LOW-INTENSITY RUNNING ANCHOR: the intake demonstrates about '+formatPaceSec(race.paceSecPerKm)+'/km for '+race.distanceKm+'K. Any row labelled easy, conversational or Zone 2 must be genuinely below that demonstrated race intensity; never use that race pace or a faster pace as low intensity. If no threshold test exists, use the authored pace + RPE/breathing hierarchy rather than fabricating a precise breakpoint.');
+    }
     rules.push(`TARGET-MODALITY INTEGRITY: ${def.key} is a named ${priority} performance goal${current?` and the intake documents about ${current} current ${def.key} exposure(s) per week`:''}. Do not silently reduce that existing target-modality practice. Put the target-modality sessions into the four-week deliverable, including non-gym sport days when needed, and use the curated endurance sources to assign their actual purpose/dose. Cross-training may supplement but not replace them.`);
     if(/\d|\b(?:mile|3\s*k|5\s*k|10\s*k|half[- ]?marathon|marathon|erg|time trial|triathlon)\b/i.test(text)) rules.push(`EVENT-PROGRESSION INTEGRITY: '${text}' needs at least one progression-bearing ${def.key} session with an external event-relevant target (for example source-selected interval, pace, power, split, stroke-rate or equivalent prescription). A warm-up or generic easy session alone is not sufficient. The exact workout design must come from the curated sources, not generic model memory.`);
   }
