@@ -1,0 +1,42 @@
+name: Apply marathon one-main-variable progression
+
+on:
+  push:
+    branches:
+      - privacy-security-hardening
+    paths:
+      - qa/marathon-one-variable-trigger.txt
+
+permissions:
+  contents: write
+
+jobs:
+  apply-marathon-one-variable:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: privacy-security-hardening
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: node scripts/apply_marathon_volume_progression_guard.mjs
+      - name: Validate source-grounded marathon progression
+        run: |
+          node --check phase14/engine/phase15_elite_guardrails.js
+          node --check phase14/engine/phase15_final_qa.js
+          node --test test/marathon_progression_integrity.test.js
+          node --test test/marathon_volume_progression_guard.test.js
+          node --test test/final_concurrent_endurance_integrity.test.js
+          cd phase14 && npm run phase15:build && node --check server.phase15.js
+          grep -q 'FINAL-QA-REGEN-BUDGET' server.phase15.js
+          grep -q 'SURGICAL-QA-CORRECTION-SCOPE' server.phase15.js
+          grep -q 'SAVE-BOUNDARY-FINAL-QA' server.phase15.js
+      - name: Commit tested source patch
+        run: |
+          git config user.name 'RAZ regression bot'
+          git config user.email 'actions@users.noreply.github.com'
+          git add phase14/engine/phase15_elite_guardrails.js phase14/engine/phase15_final_qa.js
+          if git diff --cached --quiet; then echo 'No source changes'; exit 0; fi
+          git commit -m 'Progress one main marathon variable per build week'
+          git push origin HEAD:privacy-security-hardening
