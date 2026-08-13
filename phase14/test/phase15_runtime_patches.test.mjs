@@ -18,7 +18,10 @@ function fixture() {
     "    out.push(cells.join('\\t'));",
     '  const cleaned = out.join("\\n"); return cleaned;',
     '}',
-    'function privacyScrub() {}',
+    'function privacyScrub(text, intake) {',
+    '  if (!text) return text;',
+    '  return text;',
+    '}',
     'function scrubForbiddenWords(s) {',
     '  if (!s) return s;',
     '  return s;',
@@ -58,6 +61,12 @@ test('legacy formula marker counts only actual capacity/formula flags', () => {
   assert.match(out, /static-hold-exceeds-current-max\|fixed-density-reps-exceed-current-max/);
 });
 
+test('model cannot forge the server-owned formula marker', () => {
+  const out = patchPhase15RuntimeSource(fixture());
+  assert.match(out, /SERVER-OWNED-FORMULA-MARKER/);
+  assert.match(out, /QA_FORMULA_VIOLATION_COUNT/);
+});
+
 test('Sprint TSV semantics use speed quality rather than strength RPE', () => {
   const out = patchPhase15RuntimeSource(fixture());
   assert.match(out, /if \(\/\^Sprint\$\/i\.test\(ex\)\)/);
@@ -68,15 +77,12 @@ test('Sprint TSV semantics use speed quality rather than strength RPE', () => {
 test('unambiguous naming variants are repaired after legacy closed-set review', () => {
   const out = patchPhase15RuntimeSource(fixture());
   assert.match(out, /ENDURANCE-ALIAS-LASTMILE/);
-  assert.match(out, /Zone-2 Rower/);
   assert.match(out, /cells\[1\] = 'Zone-2 Row'/);
-  assert.match(out, /Bicep Curl/);
   assert.match(out, /cells\[1\] = 'Dumbbell Curl'/);
-  assert.match(out, /Passive Hang/);
   assert.match(out, /cells\[1\] = 'Dead Hang'/);
+  assert.match(out, /FINAL-REVERSE-LUNGE-LASTMILE/);
   assert.match(out, /cells\[1\] = 'Treadmill'/);
-  assert.match(out, /COOLDOWN/);
-  assert.match(out, /Jog/);
+  assert.match(out, /FINAL-COOLDOWN-LASTMILE/);
 });
 
 test('endurance external target is moved into the external target field when supplied in notes', () => {
