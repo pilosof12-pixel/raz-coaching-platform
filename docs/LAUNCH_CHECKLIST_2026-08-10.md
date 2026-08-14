@@ -1,6 +1,6 @@
 # RAZ AI Coaching Platform — Launch Checklist
 
-Status date: 2026-08-14
+Status date: 2026-08-15
 
 ## Completed / code-verified
 
@@ -103,17 +103,17 @@ Status date: 2026-08-14
 
 Note: the first end-to-end clarified build exposed the now-fixed `Parallel Box Squat` alias issue; an isolated rerun then entered generation normally but the model provider returned a temporary upstream `503 high demand`. Those are downstream/provider events, not failures of the clarification gate or zero-cost handoff.
 
-## Program Pass rollout — PENDING
+## Program Pass rollout — CONTROLLED ENFORCEMENT STAGING
 
-Do not enable commercial enforcement until these are complete.
+Commercial enforcement is now enabled for controlled staging. Do not open broad paid traffic until the acceptance matrix below passes.
 
-- [ ] Add final privacy/support email to deployed privacy/support copy.
+- [x] Add final privacy/support email to deployed privacy/support copy (`pilosof12@gmail.com`).
 - [ ] Resolve or replace the temporary admin Program Pass provisioning path; current admin-key requests have returned generic `Not found`.
 - [ ] Verify the server-side environment variable name `SUPABASE_SERVICE_ROLE_KEY` exists before enforcement goes live.
 - [ ] Rotate the previously exposed admin provisioning secret before public launch.
 - [ ] Run the full Program Pass acceptance matrix below with controlled enforcement enabled.
 - [ ] Final real-iPhone usability check.
-- [ ] Set `PROGRAM_PASS_ENFORCEMENT=1` only after the matrix passes.
+- [x] `PROGRAM_PASS_ENFORCEMENT=1` enabled for controlled staging on 15 August 2026; broad paid traffic remains gated on the matrix.
 
 ### Program Pass staging acceptance matrix
 
@@ -140,17 +140,15 @@ Do not enable commercial enforcement until these are complete.
 
 ## Remaining launch workstreams
 
-1. Add final privacy/support email.
-2. Resolve/replace admin Program Pass provisioning.
-3. Verify service-role environment-variable setup and rotate the admin secret.
-4. Run Program Pass enforcement-ON staging acceptance matrix.
-5. Run the real purchase journey: Newie purchase -> Program Pass -> intake -> clarification if needed -> generation -> spreadsheet -> leave -> return -> adjust -> language -> delete.
-6. Final real-iPhone UX check.
-7. Add clean landing/Newie attribution where available, finish launch video/social assets, then launch to first paying users.
-8. Review conversion, generation cost, clarification frequency, adjustment usage and repurchase rate before changing price or allowances.
+1. Resolve/replace admin Program Pass provisioning and verify service-role/rotated-admin-secret production setup.
+2. Run Program Pass enforcement-ON staging acceptance matrix.
+3. Run the real purchase journey: Newie purchase -> Program Pass -> intake -> clarification if needed -> generation -> spreadsheet -> leave -> return -> adjust -> language -> delete.
+4. Final real-iPhone UX check.
+5. Add clean landing/Newie attribution where available, finish launch video/social assets, then launch to first paying users.
+6. Review conversion, generation cost, clarification frequency, adjustment usage and repurchase rate before changing price or allowances.
 
 ## CI / branch status
 
 - Normal static/regression CI is the default; live Render QA should remain one-off so normal commits do not create paid AI generations.
-- PR #15 remains intentionally open/draft and should not be merged until Program Pass staging is complete.
+- PR #15 is open, mergeable and ready for review; do not merge until Program Pass staging is complete.
 - Render deployment branch remains `privacy-security-hardening` with root directory `phase14/`.
