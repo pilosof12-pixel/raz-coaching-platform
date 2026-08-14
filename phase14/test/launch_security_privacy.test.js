@@ -12,10 +12,13 @@ const root=path.resolve(here,"..");
 
 function validIntake(){return{primary_goals:["200 kg squat"],experience:"advanced",days_per_week:4,equipment:"barbell rack plates",training_location:"commercial_gym",language:"en",sport_schedule:[]};}
 
-test("deployed package starts through secure wrapper",()=>{
+test("deployed package starts through pass preflight then secure wrapper",()=>{
   const pkg=JSON.parse(fs.readFileSync(path.join(root,"package.json"),"utf8"));
-  assert.match(pkg.scripts.start,/server_secure\.js/);
+  assert.match(pkg.scripts.start,/pass_preflight\.js/);
   assert.match(pkg.scripts.start,/phase15:build/);
+  const preflight=fs.readFileSync(path.join(root,"pass_preflight.js"),"utf8");
+  assert.ok(preflight.includes('await import("./server_secure.js")'));
+  assert.ok(preflight.includes("/api/program-pass-check"));
 });
 
 test("secure wrapper exposes required launch routes and protections",()=>{
@@ -40,13 +43,21 @@ test("privacy notice documents consent deletion retention and separate entitleme
   for(const term of ["consent","delete my data","56-day","6 substantive","program pass entitlement records","aggregate","ip addresses"]) assert.ok(p.includes(term),term);
 });
 
-test("launch UI injects consent, pass code and deletion without storing admin secrets",()=>{
-  const js=fs.readFileSync(path.join(root,"public","launch-controls.js"),"utf8");
-  assert.ok(js.includes("launch-privacy-consent"));
-  assert.ok(js.includes("launch-pass-code"));
-  assert.ok(js.includes("/api/client-data"));
-  assert.ok(!js.includes("ADMIN_PROVISION_KEY"));
-  assert.ok(!js.includes("SUPABASE_SERVICE_ROLE_KEY"));
+test("launch UI gates intake early, injects consent and deletion, and stores no admin secrets",()=>{
+  const launch=fs.readFileSync(path.join(root,"public","launch-controls.js"),"utf8");
+  const gate=fs.readFileSync(path.join(root,"public","program-pass-gate.js"),"utf8");
+  const runtime=fs.readFileSync(path.join(root,"scripts","apply_launch_runtime.mjs"),"utf8");
+  assert.ok(launch.includes("launch-privacy-consent"));
+  assert.ok(launch.includes("launch-pass-code"));
+  assert.ok(launch.includes("/api/client-data"));
+  assert.ok(gate.includes("/api/program-pass-check"));
+  assert.ok(gate.includes('intake.classList.add("hidden")'));
+  assert.ok(gate.includes('passField.type = "hidden"'));
+  assert.ok(runtime.includes("program-pass-gate.js"));
+  for(const src of [launch,gate]) {
+    assert.ok(!src.includes("ADMIN_PROVISION_KEY"));
+    assert.ok(!src.includes("SUPABASE_SERVICE_ROLE_KEY"));
+  }
 });
 
 test("sqlite entitlement record survives coaching-data deletion design",async()=>{
