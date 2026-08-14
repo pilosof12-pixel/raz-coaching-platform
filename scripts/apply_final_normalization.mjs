@@ -37,6 +37,15 @@ if (!d.includes('RUN-PURPOSE-SUFFIX-ALIASES')) {
   d = d.replace(anchor, anchor + '\n  ["Run Cool-down", "Run"],\n  ["Run Cooldown", "Run"],\n  ["Run Warm-up", "Run"],\n  ["Run Warmup", "Run"], // RUN-PURPOSE-SUFFIX-ALIASES');
 }
 
+// The live ping-pong stress test exposed a harmless wording inversion for the
+// already-canonical tolerated squat variation. Normalize only this exact phrase;
+// do not broaden exercise matching beyond the closed dictionary.
+if (!d.includes('["Parallel Box Squat", "Box Squat to Parallel"]')) {
+  const anchor = '  ["Dumbbell Reverse Lunge", "Reverse Lunge"], // FINAL-LIVE-ALIAS-SET';
+  if (!d.includes(anchor)) throw new Error('parallel box squat alias anchor missing');
+  d = d.replace(anchor, '  ["Parallel Box Squat", "Box Squat to Parallel"], // PING-PONG-BOX-SQUAT-ALIAS\n' + anchor);
+}
+
 // Controlled leading descriptors are presentation/load descriptors, not new
 // exercise inventions, when the exact base movement already exists canonically.
 // Exact canonical weighted movements still win before this fallback.
