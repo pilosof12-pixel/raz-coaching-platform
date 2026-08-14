@@ -236,6 +236,7 @@ const ALIAS_LIST = [
   ["Run Cooldown", "Run"],
   ["Run Warm-up", "Run"],
   ["Run Warmup", "Run"], // RUN-PURPOSE-SUFFIX-ALIASES
+  ["Parallel Box Squat", "Box Squat to Parallel"], // PING-PONG-BOX-SQUAT-ALIAS
   ["Dumbbell Reverse Lunge", "Reverse Lunge"], // FINAL-LIVE-ALIAS-SET
   ["Run (Treadmill)", "Treadmill"], // FINAL-LIVE-ALIAS-SET-2
   ["DB Overhead Press", "Dumbbell Overhead Press"],
