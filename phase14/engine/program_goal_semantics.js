@@ -4,15 +4,7 @@
 // exercise is a direct exposure to a named goal. Notes can explain intent, but
 // they cannot turn a different movement into the target movement.
 
-function norm(value) {
-  return String(value || '')
-    .toLowerCase()
-    .replace(/[–—]/g, '-')
-    .replace(/[_/]+/g, ' ')
-    .replace(/[^\p{L}\p{N}+.-]+/gu, ' ')
-    .replace(/\s+/g, ' ')
-    .trim();
-}
+import { normalizeSemanticText as norm } from './semantic_text.js';
 
 function familyMatches(exerciseFamily, targetFamily) {
   if (!exerciseFamily || !targetFamily) return false;
@@ -22,7 +14,8 @@ function familyMatches(exerciseFamily, targetFamily) {
 }
 
 function freestandingBalanceGoal(target) {
-  return /freestanding handstand|handstand balance|unsupported handstand/i.test(String(target?.raw || ''));
+  const raw = norm(target?.raw);
+  return /freestanding handstand|handstand balance|unsupported handstand/.test(raw);
 }
 
 export function isDirectGoalExercise(exercise, target) {
@@ -32,9 +25,7 @@ export function isDirectGoalExercise(exercise, target) {
   const base = exercise.base_movement;
   const family = target.family;
 
-  if (family === 'bar_muscle_up') {
-    return base === 'bar_muscle_up';
-  }
+  if (family === 'bar_muscle_up') return base === 'bar_muscle_up';
 
   if (family === 'handstand' && freestandingBalanceGoal(target)) {
     if (base !== 'handstand') return false;
