@@ -21,6 +21,10 @@ import {
   validateTacticalScheduleArchitectureSemantic,
   validateKnownMaxPullUpDoseSemantic,
 } from './coaching_progression_gpp.js';
+import {
+  validateHardRunWarmupSemantic,
+  validateYouthProgressionQualitySemantic,
+} from './coaching_acceptance_quality.js';
 
 // Single offline entry point for the deterministic validation chain that runs
 // after the server's last-mile exercise-name/load normalization and before a
@@ -43,9 +47,11 @@ export function validateProductionProgram(program, intake = {}) {
   model = sportCalendar.model;
   model = validateDirectGoalExposureSemantic(candidate, intake, model).model;
   model = validateProgressionArchitectureSemantic(candidate, intake, model).model;
+  model = validateYouthProgressionQualitySemantic(candidate, intake, model).model;
   model = validateTacticalScheduleArchitectureSemantic(candidate, intake, model).model;
   model = validateKnownMaxPullUpDoseSemantic(candidate, intake, model).model;
   model = validateTacticalGppCoverageSemantic(candidate, intake, model).model;
+  model = validateHardRunWarmupSemantic(candidate, intake, model).model;
   model = validateWeeklyVolumeBudgetSemantic(candidate, intake, model).model;
 
   candidate = reformatWarmupCells(candidate);
