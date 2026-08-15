@@ -10,6 +10,7 @@ on:
       - 'phase14/engine/phase15_program_qa.js'
       - 'phase14/engine/phase15_final_qa.js'
       - 'phase14/engine/phase15_quality_rules.js'
+      - 'phase14/engine/phase15_elite_guardrails.js'
       - 'phase14/engine/exercise_dictionary.js'
       - 'phase14/storage.js'
       - 'phase14/admin_qa_routes.js'
@@ -22,6 +23,7 @@ on:
       - 'phase14/test/phase15_specialist_rules.test.mjs'
       - 'phase14/test/exercise_demo_coverage.test.mjs'
       - 'phase14/test/youth_gymnastics_parity.test.mjs'
+      - 'phase14/test/tactical_3k_hybrid_parity.test.mjs'
       - 'phase14/public/exerciseDemos.js'
       - 'phase14/public/spreadsheet.js'
       - 'phase14/public/spreadsheet-parity.js'
@@ -73,6 +75,7 @@ jobs:
           runcheck planner_regression node --test test/phase15_planner_regression.test.mjs
           runcheck specialist_rules node --test test/phase15_specialist_rules.test.mjs
           runcheck youth_gymnastics_parity node --test test/youth_gymnastics_parity.test.mjs
+          runcheck tactical_3k_hybrid node --test test/tactical_3k_hybrid_parity.test.mjs
           if [ -f test/exercise_demo_coverage.test.mjs ]; then runcheck demo_coverage node --test test/exercise_demo_coverage.test.mjs; fi
           runcheck build_runtime node scripts/build_phase15_runtime.mjs
           runcheck syntax_runtime node --check server.phase15.js
@@ -88,6 +91,7 @@ jobs:
           runcheck syntax_program_qa node --check engine/phase15_program_qa.js
           runcheck syntax_final_qa node --check engine/phase15_final_qa.js
           runcheck syntax_quality node --check engine/phase15_quality_rules.js
+          runcheck syntax_elite_guardrails node --check engine/phase15_elite_guardrails.js
           runcheck grep_v5 grep -q 'deterministic-skeleton-v5' server.phase15.js
           runcheck grep_final_qa grep -q 'validatePhase15FinalProgram' server.phase15.js
           runcheck grep_direct_skill_protection grep -q 'if (!OPENAI_API_KEY)' server.phase15.js
