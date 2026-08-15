@@ -56,6 +56,7 @@
       training_location: 'commercial_gym',
       language: 'en',
       split_preference: 'coach_decide',
+      qa_diagnostics: true,
       current_numbers: [
         '3 km: 13:30',
         '10 km ruck with 20 kg: 95 min',
