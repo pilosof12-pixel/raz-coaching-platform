@@ -20,6 +20,7 @@ on:
       - 'phase14/package.json'
       - 'phase14/scripts/build_phase15_runtime.mjs'
       - 'phase14/scripts/final_pipeline_lock.mjs'
+      - 'phase14/scripts/apply_compositional_exercise_vocabulary.mjs'
       - 'phase14/scripts/apply_named_skill_goal_fix.mjs'
       - 'phase14/scripts/apply_youth_gymnastics_parity.mjs'
       - 'phase14/scripts/apply_tactical_3k_parity.mjs'
@@ -56,18 +57,17 @@ permissions:
 jobs:
   static-qa:
     runs-on: ubuntu-latest
-    timeout-minutes: 8
+    timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
           node-version: '20'
 
-      - name: Apply production coaching patches in workspace
+      - name: Build exact production coaching runtime
         run: |
-          node phase14/scripts/apply_named_skill_goal_fix.mjs
-          node phase14/scripts/apply_youth_gymnastics_parity.mjs
-          node phase14/scripts/apply_tactical_3k_parity.mjs
+          cd phase14
+          npm run phase15:build
 
       - name: Run deterministic coaching and product regressions
         run: |
@@ -100,6 +100,9 @@ jobs:
           runcheck final_pipeline_lock node --test test/final_pipeline_lock.test.js
           runcheck spreadsheet_product_parity node --test test/spreadsheet_product_parity.test.js
           if [ -f test/exercise_demo_coverage.test.mjs ]; then runcheck demo_coverage node --test test/exercise_demo_coverage.test.mjs; fi
+          for f in test/*.test.js; do
+            runcheck "file_$(basename "$f")" node --test "$f"
+          done
           runcheck build_runtime node scripts/build_phase15_runtime.mjs
           runcheck lock_final_pipeline node scripts/final_pipeline_lock.mjs
           runcheck syntax_runtime node --check server.phase15.js
