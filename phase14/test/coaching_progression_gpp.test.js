@@ -42,9 +42,10 @@ test('approved Tactical golden keeps low-cost push/core GPP within the priority 
   assert.equal(result.applicable, true);
   assert.deepEqual(result.violations, []);
   for (const week of result.weeks) {
-    assert.equal(week.totals.push, 3);
+    // Two Push-up sets on Monday + two low-cost OHP sets on Friday.
+    assert.equal(week.totals.push, 4);
     assert.equal(week.totals.core, 2);
-    assert.equal(week.low_cost_support_sets, 5);
+    assert.equal(week.low_cost_support_sets, 6);
   }
 });
 
