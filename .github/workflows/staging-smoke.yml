@@ -43,7 +43,10 @@ jobs:
           const passConfig = await get('/api/program-pass-config');
           console.log('PROGRAM_PASS_CONFIG', passConfig.text);
           const pc = JSON.parse(passConfig.text);
-          if (typeof pc.enabled !== 'boolean') throw new Error(`program pass config missing enabled boolean: ${passConfig.text}`);
+          if (typeof pc.enforced !== 'boolean') throw new Error(`program pass config missing enforced boolean: ${passConfig.text}`);
+          if (pc.enforced !== true) throw new Error(`controlled staging enforcement is unexpectedly off: ${passConfig.text}`);
+          if (Number(pc.access_days) !== 56) throw new Error(`Program Pass access window drifted: ${passConfig.text}`);
+          if (Number(pc.adjustments) !== 6) throw new Error(`Program Pass adjustment allowance drifted: ${passConfig.text}`);
 
           const privacy = await get('/privacy.html');
           if (!privacy.text.includes('pilosof12@gmail.com')) throw new Error('deployed privacy contact is stale');
