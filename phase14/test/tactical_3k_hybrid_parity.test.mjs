@@ -5,6 +5,7 @@ import {
   currentTargetModalityExposure,
   elitePromptRules,
   endurancePerformanceIntegrityFlags,
+  goalDoseFlags,
 } from '../engine/phase15_elite_guardrails.js';
 import { buildSpecialistRules } from '../engine/phase15_specialist_rules.js';
 
@@ -13,12 +14,12 @@ const intake = {
   primary_goals: ['Improve 3 km from 13:30 to sub-12:00'],
   secondary_goals: [
     'Improve 10 km ruck with 20 kg from 95 min toward 82 min',
-    'Improve strict pull-ups from 14 toward 18-20 while maintaining useful squat and deadlift strength',
+    'Improve strict pull-ups from 14 toward 18-20',
   ],
-  maintenance_goals: [],
+  maintenance_goals: ['Maintain useful squat and deadlift strength while staying athletic and relatively weight-stable'],
   goal_priority_model: 'tiered',
   experience: 'advanced',
-  days_per_week: 4,
+  days_per_week: 3,
   session_length: '60-75 min',
   training_location: 'full_gym',
   equipment: 'Full gym, track/road access, hills, pull-up bar, 20 kg ruck/backpack, 30 kg sandbag and sled.',
@@ -38,6 +39,7 @@ const intake = {
     'Currently does 1 ruck per week, usually 8-10 km with 20 kg.',
     'Recent 400 m repeats are around 1:42-1:45 with adequate recovery for repeatability.',
     'Previous shin-splint irritation happened when running volume increased abruptly; currently asymptomatic at present running and ruck volume.',
+    'Can train across five calendar days and is comfortable combining compatible easy running or rucking with a strength day when sensible.',
     'Wants combat-ready / special-operations-style fitness without random punishment circuits or unnecessary mass gain.',
   ].join(' '),
   injuries: 'Previous shin-splint irritation with abrupt running-volume increases; currently asymptomatic.',
@@ -73,6 +75,28 @@ test('ruck target receives specific load-management rules', () => {
   assert.match(rules, /RUCK(?:ING)? (?:DIRECT|SPECIFICITY|PROGRESSION|LOAD)/i);
   assert.match(rules, /(?:load|pack).*(?:distance).*(?:pace)|(?:pace).*(?:distance).*(?:load|pack)/i);
   assert.match(rules, /loaded running|run under load|heavy loaded run/i);
+  assert.match(rules, /RUN \+ RUCK IMPACT HISTORY/);
+});
+
+test('tactical framing does not authorize random punishment conditioning', () => {
+  const rules = elitePromptRules(intake).join('\n');
+  assert.match(rules, /TACTICAL PRIORITY RULE/);
+  assert.match(rules, /punishment conditioning/i);
+  assert.match(rules, /Burpee EMOM/);
+  assert.match(rules, /extra HIIT/i);
+});
+
+test('strict pull-up goal cannot silently become rows or pulldowns', () => {
+  const p = parsed([
+    row('Mon', 'Run', '4:25/km', '6', '2 min', '3K-specific intervals with recovery.'),
+    row('Mon', 'Back Squat', 'RPE-selected load', '3', '4', 'Strength retention.'),
+    row('Mon', 'Lat Pulldown', 'RPE-selected load', '3', '8', 'Vertical pulling support.'),
+    row('Wed', 'Run', '5:40-6:00/km', '1', '35 min', 'Easy conversational run.'),
+    row('Fri', 'Run', '5:30-5:50/km', '1', '45 min', 'Aerobic run.'),
+    row('Sun', 'Backpack Carry', '20 kg', '1', '8 km', 'Direct ruck / loaded march at controlled walking pace.'),
+  ]);
+  const flags = goalDoseFlags('', intake, p);
+  assert.equal(flags.some(f => f.code === 'NAMED_GOAL_DIRECT_EXPOSURE_MISSING' && /pull-up/i.test(f.message)), true);
 });
 
 test('dropping the existing weekly ruck is a QA failure even when carries and sleds are present', () => {
