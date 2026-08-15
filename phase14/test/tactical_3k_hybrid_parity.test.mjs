@@ -6,8 +6,10 @@ import {
   elitePromptRules,
   endurancePerformanceIntegrityFlags,
   goalDoseFlags,
+  strengthSessionAccountingFlags,
 } from '../engine/phase15_elite_guardrails.js';
 import { buildSpecialistRules } from '../engine/phase15_specialist_rules.js';
+import { validatePhase15FinalProgram } from '../engine/phase15_final_qa.js';
 
 const intake = {
   age: 27,
@@ -20,8 +22,10 @@ const intake = {
   goal_priority_model: 'tiered',
   experience: 'advanced',
   days_per_week: 3,
+  gym_availability_mode: 'flexible',
+  available_gym_days: [],
   session_length: '60-75 min',
-  training_location: 'full_gym',
+  training_location: 'commercial_gym',
   equipment: 'Full gym, track/road access, hills, pull-up bar, 20 kg ruck/backpack, 30 kg sandbag and sled.',
   current_numbers: [
     '3 km: 13:30',
@@ -43,7 +47,7 @@ const intake = {
     'Wants combat-ready / special-operations-style fitness without random punishment circuits or unnecessary mass gain.',
   ].join(' '),
   injuries: 'Previous shin-splint irritation with abrupt running-volume increases; currently asymptomatic.',
-  pain: { active: false, description: '', severity: '', character: '', next_day_baseline: '', tolerated_movements: '' },
+  pain: { active: false, description: '', severity: '', character: '', next_day_baseline: 'normal', tolerated_movements: 'Current 18-20 km/week running and one 8-10 km ruck with 20 kg are tolerated without symptoms.' },
   mobility: { active: false, limitation: '' },
   sport: '',
   sport_schedule: [],
@@ -57,6 +61,29 @@ function parsed(rows) {
 }
 const row = (day, exercise, weight='N/A', sets='1', reps='30 min', notes='') =>
   [day, exercise, weight, sets, reps, 'N/A', 'N/A', notes, ''];
+
+function goldenWeek(week) {
+  const header = 'Day\tExercise\tWeight\tSets\tReps\tRest\tTarget RPE\tNotes\tResults';
+  const rows = [
+    ['Mon','Run','5:30-6:00 / km','1','25 min','N/A','3-4','Easy conversational run; preserve current run frequency and keep impact low.',''],
+    ['Mon','Back Squat','RPE-selected load','3','5','3 min','7','Strength maintenance; clean reps with reserve.',''],
+    ['Tue','Run','1:42-1:45 / 400 m','6','400 m','2 min','7-8','3K target pace interval session anchored to current repeatable 400 m performance.',''],
+    ['Wed','Weighted Pull-up','+25 kg','3','5','3 min','7-8','Pulling-strength support below the demonstrated +30 kg x 5 benchmark.',''],
+    ['Wed','Pull-up','Bodyweight','3','8','2 min','7','Direct strict pull-up volume; stop before rep speed or position deteriorates.',''],
+    ['Fri','Run','5:20-5:50 / km','1','40 min','N/A','4-5','Long aerobic run at controlled effort; no extra conditioning afterward.',''],
+    ['Fri','Deadlift','RPE-selected load','2','3','3 min','7','Low-cost strength maintenance behind the 3K priority.',''],
+    ['Sat','Backpack Carry','20 kg','1','70 min','N/A','5','Direct ruck / loaded march at controlled walking pace; target pace 9:25-9:35 / km. Keep pack load stable and progress only one main ruck variable at a time.',''],
+  ];
+  return `START_WEEK${week}_TSV\n${header}\n${rows.map(r=>r.join('\t')).join('\n')}\nEND_WEEK${week}_TSV`;
+}
+
+function goldenProgram() {
+  return [
+    'Tactical 3K block. Primary priority is the 3K; ruck and pull-up work remain direct, while barbell strength stays supportive.',
+    'Weeks 2-4 preserve the same hierarchy and only progress a variable when recovery and shin response remain normal.',
+    goldenWeek(1), goldenWeek(2), goldenWeek(3), goldenWeek(4),
+  ].join('\n\n');
+}
 
 test('Tactical 3K preserves the established three-run baseline and anchors current 3K pace', () => {
   assert.equal(currentTargetModalityExposure(intake, 'running'), 3);
@@ -123,4 +150,19 @@ test('a direct weekly ruck satisfies the modality floor; support carries do not 
   ]);
   const flags = endurancePerformanceIntegrityFlags('', intake, p);
   assert.equal(flags.some(f => f.code === 'TARGET_MODALITY_EXPOSURE_REDUCED' && /ruck/i.test(f.message)), false);
+});
+
+test('three requested strength sessions can coexist with additional endurance-only calendar days', () => {
+  const p = parsed([
+    row('Mon', 'Back Squat', 'RPE-selected load', '3', '5', 'Strength day 1.'),
+    row('Tue', 'Run', '5:40-6:00/km', '1', '30 min', 'Endurance-only day.'),
+    row('Wed', 'Weighted Pull-up', '+25 kg', '3', '5', 'Strength day 2.'),
+    row('Fri', 'Deadlift', 'RPE-selected load', '2', '3', 'Strength day 3.'),
+    row('Sat', 'Backpack Carry', '20 kg', '1', '60 min', 'Endurance-only ruck day.'),
+  ]);
+  assert.deepEqual(strengthSessionAccountingFlags('', intake, p), []);
+});
+
+test('the hand-built Tactical 3K target is feasible under the complete final QA contract', () => {
+  assert.doesNotThrow(() => validatePhase15FinalProgram(goldenProgram(), intake));
 });
