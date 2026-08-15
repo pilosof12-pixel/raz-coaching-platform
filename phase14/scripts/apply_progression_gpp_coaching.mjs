@@ -28,16 +28,34 @@ patch('engine/phase15_planner.js', [
     already: "import { buildConsolidationQualityBrief } from './coaching_consolidation_quality.js';",
   },
   {
+    label: 'tactical 3K/GPP quality brief import',
+    find: "import { buildConsolidationQualityBrief } from './coaching_consolidation_quality.js';\n",
+    replace: "import { buildConsolidationQualityBrief } from './coaching_consolidation_quality.js';\nimport { buildTactical3KGppQualityBrief } from './tactical_3k_gpp_quality.js';\n",
+    already: "import { buildTactical3KGppQualityBrief } from './tactical_3k_gpp_quality.js';",
+  },
+  {
     label: 'build progression/GPP brief',
     find: "  const specialist = buildSpecialistRules(intake);\n  return [\n",
     replace: "  const specialist = buildSpecialistRules(intake);\n  const progressionGpp = buildProgressionGppBrief(intake);\n  const acceptanceQuality = buildAcceptanceQualityBrief(intake);\n  const consolidationQuality = buildConsolidationQualityBrief(intake);\n  return [\n",
     already: 'const consolidationQuality = buildConsolidationQualityBrief(intake);',
   },
   {
+    label: 'build tactical 3K/GPP quality brief',
+    find: "  const consolidationQuality = buildConsolidationQualityBrief(intake);\n  return [\n",
+    replace: "  const consolidationQuality = buildConsolidationQualityBrief(intake);\n  const tactical3KGppQuality = buildTactical3KGppQualityBrief(intake);\n  return [\n",
+    already: 'const tactical3KGppQuality = buildTactical3KGppQualityBrief(intake);',
+  },
+  {
     label: 'inject progression/GPP brief',
     find: "    specialist,\n    'Session skeleton:',",
     replace: "    specialist,\n    progressionGpp,\n    acceptanceQuality,\n    consolidationQuality,\n    'Session skeleton:',",
     already: "    consolidationQuality,\n    'Session skeleton:',",
+  },
+  {
+    label: 'inject tactical 3K/GPP quality brief',
+    find: "    consolidationQuality,\n    'Session skeleton:',",
+    replace: "    consolidationQuality,\n    tactical3KGppQuality,\n    'Session skeleton:',",
+    already: "    tactical3KGppQuality,\n    'Session skeleton:',",
   },
 ]);
 
@@ -49,10 +67,22 @@ patch('server.phase15.js', [
     already: 'CONSOLIDATION-RETENTION-SEMANTIC-QA-WIRED',
   },
   {
+    label: 'tactical 3K/GPP quality imports',
+    find: 'import { validateProgressionArchitectureSemantic, validateTacticalGppCoverageSemantic, validateTacticalScheduleArchitectureSemantic, validateKnownMaxPullUpDoseSemantic } from "./engine/coaching_progression_gpp.js"; // PROGRESSION-GPP-SEMANTIC-QA-WIRED\n',
+    replace: 'import { validateProgressionArchitectureSemantic, validateTacticalGppCoverageSemantic, validateTacticalScheduleArchitectureSemantic, validateKnownMaxPullUpDoseSemantic } from "./engine/coaching_progression_gpp.js"; // PROGRESSION-GPP-SEMANTIC-QA-WIRED\nimport { validateTactical3KIntervalProgressionSemantic, validateTacticalStrengthCompletenessSemantic } from "./engine/tactical_3k_gpp_quality.js"; // TACTICAL-3K-GPP-QUALITY-WIRED\n',
+    already: 'TACTICAL-3K-GPP-QUALITY-WIRED',
+  },
+  {
     label: 'production progression/GPP validators',
     find: 'validateDirectGoalExposureSemantic(program, intake);',
     replace: 'validateDirectGoalExposureSemantic(program, intake);\n      validateProgressionArchitectureSemantic(program, intake); // FOUR-WEEK-PROGRESSION-SEMANTICS\n      validateYouthProgressionQualitySemantic(program, intake); // YOUTH-VISIBLE-PROGRESSION-QUALITY\n      validateYouthConsolidationRetentionSemantic(program, intake); // YOUTH-WEEK4-CONSOLIDATION-RETENTION\n      validateTacticalScheduleArchitectureSemantic(program, intake); // TACTICAL-SCHEDULE-ARCHITECTURE\n      validateKnownMaxPullUpDoseSemantic(program, intake); // KNOWN-MAX-PULLUP-DOSE\n      validateTacticalGppCoverageSemantic(program, intake); // TACTICAL-GPP-PRIORITY-FLOOR\n      validateHardRunWarmupSemantic(program, intake); // HARD-RUN-SAME-DAY-WARMUP',
     already: 'YOUTH-WEEK4-CONSOLIDATION-RETENTION',
+  },
+  {
+    label: 'production tactical 3K/GPP quality validators',
+    find: '      validateTacticalGppCoverageSemantic(program, intake); // TACTICAL-GPP-PRIORITY-FLOOR\n      validateHardRunWarmupSemantic(program, intake); // HARD-RUN-SAME-DAY-WARMUP',
+    replace: '      validateTacticalGppCoverageSemantic(program, intake); // TACTICAL-GPP-PRIORITY-FLOOR\n      validateTacticalStrengthCompletenessSemantic(program, intake); // TACTICAL-STRENGTH-COMPLETENESS\n      validateTactical3KIntervalProgressionSemantic(program, intake); // TACTICAL-3K-INTERVAL-PROGRESSION\n      validateHardRunWarmupSemantic(program, intake); // HARD-RUN-SAME-DAY-WARMUP',
+    already: 'TACTICAL-3K-INTERVAL-PROGRESSION',
   },
   {
     label: 'make new semantic failures repairable',
@@ -60,6 +90,12 @@ patch('server.phase15.js', [
     replace: '        err.code === "PHASE15_QUALITY_VIOLATION" ||\n        err.code === "PROGRESSION_ARCHITECTURE_MISSING" ||\n        err.code === "YOUTH_PROGRESSION_QUALITY_MISSING" ||\n        err.code === "YOUTH_CONSOLIDATION_RESET_TO_BASELINE" ||\n        err.code === "TACTICAL_SCHEDULE_ARCHITECTURE_VIOLATION" ||\n        err.code === "PULL_UP_DOSE_EXCEEDS_KNOWN_CAPACITY" ||\n        err.code === "TACTICAL_GPP_COVERAGE_MISSING" ||\n        err.code === "HARD_RUN_WARMUP_MISSING"\n',
     already: 'err.code === "YOUTH_CONSOLIDATION_RESET_TO_BASELINE"',
   },
+  {
+    label: 'make tactical 3K/GPP quality failures repairable',
+    find: '        err.code === "TACTICAL_GPP_COVERAGE_MISSING" ||\n        err.code === "HARD_RUN_WARMUP_MISSING"\n',
+    replace: '        err.code === "TACTICAL_GPP_COVERAGE_MISSING" ||\n        err.code === "TACTICAL_STRENGTH_SESSION_TOO_THIN" ||\n        err.code === "TACTICAL_3K_INTERVAL_PROGRESSION_VIOLATION" ||\n        err.code === "HARD_RUN_WARMUP_MISSING"\n',
+    already: 'err.code === "TACTICAL_3K_INTERVAL_PROGRESSION_VIOLATION"',
+  },
 ]);
 
-console.log('Progression architecture + youth progression/consolidation quality + tactical GPP/schedule/dose/warm-up production wiring complete.');
+console.log('Progression architecture + youth progression/consolidation quality + tactical GPP/schedule/dose/3K quality/warm-up production wiring complete.');
