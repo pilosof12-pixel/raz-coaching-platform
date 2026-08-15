@@ -46,12 +46,17 @@ export function detectIntakeClarifications(intake = {}) {
   const current = currentText(intake);
   const pain = painText(intake);
   const rawGoals = text([intake?.primary_goals, intake?.secondary_goals]);
+  const hasBarMuscleUpGoal = /\bbar muscle[- ]?up\b/i.test(goals);
 
   // Quantified outcomes need a current anchor. Advanced skill goals also need a
   // baseline even when written qualitatively (for example "first bar muscle-up"
   // or "freestanding handstand") because the useful progression depends on the
   // athlete's present rung, not just the destination.
   for (const mv of MOVEMENTS) {
+    // "bar muscle-up" is a strict subtype of the generic muscle-up pattern.
+    // Once the bar-specific goal exists, generic muscle-up must never create a
+    // duplicate question in the same OR a later clarification round.
+    if (mv.id === 'muscle_up' && hasBarMuscleUpGoal) continue;
     if (!mv.goal.test(goals) || mv.current.test(current) || answered(intake, `benchmark_${mv.id}`)) continue;
     const matchedGoal = rawGoals.split('|').find(x => mv.goal.test(x)) || rawGoals;
     if ((!mv.always_baseline && !looksQuantifiedGoal(matchedGoal)) || goalStatesBaselineAndTarget(matchedGoal)) continue;
@@ -145,11 +150,6 @@ export function detectIntakeClarifications(intake = {}) {
     });
   }
 
-  // A bar-specific goal is already handled by benchmark_bar_muscle_up. Do not
-  // ask a second generic muscle-up question for the exact same goal phrase.
-  if (out.some(q => q.id === 'benchmark_bar_muscle_up')) {
-    return out.filter(q => q.id !== 'benchmark_muscle_up').slice(0, 4);
-  }
   return out;
 }
 
