@@ -102,7 +102,9 @@ test('all repairable validator failures use one grounded internal repair path', 
   assert.match(out, /buildPhase15SourceGrounding\(ENGINE, intake, EXERCISE_DICTIONARY\)/);
   assert.match(out, /RETRIABLE_CODES\.has\(err\.code\)/);
   assert.match(out, /PHASE15_QUALITY_VIOLATION/);
-  assert.match(out, /repairFeedback = err\.amendment/);
+  assert.match(out, /buildRolePreservingRepairFeedback\(err, intake\)/);
+  assert.match(out, /REJECTED EXERCISE NAMES/);
+  assert.match(out, /TACTICAL ROLE-PRESERVING CANONICAL MENU/);
 });
 
 test('repair strategy escapes a poisoned candidate with a fresh grounded regeneration', () => {
