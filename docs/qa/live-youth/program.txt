@@ -1,0 +1,83 @@
+Here is your four-week program designed to help you achieve your first Bar Muscle-up and a Freestanding Handstand, while building a strong push/pull foundation and maintaining lower-body athleticism.
+
+This program prioritizes skill quality over fatigue, especially given your age and goals. We'll focus on consistent, high-quality attempts for your Bar Muscle-up transitions and Handstand kick-ups. For strength work, we'll use double progression where you aim to hit the top of the rep range before increasing difficulty (e.g., adding tempo, pauses, or moving to a harder variation).
+
+Weeks 2-4 will build on the foundation established in Week 1. For Bar Muscle-up Transition Drills, we'll aim for slightly more successful reps or less assistance. Handstand practice will focus on increasing successful kick-up attempts and brief balance time. Strength exercises will progress by adding reps, sets, or increasing the challenge through tempo or pauses, following a double progression model.
+
+Remember to listen to your body. If you experience any pain, stop the exercise and try a different variation or reduce the intensity. If you're feeling particularly fatigued from other activities, prioritize the skill work and reduce the volume or intensity of the strength exercises. The goal is consistent, high-quality practice, not pushing through discomfort or poor form.
+
+START_WEEK1_TSV
+Day	Exercise	Weight	Sets	Reps	Rest	Target RPE	Notes	Results
+Monday	[WARMUP] Band Pull-Apart Warm-up	BW	2	10	60s	N/A	Focus on shoulder blade retraction.	
+Monday	[WARMUP] Scapular Pull-up	BW	2	5	60s	N/A	Focus on initiating with the lats.	
+Monday	Bar Muscle-up Transition Drill	BW	4	1-2	120s	N/A	Focus on a smooth, controlled turnover. Use minimal assistance needed for clean reps.	
+Monday	Explosive Hip-to-Bar Pull-up	BW	3	3	120s	8	Explode up, aiming to get hips to the bar. Full recovery between sets.	
+Monday	Controlled Handstand Kick-up	BW	5	1-2	90s	N/A	Focus on controlled kick-ups to a balanced position against the wall. 1-2 attempts per set.	
+Monday	Ring Dip	BW	3	6-8	90s	8	Controlled descent, full lockout.	
+Monday	Ring Row	BW	3	8-12	60s	8	Adjust foot position to control difficulty.	
+Tuesday	[WARMUP] Bodyweight Squat	BW	2	10	60s	N/A	Focus on full range of motion.	
+Tuesday	[WARMUP] Push-up	BW	2	8	60s	N/A	Controlled reps.	
+Tuesday	Controlled Handstand Kick-up	BW	5	1-2	90s	N/A	Focus on controlled kick-ups to a balanced position against the wall. 1-2 attempts per set.	
+Tuesday	Bar Muscle-up Transition Drill	BW	4	1-2	120s	N/A	Focus on a smooth, controlled turnover. Use minimal assistance needed for clean reps.	
+Tuesday	Pistol Squat	BW	3	3-5 per leg	90s	8	Controlled descent, stand tall.	
+Tuesday	Broad Jump	BW	3	3	120s	N/A	Full reset between jumps, focus on maximal distance and soft landing.	
+Tuesday	Pull-up	BW	3	6-8	90s	8	Strict reps, full range of motion.	
+Tuesday	Push-up	BW	3	8-12	60s	8	Maintain a strong plank position.	
+END_WEEK1_TSV
+
+START_WEEK2_TSV
+Day	Exercise	Weight	Sets	Reps	Rest	Target RPE	Notes	Results
+Monday	[WARMUP] Band Pull-Apart Warm-up	BW	2	10	60s	N/A	Focus on shoulder blade retraction.	
+Monday	[WARMUP] Scapular Pull-up	BW	2	5	60s	N/A	Focus on initiating with the lats.	
+Monday	Bar Muscle-up Transition Drill	BW	4	1-3	120s	N/A	Aim for slightly more successful reps or less assistance for clean turnover.	
+Monday	Explosive Hip-to-Bar Pull-up	BW	3	3	120s	8	Explode up, aiming to get hips to the bar. Full recovery between sets.	
+Monday	Controlled Handstand Kick-up	BW	6	1-2	90s	N/A	Increase attempts, focus on brief unsupported balance. 1-2 attempts per set.	
+Monday	Ring Dip	BW	3	7-9	90s	8	Controlled descent, full lockout. Aim for top of rep range.	
+Monday	Ring Row	BW	3	10-14	60s	8	Adjust foot position to control difficulty. Aim for top of rep range.	
+Tuesday	[WARMUP] Bodyweight Squat	BW	2	10	60s	N/A	Focus on full range of motion.	
+Tuesday	[WARMUP] Push-up	BW	2	8	60s	N/A	Controlled reps.	
+Tuesday	Controlled Handstand Kick-up	BW	6	1-2	90s	N/A	Increase attempts, focus on brief unsupported balance. 1-2 attempts per set.	
+Tuesday	Bar Muscle-up Transition Drill	BW	4	1-3	120s	N/A	Aim for slightly more successful reps or less assistance for clean turnover.	
+Tuesday	Pistol Squat	BW	3	4-6 per leg	90s	8	Controlled descent, stand tall. Aim for top of rep range.	
+Tuesday	Broad Jump	BW	3	3	120s	N/A	Full reset between jumps, focus on maximal distance and soft landing.	
+Tuesday	Pull-up	BW	3	7-9	90s	8	Strict reps, full range of motion. Aim for top of rep range.	
+Tuesday	Push-up	BW	3	10-15	60s	8	Maintain a strong plank position. Aim for top of rep range.	
+END_WEEK2_TSV
+
+START_WEEK3_TSV
+Day	Exercise	Weight	Sets	Reps	Rest	Target RPE	Notes	Results
+Monday	[WARMUP] Band Pull-Apart Warm-up	BW	2	10	60s	N/A	Focus on shoulder blade retraction.	
+Monday	[WARMUP] Scapular Pull-up	BW	2	5	60s	N/A	Focus on initiating with the lats.	
+Monday	Bar Muscle-up Transition Drill	BW	5	1-3	120s	N/A	Increase sets for more practice, focus on consistent clean reps.	
+Monday	Explosive Hip-to-Bar Pull-up	BW	3	3	120s	8	Explode up, aiming to get hips to the bar. Full recovery between sets.	
+Monday	Controlled Handstand Kick-up	BW	7	1-2	90s	N/A	Increase attempts, focus on holding brief unsupported balance. 1-2 attempts per set.	
+Monday	Ring Dip	BW	4	6-8	90s	8	Increase sets if previous week's reps were hit.	
+Monday	Ring Row	BW	4	8-12	60s	8	Increase sets if previous week's reps were hit.	
+Tuesday	[WARMUP] Bodyweight Squat	BW	2	10	60s	N/A	Focus on full range of motion.	
+Tuesday	[WARMUP] Push-up	BW	2	8	60s	N/A	Controlled reps.	
+Tuesday	Controlled Handstand Kick-up	BW	7	1-2	90s	N/A	Increase attempts, focus on holding brief unsupported balance. 1-2 attempts per set.	
+Tuesday	Bar Muscle-up Transition Drill	BW	5	1-3	120s	N/A	Increase sets for more practice, focus on consistent clean reps.	
+Tuesday	Pistol Squat	BW	3	5-7 per leg	90s	8	Controlled descent, stand tall. Aim for top of rep range.	
+Tuesday	Broad Jump	BW	3	3	120s	N/A	Full reset between jumps, focus on maximal distance and soft landing.	
+Tuesday	Pull-up	BW	4	6-8	90s	8	Increase sets if previous week's reps were hit.	
+Tuesday	Push-up	BW	4	8-12	60s	8	Increase sets if previous week's reps were hit.	
+END_WEEK3_TSV
+
+START_WEEK4_TSV
+Day	Exercise	Weight	Sets	Reps	Rest	Target RPE	Notes	Results
+Monday	[WARMUP] Band Pull-Apart Warm-up	BW	2	10	60s	N/A	Focus on shoulder blade retraction.	
+Monday	[WARMUP] Scapular Pull-up	BW	2	5	60s	N/A	Focus on initiating with the lats.	
+Monday	Bar Muscle-up Transition Drill	BW	5	1-3	120s	N/A	Consolidate technique, aim for highest quality reps with minimal assistance.	
+Monday	Explosive Hip-to-Bar Pull-up	BW	3	3	120s	8	Explode up, aiming to get hips to the bar. Full recovery between sets.	
+Monday	Controlled Handstand Kick-up	BW	8	1-2	90s	N/A	Increase attempts, focus on holding brief unsupported balance. 1-2 attempts per set.	
+Monday	Ring Dip	BW	4	7-9	90s	8	Aim for top of rep range or slightly longer holds at the bottom.	
+Monday	Ring Row	BW	4	10-14	60s	8	Aim for top of rep range or slower tempo.	
+Tuesday	[WARMUP] Bodyweight Squat	BW	2	10	60s	N/A	Focus on full range of motion.	
+Tuesday	[WARMUP] Push-up	BW	2	8	60s	N/A	Controlled reps.	
+Tuesday	Controlled Handstand Kick-up	BW	8	1-2	90s	N/A	Increase attempts, focus on holding brief unsupported balance. 1-2 attempts per set.	
+Tuesday	Bar Muscle-up Transition Drill	BW	5	1-3	120s	N/A	Consolidate technique, aim for highest quality reps with minimal assistance.	
+Tuesday	Pistol Squat	BW	3	6-8 per leg	90s	8	Controlled descent, stand tall. Aim for top of rep range or add a pause at the bottom.	
+Tuesday	Broad Jump	BW	3	3	120s	N/A	Full reset between jumps, focus on maximal distance and soft landing.	
+Tuesday	Pull-up	BW	4	7-9	90s	8	Aim for top of rep range or slower tempo.	
+Tuesday	Push-up	BW	4	10-15	60s	8	Aim for top of rep range or slower tempo.	
+END_WEEK4_TSV
