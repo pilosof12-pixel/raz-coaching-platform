@@ -72,10 +72,12 @@ test('unbenchmarked variation load repair remains wired before coaching QA', () 
   assert.match(out, /repairUnbenchmarkedVariationLoads\(fixInvalidExerciseNames\(raw\), intake\)/);
 });
 
-test('production sport-day accounting uses ProgramModel semantics', () => {
+test('production semantic QA uses ProgramModel for strength-day accounting and direct goal exposure', () => {
   const out = lockFinalPipelineSource(fixture());
-  assert.match(out, /PROGRAM-MODEL-SPORT-COUPLING-WIRED/);
+  assert.match(out, /PROGRAM-MODEL-SEMANTIC-QA-WIRED/);
   assert.match(out, /validateSportDayCouplingSemantic\(program, intake\)/);
+  assert.match(out, /validateDirectGoalExposureSemantic\(program, intake\)/);
+  assert.match(out, /PROGRAM-MODEL-DIRECT-GOAL-EXPOSURE/);
   assert.doesNotMatch(out, /validateSportDayCoupling\(program, intake\)/);
 });
 
