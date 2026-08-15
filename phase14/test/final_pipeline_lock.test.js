@@ -81,8 +81,15 @@ test('all repairable validator failures use one grounded internal repair path', 
   assert.match(out, /buildPhase15SourceGrounding\(ENGINE, intake, EXERCISE_DICTIONARY\)/);
   assert.match(out, /RETRIABLE_CODES\.has\(err\.code\)/);
   assert.match(out, /PHASE15_QUALITY_VIOLATION/);
-  assert.match(out, /repairCandidate = program/);
   assert.match(out, /repairFeedback = err\.amendment/);
+});
+
+test('repair strategy escapes a poisoned candidate with a fresh grounded regeneration', () => {
+  const out = lockFinalPipelineSource(fixture());
+  assert.match(out, /HYBRID-QA-FRESH-REGEN/);
+  assert.match(out, /repairCandidate = attempt === 2 \? null : program/);
+  assert.match(out, /ACCUMULATED QA CORRECTIONS/);
+  assert.match(out, /if \(repairFeedback && !amendments\.includes\(repairFeedback\)\) amendments\.push\(repairFeedback\)/);
 });
 
 test('repair prompt forbids review placeholders and unrelated conditioning substitutions', () => {
@@ -90,6 +97,15 @@ test('repair prompt forbids review placeholders and unrelated conditioning subst
   assert.match(out, /never emit \[REVIEW\]/i);
   assert.match(out, /Never use Burpee EMOM, Hill Sprints or unrelated conditioning as a generic substitute/i);
   assert.match(out, /preserv(?:e|es) the training intent/i);
+});
+
+test('safe validator-code trace exists only when QA diagnostics are requested', () => {
+  const out = lockFinalPipelineSource(fixture());
+  assert.match(out, /const qaTrace = \[\]/);
+  assert.match(out, /qaTrace\.push\(`A\$\{attempt\}:\$\{repairLabel\}`\)/);
+  assert.match(out, /Array\.isArray\(err\.flags\)/);
+  assert.match(out, /intake && intake\.qa_diagnostics === true/);
+  assert.match(out, /QA trace:/);
 });
 
 test('hard-substitute delivery path is removed and exhaustion fails closed', () => {
