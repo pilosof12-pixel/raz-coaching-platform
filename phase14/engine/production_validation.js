@@ -10,7 +10,10 @@ import {
 import { repairPhase15Program } from './phase15_program_qa.js';
 import { validatePhase15FinalProgram } from './phase15_final_qa.js';
 import { parseProgramModel } from './program_model.js';
-import { validateSportDayCouplingSemantic } from './semantic_program_qa.js';
+import {
+  validateDirectGoalExposureSemantic,
+  validateSportDayCouplingSemantic,
+} from './semantic_program_qa.js';
 
 // Single offline entry point for the deterministic validation chain that runs
 // after the server's last-mile exercise-name/load normalization and before a
@@ -31,6 +34,7 @@ export function validateProductionProgram(program, intake = {}) {
   let model = parseProgramModel(candidate, intake);
   const sportCalendar = validateSportDayCouplingSemantic(candidate, intake, model);
   model = sportCalendar.model;
+  model = validateDirectGoalExposureSemantic(candidate, intake, model).model;
 
   validateWeeklyVolumeBudget(candidate, intake);
   candidate = reformatWarmupCells(candidate);
@@ -40,7 +44,7 @@ export function validateProductionProgram(program, intake = {}) {
   return {
     ok: true,
     program: candidate,
-    model: parseProgramModel(candidate, intake),
+    model: validateDirectGoalExposureSemantic(candidate, intake).model,
     warnings: sportCalendar.warnings || [],
     schedule: sportCalendar.schedule || [],
   };
