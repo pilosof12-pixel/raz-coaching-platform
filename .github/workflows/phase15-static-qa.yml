@@ -88,7 +88,7 @@ jobs:
           runcheck syntax_program_qa node --check engine/phase15_program_qa.js
           runcheck syntax_final_qa node --check engine/phase15_final_qa.js
           runcheck syntax_quality node --check engine/phase15_quality_rules.js
-          runcheck grep_v4 grep -q 'deterministic-skeleton-v4' server.phase15.js
+          runcheck grep_v5 grep -q 'deterministic-skeleton-v5' server.phase15.js
           runcheck grep_final_qa grep -q 'validatePhase15FinalProgram' server.phase15.js
           runcheck grep_direct_skill_protection grep -q 'if (!OPENAI_API_KEY)' server.phase15.js
           runcheck grep_normalizer grep -q 'normalizeOpenAIExerciseNames' server.phase15.js
