@@ -5,10 +5,13 @@ import fs from 'node:fs';
 const storage = fs.readFileSync(new URL('../storage.js', import.meta.url), 'utf8');
 const app = fs.readFileSync(new URL('../public/app.js', import.meta.url), 'utf8');
 
-test('Supabase client retries transport-level fetch failures', () => {
-  assert.match(storage, /const retryFetch = async/);
-  assert.match(storage, /attempt < 3/);
-  assert.match(storage, /fetch: retryFetch/);
+test('Supabase operations retry transient transport failures through the shared wrapper', () => {
+  assert.match(storage, /function isTransientSupabaseError\(err\)/);
+  assert.match(storage, /async function runSupabase\(operation,fn,\{attempts=2\}=\{\}\)/);
+  assert.match(storage, /if \(!isTransientSupabaseError\(err\) \|\| attempt===attempts\) throw err;/);
+  assert.match(storage, /await sleep\(attempt===1\?200:650\)/);
+  assert.match(storage, /runSupabase\(\"getClient\/select\"/);
+  assert.match(storage, /runSupabase\(\"finishJob\/update\"/);
 });
 
 test('intake draft persists across refresh and failed builds', () => {
