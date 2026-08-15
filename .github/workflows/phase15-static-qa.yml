@@ -15,7 +15,6 @@ on:
       - 'phase14/admin_qa_routes.js'
       - 'phase14/package.json'
       - 'phase14/scripts/build_phase15_runtime.mjs'
-      - 'phase14/scripts/apply_avatar_gap_fixes.mjs'
       - 'phase14/scripts/apply_named_skill_goal_fix.mjs'
       - 'phase14/scripts/apply_youth_gymnastics_parity.mjs'
       - 'phase14/scripts/apply_launch_runtime.mjs'
@@ -38,7 +37,7 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: write
+  contents: read
 
 jobs:
   static-qa:
@@ -49,26 +48,26 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '20'
-      - name: Apply deterministic avatar gap fixes
-        run: node phase14/scripts/apply_avatar_gap_fixes.mjs
-      - name: Apply named-skill and Youth gymnastics parity patches
+
+      # These are part of the production phase15:build chain. Apply them in the
+      # temporary Actions workspace so static QA tests the same effective runtime
+      # without modifying or auto-committing the release branch.
+      - name: Apply production coaching patches in workspace
         run: |
           node phase14/scripts/apply_named_skill_goal_fix.mjs
           node phase14/scripts/apply_youth_gymnastics_parity.mjs
-      - id: qa
-        name: Run deterministic coaching and product regressions
-        continue-on-error: true
+
+      - name: Run deterministic coaching and product regressions
         run: |
           set +e
           cd phase14
-          : > ../.github/phase15-static-qa-log.txt
           failed=0
           runcheck() {
             label="$1"; shift
-            echo "===== $label =====" | tee -a ../.github/phase15-static-qa-log.txt
-            "$@" >> ../.github/phase15-static-qa-log.txt 2>&1
+            echo "===== $label ====="
+            "$@"
             code=$?
-            echo "EXIT=$code" | tee -a ../.github/phase15-static-qa-log.txt
+            echo "EXIT=$code"
             if [ "$code" -ne 0 ]; then failed=1; fi
           }
           runcheck planner_regression node --test test/phase15_planner_regression.test.mjs
@@ -102,31 +101,3 @@ jobs:
           runcheck grep_overview_tab grep -q "addWorksheet('Overview')" public/spreadsheet-parity.js
           runcheck grep_privacy grep -q '/privacy.html' public/index.html
           exit "$failed"
-      - name: Write static QA result
-        if: always()
-        env:
-          QA_OUTCOME: ${{ steps.qa.outcome }}
-          SHA: ${{ github.sha }}
-        run: |
-          node - <<'NODE'
-          const fs=require('fs');
-          fs.writeFileSync('.github/phase15-static-qa-result.json', JSON.stringify({
-            timestamp:new Date().toISOString(),
-            tested_sha:process.env.SHA,
-            outcome:process.env.QA_OUTCOME,
-            ok:process.env.QA_OUTCOME==='success'
-          },null,2));
-          NODE
-      - name: Commit patched sources and QA result
-        if: always()
-        run: |
-          git config user.name 'RAZ static QA bot'
-          git config user.email 'actions@users.noreply.github.com'
-          git pull --rebase origin main || true
-          git add phase14/engine/exercise_dictionary.js phase14/scripts/build_phase15_runtime.mjs .github/phase15-static-qa-result.json .github/phase15-static-qa-log.txt
-          if git diff --cached --quiet; then exit 0; fi
-          git commit -m 'Record Phase 15 avatar fixes and static QA result'
-          git push
-      - name: Fail if QA failed
-        if: steps.qa.outcome != 'success'
-        run: exit 1
