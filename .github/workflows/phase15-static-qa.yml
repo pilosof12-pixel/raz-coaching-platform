@@ -18,6 +18,7 @@ on:
       - 'phase14/scripts/build_phase15_runtime.mjs'
       - 'phase14/scripts/apply_named_skill_goal_fix.mjs'
       - 'phase14/scripts/apply_youth_gymnastics_parity.mjs'
+      - 'phase14/scripts/apply_tactical_3k_parity.mjs'
       - 'phase14/scripts/apply_launch_runtime.mjs'
       - 'phase14/test/phase15_planner_regression.test.mjs'
       - 'phase14/test/phase15_specialist_rules.test.mjs'
@@ -58,6 +59,7 @@ jobs:
         run: |
           node phase14/scripts/apply_named_skill_goal_fix.mjs
           node phase14/scripts/apply_youth_gymnastics_parity.mjs
+          node phase14/scripts/apply_tactical_3k_parity.mjs
 
       - name: Run deterministic coaching and product regressions
         run: |
@@ -92,6 +94,7 @@ jobs:
           runcheck syntax_final_qa node --check engine/phase15_final_qa.js
           runcheck syntax_quality node --check engine/phase15_quality_rules.js
           runcheck syntax_elite_guardrails node --check engine/phase15_elite_guardrails.js
+          runcheck syntax_tactical_patch node --check scripts/apply_tactical_3k_parity.mjs
           runcheck grep_v5 grep -q 'deterministic-skeleton-v5' server.phase15.js
           runcheck grep_final_qa grep -q 'validatePhase15FinalProgram' server.phase15.js
           runcheck grep_direct_skill_protection grep -q 'if (!OPENAI_API_KEY)' server.phase15.js
