@@ -20,13 +20,28 @@ function patchFile(rel, transforms) {
   console.log(`${rel}: ${changed ? 'Youth gymnastics parity applied' : 'already current'}`);
 }
 
+// The legacy dictionary contains more than one location-whitelist copy. Patch
+// every home_gym block independently instead of relying on a globally unique
+// "pull_up_bar, bands" text anchor. This stays deterministic: only the explicit
+// home_gym block can be changed and rings are inserted at most once per block.
+{
+  const p = path.join(root, 'engine', 'exercise_dictionary.js');
+  let src = fs.readFileSync(p, 'utf8');
+  let changed = false;
+  let homeBlocks = 0;
+  src = src.replace(/\["home_gym",\s*new Set\(\[([\s\S]*?)\]\)\]/g, (block, inner) => {
+    homeBlocks += 1;
+    if (/"rings"/.test(inner)) return block;
+    if (!/"pull_up_bar"/.test(inner)) throw new Error('home_gym whitelist block has no pull_up_bar anchor');
+    changed = true;
+    return block.replace('"pull_up_bar",', '"pull_up_bar", "rings",');
+  });
+  if (homeBlocks < 1) throw new Error('No home_gym whitelist block found');
+  if (changed) fs.writeFileSync(p, src);
+  console.log(`engine/exercise_dictionary.js home_gym rings: ${changed ? 'patched' : 'already current'} (${homeBlocks} block${homeBlocks===1?'':'s'})`);
+}
+
 patchFile('engine/exercise_dictionary.js', [
-  {
-    label: 'home gym rings belong to effective equipment',
-    find: '    "pull_up_bar", "bands", "kettlebells",\n',
-    replace: '    "pull_up_bar", "rings", "bands", "kettlebells",\n',
-    already: '    "pull_up_bar", "rings", "bands", "kettlebells",\n'
-  },
   {
     label: 'remove generic Burpee EMOM strength fallback',
     find: '    const sub = EQUIPMENT_SUBSTITUTIONS.get(canonical);\n    const replacement = sub ? (isOutdoor ? sub.outdoor : sub.default) : (isOutdoor ? "Hill Sprints" : "Burpee EMOM");\n',
@@ -39,7 +54,7 @@ patchFile('engine/phase15_planner.js', [
   {
     label: 'named-skill evidence flags',
     find: "  const freestandingHandstandGoal = /freestanding handstand|handstand balance/i.test(namedSkillGoals) && !/handstand push|\\bhspu\\b/i.test(namedSkillGoals);\n",
-    replace: "  const freestandingHandstandGoal = /freestanding handstand|handstand balance/i.test(namedSkillGoals) && !/handstand push|\\bhspu\\b/i.test(namedSkillGoals);\n  const namedSkillEvidence = JSON.stringify({current_numbers:intake.current_numbers,clarification_answers:intake.clarification_answers,notes:intake.notes});\n  const advancedBarMuscleUpBase = /ring muscle.?up/i.test(namedSkillEvidence) || /(?:8|9|1[0-9]|2[0-9])\\s*(?:strict\\s*)?pull.?ups?/i.test(namedSkillEvidence);\n  const noReliableHandstandBalance = /no reliable unsupported|cannot.*unsupported|no.*freestanding.*hold|0\\s*(?:s|sec).*freestanding/i.test(namedSkillEvidence);\n  const lowerAthleticGoal = /lower[- ]body athletic|athleticism|general strength/i.test(`${secondary} ${notes}`);\n  const pistolBaseline = /pistol squat/i.test(namedSkillEvidence);\n  const ageMatch = `${notes} ${txt(intake.age)}`.match(/(?:athlete\\s+is|age\\s*[:=]?)?\\s*([1-9]|1[0-7])\\b/i);\n  const youthAthlete = Number(intake.age||0) > 0 ? Number(intake.age) < 18 : !!ageMatch;\n",
+    replace: "  const freestandingHandstandGoal = /freestanding handstand|handstand balance/i.test(namedSkillGoals) && !/handstand push|\\bhspu\\b/i.test(namedSkillGoals);\n  const namedSkillEvidence = JSON.stringify({current_numbers:intake.current_numbers,clarification_answers:intake.clarification_answers,notes:intake.notes});\n  const advancedBarMuscleUpBase = /ring muscle.?up/i.test(namedSkillEvidence) || /(?:8|9|1[0-9]|2[0-9])\\s*(?:strict\\s*)?pull.?ups?/i.test(namedSkillEvidence);\n  const noReliableHandstandBalance = /no reliable unsupported|cannot.*unsupported|no.*freestanding.*hold|0\\s*(?:s|sec).*freestanding/i.test(namedSkillEvidence);\n  const lowerAthleticGoal = /lower[- ]body athletic|athleticism|general strength/i.test(`${secondary} ${notes}`);\n  const pistolBaseline = /pistol squat/i.test(namedSkillEvidence);\n  const explicitAge = Number(intake.age || intake.age_years || 0);\n  const ageFromNotes = `${notes}`.match(/(?:athlete\\s+is|age\\s*[:=]?)\\s*(\\d{1,2})\\b/i);\n  const parsedAge = explicitAge > 0 ? explicitAge : (ageFromNotes ? Number(ageFromNotes[1]) : 0);\n  const youthAthlete = parsedAge > 0 && parsedAge < 18;\n",
     already: 'const advancedBarMuscleUpBase ='
   },
   {
