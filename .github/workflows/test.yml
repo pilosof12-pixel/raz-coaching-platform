@@ -58,6 +58,7 @@ jobs:
           node --check phase14/engine/phase15_final_qa.js
           node --check phase14/intake_clarification.js
           node --check phase14/public/clarification-controls.js
+          node --check phase14/public/spreadsheet-parity.js
           node --test phase14/test/phase15_source_grounding.test.mjs
           node --test phase14/test/phase15_runtime_patches.test.mjs
           node --test phase14/test/intake_clarification.test.mjs
@@ -67,6 +68,7 @@ jobs:
           node --test phase14/test/endurance_semantic_guardrails.test.js
           node --test phase14/test/final_normalization.test.js
           node --test phase14/test/final_pipeline_lock.test.js
+          node --test phase14/test/spreadsheet_product_parity.test.js
           grep -q 'PRODUCTION-RUNTIME-PATCH-WIRED' phase14/scripts/build_phase15_runtime.mjs
           grep -q 'FINAL-LIVE-ALIAS-SET' phase14/engine/exercise_dictionary.js
           grep -q 'RUN-EVENT-PREFIX-NORMALIZATION' phase14/engine/exercise_dictionary.js
@@ -77,8 +79,6 @@ jobs:
           grep -q 'ENDURANCE-ALL-WEEKS-FINAL-QA' phase14/engine/phase15_final_qa.js
           node phase14/scripts/build_phase15_runtime.mjs
           node phase14/scripts/final_pipeline_lock.mjs
-          # Production parity: apply the same normalization before build, build once,
-          # then apply the fail-closed final pipeline lock exactly as phase14/start does.
           node phase14/scripts/apply_launch_runtime.mjs
           node --check phase14/server.phase15.js
           node --check phase14/server_secure.js
@@ -89,6 +89,7 @@ jobs:
           node --check phase14/intake_clarification.js
           node --check phase14/public/clarification-controls.js
           node --check phase14/public/launch-controls.js
+          node --check phase14/public/spreadsheet-parity.js
           node --test phase14/test/launch_security_privacy.test.js
           node --test phase14/test/phase15_planner_regression.test.mjs
           node --test phase14/test/phase15_specialist_rules.test.mjs
@@ -102,9 +103,9 @@ jobs:
           grep -q 'source-aligned: only explicit density goals require density rows' phase14/server.phase15.js
           grep -q 'LEGACY-FORMULA-SCOPE-NARROWED' phase14/server.phase15.js
           grep -q 'SERVER-OWNED-FORMULA-MARKER' phase14/server.phase15.js
-          grep -q 'FINAL-QA-REGEN-BUDGET' phase14/server.phase15.js
-          grep -q 'PHASE15-FINAL-QA-RETRIABLE' phase14/server.phase15.js
-          grep -q 'FINAL-QA-FAIL-CLOSED' phase14/server.phase15.js
+          grep -q 'INTERNAL_QUALITY_REPAIR_ARCHITECTURE' phase14/server.phase15.js
+          grep -q 'INTERNAL-QA-REPAIR-BUDGET' phase14/server.phase15.js
+          grep -q 'INTERNAL_QA_REPAIR_EXHAUSTED' phase14/server.phase15.js
           grep -q 'SAVE-BOUNDARY-FINAL-QA' phase14/server.phase15.js
           grep -q "cells\[6\] = 'N/A'" phase14/server.phase15.js
           grep -q 'SOURCE-LABEL-CLIENT-SCRUB' phase14/server.phase15.js
@@ -125,6 +126,7 @@ jobs:
           grep -q 'ENDURANCE-LIVE-ALIAS-SET' phase14/engine/exercise_dictionary.js
           grep -q 'FINAL-LIVE-ALIAS-SET' phase14/engine/exercise_dictionary.js
           grep -q 'ENDURANCE-MODALITY-CATALOG-ROUTING' phase14/engine/phase15_source_router.js
+          grep -q 'spreadsheet-parity.js' phase14/public/index.html
           grep -q 'clarification-controls.js' phase14/public/index.html
           grep -q 'launch-controls.js' phase14/public/index.html
           grep -q 'launch-mobile.css' phase14/public/index.html
