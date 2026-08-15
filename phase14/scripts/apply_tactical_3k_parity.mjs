@@ -40,6 +40,18 @@ patchFile('engine/phase15_elite_guardrails.js', [
     already: "const ruckDef=MODALITY_DEFS.find(x=>x.key==='rucking');"
   },
   {
+    label: 'generic strict pull-up is a direct goal family',
+    find: "    ['weighted_pullup',/(weighted pull|pull.?up.*\\+?\\d|\\+?\\d+\\s*kg.*pull)/i,/(weighted pull|pull.?up)/i],\n    ['squat',/(back squat|box squat|front squat|\\bsquat\\b)/i,/(back squat|box squat|front squat|\\bsquat\\b)/i],",
+    replace: "    ['weighted_pullup',/(weighted pull|pull.?up.*\\+?\\d|\\+?\\d+\\s*kg.*pull)/i,/(weighted pull|pull.?up)/i],\n    ['strict_pullup',/\\b(?:strict\\s*)?pull.?ups?\\b/i,/\\b(?:strict\\s*)?(?:weighted\\s*)?pull.?ups?\\b/i],\n    ['squat',/(back squat|box squat|front squat|\\bsquat\\b)/i,/(back squat|box squat|front squat|\\bsquat\\b)/i],",
+    already: "['strict_pullup',/\\b(?:strict\\s*)?pull.?ups?\\b/i"
+  },
+  {
+    label: 'tactical language does not authorize fatigue theatre',
+    find: "  ];\n  for(const {priority,text,def} of explicitModalityGoals(intake)) {",
+    replace: "  ];\n  const tacticalContext=JSON.stringify({primary:intake.primary_goals,secondary:intake.secondary_goals,maintenance:intake.maintenance_goals,notes:intake.notes});\n  if(/combat[- ]?ready|special[- ]?operations|tactical|selection prep/i.test(tacticalContext)) rules.push('TACTICAL PRIORITY RULE: tactical/combat-ready language is context, not permission for punishment conditioning. Preserve the named 3K, ruck and calisthenics targets first. Do not add Burpee EMOM, arbitrary operator finishers, daily maximal tests or extra HIIT unless a named performance need, curated source and the recovery/time budget justify it.');\n  for(const {priority,text,def} of explicitModalityGoals(intake)) {",
+    already: 'TACTICAL PRIORITY RULE:'
+  },
+  {
     label: 'ruck coaching and mechanical-load rules',
     find: "    if(def.key==='running' && /\\bmarathon\\b/i.test(text)) {",
     replace: "    if(def.key==='rucking') {\n      rules.push('RUCK DIRECT SPECIFICITY: a named ruck/loaded-march goal needs at least one direct weekly ruck exposure. Farmer Carry, sled work and Sandbag Carry may support trunk, grip or work capacity but cannot replace loaded locomotion over meaningful distance/time.');\n      rules.push('RUCK PROGRESSION LOAD MANAGEMENT: progress the smallest useful mechanical variable from the current tolerated benchmark. Do not simultaneously make pack load heavier, distance longer and pace faster. Hold the other major variables stable while one progresses, and use foot/ankle/shin response plus next-day recovery as load-management gates.');\n      rules.push('RUCK LOADED-RUNNING RULE: do not default to heavy loaded running or run under load as a toughness shortcut. Use controlled ruck/loaded walking unless the intake explicitly requires loaded running and the curated source supports it.');\n      const impactContext=JSON.stringify({injuries:intake.injuries,pain:intake.pain,notes:intake.notes});\n      if(/shin splint|shin pain|tibial/i.test(impactContext)) rules.push('RUN + RUCK IMPACT HISTORY: the athlete is currently asymptomatic at an established running/ruck workload but has a shin-load history. Preserve tolerated exposure and avoid simultaneous abrupt increases in running impact and ruck mechanical stress; change one main load lever, then reassess symptoms/recovery.');\n    }\n    if(def.key==='running' && /\\bmarathon\\b/i.test(text)) {",
