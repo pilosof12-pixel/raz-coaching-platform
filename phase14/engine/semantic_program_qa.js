@@ -7,6 +7,10 @@ import {
   parseProgramModel,
   strengthDaysForWeek,
 } from './program_model.js';
+import {
+  applyDirectGoalSemantics,
+  directGoalExposureViolations,
+} from './program_goal_semantics.js';
 
 function requestedStrengthSessions(intake = {}) {
   const value = Number(intake.days_per_week || 0);
@@ -93,6 +97,31 @@ export function validateSportDayCouplingSemantic(program, intake = {}, suppliedM
         strengthDaysForWeek(model, week.week).map((day) => day.day),
       ])
     ),
+    model,
+  };
+}
+
+export function validateDirectGoalExposureSemantic(program, intake = {}, suppliedModel = null) {
+  const model = applyDirectGoalSemantics(suppliedModel || parseProgramModel(program, intake));
+  const violations = directGoalExposureViolations(model);
+
+  if (violations.length) {
+    const summary = violations.map((v) =>
+      `Week ${v.week}: ${v.tier} goal '${v.goal}' has no direct ${v.family} exposure.`
+    ).join(' ');
+    const amendment =
+      'PRIOR ATTEMPT FAILED DIRECT GOAL EXPOSURE VALIDATION. ' +
+      `${summary} Exercise notes do not count as target-skill exposure. ` +
+      'Restore the named movement or target-specific skill pattern while preserving unrelated valid work.';
+    throw new RetriableValidationError('NAMED_GOAL_DIRECT_EXPOSURE_MISSING', amendment, {
+      violations,
+      semantic_model_version: model.version,
+    });
+  }
+
+  return {
+    ok: true,
+    semantic_model_version: model.version,
     model,
   };
 }
