@@ -1,0 +1,39 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import fs from 'node:fs';
+
+const parity = fs.readFileSync(new URL('../public/spreadsheet-parity.js', import.meta.url), 'utf8');
+const launch = fs.readFileSync(new URL('../scripts/apply_launch_runtime.mjs', import.meta.url), 'utf8');
+
+test('client spreadsheet uses the canonical six-tab Youth gymnastics structure', () => {
+  assert.match(parity, /addWorksheet\('Overview'\)/);
+  assert.match(parity, /addWorksheet\('Warm-Up'\)/);
+  assert.match(parity, /addWorksheet\(`Week \$\{w\.week\}`\)/);
+  assert.doesNotMatch(parity, /addWorksheet\(['"]README['"]\)/);
+  assert.doesNotMatch(parity, /Strength Block - Week/);
+});
+
+test('week sheets preserve the approved 11-column client coaching layout', () => {
+  for (const header of [
+    'Exercise','Load / Target','Sets','Reps / Duration','Rest','Effort',
+    'Coaching Note','Log','Video','Status','Done'
+  ]) assert.ok(parity.includes(`'${header}'`), header);
+});
+
+test('overview and warm-up are first-class client sheets rather than README prose', () => {
+  for (const text of ['ATHLETE PROFILE','WEEKLY STRUCTURE','COACHING PURPOSE','PROGRAM RULES']) assert.ok(parity.includes(text), text);
+  for (const text of ['Section','Movement / Target','Dose','Purpose','Video','Notes']) assert.ok(parity.includes(`'${text}'`), text);
+});
+
+test('every exercise has a usable hyperlink path even without a curated direct demo', () => {
+  assert.match(parity, /resolveExerciseDemo\(name\)/);
+  assert.match(parity, /youtube\.com\/results\?search_query=/);
+  assert.match(parity, /setHyperlink\(ws\.getRow\(row\)\.getCell\(9\),r\.exercise\)/);
+  assert.match(parity, /setHyperlink\(ws\.getRow\(row\)\.getCell\(6\),item\[1\]\)/);
+});
+
+test('premium parity exporter overrides the legacy exporter at runtime', () => {
+  assert.match(parity, /window\.buildStrengthSpreadsheet=buildParitySpreadsheet/);
+  assert.match(launch, /spreadsheet-parity\.js/);
+  assert.match(launch, /Load the approved client spreadsheet exporter after the legacy spreadsheet\.js/);
+});
