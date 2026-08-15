@@ -14,7 +14,7 @@ export function lockFinalPipelineSource(input) {
   // an exact kg may remain only when that exact variation has its own benchmark.
   once(
     'import { EXERCISE_DICTIONARY } from "./engine/exercise_dictionary.js";',
-    'import { EXERCISE_DICTIONARY } from "./engine/exercise_dictionary.js";\nimport { repairUnbenchmarkedVariationLoads } from "./engine/phase15_elite_guardrails.js"; // UNBENCHMARKED-VARIATION-REPAIR-WIRED\nimport { validateDirectGoalExposureSemantic, validateSportDayCouplingSemantic, validateWeeklyVolumeBudgetSemantic } from "./engine/semantic_program_qa.js"; // PROGRAM-MODEL-SEMANTIC-QA-WIRED',
+    'import { EXERCISE_DICTIONARY } from "./engine/exercise_dictionary.js";\nimport { repairUnbenchmarkedVariationLoads } from "./engine/phase15_elite_guardrails.js"; // UNBENCHMARKED-VARIATION-REPAIR-WIRED\nimport { validateDirectGoalExposureSemantic, validateSportDayCouplingSemantic, validateWeeklyVolumeBudgetSemantic } from "./engine/semantic_program_qa.js"; // PROGRAM-MODEL-SEMANTIC-QA-WIRED\nimport { validateClientOutputCleanliness } from "./engine/client_output_qa.js"; // CLIENT-OUTPUT-CLEANLINESS-WIRED',
     'variation-load and semantic QA imports'
   );
 
@@ -42,6 +42,15 @@ export function lockFinalPipelineSource(input) {
     'validateWeeklyVolumeBudget(program, intake);',
     'validateWeeklyVolumeBudgetSemantic(program, intake); // PROGRAM-MODEL-WEEKLY-VOLUME-ACCOUNTING',
     'semantic weekly volume QA'
+  );
+
+  // Output cleanliness is not a coaching semantic inference. It is a final
+  // transport boundary: internal repair labels, validator codes and placeholders
+  // must never cross into the paying client's program.
+  once(
+    '      validatePhase15FinalProgram(program, intake);',
+    '      validatePhase15FinalProgram(program, intake);\n      validateClientOutputCleanliness(program); // CLIENT-OUTPUT-CLEANLINESS-INLOOP',
+    'in-loop client cleanliness'
   );
 
   // -----------------------------------------------------------------------
@@ -86,12 +95,13 @@ export function lockFinalPipelineSource(input) {
   const newTail = `  if (lastValid) {\n    const trace = qaTrace.join(" -> ");\n    const debugSuffix = intake && intake.qa_diagnostics === true && trace ? \` QA trace: \${trace}.\` : "";\n    const err = new Error("Internal coaching QA could not repair the candidate program after multiple passes. No client-facing program was saved. Please retry the build." + debugSuffix);\n    err.code = "INTERNAL_QA_REPAIR_EXHAUSTED";\n    err.qa_trace = qaTrace.slice();\n    throw err;\n  }\n  throw new Error(\n    "The program generator returned an unusable result after multiple attempts. Please try again."\n  );`;
   once(oldTail, newTail, 'repair exhaustion fails closed');
 
-  // privacyScrub/last-mile normalization can change TSV cells after in-loop QA.
-  // Revalidate the exact client-visible string immediately before persistence.
+  // privacyScrub may rewrite client-facing prose after in-loop QA. Revalidate the
+  // exact outgoing string immediately before persistence and fail closed if any
+  // internal QA artifact survived or was introduced at that final boundary.
   const saveProgramAnchor = '    const program = privacyScrub(await generateValidatedProgram(intake, progress), intake);';
   once(
     saveProgramAnchor,
-    saveProgramAnchor + '\n    validatePhase15FinalProgram(program, intake); // SAVE-BOUNDARY-FINAL-QA',
+    saveProgramAnchor + '\n    validatePhase15FinalProgram(program, intake); // SAVE-BOUNDARY-FINAL-QA\n    validateClientOutputCleanliness(program); // SAVE-BOUNDARY-CLIENT-CLEANLINESS',
     'save-boundary final QA'
   );
 
