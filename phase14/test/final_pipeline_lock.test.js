@@ -22,6 +22,7 @@ function fixture() {
     '    const raw = await runEngineRaw(userContent);',
     '    let program = fixInvalidExerciseNames(raw); // step 1',
     '    try {',
+    '      validateSportDayCoupling(program, intake);',
     '      program = reformatWarmupCells(program);',
     '      validatePhase15FinalProgram(program, intake);',
     '      return program;',
@@ -69,6 +70,13 @@ test('unbenchmarked variation load repair remains wired before coaching QA', () 
   assert.match(out, /repairUnbenchmarkedVariationLoads/);
   assert.match(out, /UNBENCHMARKED-VARIATION-REPAIR-WIRED/);
   assert.match(out, /repairUnbenchmarkedVariationLoads\(fixInvalidExerciseNames\(raw\), intake\)/);
+});
+
+test('production sport-day accounting uses ProgramModel semantics', () => {
+  const out = lockFinalPipelineSource(fixture());
+  assert.match(out, /PROGRAM-MODEL-SPORT-COUPLING-WIRED/);
+  assert.match(out, /validateSportDayCouplingSemantic\(program, intake\)/);
+  assert.doesNotMatch(out, /validateSportDayCoupling\(program, intake\)/);
 });
 
 test('all repairable validator failures use one grounded internal repair path', () => {
