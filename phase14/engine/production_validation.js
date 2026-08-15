@@ -18,6 +18,8 @@ import {
 import {
   validateProgressionArchitectureSemantic,
   validateTacticalGppCoverageSemantic,
+  validateTacticalScheduleArchitectureSemantic,
+  validateKnownMaxPullUpDoseSemantic,
 } from './coaching_progression_gpp.js';
 
 // Single offline entry point for the deterministic validation chain that runs
@@ -41,6 +43,8 @@ export function validateProductionProgram(program, intake = {}) {
   model = sportCalendar.model;
   model = validateDirectGoalExposureSemantic(candidate, intake, model).model;
   model = validateProgressionArchitectureSemantic(candidate, intake, model).model;
+  model = validateTacticalScheduleArchitectureSemantic(candidate, intake, model).model;
+  model = validateKnownMaxPullUpDoseSemantic(candidate, intake, model).model;
   model = validateTacticalGppCoverageSemantic(candidate, intake, model).model;
   model = validateWeeklyVolumeBudgetSemantic(candidate, intake, model).model;
 
