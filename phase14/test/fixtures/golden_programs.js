@@ -19,7 +19,7 @@ export const TACTICAL_3K_INTAKE = {
   available_gym_days: [],
   session_length: '60-75 min',
   training_location: 'commercial_gym',
-  equipment: 'Full gym, track/road access, hills, pull-up bar, 20 kg ruck/backpack, 30 kg sandbag and sled.',
+  equipment: 'Full gym, track/road access, hills, pull-up bar, cable stack, 20 kg ruck/backpack, 30 kg sandbag and sled.',
   current_numbers: [
     '3 km: 13:30',
     '10 km ruck with 20 kg: 95 min',
@@ -56,23 +56,41 @@ export const TACTICAL_3K_INTAKE = {
 };
 
 function tacticalWeek(week) {
+  const easyMinutes = [25, 28, 30, 25][week - 1];
+  const longMinutes = [40, 42, 45, 35][week - 1];
+  const intervalSets = ['6', '7', '5', '6'][week - 1];
+  const intervalReps = ['400 m', '400 m', '600 m', '400 m'][week - 1];
+  const intervalLoad = ['1:42-1:45 / 400 m', '1:40-1:43 / 400 m', '2:32-2:36 / 600 m', '1:38-1:40 / 400 m'][week - 1];
+  const weightedLoad = ['+25 kg', '+27.5 kg', '+30 kg', '+25 kg'][week - 1];
+  const weightedReps = ['5', '4', '3', '5'][week - 1];
+  const pullReps = ['8', '9', '10', '8'][week - 1];
+  const ruckMinutes = ['70 min', '75 min', '75 min', '70 min'][week - 1];
+  const ruckEffort = ['5', '5', '5', '5-6'][week - 1];
+  const squatSets = ['3', '3', '3', '2'][week - 1];
+  const squatReps = ['5', '5', '4', '3'][week - 1];
+  const pushReps = ['15', '17', '20', '15'][week - 1];
+
   const rows = [
-    ['Mon', 'Run', '5:30-6:00 / km', '1', '25 min', 'N/A', '3-4', 'Easy conversational run; preserve current run frequency and keep impact low.', ''],
-    ['Mon', 'Back Squat', 'RPE-selected load', '3', '5', '3 min', '7', 'Strength maintenance; clean reps with reserve.', ''],
-    ['Tue', 'Run', '1:42-1:45 / 400 m', '6', '400 m', '2 min', '7-8', '3K target pace interval session anchored to current repeatable 400 m performance.', ''],
-    ['Wed', 'Weighted Pull-up', '+25 kg', '3', '5', '3 min', '7-8', 'Pulling-strength support below the demonstrated +30 kg x 5 benchmark.', ''],
-    ['Wed', 'Pull-up', 'Bodyweight', '3', '8', '2 min', '7', 'Direct strict pull-up volume; stop before rep speed or position deteriorates.', ''],
-    ['Fri', 'Run', '5:20-5:50 / km', '1', '40 min', 'N/A', '4-5', 'Long aerobic run at controlled effort; no extra conditioning afterward.', ''],
-    ['Fri', 'Deadlift', 'RPE-selected load', '2', '3', '3 min', '7', 'Low-cost strength maintenance behind the 3K priority.', ''],
-    ['Sat', 'Backpack Carry', '20 kg', '1', '70 min', 'N/A', '5', 'Direct ruck / loaded march at controlled walking pace; target pace 9:25-9:35 / km. Keep pack load stable and progress only one main ruck variable at a time.', ''],
+    ['Mon', 'Run', '5:30-6:00 / km', '1', `${easyMinutes} min`, 'N/A', week === 4 ? '3' : '3-4', 'Easy conversational run; preserve direct run frequency and keep impact comfortable.', ''],
+    ['Mon', 'Back Squat', 'RPE-selected load', squatSets, squatReps, '3 min', week === 4 ? '6-7' : '7', 'Strength maintenance behind the 3K priority; no grinding.', ''],
+    ['Mon', 'Push-up', 'Bodyweight', '3', pushReps, '60-90s', '6-7', 'Low-cost pushing GPP. Leave clear reserve so it does not compete with running or pulling priorities.', ''],
+    ['Tue', 'Run', intervalLoad, intervalSets, intervalReps, week === 3 || week === 4 ? '2.5-3 min' : '2 min', week === 4 ? '8' : '7-8', '3K-specific interval session. Keep every rep repeatable and add easy running before and after.', ''],
+    ['Wed', 'Weighted Pull-up', weightedLoad, week === 4 ? '2' : '3', weightedReps, '3 min', week === 3 ? '8' : '7-8', 'Primary pulling-strength progression anchored to the demonstrated +30 kg x 5 benchmark.', ''],
+    ['Wed', 'Pull-up', 'Bodyweight', '2', pullReps, '2 min', week === 3 ? '7-8' : '7', 'Direct strict pull-up capacity work; stop before rep speed or position deteriorates.', ''],
+    ['Wed', 'Pallof Press', 'RPE-selected load', '2', '10 / side', '60s', '6', 'Small trunk GPP dose for anti-rotation capacity. Keep it crisp and low fatigue.', ''],
+    ['Fri', 'Run', '5:20-5:50 / km', '1', `${longMinutes} min`, 'N/A', week === 4 ? '3-4' : '4-5', 'Long aerobic run at controlled effort; no extra hard conditioning afterward.', ''],
+    ['Fri', 'Deadlift', 'RPE-selected load', '2', '3', '3 min', week === 4 ? '6-7' : '7', 'Low-cost posterior-chain strength maintenance.', ''],
+    ['Sat', 'Backpack Carry', '20 kg', '1', ruckMinutes, 'N/A', ruckEffort, week === 4
+      ? 'Direct ruck / loaded march. With running volume reduced, allow a modest pace progression toward 9:10-9:25 / km only if shin response remains normal.'
+      : 'Direct ruck / loaded march at controlled walking pace around 9:25-9:35 / km. Keep pack load stable and progress only one main ruck variable at a time.', ''],
   ];
   return weekBlock(week, rows);
 }
 
 export function tactical3KGoldenProgram() {
   return [
-    'Tactical 3K block. Primary priority is the 3K; ruck and pull-up work remain direct, while barbell strength stays supportive.',
-    'Weeks 2-4 preserve the same hierarchy and only progress a variable when recovery and shin response remain normal.',
+    'Tactical 3K block. The 3K remains primary; ruck and pull-up goals progress directly, barbell strength stays supportive, and a small pushing/trunk GPP floor preserves general preparedness.',
+    'The GPP dose is deliberately smaller than the priority work and is the first volume trimmed if running, rucking, pulling quality or recovery deteriorates.',
     tacticalWeek(1), tacticalWeek(2), tacticalWeek(3), tacticalWeek(4),
   ].join('\n\n');
 }
@@ -98,20 +116,39 @@ export const YOUTH_GYMNASTICS_INTAKE = {
 };
 
 function youthWeek(week) {
+  const kickA = ['4', '5', '6', '4'][week - 1];
+  const kickB = ['5', '5', '6', '4'][week - 1];
+  const ctb = ['3', '4', '4', '3'][week - 1];
+  const ring = ['5', '6', '7', '5'][week - 1];
+  const pull = ['6', '7', '8', '6'][week - 1];
+  const pistol = ['5 / side', '6 / side', '7 / side', '5 / side'][week - 1];
+  const band = [
+    'BW + moderate band',
+    'BW + slightly lighter band if all Week 1 reps were clean',
+    'BW + lightest band that preserves a fast symmetrical turnover',
+    'BW + best clean band from Weeks 2-3; test the next reduction only if crisp',
+  ][week - 1];
+
   const rows = [
     ['Mon', '[WARMUP] Scapular Pull-up', 'BW', '2', '5', '45s', 'N/A', 'Short non-fatiguing shoulder/scapular preparation.', ''],
-    ['Mon', 'Controlled Handstand Kick-up', 'BW', '4', '2 attempts', '60s', 'N/A', 'Primary handstand balance practice while fresh. Finish each attempt before alignment deteriorates.', ''],
-    ['Mon', 'Band-Assisted Bar Muscle-up Transition Drill', 'BW + band', '4', '2', '90s', 'N/A', 'Direct bar muscle-up turnover practice. Use only enough assistance for clean symmetrical reps.', ''],
-    ['Mon', 'Strict Chest-to-Bar Pull-up', 'BW', '4', '3', '2 min', '7', 'High-pull support for the bar muscle-up. Full recovery and chest-to-bar intent.', ''],
-    ['Mon', 'Strict Ring Dip', 'BW', '3', '5', '2 min', '7', 'Push-strength support with clean ring control.', ''],
-    ['Mon', 'Pistol Squat', 'BW', '3', '5 / side', '90s', '7', 'Established unilateral lower-body strength. Controlled reps; no grinders.', ''],
+    ['Mon', 'Controlled Handstand Kick-up', 'BW', kickA, '2 attempts', '60s', 'N/A', week === 4
+      ? 'Consolidate the best entry pattern from the block and compare successful independent balance with Week 1.'
+      : 'Primary handstand balance practice while fresh. Progress successful entries and independent balance quality, not fatigue.', ''],
+    ['Mon', 'Band-Assisted Bar Muscle-up Transition Drill', band, '4', '2', '90s', 'N/A', 'Direct bar muscle-up turnover practice. Reduce assistance only after clean symmetrical reps.', ''],
+    ['Mon', 'Strict Chest-to-Bar Pull-up', 'BW', '4', ctb, '2 min', '7', 'High-pull support for the bar muscle-up. Full recovery and chest-to-bar intent.', ''],
+    ['Mon', 'Strict Ring Dip', 'BW', '3', ring, '2 min', '7', 'Push-strength support with clean ring control. Progress reps before making the variation harder.', ''],
+    ['Mon', 'Pistol Squat', 'BW', '3', pistol, '90s', '7', week === 4
+      ? 'Consolidate clean unilateral strength. If Week 3 was easy, next block may progress pause/tempo or difficulty rather than chasing fatigue.'
+      : 'Established unilateral lower-body strength. Progress clean reps conservatively; no grinders.', ''],
     ['Thu', '[WARMUP] Wrist Prep', 'BW', '2', '30 sec', '30s', 'N/A', 'Short wrist and shoulder preparation.', ''],
-    ['Thu', 'Controlled Handstand Kick-up', 'BW', '5', '1-2 attempts', '60s', 'N/A', 'Direct independent-balance practice. Accumulate successful kick-ups, not fatigue.', ''],
-    ['Thu', 'Band-Assisted Bar Muscle-up Transition Drill', 'BW + band', '4', '2', '90s', 'N/A', 'Second direct bar muscle-up exposure. Reduce assistance only when mechanics remain clean.', ''],
-    ['Thu', 'Explosive Hip-to-Bar Pull-up', 'BW', '4', '2', '2 min', '7', 'Explosive vertical pulling support with full recovery.', ''],
-    ['Thu', 'Strict Pull-up', 'BW', '3', '6', '2 min', '7', 'General pull strength support below fatigue failure.', ''],
-    ['Thu', 'Strict Ring Dip', 'BW', '3', '5', '2 min', '7', 'General push strength support.', ''],
-    ['Thu', 'Pistol Squat', 'BW', '3', '5 / side', '90s', '7', 'Lower-body athletic strength with repeatable technique.', ''],
+    ['Thu', 'Controlled Handstand Kick-up', 'BW', kickB, '1-2 attempts', '60s', 'N/A', week === 4
+      ? 'Consolidate controlled independent entries. Finish with successful attempts rather than accumulating misses.'
+      : 'Second direct independent-balance exposure. Accumulate successful kick-ups and better balance, not fatigue.', ''],
+    ['Thu', 'Band-Assisted Bar Muscle-up Transition Drill', band, '4', '2', '90s', 'N/A', 'Second direct bar muscle-up exposure. Preserve bar path and turnover mechanics before reducing assistance.', ''],
+    ['Thu', 'Explosive Hip-to-Bar Pull-up', 'BW', '4', week === 3 ? '3' : '2', '2 min', '7', 'Explosive vertical pulling support with full recovery. Stop if height or speed drops.', ''],
+    ['Thu', 'Strict Pull-up', 'BW', '3', pull, '2 min', '7', 'General pull strength support below fatigue failure. Use conservative rep progression.', ''],
+    ['Thu', 'Strict Ring Dip', 'BW', '3', ring, '2 min', '7', 'General push strength support. Progress clean reps before difficulty.', ''],
+    ['Thu', 'Pistol Squat', 'BW', '3', pistol, '90s', '7', 'Lower-body athletic strength with repeatable technique and no grinders.', ''],
   ];
   return weekBlock(week, rows);
 }
@@ -119,7 +156,7 @@ function youthWeek(week) {
 export function youthGymnasticsGoldenProgram() {
   return [
     'Youth gymnastics block. Both primary skills are trained directly in both weekly sessions while fresh, with high-pull support, ring push/pull strength and controlled unilateral leg work.',
-    'Weeks 2-4 progress execution quality and assistance only after clean successful reps; no grinders or repeated failed attempts.',
+    'Progression is explicit but conditional: improve successful handstand balance, reduce muscle-up assistance, and build clean foundation reps before increasing difficulty. Week 4 consolidates rather than forcing failure.',
     youthWeek(1), youthWeek(2), youthWeek(3), youthWeek(4),
   ].join('\n\n');
 }
