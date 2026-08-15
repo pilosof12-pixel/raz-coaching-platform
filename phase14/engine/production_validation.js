@@ -6,6 +6,7 @@ import {
   reformatWarmupCells,
   validateAndCalibrateSkills,
 } from './exercise_dictionary.js';
+import { validateClientOutputCleanliness } from './client_output_qa.js';
 import { repairPhase15Program } from './phase15_program_qa.js';
 import { validatePhase15FinalProgram } from './phase15_final_qa.js';
 import { parseProgramModel } from './program_model.js';
@@ -40,6 +41,7 @@ export function validateProductionProgram(program, intake = {}) {
   candidate = reformatWarmupCells(candidate);
   candidate = repairPhase15Program(candidate);
   validatePhase15FinalProgram(candidate, intake);
+  validateClientOutputCleanliness(candidate);
 
   return {
     ok: true,
