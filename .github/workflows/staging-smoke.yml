@@ -1,0 +1,58 @@
+name: Live staging smoke
+
+on:
+  push:
+    paths:
+      - '.github/workflows/staging-smoke.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  smoke:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Verify live Render surface without generation
+        env:
+          BASE_URL: https://raz-coaching-platform.onrender.com
+        run: |
+          node <<'NODE'
+          const base = process.env.BASE_URL;
+          const sleep = ms => new Promise(r => setTimeout(r, ms));
+          async function get(path, attempts = 8) {
+            let last = '';
+            for (let i = 0; i < attempts; i++) {
+              try {
+                const r = await fetch(base + path, { headers: { accept: path.endsWith('.html') ? 'text/html' : 'application/json' } });
+                const text = await r.text();
+                last = `status=${r.status} body=${text.slice(0, 1000)}`;
+                if (r.ok) return { status: r.status, text, headers: Object.fromEntries(r.headers) };
+              } catch (e) { last = String(e?.message || e); }
+              await sleep(3000);
+            }
+            throw new Error(`${path} unavailable: ${last}`);
+          }
+
+          const health = await get('/api/health');
+          console.log('HEALTH', health.text);
+          const h = JSON.parse(health.text);
+          if (h.ok !== true) throw new Error(`health not ok: ${health.text}`);
+
+          const passConfig = await get('/api/program-pass-config');
+          console.log('PROGRAM_PASS_CONFIG', passConfig.text);
+          const pc = JSON.parse(passConfig.text);
+          if (typeof pc.enabled !== 'boolean') throw new Error(`program pass config missing enabled boolean: ${passConfig.text}`);
+
+          const privacy = await get('/privacy.html');
+          if (!privacy.text.includes('pilosof12@gmail.com')) throw new Error('deployed privacy contact is stale');
+          if (!/Delete my data/i.test(privacy.text)) throw new Error('deployed privacy deletion copy missing');
+          console.log('PRIVACY_OK', privacy.status);
+
+          const app = await get('/');
+          if (!/RAZ/i.test(app.text)) throw new Error('app shell does not look like RAZ coaching platform');
+          console.log('APP_OK', app.status);
+
+          console.log(JSON.stringify({ ok: true, health: h, program_pass_config: pc, privacy: true, app: true }));
+          NODE
