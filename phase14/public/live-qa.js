@@ -51,7 +51,7 @@
       training_location: 'home_gym',
       language: 'en',
       split_preference: 'coach_decide',
-      current_numbers: '',
+      current_numbers: 'Pistol squat: can perform with about +5 kg external load historically; no external load is available for the current home block.',
       performance_markers: [],
       injuries: 'None reported',
       pain: { active:false, description:'', severity:'', character:'', next_day_baseline:'', tolerated_movements:'' },
