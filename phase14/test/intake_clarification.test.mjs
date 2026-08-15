@@ -48,6 +48,20 @@ test('ring muscle-up evidence does not falsely satisfy a bar muscle-up baseline'
   assert.ok(!out.includes('benchmark_muscle_up'));
 });
 
+test('answering the two youth skill clarifications fully resolves the next round', () => {
+  const result = intakeClarificationResult({
+    primary_goals:['Achieve first bar muscle-up','Achieve a freestanding handstand'],
+    secondary_goals:['Build general push and pull strength'],
+    equipment:'Home setup with rings, pull-up bar, resistance bands and bench. No external weights.',
+    clarification_answers:{
+      benchmark_bar_muscle_up:'Cannot perform a bar muscle-up yet. Can perform a ring muscle-up. About 12 strict pull-ups and 6 good ring dips.',
+      benchmark_handstand:'Wall-facing handstand about 15 seconds; back-to-wall about 20 seconds. Controlled kick-ups are improving, but there is no reliable unsupported balance time yet.',
+    },
+  });
+  assert.equal(result.ready, true);
+  assert.deepEqual(result.questions, []);
+});
+
 test('fully specified youth muscle-up and handstand avatar does not create redundant skill ping-pong', () => {
   const out = ids({
     primary_goals:['Achieve first bar muscle-up','Achieve a freestanding handstand'],
