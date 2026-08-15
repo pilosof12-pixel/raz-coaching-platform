@@ -6,6 +6,17 @@ if (!html.includes('href="launch-mobile.css"')) {
   html = html.replace(/<\/head>/i, '  <link rel="stylesheet" href="launch-mobile.css">\n</head>');
 }
 
+// Load the approved client spreadsheet exporter after the legacy spreadsheet.js
+// has defined its parser helpers. This override produces the Youth-gymnastics
+// product structure: Overview -> Warm-Up -> Week 1 -> Week 2 -> Week 3 -> Week 4.
+if (!html.includes('src="spreadsheet-parity.js"')) {
+  if (html.includes('<script src="program-pass-gate.js"></script>')) {
+    html = html.replace('<script src="program-pass-gate.js"></script>', '<script src="spreadsheet-parity.js"></script>\n  <script src="program-pass-gate.js"></script>');
+  } else {
+    html = html.replace(/<\/body>/i, '  <script src="spreadsheet-parity.js"></script>\n</body>');
+  }
+}
+
 // Program Pass gate must load before launch-controls so it can reserve the
 // hidden pass field and prevent a second visible pass prompt on the final step.
 if (!html.includes('src="program-pass-gate.js"')) {
