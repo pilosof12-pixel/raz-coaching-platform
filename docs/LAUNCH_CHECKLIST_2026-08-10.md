@@ -32,6 +32,8 @@ Status date: 2026-08-15
 
 - [x] Requested strength-day integrity fixed while preserving low-cost support sessions when concurrent sport load is high.
 - [x] Named endurance/sport goals require direct modality-specific exposure.
+- [x] Named bar-muscle-up and freestanding-handstand goals reserve direct skill exposure in the deterministic skeleton; support work cannot silently replace the target skill.
+- [x] Exercise vocabulary supports controlled compositional variants built from approved movement families + equipment/assistance/execution modifiers while retaining deterministic rejection of nonsensical combinations.
 - [x] Pain-sensitive specificity implemented: exact goal movement when tolerated; otherwise the closest explicitly tolerated source-supported variation.
 - [x] Unbenchmarked variations use autoregulated/conservative loading instead of inheriting unsupported fixed loads.
 - [x] Sprint/power semantics fixed: near-max speed work uses speed/quality language, full recovery and `Target RPE = N/A` rather than a contradictory strength-style RPE.
@@ -49,7 +51,7 @@ Status date: 2026-08-15
 - [x] Step 4 — Sprint/power speed-quality semantics fixed.
 - [x] Step 5 — False formula-marker path fixed.
 - [x] Step 6 — Deterministic Adaptive Intake / Ping-Pong implemented before rate-limit / Program Pass / AI generation.
-- [x] Step 7 — Live adversarial coaching QA completed across Warrior, concurrent strength/combat + 5K, dedicated 5K, 2K rowing, marathon and Olympic triathlon. Manual coaching review, not validator status alone, is the acceptance gate.
+- [x] Step 7 — Live adversarial coaching QA completed across Warrior, concurrent strength/combat + 5K, dedicated 5K, 2K rowing, marathon, Olympic triathlon and youth calisthenics. Manual coaching review, not validator status alone, is the acceptance gate.
 
 ### Live coaching acceptance
 
@@ -59,6 +61,7 @@ Status date: 2026-08-15
 - [x] 2K rowing stress case passed.
 - [x] Olympic-distance triathlon stress case passed.
 - [x] Marathon stress case manually accepted at ~9.1/10 after current-volume anchoring, single-lever progression and stable maintenance-strength fixes.
+- [x] Youth calisthenics adversarial live QA passed after exposing/fixing second-round ping-pong aliasing, compositional exercise-vocabulary gaps and missing direct bar-muscle-up/handstand skeleton slots.
 
 ## Cardio / Endurance source cluster
 
@@ -97,6 +100,7 @@ Status date: 2026-08-15
 - [x] No OpenAI/Gemini call is used to decide clarification questions.
 - [x] Live stress: running benchmark/exposure, low-back tolerance, limited-load ceiling, combat schedule and planche baseline all returned targeted HTTP `422` clarification responses with no job/token.
 - [x] Live stress: overloaded intake returned exactly four first-round questions, then one remaining second-round question after those answers were supplied.
+- [x] Live stress: youth bar-muscle-up + freestanding-handstand intake returned exactly the two material baseline questions; answering them produced no redundant second-round alias question and generation proceeded normally.
 - [x] Live stress: seven clarification requests from the same runner did not consume the build-rate allowance; the fully answered intake still received HTTP `202` with a normal generation job/token.
 - [x] Therefore ping-pong adds application/request overhead but **no separate clarification AI-generation cost**.
 - [x] QA note saved at `docs/qa/PING_PONG_STRESS_2026-08-13.md`.
@@ -108,7 +112,7 @@ Note: the first end-to-end clarified build exposed the now-fixed `Parallel Box S
 Commercial enforcement is now enabled for controlled staging. Do not open broad paid traffic until the acceptance matrix below passes.
 
 - [x] Add final privacy/support email to deployed privacy/support copy (`pilosof12@gmail.com`).
-- [ ] Resolve or replace the temporary admin Program Pass provisioning path; current admin-key requests have returned generic `Not found`.
+- [x] Temporary admin Program Pass provisioning path works from the mobile admin QA page under the existing admin-key protection.
 - [ ] Verify the server-side environment variable name `SUPABASE_SERVICE_ROLE_KEY` exists before enforcement goes live.
 - [ ] Rotate the previously exposed admin provisioning secret before public launch.
 - [ ] Run the full Program Pass acceptance matrix below with controlled enforcement enabled.
@@ -117,14 +121,14 @@ Commercial enforcement is now enabled for controlled staging. Do not open broad 
 
 ### Program Pass staging acceptance matrix
 
-- [ ] Valid unused Program Pass creates a first program.
-- [ ] Invalid Program Pass cannot create a program.
+- [x] Valid unused Program Pass creates a first program.
+- [x] Invalid Program Pass cannot create a program.
 - [ ] Used Program Pass cannot activate a second personal code.
 - [ ] Activated pass recovers correctly if the first browser response is lost.
-- [ ] Failed first generation retries without consuming another pass.
-- [ ] Completed first program cannot call Build again with the same pass.
+- [x] Failed first generation retries without consuming another pass.
+- [x] Completed first program cannot call Build again with the same pass/personal entitlement.
 - [ ] Delete My Data does not create another block credit or reset adjustments.
-- [ ] Returning personal code loads during the 56-day access window.
+- [x] Returning personal code loads during the 56-day access window.
 - [ ] Returning personal code is denied after expiry.
 - [ ] Adjustments 1 through 6 succeed.
 - [ ] Adjustment 7 is rejected before an AI call.
@@ -140,10 +144,10 @@ Commercial enforcement is now enabled for controlled staging. Do not open broad 
 
 ## Remaining launch workstreams
 
-1. Resolve/replace admin Program Pass provisioning and verify service-role/rotated-admin-secret production setup.
-2. Run Program Pass enforcement-ON staging acceptance matrix.
+1. Verify service-role/rotated-admin-secret production setup.
+2. Finish the remaining Program Pass enforcement-ON staging acceptance matrix: second-personal-code protection, lost-response recovery, six adjustments + seventh rejection, failed-adjustment non-consumption, language switching, enforcement-ON deletion, expiry/grace and spreadsheet-after-adjustment.
 3. Run the real purchase journey: Newie purchase -> Program Pass -> intake -> clarification if needed -> generation -> spreadsheet -> leave -> return -> adjust -> language -> delete.
-4. Final real-iPhone UX check.
+4. Final real-iPhone UX check on intake and generated program tables.
 5. Add clean landing/Newie attribution where available, finish launch video/social assets, then launch to first paying users.
 6. Review conversion, generation cost, clarification frequency, adjustment usage and repurchase rate before changing price or allowances.
 
