@@ -33,6 +33,12 @@ test("intake preflight blocks malformed expensive requests",()=>{
   assert.equal(validateLaunchIntake(validIntake()),null);
 });
 
+test("Tactical live-QA fixture uses a launch-valid training location",()=>{
+  const tactical=fs.readFileSync(path.join(root,"public","live-qa-tactical.js"),"utf8");
+  assert.ok(tactical.includes("training_location: 'commercial_gym'"));
+  assert.ok(!tactical.includes("training_location: 'full_gym'"));
+});
+
 test("analytics allowlist rejects customer content fields",()=>{
   assert.equal(isAllowedAnalyticsEvent("build_started"),true);
   for(const unsafe of ["intake","injury","program","token","ip","email"]) assert.equal(isAllowedAnalyticsEvent(unsafe),false);
