@@ -27,6 +27,43 @@ test("secure wrapper exposes required launch routes and protections",()=>{
   assert.ok(!src.includes("console.log(req.body)"));
 });
 
+test("Program Pass usage finalizes only after a job reaches done",()=>{
+  const src=fs.readFileSync(path.join(root,"server_secure.js"),"utf8");
+  const start=src.indexOf("function finalizeCommercialJob");
+  const end=src.indexOf("async function guardProgramPass");
+  assert.ok(start>=0&&end>start);
+  const block=src.slice(start,end);
+  assert.match(block,/if\(body\?\.status!=="done"\) return original\(body\)/);
+  assert.match(block,/meta\.kind==="build"\?passStore\.markInitialBuildCompleted\(meta\.token,Date\.now\(\)\):passStore\.incrementAdjustment\(meta\.token\)/);
+  assert.doesNotMatch(block,/status==="error"[^\n]*markInitialBuildCompleted/);
+  assert.doesNotMatch(block,/status==="error"[^\n]*incrementAdjustment/);
+});
+
+test("successful persistence precedes done status for build and adjustment jobs",()=>{
+  const src=fs.readFileSync(path.join(root,"server.js"),"utf8");
+  const buildStart=src.indexOf("async function runBuildJob");
+  const adjustStart=src.indexOf("async function runAdjustJob");
+  const routeStart=src.indexOf("app.post(\"/api/build\"");
+  assert.ok(buildStart>=0&&adjustStart>buildStart&&routeStart>adjustStart);
+  const build=src.slice(buildStart,adjustStart);
+  const adjust=src.slice(adjustStart,routeStart);
+  assert.ok(build.indexOf("await store.upsertClient") < build.indexOf('await store.finishJob(jobId, "done"')));
+  assert.ok(build.indexOf("await store.addHistory") < build.indexOf('await store.finishJob(jobId, "done"')));
+  assert.ok(build.indexOf("await store.bumpUsage") < build.indexOf('await store.finishJob(jobId, "done"')));
+  assert.ok(adjust.indexOf("await store.updateClientProgram") < adjust.indexOf('await store.finishJob(jobId, "done"')));
+  assert.ok(adjust.indexOf("await store.addHistory") < adjust.indexOf('await store.finishJob(jobId, "done"')));
+  assert.ok(adjust.indexOf("await store.bumpUsage") < adjust.indexOf('await store.finishJob(jobId, "done"')));
+  assert.match(build,/catch \(e\)[\s\S]*finishJob\(jobId, "error"/);
+  assert.match(adjust,/catch \(e\)[\s\S]*finishJob\(jobId, "error"/);
+});
+
+test("client delivery fails closed on review and support placeholders",()=>{
+  const src=fs.readFileSync(path.join(root,"server.js"),"utf8");
+  assert.match(src,/\[REVIEW\\\]|contact\\s\+support\|could not be safely generated/i);
+  assert.match(src,/UNRESOLVED_CLIENT_REVIEW/);
+  assert.match(src,/Final client QA blocked unresolved review\/support text/);
+});
+
 test("intake preflight blocks malformed expensive requests",()=>{
   assert.match(validateLaunchIntake(null),/Missing intake/);
   assert.match(validateLaunchIntake({}),/primary goal/i);
