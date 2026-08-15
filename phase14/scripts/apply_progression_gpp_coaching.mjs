@@ -24,20 +24,20 @@ patch('engine/phase15_planner.js', [
   {
     label: 'progression/GPP brief import',
     find: "import { buildSpecialistRules } from './phase15_specialist_rules.js';\n",
-    replace: "import { buildSpecialistRules } from './phase15_specialist_rules.js';\nimport { buildProgressionGppBrief } from './coaching_progression_gpp.js';\n",
-    already: "import { buildProgressionGppBrief } from './coaching_progression_gpp.js';",
+    replace: "import { buildSpecialistRules } from './phase15_specialist_rules.js';\nimport { buildProgressionGppBrief } from './coaching_progression_gpp.js';\nimport { buildAcceptanceQualityBrief } from './coaching_acceptance_quality.js';\n",
+    already: "import { buildAcceptanceQualityBrief } from './coaching_acceptance_quality.js';",
   },
   {
     label: 'build progression/GPP brief',
     find: "  const specialist = buildSpecialistRules(intake);\n  return [\n",
-    replace: "  const specialist = buildSpecialistRules(intake);\n  const progressionGpp = buildProgressionGppBrief(intake);\n  return [\n",
-    already: 'const progressionGpp = buildProgressionGppBrief(intake);',
+    replace: "  const specialist = buildSpecialistRules(intake);\n  const progressionGpp = buildProgressionGppBrief(intake);\n  const acceptanceQuality = buildAcceptanceQualityBrief(intake);\n  return [\n",
+    already: 'const acceptanceQuality = buildAcceptanceQualityBrief(intake);',
   },
   {
     label: 'inject progression/GPP brief',
     find: "    specialist,\n    'Session skeleton:',",
-    replace: "    specialist,\n    progressionGpp,\n    'Session skeleton:',",
-    already: "    progressionGpp,\n    'Session skeleton:',",
+    replace: "    specialist,\n    progressionGpp,\n    acceptanceQuality,\n    'Session skeleton:',",
+    already: "    acceptanceQuality,\n    'Session skeleton:',",
   },
 ]);
 
@@ -45,21 +45,21 @@ patch('server.phase15.js', [
   {
     label: 'production semantic imports',
     find: 'import { validateDirectGoalExposureSemantic, validateSportDayCouplingSemantic, validateWeeklyVolumeBudgetSemantic } from "./engine/semantic_program_qa.js"; // PROGRAM-MODEL-SEMANTIC-QA-WIRED\n',
-    replace: 'import { validateDirectGoalExposureSemantic, validateSportDayCouplingSemantic, validateWeeklyVolumeBudgetSemantic } from "./engine/semantic_program_qa.js"; // PROGRAM-MODEL-SEMANTIC-QA-WIRED\nimport { validateProgressionArchitectureSemantic, validateTacticalGppCoverageSemantic, validateTacticalScheduleArchitectureSemantic, validateKnownMaxPullUpDoseSemantic } from "./engine/coaching_progression_gpp.js"; // PROGRESSION-GPP-SEMANTIC-QA-WIRED\n',
-    already: 'PROGRESSION-GPP-SEMANTIC-QA-WIRED',
+    replace: 'import { validateDirectGoalExposureSemantic, validateSportDayCouplingSemantic, validateWeeklyVolumeBudgetSemantic } from "./engine/semantic_program_qa.js"; // PROGRAM-MODEL-SEMANTIC-QA-WIRED\nimport { validateProgressionArchitectureSemantic, validateTacticalGppCoverageSemantic, validateTacticalScheduleArchitectureSemantic, validateKnownMaxPullUpDoseSemantic } from "./engine/coaching_progression_gpp.js"; // PROGRESSION-GPP-SEMANTIC-QA-WIRED\nimport { validateHardRunWarmupSemantic, validateYouthProgressionQualitySemantic } from "./engine/coaching_acceptance_quality.js"; // ACCEPTANCE-QUALITY-SEMANTIC-QA-WIRED\n',
+    already: 'ACCEPTANCE-QUALITY-SEMANTIC-QA-WIRED',
   },
   {
     label: 'production progression/GPP validators',
     find: 'validateDirectGoalExposureSemantic(program, intake);',
-    replace: 'validateDirectGoalExposureSemantic(program, intake);\n      validateProgressionArchitectureSemantic(program, intake); // FOUR-WEEK-PROGRESSION-SEMANTICS\n      validateTacticalScheduleArchitectureSemantic(program, intake); // TACTICAL-SCHEDULE-ARCHITECTURE\n      validateKnownMaxPullUpDoseSemantic(program, intake); // KNOWN-MAX-PULLUP-DOSE\n      validateTacticalGppCoverageSemantic(program, intake); // TACTICAL-GPP-PRIORITY-FLOOR',
-    already: 'TACTICAL-SCHEDULE-ARCHITECTURE',
+    replace: 'validateDirectGoalExposureSemantic(program, intake);\n      validateProgressionArchitectureSemantic(program, intake); // FOUR-WEEK-PROGRESSION-SEMANTICS\n      validateYouthProgressionQualitySemantic(program, intake); // YOUTH-VISIBLE-PROGRESSION-QUALITY\n      validateTacticalScheduleArchitectureSemantic(program, intake); // TACTICAL-SCHEDULE-ARCHITECTURE\n      validateKnownMaxPullUpDoseSemantic(program, intake); // KNOWN-MAX-PULLUP-DOSE\n      validateTacticalGppCoverageSemantic(program, intake); // TACTICAL-GPP-PRIORITY-FLOOR\n      validateHardRunWarmupSemantic(program, intake); // HARD-RUN-SAME-DAY-WARMUP',
+    already: 'YOUTH-VISIBLE-PROGRESSION-QUALITY',
   },
   {
     label: 'make new semantic failures repairable',
     find: '        err.code === "PHASE15_QUALITY_VIOLATION"\n',
-    replace: '        err.code === "PHASE15_QUALITY_VIOLATION" ||\n        err.code === "PROGRESSION_ARCHITECTURE_MISSING" ||\n        err.code === "TACTICAL_SCHEDULE_ARCHITECTURE_VIOLATION" ||\n        err.code === "PULL_UP_DOSE_EXCEEDS_KNOWN_CAPACITY" ||\n        err.code === "TACTICAL_GPP_COVERAGE_MISSING"\n',
-    already: 'err.code === "PULL_UP_DOSE_EXCEEDS_KNOWN_CAPACITY"',
+    replace: '        err.code === "PHASE15_QUALITY_VIOLATION" ||\n        err.code === "PROGRESSION_ARCHITECTURE_MISSING" ||\n        err.code === "YOUTH_PROGRESSION_QUALITY_MISSING" ||\n        err.code === "TACTICAL_SCHEDULE_ARCHITECTURE_VIOLATION" ||\n        err.code === "PULL_UP_DOSE_EXCEEDS_KNOWN_CAPACITY" ||\n        err.code === "TACTICAL_GPP_COVERAGE_MISSING" ||\n        err.code === "HARD_RUN_WARMUP_MISSING"\n',
+    already: 'err.code === "HARD_RUN_WARMUP_MISSING"',
   },
 ]);
 
-console.log('Progression architecture + tactical GPP/schedule/dose production wiring complete.');
+console.log('Progression architecture + youth progression quality + tactical GPP/schedule/dose/warm-up production wiring complete.');
