@@ -28,13 +28,15 @@ test('clarification answers resolve the questions without needing AI inference',
   assert.equal(intakeClarificationResult(intake).ready, true);
 });
 
-test('first bar muscle-up and freestanding handstand ask for skill baselines even without numeric goals', () => {
+test('first bar muscle-up and freestanding handstand ask only the two skill-specific baselines', () => {
   const out = ids({
     primary_goals:['Achieve first bar muscle-up','Achieve a freestanding handstand'],
     equipment:'Home setup with rings, pull-up bar, resistance bands and bench',
   });
   assert.ok(out.includes('benchmark_bar_muscle_up'));
   assert.ok(out.includes('benchmark_handstand'));
+  assert.ok(!out.includes('benchmark_muscle_up'));
+  assert.equal(out.length, 2);
 });
 
 test('ring muscle-up evidence does not falsely satisfy a bar muscle-up baseline', () => {
@@ -43,6 +45,7 @@ test('ring muscle-up evidence does not falsely satisfy a bar muscle-up baseline'
     current_numbers:['Ring muscle-up: achieved','Pull-ups: 12','Ring dips: 6'],
   });
   assert.ok(out.includes('benchmark_bar_muscle_up'));
+  assert.ok(!out.includes('benchmark_muscle_up'));
 });
 
 test('fully specified youth muscle-up and handstand avatar does not create redundant skill ping-pong', () => {
@@ -58,6 +61,7 @@ test('fully specified youth muscle-up and handstand avatar does not create redun
   });
   assert.ok(!out.includes('benchmark_bar_muscle_up'));
   assert.ok(!out.includes('benchmark_handstand'));
+  assert.deepEqual(out, []);
 });
 
 test('vague low-back pain intersecting a squat goal asks movement-tolerance question', () => {
