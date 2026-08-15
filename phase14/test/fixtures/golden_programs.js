@@ -60,7 +60,7 @@ function tacticalWeek(week) {
   const longMinutes = [40, 42, 45, 35][week - 1];
   const intervalSets = ['6', '7', '5', '6'][week - 1];
   const intervalReps = ['400 m', '400 m', '600 m', '400 m'][week - 1];
-  const intervalLoad = ['1:42-1:45 / 400 m', '1:40-1:43 / 400 m', '2:32-2:36 / 600 m', '1:38-1:40 / 400 m'][week - 1];
+  const intervalLoad = ['1:42-1:45 / 400 m', '1:42-1:45 / 400 m', '2:35-2:39 / 600 m', '1:39-1:41 / 400 m'][week - 1];
   const weightedLoad = ['+25 kg', '+27.5 kg', '+30 kg', '+25 kg'][week - 1];
   const weightedReps = ['5', '4', '3', '5'][week - 1];
   const pullReps = ['8', '9', '10', '8'][week - 1];
@@ -73,13 +73,14 @@ function tacticalWeek(week) {
   const rows = [
     ['Mon', 'Run', '5:30-6:00 / km', '1', `${easyMinutes} min`, 'N/A', week === 4 ? '3' : '3-4', 'Easy conversational run; preserve direct run frequency and keep impact comfortable.', ''],
     ['Mon', 'Back Squat', 'RPE-selected load', squatSets, squatReps, '3 min', week === 4 ? '6-7' : '7', 'Strength maintenance behind the 3K priority; no grinding.', ''],
-    ['Mon', 'Push-up', 'Bodyweight', '3', pushReps, '60-90s', '6-7', 'Low-cost pushing GPP. Leave clear reserve so it does not compete with running or pulling priorities.', ''],
+    ['Mon', 'Push-up', 'Bodyweight', '2', pushReps, '60-90s', '6-7', 'Low-cost pushing GPP. Leave clear reserve so it does not compete with running or pulling priorities.', ''],
     ['Tue', 'Run', intervalLoad, intervalSets, intervalReps, week === 3 || week === 4 ? '2.5-3 min' : '2 min', week === 4 ? '8' : '7-8', '3K-specific interval session. Keep every rep repeatable and add easy running before and after.', ''],
     ['Wed', 'Weighted Pull-up', weightedLoad, week === 4 ? '2' : '3', weightedReps, '3 min', week === 3 ? '8' : '7-8', 'Primary pulling-strength progression anchored to the demonstrated +30 kg x 5 benchmark.', ''],
     ['Wed', 'Pull-up', 'Bodyweight', '2', pullReps, '2 min', week === 3 ? '7-8' : '7', 'Direct strict pull-up capacity work; stop before rep speed or position deteriorates.', ''],
     ['Wed', 'Pallof Press', 'RPE-selected load', '2', '10 / side', '60s', '6', 'Small trunk GPP dose for anti-rotation capacity. Keep it crisp and low fatigue.', ''],
     ['Fri', 'Run', '5:20-5:50 / km', '1', `${longMinutes} min`, 'N/A', week === 4 ? '3-4' : '4-5', 'Long aerobic run at controlled effort; no extra hard conditioning afterward.', ''],
     ['Fri', 'Deadlift', 'RPE-selected load', '2', '3', '3 min', week === 4 ? '6-7' : '7', 'Low-cost posterior-chain strength maintenance.', ''],
+    ['Fri', 'Overhead Press', 'RPE-selected load', '2', '5', '2 min', week === 4 ? '6' : '6-7', 'Small second pushing exposure so the third gym session stays complete without competing with the 3K, ruck or pulling priorities.', ''],
     ['Sat', 'Backpack Carry', '20 kg', '1', ruckMinutes, 'N/A', ruckEffort, week === 4
       ? 'Direct ruck / loaded march. With running volume reduced, allow a modest pace progression toward 9:10-9:25 / km only if shin response remains normal.'
       : 'Direct ruck / loaded march at controlled walking pace around 9:25-9:35 / km. Keep pack load stable and progress only one main ruck variable at a time.', ''],
@@ -89,8 +90,9 @@ function tacticalWeek(week) {
 
 export function tactical3KGoldenProgram() {
   return [
-    'Tactical 3K block. The 3K remains primary; ruck and pull-up goals progress directly, barbell strength stays supportive, and a small pushing/trunk GPP floor preserves general preparedness.',
-    'The GPP dose is deliberately smaller than the priority work and is the first volume trimmed if running, rucking, pulling quality or recovery deteriorates.',
+    'Tactical 3K block. The 3K remains primary; ruck and pull-up goals progress directly, barbell strength stays supportive, and a small but real pushing/trunk GPP floor preserves general preparedness.',
+    'Each gym day contains a primary strength task plus useful support when time allows. The GPP dose remains deliberately smaller than the priority work and is the first volume trimmed if running, rucking, pulling quality or recovery deteriorates.',
+    'The 3K interval build changes one main stress lever at a time under the athlete\'s shin-impact history: Week 1 anchors current repeat ability, Week 2 adds work at the same pace, Week 3 extends rep duration without forcing faster pace, and Week 4 expresses faster speed while total running work comes down.',
     tacticalWeek(1), tacticalWeek(2), tacticalWeek(3), tacticalWeek(4),
   ].join('\n\n');
 }
