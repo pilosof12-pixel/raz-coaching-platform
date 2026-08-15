@@ -13,11 +13,13 @@ on:
       - 'phase14/engine/phase15_elite_guardrails.js'
       - 'phase14/engine/exercise_dictionary.js'
       - 'phase14/engine/program_model.js'
+      - 'phase14/engine/program_goal_semantics.js'
       - 'phase14/engine/semantic_program_qa.js'
       - 'phase14/engine/production_validation.js'
       - 'phase14/storage.js'
       - 'phase14/admin_qa_routes.js'
       - 'phase14/package.json'
+      - 'phase14/package-lock.json'
       - 'phase14/scripts/build_phase15_runtime.mjs'
       - 'phase14/scripts/final_pipeline_lock.mjs'
       - 'phase14/scripts/apply_compositional_exercise_vocabulary.mjs'
@@ -63,6 +65,13 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: phase14/package-lock.json
+
+      - name: Install production dependencies
+        run: |
+          cd phase14
+          npm ci
 
       - name: Build exact production coaching runtime
         run: |
@@ -114,6 +123,7 @@ jobs:
           runcheck syntax_tactical_live_qa node --check public/live-qa-tactical.js
           runcheck syntax_dictionary node --check engine/exercise_dictionary.js
           runcheck syntax_program_model node --check engine/program_model.js
+          runcheck syntax_goal_semantics node --check engine/program_goal_semantics.js
           runcheck syntax_semantic_qa node --check engine/semantic_program_qa.js
           runcheck syntax_production_validation node --check engine/production_validation.js
           runcheck syntax_planner node --check engine/phase15_planner.js
@@ -126,7 +136,8 @@ jobs:
           runcheck syntax_tactical_patch node --check scripts/apply_tactical_3k_parity.mjs
           runcheck grep_v5 grep -q 'deterministic-skeleton-v5' server.phase15.js
           runcheck grep_final_qa grep -q 'validatePhase15FinalProgram' server.phase15.js
-          runcheck grep_program_model_coupling grep -q 'PROGRAM-MODEL-SPORT-COUPLING-WIRED' server.phase15.js
+          runcheck grep_semantic_qa grep -q 'PROGRAM-MODEL-SEMANTIC-QA-WIRED' server.phase15.js
+          runcheck grep_direct_goal_semantics grep -q 'PROGRAM-MODEL-DIRECT-GOAL-EXPOSURE' server.phase15.js
           runcheck grep_internal_repair grep -q 'INTERNAL_QUALITY_REPAIR_ARCHITECTURE' server.phase15.js
           runcheck grep_repair_budget grep -q 'INTERNAL-QA-REPAIR-BUDGET' server.phase15.js
           runcheck grep_repair_exhaustion grep -q 'INTERNAL_QA_REPAIR_EXHAUSTED' server.phase15.js
