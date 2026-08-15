@@ -23,6 +23,7 @@ function fixture() {
     '    let program = fixInvalidExerciseNames(raw); // step 1',
     '    try {',
     '      validateSportDayCoupling(program, intake);',
+    '      validateWeeklyVolumeBudget(program, intake);',
     '      program = reformatWarmupCells(program);',
     '      validatePhase15FinalProgram(program, intake);',
     '      return program;',
@@ -72,13 +73,16 @@ test('unbenchmarked variation load repair remains wired before coaching QA', () 
   assert.match(out, /repairUnbenchmarkedVariationLoads\(fixInvalidExerciseNames\(raw\), intake\)/);
 });
 
-test('production semantic QA uses ProgramModel for strength-day accounting and direct goal exposure', () => {
+test('production semantic QA uses ProgramModel for strength-day accounting, direct goal exposure and weekly volume', () => {
   const out = lockFinalPipelineSource(fixture());
   assert.match(out, /PROGRAM-MODEL-SEMANTIC-QA-WIRED/);
   assert.match(out, /validateSportDayCouplingSemantic\(program, intake\)/);
   assert.match(out, /validateDirectGoalExposureSemantic\(program, intake\)/);
+  assert.match(out, /validateWeeklyVolumeBudgetSemantic\(program, intake\)/);
   assert.match(out, /PROGRAM-MODEL-DIRECT-GOAL-EXPOSURE/);
+  assert.match(out, /PROGRAM-MODEL-WEEKLY-VOLUME-ACCOUNTING/);
   assert.doesNotMatch(out, /validateSportDayCoupling\(program, intake\)/);
+  assert.doesNotMatch(out, /validateWeeklyVolumeBudget\(program, intake\)/);
 });
 
 test('all repairable validator failures use one grounded internal repair path', () => {
