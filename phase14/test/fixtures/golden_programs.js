@@ -118,37 +118,59 @@ export const YOUTH_GYMNASTICS_INTAKE = {
 function youthWeek(week) {
   const kickA = ['4', '5', '6', '4'][week - 1];
   const kickB = ['5', '5', '6', '4'][week - 1];
-  const ctb = ['3', '4', '4', '3'][week - 1];
-  const ring = ['5', '6', '7', '5'][week - 1];
-  const pull = ['6', '7', '8', '6'][week - 1];
-  const pistol = ['5 / side', '6 / side', '7 / side', '5 / side'][week - 1];
+  const ctbSets = ['4', '4', '4', '3'][week - 1];
+  const ctb = ['3', '4', '4', '4'][week - 1];
+  const ringSets = ['3', '3', '3', '2'][week - 1];
+  const ring = ['5', '6', '7', '6-7'][week - 1];
+  const pullSets = ['3', '3', '3', '2'][week - 1];
+  const pull = ['6', '7', '8', '7-8'][week - 1];
+  const pistolSets = ['3', '3', '3', '2'][week - 1];
+  const pistol = ['5 / side', '6 / side', '7 / side', '6-7 / side'][week - 1];
+  const transitionSets = ['4', '4', '4', '3'][week - 1];
+  const explosiveSets = ['4', '4', '4', '3'][week - 1];
   const band = [
     'BW + moderate band',
     'BW + slightly lighter band if all Week 1 reps were clean',
     'BW + lightest band that preserves a fast symmetrical turnover',
-    'BW + best clean band from Weeks 2-3; test the next reduction only if crisp',
+    'BW + retain the Week 3 lightest clean band; test one lighter-band single only if crisp',
   ][week - 1];
 
   const rows = [
     ['Mon', '[WARMUP] Scapular Pull-up', 'BW', '2', '5', '45s', 'N/A', 'Short non-fatiguing shoulder/scapular preparation.', ''],
     ['Mon', 'Controlled Handstand Kick-up', 'BW', kickA, '2 attempts', '60s', 'N/A', week === 4
-      ? 'Consolidate the best entry pattern from the block and compare successful independent balance with Week 1.'
+      ? 'Use the best Week 3 entry pattern. Match or improve the best clean unsupported balance quality/time with fewer total attempts; stop before misses accumulate.'
       : 'Primary handstand balance practice while fresh. Progress successful entries and independent balance quality, not fatigue.', ''],
-    ['Mon', 'Band-Assisted Bar Muscle-up Transition Drill', band, '4', '2', '90s', 'N/A', 'Direct bar muscle-up turnover practice. Reduce assistance only after clean symmetrical reps.', ''],
-    ['Mon', 'Strict Chest-to-Bar Pull-up', 'BW', '4', ctb, '2 min', '7', 'High-pull support for the bar muscle-up. Full recovery and chest-to-bar intent.', ''],
-    ['Mon', 'Strict Ring Dip', 'BW', '3', ring, '2 min', '7', 'Push-strength support with clean ring control. Progress reps before making the variation harder.', ''],
-    ['Mon', 'Pistol Squat', 'BW', '3', pistol, '90s', '7', week === 4
-      ? 'Consolidate clean unilateral strength. If Week 3 was easy, next block may progress pause/tempo or difficulty rather than chasing fatigue.'
+    ['Mon', 'Band-Assisted Bar Muscle-up Transition Drill', band, transitionSets, '2', '90s', 'N/A', week === 4
+      ? 'Keep the reduced assistance earned in Weeks 2-3. Lower total volume, but do not return to the Week 1 band unless technique requires it.'
+      : 'Direct bar muscle-up turnover practice. Reduce assistance only after clean symmetrical reps.', ''],
+    ['Mon', 'Strict Chest-to-Bar Pull-up', 'BW', ctbSets, ctb, '2 min', '7', week === 4
+      ? 'Keep the Week 3 rep standard with one fewer set. Every rep should reach the same height and control.'
+      : 'High-pull support for the bar muscle-up. Full recovery and chest-to-bar intent.', ''],
+    ['Mon', 'Strict Ring Dip', 'BW', ringSets, ring, '2 min', '7', week === 4
+      ? 'Maintain the higher rep standard from Weeks 2-3 while reducing total sets. Leave clear reserve.'
+      : 'Push-strength support with clean ring control. Progress reps before making the variation harder.', ''],
+    ['Mon', 'Pistol Squat', 'BW', pistolSets, pistol, '90s', '7', week === 4
+      ? 'Maintain the progressed Week 2-3 rep standard with lower total volume. Clean depth and control; no grinders.'
       : 'Established unilateral lower-body strength. Progress clean reps conservatively; no grinders.', ''],
     ['Thu', '[WARMUP] Wrist Prep', 'BW', '2', '30 sec', '30s', 'N/A', 'Short wrist and shoulder preparation.', ''],
     ['Thu', 'Controlled Handstand Kick-up', 'BW', kickB, '1-2 attempts', '60s', 'N/A', week === 4
-      ? 'Consolidate controlled independent entries. Finish with successful attempts rather than accumulating misses.'
+      ? 'Express the best Week 3 balance skill. Prioritize successful independent entries and best clean balance rather than adding attempts.'
       : 'Second direct independent-balance exposure. Accumulate successful kick-ups and better balance, not fatigue.', ''],
-    ['Thu', 'Band-Assisted Bar Muscle-up Transition Drill', band, '4', '2', '90s', 'N/A', 'Second direct bar muscle-up exposure. Preserve bar path and turnover mechanics before reducing assistance.', ''],
-    ['Thu', 'Explosive Hip-to-Bar Pull-up', 'BW', '4', week === 3 ? '3' : '2', '2 min', '7', 'Explosive vertical pulling support with full recovery. Stop if height or speed drops.', ''],
-    ['Thu', 'Strict Pull-up', 'BW', '3', pull, '2 min', '7', 'General pull strength support below fatigue failure. Use conservative rep progression.', ''],
-    ['Thu', 'Strict Ring Dip', 'BW', '3', ring, '2 min', '7', 'General push strength support. Progress clean reps before difficulty.', ''],
-    ['Thu', 'Pistol Squat', 'BW', '3', pistol, '90s', '7', 'Lower-body athletic strength with repeatable technique and no grinders.', ''],
+    ['Thu', 'Band-Assisted Bar Muscle-up Transition Drill', band, transitionSets, '2', '90s', 'N/A', week === 4
+      ? 'Preserve the lighter assistance achieved in Week 3. This is a quality consolidation exposure, not a return to baseline assistance.'
+      : 'Second direct bar muscle-up exposure. Preserve bar path and turnover mechanics before reducing assistance.', ''],
+    ['Thu', 'Explosive Hip-to-Bar Pull-up', 'BW', explosiveSets, week === 3 ? '3' : '2', '2 min', '7', week === 4
+      ? 'Lower the volume but match or exceed Week 3 pull height and speed. Stop immediately if explosiveness drops.'
+      : 'Explosive vertical pulling support with full recovery. Stop if height or speed drops.', ''],
+    ['Thu', 'Strict Pull-up', 'BW', pullSets, pull, '2 min', '7', week === 4
+      ? 'Retain the improved rep standard from Weeks 2-3 with fewer sets. Finish with 2-3 clean reps still in reserve.'
+      : 'General pull strength support below fatigue failure. Use conservative rep progression.', ''],
+    ['Thu', 'Strict Ring Dip', 'BW', ringSets, ring, '2 min', '7', week === 4
+      ? 'Maintain the higher-quality Week 2-3 rep level while reducing total fatigue.'
+      : 'General push strength support. Progress clean reps before difficulty.', ''],
+    ['Thu', 'Pistol Squat', 'BW', pistolSets, pistol, '90s', '7', week === 4
+      ? 'Maintain the progressed Week 2-3 rep standard with fewer sets and excellent control.'
+      : 'Lower-body athletic strength with repeatable technique and no grinders.', ''],
   ];
   return weekBlock(week, rows);
 }
@@ -156,7 +178,7 @@ function youthWeek(week) {
 export function youthGymnasticsGoldenProgram() {
   return [
     'Youth gymnastics block. Both primary skills are trained directly in both weekly sessions while fresh, with high-pull support, ring push/pull strength and controlled unilateral leg work.',
-    'Progression is explicit but conditional: improve successful handstand balance, reduce muscle-up assistance, and build clean foundation reps before increasing difficulty. Week 4 consolidates rather than forcing failure.',
+    'Progression is explicit but conditional: improve successful handstand balance, reduce muscle-up assistance, and build clean foundation reps before increasing difficulty. Week 4 reduces fatigue while preserving the higher clean performance standard earned in Weeks 2-3.',
     youthWeek(1), youthWeek(2), youthWeek(3), youthWeek(4),
   ].join('\n\n');
 }
