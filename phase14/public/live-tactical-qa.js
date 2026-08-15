@@ -25,6 +25,7 @@
     mobility:{active:false,limitation:''},
     sleep_hours:'7-8',recovery_rating:'Good',
     notes:['Currently runs 3 sessions per week, about 18-20 km/week: one interval session, one easy run and one longer aerobic run.','Currently does 1 ruck per week, usually 8-10 km with 20 kg.','Recent 400 m repeats are around 1:42-1:45 with adequate recovery for repeatability.','Previous shin-splint irritation happened when running volume increased abruptly; currently asymptomatic at present running and ruck volume.','Can train across five calendar days and is comfortable combining compatible easy running or rucking with a strength day when sensible.','Wants combat-ready / special-operations-style fitness without random punishment circuits or unnecessary mass gain.'].join(' '),
+    qa_diagnostics:true,
     privacy_consent:consent()
   };
 
@@ -35,7 +36,7 @@
     return {r,j,text};
   }
 
-  set('Ready.');
+  set('Ready. QA diagnostics enabled for this acceptance retry.');
   $('run').addEventListener('click', async () => {
     const pass = String($('pass').value||'').trim().toLowerCase();
     if(!/^[a-f0-9]{32}$/.test(pass)){set('Enter a valid 32-character Program Pass.','err');return;}
@@ -44,7 +45,7 @@
       set('Checking Program Pass...');
       const check = await json('/api/program-pass-check',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({pass_code:pass})});
       if(!check.r.ok || check.j.valid!==true) throw new Error(check.j.error||'Program Pass check failed.');
-      set('Pass valid. Starting real production build...');
+      set('Pass valid. Starting real production build with QA diagnostics...');
       intake.privacy_consent = consent();
       const build = await json('/api/build',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({intake,pass_code:pass})});
       if(build.r.status===422) throw new Error('Unexpected clarification gate: '+JSON.stringify(build.j));
