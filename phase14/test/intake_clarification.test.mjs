@@ -28,6 +28,38 @@ test('clarification answers resolve the questions without needing AI inference',
   assert.equal(intakeClarificationResult(intake).ready, true);
 });
 
+test('first bar muscle-up and freestanding handstand ask for skill baselines even without numeric goals', () => {
+  const out = ids({
+    primary_goals:['Achieve first bar muscle-up','Achieve a freestanding handstand'],
+    equipment:'Home setup with rings, pull-up bar, resistance bands and bench',
+  });
+  assert.ok(out.includes('benchmark_bar_muscle_up'));
+  assert.ok(out.includes('benchmark_handstand'));
+});
+
+test('ring muscle-up evidence does not falsely satisfy a bar muscle-up baseline', () => {
+  const out = ids({
+    primary_goals:['Achieve first bar muscle-up'],
+    current_numbers:['Ring muscle-up: achieved','Pull-ups: 12','Ring dips: 6'],
+  });
+  assert.ok(out.includes('benchmark_bar_muscle_up'));
+});
+
+test('fully specified youth muscle-up and handstand avatar does not create redundant skill ping-pong', () => {
+  const out = ids({
+    primary_goals:['Achieve first bar muscle-up','Achieve a freestanding handstand'],
+    secondary_goals:['Build general push and pull strength'],
+    current_numbers:[
+      'Bar muscle-up: cannot perform yet; ring muscle-up achieved; 12 strict pull-ups; 6 ring dips',
+      'Handstand: wall-facing 15 seconds; back-to-wall 20 seconds; improving kick-ups; no reliable unsupported balance',
+    ],
+    equipment:'Home setup with rings, pull-up bar, resistance bands and bench. No external weights.',
+    training_location:'home_gym',
+  });
+  assert.ok(!out.includes('benchmark_bar_muscle_up'));
+  assert.ok(!out.includes('benchmark_handstand'));
+});
+
 test('vague low-back pain intersecting a squat goal asks movement-tolerance question', () => {
   const out = ids({ primary_goals:['Back squat 200 kg'], current_numbers:['Back squat 170x3'], injuries:'Recurring low-back irritation' });
   assert.ok(out.includes('lumbar_goal_movement_tolerance'));
