@@ -77,10 +77,19 @@ jobs:
           runcheck() {
             label="$1"; shift
             echo "===== $label ====="
-            "$@"
-            code=$?
+            tmp="$(mktemp)"
+            "$@" 2>&1 | tee "$tmp"
+            code=${PIPESTATUS[0]}
             echo "EXIT=$code"
-            if [ "$code" -ne 0 ]; then failed=1; fi
+            if [ "$code" -ne 0 ]; then
+              failed=1
+              msg="$(tail -n 30 "$tmp")"
+              msg="${msg//'%'/'%25'}"
+              msg="${msg//$'\r'/'%0D'}"
+              msg="${msg//$'\n'/'%0A'}"
+              echo "::error title=${label}::${msg}"
+            fi
+            rm -f "$tmp"
           }
           runcheck planner_regression node --test test/phase15_planner_regression.test.mjs
           runcheck specialist_rules node --test test/phase15_specialist_rules.test.mjs
