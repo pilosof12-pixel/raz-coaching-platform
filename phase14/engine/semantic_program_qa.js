@@ -106,14 +106,19 @@ export function validateDirectGoalExposureSemantic(program, intake = {}, supplie
   const violations = directGoalExposureViolations(model);
 
   if (violations.length) {
+    const modalityFamilies = new Set(['running', 'ruck']);
+    const onlyModalityExposure = violations.every((v) => modalityFamilies.has(v.family));
+    const code = onlyModalityExposure
+      ? 'TARGET_MODALITY_EXPOSURE_REDUCED'
+      : 'NAMED_GOAL_DIRECT_EXPOSURE_MISSING';
     const summary = violations.map((v) =>
       `Week ${v.week}: ${v.tier} goal '${v.goal}' has no direct ${v.family} exposure.`
     ).join(' ');
     const amendment =
       'PRIOR ATTEMPT FAILED DIRECT GOAL EXPOSURE VALIDATION. ' +
-      `${summary} Exercise notes do not count as target-skill exposure. ` +
-      'Restore the named movement or target-specific skill pattern while preserving unrelated valid work.';
-    throw new RetriableValidationError('NAMED_GOAL_DIRECT_EXPOSURE_MISSING', amendment, {
+      `${summary} Exercise notes do not count as target movement or modality exposure. ` +
+      'Restore the named movement or target-specific modality while preserving unrelated valid work.';
+    throw new RetriableValidationError(code, amendment, {
       violations,
       semantic_model_version: model.version,
     });
