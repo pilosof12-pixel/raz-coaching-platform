@@ -107,8 +107,11 @@ function supportPattern(exercise) {
   const base = String(exercise.base_movement || '').toLowerCase();
   const display = String(exercise.display_name || '').toLowerCase();
   const s = `${base} ${display}`;
-  if (/(^|[_\s-])(push.?up|bench|press|dip|push)([_\s-]|$)/i.test(s)) return 'push';
+  // Specific movement identities must win over generic name fragments. Pallof
+  // Press is trunk/anti-rotation work; the word "press" must not turn it into a
+  // pushing exercise. This mirrors the ruck-before-run precedence in ProgramModel.
   if (/(^|[_\s-])(plank|pallof|rollout|ab.?wheel|dead.?bug|bird.?dog|leg.?raise|knee.?raise|hollow|core|anti.?rotation)([_\s-]|$)/i.test(s)) return 'core';
+  if (/(^|[_\s-])(push.?up|bench|press|dip|push)([_\s-]|$)/i.test(s)) return 'push';
   if (/(^|[_\s-])(split.?squat|lunge|step.?up|pistol)([_\s-]|$)/i.test(s)) return 'unilateral_lower';
   if (/(^|[_\s-])(carry|farmer|suitcase)([_\s-]|$)/i.test(s)) return 'carry';
   return null;
