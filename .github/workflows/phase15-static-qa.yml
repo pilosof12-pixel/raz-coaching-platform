@@ -3,53 +3,7 @@ name: Phase 15 Static Coaching QA
 on:
   push:
     paths:
-      - 'phase14/engine/phase15_planner.js'
-      - 'phase14/engine/phase15_specialist_rules.js'
-      - 'phase14/engine/overcoming_gravity_rules.js'
-      - 'phase14/engine/skill_progressions.js'
-      - 'phase14/engine/phase15_program_qa.js'
-      - 'phase14/engine/phase15_final_qa.js'
-      - 'phase14/engine/phase15_quality_rules.js'
-      - 'phase14/engine/phase15_elite_guardrails.js'
-      - 'phase14/engine/exercise_dictionary.js'
-      - 'phase14/engine/program_model.js'
-      - 'phase14/engine/program_goal_semantics.js'
-      - 'phase14/engine/semantic_program_qa.js'
-      - 'phase14/engine/production_validation.js'
-      - 'phase14/storage.js'
-      - 'phase14/admin_qa_routes.js'
-      - 'phase14/package.json'
-      - 'phase14/package-lock.json'
-      - 'phase14/scripts/build_phase15_runtime.mjs'
-      - 'phase14/scripts/final_pipeline_lock.mjs'
-      - 'phase14/scripts/apply_compositional_exercise_vocabulary.mjs'
-      - 'phase14/scripts/apply_named_skill_goal_fix.mjs'
-      - 'phase14/scripts/apply_youth_gymnastics_parity.mjs'
-      - 'phase14/scripts/apply_tactical_3k_parity.mjs'
-      - 'phase14/scripts/apply_launch_runtime.mjs'
-      - 'phase14/test/final_pipeline_lock.test.js'
-      - 'phase14/test/program_model_semantics.test.js'
-      - 'phase14/test/production_chain_golden.test.js'
-      - 'phase14/test/fixtures/golden_programs.js'
-      - 'phase14/test/spreadsheet_product_parity.test.js'
-      - 'phase14/test/phase15_planner_regression.test.mjs'
-      - 'phase14/test/phase15_specialist_rules.test.mjs'
-      - 'phase14/test/exercise_demo_coverage.test.mjs'
-      - 'phase14/test/youth_gymnastics_parity.test.mjs'
-      - 'phase14/test/tactical_3k_hybrid_parity.test.mjs'
-      - 'phase14/public/exerciseDemos.js'
-      - 'phase14/public/spreadsheet.js'
-      - 'phase14/public/spreadsheet-parity.js'
-      - 'phase14/public/live-qa.js'
-      - 'phase14/public/live-qa-tactical.html'
-      - 'phase14/public/live-qa-tactical.js'
-      - 'phase14/public/index.html'
-      - 'phase14/public/privacy.html'
-      - 'phase14/public/terms.html'
-      - 'phase14/data/lib/exerciseDemos.js'
-      - 'phase14/data/exercise_demos.json'
-      - 'phase14/data/exercise_demo_overrides.json'
-      - 'phase14/public/data/exercise_demo_overrides.json'
+      - 'phase14/**'
       - '.github/workflows/phase15-static-qa.yml'
   workflow_dispatch:
 
@@ -105,6 +59,8 @@ jobs:
           runcheck youth_gymnastics_parity node --test test/youth_gymnastics_parity.test.mjs
           runcheck tactical_3k_hybrid node --test test/tactical_3k_hybrid_parity.test.mjs
           runcheck program_model_semantics node --test test/program_model_semantics.test.js
+          runcheck golden_youth_good node --test --test-name-pattern='golden Youth gymnastics' test/production_chain_golden.test.js
+          runcheck golden_tactical_good node --test --test-name-pattern='golden Tactical 3K' test/production_chain_golden.test.js
           runcheck production_chain_golden node --test test/production_chain_golden.test.js
           runcheck final_pipeline_lock node --test test/final_pipeline_lock.test.js
           runcheck spreadsheet_product_parity node --test test/spreadsheet_product_parity.test.js
