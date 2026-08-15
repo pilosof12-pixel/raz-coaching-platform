@@ -119,6 +119,20 @@ function explicitRetentionCue(state) {
   return quality && reference;
 }
 
+function explicitExplosiveQualityRetentionCue(exerciseName, w3, w4) {
+  const identity = String(exerciseName || '').toLowerCase();
+  const isExplosive = /\b(?:explosive|plyometric|jump|throw|power)\b/.test(identity);
+  if (!isExplosive || !explicitRetentionCue(w4)) return false;
+
+  const s = String(w4?.text || '').toLowerCase();
+  const qualityMetric = /\b(?:height|speed|velocity|power|explosiveness|distance|quality)\b/.test(s);
+  if (!qualityMetric) return false;
+
+  const setsReduced = Number.isFinite(w3?.total_sets) && Number.isFinite(w4?.total_sets) && w4.total_sets < w3.total_sets;
+  const unitsReduced = Number.isFinite(w3?.total_target_units) && Number.isFinite(w4?.total_target_units) && w4.total_target_units < w3.total_target_units;
+  return setsReduced || unitsReduced;
+}
+
 function improvedPeak(w1, w2, w3, key) {
   const baseline = w1?.[key];
   if (!Number.isFinite(baseline)) return null;
@@ -129,7 +143,7 @@ function improvedPeak(w1, w2, w3, key) {
   return { baseline, peak, retention_floor: baseline + (peak - baseline) * 0.5 };
 }
 
-function scalarRetentionFailures(w1, w2, w3, w4) {
+function scalarRetentionFailures(w1, w2, w3, w4, { exerciseName = '' } = {}) {
   const specs = [
     ['reps', 'max_reps_upper'],
     ['duration', 'max_duration_seconds'],
@@ -142,6 +156,13 @@ function scalarRetentionFailures(w1, w2, w3, w4) {
     if (!progress) continue;
     const final = w4?.[key];
     if (Number.isFinite(final) && final >= progress.retention_floor) continue;
+
+    // Explosive work may intentionally cut reps in a consolidation week when
+    // total work falls but the earned Week-3 output standard is explicitly
+    // retained via height, speed, velocity, power, distance or execution quality.
+    // This does not exempt ordinary strength/bodyweight rep progressions.
+    if (axis === 'reps' && explicitExplosiveQualityRetentionCue(exerciseName, w3, w4)) continue;
+
     // A Week-3 reference is legitimate for a consolidation target such as
     // "retain the lightest clean Week-3 band" even when the parser cannot
     // assign that free-text reference an ordinal assistance value.
@@ -184,7 +205,7 @@ export function youthConsolidationRetentionAnalysis(program, intake = {}, suppli
     const [w1, w2, w3, w4] = weeks;
     if ([w1, w2, w3, w4].some((w) => !w.exposure_count)) continue;
 
-    const scalarFailures = scalarRetentionFailures(w1, w2, w3, w4);
+    const scalarFailures = scalarRetentionFailures(w1, w2, w3, w4, { exerciseName: row.exercise });
     const buildVolumeProgressed = (
       (Number.isFinite(w1.total_sets) && Math.max(w2.total_sets || 0, w3.total_sets || 0) > w1.total_sets) ||
       (Number.isFinite(w1.total_target_units) && Math.max(w2.total_target_units || 0, w3.total_target_units || 0) > w1.total_target_units)
@@ -220,7 +241,7 @@ export function validateYouthConsolidationRetentionSemantic(program, intake = {}
     'PRIOR ATTEMPT FAILED YOUTH WEEK-4 CONSOLIDATION VALIDATION. ' +
       `${summary}. A consolidation/deload week should reduce FATIGUE, not erase the performance standard earned in Weeks 2-3. ` +
       'Do not simply copy the Week-1 prescription after reps, load, assistance, duration or skill quality progressed. Prefer fewer sets/attempts while retaining at least an intermediate-to-Week-3 clean standard. ' +
-      'For assisted skills, keep the best clean Week-2/3 assistance and reduce volume before increasing assistance again. For handstand or explosive skill work, use fewer attempts/sets while explicitly matching or expressing the best clean Week-3 balance, height, speed or execution quality. ' +
+      'For assisted skills, keep the best clean Week-2/3 assistance and reduce volume before increasing assistance again. For handstand or explosive work, use fewer attempts/sets while explicitly matching or expressing the best clean Week-3 balance, height, speed, velocity, power, distance or execution quality. ' +
       'A larger regression is appropriate only when the intake provides a genuine active pain/injury/recovery reason; never force progression through symptoms.',
     {
       violations: result.violations,
@@ -237,6 +258,7 @@ export function buildConsolidationQualityBrief(intake = {}) {
     '* Week 4 may lower fatigue, but it must not automatically reset earned capability to Week 1. Reduce sets/attempts first while preserving the higher clean performance standard reached in Weeks 2-3.',
     '* Example: 3x5 -> 3x6 -> 3x7 should normally consolidate around fewer sets at roughly 6-7 clean reps, not return to 3x5. Moderate band -> lighter -> lightest clean band should normally retain the best clean Week-2/3 assistance with fewer sets, not return to the moderate band.',
     '* For handstand or other skill work, fewer attempts are fine in Week 4, but the target should match/express the best Week-3 entry, balance, height, speed, ROM or execution quality rather than lowering the skill standard.',
+    '* For explosive work, Week 4 may reduce reps as well as sets only when the prescription explicitly preserves or exceeds the best Week-3 output quality such as height, speed, velocity, power or distance. Do not use this exception for ordinary strength or bodyweight rep progressions.',
     '* If active pain, injury symptoms or a genuine recovery constraint in the intake requires a larger regression, state the reason and prioritize symptom-safe loading. Do not invent a recovery problem simply to justify a reset.',
   ].join('\n');
 }
