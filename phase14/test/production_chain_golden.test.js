@@ -75,9 +75,11 @@ test('Tactical 3K cannot remove the low-cost pushing and trunk GPP floor', () =>
 });
 
 test('Tactical 3K with only two strength days fails semantic strength-session accounting', () => {
+  // Remove the entire Friday strength session. The long aerobic Run remains,
+  // so Friday must not be counted as a third gym/strength day.
   const bad = tactical3KGoldenProgram()
     .split('\n')
-    .filter((line) => !line.includes('\tDeadlift\t'))
+    .filter((line) => !line.includes('\tDeadlift\t') && !line.includes('\tOverhead Press\t'))
     .join('\n');
   expectFailure(bad, TACTICAL_3K_INTAKE, 'SPORT_DAY_COUPLING_VIOLATION');
 });
