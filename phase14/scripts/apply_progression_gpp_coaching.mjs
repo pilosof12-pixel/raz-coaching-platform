@@ -45,21 +45,21 @@ patch('server.phase15.js', [
   {
     label: 'production semantic imports',
     find: 'import { validateDirectGoalExposureSemantic, validateSportDayCouplingSemantic, validateWeeklyVolumeBudgetSemantic } from "./engine/semantic_program_qa.js"; // PROGRAM-MODEL-SEMANTIC-QA-WIRED\n',
-    replace: 'import { validateDirectGoalExposureSemantic, validateSportDayCouplingSemantic, validateWeeklyVolumeBudgetSemantic } from "./engine/semantic_program_qa.js"; // PROGRAM-MODEL-SEMANTIC-QA-WIRED\nimport { validateProgressionArchitectureSemantic, validateTacticalGppCoverageSemantic } from "./engine/coaching_progression_gpp.js"; // PROGRESSION-GPP-SEMANTIC-QA-WIRED\n',
+    replace: 'import { validateDirectGoalExposureSemantic, validateSportDayCouplingSemantic, validateWeeklyVolumeBudgetSemantic } from "./engine/semantic_program_qa.js"; // PROGRAM-MODEL-SEMANTIC-QA-WIRED\nimport { validateProgressionArchitectureSemantic, validateTacticalGppCoverageSemantic, validateTacticalScheduleArchitectureSemantic, validateKnownMaxPullUpDoseSemantic } from "./engine/coaching_progression_gpp.js"; // PROGRESSION-GPP-SEMANTIC-QA-WIRED\n',
     already: 'PROGRESSION-GPP-SEMANTIC-QA-WIRED',
   },
   {
     label: 'production progression/GPP validators',
     find: 'validateDirectGoalExposureSemantic(program, intake);',
-    replace: 'validateDirectGoalExposureSemantic(program, intake);\n      validateProgressionArchitectureSemantic(program, intake); // FOUR-WEEK-PROGRESSION-SEMANTICS\n      validateTacticalGppCoverageSemantic(program, intake); // TACTICAL-GPP-PRIORITY-FLOOR',
-    already: 'TACTICAL-GPP-PRIORITY-FLOOR',
+    replace: 'validateDirectGoalExposureSemantic(program, intake);\n      validateProgressionArchitectureSemantic(program, intake); // FOUR-WEEK-PROGRESSION-SEMANTICS\n      validateTacticalScheduleArchitectureSemantic(program, intake); // TACTICAL-SCHEDULE-ARCHITECTURE\n      validateKnownMaxPullUpDoseSemantic(program, intake); // KNOWN-MAX-PULLUP-DOSE\n      validateTacticalGppCoverageSemantic(program, intake); // TACTICAL-GPP-PRIORITY-FLOOR',
+    already: 'TACTICAL-SCHEDULE-ARCHITECTURE',
   },
   {
     label: 'make new semantic failures repairable',
     find: '        err.code === "PHASE15_QUALITY_VIOLATION"\n',
-    replace: '        err.code === "PHASE15_QUALITY_VIOLATION" ||\n        err.code === "PROGRESSION_ARCHITECTURE_MISSING" ||\n        err.code === "TACTICAL_GPP_COVERAGE_MISSING"\n',
-    already: 'err.code === "PROGRESSION_ARCHITECTURE_MISSING"',
+    replace: '        err.code === "PHASE15_QUALITY_VIOLATION" ||\n        err.code === "PROGRESSION_ARCHITECTURE_MISSING" ||\n        err.code === "TACTICAL_SCHEDULE_ARCHITECTURE_VIOLATION" ||\n        err.code === "PULL_UP_DOSE_EXCEEDS_KNOWN_CAPACITY" ||\n        err.code === "TACTICAL_GPP_COVERAGE_MISSING"\n',
+    already: 'err.code === "PULL_UP_DOSE_EXCEEDS_KNOWN_CAPACITY"',
   },
 ]);
 
-console.log('Progression architecture + tactical GPP production wiring complete.');
+console.log('Progression architecture + tactical GPP/schedule/dose production wiring complete.');
