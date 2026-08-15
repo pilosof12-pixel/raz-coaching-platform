@@ -12,6 +12,7 @@ import {
 import {
   validateDirectGoalExposureSemantic,
   validateSportDayCouplingSemantic,
+  validateWeeklyVolumeBudgetSemantic,
 } from "../engine/semantic_program_qa.js";
 
 const HEADER = "Day\tExercise\tWeight\tSets\tReps\tRest\tTarget RPE\tNotes\tResults";
@@ -23,6 +24,15 @@ function program(rows) {
     ...rows,
     "END_WEEK1_TSV",
   ].join("\n");
+}
+
+function fourWeekProgram(rows) {
+  return [1, 2, 3, 4].map((week) => [
+    `START_WEEK${week}_TSV`,
+    HEADER,
+    ...rows,
+    `END_WEEK${week}_TSV`,
+  ].join("\n")).join("\n\n");
 }
 
 const HYBRID_INTAKE = {
@@ -78,6 +88,38 @@ test("SPORT_DAY_COUPLING regression: two strength days still fail when three are
       assert.equal(mismatch.scheduled, 2);
       return true;
     }
+  );
+});
+
+test("weekly volume regression: four valid weeks are never summed against one weekly reference", () => {
+  const candidate = fourWeekProgram([
+    "Mon\tWeighted Pull-up\tBW+10 kg\t10\t3\t120s\t7\tquality pulling\t",
+    "Thu\tPull-up\tBW\t10\t5\t120s\t7\tquality pulling\t",
+  ]);
+
+  const result = validateWeeklyVolumeBudgetSemantic(candidate, { days_per_week: 2 });
+  assert.equal(result.accounting_scope, "per_week");
+  assert.equal(result.weeks.length, 4);
+  assert.deepEqual(result.weeks.map((week) => week.totals.pull), [20, 20, 20, 20]);
+});
+
+test("weekly volume regression: a genuinely gross single-week overload still fails closed", () => {
+  const candidate = program([
+    "Mon\tWeighted Pull-up\tBW+10 kg\t20\t3\t120s\t7\texcessive pulling\t",
+    "Thu\tPull-up\tBW\t20\t5\t120s\t7\texcessive pulling\t",
+  ]);
+
+  assert.throws(
+    () => validateWeeklyVolumeBudgetSemantic(candidate, { days_per_week: 2 }),
+    (err) => {
+      assert.ok(err instanceof RetriableValidationError);
+      assert.equal(err.code, "WEEKLY_MRV_EXCEEDED");
+      assert.equal(err.details.accounting_scope, "per_week");
+      assert.equal(err.details.over[0].week, 1);
+      assert.equal(err.details.over[0].pattern, "pull");
+      assert.equal(err.details.over[0].total, 40);
+      return true;
+    },
   );
 });
 
