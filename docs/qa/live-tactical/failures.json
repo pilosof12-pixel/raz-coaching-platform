@@ -1,0 +1,24 @@
+[
+  {
+    "label": "latest_typed",
+    "http_status": 404,
+    "status": null,
+    "stage": null,
+    "attempt": null,
+    "detail": null,
+    "error": "Job not found.",
+    "has_program": false,
+    "program_chars": 0
+  },
+  {
+    "label": "screenshot",
+    "http_status": 404,
+    "status": null,
+    "stage": null,
+    "attempt": null,
+    "detail": null,
+    "error": "Job not found.",
+    "has_program": false,
+    "program_chars": 0
+  }
+]
