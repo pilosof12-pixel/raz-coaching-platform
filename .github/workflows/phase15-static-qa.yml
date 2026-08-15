@@ -12,6 +12,9 @@ on:
       - 'phase14/engine/phase15_quality_rules.js'
       - 'phase14/engine/phase15_elite_guardrails.js'
       - 'phase14/engine/exercise_dictionary.js'
+      - 'phase14/engine/program_model.js'
+      - 'phase14/engine/semantic_program_qa.js'
+      - 'phase14/engine/production_validation.js'
       - 'phase14/storage.js'
       - 'phase14/admin_qa_routes.js'
       - 'phase14/package.json'
@@ -22,6 +25,9 @@ on:
       - 'phase14/scripts/apply_tactical_3k_parity.mjs'
       - 'phase14/scripts/apply_launch_runtime.mjs'
       - 'phase14/test/final_pipeline_lock.test.js'
+      - 'phase14/test/program_model_semantics.test.js'
+      - 'phase14/test/production_chain_golden.test.js'
+      - 'phase14/test/fixtures/golden_programs.js'
       - 'phase14/test/spreadsheet_product_parity.test.js'
       - 'phase14/test/phase15_planner_regression.test.mjs'
       - 'phase14/test/phase15_specialist_rules.test.mjs'
@@ -50,7 +56,7 @@ permissions:
 jobs:
   static-qa:
     runs-on: ubuntu-latest
-    timeout-minutes: 6
+    timeout-minutes: 8
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -80,6 +86,8 @@ jobs:
           runcheck specialist_rules node --test test/phase15_specialist_rules.test.mjs
           runcheck youth_gymnastics_parity node --test test/youth_gymnastics_parity.test.mjs
           runcheck tactical_3k_hybrid node --test test/tactical_3k_hybrid_parity.test.mjs
+          runcheck program_model_semantics node --test test/program_model_semantics.test.js
+          runcheck production_chain_golden node --test test/production_chain_golden.test.js
           runcheck final_pipeline_lock node --test test/final_pipeline_lock.test.js
           runcheck spreadsheet_product_parity node --test test/spreadsheet_product_parity.test.js
           if [ -f test/exercise_demo_coverage.test.mjs ]; then runcheck demo_coverage node --test test/exercise_demo_coverage.test.mjs; fi
@@ -93,6 +101,9 @@ jobs:
           runcheck syntax_spreadsheet_parity node --check public/spreadsheet-parity.js
           runcheck syntax_tactical_live_qa node --check public/live-qa-tactical.js
           runcheck syntax_dictionary node --check engine/exercise_dictionary.js
+          runcheck syntax_program_model node --check engine/program_model.js
+          runcheck syntax_semantic_qa node --check engine/semantic_program_qa.js
+          runcheck syntax_production_validation node --check engine/production_validation.js
           runcheck syntax_planner node --check engine/phase15_planner.js
           runcheck syntax_specialist node --check engine/phase15_specialist_rules.js
           runcheck syntax_overcoming_gravity node --check engine/overcoming_gravity_rules.js
@@ -103,6 +114,7 @@ jobs:
           runcheck syntax_tactical_patch node --check scripts/apply_tactical_3k_parity.mjs
           runcheck grep_v5 grep -q 'deterministic-skeleton-v5' server.phase15.js
           runcheck grep_final_qa grep -q 'validatePhase15FinalProgram' server.phase15.js
+          runcheck grep_program_model_coupling grep -q 'PROGRAM-MODEL-SPORT-COUPLING-WIRED' server.phase15.js
           runcheck grep_internal_repair grep -q 'INTERNAL_QUALITY_REPAIR_ARCHITECTURE' server.phase15.js
           runcheck grep_repair_budget grep -q 'INTERNAL-QA-REPAIR-BUDGET' server.phase15.js
           runcheck grep_repair_exhaustion grep -q 'INTERNAL_QA_REPAIR_EXHAUSTED' server.phase15.js
@@ -117,4 +129,5 @@ jobs:
           runcheck grep_overview_tab grep -q "addWorksheet('Overview')" public/spreadsheet-parity.js
           runcheck grep_spreadsheet_override grep -q 'window.buildStrengthSpreadsheet=buildParitySpreadsheet' public/spreadsheet-parity.js
           runcheck grep_privacy grep -q '/privacy.html' public/index.html
+          runcheck full_phase14_check npm run check
           exit "$failed"
