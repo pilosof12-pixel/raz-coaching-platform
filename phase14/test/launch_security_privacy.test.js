@@ -47,19 +47,23 @@ test("successful persistence precedes done status for build and adjustment jobs"
   assert.ok(buildStart>=0&&adjustStart>buildStart&&routeStart>adjustStart);
   const build=src.slice(buildStart,adjustStart);
   const adjust=src.slice(adjustStart,routeStart);
-  assert.ok(build.indexOf("await store.upsertClient") < build.indexOf('await store.finishJob(jobId, "done"')));
-  assert.ok(build.indexOf("await store.addHistory") < build.indexOf('await store.finishJob(jobId, "done"')));
-  assert.ok(build.indexOf("await store.bumpUsage") < build.indexOf('await store.finishJob(jobId, "done"')));
-  assert.ok(adjust.indexOf("await store.updateClientProgram") < adjust.indexOf('await store.finishJob(jobId, "done"')));
-  assert.ok(adjust.indexOf("await store.addHistory") < adjust.indexOf('await store.finishJob(jobId, "done"')));
-  assert.ok(adjust.indexOf("await store.bumpUsage") < adjust.indexOf('await store.finishJob(jobId, "done"')));
+  const buildDone=build.indexOf('await store.finishJob(jobId, "done",');
+  const adjustDone=adjust.indexOf('await store.finishJob(jobId, "done",');
+  assert.ok(buildDone>0);
+  assert.ok(adjustDone>0);
+  assert.ok(build.indexOf("await store.upsertClient") < buildDone);
+  assert.ok(build.indexOf("await store.addHistory") < buildDone);
+  assert.ok(build.indexOf("await store.bumpUsage") < buildDone);
+  assert.ok(adjust.indexOf("await store.updateClientProgram") < adjustDone);
+  assert.ok(adjust.indexOf("await store.addHistory") < adjustDone);
+  assert.ok(adjust.indexOf("await store.bumpUsage") < adjustDone);
   assert.match(build,/catch \(e\)[\s\S]*finishJob\(jobId, "error"/);
   assert.match(adjust,/catch \(e\)[\s\S]*finishJob\(jobId, "error"/);
 });
 
 test("client delivery fails closed on review and support placeholders",()=>{
   const src=fs.readFileSync(path.join(root,"server.js"),"utf8");
-  assert.match(src,/\[REVIEW\\\]|contact\\s\+support\|could not be safely generated/i);
+  assert.match(src,/\[REVIEW\]|contact\s+support|could not be safely generated/i);
   assert.match(src,/UNRESOLVED_CLIENT_REVIEW/);
   assert.match(src,/Final client QA blocked unresolved review\/support text/);
 });
