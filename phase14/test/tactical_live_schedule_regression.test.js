@@ -40,6 +40,7 @@ test('live-like seven-day Tactical layout fails the explicit calendar budget and
   bad = replaceEvery(bad, 'Wed\tPallof Press\t', 'Tue\tPallof Press\t');
   bad = replaceEvery(bad, 'Fri\tRun\t', 'Sun\tRun\t');
   bad = replaceEvery(bad, 'Fri\tDeadlift\t', 'Wed\tDeadlift\t');
+  bad = replaceEvery(bad, 'Fri\tOverhead Press\t', 'Wed\tOverhead Press\t');
   bad = replaceEvery(bad, 'Sat\tBackpack Carry\t', 'Fri\tBackpack Carry\t');
 
   assert.throws(
@@ -51,8 +52,8 @@ test('live-like seven-day Tactical layout fails the explicit calendar budget and
 test('priority pull-up work cannot be concentrated on adjacent days when both exposures are substantive', () => {
   const bad = replaceEvery(
     tactical3KGoldenProgram(),
-    'Wed\tPull-up\tBodyweight\t2\t',
-    'Tue\tPull-up\tBodyweight\t3\t',
+    'Wed\tPull-up\tBodyweight\t2\t8\t',
+    'Tue\tPull-up\tBodyweight\t3\t8\t',
   );
   assert.throws(
     () => validateTacticalScheduleArchitectureSemantic(bad, TACTICAL_3K_INTAKE),
@@ -80,7 +81,7 @@ test('non-priority Tactical pushing stays a support dose rather than matching th
   const analysis = tacticalGppAnalysis(bad, TACTICAL_3K_INTAKE);
   assert.equal(analysis.push_is_goal, false);
   assert.equal(analysis.weeks.length, 4);
-  assert.ok(analysis.weeks.every((week) => week.totals.push === 7));
+  assert.ok(analysis.weeks.every((week) => week.totals.push === 9));
   assert.ok(analysis.weeks.every((week) => week.over_budget === true));
   assert.throws(
     () => validateTacticalGppCoverageSemantic(bad, TACTICAL_3K_INTAKE),
