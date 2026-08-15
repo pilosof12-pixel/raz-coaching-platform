@@ -14,7 +14,7 @@ export function lockFinalPipelineSource(input) {
   // an exact kg may remain only when that exact variation has its own benchmark.
   once(
     'import { EXERCISE_DICTIONARY } from "./engine/exercise_dictionary.js";',
-    'import { EXERCISE_DICTIONARY } from "./engine/exercise_dictionary.js";\nimport { repairUnbenchmarkedVariationLoads } from "./engine/phase15_elite_guardrails.js"; // UNBENCHMARKED-VARIATION-REPAIR-WIRED\nimport { validateDirectGoalExposureSemantic, validateSportDayCouplingSemantic } from "./engine/semantic_program_qa.js"; // PROGRAM-MODEL-SEMANTIC-QA-WIRED',
+    'import { EXERCISE_DICTIONARY } from "./engine/exercise_dictionary.js";\nimport { repairUnbenchmarkedVariationLoads } from "./engine/phase15_elite_guardrails.js"; // UNBENCHMARKED-VARIATION-REPAIR-WIRED\nimport { validateDirectGoalExposureSemantic, validateSportDayCouplingSemantic, validateWeeklyVolumeBudgetSemantic } from "./engine/semantic_program_qa.js"; // PROGRAM-MODEL-SEMANTIC-QA-WIRED',
     'variation-load and semantic QA imports'
   );
 
@@ -32,6 +32,16 @@ export function lockFinalPipelineSource(input) {
     'validateSportDayCoupling(program, intake);',
     'validateSportDayCouplingSemantic(program, intake); // PROGRAM-MODEL-STRENGTH-DAY-ACCOUNTING\n      validateDirectGoalExposureSemantic(program, intake); // PROGRAM-MODEL-DIRECT-GOAL-EXPOSURE',
     'semantic program QA'
+  );
+
+  // V19 called this a weekly validator but counted all four TSV weeks together,
+  // then compared that four-week sum to one-week reference bands. Production now
+  // validates each ProgramModel week independently and keeps the same conservative
+  // reference bands and hard-fail threshold.
+  once(
+    'validateWeeklyVolumeBudget(program, intake);',
+    'validateWeeklyVolumeBudgetSemantic(program, intake); // PROGRAM-MODEL-WEEKLY-VOLUME-ACCOUNTING',
+    'semantic weekly volume QA'
   );
 
   // -----------------------------------------------------------------------
