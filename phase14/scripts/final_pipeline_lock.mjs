@@ -14,14 +14,23 @@ export function lockFinalPipelineSource(input) {
   // an exact kg may remain only when that exact variation has its own benchmark.
   once(
     'import { EXERCISE_DICTIONARY } from "./engine/exercise_dictionary.js";',
-    'import { EXERCISE_DICTIONARY } from "./engine/exercise_dictionary.js";\nimport { repairUnbenchmarkedVariationLoads } from "./engine/phase15_elite_guardrails.js"; // UNBENCHMARKED-VARIATION-REPAIR-WIRED',
-    'variation-load repair import'
+    'import { EXERCISE_DICTIONARY } from "./engine/exercise_dictionary.js";\nimport { repairUnbenchmarkedVariationLoads } from "./engine/phase15_elite_guardrails.js"; // UNBENCHMARKED-VARIATION-REPAIR-WIRED\nimport { validateSportDayCouplingSemantic } from "./engine/semantic_program_qa.js"; // PROGRAM-MODEL-SPORT-COUPLING-WIRED',
+    'variation-load and semantic QA imports'
   );
 
   once(
     '    let program = fixInvalidExerciseNames(raw); // step 1',
     '    let program = repairUnbenchmarkedVariationLoads(fixInvalidExerciseNames(raw), intake); // step 1: DETERMINISTIC-UNBENCHMARKED-LOAD-REPAIR',
     'variation-load repair before QA'
+  );
+
+  // The V19 collision rule remains useful, but its old gym-day accounting treated
+  // every non-rest endurance day as a strength session. Production now delegates
+  // this call to the ProgramModel-backed semantic wrapper.
+  once(
+    'validateSportDayCoupling(program, intake);',
+    'validateSportDayCouplingSemantic(program, intake); // PROGRAM-MODEL-STRENGTH-DAY-ACCOUNTING',
+    'semantic sport-day coupling'
   );
 
   // -----------------------------------------------------------------------
@@ -91,5 +100,5 @@ if (process.argv[1] && fileURLToPath(new URL(`file://${process.argv[1]}`)) === s
   const before = fs.readFileSync(runtimePath, 'utf8');
   const after = lockFinalPipelineSource(before);
   fs.writeFileSync(runtimePath, after);
-  console.log('Phase15 final pipeline locked: hybrid grounded QA repair + fail-closed save boundary');
+  console.log('Phase15 final pipeline locked: semantic ProgramModel QA + hybrid grounded repair + fail-closed save boundary');
 }
