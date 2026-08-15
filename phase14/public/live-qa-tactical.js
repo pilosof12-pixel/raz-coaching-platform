@@ -130,6 +130,7 @@
       }
 
       row('Valid unused pass starts Tactical 3K build', true, `HTTP ${build.r.status}`);
+      info(`Job ID: ${build.j.job_id}`);
       const token = String(build.j.token);
       tokenEl.textContent = token;
       tokenWrap.classList.remove('hidden');
