@@ -29,6 +29,8 @@ on:
       - 'phase14/public/spreadsheet.js'
       - 'phase14/public/spreadsheet-parity.js'
       - 'phase14/public/live-qa.js'
+      - 'phase14/public/live-qa-tactical.html'
+      - 'phase14/public/live-qa-tactical.js'
       - 'phase14/public/index.html'
       - 'phase14/public/privacy.html'
       - 'phase14/public/terms.html'
@@ -86,6 +88,7 @@ jobs:
           runcheck syntax_admin node --check admin_qa_routes.js
           runcheck syntax_spreadsheet node --check public/spreadsheet.js
           runcheck syntax_spreadsheet_parity node --check public/spreadsheet-parity.js
+          runcheck syntax_tactical_live_qa node --check public/live-qa-tactical.js
           runcheck syntax_dictionary node --check engine/exercise_dictionary.js
           runcheck syntax_planner node --check engine/phase15_planner.js
           runcheck syntax_specialist node --check engine/phase15_specialist_rules.js
