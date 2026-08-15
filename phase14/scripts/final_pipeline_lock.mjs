@@ -14,7 +14,7 @@ export function lockFinalPipelineSource(input) {
   // an exact kg may remain only when that exact variation has its own benchmark.
   once(
     'import { EXERCISE_DICTIONARY } from "./engine/exercise_dictionary.js";',
-    'import { EXERCISE_DICTIONARY } from "./engine/exercise_dictionary.js";\nimport { repairUnbenchmarkedVariationLoads } from "./engine/phase15_elite_guardrails.js"; // UNBENCHMARKED-VARIATION-REPAIR-WIRED\nimport { validateSportDayCouplingSemantic } from "./engine/semantic_program_qa.js"; // PROGRAM-MODEL-SPORT-COUPLING-WIRED',
+    'import { EXERCISE_DICTIONARY } from "./engine/exercise_dictionary.js";\nimport { repairUnbenchmarkedVariationLoads } from "./engine/phase15_elite_guardrails.js"; // UNBENCHMARKED-VARIATION-REPAIR-WIRED\nimport { validateDirectGoalExposureSemantic, validateSportDayCouplingSemantic } from "./engine/semantic_program_qa.js"; // PROGRAM-MODEL-SEMANTIC-QA-WIRED',
     'variation-load and semantic QA imports'
   );
 
@@ -26,11 +26,12 @@ export function lockFinalPipelineSource(input) {
 
   // The V19 collision rule remains useful, but its old gym-day accounting treated
   // every non-rest endurance day as a strength session. Production now delegates
-  // this call to the ProgramModel-backed semantic wrapper.
+  // this call to the ProgramModel-backed semantic wrapper. Named-goal exposure is
+  // also checked from structured movement identity rather than Notes text.
   once(
     'validateSportDayCoupling(program, intake);',
-    'validateSportDayCouplingSemantic(program, intake); // PROGRAM-MODEL-STRENGTH-DAY-ACCOUNTING',
-    'semantic sport-day coupling'
+    'validateSportDayCouplingSemantic(program, intake); // PROGRAM-MODEL-STRENGTH-DAY-ACCOUNTING\n      validateDirectGoalExposureSemantic(program, intake); // PROGRAM-MODEL-DIRECT-GOAL-EXPOSURE',
+    'semantic program QA'
   );
 
   // -----------------------------------------------------------------------
