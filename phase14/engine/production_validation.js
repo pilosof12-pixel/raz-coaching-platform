@@ -3,7 +3,6 @@ import {
   validateEquipmentAgainstLocation,
   enforceUnilateralIntensityFloor,
   enforceIntradayConditioningOrder,
-  validateWeeklyVolumeBudget,
   reformatWarmupCells,
   validateAndCalibrateSkills,
 } from './exercise_dictionary.js';
@@ -13,6 +12,7 @@ import { parseProgramModel } from './program_model.js';
 import {
   validateDirectGoalExposureSemantic,
   validateSportDayCouplingSemantic,
+  validateWeeklyVolumeBudgetSemantic,
 } from './semantic_program_qa.js';
 
 // Single offline entry point for the deterministic validation chain that runs
@@ -35,8 +35,8 @@ export function validateProductionProgram(program, intake = {}) {
   const sportCalendar = validateSportDayCouplingSemantic(candidate, intake, model);
   model = sportCalendar.model;
   model = validateDirectGoalExposureSemantic(candidate, intake, model).model;
+  model = validateWeeklyVolumeBudgetSemantic(candidate, intake, model).model;
 
-  validateWeeklyVolumeBudget(candidate, intake);
   candidate = reformatWarmupCells(candidate);
   candidate = repairPhase15Program(candidate);
   validatePhase15FinalProgram(candidate, intake);
