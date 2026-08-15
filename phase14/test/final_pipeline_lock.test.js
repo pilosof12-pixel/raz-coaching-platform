@@ -115,6 +115,16 @@ test('repair strategy escapes a poisoned candidate with a fresh grounded regener
   assert.match(out, /if \(repairFeedback && !amendments\.includes\(repairFeedback\)\) amendments\.push\(repairFeedback\)/);
 });
 
+test('surgical repair preserves the complete accumulated QA contract instead of only the newest failure', () => {
+  const out = lockFinalPipelineSource(fixture());
+  assert.match(out, /CUMULATIVE-CONSTRAINT RULE/);
+  assert.match(out, /const cumulativeRepairFeedback = amendments\.length/);
+  assert.match(out, /amendments\.join\("\\n\\n--- PRESERVE PRIOR QA CONSTRAINT ---\\n\\n"\)/);
+  assert.match(out, /buildInternalQualityRepairPrompt\(intake, repairCandidate, cumulativeRepairFeedback\)/);
+  assert.match(out, /CUMULATIVE VALIDATOR CONTRACT TO REPAIR AND PRESERVE/);
+  assert.doesNotMatch(out, /buildInternalQualityRepairPrompt\(intake, repairCandidate, repairFeedback\)/);
+});
+
 test('repair prompt forbids review placeholders and unrelated conditioning substitutions', () => {
   const out = lockFinalPipelineSource(fixture());
   assert.match(out, /never emit \[REVIEW\]/i);
