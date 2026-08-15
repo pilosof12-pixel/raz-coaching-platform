@@ -24,6 +24,10 @@ const legitimate = [
   'Band-Assisted Bar Muscle-up Transition Drill',
   'Paused Pull-up',
   'Tempo Bulgarian Split Squat',
+  'Strict Pull-up',
+  'Strict Chin-up',
+  'Strict Ring Dip',
+  'Strict Push-up',
 ];
 
 for (const exercise of legitimate) {
@@ -38,6 +42,8 @@ test('composed variants retain deterministic equipment metadata', () => {
   assert.deepEqual(matchComposedExercise('Belt Squat Split Squat')?.requirements, ['machine']);
   assert.deepEqual(matchComposedExercise('Band-Assisted Iron Cross Eccentric')?.requirements, ['rings', 'bands']);
   assert.deepEqual(matchComposedExercise('Band-Assisted Bar Muscle-up Transition Drill')?.requirements, ['pull_up_bar', 'bands']);
+  assert.deepEqual(matchComposedExercise('Strict Pull-up')?.requirements, ['pull_up_bar']);
+  assert.deepEqual(matchComposedExercise('Strict Ring Dip')?.requirements, ['rings']);
 });
 
 test('composition grammar does not turn arbitrary exercise-sounding strings into valid movements', () => {
@@ -47,6 +53,9 @@ test('composition grammar does not turn arbitrary exercise-sounding strings into
     'Box-Assisted Barbell Human Flag Press',
     'Band-Assisted Sprint Isometric',
     'Tempo Cable Muscle-up Lunge',
+    'Strict Sprint',
+    'Strict Sled Push',
+    'Strict Cable Row',
   ];
   for (const exercise of fabricated) {
     assert.equal(matchDictionary(exercise).status, 'miss', exercise);
