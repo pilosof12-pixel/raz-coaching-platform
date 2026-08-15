@@ -95,6 +95,28 @@ test('volume-only skill build needs an explicit Week 4 quality-retention target'
   assert.deepEqual(youthConsolidationRetentionAnalysis(good, YOUTH_GYMNASTICS_INTAKE).violations, []);
 });
 
+test('explosive consolidation may lower reps when Week 3 output quality is explicitly retained', () => {
+  const good = singleExerciseBlock('Explosive Hip-to-Bar Pull-up', [
+    { sets: '4', reps: '2', notes: 'Fast high pulls.' },
+    { sets: '4', reps: '2', notes: 'Fast high pulls.' },
+    { sets: '4', reps: '3', notes: 'Fast high pulls.' },
+    { sets: '3', reps: '2', notes: 'Lower volume but match or exceed Week 3 pull height and speed.' },
+  ]);
+  assert.deepEqual(youthConsolidationRetentionAnalysis(good, YOUTH_GYMNASTICS_INTAKE).violations, []);
+});
+
+test('explosive rep reduction without an earned quality target still fails consolidation', () => {
+  const bad = singleExerciseBlock('Explosive Hip-to-Bar Pull-up', [
+    { sets: '4', reps: '2', notes: 'Fast high pulls.' },
+    { sets: '4', reps: '2', notes: 'Fast high pulls.' },
+    { sets: '4', reps: '3', notes: 'Fast high pulls.' },
+    { sets: '3', reps: '2', notes: 'Easy consolidation week.' },
+  ]);
+  const analysis = youthConsolidationRetentionAnalysis(bad, YOUTH_GYMNASTICS_INTAKE);
+  assert.equal(analysis.violations.length, 1);
+  assert.ok(analysis.violations[0].scalar_retention_failures.some((x) => x.axis === 'reps'));
+});
+
 test('active pain context can justify a larger consolidation regression', () => {
   const program = singleExerciseBlock('Strict Ring Dip', [
     { sets: '3', reps: '5' },
@@ -115,6 +137,8 @@ test('generation brief explicitly separates fatigue reduction from capability re
   assert.match(brief, /3x5 -> 3x6 -> 3x7/i);
   assert.match(brief, /not return to the moderate band/i);
   assert.match(brief, /best Week-3/i);
+  assert.match(brief, /explosive work/i);
+  assert.match(brief, /ordinary strength or bodyweight/i);
 });
 
 test('production patch wires consolidation brief, validator and repairable error into runtime', () => {
