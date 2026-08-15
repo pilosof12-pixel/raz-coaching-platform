@@ -89,7 +89,7 @@ test('repair prompt forbids review placeholders and unrelated conditioning subst
   const out = lockFinalPipelineSource(fixture());
   assert.match(out, /never emit \[REVIEW\]/i);
   assert.match(out, /Never use Burpee EMOM, Hill Sprints or unrelated conditioning as a generic substitute/i);
-  assert.match(out, /preserve the training intent/i);
+  assert.match(out, /preserv(?:e|es) the training intent/i);
 });
 
 test('hard-substitute delivery path is removed and exhaustion fails closed', () => {
