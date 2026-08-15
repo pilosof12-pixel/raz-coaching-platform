@@ -31,6 +31,14 @@ function expectFailure(program, intake, expectedCode) {
   );
 }
 
+function rewriteRows(program, fn) {
+  return program.split('\n').map((line) => {
+    if (!line.includes('\t')) return line;
+    const cells = line.split('\t');
+    return fn(cells, line).join('\t');
+  }).join('\n');
+}
+
 test('golden Youth gymnastics passes the full deterministic production validation chain', () => {
   const result = validateProductionProgram(youthGymnasticsGoldenProgram(), YOUTH_GYMNASTICS_INTAKE);
   assert.equal(result.ok, true);
@@ -49,6 +57,23 @@ test('golden Tactical 3K passes the full deterministic production validation cha
   }
 });
 
+test('Youth primary skills cannot repeat an unchanged prescription for all four weeks', () => {
+  const bad = rewriteRows(youthGymnasticsGoldenProgram(), (cells) => {
+    if (cells[1] === 'Controlled Handstand Kick-up') cells[3] = cells[0] === 'Mon' ? '4' : '5';
+    if (cells[1] === 'Band-Assisted Bar Muscle-up Transition Drill') cells[2] = 'BW + moderate band';
+    return cells;
+  });
+  expectFailure(bad, YOUTH_GYMNASTICS_INTAKE, 'PROGRESSION_ARCHITECTURE_MISSING');
+});
+
+test('Tactical 3K cannot remove the low-cost pushing and trunk GPP floor', () => {
+  const bad = tactical3KGoldenProgram()
+    .split('\n')
+    .filter((line) => !line.includes('\tPush-up\t') && !line.includes('\tPallof Press\t'))
+    .join('\n');
+  expectFailure(bad, TACTICAL_3K_INTAKE, 'TACTICAL_GPP_COVERAGE_MISSING');
+});
+
 test('Tactical 3K with only two strength days fails semantic strength-session accounting', () => {
   const bad = tactical3KGoldenProgram()
     .split('\n')
@@ -58,27 +83,46 @@ test('Tactical 3K with only two strength days fails semantic strength-session ac
 });
 
 test('Tactical 3K cannot turn the direct ruck into a fourth run', () => {
-  const bad = tactical3KGoldenProgram().replaceAll(
-    '\tBackpack Carry\t20 kg\t1\t70 min\tN/A\t5\tDirect ruck / loaded march at controlled walking pace; target pace 9:25-9:35 / km. Keep pack load stable and progress only one main ruck variable at a time.\t',
-    '\tRun\tN/A\t1\t10 km\tN/A\t5\tSteady aerobic running.\t',
-  );
+  const bad = rewriteRows(tactical3KGoldenProgram(), (cells) => {
+    if (cells[1] === 'Backpack Carry') {
+      cells[1] = 'Run';
+      cells[2] = 'Easy pace';
+      cells[4] = '40 min';
+      cells[6] = '4';
+      cells[7] = 'Steady aerobic running.';
+    }
+    return cells;
+  });
   expectFailure(bad, TACTICAL_3K_INTAKE, 'TARGET_MODALITY_EXPOSURE_REDUCED');
 });
 
 test('Tactical 3K cannot remove direct pull-up work while preserving three strength days', () => {
-  const bad = tactical3KGoldenProgram()
-    .replaceAll('\tWeighted Pull-up\t+25 kg\t3\t5\t3 min\t7-8\tPulling-strength support below the demonstrated +30 kg x 5 benchmark.\t', '\tOverhead Press\t55 kg\t3\t5\t3 min\t7\tStrength maintenance.\t')
-    .split('\n')
-    .filter((line) => !line.includes('\tPull-up\tBodyweight\t'))
-    .join('\n');
+  const bad = rewriteRows(tactical3KGoldenProgram(), (cells) => {
+    if (cells[1] === 'Weighted Pull-up') {
+      cells[1] = 'Overhead Press';
+      cells[2] = 'RPE-selected load';
+      cells[3] = '3';
+      cells[4] = '5';
+      cells[5] = '3 min';
+      cells[6] = '7';
+      cells[7] = 'General strength maintenance.';
+    }
+    return cells;
+  }).split('\n').filter((line) => !line.includes('\tPull-up\tBodyweight\t')).join('\n');
   expectFailure(bad, TACTICAL_3K_INTAKE, 'NAMED_GOAL_DIRECT_EXPOSURE_MISSING');
 });
 
 test('Youth gymnastics cannot omit direct bar muscle-up practice', () => {
-  const bad = youthGymnasticsGoldenProgram().replaceAll(
-    '\tBand-Assisted Bar Muscle-up Transition Drill\tBW + band\t4\t2\t90s\tN/A',
-    '\tStrict Pull-up\tBW\t4\t5\t90s\t7',
-  );
+  const bad = rewriteRows(youthGymnasticsGoldenProgram(), (cells) => {
+    if (cells[1] === 'Band-Assisted Bar Muscle-up Transition Drill') {
+      cells[1] = 'Strict Pull-up';
+      cells[2] = 'BW';
+      cells[3] = '4';
+      cells[4] = '5';
+      cells[6] = '7';
+    }
+    return cells;
+  });
   expectFailure(bad, YOUTH_GYMNASTICS_INTAKE, 'NAMED_GOAL_DIRECT_EXPOSURE_MISSING');
 });
 
