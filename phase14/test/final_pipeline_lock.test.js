@@ -85,6 +85,13 @@ test('production semantic QA uses ProgramModel for strength-day accounting, dire
   assert.doesNotMatch(out, /validateWeeklyVolumeBudget\(program, intake\)/);
 });
 
+test('client output cleanliness is enforced inside QA and again on the exact save-boundary string', () => {
+  const out = lockFinalPipelineSource(fixture());
+  assert.match(out, /CLIENT-OUTPUT-CLEANLINESS-WIRED/);
+  assert.match(out, /validateClientOutputCleanliness\(program\); \/\/ CLIENT-OUTPUT-CLEANLINESS-INLOOP/);
+  assert.match(out, /validateClientOutputCleanliness\(program\); \/\/ SAVE-BOUNDARY-CLIENT-CLEANLINESS/);
+});
+
 test('all repairable validator failures use one grounded internal repair path', () => {
   const out = lockFinalPipelineSource(fixture());
   assert.match(out, /INTERNAL_QUALITY_REPAIR_ARCHITECTURE/);
@@ -136,6 +143,7 @@ test('hard-substitute delivery path is removed and exhaustion fails closed', () 
 test('the exact client-visible program is revalidated immediately before persistence', () => {
   const out = lockFinalPipelineSource(fixture());
   assert.match(out, /validatePhase15FinalProgram\(program, intake\); \/\/ SAVE-BOUNDARY-FINAL-QA/);
+  assert.match(out, /validateClientOutputCleanliness\(program\); \/\/ SAVE-BOUNDARY-CLIENT-CLEANLINESS/);
 });
 
 test('repair architecture has enough bounded wall-clock headroom', () => {
