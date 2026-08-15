@@ -44,9 +44,11 @@ test('weekly push/core totals cannot hide a token deadlift-only third gym sessio
   const bad = program.replace(/^Fri\tOverhead Press\t.*$/gm, '');
   const strength = tacticalStrengthCompletenessAnalysis(bad, TACTICAL_3K_INTAKE);
 
-  assert.ok(strength.violations.length >= 1);
-  assert.ok(strength.violations.some((week) =>
-    week.token_days.some((day) => String(day.day || '').toLowerCase() === 'fri')
+  assert.equal(strength.violations.length, 4);
+  assert.ok(strength.violations.every((week) =>
+    week.token_days.some((day) =>
+      day.distinct_movement_count === 1 && day.substantive_strength_exercises.includes('Deadlift')
+    )
   ));
   assert.throws(
     () => validateTacticalStrengthCompletenessSemantic(bad, TACTICAL_3K_INTAKE),
