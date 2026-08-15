@@ -173,6 +173,7 @@ export function validateTacticalGppCoverageSemantic(program, intake = {}, suppli
     'PRIOR ATTEMPT FAILED TACTICAL GPP / PRIORITY-BUDGET VALIDATION. ' +
       `${summary}. Tactical/hybrid programming should not become pull-ups, deadlifts and running only, but GPP must remain subordinate to the named priorities. ` +
       'Keep a small weekly pushing floor and trunk floor when not pain-limited, usually a few quality sets, then use remaining recovery for the primary run, ruck, pulling and key strength work. ' +
+      'Use exact canonical Exercise-column names for the support work. Safe low-cost examples from the authoritative catalog include Push-up, Dip, Overhead Press, Pallof Press, Side Plank, Dead Bug and Hanging Leg Raise. ' +
       'Useful GPP is not permission for random finishers or punishment conditioning. Trim GPP first when time or recovery is constrained.',
     {
       violations: result.violations,
@@ -208,8 +209,9 @@ export function buildProgressionGppBrief(intake = {}) {
       '* Tactical specificity does not mean only training the named tests. Preserve a small general physical preparedness floor so the athlete remains balanced and robust.',
       '* Priority rule: primary running/rucking/pulling and key strength work receive most of the recoverable volume. Pushing, trunk and other accessories receive smaller support doses and are the first volume trimmed when recovery or session time tightens.',
       '* When not pain-limited and the athlete has at least two real strength sessions, include at least one low-cost pushing exposure and one low-cost trunk exposure each week. Usually 2-6 quality sets per category across the week is enough; do not turn them into competing hypertrophy goals unless the intake asks for that.',
+      '* CANONICAL SUPPORT VOCABULARY: the Exercise column must use exact catalog names, not family labels or invented synonyms. Low-cost push options include Push-up, Dip and Overhead Press. Low-cost trunk options include Pallof Press, Side Plank, Dead Bug and Hanging Leg Raise. Optional support patterns may use Reverse Lunge, Bulgarian Split Squat, Farmer Carry or Suitcase Carry when justified. Put tempo, loading or tactical execution detail in Weight/Notes rather than inventing a new exercise name.',
       '* A normal gym session should feel complete when time allows: primary lift/skill plus one or two useful support pieces is preferable to doing a token compound set and leaving, but never fill time with junk volume.',
-      '* GPP examples must come from verified exercises and athlete needs: push-ups/dips/pressing, Pallof/Side Plank/rollout/leg-raise family, unilateral lower-body work, carries or local robustness work. Choose needs-based items, not a checklist.',
+      '* For a direct ruck/loaded-march exposure, use the canonical Backpack Carry exercise name and put pack load, pace/distance and ruck execution detail in the remaining fields. For running sessions use the canonical Run exercise name and put interval/easy/long-session detail in the remaining fields.',
       '* GPP is not random conditioning. Burpees, arbitrary operator circuits and extra HIIT do not satisfy the pushing/trunk floor unless they are independently justified by a named capacity need.',
     );
   }
