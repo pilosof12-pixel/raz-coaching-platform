@@ -53,7 +53,7 @@
       available_gym_days: [],
       session_length: '60-75 min',
       equipment: 'Full gym, track and road access, hills, pull-up bar, 20 kg ruck/backpack, 30 kg sandbag and sled.',
-      training_location: 'full_gym',
+      training_location: 'commercial_gym',
       language: 'en',
       split_preference: 'coach_decide',
       current_numbers: [
