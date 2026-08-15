@@ -2,8 +2,17 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 
 import { RetriableValidationError } from "../engine/exercise_dictionary.js";
-import { parseProgramModel, strengthDaysForWeek, modalityDaysForWeek } from "../engine/program_model.js";
-import { validateSportDayCouplingSemantic } from "../engine/semantic_program_qa.js";
+import {
+  deriveGoalFamilies,
+  directGoalExposures,
+  modalityDaysForWeek,
+  parseProgramModel,
+  strengthDaysForWeek,
+} from "../engine/program_model.js";
+import {
+  validateDirectGoalExposureSemantic,
+  validateSportDayCouplingSemantic,
+} from "../engine/semantic_program_qa.js";
 
 const HEADER = "Day\tExercise\tWeight\tSets\tReps\tRest\tTarget RPE\tNotes\tResults";
 
@@ -70,4 +79,60 @@ test("SPORT_DAY_COUPLING regression: two strength days still fail when three are
       return true;
     }
   );
+});
+
+test("semantic goal parsing treats hyphens as presentation and preserves specific named goals", () => {
+  const goals = deriveGoalFamilies({
+    primary_goals: ["First bar muscle-up", "Freestanding handstand"],
+    secondary_goals: ["Improve strict pull-ups"],
+  });
+  assert.deepEqual(goals.map((g) => g.family), ["bar_muscle_up", "handstand", "pull_up"]);
+});
+
+test("compound maintenance goals produce multiple explicit goal families", () => {
+  const goals = deriveGoalFamilies({
+    maintenance_goals: ["Maintain useful squat and deadlift strength"],
+  });
+  assert.deepEqual(goals.map((g) => g.family), ["squat", "deadlift"]);
+});
+
+test("coaching notes cannot turn a pull-up into direct bar muscle-up exposure", () => {
+  const intake = { primary_goals: ["First bar muscle-up"], days_per_week: 1 };
+  const candidate = program([
+    "Mon\tStrict Pull-up\tBW\t4\t5\t120s\t7\tDirect bar muscle-up transition support and target-skill intent.\t",
+  ]);
+  const model = parseProgramModel(candidate, intake);
+  const exercise = model.weeks[0].days[0].exercises[0];
+  assert.equal(exercise.base_movement, "pull_up");
+  assert.equal(exercise.modality, "strength");
+  assert.equal(exercise.direct_goal_exposure, false);
+  assert.equal(directGoalExposures(model, "bar_muscle_up", 1).length, 0);
+  assert.throws(
+    () => validateDirectGoalExposureSemantic(candidate, intake),
+    (err) => err.code === "NAMED_GOAL_DIRECT_EXPOSURE_MISSING",
+  );
+});
+
+test("coaching notes cannot turn wall holding into freestanding handstand balance exposure", () => {
+  const intake = { primary_goals: ["Freestanding handstand"], days_per_week: 1 };
+  const candidate = program([
+    "Mon\tWall Handstand Hold\tBW\t4\t20 sec\t60s\tN/A\tFreestanding handstand balance practice and unsupported balance target.\t",
+  ]);
+  const model = parseProgramModel(candidate, intake);
+  const exercise = model.weeks[0].days[0].exercises[0];
+  assert.equal(exercise.base_movement, "handstand");
+  assert.equal(exercise.direct_goal_exposure, false);
+  assert.equal(directGoalExposures(model, "handstand", 1).length, 0);
+});
+
+test("10 km ruck remains ruck even when the note discusses 3K running priorities", () => {
+  const candidate = program([
+    "Sat\tBackpack Carry\t20 kg\t1\t10 km\tN/A\t5\tSupport the 3K running goal without adding another run.\t",
+  ]);
+  const model = parseProgramModel(candidate, { secondary_goals: ["Improve 10 km ruck"] });
+  const exercise = model.weeks[0].days[0].exercises[0];
+  assert.equal(exercise.base_movement, "ruck");
+  assert.equal(exercise.modality, "ruck");
+  assert.deepEqual(modalityDaysForWeek(model, 1, "running"), []);
+  assert.equal(directGoalExposures(model, "ruck", 1).length, 1);
 });
