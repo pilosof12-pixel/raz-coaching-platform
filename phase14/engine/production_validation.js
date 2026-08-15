@@ -22,6 +22,10 @@ import {
   validateKnownMaxPullUpDoseSemantic,
 } from './coaching_progression_gpp.js';
 import {
+  validateTactical3KIntervalProgressionSemantic,
+  validateTacticalStrengthCompletenessSemantic,
+} from './tactical_3k_gpp_quality.js';
+import {
   validateHardRunWarmupSemantic,
   validateYouthProgressionQualitySemantic,
 } from './coaching_acceptance_quality.js';
@@ -53,6 +57,8 @@ export function validateProductionProgram(program, intake = {}) {
   model = validateTacticalScheduleArchitectureSemantic(candidate, intake, model).model;
   model = validateKnownMaxPullUpDoseSemantic(candidate, intake, model).model;
   model = validateTacticalGppCoverageSemantic(candidate, intake, model).model;
+  model = validateTacticalStrengthCompletenessSemantic(candidate, intake, model).model;
+  model = validateTactical3KIntervalProgressionSemantic(candidate, intake, model).model;
   model = validateHardRunWarmupSemantic(candidate, intake, model).model;
   model = validateWeeklyVolumeBudgetSemantic(candidate, intake, model).model;
 
