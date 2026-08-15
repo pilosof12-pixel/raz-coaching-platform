@@ -13,13 +13,20 @@ on:
       - 'phase14/engine/exercise_dictionary.js'
       - 'phase14/storage.js'
       - 'phase14/admin_qa_routes.js'
+      - 'phase14/package.json'
       - 'phase14/scripts/build_phase15_runtime.mjs'
       - 'phase14/scripts/apply_avatar_gap_fixes.mjs'
+      - 'phase14/scripts/apply_named_skill_goal_fix.mjs'
+      - 'phase14/scripts/apply_youth_gymnastics_parity.mjs'
+      - 'phase14/scripts/apply_launch_runtime.mjs'
       - 'phase14/test/phase15_planner_regression.test.mjs'
       - 'phase14/test/phase15_specialist_rules.test.mjs'
       - 'phase14/test/exercise_demo_coverage.test.mjs'
+      - 'phase14/test/youth_gymnastics_parity.test.mjs'
       - 'phase14/public/exerciseDemos.js'
       - 'phase14/public/spreadsheet.js'
+      - 'phase14/public/spreadsheet-parity.js'
+      - 'phase14/public/live-qa.js'
       - 'phase14/public/index.html'
       - 'phase14/public/privacy.html'
       - 'phase14/public/terms.html'
@@ -44,6 +51,10 @@ jobs:
           node-version: '20'
       - name: Apply deterministic avatar gap fixes
         run: node phase14/scripts/apply_avatar_gap_fixes.mjs
+      - name: Apply named-skill and Youth gymnastics parity patches
+        run: |
+          node phase14/scripts/apply_named_skill_goal_fix.mjs
+          node phase14/scripts/apply_youth_gymnastics_parity.mjs
       - id: qa
         name: Run deterministic coaching and product regressions
         continue-on-error: true
@@ -62,6 +73,7 @@ jobs:
           }
           runcheck planner_regression node --test test/phase15_planner_regression.test.mjs
           runcheck specialist_rules node --test test/phase15_specialist_rules.test.mjs
+          runcheck youth_gymnastics_parity node --test test/youth_gymnastics_parity.test.mjs
           if [ -f test/exercise_demo_coverage.test.mjs ]; then runcheck demo_coverage node --test test/exercise_demo_coverage.test.mjs; fi
           runcheck build_runtime node scripts/build_phase15_runtime.mjs
           runcheck syntax_runtime node --check server.phase15.js
@@ -69,6 +81,7 @@ jobs:
           runcheck syntax_storage node --check storage.js
           runcheck syntax_admin node --check admin_qa_routes.js
           runcheck syntax_spreadsheet node --check public/spreadsheet.js
+          runcheck syntax_spreadsheet_parity node --check public/spreadsheet-parity.js
           runcheck syntax_dictionary node --check engine/exercise_dictionary.js
           runcheck syntax_planner node --check engine/phase15_planner.js
           runcheck syntax_specialist node --check engine/phase15_specialist_rules.js
@@ -85,7 +98,8 @@ jobs:
           runcheck grep_og grep -q 'overcomingGravityRulesForFamily' engine/phase15_specialist_rules.js
           runcheck grep_chest_row grep -q 'Chest-Supported Row' engine/exercise_dictionary.js
           runcheck grep_admin_route grep -q 'registerAdminQaRoutes' server.phase15.js
-          runcheck grep_warmup_tab grep -q 'Warm-Up Protocol' public/spreadsheet.js
+          runcheck grep_warmup_tab grep -q "addWorksheet('Warm-Up')" public/spreadsheet-parity.js
+          runcheck grep_overview_tab grep -q "addWorksheet('Overview')" public/spreadsheet-parity.js
           runcheck grep_privacy grep -q '/privacy.html' public/index.html
           exit "$failed"
       - name: Write static QA result
