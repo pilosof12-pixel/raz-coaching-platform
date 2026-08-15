@@ -18,11 +18,13 @@ const MOVEMENTS = [
   { id:'overhead_press', goal:/\b(?:overhead press|ohp|strict press)\b/i, current:/\b(?:overhead press|ohp|strict press)\b/i, label:'overhead press' },
   { id:'weighted_pull', goal:/\bweighted (?:chin|pull)[- ]?up\b/i, current:/\bweighted (?:chin|pull)[- ]?up\b/i, label:'weighted chin-up / pull-up' },
   { id:'weighted_dip', goal:/\bweighted dip\b/i, current:/\bweighted dip\b/i, label:'weighted dip' },
-  { id:'one_arm_pullup', goal:/\b(?:one[- ]arm pull[- ]?up|oap)\b/i, current:/\b(?:one[- ]arm pull[- ]?up|oap)\b/i, label:'one-arm pull-up' },
-  { id:'planche', goal:/\bplanche\b/i, current:/\bplanche\b/i, label:'planche progression / hold' },
-  { id:'front_lever', goal:/\bfront lever\b/i, current:/\bfront lever\b/i, label:'front lever progression / hold' },
-  { id:'handstand_pushup', goal:/\b(?:handstand push[- ]?up|hspu)\b/i, current:/\b(?:handstand push[- ]?up|hspu)\b/i, label:'handstand push-up progression' },
-  { id:'muscle_up', goal:/\bmuscle[- ]?up\b/i, current:/\bmuscle[- ]?up\b/i, label:'muscle-up' },
+  { id:'one_arm_pullup', goal:/\b(?:one[- ]arm pull[- ]?up|oap)\b/i, current:/\b(?:one[- ]arm pull[- ]?up|oap)\b/i, label:'one-arm pull-up', always_baseline:true },
+  { id:'planche', goal:/\bplanche\b/i, current:/\bplanche\b/i, label:'planche progression / hold', always_baseline:true },
+  { id:'front_lever', goal:/\bfront lever\b/i, current:/\bfront lever\b/i, label:'front lever progression / hold', always_baseline:true },
+  { id:'handstand_pushup', goal:/\b(?:handstand push[- ]?up|hspu)\b/i, current:/\b(?:handstand push[- ]?up|hspu)\b/i, label:'handstand push-up progression', always_baseline:true },
+  { id:'bar_muscle_up', goal:/\bbar muscle[- ]?up\b/i, current:/\bbar muscle[- ]?up\b/i, label:'bar muscle-up', always_baseline:true },
+  { id:'handstand', goal:/\b(?:free[- ]?standing|freestanding)?\s*handstand\b/i, current:/\bhandstand\b/i, label:'freestanding handstand / current handstand progression', always_baseline:true },
+  { id:'muscle_up', goal:/\bmuscle[- ]?up\b/i, current:/\bmuscle[- ]?up\b/i, label:'muscle-up', always_baseline:true },
 ];
 
 function looksQuantifiedGoal(s) {
@@ -45,16 +47,18 @@ export function detectIntakeClarifications(intake = {}) {
   const pain = painText(intake);
   const rawGoals = text([intake?.primary_goals, intake?.secondary_goals]);
 
-  // A quantified strength/skill outcome needs a current anchor for that same
-  // movement family. We ask rather than infer a load from a related variation.
+  // Quantified outcomes need a current anchor. Advanced skill goals also need a
+  // baseline even when written qualitatively (for example "first bar muscle-up"
+  // or "freestanding handstand") because the useful progression depends on the
+  // athlete's present rung, not just the destination.
   for (const mv of MOVEMENTS) {
     if (!mv.goal.test(goals) || mv.current.test(current) || answered(intake, `benchmark_${mv.id}`)) continue;
     const matchedGoal = rawGoals.split('|').find(x => mv.goal.test(x)) || rawGoals;
-    if (!looksQuantifiedGoal(matchedGoal) || goalStatesBaselineAndTarget(matchedGoal)) continue;
+    if ((!mv.always_baseline && !looksQuantifiedGoal(matchedGoal)) || goalStatesBaselineAndTarget(matchedGoal)) continue;
     addQuestion(out, intake, {
       id:`benchmark_${mv.id}`,
       prompt:`What is your current best recent performance for ${mv.label}?`,
-      help:'Give the most useful recent set, max, added load, reps or hold that you can perform with clean technique. If you do not know, write "unknown".',
+      help:'Give the most useful current progression, set, max, reps or hold you can perform with clean technique. If the goal is a skill you cannot do yet, state the closest version you can currently perform.',
     });
   }
 
