@@ -50,8 +50,8 @@ patch('server.phase15.js', [
   },
   {
     label: 'production progression/GPP validators',
-    find: '      validateDirectGoalExposureSemantic(program, intake); // PROGRAM-MODEL-DIRECT-GOAL-EXPOSURE\n',
-    replace: '      validateDirectGoalExposureSemantic(program, intake); // PROGRAM-MODEL-DIRECT-GOAL-EXPOSURE\n      validateProgressionArchitectureSemantic(program, intake); // FOUR-WEEK-PROGRESSION-SEMANTICS\n      validateTacticalGppCoverageSemantic(program, intake); // TACTICAL-GPP-PRIORITY-FLOOR\n',
+    find: 'validateDirectGoalExposureSemantic(program, intake);',
+    replace: 'validateDirectGoalExposureSemantic(program, intake);\n      validateProgressionArchitectureSemantic(program, intake); // FOUR-WEEK-PROGRESSION-SEMANTICS\n      validateTacticalGppCoverageSemantic(program, intake); // TACTICAL-GPP-PRIORITY-FLOOR',
     already: 'TACTICAL-GPP-PRIORITY-FLOOR',
   },
   {
