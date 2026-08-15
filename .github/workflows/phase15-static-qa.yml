@@ -62,6 +62,8 @@ jobs:
           runcheck golden_youth_good node --test --test-name-pattern='golden Youth gymnastics' test/production_chain_golden.test.js
           runcheck golden_tactical_good node --test --test-name-pattern='golden Tactical 3K' test/production_chain_golden.test.js
           runcheck production_chain_golden node --test test/production_chain_golden.test.js
+          runcheck client_output_cleanliness node --test test/client_output_cleanliness.test.js
+          runcheck program_pass_commercial_invariants node --test test/program_pass_commercial_invariants.test.js
           runcheck final_pipeline_lock node --test test/final_pipeline_lock.test.js
           runcheck spreadsheet_product_parity node --test test/spreadsheet_product_parity.test.js
           if [ -f test/exercise_demo_coverage.test.mjs ]; then runcheck demo_coverage node --test test/exercise_demo_coverage.test.mjs; fi
@@ -81,6 +83,7 @@ jobs:
           runcheck syntax_program_model node --check engine/program_model.js
           runcheck syntax_goal_semantics node --check engine/program_goal_semantics.js
           runcheck syntax_semantic_qa node --check engine/semantic_program_qa.js
+          runcheck syntax_client_output_qa node --check engine/client_output_qa.js
           runcheck syntax_production_validation node --check engine/production_validation.js
           runcheck syntax_planner node --check engine/phase15_planner.js
           runcheck syntax_specialist node --check engine/phase15_specialist_rules.js
@@ -94,6 +97,9 @@ jobs:
           runcheck grep_final_qa grep -q 'validatePhase15FinalProgram' server.phase15.js
           runcheck grep_semantic_qa grep -q 'PROGRAM-MODEL-SEMANTIC-QA-WIRED' server.phase15.js
           runcheck grep_direct_goal_semantics grep -q 'PROGRAM-MODEL-DIRECT-GOAL-EXPOSURE' server.phase15.js
+          runcheck grep_weekly_volume_semantics grep -q 'PROGRAM-MODEL-WEEKLY-VOLUME-ACCOUNTING' server.phase15.js
+          runcheck grep_client_cleanliness_inloop grep -q 'CLIENT-OUTPUT-CLEANLINESS-INLOOP' server.phase15.js
+          runcheck grep_client_cleanliness_save grep -q 'SAVE-BOUNDARY-CLIENT-CLEANLINESS' server.phase15.js
           runcheck grep_internal_repair grep -q 'INTERNAL_QUALITY_REPAIR_ARCHITECTURE' server.phase15.js
           runcheck grep_repair_budget grep -q 'INTERNAL-QA-REPAIR-BUDGET' server.phase15.js
           runcheck grep_repair_exhaustion grep -q 'INTERNAL_QA_REPAIR_EXHAUSTED' server.phase15.js
