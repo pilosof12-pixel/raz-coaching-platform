@@ -1,11 +1,13 @@
 // Structured compatibility model for the coaching engine.
 //
-// Phase A intentionally accepts the current client TSV as input, but parses it
-// exactly once into explicit program semantics. Validators should consume this
-// model rather than independently guessing modality, session count, goal exposure
-// and equipment from display strings.
+// Phase A accepts the current client TSV as an I/O compatibility format, but
+// parses it exactly once into explicit program semantics. Coaching notes remain
+// explanatory metadata. They are intentionally NOT allowed to redefine exercise
+// identity, modality, equipment, or direct-goal exposure.
 
-export const PROGRAM_MODEL_VERSION = 'program-model-v1';
+import { applyDirectGoalSemantics } from './program_goal_semantics.js';
+
+export const PROGRAM_MODEL_VERSION = 'program-model-v2';
 
 const DAY_ALIASES = new Map([
   ['mon', 'monday'], ['monday', 'monday'],
@@ -27,7 +29,7 @@ const EXECUTION_MODIFIERS = Object.freeze([
   ['tempo', /\btempo\b/i],
   ['eccentric', /\beccentric|negative\b/i],
   ['isometric', /\bisometric|\biso\b|\bhold\b/i],
-  ['explosive', /\bexplosive|high pull|hip to bar/i],
+  ['explosive', /\bexplosive|high[ -]?pull|hip[ -]?to[ -]?bar/i],
   ['controlled', /\bcontrolled\b/i],
   ['deficit', /\bdeficit\b/i],
   ['partial', /\bpartial\b/i],
@@ -50,33 +52,36 @@ const LOADING_METHODS = Object.freeze([
   ['ruck', /\bruck\b|\bbackpack\b/i],
 ]);
 
+// Base movement recognition is compositional identity, not a client display-name
+// whitelist. The output is the stable semantic key consumed by validators.
 const BASE_MOVEMENTS = Object.freeze([
-  ['bar_muscle_up', /\bbar muscle[ -]?up\b/i],
-  ['ring_muscle_up', /\bring muscle[ -]?up\b/i],
+  ['bar_muscle_up', /\bbar[ -]?muscle[ -]?up\b/i],
+  ['ring_muscle_up', /\bring[ -]?muscle[ -]?up\b/i],
   ['muscle_up', /\bmuscle[ -]?up\b/i],
-  ['handstand_push_up', /\bhandstand push[ -]?up|\bhspu\b/i],
-  ['handstand', /\bhandstand\b|\bkick[ -]?up\b|\btoe pulls?\b/i],
+  ['handstand_push_up', /\bhandstand[ -]?push[ -]?up\b|\bhspu\b/i],
+  ['handstand', /\bhandstand\b|\bkick[ -]?up\b|\btoe[ -]?pulls?\b/i],
   ['pull_up', /\bpull[ -]?ups?\b|\bchin[ -]?ups?\b/i],
-  ['front_lever', /\bfront lever\b/i],
+  ['front_lever', /\bfront[ -]?lever\b/i],
   ['planche', /\bplanche\b/i],
-  ['human_flag', /\bhuman flag\b/i],
-  ['iron_cross', /\biron cross\b/i],
+  ['human_flag', /\bhuman[ -]?flag\b/i],
+  ['iron_cross', /\biron[ -]?cross\b/i],
   ['maltese', /\bmaltese\b/i],
-  ['pistol_squat', /\bpistol squat\b/i],
-  ['split_squat', /\bsplit squat|bulgarian/i],
+  ['pistol_squat', /\bpistol[ -]?squat\b/i],
+  ['split_squat', /\bsplit[ -]?squat\b|\bbulgarian\b/i],
   ['squat', /\bsquat\b/i],
-  ['deadlift', /\bdeadlift\b|\brdl\b|romanian deadlift/i],
-  ['overhead_press', /\boverhead press\b|\bohp\b|\bpush press\b/i],
-  ['bench_press', /\bbench press\b/i],
+  ['deadlift', /\bdeadlift\b|\brdl\b|romanian[ -]?deadlift/i],
+  ['overhead_press', /\boverhead[ -]?press\b|\bohp\b|\bpush[ -]?press\b/i],
+  ['bench_press', /\bbench[ -]?press\b/i],
   ['dip', /\bdips?\b/i],
-  ['row_strength', /\bbarbell row\b|\bdumbbell row\b|\bcable row\b|\bring row\b|\binverted row\b|\bpendlay row\b/i],
+  ['row_strength', /\bbarbell[ -]?row\b|\bdumbbell[ -]?row\b|\bcable[ -]?row\b|\bring[ -]?row\b|\binverted[ -]?row\b|\bpendlay[ -]?row\b/i],
   ['lunge', /\blunge\b/i],
+  // Ruck precedes generic carry and running so distance text never changes it.
+  ['ruck', /\bruck(?:ing)?\b|\bloaded[ -]?march\b|\bbackpack[ -]?carry\b/i],
   ['run', /\brun(?:ning)?\b|\bjog\b|\bsprints?\b/i],
-  ['ruck', /\bruck(?:ing)?\b|\bloaded march\b|\bbackpack carry\b/i],
   ['sled', /\bsled\b|\bprowler\b/i],
   ['carry', /\bcarry\b/i],
   ['bike', /\bbike\b|\bairbike\b/i],
-  ['rowing_erg', /\brower\b|\browing erg|\brow erg\b/i],
+  ['rowing_erg', /\brower\b|\browing[ -]?erg\b|\brow[ -]?erg\b/i],
 ]);
 
 function text(value) {
@@ -85,14 +90,20 @@ function text(value) {
   return String(value || '');
 }
 
-function norm(value) {
+// Semantic tokens deliberately collapse every dash form, including the ordinary
+// ASCII hyphen. Client display punctuation must not create different meanings.
+export function normalizeSemanticText(value) {
   return String(value || '')
     .toLowerCase()
-    .replace(/[–—]/g, '-')
+    .replace(/[-–—]+/g, ' ')
     .replace(/[_/]+/g, ' ')
-    .replace(/[^\p{L}\p{N}+.-]+/gu, ' ')
+    .replace(/[^\p{L}\p{N}+.]+/gu, ' ')
     .replace(/\s+/g, ' ')
     .trim();
+}
+
+function norm(value) {
+  return normalizeSemanticText(value);
 }
 
 export function normalizeDay(value) {
@@ -142,8 +153,11 @@ function parseDose(cells) {
   };
 }
 
-function deriveBaseMovement(exercise, notes = '') {
-  const src = `${exercise} ${notes}`;
+function deriveBaseMovement(exercise) {
+  // Exercise identity is intentionally derived from the exercise cell only.
+  // A note saying "bar muscle-up support" must never turn a pull-up into a
+  // bar muscle-up in the semantic model.
+  const src = String(exercise || '');
   for (const [base, re] of BASE_MOVEMENTS) {
     if (re.test(src)) return base;
   }
@@ -154,8 +168,10 @@ function deriveBaseMovement(exercise, notes = '') {
     .replace(/\s+/g, '_') || 'unknown';
 }
 
-function deriveComposition(exercise, notes, base) {
-  const src = `${exercise} ${notes}`;
+function deriveComposition(exercise, base, load = '') {
+  // Execution/equipment can come from the exercise label or explicit load cell,
+  // but never from coaching notes.
+  const src = `${exercise} ${load}`;
   const execution = EXECUTION_MODIFIERS.filter(([, re]) => re.test(src)).map(([key]) => key);
   const assistance = ASSISTANCE_METHODS.filter(([, re]) => re.test(src)).map(([key]) => key);
   const loading = LOADING_METHODS.filter(([, re]) => re.test(src)).map(([key]) => key);
@@ -183,28 +199,38 @@ function goalFamilyFromBase(base) {
   if (base === 'pull_up') return 'pull_up';
   if (base === 'ruck') return 'ruck';
   if (base === 'run') return 'running';
-  if (base.includes('squat')) return 'squat';
+  if (typeof base === 'string' && base.includes('squat')) return 'squat';
   if (base === 'deadlift') return 'deadlift';
   if (base === 'overhead_press') return 'overhead_press';
   return base || null;
 }
 
-function detectGoalFamily(value) {
+function detectGoalFamilies(value) {
   const s = norm(value);
-  if (/bar muscle up/.test(s)) return 'bar_muscle_up';
-  if (/freestanding handstand|handstand/.test(s)) return 'handstand';
-  if (/strict pull up|weighted pull up|pull up/.test(s)) return 'pull_up';
-  if (/\bruck\b|rucking|loaded march/.test(s)) return 'ruck';
-  if (/\b3 ?k(?:m)?\b|3 km|three kilomet|running|\brun\b/.test(s)) return 'running';
-  if (/squat/.test(s)) return 'squat';
-  if (/deadlift/.test(s)) return 'deadlift';
-  if (/overhead press|\bohp\b/.test(s)) return 'overhead_press';
-  if (/muscle up/.test(s)) return 'muscle_up';
-  return null;
+  const out = [];
+  const add = (family) => { if (!out.includes(family)) out.push(family); };
+
+  const barMuscleUp = /\bbar muscle up\b/.test(s);
+  if (barMuscleUp) add('bar_muscle_up');
+  else if (/\bmuscle up\b/.test(s)) add('muscle_up');
+
+  if (/\bfreestanding handstand\b|\bhandstand balance\b|\bunsupported handstand\b|\bhandstand\b/.test(s)) add('handstand');
+  if (/\bstrict pull ups?\b|\bweighted pull ups?\b|\bpull ups?\b/.test(s)) add('pull_up');
+  if (/\bruck\b|\brucking\b|\bloaded march\b/.test(s)) add('ruck');
+
+  // 3K race language is explicitly running. Generic kilometre text is not:
+  // "10 km ruck" must remain a ruck goal, never become a run goal.
+  if (/\b3\s*k(?:m)?\b|\b3\s*km\b|\bthree kilomet|\brunning\b|\brun\b/.test(s)) add('running');
+
+  if (/\bsquat\b/.test(s)) add('squat');
+  if (/\bdeadlift\b/.test(s)) add('deadlift');
+  if (/\boverhead press\b|\bohp\b/.test(s)) add('overhead_press');
+  return out;
 }
 
 export function deriveGoalFamilies(intake = {}) {
   const out = [];
+  const seen = new Set();
   for (const [key, tier] of [
     ['primary_goals', 'primary'],
     ['secondary_goals', 'secondary'],
@@ -212,8 +238,13 @@ export function deriveGoalFamilies(intake = {}) {
   ]) {
     const values = Array.isArray(intake[key]) ? intake[key] : (intake[key] ? [intake[key]] : []);
     for (const raw of values) {
-      const family = detectGoalFamily(raw);
-      if (family) out.push({ family, tier, raw: String(raw) });
+      for (const family of detectGoalFamilies(raw)) {
+        const target = { family, tier, raw: String(raw) };
+        const signature = `${family}\u0000${tier}\u0000${target.raw}`;
+        if (seen.has(signature)) continue;
+        seen.add(signature);
+        out.push(target);
+      }
     }
   }
   return out;
@@ -226,31 +257,30 @@ function familyMatches(exerciseFamily, targetFamily) {
   return false;
 }
 
-function inferModality({ rawExercise, exercise, notes, base, warmup }) {
+function inferModality({ exercise, base, warmup }) {
   if (warmup) return 'warm_up';
-  const src = norm(`${exercise} ${notes}`);
+  const src = norm(exercise);
 
-  // Ruck must be decided before running. A distance such as 10 km does not make
-  // a loaded march a run.
-  if (base === 'ruck' || /\bruck(?:ing)?\b|loaded march|backpack carry/.test(src)) return 'ruck';
-  if (base === 'run' || /\brun(?:ning)?\b|\bjog\b|\bsprints?\b/.test(src)) return 'running';
+  // Identity/modality is based on the movement label, never coaching notes.
+  if (base === 'ruck') return 'ruck';
+  if (base === 'run') return 'running';
   if (/\bbjj\b|jiu jitsu|mma|boxing|kickboxing|wrestling|muay thai/.test(src)) return 'sport';
-  if (['bar_muscle_up', 'ring_muscle_up', 'muscle_up', 'handstand', 'handstand_push_up', 'front_lever', 'planche', 'human_flag', 'iron_cross', 'maltese'].includes(base) || /\bskill\b|transition drill|balance practice/.test(src)) return 'skill';
-  if (/\b(squat|deadlift|press|pull up|chin up|dip|lunge|strength|hypertrophy|curl|raise)\b/.test(src) || ['pull_up', 'pistol_squat', 'split_squat', 'squat', 'deadlift', 'overhead_press', 'bench_press', 'dip', 'row_strength', 'lunge'].includes(base)) return 'strength';
-  if (/\bbike\b|rower|rowing erg|sled|prowler|burpee|emom|conditioning|metcon|carry/.test(src)) return 'conditioning';
+  if (['bar_muscle_up', 'ring_muscle_up', 'muscle_up', 'handstand', 'handstand_push_up', 'front_lever', 'planche', 'human_flag', 'iron_cross', 'maltese'].includes(base)) return 'skill';
+  if (['pull_up', 'pistol_squat', 'split_squat', 'squat', 'deadlift', 'overhead_press', 'bench_press', 'dip', 'row_strength', 'lunge'].includes(base)) return 'strength';
+  if (['bike', 'rowing_erg', 'sled', 'carry'].includes(base) || /\bburpee\b|\bemom\b|\bconditioning\b|\bmetcon\b/.test(src)) return 'conditioning';
   if (/mobility|stretch|cooldown|cool down|breath/.test(src)) return 'recovery';
+
+  // Unknown resistance exercises remain strength for compatibility, but retain
+  // their explicit unknown base key for downstream dictionary/schema QA.
   return 'strength';
 }
 
 function inferRole({ warmup, modality, goalFamily, goalTargets, notes }) {
   if (warmup) return 'warm_up';
-  const primary = goalTargets.some((g) => g.tier === 'primary' && familyMatches(goalFamily, g.family));
-  if (primary) return 'primary_goal';
-  const support = goalTargets.some((g) => familyMatches(goalFamily, g.family));
-  if (support) return 'support';
+  const related = goalTargets.some((g) => familyMatches(goalFamily, g.family));
+  if (related) return 'support';
   if (/accessory|optional|finisher/i.test(notes)) return 'accessory';
-  if (modality === 'skill') return 'support';
-  if (modality === 'strength') return 'support';
+  if (modality === 'skill' || modality === 'strength') return 'support';
   return 'support';
 }
 
@@ -322,15 +352,15 @@ export function parseProgramModel(program, intake = {}) {
           exercises: [],
         });
       }
+
       const rawExercise = String(row.exercise || '').trim();
       const warmup = isWarmup(rawExercise);
       const exercise = stripWarmupPrefix(rawExercise);
       const notes = String(row.notes || '');
-      const base = deriveBaseMovement(exercise, notes);
+      const base = deriveBaseMovement(exercise);
       const goalFamily = goalFamilyFromBase(base);
-      const modality = inferModality({ rawExercise, exercise, notes, base, warmup });
-      const composition = deriveComposition(exercise, notes, base);
-      const matchingGoals = goalTargets.filter((g) => familyMatches(goalFamily, g.family));
+      const modality = inferModality({ exercise, base, warmup });
+      const composition = deriveComposition(exercise, base, row.weight);
       const role = inferRole({ warmup, modality, goalFamily, goalTargets, notes });
       const item = {
         source: 'tsv',
@@ -341,8 +371,9 @@ export function parseProgramModel(program, intake = {}) {
         modality,
         role,
         goal_family: goalFamily,
-        direct_goal_exposure: matchingGoals.length > 0 && !warmup,
-        direct_goal_families: matchingGoals.map((g) => g.family),
+        direct_goal_exposure: false,
+        direct_goal_families: [],
+        direct_goal_targets: [],
         equipment: composition.equipment,
         execution_modifiers: composition.execution,
         assistance_methods: composition.assistance,
@@ -360,14 +391,13 @@ export function parseProgramModel(program, intake = {}) {
           modality,
           source: 'tsv',
           purpose: goalFamily || modality,
-          priority: role === 'primary_goal' ? 'primary' : 'support',
+          priority: 'support',
           counts_toward_strength_frequency: modality === 'strength' || modality === 'skill',
           exercises: [],
         };
         dayModel.sessions.push(session);
       }
       session.exercises.push(item);
-      if (role === 'primary_goal') session.priority = 'primary';
     }
 
     addIntakeSportSessions(daysByName, intake);
@@ -381,13 +411,13 @@ export function parseProgramModel(program, intake = {}) {
 
   if (!weeks.length) diagnostics.push({ code: 'PROGRAM_MODEL_NO_WEEK_BLOCKS' });
 
-  return {
+  return applyDirectGoalSemantics({
     version: PROGRAM_MODEL_VERSION,
     source: 'tsv_compatibility',
     weeks,
     goals: goalTargets,
     diagnostics,
-  };
+  });
 }
 
 export function strengthDaysForWeek(model, weekNumber = 1) {
