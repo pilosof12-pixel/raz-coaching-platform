@@ -145,6 +145,11 @@ export function detectIntakeClarifications(intake = {}) {
     });
   }
 
+  // A bar-specific goal is already handled by benchmark_bar_muscle_up. Do not
+  // ask a second generic muscle-up question for the exact same goal phrase.
+  if (out.some(q => q.id === 'benchmark_bar_muscle_up')) {
+    return out.filter(q => q.id !== 'benchmark_muscle_up').slice(0, 4);
+  }
   return out;
 }
 
