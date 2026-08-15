@@ -16,10 +16,13 @@ on:
       - 'phase14/admin_qa_routes.js'
       - 'phase14/package.json'
       - 'phase14/scripts/build_phase15_runtime.mjs'
+      - 'phase14/scripts/final_pipeline_lock.mjs'
       - 'phase14/scripts/apply_named_skill_goal_fix.mjs'
       - 'phase14/scripts/apply_youth_gymnastics_parity.mjs'
       - 'phase14/scripts/apply_tactical_3k_parity.mjs'
       - 'phase14/scripts/apply_launch_runtime.mjs'
+      - 'phase14/test/final_pipeline_lock.test.js'
+      - 'phase14/test/spreadsheet_product_parity.test.js'
       - 'phase14/test/phase15_planner_regression.test.mjs'
       - 'phase14/test/phase15_specialist_rules.test.mjs'
       - 'phase14/test/exercise_demo_coverage.test.mjs'
@@ -54,9 +57,6 @@ jobs:
         with:
           node-version: '20'
 
-      # These are part of the production phase15:build chain. Apply them in the
-      # temporary Actions workspace so static QA tests the same effective runtime
-      # without modifying or auto-committing the release branch.
       - name: Apply production coaching patches in workspace
         run: |
           node phase14/scripts/apply_named_skill_goal_fix.mjs
@@ -80,8 +80,11 @@ jobs:
           runcheck specialist_rules node --test test/phase15_specialist_rules.test.mjs
           runcheck youth_gymnastics_parity node --test test/youth_gymnastics_parity.test.mjs
           runcheck tactical_3k_hybrid node --test test/tactical_3k_hybrid_parity.test.mjs
+          runcheck final_pipeline_lock node --test test/final_pipeline_lock.test.js
+          runcheck spreadsheet_product_parity node --test test/spreadsheet_product_parity.test.js
           if [ -f test/exercise_demo_coverage.test.mjs ]; then runcheck demo_coverage node --test test/exercise_demo_coverage.test.mjs; fi
           runcheck build_runtime node scripts/build_phase15_runtime.mjs
+          runcheck lock_final_pipeline node scripts/final_pipeline_lock.mjs
           runcheck syntax_runtime node --check server.phase15.js
           runcheck syntax_server node --check server.js
           runcheck syntax_storage node --check storage.js
@@ -100,6 +103,9 @@ jobs:
           runcheck syntax_tactical_patch node --check scripts/apply_tactical_3k_parity.mjs
           runcheck grep_v5 grep -q 'deterministic-skeleton-v5' server.phase15.js
           runcheck grep_final_qa grep -q 'validatePhase15FinalProgram' server.phase15.js
+          runcheck grep_internal_repair grep -q 'INTERNAL_QUALITY_REPAIR_ARCHITECTURE' server.phase15.js
+          runcheck grep_repair_budget grep -q 'INTERNAL-QA-REPAIR-BUDGET' server.phase15.js
+          runcheck grep_repair_exhaustion grep -q 'INTERNAL_QA_REPAIR_EXHAUSTED' server.phase15.js
           runcheck grep_direct_skill_protection grep -q 'if (!OPENAI_API_KEY)' server.phase15.js
           runcheck grep_normalizer grep -q 'normalizeOpenAIExerciseNames' server.phase15.js
           runcheck grep_fast_path grep -q 'fast new-client intake persist' server.phase15.js
@@ -109,5 +115,6 @@ jobs:
           runcheck grep_admin_route grep -q 'registerAdminQaRoutes' server.phase15.js
           runcheck grep_warmup_tab grep -q "addWorksheet('Warm-Up')" public/spreadsheet-parity.js
           runcheck grep_overview_tab grep -q "addWorksheet('Overview')" public/spreadsheet-parity.js
+          runcheck grep_spreadsheet_override grep -q 'window.buildStrengthSpreadsheet=buildParitySpreadsheet' public/spreadsheet-parity.js
           runcheck grep_privacy grep -q '/privacy.html' public/index.html
           exit "$failed"
