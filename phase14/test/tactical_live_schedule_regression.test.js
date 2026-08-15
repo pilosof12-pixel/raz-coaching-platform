@@ -76,10 +76,12 @@ test('known strict pull-up max calibrates repeated submaximal work instead of al
 });
 
 test('non-priority Tactical pushing stays a support dose rather than matching the priority volume budget', () => {
-  const extraPush = '\nMon\tOverhead Press\tRPE-selected load\t3\t5\t2 min\t7\tSupport only.\t\nMon\tDip\tBodyweight\t2\t10\t90s\t7\tSupport only.\t';
-  const bad = tactical3KGoldenProgram().replace(/(END_WEEK[1-4]_TSV)/g, `${extraPush}$1`);
+  const bad = tactical3KGoldenProgram().replace(/Mon\tPush-up\tBodyweight\t(?:3|2)\t/g, 'Mon\tPush-up\tBodyweight\t7\t');
   const analysis = tacticalGppAnalysis(bad, TACTICAL_3K_INTAKE);
-  assert.ok(analysis.weeks.every((week) => week.totals.push >= 8));
+  assert.equal(analysis.push_is_goal, false);
+  assert.equal(analysis.weeks.length, 4);
+  assert.ok(analysis.weeks.every((week) => week.totals.push === 7));
+  assert.ok(analysis.weeks.every((week) => week.over_budget === true));
   assert.throws(
     () => validateTacticalGppCoverageSemantic(bad, TACTICAL_3K_INTAKE),
     (error) => error?.code === 'TACTICAL_GPP_COVERAGE_MISSING',
