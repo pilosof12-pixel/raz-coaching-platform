@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <title>RAZ Live Youth QA</title>
+  <style>
+    body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;max-width:760px;margin:0 auto;padding:24px;background:#0b1324;color:#eef3fb}
+    .card{background:#16213a;border-radius:16px;padding:20px;margin-top:18px}
+    input,button,textarea{font:inherit} input{width:100%;box-sizing:border-box;padding:14px;border-radius:10px;border:1px solid #52617d;background:#0f1930;color:#fff}
+    button{margin-top:12px;padding:13px 18px;border:0;border-radius:10px;font-weight:700;cursor:pointer}
+    button:disabled{opacity:.55}.muted{color:#aebbd3}.ok{color:#94e2b3}.err{color:#ff9b9b}pre{white-space:pre-wrap;word-break:break-word;background:#0f1930;padding:14px;border-radius:10px;max-height:55vh;overflow:auto}
+  </style>
+</head>
+<body>
+  <h1>RAZ Live Youth Acceptance</h1>
+  <p class="muted">This launches the permanent Youth Gymnastics acceptance avatar through the deployed Program Pass and production generation path. The pass is entered only in this browser and is not embedded in this page.</p>
+  <div class="card">
+    <label for="pass">Unused Program Pass</label>
+    <input id="pass" maxlength="32" autocomplete="off" autocapitalize="none" spellcheck="false" placeholder="32-character pass">
+    <button id="run">Run live Youth build</button>
+    <p id="status" class="muted">Ready.</p>
+  </div>
+  <div id="result" class="card" hidden>
+    <h2>Live result</h2>
+    <p><strong>Personal code:</strong> <code id="token"></code></p>
+    <p><strong>Job:</strong> <span id="job"></span></p>
+    <pre id="program"></pre>
+  </div>
+<script>
+(() => {
+  const $ = id => document.getElementById(id);
+  const sleep = ms => new Promise(r => setTimeout(r, ms));
+  const set = (t,c='muted') => { $('status').textContent=t; $('status').className=c; };
+  const consent = () => ({health_data:true,policy_version:'2026-08-15',consented_at:new Date().toISOString()});
+  const intake = {
+    age:13,
+    language:'en',
+    experience:'intermediate',
+    primary_goals:['Achieve first bar muscle-up','Achieve a freestanding handstand'],
+    secondary_goals:['Build a strong general push and pull foundation while maintaining lower-body athleticism'],
+    days_per_week:2,
+    session_length:'60 min',
+    session_duration_minutes:60,
+    gym_availability_mode:'flexible',
+    available_gym_days:[],
+    training_location:'home_gym',
+    equipment:'Home setup: rings, pull-up bar, resistance bands and bench. No external weights.',
+    current_numbers:'Pistol squat established; ring muscle-up achieved; about 12 strict pull-ups and 6 good ring dips. Wall-facing handstand about 15 seconds; back-to-wall about 20 seconds. Controlled kick-ups are improving, but there is no reliable unsupported balance time yet.',
+    clarification_answers:{
+      benchmark_bar_muscle_up:'Cannot perform a bar muscle-up yet. Can perform a ring muscle-up. About 12 strict pull-ups and 6 good ring dips.',
+      benchmark_handstand:'Wall-facing handstand about 15 seconds; back-to-wall about 20 seconds. Controlled kick-ups are improving, but there is no reliable unsupported balance time yet.'
+    },
+    injuries:'None reported',
+    pain:{active:false},
+    sport:'',sport_schedule:[],
+    mobility:{active:false},
+    sleep_hours:'8-9',recovery_rating:'Good',
+    notes:'Athlete is 13 years old. Two structured sessions per week. Rings, pull-up bar, bands and bench only. No external weights. Skill quality before fatigue; no grinders or repeated failed attempts.',
+    privacy_consent:consent()
+  };
+
+  async function json(path, options={}) {
+    const r = await fetch(path, options);
+    const text = await r.text();
+    let j={}; try{j=JSON.parse(text)}catch{}
+    return {r,j,text};
+  }
+
+  $('run').addEventListener('click', async () => {
+    const pass = String($('pass').value||'').trim().toLowerCase();
+    if(!/^[a-f0-9]{32}$/.test(pass)){set('Enter a valid 32-character Program Pass.','err');return;}
+    $('run').disabled=true; $('result').hidden=true;
+    try{
+      set('Checking Program Pass…');
+      const check = await json('/api/program-pass-check',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({pass_code:pass})});
+      if(!check.r.ok || check.j.valid!==true) throw new Error(check.j.error||'Program Pass check failed.');
+      set('Pass valid. Starting real production build…');
+      intake.privacy_consent = consent();
+      const build = await json('/api/build',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({intake,pass_code:pass})});
+      if(build.r.status===422) throw new Error('Unexpected clarification gate: '+JSON.stringify(build.j));
+      if(build.r.status!==202 || !build.j.job_id) throw new Error(build.j.error||('Build rejected, HTTP '+build.r.status));
+      $('token').textContent=build.j.token||''; $('job').textContent=build.j.job_id; $('result').hidden=false;
+      for(let i=0;i<180;i++){
+        set('Live generation running… '+(i*2)+'s');
+        await sleep(2000);
+        const poll = await json('/api/job/'+encodeURIComponent(build.j.job_id));
+        if(poll.j.status==='error') throw new Error(poll.j.error||'Live generation failed.');
+        if(poll.j.status==='done'){
+          $('program').textContent=poll.j.program||'';
+          set('LIVE BUILD COMPLETE. Send ChatGPT the personal code shown above.','ok');
+          return;
+        }
+      }
+      throw new Error('Live generation timed out.');
+    }catch(e){set(String(e&&e.message||e),'err')}
+    finally{$('run').disabled=false}
+  });
+})();
+</script>
+</body>
+</html>
