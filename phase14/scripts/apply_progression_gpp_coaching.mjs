@@ -49,7 +49,9 @@ patch('engine/phase15_planner.js', [
     label: 'inject progression/GPP brief',
     find: "    specialist,\n    'Session skeleton:',",
     replace: "    specialist,\n    progressionGpp,\n    acceptanceQuality,\n    consolidationQuality,\n    'Session skeleton:',",
-    already: "    consolidationQuality,\n    'Session skeleton:',",
+    // This marker remains present after the later Tactical quality brief is
+    // inserted between consolidationQuality and the Session skeleton.
+    already: "    progressionGpp,\n    acceptanceQuality,\n    consolidationQuality,",
   },
   {
     label: 'inject tactical 3K/GPP quality brief',
