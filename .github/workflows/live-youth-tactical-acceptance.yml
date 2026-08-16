@@ -165,4 +165,4 @@ jobs:
           git commit -m 'Record live Youth and Tactical acceptance outputs'
           git push origin HEAD:privacy-security-hardening
 
-# Live acceptance trigger: 2026-08-16T04:52+10:00
+# Final v6 website acceptance trigger: 2026-08-17T06:34+10:00
