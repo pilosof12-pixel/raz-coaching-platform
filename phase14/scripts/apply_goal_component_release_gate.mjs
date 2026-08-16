@@ -22,11 +22,22 @@ patch('engine/repairable_validation_bundle.js', (src) => {
     if (!src.includes(anchor)) throw new Error('repairable bundle import anchor missing');
     src = src.replace(anchor, anchor + "import { validateGoalComponentCoverageSemantic } from './goal_progression_graph.js';\n");
   }
-  const check = "    () => validateGoalComponentCoverageSemantic(candidate, intake, model),\n";
-  if (!src.includes(check)) {
+  if (!src.includes("validateAdvancedHybridQualitySemantic")) {
+    const anchor = "import { validateGoalComponentCoverageSemantic } from './goal_progression_graph.js';\n";
+    if (!src.includes(anchor)) throw new Error('advanced hybrid import anchor missing');
+    src = src.replace(anchor, anchor + "import { validateAdvancedHybridQualitySemantic } from './advanced_hybrid_quality.js';\n");
+  }
+  const goalCheck = "    () => validateGoalComponentCoverageSemantic(candidate, intake, model),\n";
+  if (!src.includes(goalCheck)) {
     const anchor = "    () => validateProgressionArchitectureSemantic(candidate, intake, model),\n";
     if (!src.includes(anchor)) throw new Error('repairable bundle semantic anchor missing');
-    src = src.replace(anchor, anchor + check);
+    src = src.replace(anchor, anchor + goalCheck);
+  }
+  const hybridCheck = "    () => validateAdvancedHybridQualitySemantic(candidate, intake, model),\n";
+  if (!src.includes(hybridCheck)) {
+    const anchor = "    () => validateGoalComponentCoverageSemantic(candidate, intake, model),\n";
+    if (!src.includes(anchor)) throw new Error('advanced hybrid semantic anchor missing');
+    src = src.replace(anchor, anchor + hybridCheck);
   }
   return src;
 });
