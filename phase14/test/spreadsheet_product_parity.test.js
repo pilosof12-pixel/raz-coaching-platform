@@ -32,8 +32,10 @@ test('every exercise has a usable hyperlink path even without a curated direct d
   assert.match(parity, /setHyperlink\(ws\.getRow\(row\)\.getCell\(6\),item\[1\]\)/);
 });
 
-test('premium parity exporter overrides the legacy exporter at runtime', () => {
+test('premium parity exporter overrides the legacy exporter before app initialization', () => {
   assert.match(parity, /window\.buildStrengthSpreadsheet=buildParitySpreadsheet/);
-  assert.match(launch, /spreadsheet-parity\.js/);
-  assert.match(launch, /Load the approved client spreadsheet exporter after the legacy spreadsheet\.js/);
+  assert.match(launch, /const legacySpreadsheetTag = '<script src="spreadsheet\.js"><\/script>';/);
+  assert.match(launch, /const paritySpreadsheetTag = '<script src="spreadsheet-parity\.js"><\/script>';/);
+  assert.match(launch, /const appTag = '<script src="app\.js"><\/script>';/);
+  assert.match(launch, /parityPos > legacyPos && appPos > parityPos/);
 });
