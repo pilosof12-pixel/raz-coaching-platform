@@ -105,3 +105,5 @@ jobs:
           name: live-advanced-hybrid-qa
           path: qa-output/
           if-no-files-found: ignore
+
+# Final v6 website acceptance trigger: 2026-08-17T06:34+10:00
