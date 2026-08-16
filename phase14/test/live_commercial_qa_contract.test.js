@@ -18,10 +18,9 @@ test('commercial QA helper stays CSP-safe and credential-free', () => {
 test('commercial QA helper uses the deployed Program Pass API contracts', () => {
   assert.match(js, /\/api\/program-pass-status/);
   assert.match(js, /method: 'POST'/);
-  assert.match(js, /\/api\/adjust/);
-  assert.match(js, /JSON\.stringify\(\{ token, request \}\)/);
-  assert.match(js, /\/api\/set-language/);
-  assert.match(js, /JSON\.stringify\(\{ token, language \}\)/);
+  assert.match(js, /body: JSON\.stringify\(body\)/);
+  assert.match(js, /runJob\('\/api\/adjust', \{ token, request \}, adjustResult\)/);
+  assert.match(js, /runJob\('\/api\/set-language', \{ token, language \}, languageResult\)/);
   assert.match(js, /\/api\/client-data/);
   assert.match(js, /method: 'DELETE'/);
 });
