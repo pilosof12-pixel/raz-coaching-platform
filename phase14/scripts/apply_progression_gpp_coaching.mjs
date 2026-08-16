@@ -61,21 +61,21 @@ patch('engine/phase15_planner.js', [
     label: 'inject progression/GPP brief',
     find: "    specialist,\n    'Session skeleton:',",
     replace: "    specialist,\n    progressionGpp,\n    acceptanceQuality,\n    consolidationQuality,\n    'Session skeleton:',",
-    // This marker remains present after the later Tactical quality brief is
-    // inserted between consolidationQuality and the Session skeleton.
     already: "    progressionGpp,\n    acceptanceQuality,\n    consolidationQuality,",
   },
   {
     label: 'inject tactical 3K/GPP quality brief',
     find: "    consolidationQuality,\n    'Session skeleton:',",
     replace: "    consolidationQuality,\n    tactical3KGppQuality,\n    'Session skeleton:',",
-    already: "    tactical3KGppQuality,\n    'Session skeleton:',",
+    // Must remain idempotent after the hybrid line is inserted between this
+    // brief and Session skeleton.
+    already: "    tactical3KGppQuality,",
   },
   {
     label: 'inject high-concurrency hybrid brief',
     find: "    tactical3KGppQuality,\n    'Session skeleton:',",
     replace: "    tactical3KGppQuality,\n    advancedHybridConcurrency,\n    'Session skeleton:',",
-    already: "    advancedHybridConcurrency,\n    'Session skeleton:',",
+    already: "    advancedHybridConcurrency,",
   },
 ]);
 
