@@ -73,6 +73,7 @@ jobs:
           done
           runcheck build_runtime node scripts/build_phase15_runtime.mjs
           runcheck lock_final_pipeline node scripts/final_pipeline_lock.mjs
+          runcheck reapply_qa_diagnostics node scripts/apply_live_qa_diagnostics.mjs
           runcheck syntax_runtime node --check server.phase15.js
           runcheck syntax_server node --check server.js
           runcheck syntax_storage node --check storage.js
