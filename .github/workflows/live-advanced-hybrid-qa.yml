@@ -33,6 +33,7 @@ jobs:
           const intake = {
             age:30,
             language:'en',
+            qa_diagnostics:true,
             primary_goals:['220kg back squat','4 One arm pullups'],
             secondary_goals:['100kg overhead press','Marathon'],
             maintenance_goals:['Maintain muscle mass'],
@@ -106,4 +107,4 @@ jobs:
           path: qa-output/
           if-no-files-found: ignore
 
-# Final v6 website acceptance trigger: 2026-08-17T06:34+10:00
+# Final v6 validator trace trigger: 2026-08-17T06:37+10:00
