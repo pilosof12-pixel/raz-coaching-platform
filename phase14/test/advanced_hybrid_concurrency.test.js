@@ -8,7 +8,7 @@ import {
   isHighConcurrencyHybrid,
   marathonGoalTier,
 } from '../engine/advanced_hybrid_concurrency.js';
-import { ADVANCED_HYBRID_LAUNCH_INTAKE } from './advanced_hybrid_launch_acceptance.test.js';
+import { ADVANCED_HYBRID_LAUNCH_INTAKE } from './fixtures/advanced_hybrid_launch.js';
 
 test('advanced launch intake is recognized as a high-concurrency hybrid case', () => {
   assert.equal(marathonGoalTier(ADVANCED_HYBRID_LAUNCH_INTAKE), 'secondary');
