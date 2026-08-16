@@ -34,6 +34,7 @@ import {
   validateYouthProgressionQualitySemantic,
 } from './coaching_acceptance_quality.js';
 import { validateYouthConsolidationRetentionSemantic } from './coaching_consolidation_quality.js';
+import { validateGoalComponentCoverageSemantic } from './goal_progression_graph.js';
 
 const NON_EXERCISE_ROW_NAMES = new Set(['rest', 'rest day', 'off', 'off day', 'recovery day']);
 
@@ -186,6 +187,7 @@ export function collectRepairableValidationFailures(program, intake = {}, option
   const semanticChecks = [
     () => validateSportDayCouplingSemantic(candidate, intake, model),
     () => validateDirectGoalExposureSemantic(candidate, intake, model),
+    () => validateGoalComponentCoverageSemantic(candidate, intake, model),
     () => validateProgressionArchitectureSemantic(candidate, intake, model),
     () => validateYouthProgressionQualitySemantic(candidate, intake, model),
     () => validateYouthConsolidationRetentionSemantic(candidate, intake, model),
