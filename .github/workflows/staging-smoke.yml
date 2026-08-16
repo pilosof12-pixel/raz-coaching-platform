@@ -31,19 +31,23 @@ jobs:
                 last = `status=${r.status} body=${text.slice(0, 1000)}`;
                 if (r.ok) return { status: r.status, text, headers: Object.fromEntries(r.headers) };
               } catch (e) { last = String(e?.message || e); }
-              await sleep(3000);
+              if (i + 1 < attempts) await sleep(3000);
             }
             throw new Error(`${path} unavailable: ${last}`);
           }
           async function waitForContent(path, predicate, label, attempts = 24) {
             let last = '';
             for (let i = 0; i < attempts; i++) {
-              const res = await get(path, 1);
-              last = res.text;
-              if (predicate(res.text)) return res;
-              await sleep(5000);
+              try {
+                const res = await get(path, 1);
+                last = res.text;
+                if (predicate(res.text)) return res;
+              } catch (e) {
+                last = String(e?.message || e);
+              }
+              if (i + 1 < attempts) await sleep(5000);
             }
-            throw new Error(`${label} not deployed after wait; last body=${last.slice(0, 1200)}`);
+            throw new Error(`${label} not deployed after wait; last=${last.slice(0, 1200)}`);
           }
 
           const health = await get('/api/health');
