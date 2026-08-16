@@ -8,6 +8,10 @@ let src = fs.readFileSync(target, 'utf8');
 
 function replaceOnce(needle, replacement, label) {
   if (src.includes(replacement)) return;
+  // A later controlled vocabulary layer may strengthen this exact hook while
+  // preserving the original composition call. Treat that as already applied so
+  // repeated production builds remain idempotent.
+  if (label === 'matchDictionary composition hook' && src.includes('ENDURANCE-CANONICAL-ALIAS-HOOK')) return;
   if (!src.includes(needle)) throw new Error(`Compositional vocabulary patch anchor not found (${label})`);
   src = src.replace(needle, replacement);
 }
