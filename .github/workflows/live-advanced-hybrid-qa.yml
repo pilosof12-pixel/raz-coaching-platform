@@ -1,0 +1,104 @@
+name: Live Advanced Hybrid QA
+
+on:
+  push:
+    paths:
+      - '.github/workflows/live-advanced-hybrid-qa.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  live-advanced-hybrid:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Run controlled Advanced Hybrid build
+        env:
+          BASE_URL: https://raz-coaching-platform.onrender.com
+          ADMIN_PROVISION_KEY: ${{ secrets.ADMIN_PROVISION_KEY }}
+        run: |
+          mkdir -p qa-output
+          node <<'NODE'
+          import fs from 'node:fs';
+          const base = process.env.BASE_URL;
+          const adminKey = process.env.ADMIN_PROVISION_KEY || '';
+          const sleep = ms => new Promise(r => setTimeout(r, ms));
+          const consent = { health_data:true, policy_version:'2026-08-17', consented_at:new Date().toISOString() };
+          const intake = {
+            age:30,
+            language:'en',
+            primary_goals:['220kg back squat','4 One arm pullups'],
+            secondary_goals:['100kg overhead press','Marathon'],
+            maintenance_goals:['Maintain muscle mass'],
+            goal_priority_model:'tiered_equal_primary',
+            experience:'advanced',
+            days_per_week:4,
+            gym_availability_mode:'limited',
+            available_gym_days:['Mon','Tue','Fri','Sun'],
+            equipment:'Full commercial gym — all standard barbells, dumbbells, racks, machines, cables and bodyweight stations available.',
+            training_location:'commercial_gym',
+            sport:'MMA',
+            sport_sessions_per_week:5,
+            sport_schedule:[
+              {day:'Tue',intensity:'moderate'},
+              {day:'Wed',intensity:'hard'},
+              {day:'Thu',intensity:'moderate'},
+              {day:'Fri',intensity:'hard'},
+              {day:'Sat',intensity:'moderate'}
+            ],
+            sleep_hours:'7-8 hours',
+            recovery_rating:'Good',
+            current_numbers:[
+              'Back Squat: 205 kg 1RM',
+              'One-Arm Pull-up: 2 strict reps each arm',
+              'Overhead Press: 80 kg x 4',
+              'Weighted Chin-up: +80 kg 1RM',
+              'Running: 1 session a week, about 20 km total, longest recent run about 20 km'
+            ].join('\n'),
+            injuries:'None reported',
+            pain:{active:false},
+            mobility:{active:false},
+            notes:'Advanced hybrid athlete. Primary strength and calisthenics goals outrank the marathon side quest. Preserve MMA quality and recovery.',
+            privacy_consent:consent
+          };
+          async function request(path,options={}){
+            const r=await fetch(base+path,options);
+            const text=await r.text();
+            let json={}; try{json=JSON.parse(text);}catch{}
+            return {r,text,json};
+          }
+          if(!adminKey) throw new Error('ADMIN_PROVISION_KEY is not available to Actions. No Program Pass issued and no generation attempted.');
+          const provision=await request('/api/admin/program-pass',{method:'POST',headers:{'content-type':'application/json','x-admin-provision-key':adminKey},body:JSON.stringify({count:1})});
+          if(!provision.r.ok || !provision.json?.codes?.[0]) throw new Error('Program Pass provisioning failed: '+provision.r.status+' '+provision.text);
+          const passCode=provision.json.codes[0];
+          const build=await request('/api/build',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({intake,pass_code:passCode})});
+          if(build.r.status===422) throw new Error('Unexpected clarification: '+build.text);
+          if(build.r.status!==202 || !build.json?.job_id) throw new Error('Build not accepted: '+build.r.status+' '+build.text);
+          const jobId=build.json.job_id;
+          console.log('JOB_ID',jobId);
+          let job=null;
+          for(let i=0;i<240;i++){
+            await sleep(2000);
+            const polled=await request('/api/job/'+encodeURIComponent(jobId));
+            if(polled.r.ok) job=polled.json;
+            if(job?.status==='done' || job?.status==='error') break;
+          }
+          if(job?.status!=='done' || typeof job.program!=='string') throw new Error('Generation failed: '+JSON.stringify({status:job?.status,stage:job?.stage,error:job?.error,attempt:job?.attempt}));
+          fs.writeFileSync('qa-output/advanced-hybrid-program.txt',job.program);
+          fs.writeFileSync('qa-output/result.json',JSON.stringify({ok:true,job_id:jobId,attempt:job.attempt||null,stage:job.stage||null,program_chars:job.program.length},null,2));
+          console.log('PROGRAM_START');
+          console.log(job.program);
+          console.log('PROGRAM_END');
+          NODE
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: live-advanced-hybrid-qa
+          path: qa-output/
+          if-no-files-found: ignore
