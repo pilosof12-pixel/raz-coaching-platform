@@ -54,10 +54,10 @@ patch('engine/client_output_qa.js', (src) => {
 // instruction enforceable rather than relying on another planner-specific phrase.
 
 patch('test/fixtures/golden_programs.js', (src) => {
-  if (src.includes("'Wall-Facing Handstand Hold'")) return src;
+  if (src.includes("'Wall Handstand Hold'")) return src;
   const monAnchor = "    ['Mon', 'Controlled Handstand Kick-up', 'BW', kickA, '2 attempts', '60s', 'N/A', week === 4\n      ? 'Use the best Week 3 entry pattern. Match or improve the best clean unsupported balance quality/time with fewer total attempts; stop before misses accumulate.'\n      : 'Primary handstand balance practice while fresh. Progress successful entries and independent balance quality, not fatigue.', ''],\n";
   if (!src.includes(monAnchor)) throw new Error('Youth Monday kick-up fixture anchor missing');
-  const wallRow = "    ['Mon', 'Wall-Facing Handstand Hold', 'BW', week === 4 ? '3' : '4', week === 1 ? '15-20 sec' : week === 2 ? '20-25 sec' : week === 3 ? '20-30 sec' : '20-25 sec', '60-90s', '6-7', week === 4 ? 'Consolidate the best line from Weeks 2-3 with lower total volume. Finish each hold before shoulder position or rib/pelvis control deteriorates.' : 'Substantive handstand position-capacity work: stacked shoulders, controlled ribs/pelvis and calm breathing. Build clean line and confidence without fatigue failure.', ''],\n";
+  const wallRow = "    ['Mon', 'Wall Handstand Hold', 'BW', week === 4 ? '3' : '4', week === 1 ? '15-20 sec' : week === 2 ? '20-25 sec' : week === 3 ? '20-30 sec' : '20-25 sec', '60-90s', '6-7', week === 4 ? 'Use a wall-facing setup when appropriate. Consolidate the best line from Weeks 2-3 with lower total volume and stop before shoulder position or rib/pelvis control deteriorates.' : 'Use a wall-facing setup when appropriate. Substantive handstand position-capacity work: stacked shoulders, controlled ribs/pelvis and calm breathing. Build clean line and confidence without fatigue failure.', ''],\n";
   return src.replace(monAnchor, monAnchor + wallRow);
 });
 
