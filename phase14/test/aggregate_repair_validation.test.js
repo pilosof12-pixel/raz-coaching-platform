@@ -1,5 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import fs from 'node:fs';
 import {
   collectRepairableValidationFailures,
   stripNonExerciseScheduleRows,
@@ -55,4 +56,17 @@ test('live Tactical cascade is reported as one aggregate repair contract instead
   const unknown = (hallucination?.details?.unknown || []).map((row) => row.exercise);
   assert.ok(unknown.includes('Ring Hamstring Curl'), unknown.join(' | '));
   assert.ok(!unknown.includes('Rest'), unknown.join(' | '));
+});
+
+test('aggregate runtime preserves the OpenAI direct-skill calibration guard', () => {
+  const result = collectRepairableValidationFailures(
+    liveLikeBrokenProgram(),
+    TACTICAL_3K_INTAKE,
+    { skipSkillCalibration: true },
+  );
+  assert.equal(result.skill_calibration_skipped, true);
+
+  const patch = fs.readFileSync(new URL('../scripts/apply_aggregate_repair_validation.mjs', import.meta.url), 'utf8');
+  assert.match(patch, /skipSkillCalibration: Boolean\(OPENAI_API_KEY\)/);
+  assert.match(patch, /OPENAI-DIRECT-SKILL-CALIBRATION-GUARD/);
 });
