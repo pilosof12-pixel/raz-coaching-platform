@@ -8,6 +8,7 @@ import {
   selectRungForSkill,
 } from './skill_progressions.js';
 import { overcomingGravityRulesForFamily } from './overcoming_gravity_rules.js';
+import { buildRoadmapPromptRules } from './goal_progression_graph.js';
 
 function arr(v) { return Array.isArray(v) ? v : v ? [v] : []; }
 function str(v) { return typeof v === 'string' ? v : JSON.stringify(v || ''); }
@@ -118,8 +119,12 @@ function streetLiftingRules(intake) {
 
 export function buildSpecialistRules(intake = {}) {
   const rules = [...gymnasticsRules(intake), ...streetLiftingRules(intake)];
-  if (!rules.length) return '';
-  return ['=== GOAL-SPECIFIC SPECIALIST RULES ===', ...rules.map(x => `* ${x}`)].join('\n');
+  const roadmap = buildRoadmapPromptRules(intake);
+  if (!rules.length && !roadmap) return '';
+  return [
+    ...(rules.length ? ['=== GOAL-SPECIFIC SPECIALIST RULES ===', ...rules.map(x => `* ${x}`)] : []),
+    ...(roadmap ? [roadmap] : []),
+  ].join('\n');
 }
 
 export { parseStreetGoal };
