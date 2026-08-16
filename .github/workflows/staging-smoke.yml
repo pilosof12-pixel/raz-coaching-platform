@@ -57,8 +57,8 @@ jobs:
 
           const runtimeVersion = await waitForContent(
             '/runtime-version.txt',
-            text => text.trim() === 'advanced-hybrid-v3-openai-repair-4',
-            'v3 OpenAI four-attempt repair deployment',
+            text => text.trim() === 'advanced-hybrid-v4-squat-specificity',
+            'v4 Advanced Hybrid squat specificity deployment',
             60
           );
           console.log('RUNTIME_VERSION', runtimeVersion.text.trim());
