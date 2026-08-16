@@ -57,8 +57,8 @@ jobs:
 
           const runtimeVersion = await waitForContent(
             '/runtime-version.txt',
-            text => text.trim() === 'advanced-hybrid-v5-aggregate-repair-routing',
-            'v5 aggregate repair routing deployment',
+            text => text.trim() === 'launch-acceptance-v6-hybrid-youth-tactical',
+            'v6 final Hybrid Youth Tactical acceptance deployment',
             60
           );
           console.log('RUNTIME_VERSION', runtimeVersion.text.trim());
