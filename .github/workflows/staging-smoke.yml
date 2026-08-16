@@ -12,7 +12,7 @@ permissions:
 jobs:
   smoke:
     runs-on: ubuntu-latest
-    timeout-minutes: 6
+    timeout-minutes: 8
     steps:
       - name: Verify live Render surface without generation
         env:
@@ -51,13 +51,24 @@ jobs:
           const h = JSON.parse(health.text);
           if (h.ok !== true) throw new Error(`health not ok: ${health.text}`);
 
-          const passConfig = await get('/api/program-pass-config');
+          // This backend marker proves the live server has the Advanced Hybrid
+          // production quality gate before we spend another controlled AI build.
+          const passConfig = await waitForContent(
+            '/api/program-pass-config',
+            text => {
+              try { return JSON.parse(text)?.quality_gate_version === 'advanced-hybrid-v1'; }
+              catch { return false; }
+            },
+            'Advanced Hybrid quality gate backend',
+            60
+          );
           console.log('PROGRAM_PASS_CONFIG', passConfig.text);
           const pc = JSON.parse(passConfig.text);
           if (typeof pc.enforced !== 'boolean') throw new Error(`program pass config missing enforced boolean: ${passConfig.text}`);
           if (pc.enforced !== true) throw new Error(`controlled staging enforcement is unexpectedly off: ${passConfig.text}`);
           if (Number(pc.access_days) !== 56) throw new Error(`Program Pass access window drifted: ${passConfig.text}`);
           if (Number(pc.adjustments) !== 6) throw new Error(`Program Pass adjustment allowance drifted: ${passConfig.text}`);
+          if (pc.quality_gate_version !== 'advanced-hybrid-v1') throw new Error(`coaching quality gate marker drifted: ${passConfig.text}`);
 
           const privacy = await get('/privacy.html');
           if (!privacy.text.includes('pilosof12@gmail.com')) throw new Error('deployed privacy contact is stale');
