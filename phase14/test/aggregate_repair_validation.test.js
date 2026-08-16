@@ -37,7 +37,7 @@ function liveLikeBrokenProgram() {
 
 test('Rest and Off schedule markers are removed before exercise identity QA', () => {
   const stripped = stripNonExerciseScheduleRows(liveLikeBrokenProgram(), TACTICAL_3K_INTAKE);
-  assert.doesNotMatch(stripped, /\tRest\t/);
+  assert.doesNotMatch(stripped, /^(?:Mon|Tue|Wed|Thu|Fri|Sat|Sun)\t(?:Rest|Rest Day|Off|Off Day|Recovery Day)\t/m);
   assert.match(stripped, /\tRun\t/);
   assert.match(stripped, /\tRing Hamstring Curl\t/);
 });
