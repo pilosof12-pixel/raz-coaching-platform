@@ -25,7 +25,7 @@ jobs:
             let last = '';
             for (let i = 0; i < attempts; i++) {
               try {
-                const accept = path.endsWith('.html') || path === '/' ? 'text/html' : path.endsWith('.js') || path.endsWith('.css') ? 'text/plain' : 'application/json';
+                const accept = path.endsWith('.html') || path === '/' ? 'text/html' : path.endsWith('.js') || path.endsWith('.css') || path.endsWith('.txt') ? 'text/plain' : 'application/json';
                 const r = await fetch(base + path, { headers: { accept, 'cache-control': 'no-cache' } });
                 const text = await r.text();
                 last = `status=${r.status} body=${text.slice(0, 1000)}`;
@@ -50,6 +50,14 @@ jobs:
           console.log('HEALTH', health.text);
           const h = JSON.parse(health.text);
           if (h.ok !== true) throw new Error(`health not ok: ${health.text}`);
+
+          const runtimeVersion = await waitForContent(
+            '/runtime-version.txt',
+            text => text.trim() === 'advanced-hybrid-v3-openai-repair-4',
+            'v3 OpenAI four-attempt repair deployment',
+            60
+          );
+          console.log('RUNTIME_VERSION', runtimeVersion.text.trim());
 
           const passConfig = await waitForContent(
             '/api/program-pass-config',
@@ -112,5 +120,5 @@ jobs:
           if (!exporter.text.includes('mergeTitle(ws,row,11,`${sessionLabel(intake,s,i).toUpperCase()}')) throw new Error('deployed exporter section-band renderer missing');
           console.log('SPREADSHEET_EXPORT_OK', exporter.status);
 
-          console.log(JSON.stringify({ ok: true, health: h, program_pass_config: pc, privacy: true, app: true, intake_polish: true, iphone_mobile: true, spreadsheet_export: true }));
+          console.log(JSON.stringify({ ok: true, runtime_version: runtimeVersion.text.trim(), health: h, program_pass_config: pc, privacy: true, app: true, intake_polish: true, iphone_mobile: true, spreadsheet_export: true }));
           NODE
