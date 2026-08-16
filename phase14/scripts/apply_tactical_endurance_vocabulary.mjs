@@ -3,8 +3,8 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const here = path.dirname(fileURLToPath(import.meta.url));
-const target = path.join(here, '..', 'engine', 'exercise_dictionary.js');
-let src = fs.readFileSync(target, 'utf8');
+const dictionaryPath = path.join(here, '..', 'engine', 'exercise_dictionary.js');
+let src = fs.readFileSync(dictionaryPath, 'utf8');
 let changed = false;
 
 function replaceOnce(find, replace, label, already = '') {
@@ -36,5 +36,24 @@ replaceOnce(
   'ENDURANCE-CANONICAL-ALIAS-HOOK'
 );
 
-if (changed) fs.writeFileSync(target, src);
-console.log(`${target}: ${changed ? 'Tactical endurance identity normalization applied' : 'already current'}`);
+if (changed) fs.writeFileSync(dictionaryPath, src);
+console.log(`${dictionaryPath}: ${changed ? 'Tactical endurance identity normalization applied' : 'already current'}`);
+
+// Initial generation should obey the same identity boundary as repair. This is
+// a prompt contract, not an alias expansion: all execution detail stays in the
+// dose/Notes fields while the Exercise cell remains canonical.
+const qualityPath = path.join(here, '..', 'engine', 'tactical_3k_gpp_quality.js');
+let quality = fs.readFileSync(qualityPath, 'utf8');
+if (!quality.includes('TACTICAL-ENDURANCE-EXERCISE-IDENTITY')) {
+  const anchor = "    '=== TACTICAL 3K / GPP QUALITY ===',\n";
+  const count = quality.split(anchor).length - 1;
+  if (count !== 1) throw new Error(`Tactical endurance prompt anchor expected once, found ${count}`);
+  quality = quality.replace(
+    anchor,
+    anchor + "    '* EXERCISE-COLUMN IDENTITY: use exact Exercise name Run for easy, long, threshold and interval running rows, and exact Exercise name Backpack Carry for loaded ruck/march rows. Put pace, distance, 20 kg load, interval structure and easy/long/threshold labels in Weight, Reps/Duration or Notes instead of inventing a new Exercise name. This is the TACTICAL-ENDURANCE-EXERCISE-IDENTITY rule.',\n"
+  );
+  fs.writeFileSync(qualityPath, quality);
+  console.log(`${qualityPath}: canonical Tactical endurance prompt names added`);
+} else {
+  console.log(`${qualityPath}: Tactical endurance prompt already current`);
+}
