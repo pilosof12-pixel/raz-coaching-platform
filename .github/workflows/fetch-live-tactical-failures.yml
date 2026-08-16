@@ -20,16 +20,14 @@ jobs:
       - name: Fetch exact failed Tactical jobs
         env:
           BASE_URL: https://raz-coaching-platform.onrender.com
-          JOB_LATEST: e05cf719a8a99598371900a383867ee6
-          JOB_SCREENSHOT: 25d1ad0ab9acdf10e5ca696173d20e90
+          JOB_LATEST: e55b5241c0f16fced0af47b79f05904d
         run: |
           mkdir -p docs/qa/live-tactical
           node <<'NODE'
           const fs = require('fs');
           const base = process.env.BASE_URL;
           const jobs = [
-            {label:'latest_typed', id:process.env.JOB_LATEST},
-            {label:'screenshot', id:process.env.JOB_SCREENSHOT},
+            {label:'latest_support_reference', id:process.env.JOB_LATEST},
           ];
           (async()=>{
             const out=[];
@@ -39,6 +37,7 @@ jobs:
               let data={}; try{data=JSON.parse(text)}catch{}
               out.push({
                 label:job.label,
+                job_id:job.id,
                 http_status:r.status,
                 status:data.status||null,
                 stage:data.stage||null,
@@ -59,5 +58,5 @@ jobs:
           git pull --rebase origin privacy-security-hardening || true
           git add docs/qa/live-tactical/failures.json
           if git diff --cached --quiet; then exit 0; fi
-          git commit -m 'Record Tactical live failure summaries'
+          git commit -m 'Record latest live generation failure summary'
           git push origin HEAD:privacy-security-hardening
