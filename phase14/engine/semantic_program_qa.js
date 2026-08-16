@@ -203,10 +203,24 @@ function volumeCapacityFactor(intake = {}) {
   return Math.max(0.72, Math.min(1.10, factor));
 }
 
+// External sport is an already-tolerated baseline, not newly prescribed gym
+// volume. It must reduce available headroom, but a large existing sport schedule
+// must never hard-fail MRV by itself. Otherwise a five-day combat athlete can be
+// mathematically impossible to program even with zero added core/aerobic work.
+// Cap the baseline debit at 75% of the recovery-adjusted reference. The remaining
+// 60% up to the existing 135% hard-fail threshold is still available for program
+// work. Excessive added work therefore still fails; the global MRV threshold is
+// unchanged.
+export function sportBaselineDebit(pattern, rawSport, reference) {
+  const raw = Number(rawSport || 0);
+  if (!Number.isFinite(raw) || raw <= 0 || !(reference > 0)) return 0;
+  return Math.min(raw, reference * 0.75);
+}
+
 export function validateWeeklyVolumeBudgetSemantic(program, intake = {}, suppliedModel = null) {
   const model = suppliedModel || parseProgramModel(program, intake);
   const strengthByWeek = weeklyStrengthVolumeFromModel(model);
-  const sport = estimateSportStress(intake);
+  const rawSport = estimateSportStress(intake);
   const factor = volumeCapacityFactor(intake);
   const weeks = [];
   const allOver = [];
@@ -214,22 +228,25 @@ export function validateWeeklyVolumeBudgetSemantic(program, intake = {}, supplie
   for (const week of model?.weeks || []) {
     const strength = strengthByWeek[week.week] || EMPTY_PATTERN_TOTALS();
     const totals = EMPTY_PATTERN_TOTALS();
+    const sport = EMPTY_PATTERN_TOTALS();
     const over = [];
     const advisory = [];
 
     for (const pattern of Object.keys(totals)) {
-      totals[pattern] = (strength[pattern] || 0) + (sport[pattern] || 0);
       const reference = MRV_CEILINGS[pattern] * factor;
+      sport[pattern] = sportBaselineDebit(pattern, rawSport[pattern] || 0, reference);
+      totals[pattern] = (strength[pattern] || 0) + sport[pattern];
       const ratio = reference > 0 ? totals[pattern] / reference : 0;
       if (ratio > 1.35) {
         const item = {
           week: week.week,
           pattern,
-          total: totals[pattern],
+          total: Math.round(totals[pattern] * 10) / 10,
           ceiling: Math.round(reference * 10) / 10,
           ratio,
           strength: strength[pattern] || 0,
-          sport: sport[pattern] || 0,
+          sport: Math.round(sport[pattern] * 10) / 10,
+          raw_sport: rawSport[pattern] || 0,
         };
         over.push(item);
         allOver.push(item);
@@ -237,23 +254,36 @@ export function validateWeeklyVolumeBudgetSemantic(program, intake = {}, supplie
         advisory.push({
           week: week.week,
           pattern,
-          total: totals[pattern],
+          total: Math.round(totals[pattern] * 10) / 10,
           reference: Math.round(reference * 10) / 10,
           ratio,
+          strength: strength[pattern] || 0,
+          sport: Math.round(sport[pattern] * 10) / 10,
+          raw_sport: rawSport[pattern] || 0,
         });
       }
     }
 
-    weeks.push({ week: week.week, strength, sport: { ...sport }, totals, over, advisory });
+    weeks.push({
+      week: week.week,
+      strength,
+      sport: { ...sport },
+      raw_sport: { ...rawSport },
+      totals,
+      over,
+      advisory,
+      sport_accounting: 'tolerated_baseline_debit_capped_at_75pct_reference',
+    });
   }
 
   if (allOver.length) {
     const list = allOver
-      .map((item) => `Week ${item.week} ${item.pattern}: ${item.total} (${item.strength} program + ${item.sport} sport heuristic) vs reference ${item.ceiling}`)
+      .map((item) => `Week ${item.week} ${item.pattern}: ${item.total} (${item.strength} program + ${item.sport} sport baseline debit; raw sport heuristic ${item.raw_sport}) vs reference ${item.ceiling}`)
       .join('; ');
     const amendment =
       'PRIOR ATTEMPT FAILED WEEKLY VOLUME VALIDATION. ' +
       `The following single-week workload is grossly above the internal reference band: [${list}]. ` +
+      'External sport is treated as an already-tolerated baseline that reduces programming headroom; it is not allowed to hard-fail the week by itself. ' +
       'These references are heuristics, not biological MRV facts. Reduce redundant accessory work first, preserve primary and direct-goal exposures, and re-check recovery. ' +
       'Never sum multiple program weeks and compare that four-week total with a one-week reference.';
     throw new RetriableValidationError('WEEKLY_MRV_EXCEEDED', amendment, {
@@ -262,6 +292,7 @@ export function validateWeeklyVolumeBudgetSemantic(program, intake = {}, supplie
       factor,
       semantic_model_version: model.version,
       accounting_scope: 'per_week',
+      sport_accounting: 'tolerated_baseline_debit_capped_at_75pct_reference',
     });
   }
 
@@ -271,6 +302,7 @@ export function validateWeeklyVolumeBudgetSemantic(program, intake = {}, supplie
     factor,
     semantic_model_version: model.version,
     accounting_scope: 'per_week',
+    sport_accounting: 'tolerated_baseline_debit_capped_at_75pct_reference',
     model,
   };
 }
