@@ -14,6 +14,7 @@ if (!html.includes('href="launch-mobile.css"')) {
 const legacySpreadsheetTag = '<script src="spreadsheet.js"></script>';
 const paritySpreadsheetTag = '<script src="spreadsheet-parity.js"></script>';
 const appTag = '<script src="app.js"></script>';
+const intakePolishTag = '<script src="intake-polish.js"></script>';
 
 if (!html.includes(legacySpreadsheetTag)) {
   throw new Error('launch runtime: spreadsheet.js anchor missing');
@@ -23,12 +24,15 @@ if (!html.includes(appTag)) {
 }
 html = html.replace(/\s*<script src="spreadsheet-parity\.js"><\/script>\s*/g, '\n  ');
 html = html.replace(legacySpreadsheetTag, `${legacySpreadsheetTag}\n  ${paritySpreadsheetTag}`);
+html = html.replace(/\s*<script src="intake-polish\.js"><\/script>\s*/g, '\n  ');
+html = html.replace(appTag, `${appTag}\n  ${intakePolishTag}`);
 
 const legacyPos = html.indexOf(legacySpreadsheetTag);
 const parityPos = html.indexOf(paritySpreadsheetTag);
 const appPos = html.indexOf(appTag);
-if (!(legacyPos >= 0 && parityPos > legacyPos && appPos > parityPos)) {
-  throw new Error('launch runtime: approved spreadsheet exporter must load after spreadsheet.js and before app.js');
+const intakePolishPos = html.indexOf(intakePolishTag);
+if (!(legacyPos >= 0 && parityPos > legacyPos && appPos > parityPos && intakePolishPos > appPos)) {
+  throw new Error('launch runtime: approved spreadsheet exporter must load after spreadsheet.js and before app.js, and intake polish must load after app.js');
 }
 
 // Program Pass gate must load before launch-controls so it can reserve the
