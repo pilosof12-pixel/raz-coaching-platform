@@ -52,8 +52,17 @@ if (!quality.includes('TACTICAL-ENDURANCE-EXERCISE-IDENTITY')) {
     anchor,
     anchor + "    '* EXERCISE-COLUMN IDENTITY: use exact Exercise name Run for easy, long, threshold and interval running rows, and exact Exercise name Backpack Carry for loaded ruck/march rows. Put pace, distance, 20 kg load, interval structure and easy/long/threshold labels in Weight, Reps/Duration or Notes instead of inventing a new Exercise name. This is the TACTICAL-ENDURANCE-EXERCISE-IDENTITY rule.',\n"
   );
-  fs.writeFileSync(qualityPath, quality);
-  console.log(`${qualityPath}: canonical Tactical endurance prompt names added`);
-} else {
-  console.log(`${qualityPath}: Tactical endurance prompt already current`);
 }
+
+if (!quality.includes('TACTICAL-CANONICAL-SUPPORT-NAMING')) {
+  const anchor = "    '* EXERCISE-COLUMN IDENTITY: use exact Exercise name Run for easy, long, threshold and interval running rows, and exact Exercise name Backpack Carry for loaded ruck/march rows. Put pace, distance, 20 kg load, interval structure and easy/long/threshold labels in Weight, Reps/Duration or Notes instead of inventing a new Exercise name. This is the TACTICAL-ENDURANCE-EXERCISE-IDENTITY rule.',\n";
+  const count = quality.split(anchor).length - 1;
+  if (count !== 1) throw new Error(`Tactical support naming prompt anchor expected once, found ${count}`);
+  quality = quality.replace(
+    anchor,
+    anchor + "    '* CANONICAL SUPPORT NAMING: Rest, Off and Recovery Day are schedule states, not exercises, so omit non-training days from TSV rows entirely. For posterior-chain knee-flexion support use exact names Leg Curl, Lying Leg Curl, Seated Leg Curl or Nordic Hamstring Curl. Do not invent Ring Hamstring Curl or other equipment-prefixed variants. Keep this small support work subordinate to the 3K, ruck, pull-up and key-strength priorities. This is the TACTICAL-CANONICAL-SUPPORT-NAMING rule.',\n"
+  );
+}
+
+fs.writeFileSync(qualityPath, quality);
+console.log(`${qualityPath}: canonical Tactical endurance/support prompt names current`);
