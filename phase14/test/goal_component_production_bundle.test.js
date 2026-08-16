@@ -18,10 +18,16 @@ function failureCodes(error) {
   return codes;
 }
 
+function isWallSupportedHandstandRow(line) {
+  const cells = String(line || '').split('\t');
+  const exercise = String(cells[1] || '').toLowerCase();
+  return exercise.includes('handstand') && exercise.includes('wall');
+}
+
 test('production repairable bundle rejects Youth handstand work that omits wall-supported capacity', () => {
   const kickUpOnly = youthGymnasticsGoldenProgram()
     .split('\n')
-    .filter((line) => !line.includes('\tWall-Facing Handstand Hold\t'))
+    .filter((line) => !isWallSupportedHandstandRow(line))
     .join('\n');
 
   assert.throws(
