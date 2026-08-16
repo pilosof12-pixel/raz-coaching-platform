@@ -8,9 +8,22 @@ import {
   advancedHybridLaunchProgram,
 } from './fixtures/advanced_hybrid_launch.js';
 
+function validateLaunchProgram() {
+  try {
+    return validateProductionProgram(advancedHybridLaunchProgram(), ADVANCED_HYBRID_LAUNCH_INTAKE);
+  } catch (error) {
+    const flags = Array.isArray(error?.flags)
+      ? error.flags.map((flag) => `${flag.code}:${flag.amendment || flag.message || ''}`).join(' | ')
+      : '';
+    const violations = Array.isArray(error?.details?.violations)
+      ? error.details.violations.map((v) => `${v.type || v.code || 'violation'}:${JSON.stringify(v)}`).join(' | ')
+      : '';
+    throw new Error(`advanced hybrid production validation failed: ${error?.code || 'UNKNOWN'} ${flags} ${violations}`.trim(), { cause: error });
+  }
+}
+
 test('advanced hybrid launch intake has a feasible program that passes the full production validation chain', () => {
-  const program = advancedHybridLaunchProgram();
-  const result = validateProductionProgram(program, ADVANCED_HYBRID_LAUNCH_INTAKE);
+  const result = validateLaunchProgram();
   assert.equal(result.ok, true);
 
   const model = result.model || parseProgramModel(result.program, ADVANCED_HYBRID_LAUNCH_INTAKE);
@@ -23,7 +36,7 @@ test('advanced hybrid launch intake has a feasible program that passes the full 
 });
 
 test('advanced hybrid launch gate keeps marathon work secondary instead of inventing extra hard conditioning', () => {
-  const result = validateProductionProgram(advancedHybridLaunchProgram(), ADVANCED_HYBRID_LAUNCH_INTAKE);
+  const result = validateLaunchProgram();
   const model = result.model;
   for (const week of model.weeks) {
     const hardConditioning = week.days.flatMap((d) => d.exercises).filter((ex) => {
