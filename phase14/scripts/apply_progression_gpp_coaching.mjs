@@ -34,6 +34,12 @@ patch('engine/phase15_planner.js', [
     already: "import { buildTactical3KGppQualityBrief } from './tactical_3k_gpp_quality.js';",
   },
   {
+    label: 'high-concurrency hybrid brief import',
+    find: "import { buildTactical3KGppQualityBrief } from './tactical_3k_gpp_quality.js';\n",
+    replace: "import { buildTactical3KGppQualityBrief } from './tactical_3k_gpp_quality.js';\nimport { buildAdvancedHybridConcurrencyBrief } from './advanced_hybrid_concurrency.js';\n",
+    already: "import { buildAdvancedHybridConcurrencyBrief } from './advanced_hybrid_concurrency.js';",
+  },
+  {
     label: 'build progression/GPP brief',
     find: "  const specialist = buildSpecialistRules(intake);\n  return [\n",
     replace: "  const specialist = buildSpecialistRules(intake);\n  const progressionGpp = buildProgressionGppBrief(intake);\n  const acceptanceQuality = buildAcceptanceQualityBrief(intake);\n  const consolidationQuality = buildConsolidationQualityBrief(intake);\n  return [\n",
@@ -44,6 +50,12 @@ patch('engine/phase15_planner.js', [
     find: "  const consolidationQuality = buildConsolidationQualityBrief(intake);\n  return [\n",
     replace: "  const consolidationQuality = buildConsolidationQualityBrief(intake);\n  const tactical3KGppQuality = buildTactical3KGppQualityBrief(intake);\n  return [\n",
     already: 'const tactical3KGppQuality = buildTactical3KGppQualityBrief(intake);',
+  },
+  {
+    label: 'build high-concurrency hybrid brief',
+    find: "  const tactical3KGppQuality = buildTactical3KGppQualityBrief(intake);\n  return [\n",
+    replace: "  const tactical3KGppQuality = buildTactical3KGppQualityBrief(intake);\n  const advancedHybridConcurrency = buildAdvancedHybridConcurrencyBrief(intake);\n  return [\n",
+    already: 'const advancedHybridConcurrency = buildAdvancedHybridConcurrencyBrief(intake);',
   },
   {
     label: 'inject progression/GPP brief',
@@ -58,6 +70,12 @@ patch('engine/phase15_planner.js', [
     find: "    consolidationQuality,\n    'Session skeleton:',",
     replace: "    consolidationQuality,\n    tactical3KGppQuality,\n    'Session skeleton:',",
     already: "    tactical3KGppQuality,\n    'Session skeleton:',",
+  },
+  {
+    label: 'inject high-concurrency hybrid brief',
+    find: "    tactical3KGppQuality,\n    'Session skeleton:',",
+    replace: "    tactical3KGppQuality,\n    advancedHybridConcurrency,\n    'Session skeleton:',",
+    already: "    advancedHybridConcurrency,\n    'Session skeleton:',",
   },
 ]);
 
@@ -100,4 +118,4 @@ patch('server.phase15.js', [
   },
 ]);
 
-console.log('Progression architecture + youth progression/consolidation quality + tactical GPP/schedule/dose/3K quality/warm-up production wiring complete.');
+console.log('Progression architecture + youth progression/consolidation quality + tactical GPP/schedule/dose/3K quality + high-concurrency hybrid planning + warm-up production wiring complete.');
