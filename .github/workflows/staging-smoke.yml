@@ -51,15 +51,13 @@ jobs:
           const h = JSON.parse(health.text);
           if (h.ok !== true) throw new Error(`health not ok: ${health.text}`);
 
-          // This backend marker proves the live server has the Advanced Hybrid
-          // production quality gate before we spend another controlled AI build.
           const passConfig = await waitForContent(
             '/api/program-pass-config',
             text => {
-              try { return JSON.parse(text)?.quality_gate_version === 'advanced-hybrid-v1'; }
+              try { return JSON.parse(text)?.quality_gate_version === 'advanced-hybrid-v2'; }
               catch { return false; }
             },
-            'Advanced Hybrid quality gate backend',
+            'Advanced Hybrid numeric repair quality gate backend',
             60
           );
           console.log('PROGRAM_PASS_CONFIG', passConfig.text);
@@ -68,7 +66,7 @@ jobs:
           if (pc.enforced !== true) throw new Error(`controlled staging enforcement is unexpectedly off: ${passConfig.text}`);
           if (Number(pc.access_days) !== 56) throw new Error(`Program Pass access window drifted: ${passConfig.text}`);
           if (Number(pc.adjustments) !== 6) throw new Error(`Program Pass adjustment allowance drifted: ${passConfig.text}`);
-          if (pc.quality_gate_version !== 'advanced-hybrid-v1') throw new Error(`coaching quality gate marker drifted: ${passConfig.text}`);
+          if (pc.quality_gate_version !== 'advanced-hybrid-v2') throw new Error(`coaching quality gate marker drifted: ${passConfig.text}`);
 
           const privacy = await get('/privacy.html');
           if (!privacy.text.includes('pilosof12@gmail.com')) throw new Error('deployed privacy contact is stale');
