@@ -20,6 +20,7 @@ const GENERATION_ADJUSTS_PER_HOUR=Number(process.env.GENERATION_ADJUSTS_PER_HOUR
 const MAX_INTAKE_CHARS=Number(process.env.MAX_INTAKE_CHARS||30000);
 const MAX_FIELD_CHARS=Number(process.env.MAX_FIELD_CHARS||5000);
 const ADMIN_PROVISION_KEY=process.env.ADMIN_PROVISION_KEY||"";
+const COACHING_QUALITY_GATE_VERSION="advanced-hybrid-v1";
 
 const passStore=await makeEntitlementStore();
 const analyticsStore=await makeAnalyticsStore();
@@ -105,7 +106,7 @@ async function cleanup(){await privacyStore.purgeExpiredOperationalData();if(!PR
 const originalListen=express.application.listen;
 express.application.listen=function(...args){
   if(!this.__launchRoutesInstalled){this.__launchRoutesInstalled=true;
-    this.get("/api/program-pass-config",(_req,res)=>res.json({enforced:PROGRAM_PASS_ENFORCEMENT,access_days:PROGRAM_PASS_DAYS,adjustments:PROGRAM_PASS_ADJUSTMENTS}));
+    this.get("/api/program-pass-config",(_req,res)=>res.json({enforced:PROGRAM_PASS_ENFORCEMENT,access_days:PROGRAM_PASS_DAYS,adjustments:PROGRAM_PASS_ADJUSTMENTS,quality_gate_version:COACHING_QUALITY_GATE_VERSION}));
     this.post("/api/program-pass-status",async(req,res)=>{try{const token=String(req.body?.token||"").trim();if(!TOKEN_RE.test(token))return res.status(400).json({error:"Invalid personal code."});const pass=await passStore.getPassForToken(token);if(!pass)return res.status(404).json({error:"No Program Pass is linked to this code."});const used=Number(pass.adjustment_count||0),limit=Number(pass.adjustment_limit||PROGRAM_PASS_ADJUSTMENTS);res.json({status:pass.status,expires_at:pass.expires_at,initial_build_completed:Boolean(pass.initial_build_completed_at),adjustments_used:used,adjustments_remaining:Math.max(0,limit-used),adjustment_limit:limit});}catch(e){console.error("program pass status failed:",e&&e.message);res.status(500).json({error:"Could not load Program Pass status."});}});
     this.post("/api/analytics-event",async(req,res)=>{try{const event=String(req.body?.event||"").trim();if(!isAllowedAnalyticsEvent(event))return res.status(400).json({error:"Invalid analytics event."});await analyticsStore.record(event);res.status(204).end();}catch(e){console.warn("analytics event failed:",e&&e.message);res.status(204).end();}});
     this.get("/api/admin/analytics-summary",async(req,res)=>{try{if(!ADMIN_PROVISION_KEY||req.get("x-admin-provision-key")!==ADMIN_PROVISION_KEY)return res.status(404).json({error:"Not found."});const days=Math.max(1,Math.min(365,Number(req.query?.days||30)));res.json({days,rows:await analyticsStore.summary(days)});}catch(e){res.status(500).json({error:"Could not load analytics summary."});}});
