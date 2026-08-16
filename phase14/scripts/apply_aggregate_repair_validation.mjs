@@ -13,14 +13,14 @@ let changed = false;
 // the same bounded multi-attempt opportunity to satisfy deterministic QA.
 const attemptMarker = 'OPENAI-MULTI-ATTEMPT-REPAIR-BUDGET';
 if (!src.includes(attemptMarker)) {
-  const candidates = [
-    '  const MAX_ATTEMPTS = OPENAI_API_KEY ? 1 : 3;',
-    '  const MAX_ATTEMPTS = 3;',
-  ];
-  const found = candidates.find((x) => src.includes(x));
+  const attemptPattern = /^\s*const MAX_ATTEMPTS\s*=\s*[^;\n]+;[^\n]*$/m;
+  const found = src.match(attemptPattern)?.[0] || '';
   if (!found) throw new Error('Aggregate repair attempt-budget anchor missing');
-  src = src.replace(found, `  const MAX_ATTEMPTS = 4; // ${attemptMarker}`);
+  src = src.replace(attemptPattern, `  const MAX_ATTEMPTS = 4; // ${attemptMarker}`);
   changed = true;
+}
+if (!/const MAX_ATTEMPTS\s*=\s*4\s*;\s*\/\/\s*OPENAI-MULTI-ATTEMPT-REPAIR-BUDGET/.test(src)) {
+  throw new Error('Aggregate repair final attempt budget is not four');
 }
 
 const importMarker = 'AGGREGATE-REPAIR-VALIDATION-WIRED';
