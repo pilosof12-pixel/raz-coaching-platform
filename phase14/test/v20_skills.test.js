@@ -57,7 +57,6 @@ test("selectRungForSkill: tuck-planche 15s athlete selects Advanced Tuck or high
     { equipment: ["floor"], training_location: "home" }
   );
   assert.equal(sel.gated, false);
-  // Advanced Tuck Planche is rung index 2 in the planche ladder.
   const advIdx = SKILL_PROGRESSIONS.get("planche").rungs.findIndex((r) =>
     /advanced tuck planche/i.test(r.name)
   );
@@ -87,7 +86,6 @@ test("validateAndCalibrateSkills throws SKILL_UNDER_PROGRAMMED for tuck-planche 
     }
   );
 
-  // Control: prescribing Advanced Tuck Planche (the selected rung) does NOT throw.
   const ok = program(["Mon\tAdvanced Tuck Planche\tBW\t4\t8-15s\t2 min\tRIR 1\tskill\t"]);
   assert.doesNotThrow(() => validateAndCalibrateSkills(ok, intake));
 });
@@ -114,14 +112,13 @@ test("validateAndCalibrateSkills throws SKILL_PREREQ_VIOLATION for Iron Cross wi
   );
 });
 
-test("Human Flag goal without vertical structure gates: prereq violation on over-program, note when at rung 0", () => {
+test("Human Flag goal without vertical structure gates: prereq violation on over-program, metadata note when at rung 0", () => {
   const intake = {
     primary_goals: ["human flag"],
     current_numbers: "5 pull-ups",
-    equipment: ["floor"], // no pole / vertical bar
+    equipment: ["floor"],
     training_location: "home",
   };
-  // Over-programmed (a mid-ladder rung) with no vertical structure -> hard fail.
   const over = program(["Mon\tTuck Human Flag Hold\tBW\t4\t10s\t2 min\tRIR 1\tskill\t"]);
   assert.throws(
     () => validateAndCalibrateSkills(over, intake),
@@ -133,13 +130,14 @@ test("Human Flag goal without vertical structure gates: prereq violation on over
     }
   );
 
-  // At the gated beginner rung (Side Plank) -> non-fatal, annotated with [REVIEW].
+  // At the gated beginner rung the warning remains structured QA metadata.
+  // Internal review markers must never poison an otherwise client-safe program.
   const rung0 = SKILL_PROGRESSIONS.get("human_flag").rungs[0].name;
   const okProg = program([`Mon\t${rung0}\tBW\t3\t30-45s\t60s\tRIR 2\tskill\t`]);
   const res = validateAndCalibrateSkills(okProg, intake);
   assert.equal(res.ok, true);
   assert.ok(res.annotations.some((a) => a.family === "human_flag" && a.type === "gated"));
-  assert.ok(/\[REVIEW\]/.test(res.program));
+  assert.equal(/\[REVIEW\]/.test(res.program), false);
 });
 
 test("Hebrew goal phrases route to the correct advanced skill family", () => {
