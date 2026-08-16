@@ -151,7 +151,16 @@ export function validateAdvancedHybridQualitySemantic(program, intake = {}) {
   const w3Run = (w3.filter(isRun).map(numericKm).find((n) => n != null));
   const w4Run = (w4.filter(isRun).map(numericKm).find((n) => n != null));
   if (!(w4Sets < w3Sets) || w4Rpe > w3Rpe || (w3Run != null && w4Run != null && w4Run >= w3Run)) {
-    fail('ADVANCED_HYBRID_WEEK4_NOT_CONSOLIDATING', `Week 4 must genuinely consolidate this high-concurrency block: reduce total strength work sets versus Week 3, do not raise peak prescribed RPE, and reduce the secondary long-run dose when distance is prescribed. A Week 4 label alone is not consolidation.`, { w3Sets, w4Sets, w3Rpe, w4Rpe, w3Run, w4Run });
+    const setTarget = Math.max(1, Math.floor(w3Sets * 0.85));
+    const runTarget = w3Run == null ? null : Math.max(1, Math.floor(w3Run * 0.9));
+    const runInstruction = w3Run != null
+      ? ` Week 3 long run is ${w3Run} km and Week 4 is ${w4Run ?? 'not numerically stated'} km; make Week 4 strictly lower than ${w3Run} km, preferably about ${runTarget} km.`
+      : '';
+    fail(
+      'ADVANCED_HYBRID_WEEK4_NOT_CONSOLIDATING',
+      `NUMERIC WEEK 4 REPAIR REQUIRED. Week 3 currently has ${w3Sets} total strength work sets and Week 4 has ${w4Sets}. Rewrite Week 4 so total strength work sets are strictly below ${w3Sets}; target about ${setTarget} or fewer while preserving the required exercise architecture. Week 3 peak prescribed RPE is ${w3Rpe} and Week 4 peak is ${w4Rpe}; Week 4 must not exceed RPE ${w3Rpe}.${runInstruction} Keep Weeks 1-3 unchanged. Reduce sets/accessory volume and the secondary endurance dose; do not compensate by adding reps, harder RPE, extra exercises, intervals or conditioning elsewhere. A Week 4 label or prose claim does not count unless these numeric conditions are actually true.`,
+      { w3Sets, w4Sets, w3Rpe, w4Rpe, w3Run, w4Run, setTarget, runTarget },
+    );
   }
 
   const baseline = currentRunBaseline(intake);
