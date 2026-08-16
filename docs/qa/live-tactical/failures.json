@@ -1,23 +1,13 @@
 [
   {
-    "label": "latest_typed",
-    "http_status": 404,
-    "status": null,
-    "stage": null,
-    "attempt": null,
-    "detail": null,
-    "error": "Job not found.",
-    "has_program": false,
-    "program_chars": 0
-  },
-  {
-    "label": "screenshot",
-    "http_status": 404,
-    "status": null,
-    "stage": null,
-    "attempt": null,
-    "detail": null,
-    "error": "Job not found.",
+    "label": "latest_support_reference",
+    "job_id": "e55b5241c0f16fced0af47b79f05904d",
+    "http_status": 200,
+    "status": "error",
+    "stage": "refining",
+    "attempt": 4,
+    "detail": "internal repair: WEEKLY_MRV_EXCEEDED",
+    "error": "Internal coaching QA could not repair the candidate program after multiple passes. No client-facing program was saved. Please retry the build.",
     "has_program": false,
     "program_chars": 0
   }
