@@ -158,7 +158,14 @@ function aggregateError(flags) {
 // Run deterministic transformations once, then collect every repairable coaching
 // defect that can be evaluated on the same candidate. This prevents a four-call
 // repair budget from being consumed one fail-fast validator at a time.
-export function collectRepairableValidationFailures(program, intake = {}) {
+//
+// skipSkillCalibration preserves the existing provider-specific contract: the
+// OpenAI Phase 15 path owns direct-skill selection through the grounded skeleton
+// and final semantic QA, so the legacy deterministic skill calibrator must not
+// rewrite those direct rows after generation. Legacy/Gemini paths keep the prior
+// calibration behavior by leaving this option false.
+export function collectRepairableValidationFailures(program, intake = {}, options = {}) {
+  const skipSkillCalibration = options?.skipSkillCalibration === true;
   let candidate = stripNonExerciseScheduleRows(program, intake);
   const flags = [];
   let warnings = [];
@@ -167,8 +174,10 @@ export function collectRepairableValidationFailures(program, intake = {}) {
   const dictionary = runRepairable(flags, () => validateExercisesAgainstDictionary(candidate, intake));
   if (dictionary.ok) candidate = dictionary.value.program;
 
-  const skills = runRepairable(flags, () => validateAndCalibrateSkills(candidate, intake));
-  if (skills.ok) candidate = skills.value.program;
+  if (!skipSkillCalibration) {
+    const skills = runRepairable(flags, () => validateAndCalibrateSkills(candidate, intake));
+    if (skills.ok) candidate = skills.value.program;
+  }
 
   runRepairable(flags, () => validateEquipmentAgainstLocation(candidate, intake));
   runRepairable(flags, () => enforceUnilateralIntensityFloor(candidate, intake));
@@ -212,11 +221,12 @@ export function collectRepairableValidationFailures(program, intake = {}) {
     flags: dedupeFlags(flags),
     warnings,
     schedule,
+    skill_calibration_skipped: skipSkillCalibration,
   };
 }
 
-export function validateRepairableProgramBundle(program, intake = {}) {
-  const result = collectRepairableValidationFailures(program, intake);
+export function validateRepairableProgramBundle(program, intake = {}, options = {}) {
+  const result = collectRepairableValidationFailures(program, intake, options);
   if (!result.ok) throw aggregateError(result.flags);
   return result;
 }
