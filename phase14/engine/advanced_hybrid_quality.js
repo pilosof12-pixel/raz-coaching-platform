@@ -134,7 +134,10 @@ export function validateAdvancedHybridQualitySemantic(program, intake = {}) {
       }
     }
 
-    if (work.some((r) => /interval|sprint|burpee|emom|metcon|finisher/i.test(`${r.exercise} ${r.notes}`))) {
+    // Only actual programmed movement identity can create an extra hard-conditioning
+    // exposure. Coaching prose may legitimately say things like "without intervals"
+    // or "no sprints" and must never trigger a false release failure.
+    if (work.some((r) => /interval|sprint|burpee|emom|metcon|finisher/i.test(String(r.exercise || '')))) {
       fail('ADVANCED_HYBRID_EXTRA_HARD_CONDITIONING', `Week ${week} adds hard conditioning despite five MMA sessions. Remove optional intervals, sprints, finishers or metcons unless explicitly required by a higher-priority goal.`, { week });
     }
   }
