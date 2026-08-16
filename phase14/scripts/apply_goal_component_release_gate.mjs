@@ -49,14 +49,9 @@ patch('engine/client_output_qa.js', (src) => {
   return src;
 });
 
-patch('engine/phase15_planner.js', (src) => {
-  if (!src.includes('HANDSTAND STATIC CAPACITY:')) {
-    const anchor = "    if (noReliableHandstandBalance) required.push('HANDSTAND BALANCE PROGRESSION: use wall-facing/back-to-wall work only as alignment support. Progress toward independent balance with controlled kick-up attempts, toe-pulls or brief assisted balance. Count kick-ups as attempts, usually 1-2 per mini-set, rather than fatigue reps. Do not make longer wall holds the main progression metric.');\n";
-    if (!src.includes(anchor)) throw new Error('handstand planner anchor missing');
-    src = src.replace(anchor, anchor + "    if (noReliableHandstandBalance) required.push('HANDSTAND STATIC CAPACITY: alongside independent balance practice, include a substantive wall-facing or appropriate wall-supported static handstand exposure in most weeks for line awareness, inversion confidence and shoulder endurance. This is required skill-capacity work, not merely a warm-up. Progress position quality before chasing longer fatigue holds.');\n");
-  }
-  return src;
-});
+// The zero-to-advanced roadmap prompt already states that current-state mandatory
+// components must be trained. The production semantic check above now makes that
+// instruction enforceable rather than relying on another planner-specific phrase.
 
 patch('test/fixtures/golden_programs.js', (src) => {
   if (src.includes("'Wall-Facing Handstand Hold'")) return src;
