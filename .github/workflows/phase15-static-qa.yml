@@ -113,7 +113,7 @@ jobs:
           runcheck grep_endurance_execution_composition grep -q 'ENDURANCE-EXECUTION-COMPOSITION' engine/exercise_dictionary.js
           runcheck grep_endurance_alias_hook grep -q 'ENDURANCE-CANONICAL-ALIAS-HOOK' engine/exercise_dictionary.js
           runcheck grep_qa_unknown_names grep -q 'QA-DIAGNOSTIC-UNKNOWN-NAMES' server.phase15.js
-          runcheck grep_direct_skill_protection grep -q 'if (!OPENAI_API_KEY)' server.phase15.js
+          runcheck grep_direct_skill_protection grep -q 'OPENAI-DIRECT-SKILL-CALIBRATION-GUARD' server.phase15.js
           runcheck grep_normalizer grep -q 'normalizeOpenAIExerciseNames' server.phase15.js
           runcheck grep_fast_path grep -q 'fast new-client intake persist' server.phase15.js
           runcheck grep_specialist grep -q 'buildSpecialistRules' engine/phase15_planner.js
