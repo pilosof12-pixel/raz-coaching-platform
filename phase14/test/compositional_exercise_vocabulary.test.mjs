@@ -46,6 +46,27 @@ test('composed variants retain deterministic equipment metadata', () => {
   assert.deepEqual(matchComposedExercise('Strict Ring Dip')?.requirements, ['rings']);
 });
 
+test('endurance execution labels canonicalize to structured movement identity', () => {
+  const cases = [
+    ['Easy Run', 'Run'],
+    ['Long Run', 'Run'],
+    ['Interval Run', 'Run'],
+    ['Threshold Run', 'Run'],
+    ['Run Intervals', 'Run'],
+    ['Ruck', 'Backpack Carry'],
+    ['Ruck March', 'Backpack Carry'],
+    ['Loaded March', 'Backpack Carry'],
+  ];
+  for (const [label, canonical] of cases) {
+    const match = matchDictionary(label);
+    assert.equal(match.status, 'alias', label);
+    assert.equal(match.canonical, canonical, label);
+    const result = validateExercisesAgainstDictionary(program(label), {});
+    assert.equal(result.ok, true, label);
+    assert.match(result.program, new RegExp(`\\t${canonical.replace(/[.*+?^${}()|[\\]\\]/g, '\\$&')}\\t`), label);
+  }
+});
+
 test('composition grammar does not turn arbitrary exercise-sounding strings into valid movements', () => {
   const fabricated = [
     'Cable Belt Squat Iron Cross Curl',
@@ -56,6 +77,9 @@ test('composition grammar does not turn arbitrary exercise-sounding strings into
     'Strict Sprint',
     'Strict Sled Push',
     'Strict Cable Row',
+    'Tactical Run Circuit',
+    'Loaded March Press',
+    'Ruck Burpee Complex',
   ];
   for (const exercise of fabricated) {
     assert.equal(matchDictionary(exercise).status, 'miss', exercise);
