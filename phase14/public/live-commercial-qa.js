@@ -4,7 +4,10 @@
   const loadResult = byId('load-result');
   const adjustResult = byId('adjust-result');
   const languageResult = byId('language-result');
+  const spreadsheetResult = byId('spreadsheet-result');
   const deleteResult = byId('delete-result');
+  let latestProgram = '';
+  let latestIntake = null;
 
   const set = (el, text, ok = null) => {
     el.textContent = text;
@@ -43,6 +46,13 @@
     });
   }
 
+  async function loadProgram(token) {
+    const data = await jsonFetch(`/api/program/${encodeURIComponent(token)}`);
+    latestProgram = String(data?.program || '');
+    latestIntake = data?.intake || null;
+    return data;
+  }
+
   async function pollJob(jobId, target) {
     for (let i = 0; i < 120; i += 1) {
       const job = await jsonFetch(`/api/job/${encodeURIComponent(jobId)}`);
@@ -63,6 +73,7 @@
     if (!jobId) throw new Error(`Request was accepted but no Job ID was returned: ${JSON.stringify(accepted)}`);
     set(target, `Accepted. Job: ${jobId}\nWaiting for production generation…`);
     const job = await pollJob(jobId, target);
+    if (job.program) latestProgram = String(job.program);
     return { accepted, jobId, job };
   }
 
@@ -71,7 +82,7 @@
       const token = requireCode();
       set(loadResult, 'Loading current program and commercial status…');
       const [program, status] = await Promise.all([
-        jsonFetch(`/api/program/${encodeURIComponent(token)}`),
+        loadProgram(token),
         passStatus(token),
       ]);
       const hasProgram = Boolean(program?.program);
@@ -102,6 +113,63 @@
     }
   });
 
+  byId('failed-adjustment').addEventListener('click', async () => {
+    try {
+      const token = requireCode();
+      set(adjustResult, 'Checking allowance before a deliberately oversized request…');
+      const before = await passStatus(token);
+      let rejectedBeforeJob = false;
+      let failureText = '';
+      try {
+        await jsonFetch('/api/adjust', {
+          method: 'POST',
+          body: JSON.stringify({ token, request: 'x'.repeat(5001) }),
+        });
+      } catch (err) {
+        rejectedBeforeJob = err.status === 413;
+        failureText = err.message;
+      }
+      const after = await passStatus(token);
+      const unchanged = Number(after.adjustments_used) === Number(before.adjustments_used);
+      const correct = rejectedBeforeJob && unchanged;
+      set(adjustResult,
+        `${correct ? 'PASS' : 'CHECK'}\nSafe failure response: ${failureText || 'request unexpectedly accepted'}\nRejected before generation job: ${rejectedBeforeJob}\nAdjustment usage before/after: ${before.adjustments_used}/${after.adjustments_used}\nNo adjustment credit consumed: ${unchanged}`,
+        correct);
+    } catch (err) {
+      set(adjustResult, `FAIL — ${err.message}`, false);
+    }
+  });
+
+  byId('seventh-adjustment').addEventListener('click', async () => {
+    try {
+      const token = requireCode();
+      const before = await passStatus(token);
+      if (Number(before.adjustments_remaining) !== 0) {
+        set(adjustResult, `NOT READY — this entitlement still has ${before.adjustments_remaining} adjustments remaining. Run successful substantive adjustments until the included allowance is exhausted, then use this check.`, null);
+        return;
+      }
+      let rejected = false;
+      let failureText = '';
+      try {
+        await jsonFetch('/api/adjust', {
+          method: 'POST',
+          body: JSON.stringify({ token, request: 'One more substantive adjustment after the included allowance is exhausted.' }),
+        });
+      } catch (err) {
+        rejected = err.status === 403;
+        failureText = err.message;
+      }
+      const after = await passStatus(token);
+      const unchanged = Number(after.adjustments_used) === Number(before.adjustments_used);
+      const correct = rejected && unchanged;
+      set(adjustResult,
+        `${correct ? 'PASS' : 'CHECK'}\n7th adjustment response: ${failureText || 'request unexpectedly accepted'}\nRejected before a generation job: ${rejected}\nAdjustment usage before/after: ${before.adjustments_used}/${after.adjustments_used}\nNo extra credit consumed: ${unchanged}`,
+        correct);
+    } catch (err) {
+      set(adjustResult, `FAIL — ${err.message}`, false);
+    }
+  });
+
   async function switchLanguage(language) {
     const token = requireCode();
     set(languageResult, `Reading allowance before language switch to ${language}…`);
@@ -122,6 +190,20 @@
     try { await switchLanguage('en'); } catch (err) { set(languageResult, `FAIL — ${err.message}`, false); }
   });
 
+  byId('export-spreadsheet').addEventListener('click', async () => {
+    try {
+      const token = requireCode();
+      set(spreadsheetResult, 'Loading latest persisted program before export…');
+      const data = await loadProgram(token);
+      if (!data?.program) throw new Error('No current program is available to export.');
+      if (typeof window.buildStrengthSpreadsheet !== 'function') throw new Error('Production spreadsheet exporter did not load.');
+      const rows = await window.buildStrengthSpreadsheet(data.program, data.intake || null);
+      set(spreadsheetResult, `PASS — production spreadsheet exporter completed from the latest persisted program (${rows} exercise rows). Check downloads.`, true);
+    } catch (err) {
+      set(spreadsheetResult, `FAIL — ${err.message}`, false);
+    }
+  });
+
   byId('delete-data').addEventListener('click', async () => {
     try {
       const token = requireCode();
@@ -135,7 +217,7 @@
 
       let programDeleted = false;
       try {
-        await jsonFetch(`/api/program/${encodeURIComponent(token)}`);
+        await loadProgram(token);
       } catch (err) {
         programDeleted = err.status === 404;
       }
