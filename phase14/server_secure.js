@@ -20,7 +20,7 @@ const GENERATION_ADJUSTS_PER_HOUR=Number(process.env.GENERATION_ADJUSTS_PER_HOUR
 const MAX_INTAKE_CHARS=Number(process.env.MAX_INTAKE_CHARS||30000);
 const MAX_FIELD_CHARS=Number(process.env.MAX_FIELD_CHARS||5000);
 const ADMIN_PROVISION_KEY=process.env.ADMIN_PROVISION_KEY||"";
-const COACHING_QUALITY_GATE_VERSION="advanced-hybrid-v1";
+const COACHING_QUALITY_GATE_VERSION="advanced-hybrid-v2";
 
 const passStore=await makeEntitlementStore();
 const analyticsStore=await makeAnalyticsStore();
