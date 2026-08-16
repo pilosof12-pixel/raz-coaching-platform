@@ -46,8 +46,11 @@ test('gross non-goal GPP volume is trimmed deterministically before spending ano
   );
 });
 
-test('MRV repair fails closed instead of cutting direct goal exposure to make the spreadsheet pass', () => {
-  const bloated = rewrite(tactical3KGoldenProgram(), 'Weighted Pull-up', 30);
+test('MRV repair fails closed instead of cutting a named direct goal to make the spreadsheet pass', () => {
+  // Back Squat is an explicit maintenance goal in this intake and is a tracked
+  // squat-pattern MRV exposure. Grossly overload it so the hard ceiling definitely
+  // trips, then prove deterministic support trimming refuses to alter the goal row.
+  const bloated = rewrite(tactical3KGoldenProgram(), 'Back Squat', 40);
   assert.throws(
     () => validateWeeklyVolumeBudgetSemantic(bloated, TACTICAL_3K_INTAKE),
     (err) => err?.code === 'WEEKLY_MRV_EXCEEDED',
@@ -55,5 +58,5 @@ test('MRV repair fails closed instead of cutting direct goal exposure to make th
 
   const repaired = trimExcessSupportVolume(bloated, TACTICAL_3K_INTAKE);
   assert.equal(Boolean(repaired.unresolved), true);
-  assert.deepEqual(setsFor(repaired.program, 'Weighted Pull-up'), setsFor(bloated, 'Weighted Pull-up'));
+  assert.deepEqual(setsFor(repaired.program, 'Back Squat'), setsFor(bloated, 'Back Squat'));
 });
