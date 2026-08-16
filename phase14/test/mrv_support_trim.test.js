@@ -21,7 +21,10 @@ function setsFor(program, exerciseName) {
 }
 
 test('gross non-goal GPP volume is trimmed deterministically before spending another AI repair attempt', () => {
-  const bloated = rewrite(tactical3KGoldenProgram(), 'Push-up', 20);
+  // MRV push reference is 20 sets and the hard gate is >135% of that reference.
+  // Use 30 support sets so the fixture is intentionally and unambiguously over the
+  // production ceiling instead of sitting inside the legal buffer.
+  const bloated = rewrite(tactical3KGoldenProgram(), 'Push-up', 30);
   assert.throws(
     () => validateWeeklyVolumeBudgetSemantic(bloated, TACTICAL_3K_INTAKE),
     (err) => err?.code === 'WEEKLY_MRV_EXCEEDED',
@@ -35,7 +38,7 @@ test('gross non-goal GPP volume is trimmed deterministically before spending ano
 
   const pushSets = setsFor(repaired.program, 'Push-up');
   assert.ok(pushSets.length > 0);
-  assert.ok(pushSets.every((sets) => sets >= 2 && sets < 20));
+  assert.ok(pushSets.every((sets) => sets >= 2 && sets < 30));
   assert.deepEqual(
     setsFor(repaired.program, 'Weighted Pull-up'),
     setsFor(bloated, 'Weighted Pull-up'),
@@ -44,7 +47,7 @@ test('gross non-goal GPP volume is trimmed deterministically before spending ano
 });
 
 test('MRV repair fails closed instead of cutting direct goal exposure to make the spreadsheet pass', () => {
-  const bloated = rewrite(tactical3KGoldenProgram(), 'Weighted Pull-up', 20);
+  const bloated = rewrite(tactical3KGoldenProgram(), 'Weighted Pull-up', 30);
   assert.throws(
     () => validateWeeklyVolumeBudgetSemantic(bloated, TACTICAL_3K_INTAKE),
     (err) => err?.code === 'WEEKLY_MRV_EXCEEDED',
