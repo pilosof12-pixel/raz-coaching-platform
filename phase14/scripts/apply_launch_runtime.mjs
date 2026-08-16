@@ -6,6 +6,14 @@ if (!html.includes('href="launch-mobile.css"')) {
   html = html.replace(/<\/head>/i, '  <link rel="stylesheet" href="launch-mobile.css">\n</head>');
 }
 
+// iPhone X-class devices only expose notch/home-indicator safe-area insets to
+// the page when viewport-fit=cover is present. Keep the existing responsive
+// viewport behavior and add only the iOS-safe-area capability.
+html = html.replace(
+  /<meta\s+name="viewport"\s+content="[^"]*"\s*\/?>/i,
+  '<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />'
+);
+
 // The legacy spreadsheet.js owns parser/backward-compatibility helpers, but the
 // approved parity exporter owns the actual customer workbook. Keep this order
 // explicit and deterministic: legacy parser -> approved exporter -> app.js.
