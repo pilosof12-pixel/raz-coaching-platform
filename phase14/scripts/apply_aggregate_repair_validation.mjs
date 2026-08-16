@@ -71,5 +71,15 @@ if (!src.includes(feedbackV3Marker)) {
   changed = true;
 }
 
+const feedbackV4Marker = 'ADVANCED-HYBRID-SQUAT-SPECIFICITY-REPAIR';
+if (!src.includes(feedbackV4Marker)) {
+  const anchor = '  const unknown = flags\n    .filter((flag) => flag?.code === "EXERCISE_HALLUCINATION")';
+  const count = src.split(anchor).length - 1;
+  if (count !== 1) throw new Error(`Hybrid squat repair feedback anchor expected once, found ${count}`);
+  const block = `  const hybridSquat = flags.find((flag) => flag?.code === "ADVANCED_HYBRID_SQUAT_SPECIFICITY");\n  if (hybridSquat) {\n    const fixedDays = Array.isArray(intake?.available_gym_days) ? intake.available_gym_days.join(', ') : '';\n    feedback += "\\nADVANCED-HYBRID-SQUAT-SPECIFICITY-REPAIR: Restore TWO direct Back Squat work rows in EVERY week, on two separate fixed gym days. Use the exact Exercise name Back Squat for both. One is a compact heavy exposure and one is a lower-cost volume/specificity exposure. Keep both through Week 4 even while reducing Week 4 sets. Do not count warm-up squats, split squats, leg press, machines, accessories or notes as either exposure. Fixed gym days are: " + fixedDays + ". Preserve all other already-valid primary goal exposures and trim accessories first."; // ${feedbackV4Marker}\n  }\n\n`;
+  src = src.replace(anchor, block + anchor);
+  changed = true;
+}
+
 fs.writeFileSync(target, src);
 console.log(`${target}: ${changed ? 'aggregate repair validation wired' : 'already current'}`);
