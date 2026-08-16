@@ -63,7 +63,7 @@ test('endurance execution labels canonicalize to structured movement identity', 
     assert.equal(match.canonical, canonical, label);
     const result = validateExercisesAgainstDictionary(program(label), {});
     assert.equal(result.ok, true, label);
-    assert.match(result.program, new RegExp(`\\t${canonical.replace(/[.*+?^${}()|[\\]\\]/g, '\\$&')}\\t`), label);
+    assert.ok(result.program.includes(`\t${canonical}\t`), `${label} should rewrite to ${canonical}`);
   }
 });
 
