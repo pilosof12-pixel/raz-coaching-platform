@@ -6,15 +6,29 @@ if (!html.includes('href="launch-mobile.css"')) {
   html = html.replace(/<\/head>/i, '  <link rel="stylesheet" href="launch-mobile.css">\n</head>');
 }
 
-// Load the approved client spreadsheet exporter after the legacy spreadsheet.js
-// has defined its parser helpers. This override produces the Youth-gymnastics
-// product structure: Overview -> Warm-Up -> Week 1 -> Week 2 -> Week 3 -> Week 4.
-if (!html.includes('src="spreadsheet-parity.js"')) {
-  if (html.includes('<script src="program-pass-gate.js"></script>')) {
-    html = html.replace('<script src="program-pass-gate.js"></script>', '<script src="spreadsheet-parity.js"></script>\n  <script src="program-pass-gate.js"></script>');
-  } else {
-    html = html.replace(/<\/body>/i, '  <script src="spreadsheet-parity.js"></script>\n</body>');
-  }
+// The legacy spreadsheet.js owns parser/backward-compatibility helpers, but the
+// approved parity exporter owns the actual customer workbook. Keep this order
+// explicit and deterministic: legacy parser -> approved exporter -> app.js.
+// Re-running launch:prepare removes/reinserts the parity tag so the order cannot
+// drift after other launch patches.
+const legacySpreadsheetTag = '<script src="spreadsheet.js"></script>';
+const paritySpreadsheetTag = '<script src="spreadsheet-parity.js"></script>';
+const appTag = '<script src="app.js"></script>';
+
+if (!html.includes(legacySpreadsheetTag)) {
+  throw new Error('launch runtime: spreadsheet.js anchor missing');
+}
+if (!html.includes(appTag)) {
+  throw new Error('launch runtime: app.js anchor missing');
+}
+html = html.replace(/\s*<script src="spreadsheet-parity\.js"><\/script>\s*/g, '\n  ');
+html = html.replace(legacySpreadsheetTag, `${legacySpreadsheetTag}\n  ${paritySpreadsheetTag}`);
+
+const legacyPos = html.indexOf(legacySpreadsheetTag);
+const parityPos = html.indexOf(paritySpreadsheetTag);
+const appPos = html.indexOf(appTag);
+if (!(legacyPos >= 0 && parityPos > legacyPos && appPos > parityPos)) {
+  throw new Error('launch runtime: approved spreadsheet exporter must load after spreadsheet.js and before app.js');
 }
 
 // Program Pass gate must load before launch-controls so it can reserve the
