@@ -17,6 +17,7 @@
     textarea { min-height:120px; resize:vertical; }
     button { margin-top:12px; padding:14px 16px; border:0; font-weight:800; background:#eef2f8; color:#1262d8; cursor:pointer; }
     button.secondary { background:#243657; color:#fff; }
+    button.danger { background:#4a1c2a; color:#ffd8df; }
     .status { margin-top:14px; white-space:pre-wrap; line-height:1.45; }
     .ok { color:#69e6b3; } .bad { color:#ff9f9f; } .muted { color:#9eabc2; }
     code { word-break:break-all; }
@@ -36,27 +37,39 @@
   </section>
 
   <section class="card">
-    <h2>Adjustment test</h2>
+    <h2>Adjustment allowance</h2>
     <label for="adjustment">Substantive adjustment request</label>
     <textarea id="adjustment">Keep the same goals and weekly availability. Make one useful, source-grounded adjustment to the current program while preserving the rest of the architecture.</textarea>
     <button id="run-adjustment" type="button">Run one substantive adjustment</button>
+    <button id="failed-adjustment" type="button" class="secondary">Force safe failed adjustment and verify no credit used</button>
+    <button id="seventh-adjustment" type="button" class="secondary">Check 7th-adjustment rejection when allowance is exhausted</button>
     <div id="adjust-result" class="status muted">No adjustment submitted.</div>
   </section>
 
   <section class="card">
-    <h2>Language switch test</h2>
+    <h2>Language switch</h2>
     <button id="switch-he" type="button" class="secondary">Switch to Hebrew</button>
     <button id="switch-en" type="button" class="secondary">Switch to English</button>
     <div id="language-result" class="status muted">No language switch submitted.</div>
   </section>
 
   <section class="card">
+    <h2>Spreadsheet after adjustment</h2>
+    <p>Exports the latest persisted program currently linked to this personal code using the production spreadsheet exporter.</p>
+    <button id="export-spreadsheet" type="button" class="secondary">Export latest program spreadsheet</button>
+    <div id="spreadsheet-result" class="status muted">No spreadsheet exported.</div>
+  </section>
+
+  <section class="card">
     <h2>Delete coaching data</h2>
     <p>This should remove coaching data while preserving commercial entitlement when enforcement is ON. Only use when you are ready to complete the deletion portion of the matrix.</p>
-    <button id="delete-data" type="button" class="secondary">Delete coaching data</button>
+    <button id="delete-data" type="button" class="danger">Delete coaching data and verify entitlement survives</button>
     <div id="delete-result" class="status muted">Deletion not requested.</div>
   </section>
 </main>
+<script src="/exceljs.lib.js"></script>
+<script src="/exerciseDemos.js"></script>
+<script src="/spreadsheet.js"></script>
 <script src="/live-commercial-qa.js" defer></script>
 </body>
 </html>
