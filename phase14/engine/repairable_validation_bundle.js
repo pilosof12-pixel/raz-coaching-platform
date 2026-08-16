@@ -136,11 +136,29 @@ function runRepairable(flags, fn) {
 
 function aggregateError(flags) {
   const clean = dedupeFlags(flags);
-  if (clean.length === 1 && clean[0].source_error) return clean[0].source_error;
+
+  // Every failure that reached this bundle has already been classified as
+  // repairable by runRepairable(). Never let a single newer semantic code escape
+  // directly to the outer generation loop, because that loop intentionally knows
+  // only the legacy RETRIABLE_CODES set plus this aggregate contract. Wrapping a
+  // single failure preserves its exact code/details in err.flags while ensuring
+  // attempts 2-4 receive the same repair path as multi-failure candidates.
+  if (
+    clean.length === 1 &&
+    clean[0].source_error?.code === 'PHASE15_QUALITY_VIOLATION' &&
+    Array.isArray(clean[0].source_error?.flags) &&
+    clean[0].source_error.flags.length
+  ) {
+    return clean[0].source_error;
+  }
 
   const amendment = [
-    'PRIOR ATTEMPT FAILED MULTIPLE REPAIRABLE VALIDATORS IN THE SAME CANDIDATE.',
-    'Repair ALL defects below in one pass. Do not fix one item by violating another item.',
+    clean.length > 1
+      ? 'PRIOR ATTEMPT FAILED MULTIPLE REPAIRABLE VALIDATORS IN THE SAME CANDIDATE.'
+      : 'PRIOR ATTEMPT FAILED A REPAIRABLE PRODUCTION VALIDATOR.',
+    clean.length > 1
+      ? 'Repair ALL defects below in one pass. Do not fix one item by violating another item.'
+      : 'Repair the defect below while preserving every already-valid program requirement.',
     ...clean.map((flag, i) => `${i + 1}. ${flag.code}: ${flag.amendment}`),
   ].join('\n');
   const err = new RetriableValidationError(
