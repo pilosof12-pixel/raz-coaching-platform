@@ -14,14 +14,14 @@ export function lockFinalPipelineSource(input) {
   // an exact kg may remain only when that exact variation has its own benchmark.
   once(
     'import { EXERCISE_DICTIONARY } from "./engine/exercise_dictionary.js";',
-    'import { EXERCISE_DICTIONARY } from "./engine/exercise_dictionary.js";\nimport { repairUnbenchmarkedVariationLoads } from "./engine/phase15_elite_guardrails.js"; // UNBENCHMARKED-VARIATION-REPAIR-WIRED\nimport { validateDirectGoalExposureSemantic, validateSportDayCouplingSemantic, validateWeeklyVolumeBudgetSemantic } from "./engine/semantic_program_qa.js"; // PROGRAM-MODEL-SEMANTIC-QA-WIRED\nimport { validateClientOutputCleanliness } from "./engine/client_output_qa.js"; // CLIENT-OUTPUT-CLEANLINESS-WIRED',
-    'variation-load and semantic QA imports'
+    'import { EXERCISE_DICTIONARY } from "./engine/exercise_dictionary.js";\nimport { repairUnbenchmarkedVariationLoads } from "./engine/phase15_elite_guardrails.js"; // UNBENCHMARKED-VARIATION-REPAIR-WIRED\nimport { validateDirectGoalExposureSemantic, validateSportDayCouplingSemantic, validateWeeklyVolumeBudgetSemantic } from "./engine/semantic_program_qa.js"; // PROGRAM-MODEL-SEMANTIC-QA-WIRED\nimport { validateClientOutputCleanliness } from "./engine/client_output_qa.js"; // CLIENT-OUTPUT-CLEANLINESS-WIRED\nimport { enrichSpecificWarmups } from "./engine/specific_warmup_enrichment.js"; // SPECIFIC-WARMUP-ENRICHMENT-WIRED',
+    'variation-load, warmup enrichment and semantic QA imports'
   );
 
   once(
     '    let program = fixInvalidExerciseNames(raw); // step 1',
-    '    let program = repairUnbenchmarkedVariationLoads(fixInvalidExerciseNames(raw), intake); // step 1: DETERMINISTIC-UNBENCHMARKED-LOAD-REPAIR',
-    'variation-load repair before QA'
+    '    let program = enrichSpecificWarmups(repairUnbenchmarkedVariationLoads(fixInvalidExerciseNames(raw), intake)); // step 1: DETERMINISTIC-UNBENCHMARKED-LOAD-REPAIR + SPECIFIC-WARMUP-ENRICHMENT',
+    'variation-load repair and specific warmup enrichment before QA'
   );
 
   // The V19 collision rule remains useful, but its old gym-day accounting treated
@@ -121,5 +121,5 @@ if (process.argv[1] && fileURLToPath(new URL(`file://${process.argv[1]}`)) === s
   const before = fs.readFileSync(runtimePath, 'utf8');
   const after = lockFinalPipelineSource(before);
   fs.writeFileSync(runtimePath, after);
-  console.log('Phase15 final pipeline locked: semantic ProgramModel QA + hybrid grounded repair + fail-closed save boundary');
+  console.log('Phase15 final pipeline locked: semantic ProgramModel QA + specific warmup enrichment + hybrid grounded repair + fail-closed save boundary');
 }
