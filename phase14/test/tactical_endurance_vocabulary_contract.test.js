@@ -19,12 +19,14 @@ test('production build applies bounded Tactical endurance identity normalization
   assert.doesNotMatch(vocab, /fuzzy/i);
 });
 
-test('QA-only hallucination diagnostics expose rejected names without changing normal client errors', () => {
+test('QA-only hallucination diagnostics expose rejected names from direct or aggregate failures', () => {
   const build = pkg.scripts['phase15:build'];
   assert.match(build, /apply_live_qa_diagnostics\.mjs/);
   assert.match(diagnostics, /intake\.qa_diagnostics === true/);
   assert.match(diagnostics, /repairCode === "EXERCISE_HALLUCINATION"/);
-  assert.match(diagnostics, /err\?\.details\?\.unknown/);
+  assert.match(diagnostics, /err\?\.flags/);
+  assert.match(diagnostics, /qaHallucinationSource\?\.details\?\.unknown/);
+  assert.match(diagnostics, /flag\?\.code === "EXERCISE_HALLUCINATION"/);
   assert.match(diagnostics, /slice\(0, 6\)/);
   assert.match(diagnostics, /QA-DIAGNOSTIC-UNKNOWN-NAMES/);
 });
