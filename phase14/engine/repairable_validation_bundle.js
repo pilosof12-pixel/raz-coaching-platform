@@ -13,6 +13,7 @@ import {
 import { repairPhase15Program } from './phase15_program_qa.js';
 import { validatePhase15FinalProgram } from './phase15_final_qa.js';
 import { parseProgramModel } from './program_model.js';
+import { trimExcessSupportVolume } from './mrv_support_trim.js';
 import {
   validateDirectGoalExposureSemantic,
   validateSportDayCouplingSemantic,
@@ -36,10 +37,6 @@ import { validateYouthConsolidationRetentionSemantic } from './coaching_consolid
 
 const NON_EXERCISE_ROW_NAMES = new Set(['rest', 'rest day', 'off', 'off day', 'recovery day']);
 
-// A rest/off day is schedule metadata, never an Exercise identity. Some model
-// outputs used one TSV row per empty day, which caused the zero-hallucination
-// gate to consume an entire repair attempt on the word "Rest". Remove only exact
-// non-training markers; Recovery Run, Rest-Pause work, etc. are untouched.
 export function stripNonExerciseScheduleRows(program, intake = {}) {
   const isHebrew = String(intake.language || '').toLowerCase() === 'he';
   const lines = String(program || '').split('\n');
@@ -155,21 +152,13 @@ function aggregateError(flags) {
   return err;
 }
 
-// Run deterministic transformations once, then collect every repairable coaching
-// defect that can be evaluated on the same candidate. This prevents a four-call
-// repair budget from being consumed one fail-fast validator at a time.
-//
-// skipSkillCalibration preserves the existing provider-specific contract: the
-// OpenAI Phase 15 path owns direct-skill selection through the grounded skeleton
-// and final semantic QA, so the legacy deterministic skill calibrator must not
-// rewrite those direct rows after generation. Legacy/Gemini paths keep the prior
-// calibration behavior by leaving this option false.
 export function collectRepairableValidationFailures(program, intake = {}, options = {}) {
   const skipSkillCalibration = options?.skipSkillCalibration === true;
   let candidate = stripNonExerciseScheduleRows(program, intake);
   const flags = [];
   let warnings = [];
   let schedule = [];
+  let mrv_trim = null;
 
   const dictionary = runRepairable(flags, () => validateExercisesAgainstDictionary(candidate, intake));
   if (dictionary.ok) candidate = dictionary.value.program;
@@ -184,6 +173,14 @@ export function collectRepairableValidationFailures(program, intake = {}, option
 
   const ordered = runRepairable(flags, () => enforceIntradayConditioningOrder(candidate, intake));
   if (ordered.ok && typeof ordered.value === 'string') candidate = ordered.value;
+
+  // MRV is a workload-accounting failure, not a reason to spend another model call
+  // if the candidate can be repaired conservatively. Trim only non-direct support
+  // sets, preserving all named-goal work and all run/ruck/event-specific exposure.
+  // The ordinary MRV validator remains in the chain below and still hard-fails if
+  // these bounded safe trims are insufficient.
+  mrv_trim = trimExcessSupportVolume(candidate, intake);
+  if (mrv_trim.repaired) candidate = mrv_trim.program;
 
   let model = parseProgramModel(candidate, intake);
   const semanticChecks = [
@@ -221,6 +218,11 @@ export function collectRepairableValidationFailures(program, intake = {}, option
     flags: dedupeFlags(flags),
     warnings,
     schedule,
+    mrv_trim: mrv_trim ? {
+      repaired: Boolean(mrv_trim.repaired),
+      reductions: mrv_trim.reductions || [],
+      unresolved: Boolean(mrv_trim.unresolved),
+    } : null,
     skill_calibration_skipped: skipSkillCalibration,
   };
 }
