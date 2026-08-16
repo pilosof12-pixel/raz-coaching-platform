@@ -47,15 +47,18 @@ function rowsForWeek(week) {
     : 'Easy conversational long run. Build marathon durability without adding hard intervals around five MMA sessions.';
 
   return [
+    ['Mon', '[WARMUP]', 'BW / barbell', '1', '8-10 min', 'N/A', 'N/A', `Squat prep: squat-and-reach x 6, bodyweight squat x 8. Ramp Back Squat: empty bar x 10, 60 kg x 5, 100 kg x 3, 140 kg x 2, ${week === 3 ? '170' : '165'} kg x 1 before work sets. Keep every ramp crisp.`, ''],
     ['Mon', 'Back Squat', `${squatHeavy} kg`, week === 4 ? '2' : '3', '3', '4 min', '7.5-8', 'Primary squat strength. Stop before grinding.', ''],
     ['Mon', 'One-Arm Pull-up', 'BW', `${strictOapSets}`, '1 / arm', '2-3 min', '8', 'Primary OAP skill-strength. Clean full-ROM singles with one rep in reserve.', ''],
     ['Mon', 'Pallof Press', 'RPE-selected load', '2', '8 / side', '60s', '6-7', 'Low-cost trunk support; remove first if MMA fatigue is high.', ''],
 
+    ['Tue', '[WARMUP]', 'BW / barbell', '1', '6-8 min', 'N/A', 'N/A', 'Press prep: scapular wall slide x 8 and band pull-apart x 12. Ramp Overhead Press: empty bar x 10, 40 kg x 5, 55 kg x 3, 65 kg x 1 before work sets.', ''],
     ['Tue', 'Overhead Press', `${ohp} kg`, week === 4 ? '2' : '3', week === 3 ? '4' : '5', '3 min', '7.5-8', 'Secondary strict OHP progression. Keep reps crisp before MMA.', ''],
     ['Tue', 'Bulgarian Split Squat', 'RPE-selected load', '2', '6 / side', '2 min', '7', 'Minimum useful unilateral hypertrophy/strength support.', ''],
 
     ['Wed', 'Run', 'Easy conversational pace', '1', `${runKm} km`, 'N/A', '4-5', runNote, ''],
 
+    ['Fri', '[WARMUP]', 'BW / barbell', '1', '8-10 min', 'N/A', 'N/A', 'Squat and pull prep: bodyweight squat x 8, scapular pull-up x 6. Ramp Back Squat: empty bar x 10, 60 kg x 5, 100 kg x 3, 135 kg x 2, 150 kg x 1 before work sets. Ramp Weighted Chin-up separately with BW x 5, +20 kg x 3, +35 kg x 2.', ''],
     ['Fri', 'Back Squat', `${squatVolume} kg`, week === 4 ? '2' : '3', '5', '3 min', '7-8', 'Primary squat volume exposure. Technique and bar speed stay repeatable.', ''],
     ['Fri', 'Assisted One-Arm Pull-up', week === 3 ? 'Minimum clean assistance' : 'Light assistance', '3', assistedReps, '2 min', '7-8', 'Second direct OAP exposure. Reduce assistance only when both arms stay symmetrical.', ''],
     ['Fri', 'Dip', 'BW', '2', '6-8', '90s', '7', 'Small pressing/hypertrophy floor; first accessory to trim when MMA recovery is poor.', ''],
