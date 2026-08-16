@@ -29,6 +29,10 @@ test('roadmap classifier covers launch-critical advanced families and endurance 
   assert.equal(roadmapFamilyForGoal('Full planche'), 'planche');
   assert.equal(roadmapFamilyForGoal('4 one-arm pull-ups'), 'one_arm_pull_up');
   assert.equal(roadmapFamilyForGoal('Freestanding handstand'), 'handstand');
+  assert.equal(roadmapFamilyForGoal('Freestanding HSPU'), 'hspu');
+  assert.equal(roadmapFamilyForGoal('90° HSPU'), 'hspu_90');
+  assert.equal(roadmapFamilyForGoal('90-degree handstand push-up'), 'hspu_90');
+  assert.equal(roadmapFamilyForGoal('Press to Handstand'), 'press_to_handstand');
   assert.equal(roadmapFamilyForGoal('First bar muscle-up'), 'bar_muscle_up');
   assert.equal(roadmapFamilyForGoal('Weighted chin-up +100 kg 1RM'), 'weighted_pull');
   assert.equal(roadmapFamilyForGoal('Weighted dip +120 kg'), 'weighted_dip');
@@ -39,7 +43,7 @@ test('roadmap classifier covers launch-critical advanced families and endurance 
 
 test('roadmaps encode stages, mandatory components, advancement and regression instead of flat aliases', () => {
   const summary = roadmapCoverageSummary();
-  const required = ['handstand','bar_muscle_up','planche','front_lever','human_flag','one_arm_pull_up','iron_cross','weighted_pull','weighted_dip','powerlifting','running_3k','marathon','combat_conditioning'];
+  const required = ['handstand','hspu','hspu_90','press_to_handstand','bar_muscle_up','planche','front_lever','human_flag','one_arm_pull_up','iron_cross','weighted_pull','weighted_dip','powerlifting','running_3k','marathon','combat_conditioning'];
   for (const family of required) {
     const graph = GOAL_PROGRESSION_GRAPHS[family];
     assert.ok(graph, `missing ${family}`);
@@ -48,6 +52,34 @@ test('roadmaps encode stages, mandatory components, advancement and regression i
     assert.ok(graph.advance && graph.regress, `${family} needs advance/regress rules`);
     assert.ok(summary.some((x) => x.family === family));
   }
+});
+
+test('HSPU, 90-degree HSPU and press-to-handstand remain distinct coaching adaptations', () => {
+  const hspu = GOAL_PROGRESSION_GRAPHS.hspu;
+  const ninety = GOAL_PROGRESSION_GRAPHS.hspu_90;
+  const press = GOAL_PROGRESSION_GRAPHS.press_to_handstand;
+  assert.match(hspu.endpoint, /freestanding handstand push-ups/i);
+  assert.match(ninety.endpoint, /horizontal\/planche-like bottom/i);
+  assert.ok(ninety.components.some((x) => x.id === 'horizontal_transition_control'));
+  assert.ok(press.components.some((x) => x.id === 'compression'));
+  assert.ok(press.components.some((x) => x.id === 'straight_arm_weight_shift'));
+  assert.match(press.regress, /feet jump/i);
+});
+
+test('press-to-handstand roadmap requires direct press entry rather than accepting kick-ups as a substitute', () => {
+  const prompt = buildRoadmapPromptRules({ primary_goals: ['Press to Handstand'] });
+  assert.match(prompt, /press_specific_entry/i);
+  assert.match(prompt, /rather than substituting kick-ups/i);
+  assert.match(prompt, /compression/i);
+  assert.match(prompt, /straight-arm shoulder elevation/i);
+});
+
+test('90-degree HSPU roadmap requires freestanding strength and transition control rather than generic wall HSPU volume', () => {
+  const prompt = buildRoadmapPromptRules({ primary_goals: ['Achieve a 90° HSPU'] });
+  assert.match(prompt, /PRIMARY hspu_90/);
+  assert.match(prompt, /freestanding HSPU strength reserve/i);
+  assert.match(prompt, /horizontal bottom position/i);
+  assert.match(prompt, /planche\/lean support capacity/i);
 });
 
 test('advanced calisthenics primary plus marathon side quest keeps both roadmaps and preserves priority tiers', () => {
