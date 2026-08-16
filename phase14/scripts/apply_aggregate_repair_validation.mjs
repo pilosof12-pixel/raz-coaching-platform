@@ -23,6 +23,29 @@ if (!/const MAX_ATTEMPTS\s*=\s*4\s*;\s*\/\/\s*OPENAI-MULTI-ATTEMPT-REPAIR-BUDGET
   throw new Error('Aggregate repair final attempt budget is not four');
 }
 
+// Provider reliability is separate from coaching repair. A temporary 429/5xx,
+// timeout, connection reset or provider-overload response must retry inside the
+// low-level AI call loop so it does not consume one of the four coaching QA passes.
+const providerRetryMarker = 'TRANSIENT-AI-PROVIDER-RETRY';
+if (!src.includes(providerRetryMarker)) {
+  const helperAnchor = 'async function runEngine(userContent) {';
+  const helperCount = src.split(helperAnchor).length - 1;
+  if (helperCount !== 1) throw new Error(`Provider retry helper anchor expected once, found ${helperCount}`);
+  const helper = `function isTransientAIProviderError(err) {\n  const status = Number(err?.status || err?.statusCode || err?.response?.status || 0);\n  if ([429, 500, 502, 503, 504].includes(status)) return true;\n  const code = String(err?.code || '').toUpperCase();\n  if (['ETIMEDOUT', 'ECONNRESET', 'ECONNREFUSED', 'EAI_AGAIN', 'UND_ERR_CONNECT_TIMEOUT', 'UND_ERR_HEADERS_TIMEOUT', 'UND_ERR_SOCKET'].includes(code)) return true;\n  const message = String(err?.message || err || '');\n  return /(?:\\b429\\b|\\b500\\b|\\b502\\b|\\b503\\b|\\b504\\b|high demand|overload|temporar(?:y|ily) unavailable|resource exhausted|rate limit|timed? out|timeout|connection reset|socket hang up)/i.test(message);\n}\n\nfunction transientAIRetryDelayMs(attempt) {\n  return Math.min(5000, 1000 * Math.max(1, Number(attempt) || 1));\n}\n\n// ${providerRetryMarker}\n`;
+  src = src.replace(helperAnchor, helper + helperAnchor);
+
+  const callAnchor = '    last = await runEngineRaw(userContent);';
+  const callCount = src.split(callAnchor).length - 1;
+  if (callCount !== 1) throw new Error(`Provider retry call anchor expected once, found ${callCount}`);
+  const replacement = `    try {\n      last = await runEngineRaw(userContent);\n    } catch (err) {\n      if (!isTransientAIProviderError(err) || attempt === MAX_ATTEMPTS) throw err;\n      const delayMs = transientAIRetryDelayMs(attempt);\n      console.warn(\`runEngine: transient AI provider failure on attempt \${attempt}/\${MAX_ATTEMPTS}; retrying in \${delayMs}ms: \${err?.message || err}\`);\n      await new Promise((resolve) => setTimeout(resolve, delayMs));\n      continue;\n    }`;
+  src = src.replace(callAnchor, replacement);
+  changed = true;
+}
+
+if (!src.includes(providerRetryMarker) || !src.includes('isTransientAIProviderError(err)')) {
+  throw new Error('Transient AI provider retry was not installed');
+}
+
 const importMarker = 'AGGREGATE-REPAIR-VALIDATION-WIRED';
 if (!src.includes(importMarker)) {
   const anchor = 'import { validateClientOutputCleanliness } from "./engine/client_output_qa.js"; // CLIENT-OUTPUT-CLEANLINESS-WIRED';
