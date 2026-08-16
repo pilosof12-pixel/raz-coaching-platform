@@ -1,6 +1,6 @@
 # RAZ AI Coaching Platform — Launch Checklist
 
-Status date: 2026-08-15
+Status date: 2026-08-16
 
 ## Completed / code-verified
 
@@ -42,6 +42,7 @@ Status date: 2026-08-15
 - [x] Concurrent recovery-budget logic prevents redundant bike/row conditioning from being added without a source-supported purpose.
 - [x] Marathon block logic anchored to current weekly volume, one-main-variable progression, stable support-strength dose and structural TSV validation.
 - [x] Exact `Parallel Box Squat` wording exposed by ping-pong QA is now normalized to canonical `Box Squat to Parallel` through the durable normalization patch.
+- [x] Tactical 3K/GPP live acceptance passed on 16 August 2026; exact production program and job snapshot are saved under `docs/qa/live-tactical/`, with coaching verdict recorded in `docs/qa/TACTICAL_LIVE_ACCEPTANCE_2026-08-16.md`.
 
 ### Seven-step coaching-engine integration
 
@@ -62,6 +63,7 @@ Status date: 2026-08-15
 - [x] Olympic-distance triathlon stress case passed.
 - [x] Marathon stress case manually accepted at ~9.1/10 after current-volume anchoring, single-lever progression and stable maintenance-strength fixes.
 - [x] Youth calisthenics adversarial live QA passed after exposing/fixing second-round ping-pong aliasing, compositional exercise-vocabulary gaps and missing direct bar-muscle-up/handstand skeleton slots.
+- [x] Tactical 3K/GPP live production generation passed after schedule, known-capacity pull-up dosing, GPP coverage, cumulative repair and canonical endurance-vocabulary fixes. Manual review accepted the architecture as launch-quality evidence; retain the exact program as a regression reference.
 
 ## Cardio / Endurance source cluster
 
