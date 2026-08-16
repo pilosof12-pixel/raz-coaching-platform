@@ -1,5 +1,6 @@
 (function () {
   const byId = (id) => document.getElementById(id);
+  let lastBuildJobId = '';
 
   function syncSpecificLiftingDays() {
     const group = byId('gym-availability-choice');
@@ -36,6 +37,34 @@
     }
   }
 
+  function installBuildSupportReference() {
+    const originalFetch = window.fetch.bind(window);
+    window.fetch = async function(input, init) {
+      const response = await originalFetch(input, init);
+      try {
+        const url = typeof input === 'string' ? input : String(input?.url || '');
+        const method = String(init?.method || (typeof input !== 'string' ? input?.method : '') || 'GET').toUpperCase();
+        if (method === 'POST' && /\/api\/build(?:$|\?)/.test(url)) {
+          const payload = await response.clone().json();
+          const id = payload?.job_id || payload?.jobId || payload?.id || payload?.job?.id || '';
+          if (id) lastBuildJobId = String(id);
+        }
+      } catch (_) {}
+      return response;
+    };
+
+    const status = byId('build-status');
+    if (!status) return;
+    const observer = new MutationObserver(() => {
+      const text = String(status.textContent || '');
+      if (!lastBuildJobId || !/Internal coaching QA could not repair|unusable result after multiple attempts/i.test(text)) return;
+      if (/Support reference:/i.test(text)) return;
+      status.textContent = `${text} Support reference: ${lastBuildJobId}`;
+    });
+    observer.observe(status, { childList: true, subtree: true, characterData: true });
+  }
+
   syncSpecificLiftingDays();
   assertGoalStepPrecedesMarkers();
+  installBuildSupportReference();
 })();
