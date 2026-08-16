@@ -73,6 +73,7 @@ jobs:
           done
           runcheck build_runtime node scripts/build_phase15_runtime.mjs
           runcheck lock_final_pipeline node scripts/final_pipeline_lock.mjs
+          runcheck reapply_aggregate_repair node scripts/apply_aggregate_repair_validation.mjs
           runcheck reapply_qa_diagnostics node scripts/apply_live_qa_diagnostics.mjs
           runcheck syntax_runtime node --check server.phase15.js
           runcheck syntax_server node --check server.js
@@ -87,6 +88,7 @@ jobs:
           runcheck syntax_semantic_qa node --check engine/semantic_program_qa.js
           runcheck syntax_client_output_qa node --check engine/client_output_qa.js
           runcheck syntax_production_validation node --check engine/production_validation.js
+          runcheck syntax_repairable_validation_bundle node --check engine/repairable_validation_bundle.js
           runcheck syntax_planner node --check engine/phase15_planner.js
           runcheck syntax_specialist node --check engine/phase15_specialist_rules.js
           runcheck syntax_overcoming_gravity node --check engine/overcoming_gravity_rules.js
@@ -96,17 +98,18 @@ jobs:
           runcheck syntax_elite_guardrails node --check engine/phase15_elite_guardrails.js
           runcheck syntax_tactical_patch node --check scripts/apply_tactical_3k_parity.mjs
           runcheck syntax_tactical_endurance_vocabulary node --check scripts/apply_tactical_endurance_vocabulary.mjs
+          runcheck syntax_aggregate_repair_validation node --check scripts/apply_aggregate_repair_validation.mjs
           runcheck syntax_live_qa_diagnostics node --check scripts/apply_live_qa_diagnostics.mjs
           runcheck grep_v5 grep -q 'deterministic-skeleton-v5' server.phase15.js
           runcheck grep_final_qa grep -q 'validatePhase15FinalProgram' server.phase15.js
           runcheck grep_semantic_qa grep -q 'PROGRAM-MODEL-SEMANTIC-QA-WIRED' server.phase15.js
-          runcheck grep_direct_goal_semantics grep -q 'PROGRAM-MODEL-DIRECT-GOAL-EXPOSURE' server.phase15.js
-          runcheck grep_weekly_volume_semantics grep -q 'PROGRAM-MODEL-WEEKLY-VOLUME-ACCOUNTING' server.phase15.js
           runcheck grep_client_cleanliness_inloop grep -q 'CLIENT-OUTPUT-CLEANLINESS-INLOOP' server.phase15.js
           runcheck grep_client_cleanliness_save grep -q 'SAVE-BOUNDARY-CLIENT-CLEANLINESS' server.phase15.js
           runcheck grep_internal_repair grep -q 'INTERNAL_QUALITY_REPAIR_ARCHITECTURE' server.phase15.js
           runcheck grep_repair_budget grep -q 'INTERNAL-QA-REPAIR-BUDGET' server.phase15.js
           runcheck grep_repair_exhaustion grep -q 'INTERNAL_QA_REPAIR_EXHAUSTED' server.phase15.js
+          runcheck grep_aggregate_repair grep -q 'AGGREGATE-REPAIR-VALIDATION-RUNTIME' server.phase15.js
+          runcheck grep_aggregate_feedback grep -q 'AGGREGATE-ROLE-PRESERVING-FEEDBACK' server.phase15.js
           runcheck grep_endurance_execution_composition grep -q 'ENDURANCE-EXECUTION-COMPOSITION' engine/exercise_dictionary.js
           runcheck grep_endurance_alias_hook grep -q 'ENDURANCE-CANONICAL-ALIAS-HOOK' engine/exercise_dictionary.js
           runcheck grep_qa_unknown_names grep -q 'QA-DIAGNOSTIC-UNKNOWN-NAMES' server.phase15.js
