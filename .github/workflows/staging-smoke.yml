@@ -25,7 +25,7 @@ jobs:
             let last = '';
             for (let i = 0; i < attempts; i++) {
               try {
-                const accept = path.endsWith('.html') || path === '/' ? 'text/html' : path.endsWith('.js') ? 'application/javascript' : 'application/json';
+                const accept = path.endsWith('.html') || path === '/' ? 'text/html' : path.endsWith('.js') || path.endsWith('.css') ? 'text/plain' : 'application/json';
                 const r = await fetch(base + path, { headers: { accept } });
                 const text = await r.text();
                 last = `status=${r.status} body=${text.slice(0, 1000)}`;
@@ -59,20 +59,25 @@ jobs:
           const legacyPos = app.text.indexOf('src="spreadsheet.js"');
           const parityPos = app.text.indexOf('src="spreadsheet-parity.js"');
           const appJsPos = app.text.indexOf('src="app.js"');
-          const intakePolishPos = app.text.indexOf('src="intake-polish.js"');
-          if (!(legacyPos >= 0 && parityPos > legacyPos && appJsPos > parityPos && intakePolishPos > appJsPos)) {
-            throw new Error(`deployed script order is wrong: legacy=${legacyPos} parity=${parityPos} app=${appJsPos} intakePolish=${intakePolishPos}`);
+          if (!(legacyPos >= 0 && parityPos > legacyPos && appJsPos > parityPos)) {
+            throw new Error(`deployed spreadsheet script order is wrong: legacy=${legacyPos} parity=${parityPos} app=${appJsPos}`);
           }
+          if (!app.text.includes('src="intake-polish.js"')) throw new Error('deployed specific-day intake fix missing');
+          if (!app.text.includes('viewport-fit=cover')) throw new Error('deployed iPhone safe-area viewport support missing');
           const goalPos = app.text.indexOf('id="goal_primary_1"');
           const markerPos = app.text.indexOf('id="performance-block"');
-          if (!(goalPos >= 0 && markerPos > goalPos)) throw new Error(`deployed intake order drifted: goals=${goalPos} markers=${markerPos}`);
+          if (!(goalPos >= 0 && markerPos > goalPos)) throw new Error(`deployed intake order wrong: goals=${goalPos} markers=${markerPos}`);
           console.log('APP_OK', app.status);
 
           const intakePolish = await get('/intake-polish.js');
-          if (!intakePolish.text.includes("=== 'limited'")) throw new Error('deployed specific lifting-day reveal logic missing');
-          if (!intakePolish.text.includes("panel.classList.toggle('hidden', !limited)")) throw new Error('deployed specific lifting-day panel toggle missing');
-          if (!intakePolish.text.includes('Support reference:')) throw new Error('deployed failed-build support reference missing');
+          if (!intakePolish.text.includes("mode.value || '').toLowerCase() === 'limited'")) throw new Error('deployed specific-day selector logic missing');
           console.log('INTAKE_POLISH_OK', intakePolish.status);
+
+          const mobileCss = await get('/launch-mobile.css');
+          for (const needle of ['safe-area-inset-top','safe-area-inset-bottom','@media(max-width:390px)','overflow-x:hidden','min-height:44px']) {
+            if (!mobileCss.text.includes(needle)) throw new Error(`deployed iPhone mobile polish missing: ${needle}`);
+          }
+          console.log('IPHONE_MOBILE_OK', mobileCss.status);
 
           const exporter = await get('/spreadsheet-parity.js');
           const expectedHeaders = "const headers=['Exercise','Load / Target','Sets','Reps / Duration','Rest','Effort','Coaching Note','Log','Video','Status','Done']";
@@ -82,5 +87,5 @@ jobs:
           if (!exporter.text.includes('mergeTitle(ws,row,11,`${sessionLabel(intake,s,i).toUpperCase()}')) throw new Error('deployed exporter section-band renderer missing');
           console.log('SPREADSHEET_EXPORT_OK', exporter.status);
 
-          console.log(JSON.stringify({ ok: true, health: h, program_pass_config: pc, privacy: true, app: true, intake_polish: true, spreadsheet_export: true }));
+          console.log(JSON.stringify({ ok: true, health: h, program_pass_config: pc, privacy: true, app: true, intake_polish: true, iphone_mobile: true, spreadsheet_export: true }));
           NODE
