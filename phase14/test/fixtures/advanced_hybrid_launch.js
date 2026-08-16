@@ -9,6 +9,8 @@ export const ADVANCED_HYBRID_LAUNCH_INTAKE = Object.freeze({
   days_per_week: 4,
   gym_availability_mode: 'limited',
   available_gym_days: ['Mon', 'Tue', 'Fri', 'Sun'],
+  equipment: 'Full commercial gym — all standard barbells, dumbbells, racks, machines, cables and bodyweight stations available.',
+  training_location: 'commercial_gym',
   sport: 'MMA',
   sport_sessions_per_week: 5,
   sport_schedule: [
