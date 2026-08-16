@@ -25,7 +25,8 @@ jobs:
             let last = '';
             for (let i = 0; i < attempts; i++) {
               try {
-                const r = await fetch(base + path, { headers: { accept: path.endsWith('.html') ? 'text/html' : 'application/json' } });
+                const accept = path.endsWith('.html') || path === '/' ? 'text/html' : path.endsWith('.js') ? 'application/javascript' : 'application/json';
+                const r = await fetch(base + path, { headers: { accept } });
                 const text = await r.text();
                 last = `status=${r.status} body=${text.slice(0, 1000)}`;
                 if (r.ok) return { status: r.status, text, headers: Object.fromEntries(r.headers) };
@@ -55,7 +56,21 @@ jobs:
 
           const app = await get('/');
           if (!/RAZ/i.test(app.text)) throw new Error('app shell does not look like RAZ coaching platform');
+          const legacyPos = app.text.indexOf('src="spreadsheet.js"');
+          const parityPos = app.text.indexOf('src="spreadsheet-parity.js"');
+          const appJsPos = app.text.indexOf('src="app.js"');
+          if (!(legacyPos >= 0 && parityPos > legacyPos && appJsPos > parityPos)) {
+            throw new Error(`deployed spreadsheet script order is wrong: legacy=${legacyPos} parity=${parityPos} app=${appJsPos}`);
+          }
           console.log('APP_OK', app.status);
 
-          console.log(JSON.stringify({ ok: true, health: h, program_pass_config: pc, privacy: true, app: true }));
+          const exporter = await get('/spreadsheet-parity.js');
+          const expectedHeaders = "const headers=['Exercise','Load / Target','Sets','Reps / Duration','Rest','Effort','Coaching Note','Log','Video','Status','Done']";
+          if (!exporter.text.includes(expectedHeaders)) throw new Error('deployed approved 11-column spreadsheet contract missing');
+          if (!exporter.text.includes('window.buildStrengthSpreadsheet=buildParitySpreadsheet')) throw new Error('deployed parity exporter does not own client export path');
+          if (!exporter.text.includes('const ss=sessions(week)')) throw new Error('deployed exporter is not grouping days/sessions as section bands');
+          if (!exporter.text.includes('mergeTitle(ws,row,11,`${sessionLabel(intake,s,i).toUpperCase()}')) throw new Error('deployed exporter section-band renderer missing');
+          console.log('SPREADSHEET_EXPORT_OK', exporter.status);
+
+          console.log(JSON.stringify({ ok: true, health: h, program_pass_config: pc, privacy: true, app: true, spreadsheet_export: true }));
           NODE
