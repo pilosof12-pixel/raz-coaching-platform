@@ -109,7 +109,7 @@ export function buildAdvancedHybridConcurrencyBrief(intake = {}) {
     lines.push('For a One-Arm Pull-up priority, keep direct unilateral skill-strength exposure protected. Weighted bilateral pulling is support and is reduced before direct OAP work when fatigue is excessive.');
   }
   if (/squat/i.test(arr(intake.primary_goals).join(' | '))) {
-    lines.push('For a squat primary goal, use compact heavy/volume specificity rather than filling multiple days with redundant knee-dominant accessories.');
+    lines.push('SQUAT PRIMARY HARD CONTRACT: every week must contain exactly two direct Back Squat work exposures on two separate fixed gym days: one compact heavy exposure and one lower-cost volume/specificity exposure. Both rows must use the exact Exercise name Back Squat. Never replace either exposure with a unilateral accessory, machine pattern, warm-up row or prose note. Trim accessories before removing either Back Squat exposure, including in Week 4 consolidation.');
   }
   if (/overhead\s*press|\bohp\b/i.test(arr(intake.secondary_goals).join(' | '))) {
     lines.push('For a secondary strict OHP goal, preserve at least one direct strict exposure and one low-cost complementary vertical-press exposure when recovery allows; do not turn secondary pressing into a high-volume hypertrophy block.');
