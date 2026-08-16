@@ -44,6 +44,15 @@ Status date: 2026-08-16
 - [x] Exact `Parallel Box Squat` wording exposed by ping-pong QA is now normalized to canonical `Box Squat to Parallel` through the durable normalization patch.
 - [x] Tactical 3K/GPP live acceptance passed on 16 August 2026; exact production program and job snapshot are saved under `docs/qa/live-tactical/`, with coaching verdict recorded in `docs/qa/TACTICAL_LIVE_ACCEPTANCE_2026-08-16.md`.
 
+### Coaching-quality polish before launch
+
+- [ ] Upgrade warm-up prescriptions from generic prep to session-specific preparation. Warm-ups should prepare the exact joints, movement patterns and intensity demands of the work that follows without creating meaningful fatigue.
+- [ ] Heavy strength sessions should include sensible progressive ramp-up sets toward the working load rather than only a generic five-minute warm-up. Example: deadlift warm-up should include deadlift-specific loading ramps before heavy work.
+- [ ] Pulling sessions should include specific scapular/shoulder preparation when appropriate, such as scapular pull-ups before pull-ups, chin-ups or muscle-up work.
+- [ ] Pressing/overhead sessions should include relevant shoulder and thoracic preparation when appropriate, such as controlled shoulder dislocates with a band/PVC or similar source-supported movement preparation.
+- [ ] Lower-body/full-body sessions should include useful movement-specific preparation when appropriate, such as squat-and-reach or overhead-squat patterning, rather than generic warm-up text alone.
+- [ ] Warm-up selection remains pain-aware, equipment-aware and low-fatigue; do not force the same drill menu into every program.
+
 ### Seven-step coaching-engine integration
 
 - [x] Step 1 — Physiology-first endurance cluster integrated into the Phase 14 authored knowledge layer.
@@ -147,11 +156,12 @@ Commercial enforcement is now enabled for controlled staging. Do not open broad 
 ## Remaining launch workstreams
 
 1. Verify service-role/rotated-admin-secret production setup.
-2. Finish the remaining Program Pass enforcement-ON staging acceptance matrix: second-personal-code protection, lost-response recovery, six adjustments + seventh rejection, failed-adjustment non-consumption, language switching, enforcement-ON deletion, expiry/grace and spreadsheet-after-adjustment.
-3. Run the real purchase journey: Newie purchase -> Program Pass -> intake -> clarification if needed -> generation -> spreadsheet -> leave -> return -> adjust -> language -> delete.
-4. Final real-iPhone UX check on intake and generated program tables.
-5. Add clean landing/Newie attribution where available, finish launch video/social assets, then launch to first paying users.
-6. Review conversion, generation cost, clarification frequency, adjustment usage and repurchase rate before changing price or allowances.
+2. Upgrade generic warm-up output to session-specific preparation: movement-specific activation, progressive ramp-up sets for heavy lifts, and pain/equipment-aware drills without unnecessary fatigue.
+3. Finish the remaining Program Pass enforcement-ON staging acceptance matrix: second-personal-code protection, lost-response recovery, six adjustments + seventh rejection, failed-adjustment non-consumption, language switching, enforcement-ON deletion, expiry/grace and spreadsheet-after-adjustment.
+4. Run the real purchase journey: Newie purchase -> Program Pass -> intake -> clarification if needed -> generation -> spreadsheet -> leave -> return -> adjust -> language -> delete.
+5. Final real-iPhone UX check on intake and generated program tables.
+6. Add clean landing/Newie attribution where available, finish launch video/social assets, then launch to first paying users.
+7. Review conversion, generation cost, clarification frequency, adjustment usage and repurchase rate before changing price or allowances.
 
 ## CI / branch status
 
