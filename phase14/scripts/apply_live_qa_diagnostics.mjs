@@ -15,7 +15,7 @@ const anchor = '        qaTrace.push(`A${attempt}:${repairLabel}`);';
 const count = src.split(anchor).length - 1;
 if (count !== 1) throw new Error(`QA diagnostic trace anchor expected once, found ${count}`);
 
-const replacement = `        const qaUnknownNames = intake && intake.qa_diagnostics === true && repairCode === "EXERCISE_HALLUCINATION" && Array.isArray(err?.details?.unknown)\n          ? err.details.unknown\n              .map((u) => String(u?.exercise || '').replace(/[\\r\\n\\[\\]|]+/g, ' ').trim().slice(0, 60))\n              .filter(Boolean)\n              .slice(0, 6)\n          : [];\n        const qaUnknownSuffix = qaUnknownNames.length ? '[' + qaUnknownNames.join('|') + ']' : '';\n        qaTrace.push(\`A\${attempt}:\${repairLabel}\${qaUnknownSuffix}\`); // QA-DIAGNOSTIC-UNKNOWN-NAMES`;
+const replacement = `        const qaHallucinationSource = repairCode === "EXERCISE_HALLUCINATION"\n          ? err\n          : (Array.isArray(err?.flags) ? err.flags.find((flag) => flag?.code === "EXERCISE_HALLUCINATION") : null);\n        const qaUnknownNames = intake && intake.qa_diagnostics === true && Array.isArray(qaHallucinationSource?.details?.unknown)\n          ? qaHallucinationSource.details.unknown\n              .map((u) => String(u?.exercise || '').replace(/[\\r\\n\\[\\]|]+/g, ' ').trim().slice(0, 60))\n              .filter(Boolean)\n              .slice(0, 6)\n          : [];\n        const qaUnknownSuffix = qaUnknownNames.length ? '[' + qaUnknownNames.join('|') + ']' : '';\n        qaTrace.push(\`A\${attempt}:\${repairLabel}\${qaUnknownSuffix}\`); // QA-DIAGNOSTIC-UNKNOWN-NAMES`;
 
 src = src.replace(anchor, replacement);
 fs.writeFileSync(target, src);
