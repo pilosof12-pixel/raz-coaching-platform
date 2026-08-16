@@ -28,8 +28,9 @@ test('launch runtime pins approved spreadsheet exporter after legacy parser and 
   assert.match(launch, /const legacySpreadsheetTag = '<script src="spreadsheet\.js"><\/script>';/);
   assert.match(launch, /const paritySpreadsheetTag = '<script src="spreadsheet-parity\.js"><\/script>';/);
   assert.match(launch, /const appTag = '<script src="app\.js"><\/script>';/);
-  assert.match(launch, /parityPos > legacyPos && appPos > parityPos/);
-  assert.match(launch, /approved spreadsheet exporter must load after spreadsheet\.js and before app\.js/);
+  assert.match(launch, /html = html\.replace\(legacySpreadsheetTag, `\$\{legacySpreadsheetTag\}\\n  \$\{paritySpreadsheetTag\}`\)/);
+  assert.match(launch, /legacyPos >= 0 && parityPos > legacyPos && appPos > parityPos/);
+  assert.match(launch, /generationProgressPos > intakePolishPos/);
 });
 
 test('approved weekly spreadsheet contract is exactly 11 columns and never exposes Day as a data column', () => {
