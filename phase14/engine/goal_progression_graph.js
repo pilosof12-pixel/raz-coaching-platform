@@ -15,10 +15,6 @@ function text(v) {
   if (v && typeof v === 'object') return JSON.stringify(v);
   return String(v || '');
 }
-function goalText(intake = {}) {
-  return [...arr(intake.primary_goals), ...arr(intake.secondary_goals), ...arr(intake.maintenance_goals)]
-    .map(String).join(' | ');
-}
 
 export const GOAL_PROGRESSION_GRAPHS = Object.freeze({
   handstand: {
@@ -39,6 +35,67 @@ export const GOAL_PROGRESSION_GRAPHS = Object.freeze({
     ],
     advance: 'Advance when entries and line are repeatable with improving independent balance; do not replace quality with more failed attempts.',
     regress: 'Regress assistance/ROM/difficulty when line breaks, repeated misses accumulate, pain appears, or the athlete cannot reproduce the current rung.',
+  },
+  hspu: {
+    family: 'hspu',
+    endpoint: 'Clean repeatable freestanding handstand push-ups through controlled full ROM',
+    stages: [
+      'pike pressing and overhead shoulder tolerance',
+      'elevated pike pressing',
+      'wall-supported partial ROM HSPU',
+      'full wall HSPU with improved line',
+      'deficit wall HSPU / increased ROM',
+      'freestanding eccentric control',
+      'clean freestanding HSPU',
+    ],
+    components: [
+      { id: 'vertical_press_specificity', description: 'Direct HSPU-pattern pressing at the athlete’s demonstrated rung rather than generic shoulder work.' },
+      { id: 'handstand_position', description: 'Enough inversion line and balance capacity to express pressing strength safely and efficiently.' },
+      { id: 'rom_control', description: 'Progressive ROM and eccentric control before forcing harder freestanding reps.' },
+    ],
+    advance: 'Advance ROM, balance demand or loading only after repeatable reps with a controlled head/hand position, stable shoulder elevation and no collapse through the trunk.',
+    regress: 'Regress ROM or balance demand when reps become head-first, excessively arched, asymmetrical, painful or non-repeatable.',
+  },
+  hspu_90: {
+    family: 'hspu_90',
+    endpoint: 'Controlled 90-degree handstand push-up: descend from handstand toward the horizontal/planche-like bottom and return to handstand',
+    stages: [
+      'strong full-ROM wall HSPU',
+      'clean freestanding HSPU',
+      'deficit freestanding pressing strength',
+      '90-degree eccentric / controlled lowering exposure',
+      'assisted or partial-range 90-degree return',
+      'full 90-degree HSPU single',
+      'repeatable 90-degree HSPU reps',
+    ],
+    components: [
+      { id: 'freestanding_press_strength', description: 'A genuine freestanding HSPU strength reserve; this goal must not be routed from ordinary wall pressing alone.' },
+      { id: 'horizontal_transition_control', description: 'Specific controlled exposure to the transition toward the horizontal bottom position without inventing unsupported exercise names.' },
+      { id: 'straight_arm_planche_support', description: 'Appropriate planche/lean support capacity when useful for the bottom-position mechanics and shoulder demand.' },
+    ],
+    advance: 'Advance the transition or return only after the athlete can control the eccentric and maintain shoulder/scapular position; the full skill is earned by control, not by accumulating failed attempts.',
+    regress: 'Return to a shorter ROM, stronger assistance or prerequisite pressing when the transition collapses, the athlete cannot reverse the bottom, or wrist/shoulder symptoms rise.',
+  },
+  press_to_handstand: {
+    family: 'press_to_handstand',
+    endpoint: 'Controlled press to handstand from the floor with no jump, using the athlete-appropriate pike/straddle pathway',
+    stages: [
+      'wrist tolerance, shoulder elevation and basic compression',
+      'standing/seated pike or straddle compression strength',
+      'elevated or feet-assisted press weight shift',
+      'controlled press negative from handstand',
+      'partial-range press with reduced foot assistance',
+      'full straddle or pike press to handstand single',
+      'repeatable press entries and more demanding shapes when appropriate',
+    ],
+    components: [
+      { id: 'compression', description: 'Specific active pike/straddle compression and hip-flexion strength appropriate to the chosen press shape.' },
+      { id: 'straight_arm_weight_shift', description: 'Straight-arm shoulder elevation and forward weight shift over the hands; pressing strength alone is not sufficient.' },
+      { id: 'press_specific_entry', description: 'Direct press-specific negatives, assisted presses or partial presses rather than substituting kick-ups.' },
+      { id: 'handstand_finish', description: 'Enough handstand line/balance capacity to finish and control the top position.' },
+    ],
+    advance: 'Reduce foot assistance or increase press ROM only when the athlete can keep elbows straight, maintain scapular elevation and move the hips over the hands without jumping.',
+    regress: 'Increase elevation/assistance or return to compression and negative work when elbows bend, the feet jump, the hips cannot pass over the hands, or wrist/hamstring tolerance limits the shape.',
   },
   bar_muscle_up: {
     family: 'bar_muscle_up',
@@ -183,7 +240,10 @@ export function roadmapFamilyForGoal(goal) {
   if (/human\s*flag|\bflag\b/.test(s)) return 'human_flag';
   if (/planche/.test(s)) return 'planche';
   if (/bar\s*muscle[-\s]?up/.test(s)) return 'bar_muscle_up';
-  if (/freestanding\s*handstand|handstand\s*balance|unsupported\s*handstand|\bhandstand\b/.test(s) && !/push[-\s]?up|hspu|walk/.test(s)) return 'handstand';
+  if (/(?:90\s*(?:°|º|degree|deg)|90[-\s]?degree)[^|,;]{0,35}(?:hspu|hand\s*stand\s*push)|(?:hspu|hand\s*stand\s*push)[^|,;]{0,35}90\s*(?:°|º|degree|deg)/.test(s)) return 'hspu_90';
+  if (/press\s+(?:to|into)\s+hand\s*stand|hand\s*stand\s+press|press[-\s]?handstand/.test(s)) return 'press_to_handstand';
+  if (/\bhspu\b|hand\s*stand\s*push[-\s]?up/.test(s)) return 'hspu';
+  if (/freestanding\s*handstand|handstand\s*balance|unsupported\s*handstand|\bhandstand\b/.test(s) && !/push[-\s]?up|hspu|walk|press/.test(s)) return 'handstand';
   if (/weighted\s*(pull[-\s]?up|chin[-\s]?up)/.test(s)) return 'weighted_pull';
   if (/weighted\s*dip|dip[^|,;]{0,30}\+\s*\d+\s*kg/.test(s)) return 'weighted_dip';
   if (/powerlift|squat.*bench.*deadlift|bench.*squat.*deadlift/.test(s)) return 'powerlifting';
@@ -249,8 +309,9 @@ function handstandComponentAnalysis(model, intake) {
     for (const day of week.days || []) {
       for (const ex of day.exercises || []) {
         if (ex.role === 'warm_up' || ex.modality === 'warm_up') continue;
-        if (ex.base_movement !== 'handstand') continue;
         const name = String(ex.exercise || ex.name || '').toLowerCase();
+        const semanticHandstand = ex.base_movement === 'handstand' || /hand\s*stand|handstand|kick[- ]?up/.test(name);
+        if (!semanticHandstand) continue;
         const isStatic = (ex.execution_modifiers || []).includes('isometric') || /\bhold\b/.test(name);
         if (/\bwall\b|belly[- ]to[- ]wall|chest[- ]to[- ]wall|back[- ]to[- ]wall/.test(name) && isStatic) wallStatic += 1;
         if (/kick[- ]?up|freestanding|unsupported|toe[- ]?pull|balance/.test(name)) entryBalance += 1;
