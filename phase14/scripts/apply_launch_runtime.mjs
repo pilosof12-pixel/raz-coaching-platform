@@ -23,6 +23,7 @@ const legacySpreadsheetTag = '<script src="spreadsheet.js"></script>';
 const paritySpreadsheetTag = '<script src="spreadsheet-parity.js"></script>';
 const appTag = '<script src="app.js"></script>';
 const intakePolishTag = '<script src="intake-polish.js"></script>';
+const generationProgressTag = '<script src="generation-progress.js"></script>';
 
 if (!html.includes(legacySpreadsheetTag)) {
   throw new Error('launch runtime: spreadsheet.js anchor missing');
@@ -33,14 +34,16 @@ if (!html.includes(appTag)) {
 html = html.replace(/\s*<script src="spreadsheet-parity\.js"><\/script>\s*/g, '\n  ');
 html = html.replace(legacySpreadsheetTag, `${legacySpreadsheetTag}\n  ${paritySpreadsheetTag}`);
 html = html.replace(/\s*<script src="intake-polish\.js"><\/script>\s*/g, '\n  ');
-html = html.replace(appTag, `${appTag}\n  ${intakePolishTag}`);
+html = html.replace(/\s*<script src="generation-progress\.js"><\/script>\s*/g, '\n  ');
+html = html.replace(appTag, `${appTag}\n  ${intakePolishTag}\n  ${generationProgressTag}`);
 
 const legacyPos = html.indexOf(legacySpreadsheetTag);
 const parityPos = html.indexOf(paritySpreadsheetTag);
 const appPos = html.indexOf(appTag);
 const intakePolishPos = html.indexOf(intakePolishTag);
-if (!(legacyPos >= 0 && parityPos > legacyPos && appPos > parityPos && intakePolishPos > appPos)) {
-  throw new Error('launch runtime: approved spreadsheet exporter must load after spreadsheet.js and before app.js, and intake polish must load after app.js');
+const generationProgressPos = html.indexOf(generationProgressTag);
+if (!(legacyPos >= 0 && parityPos > legacyPos && appPos > parityPos && intakePolishPos > appPos && generationProgressPos > intakePolishPos)) {
+  throw new Error('launch runtime: approved spreadsheet exporter must load before app.js; intake polish and generation progress must load after app.js');
 }
 
 // Program Pass gate must load before launch-controls so it can reserve the
