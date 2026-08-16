@@ -61,6 +61,9 @@ jobs:
               'Weighted Chin-up: +80 kg 1RM',
               'Running: 1 session a week, about 20 km total, longest recent run about 20 km'
             ].join('\n'),
+            clarification_answers:{
+              running_current_exposure:'Currently one running session per week, about 20 km total weekly running, with the longest recent run about 20 km.'
+            },
             injuries:'None reported',
             pain:{active:false},
             mobility:{active:false},
