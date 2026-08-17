@@ -1,6 +1,6 @@
 import { isHighConcurrencyHybrid } from './advanced_hybrid_concurrency.js';
 
-function arr(v) { return Array.isArray(v) ? v : v ? [v] : []; }
+function arr(v) { return Array.isArray(v) ? v : v ? [v].filter(Boolean) : []; }
 function primaryText(intake = {}) { return arr(intake.primary_goals).map(String).join(' | '); }
 function isStrictOap(name) { return /^\s*One-Arm Pull-up\s*$/i.test(String(name || '')); }
 function isWarmup(name) { return /^\s*\[WARMUP\](?:\s|$)/i.test(String(name || '')); }
@@ -19,10 +19,15 @@ function parseWeek(program, weekNumber) {
   return { re, match, header, index, rows };
 }
 
+// Deliberately mirrors advanced_hybrid_quality.js numericSets(): the release gate
+// uses the first numeric value in the Sets cell. A generated value such as
+// "4 / arm" or "4 sets" is therefore not ambiguous to the validator and must not
+// make the deterministic repair silently no-op. We still reject fractional set
+// counts because writing a fractional training set would not be a safe repair.
 function numericSets(raw) {
-  const text = String(raw || '').trim();
-  if (!/^\d+(?:\.0+)?$/.test(text)) return null;
-  const n = Number(text);
+  const m = String(raw || '').match(/\d+(?:\.\d+)?/);
+  if (!m) return null;
+  const n = Number(m[0]);
   return Number.isInteger(n) && n > 0 ? n : null;
 }
 
@@ -50,9 +55,9 @@ function addConsolidationCue(existing) {
 // The Advanced Hybrid quality gate already defines the contract: Week 4 strict
 // One-Arm Pull-up volume may hold or reduce versus Week 3, but must not increase.
 // This normalizer changes only that violated axis. It never adds OAP work, never
-// changes Weeks 1-3, and never touches assisted OAP rows. If set prescriptions are
-// not unambiguous positive integers, it no-ops and the normal fail-closed validator
-// remains authoritative.
+// changes Weeks 1-3, and never touches assisted OAP rows. Set parsing intentionally
+// matches the release validator; repaired Week-4 set cells become exact integers
+// so a range/suffix cannot hide a higher-volume interpretation after convergence.
 export function normalizeAdvancedHybridWeek4OapConsolidation(program, intake = {}) {
   const original = String(program || '');
   if (!isHighConcurrencyHybrid(intake) || !/(?:one[- ]?arm pull[- ]?ups?|\boap\b)/i.test(primaryText(intake))) {
