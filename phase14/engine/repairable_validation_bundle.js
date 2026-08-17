@@ -35,6 +35,11 @@ import {
 } from './coaching_acceptance_quality.js';
 import { validateYouthConsolidationRetentionSemantic } from './coaching_consolidation_quality.js';
 import { validateGoalComponentCoverageSemantic } from './goal_progression_graph.js';
+import { validateAdvancedHybridQualitySemantic } from './advanced_hybrid_quality.js';
+import {
+  validateYouthManualAcceptanceSemantic,
+  validateAdvancedHybridManualAcceptanceSemantic,
+} from './manual_acceptance_quality.js';
 
 const NON_EXERCISE_ROW_NAMES = new Set(['rest', 'rest day', 'off', 'off day', 'recovery day']);
 
@@ -137,12 +142,6 @@ function runRepairable(flags, fn) {
 function aggregateError(flags) {
   const clean = dedupeFlags(flags);
 
-  // Every failure that reached this bundle has already been classified as
-  // repairable by runRepairable(). Never let a single newer semantic code escape
-  // directly to the outer generation loop, because that loop intentionally knows
-  // only the legacy RETRIABLE_CODES set plus this aggregate contract. Wrapping a
-  // single failure preserves its exact code/details in err.flags while ensuring
-  // attempts 2-4 receive the same repair path as multi-failure candidates.
   if (
     clean.length === 1 &&
     clean[0].source_error?.code === 'PHASE15_QUALITY_VIOLATION' &&
@@ -193,11 +192,6 @@ export function collectRepairableValidationFailures(program, intake = {}, option
   const ordered = runRepairable(flags, () => enforceIntradayConditioningOrder(candidate, intake));
   if (ordered.ok && typeof ordered.value === 'string') candidate = ordered.value;
 
-  // MRV is a workload-accounting failure, not a reason to spend another model call
-  // if the candidate can be repaired conservatively. Trim only non-direct support
-  // sets, preserving all named-goal work and all run/ruck/event-specific exposure.
-  // The ordinary MRV validator remains in the chain below and still hard-fails if
-  // these bounded safe trims are insufficient.
   mrv_trim = trimExcessSupportVolume(candidate, intake);
   if (mrv_trim.repaired) candidate = mrv_trim.program;
 
@@ -209,6 +203,9 @@ export function collectRepairableValidationFailures(program, intake = {}, option
     () => validateProgressionArchitectureSemantic(candidate, intake, model),
     () => validateYouthProgressionQualitySemantic(candidate, intake, model),
     () => validateYouthConsolidationRetentionSemantic(candidate, intake, model),
+    () => validateYouthManualAcceptanceSemantic(candidate, intake, model),
+    () => validateAdvancedHybridQualitySemantic(candidate, intake),
+    () => validateAdvancedHybridManualAcceptanceSemantic(candidate, intake, model),
     () => validateTacticalScheduleArchitectureSemantic(candidate, intake, model),
     () => validateKnownMaxPullUpDoseSemantic(candidate, intake, model),
     () => validateTacticalGppCoverageSemantic(candidate, intake, model),
