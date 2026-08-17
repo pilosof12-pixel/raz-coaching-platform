@@ -163,6 +163,21 @@ export function validateAdvancedHybridQualitySemantic(program, intake = {}) {
     );
   }
 
+  if (/one[- ]?arm\s*(?:pull|chin)|\boap\b/.test(primary)) {
+    const strictOapSets = (rows) => rows
+      .filter((r) => !isWarmup(r) && /^one-arm pull-up$/i.test(r.exercise))
+      .reduce((sum, r) => sum + numericSets(r), 0);
+    const w3OapSets = strictOapSets(w3);
+    const w4OapSets = strictOapSets(w4);
+    if (w3OapSets > 0 && w4OapSets > w3OapSets) {
+      fail(
+        'ADVANCED_HYBRID_WEEK4_OAP_VOLUME_INCREASED',
+        `Week 4 is a consolidation week, but strict One-Arm Pull-up work increases from ${w3OapSets} sets in Week 3 to ${w4OapSets}. Preserve skill quality while holding or reducing direct strict OAP sets; do not call an increase in primary-skill volume a reduction merely because accessories decreased elsewhere. Keep the required assisted OAP exposure and reduce fatigue around it.`,
+        { w3OapSets, w4OapSets },
+      );
+    }
+  }
+
   const baseline = currentRunBaseline(intake);
   if (baseline.weekly_km) {
     const w1Run = (weeks.get(1) || []).filter(isRun).map(numericKm).find((n) => n != null);
