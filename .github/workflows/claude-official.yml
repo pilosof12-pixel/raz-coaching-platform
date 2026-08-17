@@ -1,6 +1,10 @@
 name: Claude Code Official
 
 on:
+  push:
+    branches: [privacy-security-hardening]
+    paths:
+      - '.github/workflows/claude-official.yml'
   issue_comment:
     types: [created]
   pull_request_review_comment:
@@ -26,5 +30,6 @@ jobs:
         with:
           anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
           github_token: ${{ secrets.GITHUB_TOKEN }}
+          prompt: ${{ github.event_name == 'push' && 'Verification only: inspect the repository and reply with a short confirmation that Claude Code Action authenticated successfully. Do not modify files.' || '' }}
           additional_permissions: |
             actions: read
