@@ -1,1 +1,1 @@
-launch-acceptance-v9-openai-retry
+launch-acceptance-v10-openai-fresh-key
