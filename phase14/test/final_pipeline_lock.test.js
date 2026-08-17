@@ -73,6 +73,15 @@ test('unbenchmarked variation load repair remains wired before coaching QA', () 
   assert.match(out, /repairUnbenchmarkedVariationLoads\(fixInvalidExerciseNames\(raw\), intake\)/);
 });
 
+test('youth primary-skill-order repair remains wired before coaching QA', () => {
+  const out = lockFinalPipelineSource(fixture());
+  assert.match(out, /YOUTH-SKILL-ORDER-REPAIR-WIRED/);
+  assert.match(
+    out,
+    /normalizeYouthPrimarySkillOrder\(enrichSpecificWarmups\(repairUnbenchmarkedVariationLoads\(fixInvalidExerciseNames\(raw\), intake\)\), intake\)\.program/,
+  );
+});
+
 test('production semantic QA uses ProgramModel for strength-day accounting, direct goal exposure and weekly volume', () => {
   const out = lockFinalPipelineSource(fixture());
   assert.match(out, /PROGRAM-MODEL-SEMANTIC-QA-WIRED/);
