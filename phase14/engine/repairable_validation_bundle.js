@@ -14,6 +14,10 @@ import { repairPhase15Program } from './phase15_program_qa.js';
 import { validatePhase15FinalProgram } from './phase15_final_qa.js';
 import { parseProgramModel } from './program_model.js';
 import { trimExcessSupportVolume } from './mrv_support_trim.js';
+import { enrichSpecificWarmups } from './specific_warmup_enrichment.js';
+import { normalizeYouthPrimarySkillOrder } from './youth_skill_order_normalizer.js';
+import { normalizeYouthAcquisitionGoalFloors } from './youth_goal_floor_normalizer.js';
+import { normalizeTacticalGppFloor } from './tactical_gpp_normalizer.js';
 import {
   validateDirectGoalExposureSemantic,
   validateSportDayCouplingSemantic,
@@ -169,6 +173,31 @@ function aggregateError(flags) {
   return err;
 }
 
+function applyDeterministicCandidateRepairs(program, intake = {}) {
+  let candidate = String(program || '');
+  const repairs = [];
+
+  const warmed = enrichSpecificWarmups(candidate);
+  if (warmed !== candidate) {
+    candidate = warmed;
+    repairs.push({ type: 'specific_warmup_enrichment' });
+  }
+
+  const youthFloors = normalizeYouthAcquisitionGoalFloors(candidate, intake);
+  candidate = youthFloors.program;
+  if (youthFloors.repaired) repairs.push({ type: 'youth_acquisition_goal_floor', rows: youthFloors.repairs });
+
+  const tacticalGpp = normalizeTacticalGppFloor(candidate, intake);
+  candidate = tacticalGpp.program;
+  if (tacticalGpp.repaired) repairs.push({ type: 'tactical_gpp_floor', rows: tacticalGpp.repairs });
+
+  const youthOrder = normalizeYouthPrimarySkillOrder(candidate, intake);
+  candidate = youthOrder.program;
+  if (youthOrder.reordered) repairs.push({ type: 'youth_primary_skill_order', moves: youthOrder.moves });
+
+  return { program: candidate, repairs };
+}
+
 export function collectRepairableValidationFailures(program, intake = {}, options = {}) {
   const skipSkillCalibration = options?.skipSkillCalibration === true;
   let candidate = stripNonExerciseScheduleRows(program, intake);
@@ -176,13 +205,29 @@ export function collectRepairableValidationFailures(program, intake = {}, option
   let warnings = [];
   let schedule = [];
   let mrv_trim = null;
+  let deterministic_repairs = [];
 
+  // Normalize the model-authored exercise vocabulary first. Deterministic coaching
+  // floors are only applied after that initial dictionary pass so they operate on
+  // stable movement identity rather than trying to infer intent from a rejected
+  // exercise name.
   const dictionary = runRepairable(flags, () => validateExercisesAgainstDictionary(candidate, intake));
   if (dictionary.ok) candidate = dictionary.value.program;
 
   if (!skipSkillCalibration) {
     const skills = runRepairable(flags, () => validateAndCalibrateSkills(candidate, intake));
     if (skills.ok) candidate = skills.value.program;
+  }
+
+  if (dictionary.ok) {
+    const normalized = applyDeterministicCandidateRepairs(candidate, intake);
+    candidate = normalized.program;
+    deterministic_repairs = normalized.repairs;
+
+    // The repair layer inserts only canonical source-authored movements, but run
+    // the same dictionary gate again so production never grants itself a bypass.
+    const repairedDictionary = runRepairable(flags, () => validateExercisesAgainstDictionary(candidate, intake));
+    if (repairedDictionary.ok) candidate = repairedDictionary.value.program;
   }
 
   runRepairable(flags, () => validateEquipmentAgainstLocation(candidate, intake));
@@ -233,6 +278,7 @@ export function collectRepairableValidationFailures(program, intake = {}, option
     flags: dedupeFlags(flags),
     warnings,
     schedule,
+    deterministic_repairs,
     mrv_trim: mrv_trim ? {
       repaired: Boolean(mrv_trim.repaired),
       reductions: mrv_trim.reductions || [],
