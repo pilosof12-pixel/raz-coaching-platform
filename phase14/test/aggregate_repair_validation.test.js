@@ -18,6 +18,7 @@ function brokenWeek(week) {
     ['Wed', 'Pull-up', 'Bodyweight', '2', '8', '2 min', '7', 'Strict pull-up capacity.', ''],
     ['Wed', 'Pallof Press', 'RPE-selected load', '2', '10 / side', '60s', '6', 'Trunk support.', ''],
     ['Thu', 'Ring Hamstring Curl', 'Bodyweight', '2', '10', '60s', '6', 'Posterior-chain support.', ''],
+    ['Thu', 'Quantum Hamstring Curl', 'Bodyweight', '2', '8', '60s', '6', 'Deliberately invented QA exercise.', ''],
     ['Fri', 'Run', '5:30 / km', '1', '40 min', 'N/A', '4', 'Long aerobic run.', ''],
     ['Fri', 'Deadlift', 'RPE-selected load', '2', '3', '3 min', '7', 'Strength maintenance.', ''],
     ['Fri', 'Overhead Press', 'RPE-selected load', '2', '5', '2 min', '6-7', 'Push support.', ''],
@@ -41,6 +42,7 @@ test('Rest and Off schedule markers are removed before exercise identity QA', ()
   assert.doesNotMatch(stripped, /^(?:Mon|Tue|Wed|Thu|Fri|Sat|Sun)\t(?:Rest|Rest Day|Off|Off Day|Recovery Day)\t/m);
   assert.match(stripped, /\tRun\t/);
   assert.match(stripped, /\tRing Hamstring Curl\t/);
+  assert.match(stripped, /\tQuantum Hamstring Curl\t/);
 });
 
 test('live Tactical cascade is reported as one aggregate repair contract instead of fail-fast attempts', () => {
@@ -54,7 +56,8 @@ test('live Tactical cascade is reported as one aggregate repair contract instead
 
   const hallucination = result.flags.find((flag) => flag.code === 'EXERCISE_HALLUCINATION');
   const unknown = (hallucination?.details?.unknown || []).map((row) => row.exercise);
-  assert.ok(unknown.includes('Ring Hamstring Curl'), unknown.join(' | '));
+  assert.ok(unknown.includes('Quantum Hamstring Curl'), unknown.join(' | '));
+  assert.ok(!unknown.includes('Ring Hamstring Curl'), unknown.join(' | '));
   assert.ok(!unknown.includes('Rest'), unknown.join(' | '));
 });
 
