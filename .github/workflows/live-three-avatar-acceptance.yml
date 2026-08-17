@@ -1,5 +1,5 @@
 name: Live Three Avatar Acceptance
-# acceptance-trigger: post-youth-convergence-ab72fc9
+# acceptance-trigger: round3-37fb53a1-2026-08-17
 
 on:
   push:
