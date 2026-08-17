@@ -1575,13 +1575,11 @@ function privacyScrub(text, intake) {
   // these only swap whole words, never touch tabs, newlines, or column count).
   if (tsv) tsv = phase15LastMileTsv(scrubForbiddenWords(fixInvalidExerciseNames(tsv)), intake);
 
-  let out = tsv ? prose.trim() + "\n\n" + tsv : prose.trim();
-  // Append the hidden violation-count marker so _meta.violations can be exposed
-  // downstream without a DB schema change. Never rendered in the client UI.
-  if (fv.violations > 0) {
-    out += "\n<!-- QA_FORMULA_VIOLATION_COUNT: " + fv.violations + " -->";
-  }
-  return out;
+  const out = tsv ? prose.trim() + "\n\n" + tsv : prose.trim();
+  // Formula-band findings are server-side diagnostics only. Never encode internal
+  // QA state into the client program: the save-boundary cleanliness gate correctly
+  // rejects QA markers, and client-visible program text must remain transport-clean.
+  return out; // FORMULA-QA-SERVER-SIDE-ONLY
 }
 
 // ---------- App ----------
