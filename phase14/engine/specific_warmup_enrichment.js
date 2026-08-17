@@ -40,6 +40,37 @@ function rampText(exercise, load) {
   return `Ramp ${exercise}: ${a} kg x 5, ${b} kg x 3, ${c} kg x 1-2 before ${roundTo2p5(kg)} kg work sets.`;
 }
 
+function rampMagnitude(load) {
+  const added = parseAddedKg(load);
+  if (added != null) return added;
+  const kg = parseKg(load);
+  return kg == null ? -1 : kg;
+}
+
+function normalizedExerciseKey(name) {
+  return String(name || '').trim().toLowerCase().replace(/\s+/g, ' ');
+}
+
+function priorityRampRows(work) {
+  // Top-set + back-off prescriptions for the same movement are one training
+  // exposure and need one ramp, not a second warm-up sequence before back-offs.
+  // Keep the first movement order, but retain its heaviest parseable target.
+  const byMovement = new Map();
+  work.forEach((entry, order) => {
+    const exercise = String(entry.cells?.exercise ?? '');
+    const key = normalizedExerciseKey(exercise);
+    if (!key) return;
+    const load = String(entry.cells?.weight ?? '');
+    if (!rampText(exercise, load)) return;
+    const magnitude = rampMagnitude(load);
+    const previous = byMovement.get(key);
+    if (!previous || magnitude > previous.magnitude) {
+      byMovement.set(key, { ...entry, order: previous?.order ?? order, magnitude });
+    }
+  });
+  return [...byMovement.values()].sort((a, b) => a.order - b.order).slice(0, 2);
+}
+
 function drillText(families) {
   const drills = [];
   if (families.has('hinge')) drills.push('Hip-hinge drill x 8', 'Glute bridge x 10');
@@ -82,10 +113,13 @@ function enrichWeekBlock(block) {
 
     const families = new Set(work.map(({ cells }) => exerciseFamily(cells[exIdx])));
     const drills = drillText(families);
-    const ramps = work
+    const rampWork = priorityRampRows(work.map((entry) => ({
+      ...entry,
+      cells: Object.assign(entry.cells, { exercise: entry.cells[exIdx], weight: entry.cells[weightIdx] }),
+    })));
+    const ramps = rampWork
       .map(({ cells }) => rampText(cells[exIdx], cells[weightIdx]))
-      .filter(Boolean)
-      .slice(0, 2);
+      .filter(Boolean);
 
     // Preserve authored running-specific warm-ups. Enrich generic gym warm-ups.
     for (const warm of warmups) {
