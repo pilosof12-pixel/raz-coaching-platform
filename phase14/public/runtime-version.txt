@@ -1,1 +1,1 @@
-launch-acceptance-v10-openai-fresh-key
+launch-acceptance-v11-openai-billed
