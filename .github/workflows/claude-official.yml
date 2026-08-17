@@ -30,6 +30,7 @@ jobs:
         with:
           anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          prompt: ${{ github.event_name == 'push' && 'Verification only: inspect the repository and reply with a short confirmation that Claude Code Action authenticated successfully. Do not modify files.' || '' }}
+          prompt: >-
+            Verification only. Inspect the repository and return a short confirmation that Claude Code Action authenticated successfully. Do not modify files.
           additional_permissions: |
             actions: read
