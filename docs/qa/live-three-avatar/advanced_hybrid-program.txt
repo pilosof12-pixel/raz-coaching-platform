@@ -1,105 +1,111 @@
-Here is your four-week program designed to balance your primary strength and calisthenics goals with your MMA training and marathon side quest. This plan prioritizes your 220kg Back Squat, 4 One-Arm Pull-ups, and 100kg Overhead Press, while building a sustainable foundation for your marathon.
+Here is your four-week program designed to balance your primary strength and calisthenics goals with your MMA training and marathon side quest. We'll prioritize your 220kg Back Squat and 4 One-Arm Pull-ups, while building your 100kg Overhead Press and maintaining your running base for the marathon.
 
-We'll use your current strength benchmarks to guide your working loads, focusing on quality and submaximal efforts to manage recovery alongside your demanding MMA schedule. Your Friday gym session is intentionally lighter to accommodate your hard MMA day. The marathon progression will be gradual, building weekly distance at an easy Zone 2 pace.
+The program is structured to manage fatigue from your 5 MMA sessions per week. We'll use a compact approach, focusing on quality over excessive volume, especially on days with sport. Progression will be steady, not aggressive, to ensure recovery.
 
 **Progression Notes for Weeks 2-4:**
-
-* **Back Squat**: You'll progressively increase the load on your heavy Monday session, aiming to build toward your 220kg goal. On Fridays, we'll gradually increase volume or maintain quality at a lower intensity.
-* **One-Arm Pull-up**: For your strict One-Arm Pull-up, we'll focus on maintaining high-quality singles and potentially adding a set. For Assisted One-Arm Pull-up, you'll aim to increase reps or reduce assistance over the weeks.
-* **Overhead Press**: We'll progressively increase the load on your direct Overhead Press on Sundays, working towards your 100kg goal. Your Push Press on Mondays will provide a complementary strength stimulus.
-* **Marathon Run**: Your weekly long run will gradually increase in distance at an easy Zone 2 pace, building your aerobic base without excessive fatigue. Week 4 will be a consolidation run at a slightly reduced distance.
-* **Accessories**: Volume for accessory work will remain conservative and can be adjusted or removed if recovery becomes an issue.
-* **Week 4**: This will be a consolidation week, reducing overall volume slightly to manage fatigue while maintaining intensity on your key lifts and skills.
+* **Back Squat:** We'll aim to increase load slightly or add reps within the prescribed RPE range, focusing on quality and recovery.
+* **One-Arm Pull-up:** Progression will focus on increasing the quality or number of strict singles, and reducing assistance or increasing reps for Assisted One-Arm Pull-ups.
+* **Overhead Press:** We'll work to increase load or reps for your direct strict Overhead Press, while the secondary press may vary to manage fatigue or provide a different stimulus.
+* **Marathon Running:** Your long run will gradually increase in duration or distance, respecting your current weekly volume and recovery.
+* **Accessories:** These are low-cost and will be adjusted or removed first if recovery or primary goal performance is compromised.
 
 **Pain and Substitution Guidance:**
-If you experience any pain during an exercise, stop immediately. Do not push through pain. If a specific exercise consistently causes discomfort, please note it in your results, and we can explore alternative movements or modifications in the next block. Prioritize recovery and listen to your body, especially with your high MMA volume.
+* If you experience any joint pain (especially elbows or shoulders with pulling/pressing, or knees/hips with squatting/running), reduce the load, reps, or range of motion immediately. Prioritize pain-free movement.
+* For any exercise causing sharp or persistent pain, substitute with a less provocative variation or omit it and focus on recovery. For example, if Back Squats cause knee pain, try a Goblet Squat or Leg Press with a pain-free range. If One-Arm Pull-ups irritate your elbow, reduce assistance or switch to a very light Weighted Chin-up for a session.
+* Listen to your body, especially with your high training load. It's always better to do less and recover than to push through pain and risk injury or overtraining.
 
 START_WEEK1_TSV
 Day	Exercise	Weight	Sets	Reps	Rest	Target RPE	Notes	Results
-Mon	[WARMUP]	Bodyweight	1	5-10 min	N/A	N/A	Squat-and-reach x 6; Bodyweight squat x 8; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Ramp Back Squat: 72.5 kg x 5, 107.5 kg x 3, 140 kg x 1-2 before 180 kg work sets.; Ramp Back Squat: 70 kg x 5, 105 kg x 3, 137.5 kg x 1-2 before 175 kg work sets. Keep the warm-up specific and non-fatiguing.	
-Mon	One-Arm Pull-up	Bodyweight	2	1 per arm	2 min	8	Focus on strict, controlled reps. Lead with weaker arm.	
-Mon	Back Squat	180 kg	1	3	3 min	8.5	Build to a challenging triple.	Results
-Mon	Back Squat	175 kg	2	3	2.5 min	8	Back-off sets.	Results
-Mon	Push Press	RPE-selected	3	4	2 min	7.5	Focus on powerful leg drive and strong lockout.	Results
-Mon	Dumbbell Row	RPE-selected	2	8 per arm	90 sec	7.5	Controlled eccentric.	Results
-Tue	[WARMUP]	Bodyweight	1	5 min	N/A	N/A	Scapular pull-up 2 x 5-6; Band pull-apart x 10-12 Keep the warm-up specific and non-fatiguing.	
-Tue	Assisted One-Arm Pull-up	RPE-selected	2	2-3 per arm	90 sec	7.5	Use minimum assistance for clean reps.	Results
-Tue	Side Plank	Bodyweight	3	45 sec per side	60 sec	N/A	Maintain a straight line from head to heels.	Results
-Fri	[WARMUP]	Bodyweight	1	5 min	N/A	N/A	Squat-and-reach x 6; Bodyweight squat x 8; Ramp Back Squat: 62.5 kg x 5, 92.5 kg x 3, 120 kg x 1-2 before 155 kg work sets. Keep the warm-up specific and non-fatiguing.	
-Fri	Back Squat	155 kg	3	5	2 min	7	Lighter, controlled reps. Focus on technique.	Results
-Fri	Ring Hamstring Curl	Bodyweight	3	10	90 sec	7	Keep hips extended and curl the heels toward you under control; shorten the lever if needed.	Results
-Fri	Farmer Carry	RPE-selected	3	40 meters per arm	90 sec	N/A	Maintain upright posture, tight core.	Results
-Sun	Run	N/A	1	20 km	N/A	Zone 2	Long aerobic run. Easy, conversational pace.	
-Sun	[WARMUP]	Bodyweight	1	5-10 min	N/A	N/A	Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Band shoulder pass-through x 10; Wall slide x 8; Ramp Overhead Press: 32.5 kg x 5, 47.5 kg x 3, 62.5 kg x 1-2 before 80 kg work sets.; Ramp Overhead Press: 30 kg x 5, 47.5 kg x 3, 60 kg x 1-2 before 77.5 kg work sets. Keep the warm-up specific and non-fatiguing.	Results
-Sun	Overhead Press	80 kg	1	4	3 min	8	Build to a challenging set of 4.	Results
-Sun	Overhead Press	77.5 kg	2	4	2.5 min	7.5	Back-off sets.	Results
-Sun	Weighted Chin-up	+50 kg	3	5	2 min	7.5	Controlled reps, full range of motion.	Results
-Sun	Face Pull	RPE-selected	3	15	60 sec	7	Focus on rear delt and upper back contraction.	Results
+Mon	[WARMUP]	BW	1	10 min	N/A	N/A	Squat-and-reach x 6; Bodyweight squat x 8; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Ramp Back Squat: 75 kg x 5, 110 kg x 3, 145 kg x 1-2 before 185 kg work sets. Keep the warm-up specific and non-fatiguing.	
+Mon	One-Arm Pull-up	BW	3	1	120s	8	Strict single, lead with weaker arm. Focus on quality.	
+Mon	Back Squat	185 kg	3	3	180s	8.5	Working toward 220kg. Focus on depth and control.	
+Mon	Push Press	RPE-selected	3	4	120s	8	Overload vertical press, use leg drive.	
+Mon	Dumbbell Row	RPE-selected	2	8	90s	8	Support pulling strength.	
+Mon	Pallof Press	RPE-selected	2	10 per side	60s	7	Anti-rotation core stability.	
+Tue	[WARMUP]	BW	1	5 min	N/A	N/A	Scapular pull-up 2 x 5-6; Band pull-apart x 10-12 Keep the warm-up specific and non-fatiguing.	
+Tue	Assisted One-Arm Pull-up	RPE-selected	3	2	120s	7.5	Use minimal assistance for clean reps.	
+Tue	Ring Hamstring Curl	BW	2	10	60s	7	Keep hips extended and curl the heels toward you under control; shorten the lever if needed.	
+Tue	Side Plank	BW	2	30s per side	60s	7	Trunk stability.	
+Fri	[WARMUP]	BW	1	5 min	N/A	N/A	Squat-and-reach x 6; Bodyweight squat x 8; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Ramp Back Squat: 60 kg x 5, 90 kg x 3, 117.5 kg x 1-2 before 150 kg work sets.; Ramp Weighted Chin-up: bodyweight x 5, +15 kg x 3, +32.5 kg x 2 before +45 kg work sets. Keep the warm-up specific and non-fatiguing.	
+Fri	Back Squat	150 kg	3	5	120s	7.5	Volume/specificity exposure, focus on perfect technique.	
+Fri	Weighted Chin-up	+45 kg	2	6	120s	8	Bilateral pulling support for One-Arm Pull-up.	
+Fri	Dumbbell Shoulder Press	RPE-selected	3	8	90s	7.5	Secondary vertical press, manage fatigue.	
+Fri	Reverse Lunge	RPE-selected	2	8 per leg	60s	7	Unilateral leg strength.	
+Sun	[WARMUP]	BW	1	10 min	N/A	N/A	Band shoulder pass-through x 10; Wall slide x 8; Ramp Overhead Press: 27.5 kg x 5, 42.5 kg x 3, 55 kg x 1-2 before 70 kg work sets. Keep the warm-up specific and non-fatiguing.	
+Sun	Overhead Press	70 kg	3	4	150s	8	Direct strict OHP progression.	
+Sun	Face Pull	RPE-selected	2	12	60s	7	Shoulder health and posture.	
+Sun	Neck Isometric	BW	2	20s per side	60s	7	Neck robustness for MMA.	
+Sun	Run	N/A	1	20 km	N/A	6	Long aerobic run, easy conversational pace.	
 END_WEEK1_TSV
 
 START_WEEK2_TSV
 Day	Exercise	Weight	Sets	Reps	Rest	Target RPE	Notes	Results
-Mon	[WARMUP]	Bodyweight	1	5-10 min	N/A	N/A	Squat-and-reach x 6; Bodyweight squat x 8; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Ramp Back Squat: 75 kg x 5, 110 kg x 3, 145 kg x 1-2 before 185 kg work sets.; Ramp Back Squat: 72.5 kg x 5, 107.5 kg x 3, 140 kg x 1-2 before 180 kg work sets. Keep the warm-up specific and non-fatiguing.	Results
-Mon	One-Arm Pull-up	Bodyweight	2	1 per arm	2 min	8	Focus on strict, controlled reps. Lead with weaker arm.	
-Mon	Back Squat	185 kg	1	3	3 min	8.5	Aim for a slight load increase from Week 1.	Results
-Mon	Back Squat	180 kg	2	3	2.5 min	8	Back-off sets.	Results
-Mon	Push Press	RPE-selected	3	4	2 min	7.5	Aim for a slight load increase from Week 1.	Results
-Mon	Dumbbell Row	RPE-selected	2	8 per arm	90 sec	7.5	Controlled eccentric.	Results
-Tue	[WARMUP]	Bodyweight	1	5 min	N/A	N/A	Scapular pull-up 2 x 5-6; Band pull-apart x 10-12 Keep the warm-up specific and non-fatiguing.	
-Tue	Assisted One-Arm Pull-up	RPE-selected	2	3 per arm	90 sec	7.5	Aim for 3 clean reps per arm.	Results
-Tue	Side Plank	Bodyweight	3	60 sec per side	60 sec	N/A	Maintain a straight line from head to heels.	Results
-Fri	[WARMUP]	Bodyweight	1	5 min	N/A	N/A	Squat-and-reach x 6; Bodyweight squat x 8; Ramp Back Squat: 62.5 kg x 5, 92.5 kg x 3, 120 kg x 1-2 before 155 kg work sets. Keep the warm-up specific and non-fatiguing.	
-Fri	Back Squat	155 kg	4	5	2 min	7	Lighter, controlled reps. Focus on technique.	Results
-Fri	Ring Hamstring Curl	Bodyweight	3	12	90 sec	7	Keep hips extended and curl the heels toward you under control; shorten the lever if needed.	Results
-Fri	Farmer Carry	RPE-selected	3	50 meters per arm	90 sec	N/A	Maintain upright posture, tight core.	Results
-Sun	Run	N/A	1	22 km	N/A	Zone 2	Long aerobic run. Easy, conversational pace. Small distance increase.	
-Sun	[WARMUP]	Bodyweight	1	5-10 min	N/A	N/A	Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Band shoulder pass-through x 10; Wall slide x 8; Ramp Overhead Press: 32.5 kg x 5, 50 kg x 3, 65 kg x 1-2 before 82.5 kg work sets.; Ramp Overhead Press: 32.5 kg x 5, 47.5 kg x 3, 62.5 kg x 1-2 before 80 kg work sets. Keep the warm-up specific and non-fatiguing.	Results
-Sun	Overhead Press	82.5 kg	1	4	3 min	8	Aim for a slight load increase from Week 1.	Results
-Sun	Overhead Press	80 kg	2	4	2.5 min	7.5	Back-off sets.	Results
-Sun	Weighted Chin-up	+52.5 kg	3	5	2 min	7.5	Controlled reps, full range of motion.	Results
-Sun	Face Pull	RPE-selected	3	15	60 sec	7	Focus on rear delt and upper back contraction.	Results
+Mon	[WARMUP]	BW	1	10 min	N/A	N/A	Squat-and-reach x 6; Bodyweight squat x 8; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Ramp Back Squat: 75 kg x 5, 112.5 kg x 3, 147.5 kg x 1-2 before 187.5 kg work sets. Keep the warm-up specific and non-fatiguing.	
+Mon	One-Arm Pull-up	BW	3	1	120s	8.5	Strict single, lead with weaker arm. Aim for slightly better quality/control.	
+Mon	Back Squat	187.5 kg	3	3	180s	8.5	Slight load increase, maintain quality.	
+Mon	Push Press	RPE-selected	3	4	120s	8	Overload vertical press, use leg drive.	
+Mon	Dumbbell Row	RPE-selected	2	8	90s	8	Support pulling strength.	
+Mon	Pallof Press	RPE-selected	2	10 per side	60s	7	Anti-rotation core stability.	
+Tue	[WARMUP]	BW	1	5 min	N/A	N/A	Scapular pull-up 2 x 5-6; Band pull-apart x 10-12 Keep the warm-up specific and non-fatiguing.	
+Tue	Assisted One-Arm Pull-up	RPE-selected	3	2	120s	7.5	Reduce assistance slightly if reps are clean.	
+Tue	Ring Hamstring Curl	BW	2	10	60s	7	Keep hips extended and curl the heels toward you under control; shorten the lever if needed.	
+Tue	Side Plank	BW	2	30s per side	60s	7	Trunk stability.	
+Fri	[WARMUP]	BW	1	5 min	N/A	N/A	Squat-and-reach x 6; Bodyweight squat x 8; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Ramp Back Squat: 62.5 kg x 5, 92.5 kg x 3, 120 kg x 1-2 before 155 kg work sets.; Ramp Weighted Chin-up: bodyweight x 5, +17.5 kg x 3, +32.5 kg x 2 before +47.5 kg work sets. Keep the warm-up specific and non-fatiguing.	
+Fri	Back Squat	155 kg	3	5	120s	7.5	Volume/specificity exposure, focus on perfect technique.	
+Fri	Weighted Chin-up	+47.5 kg	2	6	120s	8	Bilateral pulling support for One-Arm Pull-up.	
+Fri	Dumbbell Shoulder Press	RPE-selected	3	8	90s	7.5	Secondary vertical press, manage fatigue.	
+Fri	Reverse Lunge	RPE-selected	2	8 per leg	60s	7	Unilateral leg strength.	
+Sun	[WARMUP]	BW	1	10 min	N/A	N/A	Band shoulder pass-through x 10; Wall slide x 8; Ramp Overhead Press: 30 kg x 5, 42.5 kg x 3, 57.5 kg x 1-2 before 72.5 kg work sets. Keep the warm-up specific and non-fatiguing.	
+Sun	Overhead Press	72.5 kg	3	4	150s	8	Direct strict OHP progression.	
+Sun	Face Pull	RPE-selected	2	12	60s	7	Shoulder health and posture.	
+Sun	Neck Isometric	BW	2	20s per side	60s	7	Neck robustness for MMA.	
+Sun	Run	N/A	1	21 km	N/A	6	Long aerobic run, easy conversational pace. Slight distance increase.	
 END_WEEK2_TSV
 
 START_WEEK3_TSV
 Day	Exercise	Weight	Sets	Reps	Rest	Target RPE	Notes	Results
-Mon	[WARMUP]	Bodyweight	1	5-10 min	N/A	N/A	Squat-and-reach x 6; Bodyweight squat x 8; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Ramp Back Squat: 75 kg x 5, 115 kg x 3, 147.5 kg x 1-2 before 190 kg work sets.; Ramp Back Squat: 75 kg x 5, 110 kg x 3, 145 kg x 1-2 before 185 kg work sets. Keep the warm-up specific and non-fatiguing.	Results
-Mon	One-Arm Pull-up	Bodyweight	2	1 per arm	2 min	8	Maintain quality, focus on perfect execution.	
-Mon	Back Squat	190 kg	1	2	3 min	9	focus for a challenging double.	Results
-Mon	Back Squat	185 kg	2	3	2.5 min	8	Back-off sets.	Results
-Mon	Push Press	RPE-selected	3	4	2 min	7.5	Aim for a slight load increase from Week 2.	Results
-Mon	Dumbbell Row	RPE-selected	2	8 per arm	90 sec	7.5	Controlled eccentric.	Results
-Tue	[WARMUP]	Bodyweight	1	5 min	N/A	N/A	Scapular pull-up 2 x 5-6; Band pull-apart x 10-12 Keep the warm-up specific and non-fatiguing.	
-Tue	Assisted One-Arm Pull-up	RPE-selected	2	3-4 per arm	90 sec	7.5	Aim for 3-4 clean reps, or reduce assistance.	Results
-Tue	Side Plank	Bodyweight	3	60 sec per side	60 sec	N/A	Maintain a straight line from head to heels.	Results
-Fri	[WARMUP]	Bodyweight	1	5 min	N/A	N/A	Squat-and-reach x 6; Bodyweight squat x 8; Ramp Back Squat: 65 kg x 5, 95 kg x 3, 125 kg x 1-2 before 160 kg work sets. Keep the warm-up specific and non-fatiguing.	
-Fri	Back Squat	160 kg	4	5	2 min	7	Lighter, controlled reps. Focus on technique.	Results
-Fri	Ring Hamstring Curl	Bodyweight	3	12	90 sec	7	Keep hips extended and curl the heels toward you under control; shorten the lever if needed.	Results
-Fri	Farmer Carry	RPE-selected	3	50 meters per arm	90 sec	N/A	Maintain upright posture, tight core.	Results
-Sun	Run	N/A	1	24 km	N/A	Zone 2	Long aerobic run. Easy, conversational pace. Small distance increase.	
-Sun	[WARMUP]	Bodyweight	1	5-10 min	N/A	N/A	Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Band shoulder pass-through x 10; Wall slide x 8; Ramp Overhead Press: 35 kg x 5, 50 kg x 3, 67.5 kg x 1-2 before 85 kg work sets.; Ramp Overhead Press: 32.5 kg x 5, 47.5 kg x 3, 62.5 kg x 1-2 before 80 kg work sets. Keep the warm-up specific and non-fatiguing.	Results
-Sun	Overhead Press	85 kg	1	3	3 min	8.5	focus for a challenging triple.	Results
-Sun	Overhead Press	80 kg	2	4	2.5 min	7.5	Back-off sets.	Results
-Sun	Weighted Chin-up	+55 kg	3	5	2 min	7.5	Controlled reps, full range of motion.	Results
-Sun	Face Pull	RPE-selected	3	15	60 sec	7	Focus on rear delt and upper back contraction.	Results
+Mon	[WARMUP]	BW	1	10 min	N/A	N/A	Squat-and-reach x 6; Bodyweight squat x 8; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Ramp Back Squat: 75 kg x 5, 115 kg x 3, 147.5 kg x 1-2 before 190 kg work sets. Keep the warm-up specific and non-fatiguing.	
+Mon	One-Arm Pull-up	BW	3	1	120s	9	Strict single, lead with weaker arm. Push quality/control.	
+Mon	Back Squat	190 kg	3	3	180s	8.5	Load increase, focus on depth and control.	
+Mon	Push Press	RPE-selected	3	4	120s	8.5	Overload vertical press, use leg drive.	
+Mon	Dumbbell Row	RPE-selected	2	8	90s	8	Support pulling strength.	
+Mon	Pallof Press	RPE-selected	2	10 per side	60s	7	Anti-rotation core stability.	
+Tue	[WARMUP]	BW	1	5 min	N/A	N/A	Scapular pull-up 2 x 5-6; Band pull-apart x 10-12 Keep the warm-up specific and non-fatiguing.	
+Tue	Assisted One-Arm Pull-up	RPE-selected	3	3	120s	7.5	Aim for 3 clean reps with minimal assistance.	
+Tue	Ring Hamstring Curl	BW	2	10	60s	7	Keep hips extended and curl the heels toward you under control; shorten the lever if needed.	
+Tue	Side Plank	BW	2	30s per side	60s	7	Trunk stability.	
+Fri	[WARMUP]	BW	1	5 min	N/A	N/A	Squat-and-reach x 6; Bodyweight squat x 8; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Ramp Back Squat: 65 kg x 5, 95 kg x 3, 125 kg x 1-2 before 160 kg work sets.; Ramp Weighted Chin-up: bodyweight x 5, +17.5 kg x 3, +35 kg x 2 before +50 kg work sets. Keep the warm-up specific and non-fatiguing.	
+Fri	Back Squat	160 kg	3	5	120s	7.5	Volume/specificity exposure, focus on perfect technique.	
+Fri	Weighted Chin-up	+50 kg	2	6	120s	8	Bilateral pulling support for One-Arm Pull-up.	
+Fri	Dumbbell Shoulder Press	RPE-selected	3	8	90s	7.5	Secondary vertical press, manage fatigue.	
+Fri	Reverse Lunge	RPE-selected	2	8 per leg	60s	7	Unilateral leg strength.	
+Sun	[WARMUP]	BW	1	10 min	N/A	N/A	Band shoulder pass-through x 10; Wall slide x 8; Ramp Overhead Press: 30 kg x 5, 45 kg x 3, 57.5 kg x 1-2 before 75 kg work sets. Keep the warm-up specific and non-fatiguing.	
+Sun	Overhead Press	75 kg	3	4	150s	8	Direct strict OHP progression.	
+Sun	Face Pull	RPE-selected	2	12	60s	7	Shoulder health and posture.	
+Sun	Neck Isometric	BW	2	20s per side	60s	7	Neck robustness for MMA.	
+Sun	Run	N/A	1	22 km	N/A	6	Long aerobic run, easy conversational pace. Slight distance increase.	
 END_WEEK3_TSV
 
 START_WEEK4_TSV
 Day	Exercise	Weight	Sets	Reps	Rest	Target RPE	Notes	Results
-Mon	[WARMUP]	Bodyweight	1	5-10 min	N/A	N/A	Squat-and-reach x 6; Bodyweight squat x 8; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Ramp Back Squat: 70 kg x 5, 105 kg x 3, 137.5 kg x 1-2 before 175 kg work sets. Keep the warm-up specific and non-fatiguing.	Results
-Mon	One-Arm Pull-up	Bodyweight	3	1 per arm	2 min	8	Reduced volume, maintain high quality.	
-Mon	Back Squat	175 kg	1	3	3 min	8	Consolidation set, focus on perfect form.	Results
-Mon	Push Press	RPE-selected	2	4	2 min	7.5	Reduced volume.	Results
-Mon	Dumbbell Row	RPE-selected	2	8 per arm	90 sec	7.5	Reduced volume.	Results
-Tue	[WARMUP]	Bodyweight	1	5 min	N/A	N/A	Scapular pull-up 2 x 5-6; Band pull-apart x 10-12 Keep the warm-up specific and non-fatiguing.	
-Tue	Assisted One-Arm Pull-up	RPE-selected	2	3 per arm	90 sec	7.5	Reduced volume, maintain quality.	Results
-Tue	Side Plank	Bodyweight	2	60 sec per side	60 sec	N/A	Reduced volume.	Results
-Fri	[WARMUP]	Bodyweight	1	5 min	N/A	N/A	Squat-and-reach x 6; Bodyweight squat x 8; Ramp Back Squat: 60 kg x 5, 90 kg x 3, 117.5 kg x 1-2 before 150 kg work sets. Keep the warm-up specific and non-fatiguing.	
-Fri	Back Squat	150 kg	2	5	2 min	7	Reduced volume, focus on technique.	Results
-Fri	Ring Hamstring Curl	Bodyweight	2	10	90 sec	7	Keep hips extended and curl the heels toward you under control; shorten the lever if needed.	Results
-Fri	Farmer Carry	RPE-selected	2	40 meters per arm	90 sec	N/A	Reduced volume.	Results
-Sun	Run	N/A	1	20 km	N/A	Zone 2	Long aerobic run. Consolidation week, maintain easy pace.	
-Sun	[WARMUP]	Bodyweight	1	5-10 min	N/A	N/A	Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Band shoulder pass-through x 10; Wall slide x 8; Ramp Overhead Press: 30 kg x 5, 47.5 kg x 3, 60 kg x 1-2 before 77.5 kg work sets.; Ramp Weighted Chin-up: bodyweight x 5, +20 kg x 3, +37.5 kg x 2 before +55 kg work sets. Keep the warm-up specific and non-fatiguing.	Results
-Sun	Overhead Press	77.5 kg	1	4	3 min	7.5	Consolidation set, focus on perfect form.	Results
-Sun	Weighted Chin-up	+55 kg	2	5	2 min	7.5	Reduced volume, maintain quality.	Results
-Sun	Face Pull	RPE-selected	2	15	60 sec	7	Focus on rear delt and upper back contraction.	Results
+Mon	[WARMUP]	BW	1	10 min	N/A	N/A	Squat-and-reach x 6; Bodyweight squat x 8; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Ramp Back Squat: 72.5 kg x 5, 107.5 kg x 3, 140 kg x 1-2 before 180 kg work sets. Keep the warm-up specific and non-fatiguing.	
+Mon	One-Arm Pull-up	BW	3	1	120s	8.5	Consolidate quality, maintain strict single.	
+Mon	Back Squat	180 kg	3	3	180s	8	Slight reduction in load to manage fatigue.	
+Mon	Push Press	RPE-selected	2	3	120s	8	Maintain strength, slightly reduced volume.	
+Mon	Dumbbell Row	RPE-selected	2	8	90s	7.5	Support pulling strength, slightly lower RPE.	
+Mon	Pallof Press	RPE-selected	2	10 per side	60s	7	Anti-rotation core stability.	
+Tue	[WARMUP]	BW	1	5 min	N/A	N/A	Scapular pull-up 2 x 5-6; Band pull-apart x 10-12 Keep the warm-up specific and non-fatiguing.	
+Tue	Assisted One-Arm Pull-up	RPE-selected	3	2	120s	7	Maintain quality, slightly reduced reps/RPE.	
+Tue	Ring Hamstring Curl	BW	2	10	60s	7	Keep hips extended and curl the heels toward you under control; shorten the lever if needed.	
+Tue	Side Plank	BW	2	30s per side	60s	7	Trunk stability.	
+Fri	[WARMUP]	BW	1	5 min	N/A	N/A	Squat-and-reach x 6; Bodyweight squat x 8; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Ramp Back Squat: 57.5 kg x 5, 87.5 kg x 3, 112.5 kg x 1-2 before 145 kg work sets.; Ramp Weighted Chin-up: bodyweight x 5, +15 kg x 3, +27.5 kg x 2 before +40 kg work sets. Keep the warm-up specific and non-fatiguing.	
+Fri	Back Squat	145 kg	3	5	120s	7	Reduced load for recovery, focus on perfect technique.	
+Fri	Weighted Chin-up	+40 kg	2	6	120s	7.5	Reduced load for recovery.	
+Fri	Dumbbell Shoulder Press	RPE-selected	2	8	90s	7	Secondary vertical press, manage fatigue.	
+Fri	Reverse Lunge	RPE-selected	2	8 per leg	60s	7	Unilateral leg strength.	
+Sun	[WARMUP]	BW	1	10 min	N/A	N/A	Band shoulder pass-through x 10; Wall slide x 8; Ramp Overhead Press: 27.5 kg x 5, 40 kg x 3, 52.5 kg x 1-2 before 67.5 kg work sets. Keep the warm-up specific and non-fatiguing.	
+Sun	Overhead Press	67.5 kg	3	4	150s	7.5	Slight reduction in load for recovery.	
+Sun	Face Pull	RPE-selected	2	12	60s	7	Shoulder health and posture.	
+Sun	Neck Isometric	BW	2	20s per side	60s	7	Neck robustness for MMA.	
+Sun	Run	N/A	1	19 km	N/A	6	Long aerobic run, easy conversational pace. Reduced distance for consolidation.	
 END_WEEK4_TSV
