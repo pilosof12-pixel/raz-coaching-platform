@@ -17,6 +17,7 @@ import { trimExcessSupportVolume } from './mrv_support_trim.js';
 import { enrichSpecificWarmups } from './specific_warmup_enrichment.js';
 import { normalizeYouthPrimarySkillOrder } from './youth_skill_order_normalizer.js';
 import { normalizeYouthAcquisitionGoalFloors } from './youth_goal_floor_normalizer.js';
+import { normalizeYouthWeek4Consolidation } from './youth_consolidation_normalizer.js';
 import { normalizeTacticalGppFloor } from './tactical_gpp_normalizer.js';
 import {
   validateDirectGoalExposureSemantic,
@@ -194,6 +195,10 @@ function applyDeterministicCandidateRepairs(program, intake = {}) {
   const youthOrder = normalizeYouthPrimarySkillOrder(candidate, intake);
   candidate = youthOrder.program;
   if (youthOrder.reordered) repairs.push({ type: 'youth_primary_skill_order', moves: youthOrder.moves });
+
+  const youthConsolidation = normalizeYouthWeek4Consolidation(candidate, intake);
+  candidate = youthConsolidation.program;
+  if (youthConsolidation.repaired) repairs.push({ type: 'youth_week4_consolidation', rows: youthConsolidation.repairs });
 
   return { program: candidate, repairs };
 }
