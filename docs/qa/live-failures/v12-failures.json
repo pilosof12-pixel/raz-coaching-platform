@@ -1,0 +1,26 @@
+[
+  {
+    "label": "v12_youth_gymnastics",
+    "job_id": "4ee9238598662af0f31e05487ba2b38d",
+    "http_status": 200,
+    "status": "error",
+    "stage": "finalizing",
+    "attempt": 1,
+    "detail": "quality checks passed including Phase 15 v5",
+    "error": "PHASE15_QUALITY_VIOLATION",
+    "has_program": false,
+    "program_chars": 0
+  },
+  {
+    "label": "v12_tactical_3k",
+    "job_id": "7d21f25cbebd82bd2d6693cb3135100c",
+    "http_status": 200,
+    "status": "error",
+    "stage": "refining",
+    "attempt": 4,
+    "detail": "internal repair: EVENT_PROGRESSING_SESSION_MISSING",
+    "error": "Internal coaching QA could not repair the candidate program after multiple passes. No client-facing program was saved. Please retry the build. QA trace: A1:TACTICAL_GPP_COVERAGE_MISSING+EVENT_PROGRESSING_SESSION_MISSING -> A2:EVENT_PROGRESSING_SESSION_MISSING -> A3:EVENT_PROGRESSING_SESSION_MISSING -> A4:EVENT_PROGRESSING_SESSION_MISSING.",
+    "has_program": false,
+    "program_chars": 0
+  }
+]
