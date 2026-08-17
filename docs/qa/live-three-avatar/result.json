@@ -1,39 +1,39 @@
 {
-  "timestamp": "2026-08-17T06:28:07.087Z",
+  "timestamp": "2026-08-17T12:24:57.180Z",
   "base": "https://raz-coaching-platform.onrender.com",
   "results": [
     {
       "id": "advanced_hybrid",
-      "job_id": "551f607014170f04821d20696da3dab5",
-      "ok": true,
-      "status": "done",
+      "job_id": "ca74343f0169b30c9ec0a529f4c99b5f",
+      "ok": false,
+      "status": "error",
       "stage": "finalizing",
-      "attempt": null,
-      "error": null,
-      "program_chars": 11608,
-      "seconds": 154
+      "attempt": 3,
+      "error": "Phase 15 quality gate failed: REQUESTED_STRENGTH_SESSIONS_UNACCOUNTED",
+      "program_chars": 0,
+      "seconds": 98
     },
     {
       "id": "youth_gymnastics",
-      "job_id": "84876c3da30ab387da1ae155225fe855",
-      "ok": true,
-      "status": "done",
-      "stage": "finalizing",
-      "attempt": null,
-      "error": null,
-      "program_chars": 10195,
-      "seconds": 72
-    },
-    {
-      "id": "tactical_3k",
-      "job_id": "3a7f8bd44d4efefcd953d6dd55c516f5",
+      "job_id": "0880246ef5c47d9e882ebb1b3a9c3f30",
       "ok": false,
       "status": "error",
       "stage": "refining",
       "attempt": 4,
-      "error": "Internal coaching QA could not repair the candidate program after multiple passes. No client-facing program was saved. Please retry the build. QA trace: A1:SPORT_DAY_COUPLING_VIOLATION+PULL_UP_DOSE_EXCEEDS_KNOWN_CAPACITY+TACTICAL_GPP_COVERAGE_MISSING+REQUESTED_STRENGTH_SESSIONS_UNACCOUNTED+TARGET_MODALITY_EXPOSURE_REDUCED+EVENT_PROGRESSING_SESSION_MISSING+EVENT_PROGRESSING_SESSION_MISSING -> A2:TACTICAL_SCHEDULE_ARCHITECTURE_VIOLATION+EVENT_PROGRESSING_SESSION_MISSING -> A3:TACTICAL_SCHEDULE_ARCHITECTURE_VIOLATION+TARGET_MODALITY_EXPOSURE_REDUCED+EVENT_PROGRESSING_SESSION_MISSING+SESSION_TIME_BUDGET_EXCEEDED -> A4:TACTICAL_SCHEDULE_ARCHITECTURE_VIOLATION+EVENT_PROGRESSING_SESSION_MISSING.",
+      "error": "Internal coaching QA could not repair the candidate program after multiple passes. No client-facing program was saved. Please retry the build. QA trace: A1:YOUTH_PROGRESSION_QUALITY_MISSING+YOUTH_PRIMARY_SKILL_NOT_FRESH+PULL_UP_DOSE_EXCEEDS_KNOWN_CAPACITY -> A2:YOUTH_PROGRESSION_QUALITY_MISSING+YOUTH_PRIMARY_SKILL_NOT_FRESH -> A3:YOUTH_PROGRESSION_QUALITY_MISSING+YOUTH_PRIMARY_SKILL_NOT_FRESH -> A4:YOUTH_PROGRESSION_QUALITY_MISSING+YOUTH_CONSOLIDATION_RESET_TO_BASELINE+YOUTH_PRIMARY_SKILL_NOT_FRESH.",
       "program_chars": 0,
-      "seconds": 246
+      "seconds": 113
+    },
+    {
+      "id": "tactical_3k",
+      "job_id": "34964694c286787beb87d9bb2641bb0e",
+      "ok": true,
+      "status": "done",
+      "stage": "finalizing",
+      "attempt": null,
+      "error": null,
+      "program_chars": 9110,
+      "seconds": 92
     }
   ],
   "ok": false
