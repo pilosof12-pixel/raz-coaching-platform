@@ -23,7 +23,7 @@ jobs:
       - name: Wait for exact diagnostic runtime on Render
         env:
           BASE_URL: https://raz-coaching-platform.onrender.com
-          EXPECTED_RUNTIME: launch-acceptance-v12-youth-save-boundary-fixed
+          EXPECTED_RUNTIME: launch-acceptance-v12-youth-consolidation-fixed
         run: |
           node <<'NODE'
           const base=process.env.BASE_URL;
