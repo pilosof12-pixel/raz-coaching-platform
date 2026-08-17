@@ -17,10 +17,14 @@ function rewriteWeek(program, weekNumber, moves) {
   if (!match) return program;
 
   const lines = match[2].split('\n');
+  const originalLines = lines.slice();
   for (const move of moves) {
     const positions = move.sourceRows.slice().sort((a, b) => a - b);
-    const reordered = [...move.skillRows, ...move.supportRows].map((row) => row.raw);
-    if (positions.length !== reordered.length) continue;
+    // Exercise objects come from the semantic program model, which does not carry
+    // the original TSV line text — look it up by source_row from the lines this
+    // function already parsed instead of a nonexistent `.raw` field.
+    const reordered = [...move.skillRows, ...move.supportRows].map((row) => originalLines[row.source_row]);
+    if (positions.length !== reordered.length || reordered.some((line) => line === undefined)) continue;
     positions.forEach((sourceRow, i) => {
       if (sourceRow >= 1 && sourceRow < lines.length) lines[sourceRow] = reordered[i];
     });
