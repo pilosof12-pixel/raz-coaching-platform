@@ -1,0 +1,47 @@
+name: Apply Youth save-boundary marker fix
+
+on:
+  push:
+    paths:
+      - '.github/workflows/fix-youth-save-boundary-marker.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  apply:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: privacy-security-hardening
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Remove internal formula marker from client program
+        run: |
+          node <<'NODE'
+          const fs = require('fs');
+          const path = 'phase14/server.js';
+          let src = fs.readFileSync(path, 'utf8');
+          const old = `  let out = tsv ? prose.trim() + "\\n\\n" + tsv : prose.trim();\n  // Append the hidden violation-count marker so _meta.violations can be exposed\n  // downstream without a DB schema change. Never rendered in the client UI.\n  if (fv.violations > 0) {\n    out += "\\n<!-- QA_FORMULA_VIOLATION_COUNT: " + fv.violations + " -->";\n  }\n  return out;`;
+          const replacement = `  const out = tsv ? prose.trim() + "\\n\\n" + tsv : prose.trim();\n  // Formula-band findings are server-side diagnostics only. Never encode internal\n  // QA state into the client program: the save-boundary cleanliness gate correctly\n  // rejects QA markers, and client-visible program text must remain transport-clean.\n  return out; // FORMULA-QA-SERVER-SIDE-ONLY`;
+          const count = src.split(old).length - 1;
+          if (count !== 1) throw new Error('privacyScrub formula marker anchor expected once, found ' + count);
+          src = src.replace(old, replacement);
+          fs.writeFileSync(path, src);
+
+          const test = `import test from 'node:test';\nimport assert from 'node:assert/strict';\nimport fs from 'node:fs';\nimport { fileURLToPath } from 'node:url';\nimport path from 'node:path';\n\nconst here = path.dirname(fileURLToPath(import.meta.url));\nconst server = fs.readFileSync(path.join(here, '..', 'server.js'), 'utf8');\n\ntest('privacyScrub keeps formula QA server-side and never appends an internal marker to the client program', () => {\n  const start = server.indexOf('function privacyScrub(text, intake) {');\n  const end = server.indexOf('// ---------- App ----------', start);\n  assert.ok(start >= 0 && end > start);\n  const block = server.slice(start, end);\n  assert.match(block, /stripAndFlagFormulaViolations\\(text, intake\\)/);\n  assert.match(block, /FORMULA-QA-SERVER-SIDE-ONLY/);\n  assert.doesNotMatch(block, /out\\s*\\+=\\s*[\\\"']\\\\n<!--\\s*QA_FORMULA_VIOLATION_COUNT/i);\n});\n`;
+          fs.writeFileSync('phase14/test/privacy_scrub_client_boundary.test.js', test);
+          NODE
+      - name: Run focused regression
+        working-directory: phase14
+        run: node --test test/privacy_scrub_client_boundary.test.js test/final_pipeline_lock.test.js
+      - name: Commit fix
+        run: |
+          git config user.name 'RAZ convergence bot'
+          git config user.email 'actions@users.noreply.github.com'
+          git add phase14/server.js phase14/test/privacy_scrub_client_boundary.test.js
+          git commit -m 'Keep formula QA markers out of client programs'
+          git push origin HEAD:privacy-security-hardening
