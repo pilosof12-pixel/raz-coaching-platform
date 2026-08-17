@@ -4,6 +4,7 @@ on:
   push:
     paths:
       - '.github/workflows/staging-smoke.yml'
+      - 'phase14/public/runtime-version.txt'
   workflow_dispatch:
 
 permissions:
@@ -12,14 +13,20 @@ permissions:
 jobs:
   smoke:
     runs-on: ubuntu-latest
-    timeout-minutes: 8
+    timeout-minutes: 10
     steps:
-      - name: Verify live Render surface without generation
+      - uses: actions/checkout@v4
+      - name: Verify live Render surface against exact checkout fingerprint
         env:
           BASE_URL: https://raz-coaching-platform.onrender.com
         run: |
+          EXPECTED_RUNTIME="$(tr -d '\r\n' < phase14/public/runtime-version.txt)"
+          export EXPECTED_RUNTIME
+          echo "EXPECTED_RUNTIME=$EXPECTED_RUNTIME"
           node <<'NODE'
           const base = process.env.BASE_URL;
+          const expectedRuntime = String(process.env.EXPECTED_RUNTIME || '').trim();
+          if (!expectedRuntime) throw new Error('checkout runtime fingerprint is empty');
           const sleep = ms => new Promise(r => setTimeout(r, ms));
           async function get(path, attempts = 8) {
             let last = '';
@@ -35,40 +42,34 @@ jobs:
             }
             throw new Error(`${path} unavailable: ${last}`);
           }
-          async function waitForContent(path, predicate, label, attempts = 24) {
+          async function waitForContent(path, predicate, label, attempts = 120) {
             let last = '';
             for (let i = 0; i < attempts; i++) {
               try {
                 const res = await get(path, 1);
                 last = res.text;
                 if (predicate(res.text)) return res;
-              } catch (e) {
-                last = String(e?.message || e);
-              }
+              } catch (e) { last = String(e?.message || e); }
               if (i + 1 < attempts) await sleep(5000);
             }
             throw new Error(`${label} not deployed after wait; last=${last.slice(0, 1200)}`);
           }
+
+          const runtimeVersion = await waitForContent(
+            '/runtime-version.txt',
+            text => text.trim() === expectedRuntime,
+            `exact checkout runtime ${expectedRuntime}`
+          );
+          console.log('RUNTIME_VERSION', runtimeVersion.text.trim());
 
           const health = await get('/api/health');
           console.log('HEALTH', health.text);
           const h = JSON.parse(health.text);
           if (h.ok !== true) throw new Error(`health not ok: ${health.text}`);
 
-          const runtimeVersion = await waitForContent(
-            '/runtime-version.txt',
-            text => text.trim() === 'launch-acceptance-v6-hybrid-youth-tactical',
-            'v6 final Hybrid Youth Tactical acceptance deployment',
-            60
-          );
-          console.log('RUNTIME_VERSION', runtimeVersion.text.trim());
-
           const passConfig = await waitForContent(
             '/api/program-pass-config',
-            text => {
-              try { return JSON.parse(text)?.quality_gate_version === 'advanced-hybrid-v2'; }
-              catch { return false; }
-            },
+            text => { try { return JSON.parse(text)?.quality_gate_version === 'advanced-hybrid-v2'; } catch { return false; } },
             'Advanced Hybrid numeric repair quality gate backend',
             60
           );
@@ -83,46 +84,25 @@ jobs:
           const privacy = await get('/privacy.html');
           if (!privacy.text.includes('pilosof12@gmail.com')) throw new Error('deployed privacy contact is stale');
           if (!/Delete my data/i.test(privacy.text)) throw new Error('deployed privacy deletion copy missing');
-          console.log('PRIVACY_OK', privacy.status);
 
-          const app = await waitForContent(
-            '/',
-            text => text.includes('viewport-fit=cover') && text.includes('src="intake-polish.js"'),
-            'latest launch/iPhone shell'
-          );
+          const app = await waitForContent('/', text => text.includes('viewport-fit=cover') && text.includes('src="intake-polish.js"'), 'latest launch/iPhone shell');
           if (!/RAZ/i.test(app.text)) throw new Error('app shell does not look like RAZ coaching platform');
           const legacyPos = app.text.indexOf('src="spreadsheet.js"');
           const parityPos = app.text.indexOf('src="spreadsheet-parity.js"');
           const appJsPos = app.text.indexOf('src="app.js"');
-          if (!(legacyPos >= 0 && parityPos > legacyPos && appJsPos > parityPos)) {
-            throw new Error(`deployed spreadsheet script order is wrong: legacy=${legacyPos} parity=${parityPos} app=${appJsPos}`);
-          }
+          if (!(legacyPos >= 0 && parityPos > legacyPos && appJsPos > parityPos)) throw new Error(`deployed spreadsheet script order is wrong: legacy=${legacyPos} parity=${parityPos} app=${appJsPos}`);
           const goalPos = app.text.indexOf('id="goal_primary_1"');
           const markerPos = app.text.indexOf('id="performance-block"');
           if (!(goalPos >= 0 && markerPos > goalPos)) throw new Error(`deployed intake order wrong: goals=${goalPos} markers=${markerPos}`);
-          console.log('APP_OK', app.status);
 
-          const intakePolish = await waitForContent(
-            '/intake-polish.js',
-            text => text.includes("mode.value || '').toLowerCase() === 'limited'"),
-            'specific-day selector fix'
-          );
-          console.log('INTAKE_POLISH_OK', intakePolish.status);
-
-          const mobileCss = await waitForContent(
-            '/launch-mobile.css',
-            text => ['safe-area-inset-top','safe-area-inset-bottom','@media(max-width:390px)','overflow-x:hidden','min-height:44px'].every(needle => text.includes(needle)),
-            'iPhone safe-area mobile CSS'
-          );
-          console.log('IPHONE_MOBILE_OK', mobileCss.status);
-
+          const intakePolish = await waitForContent('/intake-polish.js', text => text.includes("mode.value || '').toLowerCase() === 'limited'"), 'specific-day selector fix');
+          const mobileCss = await waitForContent('/launch-mobile.css', text => ['safe-area-inset-top','safe-area-inset-bottom','@media(max-width:390px)','overflow-x:hidden','min-height:44px'].every(needle => text.includes(needle)), 'iPhone safe-area mobile CSS');
           const exporter = await get('/spreadsheet-parity.js');
           const expectedHeaders = "const headers=['Exercise','Load / Target','Sets','Reps / Duration','Rest','Effort','Coaching Note','Log','Video','Status','Done']";
           if (!exporter.text.includes(expectedHeaders)) throw new Error('deployed approved 11-column spreadsheet contract missing');
           if (!exporter.text.includes('window.buildStrengthSpreadsheet=buildParitySpreadsheet')) throw new Error('deployed parity exporter does not own client export path');
           if (!exporter.text.includes('const ss=sessions(week)')) throw new Error('deployed exporter is not grouping days/sessions as section bands');
           if (!exporter.text.includes('mergeTitle(ws,row,11,`${sessionLabel(intake,s,i).toUpperCase()}')) throw new Error('deployed exporter section-band renderer missing');
-          console.log('SPREADSHEET_EXPORT_OK', exporter.status);
 
-          console.log(JSON.stringify({ ok: true, runtime_version: runtimeVersion.text.trim(), health: h, program_pass_config: pc, privacy: true, app: true, intake_polish: true, iphone_mobile: true, spreadsheet_export: true }));
+          console.log(JSON.stringify({ ok: true, expected_runtime: expectedRuntime, runtime_version: runtimeVersion.text.trim(), health: h, program_pass_config: pc, privacy: true, app: true, intake_polish: intakePolish.status, iphone_mobile: mobileCss.status, spreadsheet_export: true }));
           NODE
