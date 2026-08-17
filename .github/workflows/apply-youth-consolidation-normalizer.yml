@@ -19,35 +19,49 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
-      - name: Wire normalizer and add regressions
+      - name: Wire normalizer into shared production bundle
         run: |
-          node <<'NODE'
-          const fs = require('fs');
+          python3 <<'PY'
+          from pathlib import Path
+          p = Path('phase14/engine/repairable_validation_bundle.js')
+          s = p.read_text()
 
-          const bundlePath = 'phase14/engine/repairable_validation_bundle.js';
-          let bundle = fs.readFileSync(bundlePath, 'utf8');
-          const importAnchor = "import { normalizeYouthAcquisitionGoalFloors } from './youth_goal_floor_normalizer.js';";
-          if (!bundle.includes("normalizeYouthWeek4Consolidation")) {
-            if ((bundle.split(importAnchor).length - 1) !== 1) throw new Error('Youth consolidation import anchor mismatch');
-            bundle = bundle.replace(importAnchor, importAnchor + "\nimport { normalizeYouthWeek4Consolidation } from './youth_consolidation_normalizer.js';");
+          import_anchor = "import { normalizeYouthAcquisitionGoalFloors } from './youth_goal_floor_normalizer.js';"
+          import_line = "import { normalizeYouthWeek4Consolidation } from './youth_consolidation_normalizer.js';"
+          if import_line not in s:
+              if s.count(import_anchor) != 1:
+                  raise SystemExit(f'import anchor count={s.count(import_anchor)}')
+              s = s.replace(import_anchor, import_anchor + '\n' + import_line)
 
-            const repairAnchor = `  const youthOrder = normalizeYouthPrimarySkillOrder(candidate, intake);\n  candidate = youthOrder.program;\n  if (youthOrder.reordered) repairs.push({ type: 'youth_primary_skill_order', moves: youthOrder.moves });\n\n  return { program: candidate, repairs };`;
-            const repairReplacement = `  const youthOrder = normalizeYouthPrimarySkillOrder(candidate, intake);\n  candidate = youthOrder.program;\n  if (youthOrder.reordered) repairs.push({ type: 'youth_primary_skill_order', moves: youthOrder.moves });\n\n  const youthConsolidation = normalizeYouthWeek4Consolidation(candidate, intake);\n  candidate = youthConsolidation.program;\n  if (youthConsolidation.repaired) repairs.push({ type: 'youth_week4_consolidation', rows: youthConsolidation.repairs });\n\n  return { program: candidate, repairs };`;
-            if ((bundle.split(repairAnchor).length - 1) !== 1) throw new Error('Youth consolidation repair anchor mismatch');
-            bundle = bundle.replace(repairAnchor, repairReplacement);
-            fs.writeFileSync(bundlePath, bundle);
-          }
+          old = """  const youthOrder = normalizeYouthPrimarySkillOrder(candidate, intake);
+          candidate = youthOrder.program;
+          if (youthOrder.reordered) repairs.push({ type: 'youth_primary_skill_order', moves: youthOrder.moves });
 
-          const test = `import test from 'node:test';\nimport assert from 'node:assert/strict';\n\nimport { normalizeYouthWeek4Consolidation } from '../engine/youth_consolidation_normalizer.js';\nimport { youthConsolidationRetentionAnalysis } from '../engine/coaching_consolidation_quality.js';\nimport { YOUTH_GYMNASTICS_INTAKE } from './fixtures/golden_programs.js';\n\nconst HEADER = 'Day\\tExercise\\tWeight\\tSets\\tReps\\tRest\\tTarget RPE\\tNotes\\tResults';\n\nfunction block(exercise, weeks) {\n  return weeks.map((p, index) => {\n    const week=index+1;\n    const row=['Session A', exercise, p.weight||'BW', p.sets, p.reps, '90s', '7', p.notes||'', ''].join('\\t');\n    return \\`START_WEEK\\${week}_TSV\\n\\${HEADER}\\n\\${row}\\nEND_WEEK\\${week}_TSV\\`;\n  }).join('\\n\\n');\n}\n\ntest('deterministic Youth consolidation retains Week 3 reps while lowering set cost', () => {\n  const bad=block('Strict Ring Dip',[\n    {sets:'3',reps:'5'},\n    {sets:'3',reps:'6'},\n    {sets:'3',reps:'7'},\n    {sets:'3',reps:'5',notes:'Consolidation week.'},\n  ]);\n  assert.equal(youthConsolidationRetentionAnalysis(bad,YOUTH_GYMNASTICS_INTAKE).violations.length,1);\n  const fixed=normalizeYouthWeek4Consolidation(bad,YOUTH_GYMNASTICS_INTAKE);\n  assert.equal(fixed.repaired,true);\n  assert.match(fixed.program,/Session A\\tStrict Ring Dip\\tBW\\t2\\t7\\t90s/);\n  assert.match(fixed.program,/retain the best clean Week 3 performance standard/i);\n  assert.deepEqual(youthConsolidationRetentionAnalysis(fixed.program,YOUTH_GYMNASTICS_INTAKE).violations,[]);\n});\n\ntest('deterministic Youth consolidation keeps the earned Week 3 band with lower volume', () => {\n  const bad=block('Band-Assisted Bar Muscle-up Transition Drill',[\n    {weight:'BW + moderate band',sets:'4',reps:'2'},\n    {weight:'BW + lighter band',sets:'4',reps:'2'},\n    {weight:'BW + lightest band',sets:'4',reps:'2'},\n    {weight:'BW + moderate band',sets:'3',reps:'2',notes:'Consolidation week.'},\n  ]);\n  const fixed=normalizeYouthWeek4Consolidation(bad,YOUTH_GYMNASTICS_INTAKE);\n  assert.equal(fixed.repaired,true);\n  assert.match(fixed.program,/START_WEEK4_TSV[\\s\\S]*BW \\+ lightest band\\t3\\t2/);\n  assert.deepEqual(youthConsolidationRetentionAnalysis(fixed.program,YOUTH_GYMNASTICS_INTAKE).violations,[]);\n});\n\ntest('volume-only handstand reset is repaired with explicit Week 3 quality retention, not extra attempts', () => {\n  const bad=block('Controlled Handstand Kick-up',[\n    {sets:'4',reps:'2 attempts',notes:'Clean entries.'},\n    {sets:'5',reps:'2 attempts',notes:'Clean entries.'},\n    {sets:'6',reps:'2 attempts',notes:'Clean entries.'},\n    {sets:'4',reps:'2 attempts',notes:'Consolidation week.'},\n  ]);\n  const fixed=normalizeYouthWeek4Consolidation(bad,YOUTH_GYMNASTICS_INTAKE);\n  assert.equal(fixed.repaired,true);\n  assert.match(fixed.program,/START_WEEK4_TSV[\\s\\S]*Controlled Handstand Kick-up\\tBW\\t4\\t2 attempts/);\n  assert.match(fixed.program,/best clean Week 3 entry and balance quality/i);\n  assert.deepEqual(youthConsolidationRetentionAnalysis(fixed.program,YOUTH_GYMNASTICS_INTAKE).violations,[]);\n});\n\ntest('ambiguous duplicate Week 3 rows are not guessed at and remain fail-closed', () => {\n  let bad=block('Strict Ring Dip',[\n    {sets:'3',reps:'5'},\n    {sets:'3',reps:'6'},\n    {sets:'3',reps:'7'},\n    {sets:'3',reps:'5',notes:'Consolidation week.'},\n  ]);\n  bad=bad.replace(\n    'Session A\\tStrict Ring Dip\\tBW\\t3\\t7\\t90s\\t7\\t\\t\\nEND_WEEK3_TSV',\n    'Session A\\tStrict Ring Dip\\tBW\\t3\\t7\\t90s\\t7\\t\\t\\nSession B\\tStrict Ring Dip\\tBW\\t2\\t6\\t90s\\t7\\t\\t\\nEND_WEEK3_TSV'\n  );\n  const fixed=normalizeYouthWeek4Consolidation(bad,YOUTH_GYMNASTICS_INTAKE);\n  assert.equal(fixed.repaired,false);\n  assert.equal(fixed.program,bad);\n  assert.ok(youthConsolidationRetentionAnalysis(fixed.program,YOUTH_GYMNASTICS_INTAKE).violations.length>0);\n});\n\ntest('shared production bundle wires Youth Week 4 consolidation before semantic validation', async () => {\n  const fs = await import('node:fs');\n  const src=fs.readFileSync(new URL('../engine/repairable_validation_bundle.js', import.meta.url),'utf8');\n  assert.match(src,/normalizeYouthWeek4Consolidation/);\n  assert.match(src,/type: 'youth_week4_consolidation'/);\n});\n`;
-          fs.writeFileSync('phase14/test/youth_consolidation_normalizer.test.js', test);
-          NODE
+          return { program: candidate, repairs };"""
+          new = """  const youthOrder = normalizeYouthPrimarySkillOrder(candidate, intake);
+          candidate = youthOrder.program;
+          if (youthOrder.reordered) repairs.push({ type: 'youth_primary_skill_order', moves: youthOrder.moves });
+
+          const youthConsolidation = normalizeYouthWeek4Consolidation(candidate, intake);
+          candidate = youthConsolidation.program;
+          if (youthConsolidation.repaired) repairs.push({ type: 'youth_week4_consolidation', rows: youthConsolidation.repairs });
+
+          return { program: candidate, repairs };"""
+          if "type: 'youth_week4_consolidation'" not in s:
+              if s.count(old) != 1:
+                  raise SystemExit(f'repair anchor count={s.count(old)}')
+              s = s.replace(old, new)
+
+          p.write_text(s)
+          PY
       - name: Run focused Youth consolidation regressions
         working-directory: phase14
         run: node --test test/youth_consolidation_normalizer.test.js test/coaching_consolidation_quality.test.js
-      - name: Commit wiring and tests
+      - name: Commit wiring
         run: |
           git config user.name 'RAZ convergence bot'
           git config user.email 'actions@users.noreply.github.com'
-          git add phase14/engine/repairable_validation_bundle.js phase14/test/youth_consolidation_normalizer.test.js
+          git add phase14/engine/repairable_validation_bundle.js
+          if git diff --cached --quiet; then exit 0; fi
           git commit -m 'Wire deterministic Youth Week 4 consolidation repair'
           git push origin HEAD:privacy-security-hardening
