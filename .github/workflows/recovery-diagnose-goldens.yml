@@ -28,16 +28,33 @@ jobs:
           import { ADVANCED_HYBRID_LAUNCH_INTAKE, advancedHybridLaunchProgram } from './test/fixtures/advanced_hybrid_launch.js';
           import { YOUTH_GYMNASTICS_INTAKE, youthGymnasticsGoldenProgram } from './test/fixtures/golden_programs.js';
 
-          const youthLabelsAndKickupCap = youthGymnasticsGoldenProgram()
+          let week = 0;
+          let changedRingDipRows = 0;
+          const youthCandidate = youthGymnasticsGoldenProgram()
             .split('\n')
-            .map((line) => line.startsWith('Mon\t') ? `Session A\t${line.slice(4)}` : line.startsWith('Thu\t') ? `Session B\t${line.slice(4)}` : line)
-            .join('\n')
-            .replace('Session A\tControlled Handstand Kick-up\tBW\t6\t2 attempts', 'Session A\tControlled Handstand Kick-up\tBW\t5\t2 attempts')
-            .replace('Session B\tControlled Handstand Kick-up\tBW\t6\t1-2 attempts', 'Session B\tControlled Handstand Kick-up\tBW\t5\t1-2 attempts');
+            .map((line) => {
+              const wm = line.match(/^START_WEEK(\d+)_TSV$/);
+              if (wm) week = Number(wm[1]);
+              if (line.startsWith('Mon\t')) line = `Session A\t${line.slice(4)}`;
+              else if (line.startsWith('Thu\t')) line = `Session B\t${line.slice(4)}`;
 
+              const cells = line.split('\t');
+              if (week === 3 && cells[1] === 'Controlled Handstand Kick-up' && cells[3] === '6') cells[3] = '5';
+              if (/Ring Dip/i.test(cells[1] || '')) {
+                const targetReps = {1:'3', 2:'4', 3:'4', 4:'4'}[week];
+                if (targetReps && cells[4] !== targetReps) {
+                  cells[4] = targetReps;
+                  changedRingDipRows++;
+                }
+              }
+              return cells.join('\t');
+            })
+            .join('\n');
+
+          console.log(`DIAGNOSTIC_TRANSFORM ring_dip_rows_changed=${changedRingDipRows}`);
           for (const [name, program, intake] of [
             ['HYBRID', advancedHybridLaunchProgram(), ADVANCED_HYBRID_LAUNCH_INTAKE],
-            ['YOUTH_LABELS_PLUS_KICKUP_CAP', youthLabelsAndKickupCap, YOUTH_GYMNASTICS_INTAKE],
+            ['YOUTH_LABELS_KICKUP_RINGDIP', youthCandidate, YOUTH_GYMNASTICS_INTAKE],
           ]) {
             const result = collectRepairableValidationFailures(program, intake);
             console.log(`=== ${name} RESULT ===`);
