@@ -1,32 +1,54 @@
 name: Live Three Avatar Acceptance
-# acceptance-trigger: round4-2026-08-17-2221-aest
 
 on:
   push:
     paths:
       - '.github/workflows/live-three-avatar-acceptance.yml'
+      - 'phase14/public/runtime-version.txt'
   workflow_dispatch:
 
 permissions:
-  contents: write
+  contents: read
 
 jobs:
   acceptance:
+    if: github.event_name == 'workflow_dispatch' || contains(github.event.head_commit.message, '[RUN-LIVE-ACCEPTANCE]')
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 35
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
-      - name: Allow branch deployment to settle
-        run: sleep 120
+      - name: Wait for exact checkout runtime on Render
+        env:
+          BASE_URL: https://raz-coaching-platform.onrender.com
+        run: |
+          EXPECTED_RUNTIME="$(tr -d '\r\n' < phase14/public/runtime-version.txt)"
+          export EXPECTED_RUNTIME
+          node <<'NODE'
+          const base=process.env.BASE_URL;
+          const expected=String(process.env.EXPECTED_RUNTIME||'').trim();
+          if(!expected) throw new Error('checkout runtime fingerprint is empty');
+          const sleep=ms=>new Promise(r=>setTimeout(r,ms));
+          let last='';
+          for(let i=0;i<120;i++){
+            try{
+              const r=await fetch(base+'/runtime-version.txt?qa='+Date.now(),{headers:{'cache-control':'no-cache','accept':'text/plain'}});
+              last=(await r.text()).trim();
+              if(r.ok&&last===expected){console.log('EXACT_RUNTIME_OK',expected);process.exit(0);}
+            }catch(e){last=String(e?.message||e);}
+            if(i<119) await sleep(5000);
+          }
+          throw new Error(`exact runtime not deployed: expected=${expected} last=${last}`);
+          NODE
       - name: Run Hybrid Youth Tactical through live website API
         env:
           BASE_URL: https://raz-coaching-platform.onrender.com
           ADMIN_PROVISION_KEY: ${{ secrets.ADMIN_PROVISION_KEY }}
         run: |
           mkdir -p docs/qa/live-three-avatar
+          rm -f docs/qa/live-three-avatar/result.json docs/qa/live-three-avatar/advanced_hybrid-program.txt docs/qa/live-three-avatar/youth_gymnastics-program.txt docs/qa/live-three-avatar/tactical_3k-program.txt
           node <<'NODE'
           import fs from 'node:fs';
           const base=process.env.BASE_URL;
@@ -64,13 +86,11 @@ jobs:
           fs.writeFileSync('docs/qa/live-three-avatar/result.json',JSON.stringify(result,null,2));
           if(!result.ok)process.exitCode=1;
           NODE
-      - name: Commit website acceptance evidence
+      - name: Upload website acceptance evidence
         if: always()
-        run: |
-          git config user.name 'RAZ live acceptance bot'
-          git config user.email 'actions@users.noreply.github.com'
-          git pull --rebase origin privacy-security-hardening || true
-          git add docs/qa/live-three-avatar/result.json docs/qa/live-three-avatar/*-program.txt 2>/dev/null || true
-          if git diff --cached --quiet; then exit 0; fi
-          git commit -m 'Record three avatar website acceptance round'
-          git push origin HEAD:privacy-security-hardening
+        uses: actions/upload-artifact@v4
+        with:
+          name: three-avatar-acceptance-${{ github.run_id }}-${{ github.run_attempt }}
+          path: docs/qa/live-three-avatar/
+          if-no-files-found: error
+          retention-days: 14
