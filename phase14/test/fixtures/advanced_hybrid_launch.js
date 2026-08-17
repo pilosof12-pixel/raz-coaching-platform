@@ -36,7 +36,7 @@ export const ADVANCED_HYBRID_LAUNCH_INTAKE = Object.freeze({
 const HEADER = 'Day\tExercise\tWeight\tSets\tReps\tRest\tTarget RPE\tNotes\tResults';
 
 function rowsForWeek(week) {
-  const squatHeavy = [180, 182.5, 185, 180][week - 1];
+  const squatHeavy = [175, 177.5, 180, 172.5][week - 1];
   const squatVolume = [160, 162.5, 165, 160][week - 1];
   const ohp = [70, 72.5, 75, 70][week - 1];
   const strictOapSets = [4, 5, 5, 4][week - 1];
