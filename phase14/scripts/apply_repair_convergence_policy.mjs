@@ -40,8 +40,6 @@ if (!src.includes(tacticalEventMarker)) {
   const count = src.split(anchor).length - 1;
   if (count !== 1) throw new Error(`Event repair anchor expected once, found ${count}`);
   const block = `  const eventProgression = flags.find((flag) => flag?.code === "EVENT_PROGRESSING_SESSION_MISSING");\n  if (eventProgression) {\n    const goals = [intake?.primary_goals, intake?.secondary_goals].flat().filter(Boolean).map(String).join(' | ');\n    const evidence = [intake?.current_numbers, intake?.performance_markers, intake?.clarification_answers, intake?.notes].map((v) => typeof v === 'string' ? v : JSON.stringify(v || '')).join(' ');\n    if (/\\bmarathon\\b/i.test(goals)) {\n      const kmMatches = [...evidence.matchAll(/\\b(\\d+(?:\\.\\d+)?)\\s*km\\b/ig)].map((m) => Number(m[1])).filter((n) => Number.isFinite(n) && n > 0);\n      const baselineKm = kmMatches.length ? Math.max(...kmMatches) : null;\n      feedback += "\\nMARATHON-EVENT-ANCHOR-SURGICAL-REPAIR: Do not add another run day or hard conditioning. Preserve the existing direct run session and make it unmistakably the marathon progression anchor by identifying it in Notes as the Long run (or Long aerobic run) and prescribing a measurable distance or duration. Week 1 must stay at or below the supplied current running baseline" + (baselineKm != null ? (" of about " + baselineKm + " km") : "") + ". Across Weeks 1-3 progress only ONE variable for this same long-run pathway, normally a small distance/duration increase while easy effort stays unchanged; copy non-selected running categories unchanged. Week 4 must consolidate below Week 3 in this high-concurrency block. Do not add intervals, threshold work, extra run frequency, or a second progression category just to satisfy this validator. Preserve every already-valid strength, OAP, OHP, MMA and calendar decision."; // ${eventMarker}\n    } else if (/\\b3\\s*k(?:m)?\\b|\\b3\\s*km\\b/i.test(goals) && /\\b(?:tactical|combat[- ]?ready|special[- ]?operations|operator)\\b/i.test(evidence)) {\n      feedback += "\\nTACTICAL-3K-EVENT-ANCHOR-SURGICAL-REPAIR: Do NOT add another run, conditioning row, or training day. The athlete already requires three direct running exposures and currently tolerates about 18-20 km/week. Convert ONE EXISTING Week-1 Run row into the event-progression anchor by giving that same row a source-supported 3K-specific interval/pace target in Weight, Reps or Notes (for example the already-contextualized repeat structure), while keeping the other existing Run rows as the easy/long aerobic support. Preserve three run days, the established weekly running exposure, the ruck, strength and pull-up structure, shin-impact spacing, and the five-calendar-day budget. If the event-specific run shares a day with strength, shorten/remove low-priority accessories rather than exceeding the supplied 60-minute session ceiling. Across later weeks progress the existing 3K-specific row by one useful variable at a time and consolidate Week 4; never solve this validator by appending a fourth run or extra HIIT."; // ${tacticalEventMarker}\n    }\n  }\n\n`;
-  // Replace the older marathon-only block if it is already present, otherwise
-  // insert the combined event repair at the stable unknown-exercise anchor.
   if (src.includes(eventMarker)) {
     const start = src.indexOf('  const eventProgression = flags.find((flag) => flag?.code === "EVENT_PROGRESSING_SESSION_MISSING");');
     const end = src.indexOf(anchor, start);
@@ -50,6 +48,20 @@ if (!src.includes(tacticalEventMarker)) {
   } else {
     src = src.replace(anchor, block + anchor);
   }
+  changed = true;
+}
+
+// When a high-concurrency Hybrid candidate is almost valid, a repair must not
+// solve endurance placement by silently deleting one of the requested lifting
+// sessions. Use the intake's own fixed gym-day contract rather than hard-coding a
+// generic weekly split.
+const hybridStrengthMarker = 'HYBRID-STRENGTH-FREQUENCY-SURGICAL-REPAIR';
+if (!src.includes(hybridStrengthMarker)) {
+  const anchor = '  const unknown = flags\n    .filter((flag) => flag?.code === "EXERCISE_HALLUCINATION")';
+  const count = src.split(anchor).length - 1;
+  if (count !== 1) throw new Error(`Hybrid strength repair anchor expected once, found ${count}`);
+  const block = `  const missingStrengthSessions = flags.find((flag) => flag?.code === "REQUESTED_STRENGTH_SESSIONS_UNACCOUNTED");\n  if (missingStrengthSessions) {\n    const requestedStrength = Number(intake?.days_per_week || 0);\n    const gymDays = Array.isArray(intake?.available_gym_days) ? intake.available_gym_days.filter(Boolean).map(String) : [];\n    const goals = [intake?.primary_goals, intake?.secondary_goals, intake?.maintenance_goals].flat().filter(Boolean).map(String).join(' | ');\n    const sport = String(intake?.sport || '') + ' ' + JSON.stringify(intake?.sport_schedule || []);\n    const highConcurrencyHybrid = /(?:squat|one[- ]?arm pull|\\boap\\b)/i.test(goals) && /\\b(?:mma|bjj|jiu[- ]?jitsu|wrestl|boxing|combat)\\b/i.test(sport);\n    if (highConcurrencyHybrid && requestedStrength > 0) {\n      const fixedDays = gymDays.length === requestedStrength ? gymDays.join(', ') : '';\n      feedback += "\\nHYBRID-STRENGTH-FREQUENCY-SURGICAL-REPAIR: Preserve exactly " + requestedStrength + " meaningful strength/skill-strength sessions in every week. " + (fixedDays ? ("The intake supplies exactly " + requestedStrength + " available gym days (" + fixedDays + "), so EACH of those days must retain meaningful resistance/advanced-skill work; do not turn any of them into a run-only/cardio-only day. ") : "Do not delete an existing strength day while moving endurance work. ") + "A run, ruck or conditioning-only day never counts toward this strength-session total. If the long run needs relocation, put it on a compatible non-gym day rather than replacing one of the requested lifting sessions. Preserve the already-valid squat, OAP, OHP/vertical press and weighted-pull structure; restore the missing strength day with low-cost goal-relevant work if needed rather than adding random volume."; // ${hybridStrengthMarker}\n    }\n  }\n\n`;
+  src = src.replace(anchor, block + anchor);
   changed = true;
 }
 
@@ -67,7 +79,7 @@ if (!src.includes(promptBudgetMarker)) {
   changed = true;
 }
 
-if (!src.includes(convergenceMarker) || !src.includes(eventMarker) || !src.includes(tacticalEventMarker) || !src.includes(promptBudgetMarker)) {
+if (!src.includes(convergenceMarker) || !src.includes(eventMarker) || !src.includes(tacticalEventMarker) || !src.includes(hybridStrengthMarker) || !src.includes(promptBudgetMarker)) {
   throw new Error('Repair convergence policy did not install all required markers');
 }
 
