@@ -2,6 +2,11 @@ name: Claude Code Setup
 
 on:
   workflow_dispatch:
+  push:
+    branches:
+      - privacy-security-hardening
+    paths:
+      - '.github/workflows/claude-code-setup.yml'
 
 permissions:
   contents: read
