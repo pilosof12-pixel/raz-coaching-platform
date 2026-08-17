@@ -70,12 +70,43 @@ test('Advanced repair is a no-op when Week 4 already holds or reduces strict OAP
   assert.doesNotThrow(() => validateAdvancedHybridQualitySemantic(good, intake));
 });
 
-test('non-numeric ambiguous Week 4 OAP set prescription is not guessed at', () => {
+test('Week 4 set cell with per-arm suffix is parsed exactly like the release validator and converges to an exact set count', () => {
   const bad = program(4).replace(
+    'Fri\tOne-Arm Pull-up\tBW\t4\t1 / arm',
+    'Fri\tOne-Arm Pull-up\tBW\t4 / arm\t1 / arm',
+  );
+  assert.throws(
+    () => validateAdvancedHybridQualitySemantic(bad, intake),
+    (error) => error?.code === 'ADVANCED_HYBRID_WEEK4_OAP_VOLUME_INCREASED',
+  );
+  const fixed = normalizeAdvancedHybridWeek4OapConsolidation(bad, intake);
+  assert.equal(fixed.repaired, true);
+  assert.match(fixed.program, /START_WEEK4_TSV[\s\S]*Fri\tOne-Arm Pull-up\tBW\t3\t1 \/ arm/);
+  assert.doesNotThrow(() => validateAdvancedHybridQualitySemantic(fixed.program, intake));
+});
+
+test('Week 3 set range uses the same conservative first-number metric as the release validator', () => {
+  const bad = program(3).replace(
+    'Fri\tOne-Arm Pull-up\tBW\t3\t1 / arm\t3 min\t8\tStrict quality singles, full reset between arms.\nFri\tWeighted Chin-up',
+    'Fri\tOne-Arm Pull-up\tBW\t2-3\t1 / arm\t3 min\t8\tStrict quality singles, full reset between arms.\nFri\tWeighted Chin-up',
+  );
+  assert.throws(
+    () => validateAdvancedHybridQualitySemantic(bad, intake),
+    (error) => error?.code === 'ADVANCED_HYBRID_WEEK4_OAP_VOLUME_INCREASED',
+  );
+  const fixed = normalizeAdvancedHybridWeek4OapConsolidation(bad, intake);
+  assert.equal(fixed.repaired, true);
+  assert.match(fixed.program, /START_WEEK4_TSV[\s\S]*Fri\tOne-Arm Pull-up\tBW\t2\t1 \/ arm/);
+  assert.doesNotThrow(() => validateAdvancedHybridQualitySemantic(fixed.program, intake));
+});
+
+test('set range is left unchanged when its first-number metric already satisfies consolidation', () => {
+  const good = program(4).replace(
     'Fri\tOne-Arm Pull-up\tBW\t4\t1 / arm',
     'Fri\tOne-Arm Pull-up\tBW\t3-4\t1 / arm',
   );
-  const fixed = normalizeAdvancedHybridWeek4OapConsolidation(bad, intake);
+  const fixed = normalizeAdvancedHybridWeek4OapConsolidation(good, intake);
   assert.equal(fixed.repaired, false);
-  assert.equal(fixed.program, bad);
+  assert.equal(fixed.program, good);
+  assert.doesNotThrow(() => validateAdvancedHybridQualitySemantic(good, intake));
 });
