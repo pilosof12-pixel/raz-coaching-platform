@@ -28,9 +28,14 @@ jobs:
           import { ADVANCED_HYBRID_LAUNCH_INTAKE, advancedHybridLaunchProgram } from './test/fixtures/advanced_hybrid_launch.js';
           import { YOUTH_GYMNASTICS_INTAKE, youthGymnasticsGoldenProgram } from './test/fixtures/golden_programs.js';
 
+          const youthSessionLabelsOnly = youthGymnasticsGoldenProgram()
+            .split('\n')
+            .map((line) => line.startsWith('Mon\t') ? `Session A\t${line.slice(4)}` : line.startsWith('Thu\t') ? `Session B\t${line.slice(4)}` : line)
+            .join('\n');
+
           for (const [name, program, intake] of [
             ['HYBRID', advancedHybridLaunchProgram(), ADVANCED_HYBRID_LAUNCH_INTAKE],
-            ['YOUTH', youthGymnasticsGoldenProgram(), YOUTH_GYMNASTICS_INTAKE],
+            ['YOUTH_SESSION_LABELS_ONLY', youthSessionLabelsOnly, YOUTH_GYMNASTICS_INTAKE],
           ]) {
             const result = collectRepairableValidationFailures(program, intake);
             console.log(`=== ${name} RESULT ===`);
