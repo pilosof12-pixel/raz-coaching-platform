@@ -1,0 +1,49 @@
+name: Live v7 Failure Diagnostics
+
+on:
+  push:
+    paths:
+      - '.github/workflows/live-v7-failure-diagnostics.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  diagnose:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Capture full Hybrid and Youth job diagnostics from v7
+        env:
+          BASE_URL: https://raz-coaching-platform.onrender.com
+          ADMIN_PROVISION_KEY: ${{ secrets.ADMIN_PROVISION_KEY }}
+        run: |
+          node <<'NODE'
+          const base=process.env.BASE_URL;
+          const adminKey=process.env.ADMIN_PROVISION_KEY||'';
+          const sleep=ms=>new Promise(r=>setTimeout(r,ms));
+          if(!adminKey) throw new Error('ADMIN_PROVISION_KEY missing');
+          const vr=await fetch(base+'/runtime-version.txt?qa='+Date.now(),{headers:{'cache-control':'no-cache'}});
+          const version=(await vr.text()).trim();
+          if(version!=='launch-acceptance-v7-recovery-exact-runtime') throw new Error('wrong live runtime '+version);
+          const consent=()=>({health_data:true,policy_version:'2026-08-15',consented_at:new Date().toISOString()});
+          const avatars=[
+            {id:'advanced_hybrid',intake:{age:30,language:'en',primary_goals:['220kg back squat','4 One arm pullups'],secondary_goals:['100kg overhead press','Marathon'],maintenance_goals:['Maintain muscle mass'],goal_priority_model:'tiered_equal_primary',experience:'advanced',days_per_week:4,gym_availability_mode:'limited',available_gym_days:['Mon','Tue','Fri','Sun'],equipment:'Full commercial gym — all standard barbells, dumbbells, racks, machines, cables and bodyweight stations available.',training_location:'commercial_gym',sport:'MMA',sport_sessions_per_week:5,sport_schedule:[{day:'Tue',intensity:'moderate'},{day:'Wed',intensity:'hard'},{day:'Thu',intensity:'moderate'},{day:'Fri',intensity:'hard'},{day:'Sat',intensity:'moderate'}],sleep_hours:'7-8 hours',recovery_rating:'Good',current_numbers:['Back Squat: 205 kg 1RM','One-Arm Pull-up: 2 strict reps each arm','Overhead Press: 80 kg x 4','Weighted Chin-up: +80 kg 1RM','Running: 1 session a week, about 20 km total, longest recent run about 20 km'].join('\n'),clarification_answers:{running_current_exposure:'Currently 1 run per week, about 20 km total, with the longest recent run about 20 km.'},injuries:'None reported',notes:'Advanced hybrid athlete. Primary strength and calisthenics goals outrank the marathon side quest. Preserve MMA quality and recovery. Current running is 1 run per week, about 20 km total, with the longest recent run about 20 km.',qa_diagnostics:true,privacy_consent:consent()}},
+            {id:'youth_gymnastics',intake:{age:13,language:'en',experience:'intermediate',primary_goals:['Achieve first bar muscle-up','Achieve a freestanding handstand'],secondary_goals:['Build a strong general push and pull foundation while maintaining lower-body athleticism'],days_per_week:2,session_length:'60 min',gym_availability_mode:'flexible',available_gym_days:[],training_location:'home_gym',equipment:'Home setup: rings, pull-up bar, resistance bands and bench. No external weights.',current_numbers:'Pistol squat established; ring muscle-up achieved; about 12 strict pull-ups and 6 good ring dips. Wall-facing handstand about 15 seconds; back-to-wall about 20 seconds. Controlled kick-ups are improving, but there is no reliable unsupported balance time yet.',clarification_answers:{benchmark_bar_muscle_up:'Cannot perform a bar muscle-up yet. Can perform a ring muscle-up. About 12 strict pull-ups and 6 good ring dips.',benchmark_handstand:'Wall-facing handstand about 15 seconds; back-to-wall about 20 seconds. Controlled kick-ups are improving, but there is no reliable unsupported balance time yet.'},injuries:'None reported',pain:{active:false},sport:'',sport_schedule:[],mobility:{active:false},sleep_hours:'8-9',recovery_rating:'Good',notes:'Athlete is 13 years old. Two structured sessions per week. Rings, pull-up bar, bands and bench only. No external weights. Skill quality before fatigue; no grinders or repeated failed attempts.',qa_diagnostics:true,privacy_consent:consent()}}
+          ];
+          async function req(path,opt={}){const r=await fetch(base+path,opt);const text=await r.text();let j={};try{j=JSON.parse(text)}catch{};return {r,j,text};}
+          for(const a of avatars){
+            const p=await req('/api/admin/program-pass',{method:'POST',headers:{'content-type':'application/json','x-admin-provision-key':adminKey},body:JSON.stringify({count:1})});
+            const pass=p.j?.codes?.[0]; if(!pass) throw new Error('pass provisioning failed '+a.id);
+            const b=await req('/api/build',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({intake:a.intake,pass_code:pass})});
+            if(b.r.status!==202||!b.j?.job_id) throw new Error('build rejected '+a.id+' '+b.r.status+' '+b.text);
+            let job={};
+            for(let i=0;i<240;i++){await sleep(2000);({j:job}=await req('/api/job/'+encodeURIComponent(b.j.job_id)));if(job?.status==='done'||job?.status==='error')break;}
+            console.log('=== FULL_JOB '+a.id+' ===');
+            console.log(JSON.stringify(job,null,2));
+          }
+          NODE
