@@ -9,6 +9,7 @@ import {
 } from './skill_progressions.js';
 import { overcomingGravityRulesForFamily } from './overcoming_gravity_rules.js';
 import { buildRoadmapPromptRules } from './goal_progression_graph.js';
+import { isHighConcurrencyHybrid } from './advanced_hybrid_concurrency.js';
 
 function arr(v) { return Array.isArray(v) ? v : v ? [v] : []; }
 function str(v) { return typeof v === 'string' ? v : JSON.stringify(v || ''); }
@@ -117,8 +118,41 @@ function streetLiftingRules(intake) {
   return out;
 }
 
+function manualAcceptanceRules(intake = {}) {
+  const out = [];
+  const all = `${goals(intake).join(' | ')} ${str(intake.notes)} ${str(intake.current_numbers)}`;
+  const athleteAge = Number(intake.age || intake.age_years || 0);
+  const youth = Number.isFinite(athleteAge) && athleteAge > 0 && athleteAge < 18;
+
+  if (isHighConcurrencyHybrid(intake)) {
+    const squat = String(intake.current_numbers || '').match(/back\s*squat\s*:\s*(\d+(?:\.\d+)?)\s*kg\s*(?:1\s*rm|1rm|max)?/i);
+    out.push('MANUAL-ACCEPTANCE HYBRID RULE: future target numbers are never current capacity. Multi-set heavy strength prescriptions must be plausible from the supplied CURRENT benchmark and the requested RPE, especially with 5 external combat sessions. For repeated Back Squat work use conservative benchmark-based loading; as a ceiling guide, about <=88% current 1RM for triples, <=85% for fours, <=82% for fives, and lower when fatigue requires it. Progress only after the achieved RPE/bar speed supports the increase.');
+    if (squat) out.push(`The current Back Squat 1RM is ${squat[1]} kg. Do not program repeated triples around 90-93% as though the future squat target were already achieved.`);
+    if (/one.?arm\s*(?:pull|chin)|\boap\b/i.test(all)) out.push('Every One-Arm Pull-up and Assisted One-Arm Pull-up prescription must explicitly say per arm / each side in Reps or Notes so unilateral dose is unambiguous.');
+    out.push('Do not place the substantive long run immediately before the primary heavy Back Squat day when another placement exists. Preserve the fixed strength-day calendar and move the run around it rather than accepting obvious lower-body interference.');
+  }
+
+  if (youth) {
+    if (String(intake.gym_availability_mode || '').toLowerCase() === 'flexible' && !arr(intake.available_gym_days).length) {
+      out.push('YOUTH FLEXIBLE-SCHEDULE HARD CONTRACT: do not invent Monday/Tuesday or any weekday. Label the two sessions Session A and Session B in every week.');
+    }
+    out.push('YOUTH SKILL-FIRST HARD CONTRACT: after the warm-up, primary bar-muscle-up/handstand skill practice comes before ring dips, rows, push-ups, pistol squats or other support strength. The introduction and TSV must agree that skills are trained fresh.');
+    if (/handstand/i.test(all)) out.push('YOUTH HANDSTAND QUALITY CONTRACT: controlled kick-up practice should usually stay around 3-5 quality sets and <=20 planned attempts per session. Do not progress 5->6->7 sets. Progress entry control, successful independent-balance attempts, balance time, body line, assistance or wall dependence while wall-supported holds provide the measurable capacity progression.');
+    const dip = all.match(/(?:about\s*)?(\d{1,2})\s*(?:good|clean|strict)?\s*ring\s*dips?/i);
+    if (dip) out.push(`YOUTH CAPACITY CONTRACT: current ring-dip capacity is about ${dip[1]} good reps. That is a fresh ceiling, not a 3-set working prescription. Keep repeated ring-dip sets clearly submaximal (roughly <=70-75% of that ceiling at first) and progress quality/reps conservatively rather than prescribing 3 sets at the current max.`);
+  }
+
+  const tactical = /\b(?:tactical|military|special[- ]?operations|combat[- ]?ready|operator)\b/i.test(all) && /3\s*km|3k/i.test(all);
+  if (tactical) {
+    out.push('TACTICAL 3K FIVE-DAY CONVERGENCE CONTRACT: for the supplied 3K + 20 kg ruck + pull-up avatar with 3 requested strength sessions and an explicit five-calendar-day allowance, use the stable five-day architecture instead of rediscovering the schedule: Day 1 strength with squat + weighted pull-up + low-cost push plus easy Run/Zone 2; Day 2 3K-specific Run intervals; Day 3 deadlift + OHP + strict pull-up + trunk; Day 4 20 kg ruck/Backpack Carry; Day 5 unilateral/lower support + non-adjacent pull support plus easy aerobic Run. Keep three direct Run exposures, one ruck, and three genuine strength sessions across exactly five training days.');
+    out.push('The 3K progression requirement must be satisfied by modifying the existing interval Run row: make its Load/Target or Notes explicitly event-specific (for example current-calibrated 3K interval pace). Do not add a fourth Run, a sixth training day, or extra conditioning just to satisfy progression.');
+    out.push('Keep substantive pull-up priority exposures non-adjacent (for example Day 1 / Day 3 / Day 5), preserve the tolerated 18-20 km/week running baseline without abrupt impact increases, and keep every nominal 60-minute strength day inside the time budget by trimming support work before primary work.');
+  }
+  return out;
+}
+
 export function buildSpecialistRules(intake = {}) {
-  const rules = [...gymnasticsRules(intake), ...streetLiftingRules(intake)];
+  const rules = [...gymnasticsRules(intake), ...streetLiftingRules(intake), ...manualAcceptanceRules(intake)];
   const roadmap = buildRoadmapPromptRules(intake);
   if (!rules.length && !roadmap) return '';
   return [
