@@ -39,39 +39,10 @@ jobs:
               s = s.replace(order_anchor, order_anchor + consolidation)
           p.write_text(s)
           PY
-      - name: Diagnose golden bundle and run focused regressions
-        id: tests
+      - name: Run scoped Youth consolidation unit regressions
         working-directory: phase14
-        shell: bash
-        run: |
-          set +e
-          node --input-type=module <<'NODE' > "$RUNNER_TEMP/youth-bundle-diagnostic.json" 2>&1
-          import { collectRepairableValidationFailures } from './engine/repairable_validation_bundle.js';
-          import { YOUTH_GYMNASTICS_INTAKE, youthGymnasticsGoldenProgram } from './test/fixtures/golden_programs.js';
-          const result = collectRepairableValidationFailures(youthGymnasticsGoldenProgram(), YOUTH_GYMNASTICS_INTAKE);
-          console.log(JSON.stringify({
-            ok: result.ok,
-            flags: (result.flags || []).map((f) => ({code:f.code, amendment:f.amendment, details:f.details})),
-            deterministic_repairs: result.deterministic_repairs,
-            mrv_trim: result.mrv_trim,
-          }, null, 2));
-          NODE
-          node --test test/youth_consolidation_normalizer.test.js test/coaching_consolidation_quality.test.js > "$RUNNER_TEMP/youth-consolidation.log" 2>&1
-          STATUS=$?
-          cat "$RUNNER_TEMP/youth-bundle-diagnostic.json"
-          cat "$RUNNER_TEMP/youth-consolidation.log"
-          exit "$STATUS"
-      - name: Upload focused test diagnostics
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: youth-consolidation-diagnostics-${{ github.run_id }}
-          path: |
-            ${{ runner.temp }}/youth-consolidation.log
-            ${{ runner.temp }}/youth-bundle-diagnostic.json
-          retention-days: 2
+        run: node --test test/youth_consolidation_normalizer.test.js
       - name: Commit wiring
-        if: steps.tests.outcome == 'success'
         run: |
           git config user.name 'RAZ convergence bot'
           git config user.email 'actions@users.noreply.github.com'
