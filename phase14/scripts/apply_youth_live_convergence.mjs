@@ -56,13 +56,13 @@ patchTextFile('server.phase15.js', [
   },
 ]);
 
-// When deterministic QA still catches a Youth miss, turn the broad validator
-// message into a surgical edit contract. Preserve all unrelated rows and make the
-// smallest correction needed for the current candidate to converge.
+// Aggregate repair rewrites the feedback helper before this stage. Its replacement
+// joins the helper and generateValidatedProgram with a single newline, so anchor
+// that exact generated shape rather than the pre-aggregate two-newline source.
 patchTextFile('server.phase15.js', [
   {
     label: 'Youth surgical repair feedback',
-    find: '  return feedback;\n}\n\nasync function generateValidatedProgram',
+    find: '  return feedback;\n}\nasync function generateValidatedProgram',
     replace: `  const repairContext = String(feedback || '');
   const youthAge = Number(intake?.age || intake?.age_years || 0);
   const youth = Number.isFinite(youthAge) && youthAge > 0 && youthAge < 18;
@@ -80,7 +80,7 @@ patchTextFile('server.phase15.js', [
     feedback += '\\nYOUTH-WEEK4-SURGICAL-REPAIR: Do not copy Week 1 back into Week 4 after Weeks 2-3 progressed. Reduce fatigue by cutting sets/attempts first, while retaining at least an intermediate-to-Week-3 clean rep, assistance, balance, ROM or execution standard. For handstand/skill rows, explicitly say retain or match the best clean Week-3 entry/balance/quality while using fewer attempts. Preserve every unrelated Week-4 row.';
   }
   return feedback;
-}\n\nasync function generateValidatedProgram`,
+}\nasync function generateValidatedProgram`,
     already: 'YOUTH-PULL-UP-SURGICAL-REPAIR:',
   },
 ]);
