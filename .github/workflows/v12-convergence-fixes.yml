@@ -1,0 +1,69 @@
+name: Apply v12 convergence fixes
+
+on:
+  push:
+    paths:
+      - '.github/workflows/v12-convergence-fixes.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  apply:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: privacy-security-hardening
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Patch exact v12 convergence defects
+        run: |
+          node <<'NODE'
+          const fs = require('fs');
+
+          function replaceOnce(path, from, to, label) {
+            let src = fs.readFileSync(path, 'utf8');
+            const count = src.split(from).length - 1;
+            if (count !== 1) throw new Error(`${label}: expected one anchor, found ${count}`);
+            src = src.replace(from, to);
+            fs.writeFileSync(path, src);
+          }
+
+          replaceOnce(
+            'phase14/engine/phase15_elite_guardrails.js',
+            `function eventProgressionBearing(item) {\n  const s=\`${'${item.ctx} ${item.dose}'}\`;\n  return /(?:\\b(?:interval|threshold|critical speed|critical power|race pace|goal pace|target pace|2k pace|3k pace|5k pace|10k pace|marathon pace|split target|stroke rate|cadence|power target|pace target)\\b|\\b\\d+:\\d+(?:-\\d+:\\d+)?\\s*\\/\\s*500m\\b|\\b\\d+(?::\\d+)?\\s*\\/\\s*km\\b|\\b\\d+(?:\\.\\d+)?\\s*(?:km\\/h|kph|watts?|w)\\b|\\bprogress(?:ion|ively)?\\b)/i.test(s); // ROWING-500M-SPLIT-PROGRESSION\n}`,
+            `function eventProgressionBearing(item) {\n  const s=\`${'${item.ctx} ${item.dose}'}\`;\n  const explicitTarget = /(?:\\b(?:interval|threshold|critical speed|critical power|race pace|goal pace|target pace|2k pace|3k pace|5k pace|10k pace|marathon pace|split target|stroke rate|cadence|power target|pace target)\\b|\\b\\d+:\\d+(?:-\\d+:\\d+)?\\s*\\/\\s*500m\\b|\\b\\d+(?::\\d+)?\\s*\\/\\s*km\\b|\\b\\d+(?:\\.\\d+)?\\s*(?:km\\/h|kph|watts?|w)\\b|\\bprogress(?:ion|ively)?\\b)/i.test(s);\n  // A standard interval can encode its event-specific target as repetition distance\n  // plus a per-repetition clock (for example 5 x 400 m at 1:42-1:45) without\n  // repeating the magic words \"interval\" or \"3K pace\" in Notes. Treat that\n  // representation as progression-bearing rather than forcing stylistic wording.\n  const clockTarget = /\\b\\d{1,2}:\\d{2}(?:\\s*(?:-|–|to)\\s*\\d{1,2}:\\d{2})?\\b/.test(s);\n  const distanceTarget = /\\b\\d+(?:\\.\\d+)?\\s*(?:m|km)\\b/i.test(s);\n  return explicitTarget || (clockTarget && distanceTarget); // ROWING-500M-SPLIT-PROGRESSION + DISTANCE-CLOCK-TARGET\n}`,
+            'event progression detector',
+          );
+
+          const testPath = 'phase14/test/phase15_elite_guardrails.test.mjs';
+          let tests = fs.readFileSync(testPath, 'utf8');
+          const marker = `test('3K distance plus per-rep clock target is progression-bearing without magic wording'`;
+          if (!tests.includes(marker)) {
+            tests += `\n\ntest('3K distance plus per-rep clock target is progression-bearing without magic wording',()=>{\n  const intake={\n    primary_goals:['Improve 3 km from 13:30 to sub-12:00'],\n    notes:'Currently runs 3 sessions per week, about 18-20 km/week.'\n  };\n  const p=parsed([\n    row('Mon','Run','N/A','1','35 min','Easy aerobic running.'),\n    row('Tue','Run','1:42-1:45','5','400 m','2 min jog recovery; keep every repetition repeatable.'),\n    row('Fri','Run','N/A','1','45 min','Easy aerobic running.')\n  ]);\n  const flags=endurancePerformanceIntegrityFlags('',intake,p);\n  assert.equal(flags.some(x=>x.code==='EVENT_PROGRESSING_SESSION_MISSING'),false);\n});\n`;
+            fs.writeFileSync(testPath, tests);
+          }
+
+          replaceOnce(
+            'phase14/server.js',
+            `  } catch (e) {\n    console.error("build job error:", e);\n    await store.finishJob(jobId, "error", null, e.message || "Engine error.", Date.now());\n  }\n}`,
+            `  } catch (e) {\n    console.error("build job error:", e);\n    const qaCodes = intake?.qa_diagnostics ? [...new Set([\n      e?.code,\n      ...(Array.isArray(e?.flags) ? e.flags.map((flag) => flag?.code) : []),\n      ...(Array.isArray(e?.details?.violations) ? e.details.violations.flatMap((v) => [v?.code, v?.type]) : []),\n    ].map((code) => String(code || '')).filter((code) => /^[A-Z0-9_]+$/.test(code)))].slice(0, 8) : [];\n    const baseError = e?.message || e?.code || "Engine error.";\n    const jobError = qaCodes.length ? \`${'${baseError} [QA:${qaCodes.join("+")}]'}\` : baseError;\n    await store.finishJob(jobId, "error", null, jobError, Date.now());\n  }\n}`,
+            'build QA code diagnostics',
+          );
+          NODE
+      - name: Run focused and full Phase 14 tests
+        working-directory: phase14
+        run: |
+          node --test test/phase15_elite_guardrails.test.mjs
+          npm test
+      - name: Commit fixes
+        run: |
+          git config user.name 'RAZ convergence bot'
+          git config user.email 'actions@users.noreply.github.com'
+          git add phase14/engine/phase15_elite_guardrails.js phase14/test/phase15_elite_guardrails.test.mjs phase14/server.js
+          if git diff --cached --quiet; then exit 0; fi
+          git commit -m 'Fix Tactical event target recognition and expose QA codes in diagnostics'
+          git push origin HEAD:privacy-security-hardening
