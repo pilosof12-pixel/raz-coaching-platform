@@ -2,6 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 
 import { validateProductionProgram } from '../engine/production_validation.js';
+import { validateGoalComponentCoverageSemantic } from '../engine/goal_progression_graph.js';
 import {
   YOUTH_GYMNASTICS_INTAKE,
   youthGymnasticsGoldenProgram,
@@ -24,31 +25,30 @@ function isWallSupportedHandstandRow(line) {
   return exercise.includes('handstand') && exercise.includes('wall');
 }
 
-test('production repairable bundle rejects Youth handstand work that omits wall-supported capacity', () => {
+test('raw Youth component gate rejects missing wall capacity before production restores the explicit acquisition floor', () => {
   const kickUpOnly = youthGymnasticsGoldenProgram()
     .split('\n')
     .filter((line) => !isWallSupportedHandstandRow(line))
     .join('\n');
 
   assert.throws(
-    () => validateProductionProgram(kickUpOnly, YOUTH_GYMNASTICS_INTAKE),
+    () => validateGoalComponentCoverageSemantic(kickUpOnly, YOUTH_GYMNASTICS_INTAKE),
     (error) => {
       const codes = failureCodes(error);
-      assert.equal(
-        error?.code,
-        'PHASE15_QUALITY_VIOLATION',
-        'A single repairable semantic defect must stay inside the aggregate repair contract so the outer generation loop can use later repair attempts.',
-      );
       assert.ok(
         codes.has('GOAL_COMPONENT_COVERAGE_MISSING'),
         `Expected GOAL_COMPONENT_COVERAGE_MISSING; received ${[...codes].join(', ') || error?.message || 'unknown error'}`,
       );
-      assert.ok(
-        (error?.flags || []).some((flag) => flag?.code === 'GOAL_COMPONENT_COVERAGE_MISSING'),
-        'The aggregate repair error must preserve the exact underlying semantic code for targeted repair feedback.',
-      );
       return true;
     },
+  );
+
+  const repaired = validateProductionProgram(kickUpOnly, YOUTH_GYMNASTICS_INTAKE);
+  assert.equal(repaired.ok, true);
+  assert.match(
+    repaired.program,
+    /\tWall Handstand Hold\tBW/,
+    'Production may restore the source-authored wall-supported capacity floor only for the explicit Youth acquisition state.',
   );
 });
 
