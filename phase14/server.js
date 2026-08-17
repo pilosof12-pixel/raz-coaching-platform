@@ -1761,7 +1761,14 @@ async function runBuildJob(jobId, token, intake) {
     await store.finishJob(jobId, "done", program, null, now);
   } catch (e) {
     console.error("build job error:", e);
-    await store.finishJob(jobId, "error", null, e.message || "Engine error.", Date.now());
+    const qaCodes = intake?.qa_diagnostics ? [...new Set([
+      e?.code,
+      ...(Array.isArray(e?.flags) ? e.flags.map((flag) => flag?.code) : []),
+      ...(Array.isArray(e?.details?.violations) ? e.details.violations.flatMap((v) => [v?.code, v?.type]) : []),
+    ].map((code) => String(code || '')).filter((code) => /^[A-Z0-9_]+$/.test(code)))].slice(0, 8) : [];
+    const baseError = e?.message || e?.code || "Engine error.";
+    const jobError = qaCodes.length ? `${baseError} [QA:${qaCodes.join("+")}]` : baseError;
+    await store.finishJob(jobId, "error", null, jobError, Date.now());
   }
 }
 

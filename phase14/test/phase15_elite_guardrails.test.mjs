@@ -187,3 +187,18 @@ test('integrity prompt rules defer workout design to sources while preserving cl
   assert.match(rules,/direct Back Squat exposure/i);
   assert.doesNotMatch(rules,/every primary goal needs multiple/i);
 });
+
+
+test('3K distance plus per-rep clock target is progression-bearing without magic wording',()=>{
+  const intake={
+    primary_goals:['Improve 3 km from 13:30 to sub-12:00'],
+    notes:'Currently runs 3 sessions per week, about 18-20 km/week.'
+  };
+  const p=parsed([
+    row('Mon','Run','N/A','1','35 min','Easy aerobic running.'),
+    row('Tue','Run','1:42-1:45','5','400 m','2 min jog recovery; keep every repetition repeatable.'),
+    row('Fri','Run','N/A','1','45 min','Easy aerobic running.')
+  ]);
+  const flags=endurancePerformanceIntegrityFlags('',intake,p);
+  assert.equal(flags.some(x=>x.code==='EVENT_PROGRESSING_SESSION_MISSING'),false);
+});

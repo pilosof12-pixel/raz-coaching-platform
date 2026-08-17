@@ -112,7 +112,14 @@ function meaningfulModalityRows(parsed, def) {
 
 function eventProgressionBearing(item) {
   const s=`${item.ctx} ${item.dose}`;
-  return /(?:\b(?:interval|threshold|critical speed|critical power|race pace|goal pace|target pace|2k pace|3k pace|5k pace|10k pace|marathon pace|split target|stroke rate|cadence|power target|pace target)\b|\b\d+:\d+(?:-\d+:\d+)?\s*\/\s*500m\b|\b\d+(?::\d+)?\s*\/\s*km\b|\b\d+(?:\.\d+)?\s*(?:km\/h|kph|watts?|w)\b|\bprogress(?:ion|ively)?\b)/i.test(s); // ROWING-500M-SPLIT-PROGRESSION
+  const explicitTarget = /(?:\b(?:interval|threshold|critical speed|critical power|race pace|goal pace|target pace|2k pace|3k pace|5k pace|10k pace|marathon pace|split target|stroke rate|cadence|power target|pace target)\b|\b\d+:\d+(?:-\d+:\d+)?\s*\/\s*500m\b|\b\d+(?::\d+)?\s*\/\s*km\b|\b\d+(?:\.\d+)?\s*(?:km\/h|kph|watts?|w)\b|\bprogress(?:ion|ively)?\b)/i.test(s);
+  // A standard interval can encode its event-specific target as repetition distance
+  // plus a per-repetition clock (for example 5 x 400 m at 1:42-1:45) without
+  // repeating the magic words "interval" or "3K pace" in Notes. Treat that
+  // representation as progression-bearing rather than forcing stylistic wording.
+  const clockTarget = /\b\d{1,2}:\d{2}(?:\s*(?:-|–|to)\s*\d{1,2}:\d{2})?\b/.test(s);
+  const distanceTarget = /\b\d+(?:\.\d+)?\s*(?:m|km)\b/i.test(s);
+  return explicitTarget || (clockTarget && distanceTarget); // ROWING-500M-SPLIT-PROGRESSION + DISTANCE-CLOCK-TARGET
 }
 
 function currentRunningRaceAnchor(intake={}) {
