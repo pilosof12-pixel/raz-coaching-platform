@@ -14,6 +14,7 @@ import { repairPhase15Program } from './phase15_program_qa.js';
 import { validatePhase15FinalProgram } from './phase15_final_qa.js';
 import { parseProgramModel } from './program_model.js';
 import { trimExcessSupportVolume } from './mrv_support_trim.js';
+import { repairYouthPrimarySkillOrder, repairHybridMarathonEventAnchor } from './deterministic_coaching_repairs.js';
 import {
   validateDirectGoalExposureSemantic,
   validateSportDayCouplingSemantic,
@@ -52,34 +53,11 @@ export function stripNonExerciseScheduleRows(program, intake = {}) {
   let delim = '\t';
 
   for (const line of lines) {
-    if (/START_WEEK\d+_TSV/.test(line)) {
-      inBlock = true;
-      header = null;
-      exIdx = -1;
-      out.push(line);
-      continue;
-    }
-    if (/END_WEEK\d+_TSV/.test(line)) {
-      inBlock = false;
-      header = null;
-      exIdx = -1;
-      out.push(line);
-      continue;
-    }
-    if (!inBlock || !line.trim()) {
-      out.push(line);
-      continue;
-    }
-
+    if (/START_WEEK\d+_TSV/.test(line)) { inBlock = true; header = null; exIdx = -1; out.push(line); continue; }
+    if (/END_WEEK\d+_TSV/.test(line)) { inBlock = false; header = null; exIdx = -1; out.push(line); continue; }
+    if (!inBlock || !line.trim()) { out.push(line); continue; }
     const rowDelim = line.includes('\t') ? '\t' : (line.includes(',') ? ',' : delim);
-    if (!header) {
-      delim = rowDelim;
-      header = line.split(delim).map((c) => c.trim().toLowerCase());
-      exIdx = header.indexOf('exercise');
-      out.push(line);
-      continue;
-    }
-
+    if (!header) { delim = rowDelim; header = line.split(delim).map((c) => c.trim().toLowerCase()); exIdx = header.indexOf('exercise'); out.push(line); continue; }
     if (exIdx >= 0) {
       const cells = line.split(rowDelim);
       const raw = exIdx < cells.length ? cells[exIdx] : '';
@@ -92,78 +70,32 @@ export function stripNonExerciseScheduleRows(program, intake = {}) {
 }
 
 function isRepairable(err) {
-  return Boolean(
-    err instanceof RetriableValidationError ||
-    err instanceof SkillCalibrationError ||
-    err?.code === 'PHASE15_QUALITY_VIOLATION'
-  );
+  return Boolean(err instanceof RetriableValidationError || err instanceof SkillCalibrationError || err?.code === 'PHASE15_QUALITY_VIOLATION');
 }
-
 function flattenError(err) {
   if (err?.code === 'PHASE15_QUALITY_VIOLATION' && Array.isArray(err.flags) && err.flags.length) {
-    return err.flags.map((flag) => ({
-      code: String(flag?.code || 'PHASE15_QUALITY_VIOLATION'),
-      amendment: String(flag?.amendment || flag?.message || err?.amendment || err?.message || ''),
-      details: flag?.details || {},
-      source_error: err,
-    }));
+    return err.flags.map((flag) => ({ code: String(flag?.code || 'PHASE15_QUALITY_VIOLATION'), amendment: String(flag?.amendment || flag?.message || err?.amendment || err?.message || ''), details: flag?.details || {}, source_error: err }));
   }
-  return [{
-    code: String(err?.code || 'INTERNAL_QUALITY_VIOLATION'),
-    amendment: String(err?.amendment || err?.message || err?.code || 'Unknown quality failure'),
-    details: err?.details || {},
-    source_error: err,
-  }];
+  return [{ code: String(err?.code || 'INTERNAL_QUALITY_VIOLATION'), amendment: String(err?.amendment || err?.message || err?.code || 'Unknown quality failure'), details: err?.details || {}, source_error: err }];
 }
-
 function dedupeFlags(flags) {
-  const seen = new Set();
-  const out = [];
-  for (const flag of flags) {
-    const key = `${flag.code}|${flag.amendment}`;
-    if (seen.has(key)) continue;
-    seen.add(key);
-    out.push(flag);
-  }
+  const seen = new Set(), out = [];
+  for (const flag of flags) { const key = `${flag.code}|${flag.amendment}`; if (seen.has(key)) continue; seen.add(key); out.push(flag); }
   return out;
 }
-
 function runRepairable(flags, fn) {
-  try {
-    return { ok: true, value: fn() };
-  } catch (err) {
-    if (!isRepairable(err)) throw err;
-    flags.push(...flattenError(err));
-    return { ok: false, value: null };
-  }
+  try { return { ok: true, value: fn() }; }
+  catch (err) { if (!isRepairable(err)) throw err; flags.push(...flattenError(err)); return { ok: false, value: null }; }
 }
-
 function aggregateError(flags) {
   const clean = dedupeFlags(flags);
-
-  if (
-    clean.length === 1 &&
-    clean[0].source_error?.code === 'PHASE15_QUALITY_VIOLATION' &&
-    Array.isArray(clean[0].source_error?.flags) &&
-    clean[0].source_error.flags.length
-  ) {
-    return clean[0].source_error;
-  }
-
+  if (clean.length === 1 && clean[0].source_error?.code === 'PHASE15_QUALITY_VIOLATION' && Array.isArray(clean[0].source_error?.flags) && clean[0].source_error.flags.length) return clean[0].source_error;
   const amendment = [
-    clean.length > 1
-      ? 'PRIOR ATTEMPT FAILED MULTIPLE REPAIRABLE VALIDATORS IN THE SAME CANDIDATE.'
-      : 'PRIOR ATTEMPT FAILED A REPAIRABLE PRODUCTION VALIDATOR.',
-    clean.length > 1
-      ? 'Repair ALL defects below in one pass. Do not fix one item by violating another item.'
-      : 'Repair the defect below while preserving every already-valid program requirement.',
+    clean.length > 1 ? 'PRIOR ATTEMPT FAILED MULTIPLE REPAIRABLE VALIDATORS IN THE SAME CANDIDATE.' : 'PRIOR ATTEMPT FAILED A REPAIRABLE PRODUCTION VALIDATOR.',
+    clean.length > 1 ? 'Repair ALL defects below in one pass. Do not fix one item by violating another item.' : 'Repair the defect below while preserving every already-valid program requirement.',
     ...clean.map((flag, i) => `${i + 1}. ${flag.code}: ${flag.amendment}`),
   ].join('\n');
-  const err = new RetriableValidationError(
-    'PHASE15_QUALITY_VIOLATION',
-    amendment,
-    { violations: clean.map(({ code, amendment, details }) => ({ code, amendment, details })) },
-  );
+  const err = new RetriableValidationError('PHASE15_QUALITY_VIOLATION', amendment, { violations: clean.map(({ code, amendment, details }) => ({ code, amendment, details })) });
   err.flags = clean.map(({ code, amendment, details }) => ({ code, amendment, details }));
   err.aggregate = true;
   return err;
@@ -173,26 +105,26 @@ export function collectRepairableValidationFailures(program, intake = {}, option
   const skipSkillCalibration = options?.skipSkillCalibration === true;
   let candidate = stripNonExerciseScheduleRows(program, intake);
   const flags = [];
-  let warnings = [];
-  let schedule = [];
-  let mrv_trim = null;
+  let warnings = [], schedule = [], mrv_trim = null;
 
   const dictionary = runRepairable(flags, () => validateExercisesAgainstDictionary(candidate, intake));
   if (dictionary.ok) candidate = dictionary.value.program;
-
   if (!skipSkillCalibration) {
     const skills = runRepairable(flags, () => validateAndCalibrateSkills(candidate, intake));
     if (skills.ok) candidate = skills.value.program;
   }
-
   runRepairable(flags, () => validateEquipmentAgainstLocation(candidate, intake));
   runRepairable(flags, () => enforceUnilateralIntensityFloor(candidate, intake));
-
   const ordered = runRepairable(flags, () => enforceIntradayConditioningOrder(candidate, intake));
   if (ordered.ok && typeof ordered.value === 'string') candidate = ordered.value;
 
   mrv_trim = trimExcessSupportVolume(candidate, intake);
   if (mrv_trim.repaired) candidate = mrv_trim.program;
+
+  // Deterministic repairs are deliberately narrow: row order and event-role annotation only.
+  // They never add exercises, sets, reps, load, distance or training days.
+  candidate = repairYouthPrimarySkillOrder(candidate, intake);
+  candidate = repairHybridMarathonEventAnchor(candidate, intake);
 
   let model = parseProgramModel(candidate, intake);
   const semanticChecks = [
@@ -212,14 +144,10 @@ export function collectRepairableValidationFailures(program, intake = {}, option
     () => validateHardRunWarmupSemantic(candidate, intake, model),
     () => validateWeeklyVolumeBudgetSemantic(candidate, intake, model),
   ];
-
   for (let i = 0; i < semanticChecks.length; i++) {
     const checked = runRepairable(flags, semanticChecks[i]);
     if (checked.ok && checked.value?.model) model = checked.value.model;
-    if (i === 0 && checked.ok) {
-      warnings = checked.value?.warnings || [];
-      schedule = checked.value?.schedule || [];
-    }
+    if (i === 0 && checked.ok) { warnings = checked.value?.warnings || []; schedule = checked.value?.schedule || []; }
   }
 
   candidate = reformatWarmupCells(candidate);
@@ -233,11 +161,7 @@ export function collectRepairableValidationFailures(program, intake = {}, option
     flags: dedupeFlags(flags),
     warnings,
     schedule,
-    mrv_trim: mrv_trim ? {
-      repaired: Boolean(mrv_trim.repaired),
-      reductions: mrv_trim.reductions || [],
-      unresolved: Boolean(mrv_trim.unresolved),
-    } : null,
+    mrv_trim: mrv_trim ? { repaired: Boolean(mrv_trim.repaired), reductions: mrv_trim.reductions || [], unresolved: Boolean(mrv_trim.unresolved) } : null,
     skill_calibration_skipped: skipSkillCalibration,
   };
 }
