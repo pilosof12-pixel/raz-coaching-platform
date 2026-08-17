@@ -33,24 +33,12 @@ jobs:
                   raise SystemExit(f'import anchor count={s.count(import_anchor)}')
               s = s.replace(import_anchor, import_anchor + '\n' + import_line)
 
-          old = """  const youthOrder = normalizeYouthPrimarySkillOrder(candidate, intake);
-          candidate = youthOrder.program;
-          if (youthOrder.reordered) repairs.push({ type: 'youth_primary_skill_order', moves: youthOrder.moves });
-
-          return { program: candidate, repairs };"""
-          new = """  const youthOrder = normalizeYouthPrimarySkillOrder(candidate, intake);
-          candidate = youthOrder.program;
-          if (youthOrder.reordered) repairs.push({ type: 'youth_primary_skill_order', moves: youthOrder.moves });
-
-          const youthConsolidation = normalizeYouthWeek4Consolidation(candidate, intake);
-          candidate = youthConsolidation.program;
-          if (youthConsolidation.repaired) repairs.push({ type: 'youth_week4_consolidation', rows: youthConsolidation.repairs });
-
-          return { program: candidate, repairs };"""
+          order_anchor = "  if (youthOrder.reordered) repairs.push({ type: 'youth_primary_skill_order', moves: youthOrder.moves });"
+          consolidation = "\n\n  const youthConsolidation = normalizeYouthWeek4Consolidation(candidate, intake);\n  candidate = youthConsolidation.program;\n  if (youthConsolidation.repaired) repairs.push({ type: 'youth_week4_consolidation', rows: youthConsolidation.repairs });"
           if "type: 'youth_week4_consolidation'" not in s:
-              if s.count(old) != 1:
-                  raise SystemExit(f'repair anchor count={s.count(old)}')
-              s = s.replace(old, new)
+              if s.count(order_anchor) != 1:
+                  raise SystemExit(f'order anchor count={s.count(order_anchor)}')
+              s = s.replace(order_anchor, order_anchor + consolidation)
 
           p.write_text(s)
           PY
