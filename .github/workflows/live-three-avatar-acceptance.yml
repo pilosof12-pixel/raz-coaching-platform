@@ -1,5 +1,5 @@
 name: Live Three Avatar Acceptance
-# acceptance-trigger: round3-37fb53a1-2026-08-17
+# acceptance-trigger: round4-2026-08-17-2221-aest
 
 on:
   push:
