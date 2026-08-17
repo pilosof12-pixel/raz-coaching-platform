@@ -19,6 +19,7 @@ import { normalizeYouthPrimarySkillOrder } from './youth_skill_order_normalizer.
 import { normalizeYouthAcquisitionGoalFloors } from './youth_goal_floor_normalizer.js';
 import { normalizeYouthSessionQuality } from './youth_session_quality_normalizer.js';
 import { normalizeYouthWeek4Consolidation } from './youth_consolidation_normalizer.js';
+import { validateYouthSessionQualitySemantic } from './youth_session_quality.js';
 import { normalizeTacticalGppFloor } from './tactical_gpp_normalizer.js';
 import {
   validateDirectGoalExposureSemantic,
@@ -257,6 +258,7 @@ export function collectRepairableValidationFailures(program, intake = {}, option
     () => validateProgressionArchitectureSemantic(candidate, intake, model),
     () => validateYouthProgressionQualitySemantic(candidate, intake, model),
     () => validateYouthConsolidationRetentionSemantic(candidate, intake, model),
+    () => validateYouthSessionQualitySemantic(candidate, intake, model),
     () => validateYouthManualAcceptanceSemantic(candidate, intake, model),
     () => validateAdvancedHybridManualAcceptanceSemantic(candidate, intake, model),
     () => validateTacticalScheduleArchitectureSemantic(candidate, intake, model),
