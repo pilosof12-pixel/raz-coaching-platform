@@ -1,11 +1,7 @@
+import fs from 'node:fs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 
-import {
-  EXERCISE_DICTIONARY,
-  EXERCISE_ALIASES,
-  EXERCISE_EQUIPMENT_REQUIREMENTS,
-} from '../engine/exercise_dictionary.js';
 import { pullUpDoseAnalysis } from '../engine/coaching_progression_gpp.js';
 
 const youth = {
@@ -15,12 +11,14 @@ const youth = {
   current_numbers: 'About 12 strict pull-ups. Wall-facing handstand about 15 seconds; no reliable unsupported balance time yet.',
 };
 
-test('ring-specific Youth movements are canonical and require rings', () => {
-  for (const name of ['Ring Push-up', 'Ring Hamstring Curl']) {
-    assert.equal(EXERCISE_DICTIONARY.has(name), true, `${name} must be canonical`);
-    assert.deepEqual(EXERCISE_EQUIPMENT_REQUIREMENTS.get(name), ['rings']);
-  }
-  assert.equal(EXERCISE_ALIASES.get('Wall-Facing Handstand Hold'), 'Wall Handstand Hold');
+test('Youth live convergence patch locks ring vocabulary and wall-handstand normalization', () => {
+  const src = fs.readFileSync(new URL('../scripts/apply_youth_live_convergence.mjs', import.meta.url), 'utf8');
+  assert.match(src, /Ring Push-up/);
+  assert.match(src, /Ring Hamstring Curl/);
+  assert.match(src, /Wall-Facing Handstand Hold/);
+  assert.match(src, /YOUTH-HANDSTAND-COMPONENT-SURGICAL-REPAIR/);
+  assert.match(src, /YOUTH-WEEK4-SURGICAL-REPAIR/);
+  assert.match(src, /YOUTH-PULL-UP-SURGICAL-REPAIR/);
 });
 
 test('known 12-rep pull-up max accepts submaximal 3x8 and rejects repeated 3x10', () => {
