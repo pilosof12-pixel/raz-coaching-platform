@@ -35,7 +35,6 @@ import {
 } from './coaching_acceptance_quality.js';
 import { validateYouthConsolidationRetentionSemantic } from './coaching_consolidation_quality.js';
 import { validateGoalComponentCoverageSemantic } from './goal_progression_graph.js';
-import { validateAdvancedHybridQualitySemantic } from './advanced_hybrid_quality.js';
 import {
   validateYouthManualAcceptanceSemantic,
   validateAdvancedHybridManualAcceptanceSemantic,
@@ -204,7 +203,6 @@ export function collectRepairableValidationFailures(program, intake = {}, option
     () => validateYouthProgressionQualitySemantic(candidate, intake, model),
     () => validateYouthConsolidationRetentionSemantic(candidate, intake, model),
     () => validateYouthManualAcceptanceSemantic(candidate, intake, model),
-    () => validateAdvancedHybridQualitySemantic(candidate, intake),
     () => validateAdvancedHybridManualAcceptanceSemantic(candidate, intake, model),
     () => validateTacticalScheduleArchitectureSemantic(candidate, intake, model),
     () => validateKnownMaxPullUpDoseSemantic(candidate, intake, model),
