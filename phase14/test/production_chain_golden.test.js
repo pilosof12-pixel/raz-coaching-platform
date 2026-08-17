@@ -2,6 +2,9 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 
 import { validateProductionProgram } from '../engine/production_validation.js';
+import { collectRepairableValidationFailures } from '../engine/repairable_validation_bundle.js';
+import { validateDirectGoalExposureSemantic } from '../engine/semantic_program_qa.js';
+import { validateTacticalGppCoverageSemantic } from '../engine/coaching_progression_gpp.js';
 import {
   TACTICAL_3K_INTAKE,
   YOUTH_GYMNASTICS_INTAKE,
@@ -13,13 +16,30 @@ function codesFrom(error) {
   const out = new Set();
   if (error?.code) out.add(error.code);
   for (const flag of error?.flags || []) if (flag?.code) out.add(flag.code);
-  for (const violation of error?.details?.violations || []) if (violation?.type) out.add(violation.type);
+  for (const violation of error?.details?.violations || []) {
+    if (violation?.code) out.add(violation.code);
+    if (violation?.type) out.add(violation.type);
+  }
   return out;
 }
 
 function expectFailure(program, intake, expectedCode) {
   assert.throws(
     () => validateProductionProgram(program, intake),
+    (error) => {
+      const codes = codesFrom(error);
+      assert.ok(
+        codes.has(expectedCode),
+        `Expected ${expectedCode}; received ${[...codes].join(', ') || error?.message || 'unknown error'}`,
+      );
+      return true;
+    },
+  );
+}
+
+function expectValidatorFailure(fn, expectedCode) {
+  assert.throws(
+    fn,
     (error) => {
       const codes = codesFrom(error);
       assert.ok(
@@ -66,12 +86,34 @@ test('Youth primary skills cannot repeat an unchanged prescription for all four 
   expectFailure(bad, YOUTH_GYMNASTICS_INTAKE, 'PROGRESSION_ARCHITECTURE_MISSING');
 });
 
-test('Tactical 3K cannot remove the low-cost pushing and trunk GPP floor', () => {
+test('Tactical missing GPP is repaired locally but unrelated strength-session defects still fail closed', () => {
   const bad = tactical3KGoldenProgram()
     .split('\n')
     .filter((line) => !line.includes('\tPush-up\t') && !line.includes('\tPallof Press\t'))
     .join('\n');
-  expectFailure(bad, TACTICAL_3K_INTAKE, 'TACTICAL_GPP_COVERAGE_MISSING');
+
+  // The semantic gate remains strict: the model-authored candidate is genuinely
+  // missing the required low-cost push/core floor before production repair.
+  expectValidatorFailure(
+    () => validateTacticalGppCoverageSemantic(bad, TACTICAL_3K_INTAKE),
+    'TACTICAL_GPP_COVERAGE_MISSING',
+  );
+
+  const collected = collectRepairableValidationFailures(bad, TACTICAL_3K_INTAKE);
+  assert.ok(
+    collected.deterministic_repairs.some((repair) => repair?.type === 'tactical_gpp_floor'),
+    'Production must restore the canonical Tactical GPP floor before spending another AI attempt.',
+  );
+  const remaining = new Set((collected.flags || []).map((flag) => flag?.code));
+  assert.equal(
+    remaining.has('TACTICAL_GPP_COVERAGE_MISSING'),
+    false,
+    'The deterministic GPP repair must clear the exact defect it owns.',
+  );
+  assert.ok(
+    remaining.has('TACTICAL_STRENGTH_SESSION_TOO_THIN'),
+    `Expected unrelated thin-session defect to remain fail-closed; received ${[...remaining].join(', ')}`,
+  );
 });
 
 test('Tactical 3K with only two strength days fails semantic strength-session accounting', () => {
@@ -114,7 +156,7 @@ test('Tactical 3K cannot remove direct pull-up work while preserving three stren
   expectFailure(bad, TACTICAL_3K_INTAKE, 'NAMED_GOAL_DIRECT_EXPOSURE_MISSING');
 });
 
-test('Youth gymnastics cannot omit direct bar muscle-up practice', () => {
+test('Youth bar muscle-up omission is rejected semantically then restored only for explicit acquisition intake', () => {
   const bad = rewriteRows(youthGymnasticsGoldenProgram(), (cells) => {
     if (cells[1] === 'Band-Assisted Bar Muscle-up Transition Drill') {
       cells[1] = 'Strict Pull-up';
@@ -125,15 +167,39 @@ test('Youth gymnastics cannot omit direct bar muscle-up practice', () => {
     }
     return cells;
   });
-  expectFailure(bad, YOUTH_GYMNASTICS_INTAKE, 'NAMED_GOAL_DIRECT_EXPOSURE_MISSING');
+
+  expectValidatorFailure(
+    () => validateDirectGoalExposureSemantic(bad, YOUTH_GYMNASTICS_INTAKE),
+    'NAMED_GOAL_DIRECT_EXPOSURE_MISSING',
+  );
+
+  const repaired = validateProductionProgram(bad, YOUTH_GYMNASTICS_INTAKE);
+  assert.equal(repaired.ok, true);
+  assert.match(
+    repaired.program,
+    /\tBar Muscle-up Transition Drill\t/,
+    'Explicit first-bar-muscle-up acquisition may restore only the canonical bar-specific transition floor.',
+  );
 });
 
-test('Youth gymnastics cannot substitute wall holding for all independent-balance practice', () => {
+test('Youth independent-balance omission is rejected semantically then restored only for explicit acquisition intake', () => {
   const bad = youthGymnasticsGoldenProgram().replaceAll(
     '\tControlled Handstand Kick-up\tBW',
     '\tWall Handstand Hold\tBW',
   );
-  expectFailure(bad, YOUTH_GYMNASTICS_INTAKE, 'NAMED_GOAL_DIRECT_EXPOSURE_MISSING');
+
+  expectValidatorFailure(
+    () => validateDirectGoalExposureSemantic(bad, YOUTH_GYMNASTICS_INTAKE),
+    'NAMED_GOAL_DIRECT_EXPOSURE_MISSING',
+  );
+
+  const repaired = validateProductionProgram(bad, YOUTH_GYMNASTICS_INTAKE);
+  assert.equal(repaired.ok, true);
+  assert.match(
+    repaired.program,
+    /\tControlled Handstand Kick-up\tBW/,
+    'Explicit freestanding-handstand acquisition may restore the canonical fresh independent-balance floor.',
+  );
 });
 
 test('Youth gymnastics fails closed on invented home-gym equipment', () => {
