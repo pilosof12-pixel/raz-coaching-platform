@@ -17,6 +17,7 @@ import { trimExcessSupportVolume } from './mrv_support_trim.js';
 import { enrichSpecificWarmups } from './specific_warmup_enrichment.js';
 import { normalizeYouthPrimarySkillOrder } from './youth_skill_order_normalizer.js';
 import { normalizeYouthAcquisitionGoalFloors } from './youth_goal_floor_normalizer.js';
+import { normalizeYouthSessionQuality } from './youth_session_quality_normalizer.js';
 import { normalizeYouthWeek4Consolidation } from './youth_consolidation_normalizer.js';
 import { normalizeTacticalGppFloor } from './tactical_gpp_normalizer.js';
 import {
@@ -187,6 +188,10 @@ function applyDeterministicCandidateRepairs(program, intake = {}) {
   const youthFloors = normalizeYouthAcquisitionGoalFloors(candidate, intake);
   candidate = youthFloors.program;
   if (youthFloors.repaired) repairs.push({ type: 'youth_acquisition_goal_floor', rows: youthFloors.repairs });
+
+  const youthSessionQuality = normalizeYouthSessionQuality(candidate, intake);
+  candidate = youthSessionQuality.program;
+  if (youthSessionQuality.repaired) repairs.push({ type: 'youth_session_quality', rows: youthSessionQuality.repairs });
 
   const tacticalGpp = normalizeTacticalGppFloor(candidate, intake);
   candidate = tacticalGpp.program;
