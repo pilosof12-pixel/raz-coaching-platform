@@ -4,6 +4,8 @@ on:
   push:
     paths:
       - '.github/workflows/recovery-diagnose-goldens.yml'
+      - 'phase14/test/fixtures/advanced_hybrid_launch.js'
+      - 'phase14/test/fixtures/golden_programs.js'
 
 permissions:
   contents: read
