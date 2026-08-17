@@ -1,0 +1,34 @@
+{
+  "timestamp": "2026-08-17T05:15:07.392Z",
+  "base": "https://raz-coaching-platform.onrender.com",
+  "results": [
+    {
+      "id": "advanced_hybrid",
+      "ok": false,
+      "error": "build not accepted 422 {\"error\":\"A few details are needed before I can build this accurately.\",\"clarification_required\":true,\"clarifications\":[{\"answer_type\":\"text\",\"required\":true,\"id\":\"running_current_exposure\",\"prompt\":\"What does your current running look like in a normal week?\",\"help\":\"Approximate sessions per week an"
+    },
+    {
+      "id": "youth_gymnastics",
+      "job_id": "a607fc1424db8acb8906c6677443efbb",
+      "ok": false,
+      "status": "error",
+      "stage": "refining",
+      "attempt": 4,
+      "error": "Internal coaching QA could not repair the candidate program after multiple passes. No client-facing program was saved. Please retry the build. QA trace: A1:EXERCISE_HALLUCINATION+YOUTH_PROGRESSION_QUALITY_MISSING+YOUTH_CONSOLIDATION_RESET_TO_BASELINE+PULL_UP_DOSE_EXCEEDS_KNOWN_CAPACITY[Wall-Facing Handstand Hold|Ring Push-up|Ring Hamstring Curl|Wall-Facing Handstand Hold|Ring Push-up|Ring Hamstring Curl] -> A2:EXERCISE_HALLUCINATION+GOAL_COMPONENT_COVERAGE_MISSING+YOUTH_CONSOLIDATION_RESET_TO_BASELINE+PULL_UP_DOSE_EXCEEDS_KNOWN_CAPACITY[Ring Hamstring Curl|Ring Hamstring Curl|Ring Hamstring Curl|Ring Hamstring Curl] -> A3:EXERCISE_HALLUCINATION+GOAL_COMPONENT_COVERAGE_MISSING+YOUTH_CONSOLIDATION_RESET_TO_BASELINE+PULL_UP_DOSE_EXCEEDS_KNOWN_CAPACITY[Ring Hamstring Curl|Ring Hamstring Curl|Ring Hamstring Curl|Ring Hamstring Curl] -> A4:GOAL_COMPONENT_COVERAGE_MISSING+YOUTH_CONSOLIDATION_RESET_TO_BASELINE+PULL_UP_DOSE_EXCEEDS_KNOWN_CAPACITY.",
+      "program_chars": 0,
+      "seconds": 115
+    },
+    {
+      "id": "tactical_3k",
+      "job_id": "b9b0c96cc8c366a906eab059ba417f26",
+      "ok": true,
+      "status": "done",
+      "stage": "finalizing",
+      "attempt": null,
+      "error": null,
+      "program_chars": 12576,
+      "seconds": 139
+    }
+  ],
+  "ok": false
+}
