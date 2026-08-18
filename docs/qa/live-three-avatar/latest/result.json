@@ -1,12 +1,12 @@
 {
-  "timestamp": "2026-08-18T14:18:40.425Z",
+  "timestamp": "2026-08-18T14:25:26.049Z",
   "base": "https://raz-coaching-platform.onrender.com",
-  "head_sha": "2df6facc6f8a0e1413897ba676b4e691c8a62bb6",
-  "runtime": "launch-acceptance-v28-oap-deterministic-convergence-20260819",
+  "head_sha": "b48b9f52fcbc551a8eee0c9f6d17beed680e0dcc",
+  "runtime": "launch-acceptance-v29-repeatability-same-logic-20260819",
   "results": [
     {
       "id": "advanced_hybrid",
-      "job_id": "91c3a07d437ed4eab538cc27d22b6d30",
+      "job_id": "5328313f7cba43629c9d1fb2e71bd9a4",
       "ok": true,
       "status": "done",
       "stage": "finalizing",
@@ -14,12 +14,12 @@
       "detail": "saving program",
       "last_seen_status": "done",
       "error": null,
-      "program_chars": 12858,
-      "seconds": 82
+      "program_chars": 12979,
+      "seconds": 107
     },
     {
       "id": "youth_gymnastics",
-      "job_id": "5a11456c1c898831d9e9e9ec76e2b741",
+      "job_id": "9b2a08c9e66560cc37367e79b491fba8",
       "ok": true,
       "status": "done",
       "stage": "finalizing",
@@ -27,12 +27,12 @@
       "detail": "saving program",
       "last_seen_status": "done",
       "error": null,
-      "program_chars": 10330,
-      "seconds": 52
+      "program_chars": 9957,
+      "seconds": 45
     },
     {
       "id": "tactical_3k",
-      "job_id": "3b4f1f13b4ec4ad59c46935aab783284",
+      "job_id": "6982d11953fa7a3ed106e25026d8b058",
       "ok": true,
       "status": "done",
       "stage": "finalizing",
@@ -40,8 +40,8 @@
       "detail": "saving program",
       "last_seen_status": "done",
       "error": null,
-      "program_chars": 10957,
-      "seconds": 123
+      "program_chars": 12304,
+      "seconds": 163
     }
   ],
   "ok": true
