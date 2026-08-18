@@ -1,25 +1,25 @@
 {
-  "timestamp": "2026-08-18T04:57:08.296Z",
+  "timestamp": "2026-08-18T06:15:56.282Z",
   "base": "https://raz-coaching-platform.onrender.com",
-  "head_sha": "df4ca26e81e5ad192e576b8afce6e4129556f791",
-  "runtime": "launch-acceptance-v18-published-three-avatar-evidence",
+  "head_sha": "c1644079ffdaf755a5b9c946202bb03b5a964f6d",
+  "runtime": "launch-acceptance-v19-repeatability-tactical-benchmark",
   "results": [
     {
       "id": "advanced_hybrid",
-      "job_id": "8913d352bc4d5162fb01c7f4562323da",
-      "ok": true,
-      "status": "done",
-      "stage": "finalizing",
-      "attempt": 0,
-      "detail": "saving program",
-      "last_seen_status": "done",
-      "error": null,
-      "program_chars": 12429,
-      "seconds": 70
+      "job_id": "cc18404f5dce6eb4327c1e90d3d7a874",
+      "ok": false,
+      "status": "error",
+      "stage": "refining",
+      "attempt": 4,
+      "detail": "internal repair: ADVANCED_HYBRID_OHP_ARCHITECTURE",
+      "last_seen_status": "error",
+      "error": "Internal coaching QA could not repair the candidate program after multiple passes. No client-facing program was saved. Please retry the build. QA trace: A1:ADVANCED_HYBRID_OHP_ARCHITECTURE+ADVANCED_HYBRID_SQUAT_LOAD_EXCEEDS_CURRENT_CAPACITY+EVENT_PROGRESSING_SESSION_MISSING -> A2:ADVANCED_HYBRID_OHP_ARCHITECTURE -> A3:ADVANCED_HYBRID_OHP_ARCHITECTURE -> A4:ADVANCED_HYBRID_OHP_ARCHITECTURE. [QA:INTERNAL_QA_REPAIR_EXHAUSTED]",
+      "program_chars": 0,
+      "seconds": 153
     },
     {
       "id": "youth_gymnastics",
-      "job_id": "cd98f801885fb64008825cd3840ed0ff",
+      "job_id": "3eb55eebf958d4834c29ddbe14859137",
       "ok": true,
       "status": "done",
       "stage": "finalizing",
@@ -27,12 +27,12 @@
       "detail": "saving program",
       "last_seen_status": "done",
       "error": null,
-      "program_chars": 10677,
-      "seconds": 42
+      "program_chars": 10157,
+      "seconds": 77
     },
     {
       "id": "tactical_3k",
-      "job_id": "365b3be5dac34186b527984a34f35829",
+      "job_id": "1145664ea85c366bb63a076098436a21",
       "ok": true,
       "status": "done",
       "stage": "finalizing",
@@ -40,9 +40,9 @@
       "detail": "saving program",
       "last_seen_status": "done",
       "error": null,
-      "program_chars": 10964,
-      "seconds": 50
+      "program_chars": 11425,
+      "seconds": 121
     }
   ],
-  "ok": true
+  "ok": false
 }
