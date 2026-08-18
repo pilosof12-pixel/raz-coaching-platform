@@ -1,0 +1,53 @@
+name: Patch Youth Final Boundary v25
+
+on:
+  push:
+    branches: [privacy-security-hardening]
+    paths:
+      - '.github/workflows/patch-youth-final-boundary-v25.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: privacy-security-hardening
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Wire Youth consolidation at final boundary
+        run: |
+          python <<'PY'
+          from pathlib import Path
+          p=Path('phase14/engine/repairable_validation_bundle.js')
+          s=p.read_text()
+          anchor="  const finalTacticalPull = normalizeTacticalWeightedPullExposure(candidate, intake);\n  candidate = finalTacticalPull.program;\n  if (finalTacticalPull.repaired) deterministic_repairs.push({ type: 'final_tactical_weighted_pull', rows: finalTacticalPull.repairs });\n\n  const finalModel = parseProgramModel(candidate, intake);"
+          insert="  const finalTacticalPull = normalizeTacticalWeightedPullExposure(candidate, intake);\n  candidate = finalTacticalPull.program;\n  if (finalTacticalPull.repaired) deterministic_repairs.push({ type: 'final_tactical_weighted_pull', rows: finalTacticalPull.repairs });\n\n  const finalYouthConsolidation = normalizeYouthWeek4Consolidation(candidate, intake);\n  candidate = finalYouthConsolidation.program;\n  if (finalYouthConsolidation.repaired) deterministic_repairs.push({ type: 'final_youth_week4_consolidation', rows: finalYouthConsolidation.repairs });\n\n  const finalModel = parseProgramModel(candidate, intake);"
+          if "final_youth_week4_consolidation" not in s:
+              if s.count(anchor)!=1: raise SystemExit(f'anchor count={s.count(anchor)}')
+              s=s.replace(anchor,insert)
+          anchor2="  runRepairable(flags, () => validateKnownMaxPullUpDoseSemantic(candidate, intake, finalModel));\n  runRepairable(flags, () => validatePhase15FinalProgram(candidate, intake));"
+          insert2="  runRepairable(flags, () => validateKnownMaxPullUpDoseSemantic(candidate, intake, finalModel));\n  runRepairable(flags, () => validateYouthConsolidationRetentionSemantic(candidate, intake, finalModel));\n  runRepairable(flags, () => validateYouthSessionQualitySemantic(candidate, intake, finalModel));\n  runRepairable(flags, () => validatePhase15FinalProgram(candidate, intake));"
+          if "validateYouthConsolidationRetentionSemantic(candidate, intake, finalModel)" not in s:
+              if s.count(anchor2)!=1: raise SystemExit(f'validator anchor count={s.count(anchor2)}')
+              s=s.replace(anchor2,insert2)
+          p.write_text(s)
+          PY
+      - name: Run focused Youth consolidation tests
+        working-directory: phase14
+        run: |
+          node --test test/youth_consolidation_normalizer.test.js
+          node --test test/youth_live_convergence_contract.test.js
+          node --test test/youth_session_quality.test.js
+      - name: Commit production wiring
+        run: |
+          git config user.name 'RAZ QA patch bot'
+          git config user.email 'actions@users.noreply.github.com'
+          git add phase14/engine/repairable_validation_bundle.js
+          if git diff --cached --quiet; then exit 0; fi
+          git commit -m 'Wire Youth consolidation at final production boundary'
+          git push origin HEAD:privacy-security-hardening
