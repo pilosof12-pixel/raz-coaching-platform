@@ -1,12 +1,12 @@
 {
-  "timestamp": "2026-08-18T11:40:12.882Z",
+  "timestamp": "2026-08-18T11:41:44.339Z",
   "base": "https://raz-coaching-platform.onrender.com",
-  "head_sha": "85cbd4bfdb9c43633766c96891ab5073292f7a5f",
-  "runtime": "launch-acceptance-v25-youth-final-boundary-repeatability",
+  "head_sha": "ac2cb894c434ff24d9a9a291bee544703003fd10",
+  "runtime": "launch-acceptance-v26-youth-final-boundary-retrigger",
   "results": [
     {
       "id": "advanced_hybrid",
-      "job_id": "12c03eafe781d5ee0f2036fa9a8947fa",
+      "job_id": "6c7aea6cad91a5736ebc19b2e766e361",
       "ok": false,
       "status": "error",
       "stage": "generating",
@@ -15,11 +15,11 @@
       "last_seen_status": "error",
       "error": "You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/.",
       "program_chars": 0,
-      "seconds": 6
+      "seconds": 4
     },
     {
       "id": "youth_gymnastics",
-      "job_id": "36050dc3d62928d1c201de56dd79aa68",
+      "job_id": "7c0b76b290ffe11b03406df3dfbb58c9",
       "ok": false,
       "status": "error",
       "stage": "generating",
@@ -32,7 +32,7 @@
     },
     {
       "id": "tactical_3k",
-      "job_id": "925f6793c8d41b3cdaee7e6546779805",
+      "job_id": "56fe0e9af5313c906112807cb9d8ab56",
       "ok": false,
       "status": "error",
       "stage": "generating",
@@ -41,7 +41,7 @@
       "last_seen_status": "error",
       "error": "You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/.",
       "program_chars": 0,
-      "seconds": 4
+      "seconds": 2
     }
   ],
   "ok": false
