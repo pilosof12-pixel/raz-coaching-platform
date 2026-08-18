@@ -63,3 +63,5 @@ jobs:
           if git diff --cached --quiet; then exit 0; fi
           git commit -m 'Wire final-boundary Advanced and Tactical convergence'
           git push origin HEAD:privacy-security-hardening
+
+# retrigger: 2026-08-18T17:00+10:00
