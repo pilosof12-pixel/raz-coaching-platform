@@ -1,4 +1,5 @@
 // Generic integrity guardrails for Phase 15.
+import { isHighConcurrencyHybrid } from './advanced_hybrid_concurrency.js';
 // IMPORTANT: this file does not define new coaching theory. It enforces
 // client/source consistency already required by the authored RAZ logic:
 // named goals cannot disappear, an athlete's existing target-modality practice
@@ -420,28 +421,50 @@ export function exactPrimaryMovementFlags(program,intake={},parsed=null) {
   return flags;
 }
 
-function meaningfulStrengthRow(exercise='', cells=[], idx={}) {
+function strengthSetCount(exercise='', cells=[], idx={}) {
   const ex=norm(exercise);
-  if (!ex || /^\s*\[warmup\]/i.test(ex)) return false;
-  if (/(zone.?2|bike|rower|run|jog|sprint|shuttle|walk|conditioning|pallof|side plank|plank|dead bug|bird dog|neck isometric|mobility|stretch)/i.test(ex)) return false;
+  if (!ex || /^\s*\[warmup\]/i.test(ex)) return 0;
+  if (/(zone.?2|bike|rower|run|jog|sprint|shuttle|walk|conditioning|pallof|side plank|plank|dead bug|bird dog|neck isometric|mobility|stretch)/i.test(ex)) return 0;
   const resistance=/(squat|lunge|deadlift|rdl|hinge|press|bench|row|chin|pull.?up|dip|curl|extension|raise|fly|pulldown|leg press|leg curl|hip thrust|split squat|step.?up|calf|planche|lever|handstand|muscle.?up)/i.test(ex);
-  if (!resistance) return false;
-  return (num(cells[idx.sets]||'')||1)>=2;
+  if (!resistance) return 0;
+  const sets=num(cells[idx.sets]||'');
+  return Number.isFinite(sets) && sets > 0 ? sets : 1;
+}
+
+function meaningfulStrengthRow(exercise='', cells=[], idx={}) {
+  return strengthSetCount(exercise,cells,idx)>=2;
+}
+
+function compoundMicrodoseRow(exercise='', cells=[], idx={}) {
+  if (strengthSetCount(exercise,cells,idx)<1) return false;
+  const ex=norm(exercise);
+  return /(squat|deadlift|rdl|hinge|press|bench|chin|pull.?up|dip|planche|lever|handstand|muscle.?up)/i.test(ex);
 }
 
 export function strengthSessionAccountingFlags(program, intake={}, parsed=null) {
   const requested=Number(intake.days_per_week||0);
   if (!parsed || !requested) return [];
   const d=parsed.idx.day,e=parsed.idx.exercise;
-  const strengthDays=new Set();
+  const byDay=new Map();
   for (const row of parsed.rows) {
     const day=row.cells[d]||''; if(!day) continue;
-    if (meaningfulStrengthRow(row.cells[e]||'',row.cells,parsed.idx)) strengthDays.add(day);
+    const exercise=row.cells[e]||'';
+    const sets=strengthSetCount(exercise,row.cells,parsed.idx);
+    if(!sets) continue;
+    const state=byDay.get(day)||{sets:0,compoundMicrodose:false};
+    state.sets+=sets;
+    if(compoundMicrodoseRow(exercise,row.cells,parsed.idx)) state.compoundMicrodose=true;
+    byDay.set(day,state);
+  }
+  const highConcurrency=isHighConcurrencyHybrid(intake);
+  const strengthDays=new Set();
+  for(const [day,state] of byDay) {
+    if(state.sets>=2 || (highConcurrency && state.compoundMicrodose && state.sets>=1)) strengthDays.add(day); // HIGH-CONCURRENCY-STRENGTH-MICRODOSE-ACCOUNTING
   }
   if (strengthDays.size>=requested) return [];
   return [{
     code:'REQUESTED_STRENGTH_SESSIONS_UNACCOUNTED',
-    message:`Client requested ${requested} strength sessions; Week 1 contains ${strengthDays.size} meaningful resistance-training day(s). The authored planner may choose lower-cost strength work under high sport load, but it may not silently turn a requested strength day into cardio/core only.`
+    message:`Client requested ${requested} strength sessions; Week 1 contains ${strengthDays.size} meaningful resistance-training day(s). The authored planner may choose lower-cost strength work under high sport load, but it may not silently turn a requested strength day into cardio/core only. A one-set day counts only in a verified high-concurrency hybrid when that set is a compound/primary strength or advanced-skill microdose; token isolation, cardio and core rows do not satisfy the request.`
   }];
 }
 
