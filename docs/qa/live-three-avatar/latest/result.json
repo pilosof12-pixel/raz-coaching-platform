@@ -1,25 +1,25 @@
 {
-  "timestamp": "2026-08-18T14:07:46.850Z",
+  "timestamp": "2026-08-18T14:18:40.425Z",
   "base": "https://raz-coaching-platform.onrender.com",
-  "head_sha": "b005c64b61c787d88b42ff98a47d40077d60ad9f",
-  "runtime": "launch-acceptance-v27-post-quota-preflight-20260819",
+  "head_sha": "2df6facc6f8a0e1413897ba676b4e691c8a62bb6",
+  "runtime": "launch-acceptance-v28-oap-deterministic-convergence-20260819",
   "results": [
     {
       "id": "advanced_hybrid",
-      "job_id": "e88b3212b0db992d982c3dfbb2ce0247",
-      "ok": false,
-      "status": "error",
-      "stage": "refining",
-      "attempt": 4,
-      "detail": "internal repair: ADVANCED_HYBRID_WEEK4_OAP_VOLUME_INCREASED+REQUESTED_STRENGTH_SESSIONS_UNACCOUNTED",
-      "last_seen_status": "error",
-      "error": "Internal coaching QA could not repair the candidate program after multiple passes. No client-facing program was saved. Please retry the build. QA trace: A1:ADVANCED_HYBRID_WEEK4_OAP_VOLUME_INCREASED+WEEKLY_MRV_EXCEEDED -> A2:ADVANCED_HYBRID_WEEK4_OAP_VOLUME_INCREASED -> A3:ADVANCED_HYBRID_WEEK4_OAP_VOLUME_INCREASED -> A4:ADVANCED_HYBRID_WEEK4_OAP_VOLUME_INCREASED+REQUESTED_STRENGTH_SESSIONS_UNACCOUNTED. [QA:INTERNAL_QA_REPAIR_EXHAUSTED]",
-      "program_chars": 0,
-      "seconds": 188
+      "job_id": "91c3a07d437ed4eab538cc27d22b6d30",
+      "ok": true,
+      "status": "done",
+      "stage": "finalizing",
+      "attempt": 0,
+      "detail": "saving program",
+      "last_seen_status": "done",
+      "error": null,
+      "program_chars": 12858,
+      "seconds": 82
     },
     {
       "id": "youth_gymnastics",
-      "job_id": "f52967cf47ff2c304a27fa1b7a23cb6d",
+      "job_id": "5a11456c1c898831d9e9e9ec76e2b741",
       "ok": true,
       "status": "done",
       "stage": "finalizing",
@@ -27,12 +27,12 @@
       "detail": "saving program",
       "last_seen_status": "done",
       "error": null,
-      "program_chars": 10920,
-      "seconds": 54
+      "program_chars": 10330,
+      "seconds": 52
     },
     {
       "id": "tactical_3k",
-      "job_id": "4e506cac0fad57020bf044c60296848f",
+      "job_id": "3b4f1f13b4ec4ad59c46935aab783284",
       "ok": true,
       "status": "done",
       "stage": "finalizing",
@@ -40,9 +40,9 @@
       "detail": "saving program",
       "last_seen_status": "done",
       "error": null,
-      "program_chars": 11133,
-      "seconds": 54
+      "program_chars": 10957,
+      "seconds": 123
     }
   ],
-  "ok": false
+  "ok": true
 }
