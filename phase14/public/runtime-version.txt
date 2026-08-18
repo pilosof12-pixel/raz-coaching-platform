@@ -1,1 +1,1 @@
-launch-acceptance-v19-repeatability-tactical-benchmark
+launch-acceptance-v20-repeatability-advanced-ohp-convergence
