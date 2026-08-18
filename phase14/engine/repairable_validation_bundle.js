@@ -16,6 +16,7 @@ import { parseProgramModel } from './program_model.js';
 import { trimExcessSupportVolume } from './mrv_support_trim.js';
 import { enrichSpecificWarmups } from './specific_warmup_enrichment.js';
 import { normalizeAdvancedHybridWeek4OapConsolidation } from './advanced_hybrid_oap_consolidation_normalizer.js';
+import { normalizeAdvancedHybridOHPComplement } from './advanced_hybrid_ohp_normalizer.js';
 import { normalizeYouthPrimarySkillOrder } from './youth_skill_order_normalizer.js';
 import { normalizeYouthAcquisitionGoalFloors } from './youth_goal_floor_normalizer.js';
 import { normalizeYouthSessionQuality } from './youth_session_quality_normalizer.js';
@@ -190,6 +191,10 @@ function applyDeterministicCandidateRepairs(program, intake = {}) {
   const advancedOapConsolidation = normalizeAdvancedHybridWeek4OapConsolidation(candidate, intake);
   candidate = advancedOapConsolidation.program;
   if (advancedOapConsolidation.repaired) repairs.push({ type: 'advanced_hybrid_week4_oap_consolidation', rows: advancedOapConsolidation.repairs });
+
+  const advancedOhpComplement = normalizeAdvancedHybridOHPComplement(candidate, intake);
+  candidate = advancedOhpComplement.program;
+  if (advancedOhpComplement.repaired) repairs.push({ type: 'advanced_hybrid_ohp_complement', rows: advancedOhpComplement.repairs });
 
   const youthFloors = normalizeYouthAcquisitionGoalFloors(candidate, intake);
   candidate = youthFloors.program;
