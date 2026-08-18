@@ -43,6 +43,7 @@ jobs:
           throw new Error(`exact runtime not deployed: expected=${expected} last=${last}`);
           NODE
       - name: Run Hybrid Youth Tactical through live website API
+        id: live_generation
         env:
           BASE_URL: https://raz-coaching-platform.onrender.com
           ADMIN_PROVISION_KEY: ${{ secrets.ADMIN_PROVISION_KEY }}
@@ -126,7 +127,7 @@ jobs:
           if(!result.ok)process.exitCode=1;
           NODE
       - name: Upload website acceptance evidence
-        if: always()
+        if: always() && steps.live_generation.outcome != 'skipped'
         uses: actions/upload-artifact@v4
         with:
           name: three-avatar-acceptance-${{ github.run_id }}-${{ github.run_attempt }}
@@ -134,10 +135,10 @@ jobs:
           if-no-files-found: error
           retention-days: 14
       - name: Publish synthetic QA evidence to branch
-        if: always() && github.ref_name == 'privacy-security-hardening'
+        if: always() && github.ref_name == 'privacy-security-hardening' && steps.live_generation.outcome != 'skipped'
         run: |
           if [ ! -f docs/qa/live-three-avatar/result.json ]; then
-            echo "No result.json to publish"
+            echo "No fresh result.json to publish"
             exit 0
           fi
           mkdir -p docs/qa/live-three-avatar/latest
