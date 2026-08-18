@@ -313,10 +313,16 @@ export function collectRepairableValidationFailures(program, intake = {}, option
   candidate = finalTacticalPull.program;
   if (finalTacticalPull.repaired) deterministic_repairs.push({ type: 'final_tactical_weighted_pull', rows: finalTacticalPull.repairs });
 
+  const finalYouthConsolidation = normalizeYouthWeek4Consolidation(candidate, intake);
+  candidate = finalYouthConsolidation.program;
+  if (finalYouthConsolidation.repaired) deterministic_repairs.push({ type: 'final_youth_week4_consolidation', rows: finalYouthConsolidation.repairs });
+
   const finalModel = parseProgramModel(candidate, intake);
   runRepairable(flags, () => validateAdvancedHybridManualAcceptanceSemantic(candidate, intake, finalModel));
   runRepairable(flags, () => validateTacticalScheduleArchitectureSemantic(candidate, intake, finalModel));
   runRepairable(flags, () => validateKnownMaxPullUpDoseSemantic(candidate, intake, finalModel));
+  runRepairable(flags, () => validateYouthConsolidationRetentionSemantic(candidate, intake, finalModel));
+  runRepairable(flags, () => validateYouthSessionQualitySemantic(candidate, intake, finalModel));
   runRepairable(flags, () => validatePhase15FinalProgram(candidate, intake));
 
   return {
