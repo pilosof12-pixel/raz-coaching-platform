@@ -1,86 +1,80 @@
-Skills go first every session while you’re fresh. Keep every rep and attempt clean, stop before form breaks, and avoid repeated misses.
+Here is your personalized 4-week program designed to help you achieve your first bar muscle-up and a freestanding handstand, while building a strong general push and pull foundation. We'll focus on high-quality skill practice and controlled progression, respecting your 13-year-old body and your available equipment.
 
-Weeks 2-4: the plan progresses by cleaner bar transition work with a little less assistance, slightly more controlled handstand attempts, and more control on support strength. Week 4 keeps the best Week 3 skill standard but trims fatigue a bit.
+The program emphasizes skill work while fresh, followed by support strength. For your bar muscle-up, we'll work on explosive pulling and specific transition drills. For the handstand, we'll combine wall holds for body line and endurance with controlled kick-ups for balance practice. Since you have no external weights, we'll use tempo, pauses, and rep progression for strength, and bands for assistance where needed.
 
-If wrists, elbows, or shoulders get sore, reduce kick-up attempts first, then add a bit more band help on Bar Muscle-up Transition Drill. If pistols irritate the knee, shorten range only as needed and keep the slow lower/pause.
+Over the next four weeks, you'll see a clear progression in your skill work. For the Bar Muscle-up Transition Drill, we'll aim to reduce band assistance or improve the smoothness of the turnover. For Controlled Handstand Kick-ups, the goal is to increase successful attempts and brief moments of independent balance. Your support strength exercises will progress by adding reps, sets, or increasing the difficulty of the variation. Week 4 will consolidate your best performance from Weeks 2 and 3 with slightly reduced volume to manage fatigue, ensuring you retain the quality you've built.
+
+Remember to prioritize perfect form over extra reps, especially for skill work. If you experience any pain, stop the exercise and consider a temporary substitution or modification. Listen to your body and adjust as needed.
 
 START_WEEK1_TSV
 Day	Exercise	Weight	Sets	Reps	Rest	Target RPE	Notes	Results
-Session A	[WARMUP] Band Pull-Apart Warm-up	Light band	2	12	30s	3	Smooth shoulder prep; no fatigue.; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Band shoulder pass-through x 10; Scapular push-up x 8; Keep the warm-up specific and non-fatiguing.	
-Session A	[WARMUP] Scapular Push-up	BW	2	8	30s	3	Move only through shoulder blades; keep elbows straight.	
-Session A	Controlled Handstand Kick-up	BW	4	3	45s	N/A	3 quality attempts per set; stick to controlled entries and step down before a wild save.	
-Session A	Bar Muscle-up Transition Drill	Light band	5	1	75s	6	Use enough help for a close-to-bar, even turnover; singles only.	
-Session A	Wall Handstand Hold	BW	3	15-20 sec	60-90s	5-6	Substantive wall-supported position capacity for line, confidence and shoulder endurance. Keep ribs/pelvis controlled and stop well before fatigue failure.	
-Session A	Explosive Hip-to-Bar Pull-up	BW	5	2	90s	6	Full reset each rep; stop if height drops below lower chest/upper stomach.	
-Session A	Ring Dip	BW	3	3	90s	7	Submaximal; smooth depth and no grinding.	
-Session A	Ring Row	BW	2	8	60s	7	Body angle that keeps all reps clean with a brief chest-to-ring pause.	
-Session B	[WARMUP] Band Pull-Apart Warm-up	Light band	2	12	30s	3	Smooth shoulder prep; no fatigue.; Squat-and-reach x 6; Bodyweight squat x 8; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Keep the warm-up specific and non-fatiguing.	
-Session B	[WARMUP] Deep Squat Hold	BW	2	20s	30s	2	Breathe and open ankles/hips without forcing range.	
-Session B	Controlled Handstand Kick-up	BW	4	3	45s	N/A	3 quality attempts per set; finish while balance is still sharp.	
-Session B	Bar Muscle-up Transition Drill	Light band	5	1	75s	6	Same clean turnover standard as Session A; no ugly reps.	
-Session B	Handstand Hold	BW	3	20s	60s	6	Back-to-wall hold; light heel contact, stacked line.	
-Session B	Box Jump	BW	4	2	90s	N/A	Full reset between reps; aim for crisp takeoff and quiet landing.	
-Session B	Pistol Squat	BW	3	5	90s	7	Use controlled descent; own balance at the bottom before standing.	
-Session B	Ring Hamstring Curl	BW	3	8	75s	7	Keep hips extended and curl the heels toward you under control; shorten the lever if needed.	
-Session B	Pull-up	BW	2	6	75s	7	Strict support pulling; leave several clean reps in reserve.	
+Monday	[WARMUP]	Bodyweight	1	5 min	N/A	N/A	Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Band shoulder pass-through x 10; Scapular push-up x 8 Keep the warm-up specific and non-fatiguing.	
+Monday	Ring Dip	Bodyweight	3	6-8	90 sec	RPE 7-8	Controlled descent, full lockout at the top.	
+Monday	Ring Row	Bodyweight	3	8-12	60-90 sec	RPE 7-8	Adjust feet to control difficulty. Focus on scapular retraction.	
+Monday	Bar Muscle-up Transition Drill	Band-assisted	3	2-3	2-3 min	N/A	Focus on a smooth, controlled turnover. Use band for just enough assistance to achieve clean reps.	
+Monday	Explosive Hip-to-Bar Pull-up	Bodyweight	3	3-5	2-3 min	N/A	Explode upwards, aiming to get your hips to the bar. Quality over quantity.	
+Monday	Controlled Handstand Kick-up	Bodyweight	5	3-5 attempts	1-2 min	N/A	Focus on controlled entries, aiming for brief moments of balance. Reset fully between attempts.	
+Monday	Wall Handstand Hold	Bodyweight	3	15-20 sec	1-2 min	N/A	Maintain a straight body line, hands shoulder-width apart.	
+Tuesday	[WARMUP]	Bodyweight	1	5 min	N/A	N/A	Squat-and-reach x 6; Bodyweight squat x 8; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12 Keep the warm-up specific and non-fatiguing.	
+Tuesday	Controlled Handstand Kick-up	Bodyweight	5	3-5 attempts	1-2 min	N/A	Focus on controlled entries, aiming for brief moments of balance. Reset fully between attempts.	
+Tuesday	Wall Handstand Hold	Bodyweight	3	15-20 sec	1-2 min	N/A	Maintain a straight body line, hands shoulder-width apart.	
+Tuesday	Bar Muscle-up Transition Drill	Band-assisted	3	2-3	2-3 min	N/A	Focus on a smooth, controlled turnover. Use band for just enough assistance to achieve clean reps.	
+Tuesday	Pistol Squat	Bodyweight	3	4-6/side	90 sec	RPE 7-8	Controlled descent, maintain balance. Use bench or band for assistance if needed.	
+Tuesday	Broad Jump	Bodyweight	3	3	2 min	N/A	Explode for maximum distance, land softly. Full reset between jumps.	
+Tuesday	Ring Push-up	Bodyweight	3	8-12	60-90 sec	RPE 7-8	Keep the rings stable, body rigid, and stop 1-2 reps before form breaks.	
+Tuesday	Side Plank	Bodyweight	3	20-30 sec/side	30 sec	RPE 7-8	Maintain a straight line from head to heels.	
 END_WEEK1_TSV
 START_WEEK2_TSV
 Day	Exercise	Weight	Sets	Reps	Rest	Target RPE	Notes	Results
-Session A	[WARMUP] Band Pull-Apart Warm-up	Light band	2	12	30s	3	Smooth shoulder prep; no fatigue.; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Band shoulder pass-through x 10; Scapular push-up x 8; Keep the warm-up specific and non-fatiguing.	
-Session A	[WARMUP] Scapular Push-up	BW	2	8	30s	3	Move only through shoulder blades; keep elbows straight.	
-Session A	Controlled Handstand Kick-up	BW	4	4	45s	N/A	4 quality attempts per set; same control standard before adding any extra balance fight.	
-Session A	Bar Muscle-up Transition Drill	Lighter band	5	1	75s	6	Reduce assistance only if turnover stays close, fast, and symmetrical.	
-Session A	Wall Handstand Hold	BW	3	20-25 sec	60-90s	5-6	Substantive wall-supported position capacity for line, confidence and shoulder endurance. Keep ribs/pelvis controlled and stop well before fatigue failure.	
-Session A	Explosive Hip-to-Bar Pull-up	BW	5	2	90s	6	Try to reach slightly higher contact point without kipping.	
-Session A	Ring Dip	BW	3	3	90s	7	Same reps; make each rep cleaner and more stable.	
-Session A	Ring Row	BW	2	9	60s	7	Body angle that keeps all reps clean with a brief chest-to-ring pause.	
-Session B	[WARMUP] Band Pull-Apart Warm-up	Light band	2	12	30s	3	Smooth shoulder prep; no fatigue.; Squat-and-reach x 6; Bodyweight squat x 8; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Keep the warm-up specific and non-fatiguing.	
-Session B	[WARMUP] Deep Squat Hold	BW	2	20s	30s	2	Breathe and open ankles/hips without forcing range.	
-Session B	Controlled Handstand Kick-up	BW	4	4	45s	N/A	4 quality attempts per set; keep misses low and repeat the same entry shape.	
-Session B	Bar Muscle-up Transition Drill	Lighter band	5	1	75s	6	Same clean turnover standard as Session A.	
-Session B	Handstand Hold	BW	3	25s	60s	6	Back-to-wall hold; lighter wall pressure than Week 1.	
-Session B	Box Jump	BW	4	2	90s	N/A	Full reset between reps; beat Week 1 with better distance or cleaner landing, not more fatigue.	
-Session B	Pistol Squat	BW	3	6	90s	7	Same control; add one clean rep per set only if balance stays solid.	
-Session B	Ring Hamstring Curl	BW	3	9	75s	7	Keep hips extended and curl the heels toward you under control; shorten the lever if needed.	
-Session B	Pull-up	BW	2	7	75s	7	Strict support pulling; still comfortably below max.	
+Monday	[WARMUP]	Bodyweight	1	5 min	N/A	N/A	Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Band shoulder pass-through x 10; Scapular push-up x 8 Keep the warm-up specific and non-fatiguing.	
+Monday	Ring Dip	Bodyweight	3	7-9	90 sec	RPE 7-8	Controlled descent, full lockout at the top.	
+Monday	Ring Row	Bodyweight	3	10-14	60-90 sec	RPE 7-8	Adjust feet to control difficulty. Focus on scapular retraction.	
+Monday	Bar Muscle-up Transition Drill	Band-assisted	3	2-3	2-3 min	N/A	Aim for slightly less band assistance or a faster, cleaner turnover.	
+Monday	Explosive Hip-to-Bar Pull-up	Bodyweight	3	4-6	2-3 min	N/A	Explode upwards, aiming to get your hips to the bar. Focus on higher contact point.	
+Monday	Controlled Handstand Kick-up	Bodyweight	6	3-5 attempts	1-2 min	N/A	Increase attempts, focus on holding balance for a second or two.	
+Monday	Wall Handstand Hold	Bodyweight	3	20-25 sec	1-2 min	N/A	Maintain a straight body line, hands shoulder-width apart.	
+Tuesday	[WARMUP]	Bodyweight	1	5 min	N/A	N/A	Squat-and-reach x 6; Bodyweight squat x 8; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12 Keep the warm-up specific and non-fatiguing.	
+Tuesday	Controlled Handstand Kick-up	Bodyweight	6	3-5 attempts	1-2 min	N/A	Increase attempts, focus on holding balance for a second or two.	
+Tuesday	Wall Handstand Hold	Bodyweight	3	20-25 sec	1-2 min	N/A	Maintain a straight body line, hands shoulder-width apart.	
+Tuesday	Bar Muscle-up Transition Drill	Band-assisted	3	2-3	2-3 min	N/A	Aim for slightly less band assistance or a faster, cleaner turnover.	
+Tuesday	Pistol Squat	Bodyweight	3	5-7/side	90 sec	RPE 7-8	Controlled descent, maintain balance. Use bench or band for assistance if needed.	
+Tuesday	Broad Jump	Bodyweight	3	3	2 min	N/A	Explode for maximum distance, land softly. Full reset between jumps.	
+Tuesday	Ring Push-up	Bodyweight	3	10-14	60-90 sec	RPE 7-8	Keep the rings stable, body rigid, and stop 1-2 reps before form breaks.	
+Tuesday	Side Plank	Bodyweight	3	25-35 sec/side	30 sec	RPE 7-8	Maintain a straight line from head to heels.	
 END_WEEK2_TSV
 START_WEEK3_TSV
 Day	Exercise	Weight	Sets	Reps	Rest	Target RPE	Notes	Results
-Session A	[WARMUP] Band Pull-Apart Warm-up	Light band	2	12	30s	3	Smooth shoulder prep; no fatigue.; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Band shoulder pass-through x 10; Scapular push-up x 8; Keep the warm-up specific and non-fatiguing.	
-Session A	[WARMUP] Scapular Push-up	BW	2	8	30s	3	Move only through shoulder blades; keep elbows straight.	
-Session A	Controlled Handstand Kick-up	BW	5	4	45s	N/A	Up to 20 total attempts; only count sets done with controlled entries and safe step-downs.	
-Session A	Bar Muscle-up Transition Drill	Lighter band	6	1	75s	6	Hold Week 2 assistance and add one more clean single; no rushed turnovers.	
-Session A	Wall Handstand Hold	BW	3	20-30 sec	60-90s	5-6	Substantive wall-supported position capacity for line, confidence and shoulder endurance. Keep ribs/pelvis controlled and stop well before fatigue failure.	
-Session A	Explosive Hip-to-Bar Pull-up	BW	5	3	90s	6	Explosive triples only if every rep still reaches the target height cleanly.	
-Session A	Ring Dip	BW	3	4	90s	7	Add one rep only if all reps stay crisp and well short of failure.	
-Session A	Ring Row	BW	2	10	60s	7	Body angle that keeps all reps clean with a brief chest-to-ring pause.	
-Session B	[WARMUP] Band Pull-Apart Warm-up	Light band	2	12	30s	3	Smooth shoulder prep; no fatigue.; Squat-and-reach x 6; Bodyweight squat x 8; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Keep the warm-up specific and non-fatiguing.	
-Session B	[WARMUP] Deep Squat Hold	BW	2	20s	30s	2	Breathe and open ankles/hips without forcing range.	
-Session B	Controlled Handstand Kick-up	BW	5	4	45s	N/A	Up to 20 total attempts; stop early if entries lose consistency.	
-Session B	Bar Muscle-up Transition Drill	Lighter band	6	1	75s	6	Match Session A quality; clean singles only.	
-Session B	Handstand Hold	BW	3	30s	60s	6	Back-to-wall hold; keep lighter wall contact than before.	
-Session B	Box Jump	BW	5	2	90s	N/A	Full reset between reps; keep best Week 2 jump quality and add one set.	
-Session B	Pistol Squat	BW	3	6	90s	7	Add a 1-second pause in the bottom before standing.	
-Session B	Ring Hamstring Curl	BW	3	10	75s	7	Keep hips extended and curl the heels toward you under control; shorten the lever if needed.	
-Session B	Pull-up	BW	2	8	75s	7	Strict support pulling; still no grindy reps.	
+Monday	[WARMUP]	Bodyweight	1	5 min	N/A	N/A	Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Band shoulder pass-through x 10; Scapular push-up x 8 Keep the warm-up specific and non-fatiguing.	
+Monday	Ring Dip	Bodyweight	3	8-10	90 sec	RPE 7-8	Controlled descent, full lockout at the top.	
+Monday	Bar Muscle-up Transition Drill	Band-assisted	4	2-3	2-3 min	N/A	Focus on minimal assistance for a very clean, symmetrical turnover.	
+Monday	Explosive Hip-to-Bar Pull-up	Bodyweight	3	5-7	2-3 min	N/A	Explode upwards, aiming to get your hips to the bar. Focus on maximum height.	
+Monday	Controlled Handstand Kick-up	Bodyweight	7	3-5 attempts	1-2 min	N/A	Increase attempts, focus on longer independent balance holds.	
+Monday	Wall Handstand Hold	Bodyweight	3	25-30 sec	1-2 min	N/A	Maintain a straight body line, hands shoulder-width apart.	
+Monday	Ring Row	Bodyweight	3	12-16	60-90 sec	RPE 7-8	Adjust feet to control difficulty. Focus on scapular retraction.	
+Tuesday	[WARMUP]	Bodyweight	1	5 min	N/A	N/A	Squat-and-reach x 6; Bodyweight squat x 8; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12 Keep the warm-up specific and non-fatiguing.	
+Tuesday	Pistol Squat	Bodyweight	3	6-8/side	90 sec	RPE 7-8	Controlled descent, maintain balance. Use bench or band for assistance if needed.	
+Tuesday	Controlled Handstand Kick-up	Bodyweight	7	3-5 attempts	1-2 min	N/A	Increase attempts, focus on longer independent balance holds.	
+Tuesday	Wall Handstand Hold	Bodyweight	3	25-30 sec	1-2 min	N/A	Maintain a straight body line, hands shoulder-width apart.	
+Tuesday	Bar Muscle-up Transition Drill	Band-assisted	4	2-3	2-3 min	N/A	Focus on minimal assistance for a very clean, symmetrical turnover.	
+Tuesday	Broad Jump	Bodyweight	3	3	2 min	N/A	Explode for maximum distance, land softly. Full reset between jumps.	
+Tuesday	Ring Push-up	Bodyweight	3	12-16	60-90 sec	RPE 7-8	Keep the rings stable, body rigid, and stop 1-2 reps before form breaks.	
+Tuesday	Side Plank	Bodyweight	3	30-40 sec/side	30 sec	RPE 7-8	Maintain a straight line from head to heels.	
 END_WEEK3_TSV
 START_WEEK4_TSV
 Day	Exercise	Weight	Sets	Reps	Rest	Target RPE	Notes	Results
-Session A	[WARMUP] Band Pull-Apart Warm-up	Light band	2	12	30s	3	Smooth shoulder prep; no fatigue.; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Band shoulder pass-through x 10; Scapular push-up x 8; Keep the warm-up specific and non-fatiguing.	
-Session A	[WARMUP] Scapular Push-up	BW	2	8	30s	3	Move only through shoulder blades; keep elbows straight.	
-Session A	Controlled Handstand Kick-up	BW	4	4	45s	N/A	Keep the Week 3 entry standard but with fewer total attempts; quality over quantity.	
-Session A	Bar Muscle-up Transition Drill	Lighter band	5	1	75s	6	Retain the best Week 3 assistance and turnover quality with one less single.	
-Session A	Wall Handstand Hold	BW	2	20-25 sec	60-90s	5-6	Wall-supported line and shoulder-capacity consolidation. Retain the best Week 3 body-line standard with lower volume.	
-Session A	Explosive Hip-to-Bar Pull-up	BW	4	3	90s	6	Keep Week 3 height standard; stop as soon as speed drops.	
-Session A	Ring Dip	BW	2	4	90s	7	Keep Week 3 rep quality; leave clear reps in reserve.	
-Session A	Ring Row	BW	2	10	60s	7	Same clean range and pause as Week 3.	
-Session B	[WARMUP] Band Pull-Apart Warm-up	Light band	2	12	30s	3	Smooth shoulder prep; no fatigue.; Squat-and-reach x 6; Bodyweight squat x 8; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Keep the warm-up specific and non-fatiguing.	
-Session B	[WARMUP] Deep Squat Hold	BW	2	20s	30s	2	Breathe and open ankles/hips without forcing range.	
-Session B	Controlled Handstand Kick-up	BW	4	4	45s	N/A	Keep the Week 3 entry standard but with fewer total attempts.	
-Session B	Bar Muscle-up Transition Drill	Lighter band	5	1	75s	6	Retain the best Week 3 turnover quality; no extra fatigue chasing reps.	
-Session B	Handstand Hold	BW	2	30s	60s	6	Back-to-wall hold; keep the Week 3 stacked line.	
-Session B	Box Jump	BW	4	2	90s	N/A	Match or beat best Week 3 jump quality with less fatigue.	
-Session B	Pistol Squat	BW	3	6	90s	7	Keep the 1-second bottom pause from Week 3.	
-Session B	Ring Hamstring Curl	BW	2	10	75s	7	Keep hips extended and curl the heels toward you under control; shorten the lever if needed.	
-Session B	Pull-up	BW	2	8	75s	7	Same strict support pulling as Week 3.	
+Monday	[WARMUP]	Bodyweight	1	5 min	N/A	N/A	Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Band shoulder pass-through x 10; Scapular push-up x 8 Keep the warm-up specific and non-fatiguing.	
+Monday	Ring Dip	Bodyweight	2	8-10	90 sec	RPE 7-8	Maintain Week 3 reps and quality.	
+Monday	Bar Muscle-up Transition Drill	Band-assisted	3	2-3	2-3 min	N/A	Consolidate best quality from Week 3, aiming for the cleanest turnover with minimal assistance.	
+Monday	Explosive Hip-to-Bar Pull-up	Bodyweight	2	5-7	2-3 min	N/A	Maintain Week 3 quality, focus on explosive power and high bar contact.	
+Monday	Controlled Handstand Kick-up	Bodyweight	6	3-5 attempts	1-2 min	N/A	Consolidate best quality from Week 3, aiming for longer independent balance holds.	
+Monday	Wall Handstand Hold	Bodyweight	2	25-30 sec	1-2 min	N/A	Consolidate best quality from Week 3, maintaining hold time and body line.	
+Monday	Ring Row	Bodyweight	2	12-16	60-90 sec	RPE 7-8	Maintain Week 3 reps and quality.	
+Tuesday	[WARMUP]	Bodyweight	1	5 min	N/A	N/A	Squat-and-reach x 6; Bodyweight squat x 8; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12 Keep the warm-up specific and non-fatiguing.	
+Tuesday	Pistol Squat	Bodyweight	2	6-8/side	90 sec	RPE 7-8	Maintain Week 3 reps and quality.	
+Tuesday	Controlled Handstand Kick-up	Bodyweight	6	3-5 attempts	1-2 min	N/A	Consolidate best quality from Week 3, aiming for longer independent balance holds.	
+Tuesday	Wall Handstand Hold	Bodyweight	2	25-30 sec	1-2 min	N/A	Consolidate best quality from Week 3, maintaining hold time and body line.	
+Tuesday	Bar Muscle-up Transition Drill	Band-assisted	3	2-3	2-3 min	N/A	Consolidate best quality from Week 3, aiming for the cleanest turnover with minimal assistance.	
+Tuesday	Broad Jump	Bodyweight	2	3	2 min	N/A	Maintain Week 3 quality, focus on maximum distance and soft landings.	
+Tuesday	Ring Push-up	Bodyweight	2	12-16	60-90 sec	RPE 7-8	Keep the rings stable, body rigid, and stop 1-2 reps before form breaks.	
+Tuesday	Side Plank	Bodyweight	2	30-40 sec/side	30 sec	RPE 7-8	Maintain Week 3 hold time and quality.	
 END_WEEK4_TSV

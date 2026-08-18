@@ -1,48 +1,40 @@
 {
-  "timestamp": "2026-08-18T14:25:26.049Z",
+  "timestamp": "2026-08-17T12:24:57.180Z",
   "base": "https://raz-coaching-platform.onrender.com",
-  "head_sha": "b48b9f52fcbc551a8eee0c9f6d17beed680e0dcc",
-  "runtime": "launch-acceptance-v29-repeatability-same-logic-20260819",
   "results": [
     {
       "id": "advanced_hybrid",
-      "job_id": "5328313f7cba43629c9d1fb2e71bd9a4",
-      "ok": true,
-      "status": "done",
+      "job_id": "ca74343f0169b30c9ec0a529f4c99b5f",
+      "ok": false,
+      "status": "error",
       "stage": "finalizing",
-      "attempt": 0,
-      "detail": "saving program",
-      "last_seen_status": "done",
-      "error": null,
-      "program_chars": 12979,
-      "seconds": 107
+      "attempt": 3,
+      "error": "Phase 15 quality gate failed: REQUESTED_STRENGTH_SESSIONS_UNACCOUNTED",
+      "program_chars": 0,
+      "seconds": 98
     },
     {
       "id": "youth_gymnastics",
-      "job_id": "9b2a08c9e66560cc37367e79b491fba8",
-      "ok": true,
-      "status": "done",
-      "stage": "finalizing",
-      "attempt": 0,
-      "detail": "saving program",
-      "last_seen_status": "done",
-      "error": null,
-      "program_chars": 9957,
-      "seconds": 45
+      "job_id": "0880246ef5c47d9e882ebb1b3a9c3f30",
+      "ok": false,
+      "status": "error",
+      "stage": "refining",
+      "attempt": 4,
+      "error": "Internal coaching QA could not repair the candidate program after multiple passes. No client-facing program was saved. Please retry the build. QA trace: A1:YOUTH_PROGRESSION_QUALITY_MISSING+YOUTH_PRIMARY_SKILL_NOT_FRESH+PULL_UP_DOSE_EXCEEDS_KNOWN_CAPACITY -> A2:YOUTH_PROGRESSION_QUALITY_MISSING+YOUTH_PRIMARY_SKILL_NOT_FRESH -> A3:YOUTH_PROGRESSION_QUALITY_MISSING+YOUTH_PRIMARY_SKILL_NOT_FRESH -> A4:YOUTH_PROGRESSION_QUALITY_MISSING+YOUTH_CONSOLIDATION_RESET_TO_BASELINE+YOUTH_PRIMARY_SKILL_NOT_FRESH.",
+      "program_chars": 0,
+      "seconds": 113
     },
     {
       "id": "tactical_3k",
-      "job_id": "6982d11953fa7a3ed106e25026d8b058",
+      "job_id": "34964694c286787beb87d9bb2641bb0e",
       "ok": true,
       "status": "done",
       "stage": "finalizing",
-      "attempt": 0,
-      "detail": "saving program",
-      "last_seen_status": "done",
+      "attempt": null,
       "error": null,
-      "program_chars": 12304,
-      "seconds": 163
+      "program_chars": 9110,
+      "seconds": 92
     }
   ],
-  "ok": true
+  "ok": false
 }
