@@ -1,0 +1,52 @@
+name: Patch Advanced OHP Convergence
+
+on:
+  push:
+    branches: [privacy-security-hardening]
+    paths:
+      - '.github/workflows/patch-advanced-ohp-convergence.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: privacy-security-hardening
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Wire deterministic Advanced OHP complement into production bundle
+        run: |
+          python <<'PY'
+          from pathlib import Path
+          p=Path('phase14/engine/repairable_validation_bundle.js')
+          s=p.read_text()
+          old="import { normalizeAdvancedHybridWeek4OapConsolidation } from './advanced_hybrid_oap_consolidation_normalizer.js';"
+          new=old+"\nimport { normalizeAdvancedHybridOHPComplement } from './advanced_hybrid_ohp_normalizer.js';"
+          if "normalizeAdvancedHybridOHPComplement" not in s:
+              if s.count(old)!=1: raise SystemExit(f'import anchor count={s.count(old)}')
+              s=s.replace(old,new)
+          anchor="  const advancedOapConsolidation = normalizeAdvancedHybridWeek4OapConsolidation(candidate, intake);\n  candidate = advancedOapConsolidation.program;\n  if (advancedOapConsolidation.repaired) repairs.push({ type: 'advanced_hybrid_week4_oap_consolidation', rows: advancedOapConsolidation.repairs });\n"
+          insert=anchor+"\n  const advancedOhpComplement = normalizeAdvancedHybridOHPComplement(candidate, intake);\n  candidate = advancedOhpComplement.program;\n  if (advancedOhpComplement.repaired) repairs.push({ type: 'advanced_hybrid_ohp_complement', rows: advancedOhpComplement.repairs });\n"
+          if "advanced_hybrid_ohp_complement" not in s:
+              if s.count(anchor)!=1: raise SystemExit(f'candidate repair anchor count={s.count(anchor)}')
+              s=s.replace(anchor,insert)
+          p.write_text(s)
+          PY
+          grep -q "normalizeAdvancedHybridOHPComplement" phase14/engine/repairable_validation_bundle.js
+          grep -q "advanced_hybrid_ohp_complement" phase14/engine/repairable_validation_bundle.js
+      - name: Run focused OHP convergence tests
+        working-directory: phase14
+        run: node --test test/advanced_hybrid_ohp_normalizer.test.js
+      - name: Commit wired production source
+        run: |
+          git config user.name 'RAZ QA patch bot'
+          git config user.email 'actions@users.noreply.github.com'
+          git add phase14/engine/repairable_validation_bundle.js
+          if git diff --cached --quiet; then exit 0; fi
+          git commit -m 'Wire deterministic Advanced Hybrid OHP convergence'
+          git push origin HEAD:privacy-security-hardening
