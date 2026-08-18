@@ -17,17 +17,21 @@ const H = 'Day\tExercise\tWeight\tSets\tReps\tRest\tTarget RPE\tNotes\tResults';
 function row(day, exercise, weight, sets, reps, notes='') {
   return [day, exercise, weight, String(sets), String(reps), '2 min', '7', notes, ''].join('\t');
 }
-function week(n, weightedExercise='Weighted Pull-up', weightedLoad='+15 kg', warmupNote='') {
+function week(n, opts={}) {
+  const weightedExercise = opts.weightedExercise || 'Weighted Pull-up';
+  const weightedLoad = opts.weightedLoad || '+15 kg';
+  const weightedSets = opts.weightedSets ?? 4;
+  const weightedReps = opts.weightedReps ?? 4;
   const rows = [
-    warmupNote ? row('Mon', '[WARMUP]', 'N/A', 1, '8 min', warmupNote) : null,
-    row('Mon', weightedExercise, weightedLoad, 4, 4, 'Weighted strength support.'),
+    opts.warmupNote ? row('Mon', '[WARMUP]', 'N/A', 1, '8 min', opts.warmupNote) : null,
+    row('Mon', weightedExercise, weightedLoad, weightedSets, weightedReps, 'Weighted strength support.'),
     row('Fri', 'Pull-up', 'BW', 4, 6, 'Strict bodyweight quality volume.'),
     row('Sat', 'Backpack Carry', '20 kg', 1, '8 km', 'Controlled ruck walk.'),
   ].filter(Boolean);
   return `START_WEEK${n}_TSV\n${H}\n${rows.join('\n')}\nEND_WEEK${n}_TSV`;
 }
 function program(opts={}) {
-  return [1,2,3,4].map((n) => week(n, opts.weightedExercise, opts.weightedLoad, opts.warmupNote)).join('\n');
+  return [1,2,3,4].map((n) => week(n, opts)).join('\n');
 }
 
 test('tactical manual acceptance requires explicit weighted pull identity and +kg load when benchmarked', () => {
@@ -36,6 +40,19 @@ test('tactical manual acceptance requires explicit weighted pull identity and +k
     () => validateTacticalManualAcceptanceSemantic(program({ weightedExercise: 'Pull-up', weightedLoad: 'RPE-selected load' }), intake),
     (error) => error?.code === 'TACTICAL_WEIGHTED_PULL_EXPOSURE_AMBIGUOUS',
   );
+});
+
+test('tactical weighted pulling cannot repeat a demonstrated 5-rep benchmark as near-max multi-set volume', () => {
+  assert.throws(
+    () => validateTacticalManualAcceptanceSemantic(program({ weightedLoad: '+27.5 kg', weightedSets: 4, weightedReps: 5 }), intake),
+    (error) => error?.code === 'TACTICAL_WEIGHTED_PULL_DOSE_TOO_CLOSE_TO_BENCHMARK',
+  );
+  assert.throws(
+    () => validateTacticalManualAcceptanceSemantic(program({ weightedLoad: '+30 kg', weightedSets: 5, weightedReps: 5 }), intake),
+    (error) => error?.code === 'TACTICAL_WEIGHTED_PULL_DOSE_TOO_CLOSE_TO_BENCHMARK',
+  );
+  assert.doesNotThrow(() => validateTacticalManualAcceptanceSemantic(program({ weightedLoad: '+27.5 kg', weightedSets: 4, weightedReps: 3 }), intake));
+  assert.doesNotThrow(() => validateTacticalManualAcceptanceSemantic(program({ weightedLoad: '+22.5 kg', weightedSets: 4, weightedReps: 5 }), intake));
 });
 
 test('tactical manual acceptance rejects strength-style kg x reps ruck warm-up prose', () => {
