@@ -1,25 +1,25 @@
 {
-  "timestamp": "2026-08-18T06:15:56.282Z",
+  "timestamp": "2026-08-18T06:33:36.253Z",
   "base": "https://raz-coaching-platform.onrender.com",
-  "head_sha": "c1644079ffdaf755a5b9c946202bb03b5a964f6d",
-  "runtime": "launch-acceptance-v19-repeatability-tactical-benchmark",
+  "head_sha": "31b093d73134549836aa0b926d3c43e4185bb364",
+  "runtime": "launch-acceptance-v20-repeatability-advanced-ohp-convergence",
   "results": [
     {
       "id": "advanced_hybrid",
-      "job_id": "cc18404f5dce6eb4327c1e90d3d7a874",
+      "job_id": "d9015d5f682f1207b47573dac01b5fbf",
       "ok": false,
       "status": "error",
       "stage": "refining",
       "attempt": 4,
-      "detail": "internal repair: ADVANCED_HYBRID_OHP_ARCHITECTURE",
+      "detail": "internal repair: ADVANCED_HYBRID_WEEK4_OAP_VOLUME_INCREASED",
       "last_seen_status": "error",
-      "error": "Internal coaching QA could not repair the candidate program after multiple passes. No client-facing program was saved. Please retry the build. QA trace: A1:ADVANCED_HYBRID_OHP_ARCHITECTURE+ADVANCED_HYBRID_SQUAT_LOAD_EXCEEDS_CURRENT_CAPACITY+EVENT_PROGRESSING_SESSION_MISSING -> A2:ADVANCED_HYBRID_OHP_ARCHITECTURE -> A3:ADVANCED_HYBRID_OHP_ARCHITECTURE -> A4:ADVANCED_HYBRID_OHP_ARCHITECTURE. [QA:INTERNAL_QA_REPAIR_EXHAUSTED]",
+      "error": "Internal coaching QA could not repair the candidate program after multiple passes. No client-facing program was saved. Please retry the build. QA trace: A1:ADVANCED_HYBRID_WEEK4_OAP_VOLUME_INCREASED+WEEKLY_MRV_EXCEEDED -> A2:ADVANCED_HYBRID_WEEK4_OAP_VOLUME_INCREASED -> A3:ADVANCED_HYBRID_WEEK4_OAP_VOLUME_INCREASED -> A4:ADVANCED_HYBRID_WEEK4_OAP_VOLUME_INCREASED. [QA:INTERNAL_QA_REPAIR_EXHAUSTED]",
       "program_chars": 0,
-      "seconds": 153
+      "seconds": 168
     },
     {
       "id": "youth_gymnastics",
-      "job_id": "3eb55eebf958d4834c29ddbe14859137",
+      "job_id": "79cdad42ba2452342b48589ebe6fdbd6",
       "ok": true,
       "status": "done",
       "stage": "finalizing",
@@ -27,21 +27,21 @@
       "detail": "saving program",
       "last_seen_status": "done",
       "error": null,
-      "program_chars": 10157,
-      "seconds": 77
+      "program_chars": 10529,
+      "seconds": 93
     },
     {
       "id": "tactical_3k",
-      "job_id": "1145664ea85c366bb63a076098436a21",
-      "ok": true,
-      "status": "done",
-      "stage": "finalizing",
-      "attempt": 0,
-      "detail": "saving program",
-      "last_seen_status": "done",
-      "error": null,
-      "program_chars": 11425,
-      "seconds": 121
+      "job_id": "88304e5f6150fa385ce7512a7e7b6508",
+      "ok": false,
+      "status": "error",
+      "stage": "refining",
+      "attempt": 4,
+      "detail": "internal repair: TACTICAL_WEIGHTED_PULL_EXPOSURE_AMBIGUOUS",
+      "last_seen_status": "error",
+      "error": "Internal coaching QA could not repair the candidate program after multiple passes. No client-facing program was saved. Please retry the build. QA trace: A1:SPORT_DAY_COUPLING_VIOLATION+TACTICAL_WEIGHTED_PULL_DOSE_TOO_CLOSE_TO_BENCHMARK+TACTICAL_SCHEDULE_ARCHITECTURE_VIOLATION+TSV_ROW_COLUMN_COUNT_MISMATCH+TSV_ROW_COLUMN_COUNT_MISMATCH+TSV_ROW_COLUMN_COUNT_MISMATCH+TSV_ROW_COLUMN_COUNT_MISMATCH -> A2:TACTICAL_WEIGHTED_PULL_EXPOSURE_AMBIGUOUS -> A3:TACTICAL_WEIGHTED_PULL_EXPOSURE_AMBIGUOUS+TACTICAL_SCHEDULE_ARCHITECTURE_VIOLATION -> A4:TACTICAL_WEIGHTED_PULL_EXPOSURE_AMBIGUOUS. [QA:INTERNAL_QA_REPAIR_EXHAUSTED]",
+      "program_chars": 0,
+      "seconds": 171
     }
   ],
   "ok": false
