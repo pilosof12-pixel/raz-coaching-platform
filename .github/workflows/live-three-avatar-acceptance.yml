@@ -8,7 +8,7 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
   acceptance:
@@ -119,7 +119,7 @@ jobs:
             if(rec.ok)fs.writeFileSync(`docs/qa/live-three-avatar/${a.id}-program.txt`,job.program);
             return rec;
           }
-          const result={timestamp:now(),base,results:[]};
+          const result={timestamp:now(),base,head_sha:process.env.GITHUB_SHA||null,runtime:fs.readFileSync('phase14/public/runtime-version.txt','utf8').trim(),results:[]};
           for(const a of [hybrid,youth,tactical]){const rec=await runAvatar(a);result.results.push(rec);console.log(JSON.stringify(rec));}
           result.ok=result.results.every(x=>x.ok);
           fs.writeFileSync('docs/qa/live-three-avatar/result.json',JSON.stringify(result,null,2));
@@ -133,3 +133,28 @@ jobs:
           path: docs/qa/live-three-avatar/
           if-no-files-found: error
           retention-days: 14
+      - name: Publish synthetic QA evidence to branch
+        if: always() && github.ref_name == 'privacy-security-hardening'
+        run: |
+          if [ ! -f docs/qa/live-three-avatar/result.json ]; then
+            echo "No result.json to publish"
+            exit 0
+          fi
+          mkdir -p docs/qa/live-three-avatar/latest
+          cp docs/qa/live-three-avatar/result.json docs/qa/live-three-avatar/latest/result.json
+          for f in advanced_hybrid-program.txt youth_gymnastics-program.txt tactical_3k-program.txt; do
+            if [ -f "docs/qa/live-three-avatar/$f" ]; then
+              cp "docs/qa/live-three-avatar/$f" "docs/qa/live-three-avatar/latest/$f"
+            else
+              rm -f "docs/qa/live-three-avatar/latest/$f"
+            fi
+          done
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add docs/qa/live-three-avatar/latest
+          if git diff --cached --quiet; then
+            echo "QA evidence unchanged"
+            exit 0
+          fi
+          git commit -m "Record latest synthetic live acceptance evidence [skip ci]"
+          git push origin "HEAD:${GITHUB_REF_NAME}"
