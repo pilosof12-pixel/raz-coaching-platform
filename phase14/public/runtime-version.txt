@@ -1,1 +1,1 @@
-launch-acceptance-v23-microdose-repeatability
+launch-acceptance-v24-fixed-day-lastmile-repeatability
