@@ -14,7 +14,7 @@ jobs:
   acceptance:
     if: github.event_name == 'workflow_dispatch' || contains(github.event.head_commit.message, '[RUN-LIVE-ACCEPTANCE]')
     runs-on: ubuntu-latest
-    timeout-minutes: 35
+    timeout-minutes: 45
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -74,9 +74,48 @@ jobs:
             const pass=await issuePass();
             const b=await req('/api/build',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({intake:a.intake,pass_code:pass})});
             if(b.r.status!==202||!b.j?.job_id)return {id:a.id,ok:false,error:'build not accepted '+b.r.status+' '+b.text.slice(0,300)};
-            let job={}; const started=Date.now();
-            for(let i=0;i<240;i++){await sleep(2000);try{({j:job}=await req('/api/job/'+encodeURIComponent(b.j.job_id)));}catch{};if(job?.status==='done'||job?.status==='error')break;}
-            const rec={id:a.id,job_id:b.j.job_id,ok:job?.status==='done'&&typeof job?.program==='string'&&job.program.length>500,status:job?.status||'timeout',stage:job?.stage||null,attempt:job?.attempt||null,error:job?.error||null,program_chars:typeof job?.program==='string'?job.program.length:0,seconds:Math.round((Date.now()-started)/1000)};
+            let job={};
+            let lastSeen=null;
+            let consecutive404=0;
+            let lastSignature='';
+            const started=Date.now();
+            for(let i=0;i<360;i++){
+              await sleep(2000);
+              try{
+                const poll=await req('/api/job/'+encodeURIComponent(b.j.job_id));
+                if(poll.r.ok){
+                  job=poll.j||{};
+                  lastSeen={...job};
+                  consecutive404=0;
+                  const sig=[job.status,job.stage,job.attempt,job.detail].map((x)=>String(x??'')).join('|');
+                  if(sig!==lastSignature){
+                    console.log(JSON.stringify({id:a.id,poll:true,status:job.status||null,stage:job.stage||null,attempt:job.attempt??null,detail:job.detail||null,seconds:Math.round((Date.now()-started)/1000)}));
+                    lastSignature=sig;
+                  }
+                  if(job?.status==='done'||job?.status==='error') break;
+                } else if(poll.r.status===404){
+                  consecutive404++;
+                  if(consecutive404>=5) break;
+                }
+              }catch(e){
+                console.warn(JSON.stringify({id:a.id,poll_error:String(e?.message||e)}));
+              }
+            }
+            const disappeared=consecutive404>=5;
+            const timedOut=!disappeared&&job?.status!=='done'&&job?.status!=='error';
+            const rec={
+              id:a.id,
+              job_id:b.j.job_id,
+              ok:job?.status==='done'&&typeof job?.program==='string'&&job.program.length>500,
+              status:job?.status==='done'||job?.status==='error' ? job.status : (disappeared?'job_disappeared':(timedOut?'timeout':job?.status||'timeout')),
+              stage:job?.stage||lastSeen?.stage||null,
+              attempt:job?.attempt??lastSeen?.attempt??null,
+              detail:job?.detail||lastSeen?.detail||null,
+              last_seen_status:lastSeen?.status||null,
+              error:job?.error||(disappeared?'Job state disappeared after successful earlier polling.':null),
+              program_chars:typeof job?.program==='string'?job.program.length:0,
+              seconds:Math.round((Date.now()-started)/1000)
+            };
             if(rec.ok)fs.writeFileSync(`docs/qa/live-three-avatar/${a.id}-program.txt`,job.program);
             return rec;
           }
