@@ -1,5 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import fs from 'node:fs';
 
 import { normalizeAdvancedHybridOHPComplement } from '../engine/advanced_hybrid_ohp_normalizer.js';
 import { validateAdvancedHybridQualitySemantic } from '../engine/advanced_hybrid_quality.js';
@@ -60,4 +61,10 @@ test('normalizer is a no-op outside high-concurrency hybrid intakes', () => {
   const fixed = normalizeAdvancedHybridOHPComplement(raw, intake);
   assert.equal(fixed.repaired, false);
   assert.equal(fixed.program, raw);
+});
+
+test('shared production bundle wires the deterministic OHP complement before semantic release QA', () => {
+  const bundle = fs.readFileSync(new URL('../engine/repairable_validation_bundle.js', import.meta.url), 'utf8');
+  assert.match(bundle, /normalizeAdvancedHybridOHPComplement/);
+  assert.match(bundle, /type: 'advanced_hybrid_ohp_complement'/);
 });
