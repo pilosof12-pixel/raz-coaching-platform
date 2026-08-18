@@ -23,6 +23,7 @@ import { normalizeYouthSessionQuality } from './youth_session_quality_normalizer
 import { normalizeYouthWeek4Consolidation } from './youth_consolidation_normalizer.js';
 import { validateYouthSessionQualitySemantic } from './youth_session_quality.js';
 import { normalizeTacticalGppFloor } from './tactical_gpp_normalizer.js';
+import { normalizeTacticalWeightedPullExposure } from './tactical_weighted_pull_normalizer.js';
 import {
   validateDirectGoalExposureSemantic,
   validateSportDayCouplingSemantic,
@@ -204,6 +205,10 @@ function applyDeterministicCandidateRepairs(program, intake = {}) {
   candidate = youthSessionQuality.program;
   if (youthSessionQuality.repaired) repairs.push({ type: 'youth_session_quality', rows: youthSessionQuality.repairs });
 
+  const tacticalWeightedPull = normalizeTacticalWeightedPullExposure(candidate, intake);
+  candidate = tacticalWeightedPull.program;
+  if (tacticalWeightedPull.repaired) repairs.push({ type: 'tactical_weighted_pull', rows: tacticalWeightedPull.repairs });
+
   const tacticalGpp = normalizeTacticalGppFloor(candidate, intake);
   candidate = tacticalGpp.program;
   if (tacticalGpp.repaired) repairs.push({ type: 'tactical_gpp_floor', rows: tacticalGpp.repairs });
@@ -291,6 +296,27 @@ export function collectRepairableValidationFailures(program, intake = {}, option
 
   candidate = reformatWarmupCells(candidate);
   candidate = repairPhase15Program(candidate);
+
+  // Final-boundary convergence: the legacy formatting/repair pass must not be
+  // able to reintroduce a defect after deterministic candidate repair. Re-apply
+  // only narrow, idempotent repairs here, then re-run affected semantic gates
+  // before the final release validator.
+  const finalAdvancedOap = normalizeAdvancedHybridWeek4OapConsolidation(candidate, intake);
+  candidate = finalAdvancedOap.program;
+  if (finalAdvancedOap.repaired) deterministic_repairs.push({ type: 'final_advanced_hybrid_week4_oap_consolidation', rows: finalAdvancedOap.repairs });
+
+  const finalAdvancedOhp = normalizeAdvancedHybridOHPComplement(candidate, intake);
+  candidate = finalAdvancedOhp.program;
+  if (finalAdvancedOhp.repaired) deterministic_repairs.push({ type: 'final_advanced_hybrid_ohp_complement', rows: finalAdvancedOhp.repairs });
+
+  const finalTacticalPull = normalizeTacticalWeightedPullExposure(candidate, intake);
+  candidate = finalTacticalPull.program;
+  if (finalTacticalPull.repaired) deterministic_repairs.push({ type: 'final_tactical_weighted_pull', rows: finalTacticalPull.repairs });
+
+  const finalModel = parseProgramModel(candidate, intake);
+  runRepairable(flags, () => validateAdvancedHybridManualAcceptanceSemantic(candidate, intake, finalModel));
+  runRepairable(flags, () => validateTacticalScheduleArchitectureSemantic(candidate, intake, finalModel));
+  runRepairable(flags, () => validateKnownMaxPullUpDoseSemantic(candidate, intake, finalModel));
   runRepairable(flags, () => validatePhase15FinalProgram(candidate, intake));
 
   return {
