@@ -27,10 +27,6 @@ export function patchAdvancedHybridOapPipelineSource(input) {
     );
   }
 
-  // The initial candidate is not the only candidate that can reach final QA. The
-  // repair loop can replace `program` after a semantic failure. Re-apply the same
-  // bounded deterministic OAP consolidation normalizer immediately before EVERY
-  // final validation so a repair cannot re-introduce Week-4 strict-OAP set creep.
   if (!source.includes(OAP_REVALIDATION_MARKER)) {
     const validationRe = /^(\s*)validatePhase15FinalProgram\(program, intake\);\s*$/gm;
     const matches = [...source.matchAll(validationRe)];
@@ -41,23 +37,17 @@ export function patchAdvancedHybridOapPipelineSource(input) {
     );
   }
 
-  // Align the generative policy with Raz's coaching logic instead of relying only
-  // on post-generation cleanup. For an already-advanced OAP athlete under heavy
-  // concurrent sport load, more strict-OAP sets are not the default progression
-  // axis. Preserve low-volume high-quality specificity and progress a meaningful
-  // performance variable only when the source-grounded plan calls for it.
   if (!source.includes(OAP_COACHING_ALIGNMENT_MARKER)) {
-    const promptAnchor = '  "Use realistic current-performance anchors. Goal numbers are targets, not current capacities. Prefer low fatigue and specificity when sport load is high. Do not assign a high RPE to a load that is obviously too light for the athlete\'s current benchmark.",';
-    const promptCount = source.split(promptAnchor).length - 1;
-    if (promptCount !== 1) throw new Error(`Advanced Hybrid OAP coaching prompt anchor expected once, found ${promptCount}`);
-    const rule = '  "ADVANCED OAP PROGRESSION AXIS LOCK: when an athlete already owns strict One-Arm Pull-up reps and is in a high-concurrency strength plus combat-sport plan, do not create progression merely by adding strict OAP sets. Keep strict OAP attempt-set count stable through build weeks unless the intake or authored source specifically identifies volume tolerance as the limiter. Prefer better execution quality, rep quality within a low set count, less assistance on the assisted exposure, or another verified performance variable that does not manufacture extra fatigue. Week 4 must hold or reduce strict OAP sets versus Week 3 while preserving the best earned skill standard. Never move volume from accessories into extra strict OAP sets just to satisfy a general progression or consolidation check.", // ADVANCED-HYBRID-OAP-PROGRESSION-AXIS-LOCK';
-    source = source.replace(promptAnchor, `${promptAnchor}\n${rule}`);
+    const developerStart = 'const OPENAI_COMPACT_DEVELOPER = [';
+    const start = source.indexOf(developerStart);
+    if (start < 0) throw new Error('Advanced Hybrid OAP developer prompt boundary missing');
+    const joinAnchor = '].join("\\n");';
+    const end = source.indexOf(joinAnchor, start);
+    if (end < 0) throw new Error('Advanced Hybrid OAP developer prompt closing boundary missing');
+    const rule = '  "ADVANCED OAP PROGRESSION AXIS LOCK: when an athlete already owns strict One-Arm Pull-up reps and is in a high-concurrency strength plus combat-sport plan, do not create progression merely by adding strict OAP sets. Keep strict OAP attempt-set count stable through build weeks unless the intake or authored source specifically identifies volume tolerance as the limiter. Prefer better execution quality, rep quality within a low set count, less assistance on the assisted exposure, or another verified performance variable that does not manufacture extra fatigue. Week 4 must hold or reduce strict OAP sets versus Week 3 while preserving the best earned skill standard. Never move volume from accessories into extra strict OAP sets just to satisfy a general progression or consolidation check.", // ADVANCED-HYBRID-OAP-PROGRESSION-AXIS-LOCK\n';
+    source = source.slice(0, end) + rule + source.slice(end);
   }
 
-  // Aggregate repair feedback is installed later in the startup build chain. When
-  // this patcher is run a second time at the end of that chain, strengthen the
-  // Week-4 numeric repair so the repair model cannot satisfy a lower total-set
-  // target by shifting deleted accessory volume into extra strict OAP attempts.
   if (source.includes('ADVANCED-HYBRID-NUMERIC-REPAIR-FEEDBACK') && !source.includes(OAP_REPAIR_FEEDBACK_MARKER)) {
     const feedbackAnchor = 'Do not replace removed sets with extra reps, harder effort, new exercises, intervals, finishers or conditioning. This is a measurable workload reduction, not a prose rewrite.';
     const feedbackCount = source.split(feedbackAnchor).length - 1;
