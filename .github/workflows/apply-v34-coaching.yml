@@ -74,20 +74,21 @@ jobs:
           ts = ts.replace(marker, extra + marker, 1)
           t.write_text(ts)
 
-          # One legacy regression asserted the old wording "submaximal singles" even
-          # though v34 intentionally leads with readiness-dependent multi-rep work and
-          # then uses clean singles. Update only that stale regex expectation; keep the
-          # underlying rule that eccentrics/isometrics are assistance, not replacement.
+          # Update only legacy tests that still require the old singles-only wording.
+          # The v34 contract test intentionally rejects singles-only programming, so it
+          # must never be rewritten by this compatibility migration.
           changed = 0
           stale = re.compile(r'/[^/\n]*submaximal singles[^/\n]*/i', re.I)
           for test_file in Path('phase14/test').glob('*.test.js'):
+              if test_file.name == 'v34_coaching_architecture.test.js':
+                  continue
               body = test_file.read_text()
               body2, n = stale.subn('/(?:priority set|clean strict reps|clean singles)/i', body)
               if n:
                   test_file.write_text(body2)
                   changed += n
           if changed < 1:
-              raise SystemExit('stale submaximal-singles regression assertion not found')
+              raise SystemExit('stale legacy submaximal-singles regression assertion not found')
 
       - uses: actions/setup-node@v4
         if: steps.ready.outputs.ready == 'true'
