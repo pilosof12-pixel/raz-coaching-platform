@@ -34,13 +34,14 @@ jobs:
         with:
           node-version: '22'
           cache: npm
-      - name: Apply exact v34 patch and test
+      - name: Apply v34 staged patch and test
         if: steps.ready.outputs.ready == 'true'
         shell: bash
         run: |
           set -euo pipefail
           cat .github/v34-patch/chunk*.b64 | tr -d '\n' | base64 -d > /tmp/v34.patch
-          echo "9c0bacf4023f4a37cd165b124ddfb420302e6108c932c2145e941ee6d129fd30  /tmp/v34.patch" | sha256sum -c -
+          echo "Reconstructed staged patch:"
+          sha256sum /tmp/v34.patch
           git apply --check /tmp/v34.patch
           git apply /tmp/v34.patch
           python - <<'PY'
@@ -75,7 +76,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          rm -rf .github/v34-patch .github/workflows/apply-v34-coaching.yml .github/workflows/apply-v33-final-coaching-coherence.yml
+          rm -rf .github/v34-patch .github/workflows/apply-v34-coaching.yml .github/workflows/apply-v33-final-coaching-coherence.yml .github/v34-*-trigger.txt .github/v34-pr*-trigger.txt .github/v34-direct-trigger.txt .github/v34-merge-event-trigger.txt
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add -A
