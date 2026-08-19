@@ -1,12 +1,12 @@
 {
-  "timestamp": "2026-08-19T12:33:01.301Z",
+  "timestamp": "2026-08-19T12:54:16.690Z",
   "base": "https://raz-coaching-platform.onrender.com",
-  "head_sha": "6868831ccb972c3915fa05d9650ebc0e05b15028",
-  "runtime": "launch-acceptance-v31-hybrid-tactical-convergence-v2-20260819",
+  "head_sha": "66c37107e05ad8175ebf6c1a663b6d4b717be93f",
+  "runtime": "launch-acceptance-v32-youth-progression-convergence-v1-20260819",
   "results": [
     {
       "id": "advanced_hybrid",
-      "job_id": "8493bb2f490cccbb936d7b6c017b7b3b",
+      "job_id": "3dcb5a6db4d5c35b79f36e2534362add",
       "ok": true,
       "status": "done",
       "stage": "finalizing",
@@ -14,25 +14,12 @@
       "detail": "saving program",
       "last_seen_status": "done",
       "error": null,
-      "program_chars": 14780,
-      "seconds": 82
+      "program_chars": 16605,
+      "seconds": 170
     },
     {
       "id": "youth_gymnastics",
-      "job_id": "f4bb28638aa47453585cfd47bf366a08",
-      "ok": false,
-      "status": "error",
-      "stage": "refining",
-      "attempt": 4,
-      "detail": "internal repair: PROGRESSION_ARCHITECTURE_MISSING+YOUTH_PROGRESSION_QUALITY_MISSING",
-      "last_seen_status": "error",
-      "error": "Internal coaching QA could not repair the candidate program after multiple passes. No client-facing program was saved. Please retry the build. QA trace: A1:PROGRESSION_ARCHITECTURE_MISSING+YOUTH_PROGRESSION_QUALITY_MISSING -> A2:PROGRESSION_ARCHITECTURE_MISSING+YOUTH_PROGRESSION_QUALITY_MISSING -> A3:PROGRESSION_ARCHITECTURE_MISSING+YOUTH_PROGRESSION_QUALITY_MISSING -> A4:PROGRESSION_ARCHITECTURE_MISSING+YOUTH_PROGRESSION_QUALITY_MISSING. [QA:INTERNAL_QA_REPAIR_EXHAUSTED]",
-      "program_chars": 0,
-      "seconds": 117
-    },
-    {
-      "id": "tactical_3k",
-      "job_id": "8c524e5bb3deb9c6ddf57fb62343c525",
+      "job_id": "99d4bedbcaaaa0365dac852062543aff",
       "ok": true,
       "status": "done",
       "stage": "finalizing",
@@ -40,9 +27,22 @@
       "detail": "saving program",
       "last_seen_status": "done",
       "error": null,
-      "program_chars": 11019,
-      "seconds": 88
+      "program_chars": 14546,
+      "seconds": 40
+    },
+    {
+      "id": "tactical_3k",
+      "job_id": "14da8a922c191ef09ebe7982f012798a",
+      "ok": true,
+      "status": "done",
+      "stage": "finalizing",
+      "attempt": 0,
+      "detail": "saving program",
+      "last_seen_status": "done",
+      "error": null,
+      "program_chars": 10502,
+      "seconds": 177
     }
   ],
-  "ok": false
+  "ok": true
 }
