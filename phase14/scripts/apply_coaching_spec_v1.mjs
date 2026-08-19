@@ -24,11 +24,14 @@ function patch(rel, transforms, { optional = false } = {}) {
   console.log(`${rel}: ${changed ? 'Coaching Spec v1.0 applied' : 'already current'}`);
 }
 
-// Keep the frozen rules unchanged while making two implementation details converge:
+// Keep the frozen rules unchanged while making implementation details converge:
 // 1) a safe negative instruction such as "do not train to failure" must not be
 //    mistaken for a failure prescription;
 // 2) AH-01 repair feedback must name the concrete dose change required instead of
-//    asking the model to infer which lower-priority family to stop progressing.
+//    asking the model to infer which lower-priority family to stop progressing;
+// 3) AH-04 adjacent pulling gets a narrow deterministic microdose repair before the
+//    same frozen hard validator runs, rather than asking the model to rediscover the
+//    same correction across repeated repair attempts.
 patch('engine/coaching_spec_v1_quality.js', [
   {
     label: 'youth negation-aware failure classifier',
@@ -64,6 +67,18 @@ patch('engine/repairable_validation_bundle.js', [
     already: 'COACHING-SPEC-V1-HARD-RULES',
   },
   {
+    label: 'adjacent pull normalizer import',
+    find: "import { normalizeAdvancedHybridWeek4OapConsolidation } from './advanced_hybrid_oap_consolidation_normalizer.js';\n",
+    replace: "import { normalizeAdvancedHybridWeek4OapConsolidation } from './advanced_hybrid_oap_consolidation_normalizer.js';\nimport { normalizeAdvancedHybridAdjacentPulling } from './advanced_hybrid_pull_spacing_normalizer.js'; // COACH-SPEC-V1-AH04-NORMALIZER\n",
+    already: 'COACH-SPEC-V1-AH04-NORMALIZER',
+  },
+  {
+    label: 'candidate adjacent pull convergence',
+    find: "  if (advancedOapConsolidation.repaired) repairs.push({ type: 'advanced_hybrid_week4_oap_consolidation', rows: advancedOapConsolidation.repairs });\n",
+    replace: "  if (advancedOapConsolidation.repaired) repairs.push({ type: 'advanced_hybrid_week4_oap_consolidation', rows: advancedOapConsolidation.repairs });\n\n  const advancedPullSpacing = normalizeAdvancedHybridAdjacentPulling(candidate, intake);\n  candidate = advancedPullSpacing.program;\n  if (advancedPullSpacing.repaired) repairs.push({ type: 'advanced_hybrid_adjacent_pull_spacing', rows: advancedPullSpacing.repairs }); // COACH-SPEC-V1-AH04-CANDIDATE-REPAIR\n",
+    already: 'COACH-SPEC-V1-AH04-CANDIDATE-REPAIR',
+  },
+  {
     // IMPORTANT: anchor to one stable validator line, not adjacency between two
     // validators. Earlier phase15:build patches legitimately insert validators in
     // this list before Coaching Spec v1 runs in production.
@@ -71,6 +86,12 @@ patch('engine/repairable_validation_bundle.js', [
     find: "    () => validateAdvancedHybridManualAcceptanceSemantic(candidate, intake, model),\n",
     replace: "    () => validateAdvancedHybridManualAcceptanceSemantic(candidate, intake, model),\n    () => validateAdvancedHybridCoachingSpecV1(candidate, intake, model),\n    () => validateYouthCoachingSpecV1HardRules(candidate, intake, model),\n    () => validateTactical3KCoachingSpecV1(candidate, intake, model),\n",
     already: '() => validateAdvancedHybridCoachingSpecV1(candidate, intake, model),',
+  },
+  {
+    label: 'final adjacent pull convergence',
+    find: "  if (finalAdvancedOap.repaired) deterministic_repairs.push({ type: 'final_advanced_hybrid_week4_oap_consolidation', rows: finalAdvancedOap.repairs });\n",
+    replace: "  if (finalAdvancedOap.repaired) deterministic_repairs.push({ type: 'final_advanced_hybrid_week4_oap_consolidation', rows: finalAdvancedOap.repairs });\n\n  const finalAdvancedPullSpacing = normalizeAdvancedHybridAdjacentPulling(candidate, intake);\n  candidate = finalAdvancedPullSpacing.program;\n  if (finalAdvancedPullSpacing.repaired) deterministic_repairs.push({ type: 'final_advanced_hybrid_adjacent_pull_spacing', rows: finalAdvancedPullSpacing.repairs }); // COACH-SPEC-V1-AH04-FINAL-REPAIR\n",
+    already: 'COACH-SPEC-V1-AH04-FINAL-REPAIR',
   },
   {
     label: 'coaching spec final-boundary checks',
@@ -111,4 +132,4 @@ if (fs.existsSync(plannerPath)) {
   }
 }
 
-console.log('Frozen Coaching Specification v1.0 hard-rule and prompt wiring complete.');
+console.log('Frozen Coaching Specification v1.0 hard-rule, deterministic AH-04 repair and prompt wiring complete.');
