@@ -2,7 +2,7 @@ TAP version 13
 # Subtest: advanced hybrid pre-live candidate clears an objective 9/10 quality floor
 not ok 1 - advanced hybrid pre-live candidate clears an objective 9/10 quality floor
   ---
-  duration_ms: 119.885263
+  duration_ms: 105.429373
   type: 'test'
   location: '/home/runner/work/raz-coaching-platform/raz-coaching-platform/phase14/test/advanced_hybrid_9plus_quality_gate.test.js:66:1'
   failureType: 'testCodeFailure'
@@ -24,61 +24,61 @@ not ok 1 - advanced hybrid pre-live candidate clears an objective 9/10 quality f
 # Subtest: production Hybrid semantic gate accepts the benchmarked 9 plus fixture
 ok 2 - production Hybrid semantic gate accepts the benchmarked 9 plus fixture
   ---
-  duration_ms: 5.035147
+  duration_ms: 5.397816
   type: 'test'
   ...
 # Subtest: production Hybrid semantic gate rejects generic one-squat architecture
 ok 3 - production Hybrid semantic gate rejects generic one-squat architecture
   ---
-  duration_ms: 1.154643
+  duration_ms: 1.363457
   type: 'test'
   ...
 # Subtest: production Hybrid semantic gate rejects generic benchmark loading
 ok 4 - production Hybrid semantic gate rejects generic benchmark loading
   ---
-  duration_ms: 0.919693
+  duration_ms: 1.398059
   type: 'test'
   ...
 # Subtest: production Hybrid semantic gate rejects fake warmups without ramps
 ok 5 - production Hybrid semantic gate rejects fake warmups without ramps
   ---
-  duration_ms: 0.861512
+  duration_ms: 0.804076
   type: 'test'
   ...
 # Subtest: production Hybrid semantic gate rejects Week 4 that does not consolidate
 ok 6 - production Hybrid semantic gate rejects Week 4 that does not consolidate
   ---
-  duration_ms: 0.839736
+  duration_ms: 1.017603
   type: 'test'
   ...
 # Subtest: advanced launch intake is recognized as a high-concurrency hybrid case
 ok 7 - advanced launch intake is recognized as a high-concurrency hybrid case
   ---
-  duration_ms: 1.668567
+  duration_ms: 1.194487
   type: 'test'
   ...
 # Subtest: current one-run 20 km baseline is parsed instead of treating marathon distance as current capacity
 ok 8 - current one-run 20 km baseline is parsed instead of treating marathon distance as current capacity
   ---
-  duration_ms: 0.680669
+  duration_ms: 0.498982
   type: 'test'
   ...
 # Subtest: high-concurrency brief protects primary work and constrains marathon side quest to recoverable starting dose
 ok 9 - high-concurrency brief protects primary work and constrains marathon side quest to recoverable starting dose
   ---
-  duration_ms: 3.060162
+  duration_ms: 2.581449
   type: 'test'
   ...
 # Subtest: ordinary non-marathon strength client does not receive the hybrid concurrency contract
 ok 10 - ordinary non-marathon strength client does not receive the hybrid concurrency contract
   ---
-  duration_ms: 0.237262
+  duration_ms: 0.187108
   type: 'test'
   ...
 # Subtest: advanced hybrid launch intake has a feasible program that passes the full production validation chain
 not ok 11 - advanced hybrid launch intake has a feasible program that passes the full production validation chain
   ---
-  duration_ms: 86.321728
+  duration_ms: 138.963175
   type: 'test'
   location: '/home/runner/work/raz-coaching-platform/raz-coaching-platform/phase14/test/advanced_hybrid_launch_acceptance.test.js:25:1'
   failureType: 'testCodeFailure'
@@ -95,7 +95,7 @@ not ok 11 - advanced hybrid launch intake has a feasible program that passes the
 # Subtest: advanced hybrid launch gate keeps marathon work secondary instead of inventing extra hard conditioning
 not ok 12 - advanced hybrid launch gate keeps marathon work secondary instead of inventing extra hard conditioning
   ---
-  duration_ms: 43.247684
+  duration_ms: 45.094942
   type: 'test'
   location: '/home/runner/work/raz-coaching-platform/raz-coaching-platform/phase14/test/advanced_hybrid_launch_acceptance.test.js:38:1'
   failureType: 'testCodeFailure'
@@ -114,19 +114,19 @@ not ok 12 - advanced hybrid launch gate keeps marathon work secondary instead of
 # Subtest: golden Advanced Hybrid keeps Week 4 strict OAP volume consolidated
 ok 13 - golden Advanced Hybrid keeps Week 4 strict OAP volume consolidated
   ---
-  duration_ms: 6.883475
+  duration_ms: 5.027585
   type: 'test'
   ...
 # Subtest: Week 4 cannot increase strict OAP sets while hiding behind lower aggregate accessory volume
 ok 14 - Week 4 cannot increase strict OAP sets while hiding behind lower aggregate accessory volume
   ---
-  duration_ms: 1.548679
+  duration_ms: 1.034297
   type: 'test'
   ...
 # Subtest: Advanced validator rejects Week 4 strict OAP set volume above Week 3
 not ok 15 - Advanced validator rejects Week 4 strict OAP set volume above Week 3
   ---
-  duration_ms: 5.368769
+  duration_ms: 5.225229
   type: 'test'
   location: '/home/runner/work/raz-coaching-platform/raz-coaching-platform/phase14/test/advanced_hybrid_oap_consolidation_normalizer.test.js:48:1'
   failureType: 'testCodeFailure'
@@ -148,7 +148,7 @@ not ok 15 - Advanced validator rejects Week 4 strict OAP set volume above Week 3
 # Subtest: deterministic Advanced repair caps Week 4 strict OAP volume at Week 3 without touching assisted work
 not ok 16 - deterministic Advanced repair caps Week 4 strict OAP volume at Week 3 without touching assisted work
   ---
-  duration_ms: 3.80473
+  duration_ms: 4.003673
   type: 'test'
   location: '/home/runner/work/raz-coaching-platform/raz-coaching-platform/phase14/test/advanced_hybrid_oap_consolidation_normalizer.test.js:55:1'
   failureType: 'testCodeFailure'
@@ -183,7 +183,7 @@ not ok 16 - deterministic Advanced repair caps Week 4 strict OAP volume at Week 
 # Subtest: Advanced repair is a no-op when Week 4 already holds or reduces strict OAP volume
 not ok 17 - Advanced repair is a no-op when Week 4 already holds or reduces strict OAP volume
   ---
-  duration_ms: 1.097092
+  duration_ms: 1.12974
   type: 'test'
   location: '/home/runner/work/raz-coaching-platform/raz-coaching-platform/phase14/test/advanced_hybrid_oap_consolidation_normalizer.test.js:65:1'
   failureType: 'testCodeFailure'
@@ -209,7 +209,7 @@ not ok 17 - Advanced repair is a no-op when Week 4 already holds or reduces stri
 # Subtest: Week 4 set cell with per-arm suffix is parsed exactly like the release validator and converges to an exact set count
 not ok 18 - Week 4 set cell with per-arm suffix is parsed exactly like the release validator and converges to an exact set count
   ---
-  duration_ms: 0.423943
+  duration_ms: 0.592521
   type: 'test'
   location: '/home/runner/work/raz-coaching-platform/raz-coaching-platform/phase14/test/advanced_hybrid_oap_consolidation_normalizer.test.js:73:1'
   failureType: 'testCodeFailure'
@@ -233,7 +233,7 @@ not ok 18 - Week 4 set cell with per-arm suffix is parsed exactly like the relea
 # Subtest: Week 3 set range uses the same conservative first-number metric as the release validator
 not ok 19 - Week 3 set range uses the same conservative first-number metric as the release validator
   ---
-  duration_ms: 0.427747
+  duration_ms: 0.677287
   type: 'test'
   location: '/home/runner/work/raz-coaching-platform/raz-coaching-platform/phase14/test/advanced_hybrid_oap_consolidation_normalizer.test.js:88:1'
   failureType: 'testCodeFailure'
@@ -257,7 +257,7 @@ not ok 19 - Week 3 set range uses the same conservative first-number metric as t
 # Subtest: set range is left unchanged when its first-number metric already satisfies consolidation
 not ok 20 - set range is left unchanged when its first-number metric already satisfies consolidation
   ---
-  duration_ms: 0.375973
+  duration_ms: 0.510308
   type: 'test'
   location: '/home/runner/work/raz-coaching-platform/raz-coaching-platform/phase14/test/advanced_hybrid_oap_consolidation_normalizer.test.js:103:1'
   failureType: 'testCodeFailure'
@@ -283,7 +283,7 @@ not ok 20 - set range is left unchanged when its first-number metric already sat
 # Subtest: production runtime normalizes every Advanced Hybrid OAP candidate before final QA
 not ok 21 - production runtime normalizes every Advanced Hybrid OAP candidate before final QA
   ---
-  duration_ms: 1.462183
+  duration_ms: 1.527811
   type: 'test'
   location: '/home/runner/work/raz-coaching-platform/raz-coaching-platform/phase14/test/advanced_hybrid_oap_pipeline_wiring.test.js:29:1'
   failureType: 'testCodeFailure'
@@ -300,7 +300,7 @@ not ok 21 - production runtime normalizes every Advanced Hybrid OAP candidate be
 # Subtest: Advanced Hybrid OAP prompt forbids manufactured strict-set progression
 not ok 22 - Advanced Hybrid OAP prompt forbids manufactured strict-set progression
   ---
-  duration_ms: 0.222735
+  duration_ms: 0.299255
   type: 'test'
   location: '/home/runner/work/raz-coaching-platform/raz-coaching-platform/phase14/test/advanced_hybrid_oap_pipeline_wiring.test.js:44:1'
   failureType: 'testCodeFailure'
@@ -319,7 +319,7 @@ not ok 22 - Advanced Hybrid OAP prompt forbids manufactured strict-set progressi
 # Subtest: Advanced Hybrid OAP pipeline wiring is idempotent
 not ok 23 - Advanced Hybrid OAP pipeline wiring is idempotent
   ---
-  duration_ms: 1.832449
+  duration_ms: 2.58277
   type: 'test'
   location: '/home/runner/work/raz-coaching-platform/raz-coaching-platform/phase14/test/advanced_hybrid_oap_pipeline_wiring.test.js:50:1'
   failureType: 'testCodeFailure'
@@ -338,13 +338,13 @@ not ok 23 - Advanced Hybrid OAP pipeline wiring is idempotent
 # Subtest: Advanced Hybrid OAP pipeline wiring fails closed when expected runtime anchors drift
 ok 24 - Advanced Hybrid OAP pipeline wiring fails closed when expected runtime anchors drift
   ---
-  duration_ms: 0.672168
+  duration_ms: 0.856994
   type: 'test'
   ...
 # Subtest: Advanced Hybrid OHP complement converges missing Push Press without changing strict OHP
 not ok 25 - Advanced Hybrid OHP complement converges missing Push Press without changing strict OHP
   ---
-  duration_ms: 9.994611
+  duration_ms: 13.796013
   type: 'test'
   location: '/home/runner/work/raz-coaching-platform/raz-coaching-platform/phase14/test/advanced_hybrid_ohp_normalizer.test.js:25:1'
   failureType: 'testCodeFailure'
@@ -368,7 +368,7 @@ not ok 25 - Advanced Hybrid OHP complement converges missing Push Press without 
 # Subtest: normalizer is idempotent when Push Press already exists
 not ok 26 - normalizer is idempotent when Push Press already exists
   ---
-  duration_ms: 0.834319
+  duration_ms: 1.269898
   type: 'test'
   location: '/home/runner/work/raz-coaching-platform/raz-coaching-platform/phase14/test/advanced_hybrid_ohp_normalizer.test.js:41:1'
   failureType: 'testCodeFailure'
@@ -394,49 +394,49 @@ not ok 26 - normalizer is idempotent when Push Press already exists
 # Subtest: normalizer fails closed when strict OHP itself is missing
 ok 27 - normalizer fails closed when strict OHP itself is missing
   ---
-  duration_ms: 1.845995
+  duration_ms: 2.762478
   type: 'test'
   ...
 # Subtest: normalizer is a no-op outside high-concurrency hybrid intakes
 ok 28 - normalizer is a no-op outside high-concurrency hybrid intakes
   ---
-  duration_ms: 0.501538
+  duration_ms: 0.681814
   type: 'test'
   ...
 # Subtest: shared production bundle wires the deterministic OHP complement before semantic release QA
 ok 29 - shared production bundle wires the deterministic OHP complement before semantic release QA
   ---
-  duration_ms: 0.537312
+  duration_ms: 0.870865
   type: 'test'
   ...
 # Subtest: AH-04 normalizer preserves strict OAP and converts adjacent assisted work to a technical microdose
 ok 30 - AH-04 normalizer preserves strict OAP and converts adjacent assisted work to a technical microdose
   ---
-  duration_ms: 18.847334
+  duration_ms: 19.513665
   type: 'test'
   ...
 # Subtest: AH-04 normalizer trims adjacent weighted bilateral support before strict OAP specificity
 ok 31 - AH-04 normalizer trims adjacent weighted bilateral support before strict OAP specificity
   ---
-  duration_ms: 2.27127
+  duration_ms: 2.335983
   type: 'test'
   ...
 # Subtest: AH-04 normalizer is idempotent after the adjacent conflict is removed
 ok 32 - AH-04 normalizer is idempotent after the adjacent conflict is removed
   ---
-  duration_ms: 0.870794
+  duration_ms: 0.850455
   type: 'test'
   ...
 # Subtest: Rest and Off schedule markers are removed before exercise identity QA
 ok 33 - Rest and Off schedule markers are removed before exercise identity QA
   ---
-  duration_ms: 3.766683
+  duration_ms: 3.280117
   type: 'test'
   ...
 # Subtest: live Tactical cascade is reported as one aggregate repair contract instead of fail-fast attempts
 not ok 34 - live Tactical cascade is reported as one aggregate repair contract instead of fail-fast attempts
   ---
-  duration_ms: 102.400034
+  duration_ms: 71.616898
   type: 'test'
   location: '/home/runner/work/raz-coaching-platform/raz-coaching-platform/phase14/test/aggregate_repair_validation.test.js:48:1'
   failureType: 'testCodeFailure'
@@ -458,67 +458,67 @@ not ok 34 - live Tactical cascade is reported as one aggregate repair contract i
 # Subtest: aggregate runtime preserves the OpenAI direct-skill calibration guard
 ok 35 - aggregate runtime preserves the OpenAI direct-skill calibration guard
   ---
-  duration_ms: 36.376428
+  duration_ms: 28.183897
   type: 'test'
   ...
 # Subtest: known-good golden programs contain no client-facing internal QA artifacts
 ok 36 - known-good golden programs contain no client-facing internal QA artifacts
   ---
-  duration_ms: 2.223601
+  duration_ms: 2.748457
   type: 'test'
   ...
 # Subtest: review and support placeholders fail closed before client delivery
 ok 37 - review and support placeholders fail closed before client delivery
   ---
-  duration_ms: 0.508206
+  duration_ms: 0.717637
   type: 'test'
   ...
 # Subtest: validator codes and internal QA traces can never appear in the paying-client program
 ok 38 - validator codes and internal QA traces can never appear in the paying-client program
   ---
-  duration_ms: 0.387818
+  duration_ms: 0.415648
   type: 'test'
   ...
 # Subtest: approved Youth golden has meaningful forward progression before consolidation
 ok 39 - approved Youth golden has meaningful forward progression before consolidation
   ---
-  duration_ms: 20.40187
+  duration_ms: 19.953599
   type: 'test'
   ...
 # Subtest: Youth progression cannot be faked by changing only rest, RPE wording or Notes
 ok 40 - Youth progression cannot be faked by changing only rest, RPE wording or Notes
   ---
-  duration_ms: 2.645101
+  duration_ms: 2.308072
   type: 'test'
   ...
 # Subtest: Youth acceptance brief makes progression visible in prescription fields and allows Week 4 consolidation
 ok 41 - Youth acceptance brief makes progression visible in prescription fields and allows Week 4 consolidation
   ---
-  duration_ms: 0.55111
+  duration_ms: 0.583187
   type: 'test'
   ...
 # Subtest: approved Tactical golden contains specific preparation for every hard run
 ok 42 - approved Tactical golden contains specific preparation for every hard run
   ---
-  duration_ms: 3.018191
+  duration_ms: 3.782925
   type: 'test'
   ...
 # Subtest: live-like interval prescription without same-day running preparation fails closed
 ok 43 - live-like interval prescription without same-day running preparation fails closed
   ---
-  duration_ms: 3.696457
+  duration_ms: 4.560871
   type: 'test'
   ...
 # Subtest: production patch script wires the new quality brief and validators into the generated runtime
 ok 44 - production patch script wires the new quality brief and validators into the generated runtime
   ---
-  duration_ms: 0.49476
+  duration_ms: 0.552711
   type: 'test'
   ...
 # Subtest: approved Youth golden consolidates Week 4 without erasing the Week 2-3 standard
 not ok 45 - approved Youth golden consolidates Week 4 without erasing the Week 2-3 standard
   ---
-  duration_ms: 115.327671
+  duration_ms: 120.870803
   type: 'test'
   location: '/home/runner/work/raz-coaching-platform/raz-coaching-platform/phase14/test/coaching_consolidation_quality.test.js:26:1'
   failureType: 'testCodeFailure'
@@ -538,115 +538,115 @@ not ok 45 - approved Youth golden consolidates Week 4 without erasing the Week 2
 # Subtest: Week 4 cannot reset a progressed bodyweight rep target to Week 1
 ok 46 - Week 4 cannot reset a progressed bodyweight rep target to Week 1
   ---
-  duration_ms: 2.007354
+  duration_ms: 2.375523
   type: 'test'
   ...
 # Subtest: Week 4 may reduce sets while retaining the improved rep standard
 ok 47 - Week 4 may reduce sets while retaining the improved rep standard
   ---
-  duration_ms: 0.679677
+  duration_ms: 0.689304
   type: 'test'
   ...
 # Subtest: assistance progression cannot return to the Week 1 band in Week 4
 ok 48 - assistance progression cannot return to the Week 1 band in Week 4
   ---
-  duration_ms: 0.750274
+  duration_ms: 0.772168
   type: 'test'
   ...
 # Subtest: assisted skill may reduce Week 4 volume while retaining the best clean Week 3 band
 ok 49 - assisted skill may reduce Week 4 volume while retaining the best clean Week 3 band
   ---
-  duration_ms: 1.670659
+  duration_ms: 1.688511
   type: 'test'
   ...
 # Subtest: volume-only skill build needs an explicit Week 4 quality-retention target
 ok 50 - volume-only skill build needs an explicit Week 4 quality-retention target
   ---
-  duration_ms: 0.935954
+  duration_ms: 0.930203
   type: 'test'
   ...
 # Subtest: explosive consolidation may lower reps when Week 3 output quality is explicitly retained
 ok 51 - explosive consolidation may lower reps when Week 3 output quality is explicitly retained
   ---
-  duration_ms: 0.671398
+  duration_ms: 0.687943
   type: 'test'
   ...
 # Subtest: explosive rep reduction without an earned quality target still fails consolidation
 ok 52 - explosive rep reduction without an earned quality target still fails consolidation
   ---
-  duration_ms: 0.559029
+  duration_ms: 0.592651
   type: 'test'
   ...
 # Subtest: active pain context can justify a larger consolidation regression
 ok 53 - active pain context can justify a larger consolidation regression
   ---
-  duration_ms: 0.752188
+  duration_ms: 0.804607
   type: 'test'
   ...
 # Subtest: generation brief explicitly separates fatigue reduction from capability reset
 ok 54 - generation brief explicitly separates fatigue reduction from capability reset
   ---
-  duration_ms: 0.902373
+  duration_ms: 0.752058
   type: 'test'
   ...
 # Subtest: production patch wires consolidation brief, validator and repairable error into runtime
 ok 55 - production patch wires consolidation brief, validator and repairable error into runtime
   ---
-  duration_ms: 0.40552
+  duration_ms: 0.326956
   type: 'test'
   ...
 # Subtest: Youth brief selects quality/assistance/bodyweight progression rather than mandatory fatigue
 ok 56 - Youth brief selects quality/assistance/bodyweight progression rather than mandatory fatigue
   ---
-  duration_ms: 1.652246
+  duration_ms: 1.737734
   type: 'test'
   ...
 # Subtest: Tactical brief makes GPP a small floor subordinate to named priorities
 ok 57 - Tactical brief makes GPP a small floor subordinate to named priorities
   ---
-  duration_ms: 0.344885
+  duration_ms: 0.547454
   type: 'test'
   ...
 # Subtest: approved Youth golden exposes progression in both primary skill families
 ok 58 - approved Youth golden exposes progression in both primary skill families
   ---
-  duration_ms: 15.109025
+  duration_ms: 17.188597
   type: 'test'
   ...
 # Subtest: approved Tactical golden keeps low-cost push/core GPP within the priority budget
 ok 59 - approved Tactical golden keeps low-cost push/core GPP within the priority budget
   ---
-  duration_ms: 6.993662
+  duration_ms: 7.101299
   type: 'test'
   ...
 # Subtest: Tactical GPP cannot expand until it competes with the named priority budget
 ok 60 - Tactical GPP cannot expand until it competes with the named priority budget
   ---
-  duration_ms: 3.490253
+  duration_ms: 3.71957
   type: 'test'
   ...
 # Subtest: AH-01 deterministic convergence holds secondary pressing at Week 1 dose
 ok 61 - AH-01 deterministic convergence holds secondary pressing at Week 1 dose
   ---
-  duration_ms: 16.575974
+  duration_ms: 17.457158
   type: 'test'
   ...
 # Subtest: YG-07 does not false-positive explicit anti-failure coaching language
 ok 62 - YG-07 does not false-positive explicit anti-failure coaching language
   ---
-  duration_ms: 2.278699
+  duration_ms: 3.608816
   type: 'test'
   ...
 # Subtest: YG-07 still rejects an actual AMRAP prescription
 ok 63 - YG-07 still rejects an actual AMRAP prescription
   ---
-  duration_ms: 0.788102
+  duration_ms: 1.227095
   type: 'test'
   ...
 # Subtest: live Tactical special-operations-style context no longer bypasses T3K-02
 not ok 64 - live Tactical special-operations-style context no longer bypasses T3K-02
   ---
-  duration_ms: 3.075241
+  duration_ms: 2.24632
   type: 'test'
   location: '/home/runner/work/raz-coaching-platform/raz-coaching-platform/phase14/test/coaching_spec_v1_live_convergence.test.js:44:1'
   failureType: 'testCodeFailure'
@@ -663,139 +663,139 @@ not ok 64 - live Tactical special-operations-style context no longer bypasses T3
 # Subtest: Tactical convergence creates 400 -> 600 -> 800 race-specific development and protects the next-day key run
 ok 65 - Tactical convergence creates 400 -> 600 -> 800 race-specific development and protects the next-day key run
   ---
-  duration_ms: 17.339295
+  duration_ms: 11.878832
   type: 'test'
   ...
 # Subtest: Tactical Week 1 with no pace/clock-anchored key session triggers EVENT_PROGRESSING_SESSION_MISSING before repair
 ok 66 - Tactical Week 1 with no pace/clock-anchored key session triggers EVENT_PROGRESSING_SESSION_MISSING before repair
   ---
-  duration_ms: 7.887804
+  duration_ms: 5.604513
   type: 'test'
   ...
 # Subtest: Tactical convergence canonicalizes the existing Week 1 key row into a legitimate event-specific session instead of adding one
 ok 67 - Tactical convergence canonicalizes the existing Week 1 key row into a legitimate event-specific session instead of adding one
   ---
-  duration_ms: 2.671353
+  duration_ms: 1.814808
   type: 'test'
   ...
 # Subtest: [D] after repair the EVENT_PROGRESSING_SESSION_MISSING path is silent, and the program still passes the frozen Tactical spec
 ok 68 - [D] after repair the EVENT_PROGRESSING_SESSION_MISSING path is silent, and the program still passes the frozen Tactical spec
   ---
-  duration_ms: 4.28301
+  duration_ms: 2.638583
   type: 'test'
   ...
 # Subtest: Week 2/3 still develop past 400 m rather than collapsing back to a 400-only block after the Week 1 fix
 ok 69 - Week 2/3 still develop past 400 m rather than collapsing back to a 400-only block after the Week 1 fix
   ---
-  duration_ms: 1.759168
+  duration_ms: 1.219483
   type: 'test'
   ...
 # Subtest: repaired Week 1 pace is anchored to current 13:30 3K capacity, not aspirational sub-12:00 goal pace
 ok 70 - repaired Week 1 pace is anchored to current 13:30 3K capacity, not aspirational sub-12:00 goal pace
   ---
-  duration_ms: 1.441496
+  duration_ms: 1.040738
   type: 'test'
   ...
 # Subtest: the key run stays protected from substantial preceding lower-body strength (T3K-05) after Week 1 canonicalization
 ok 71 - the key run stays protected from substantial preceding lower-body strength (T3K-05) after Week 1 canonicalization
   ---
-  duration_ms: 2.269258
+  duration_ms: 1.677945
   type: 'test'
   ...
 # Subtest: prior shin-splint history keeps its explicit symptom-gated progression language after the Week 1 repair
 ok 72 - prior shin-splint history keeps its explicit symptom-gated progression language after the Week 1 repair
   ---
-  duration_ms: 1.350835
+  duration_ms: 0.891796
   type: 'test'
   ...
 # Subtest: [E] the Week 1 event-progression repair is idempotent (second pass is byte-identical)
 ok 73 - [E] the Week 1 event-progression repair is idempotent (second pass is byte-identical)
   ---
-  duration_ms: 2.01916
+  duration_ms: 1.340043
   type: 'test'
   ...
 # Subtest: [F] the Week 1 repair does not add a duplicate key run row
 ok 74 - [F] the Week 1 repair does not add a duplicate key run row
   ---
-  duration_ms: 1.207384
+  duration_ms: 0.871606
   type: 'test'
   ...
 # Subtest: an already-progression-bearing Week 1 row is left untouched by the new repair
 ok 75 - an already-progression-bearing Week 1 row is left untouched by the new repair
   ---
-  duration_ms: 0.945523
+  duration_ms: 0.570047
   type: 'test'
   ...
 # Subtest: [A] Week 1 with one bearing row plus one non-bearing row already satisfies the validator, so the new repair does nothing
 ok 76 - [A] Week 1 with one bearing row plus one non-bearing row already satisfies the validator, so the new repair does nothing
   ---
-  duration_ms: 1.019734
+  duration_ms: 0.648024
   type: 'test'
   ...
 # Subtest: [B] row-local shin-symptom/readiness language on the key row survives canonicalization
 ok 77 - [B] row-local shin-symptom/readiness language on the key row survives canonicalization
   ---
-  duration_ms: 1.233343
+  duration_ms: 0.899317
   type: 'test'
   ...
 # Subtest: [C] "Running Intervals" is recognized as the intended existing key row (sets >= 2, parseable distance)
 ok 78 - [C] "Running Intervals" is recognized as the intended existing key row (sets >= 2, parseable distance)
   ---
-  duration_ms: 1.464048
+  duration_ms: 1.063852
   type: 'test'
   ...
 # Subtest: Youth convergence caps attempts, keeps power volume at the baseline, and integrates assisted full bar muscle-up singles
 ok 79 - Youth convergence caps attempts, keeps power volume at the baseline, and integrates assisted full bar muscle-up singles
   ---
-  duration_ms: 15.993846
+  duration_ms: 9.969133
   type: 'test'
   ...
 # Subtest: Advanced Hybrid convergence holds secondary long-run distance at the tolerated Week 1 dose
 ok 80 - Advanced Hybrid convergence holds secondary long-run distance at the tolerated Week 1 dose
   ---
-  duration_ms: 1.558759
+  duration_ms: 1.077202
   type: 'test'
   ...
 # Subtest: [G1-1] generic Zone 2 plus a spare running slot converges deterministically into a real event session
 ok 81 - [G1-1] generic Zone 2 plus a spare running slot converges deterministically into a real event session
   ---
-  duration_ms: 3.367013
+  duration_ms: 2.561939
   type: 'test'
   ...
 # Subtest: [G1-2] a single essential Zone 2 run with no spare slot fails closed and fabricates nothing
 ok 82 - [G1-2] a single essential Zone 2 run with no spare slot fails closed and fabricates nothing
   ---
-  duration_ms: 1.664718
+  duration_ms: 1.257971
   type: 'test'
   ...
 # Subtest: [G1-3] an existing legitimate Week 1 interval plus Zone 2 is byte-stable for the generic-run repair
 ok 83 - [G1-3] an existing legitimate Week 1 interval plus Zone 2 is byte-stable for the generic-run repair
   ---
-  duration_ms: 1.637057
+  duration_ms: 0.90831
   type: 'test'
   ...
 # Subtest: [G1-4] the generic-run repair is idempotent and creates no duplicate event row
 ok 84 - [G1-4] the generic-run repair is idempotent and creates no duplicate event row
   ---
-  duration_ms: 2.018387
+  duration_ms: 1.901487
   type: 'test'
   ...
 # Subtest: [G1-5] row-local and block-level symptom/readiness language survives the generic-run repair
 ok 85 - [G1-5] row-local and block-level symptom/readiness language survives the generic-run repair
   ---
-  duration_ms: 0.738534
+  duration_ms: 1.007729
   type: 'test'
   ...
 # Subtest: [G1-6] a non-Tactical intake gets no Tactical repair at all
 ok 86 - [G1-6] a non-Tactical intake gets no Tactical repair at all
   ---
-  duration_ms: 0.174211
+  duration_ms: 0.175
   type: 'test'
   ...
 # Subtest: [G2-1] an identical 600 m session repeated for four weeks is rejected as static
 not ok 87 - [G2-1] an identical 600 m session repeated for four weeks is rejected as static
   ---
-  duration_ms: 0.874607
+  duration_ms: 0.888641
   type: 'test'
   location: '/home/runner/work/raz-coaching-platform/raz-coaching-platform/phase14/test/coaching_spec_v1_live_convergence.test.js:390:1'
   failureType: 'testCodeFailure'
@@ -823,7 +823,7 @@ not ok 87 - [G2-1] an identical 600 m session repeated for four weeks is rejecte
 # Subtest: [G2-2] the same dose with escalating wording in the notes is still rejected
 not ok 88 - [G2-2] the same dose with escalating wording in the notes is still rejected
   ---
-  duration_ms: 0.256894
+  duration_ms: 0.301017
   type: 'test'
   location: '/home/runner/work/raz-coaching-platform/raz-coaching-platform/phase14/test/coaching_spec_v1_live_convergence.test.js:400:1'
   failureType: 'testCodeFailure'
@@ -851,7 +851,7 @@ not ok 88 - [G2-2] the same dose with escalating wording in the notes is still r
 # Subtest: [G2-3] a trivial rest-only tweak is not accepted as event progression
 not ok 89 - [G2-3] a trivial rest-only tweak is not accepted as event progression
   ---
-  duration_ms: 0.277014
+  duration_ms: 0.433515
   type: 'test'
   location: '/home/runner/work/raz-coaching-platform/raz-coaching-platform/phase14/test/coaching_spec_v1_live_convergence.test.js:410:1'
   failureType: 'testCodeFailure'
@@ -879,31 +879,31 @@ not ok 89 - [G2-3] a trivial rest-only tweak is not accepted as event progressio
 # Subtest: [G2-4] the live v30k build-extend-taper shape passes
 ok 90 - [G2-4] the live v30k build-extend-taper shape passes
   ---
-  duration_ms: 0.191667
+  duration_ms: 0.17465
   type: 'test'
   ...
 # Subtest: [G2-5] one plateau week followed by real progression and a taper passes
 ok 91 - [G2-5] one plateau week followed by real progression and a taper passes
   ---
-  duration_ms: 0.175583
+  duration_ms: 0.167279
   type: 'test'
   ...
 # Subtest: [G2-6] a Week 4 taper that reduces volume at maintained pace is not flagged as regression
 ok 92 - [G2-6] a Week 4 taper that reduces volume at maintained pace is not flagged as regression
   ---
-  duration_ms: 0.164936
+  duration_ms: 0.148681
   type: 'test'
   ...
 # Subtest: [G2-7] progression carried by session density alone passes
 ok 93 - [G2-7] progression carried by session density alone passes
   ---
-  duration_ms: 0.150155
+  duration_ms: 0.176483
   type: 'test'
   ...
 # Subtest: [G2-8] random oscillation with no defensible direction is rejected
 not ok 94 - [G2-8] random oscillation with no defensible direction is rejected
   ---
-  duration_ms: 0.298646
+  duration_ms: 0.317261
   type: 'test'
   location: '/home/runner/work/raz-coaching-platform/raz-coaching-platform/phase14/test/coaching_spec_v1_live_convergence.test.js:460:1'
   failureType: 'testCodeFailure'
@@ -929,7 +929,7 @@ not ok 94 - [G2-8] random oscillation with no defensible direction is rejected
 # Subtest: [G2-9] an intermediate week collapsing below baseline is rejected as incoherent even when a later week develops
 not ok 95 - [G2-9] an intermediate week collapsing below baseline is rejected as incoherent even when a later week develops
   ---
-  duration_ms: 0.259938
+  duration_ms: 0.302009
   type: 'test'
   location: '/home/runner/work/raz-coaching-platform/raz-coaching-platform/phase14/test/coaching_spec_v1_live_convergence.test.js:470:1'
   failureType: 'testCodeFailure'
@@ -957,61 +957,61 @@ not ok 95 - [G2-9] an intermediate week collapsing below baseline is rejected as
 # Subtest: [G2-10] fewer than three weeks of key sessions is treated as insufficient evidence, not a violation
 ok 96 - [G2-10] fewer than three weeks of key sessions is treated as insufficient evidence, not a violation
   ---
-  duration_ms: 0.17385
+  duration_ms: 0.234369
   type: 'test'
   ...
 # Subtest: [G2-11] the new cross-week rule never fires for a non-Tactical intake
 ok 97 - [G2-11] the new cross-week rule never fires for a non-Tactical intake
   ---
-  duration_ms: 0.160049
+  duration_ms: 0.211534
   type: 'test'
   ...
 # Subtest: [G2-12] the deterministic generic-run repair produces a block that satisfies the new cross-week rule
 ok 98 - [G2-12] the deterministic generic-run repair produces a block that satisfies the new cross-week rule
   ---
-  duration_ms: 0.794858
+  duration_ms: 0.855411
   type: 'test'
   ...
 # Subtest: [G2-13] Advanced Hybrid and Youth convergence outputs are unaffected by this pass
 ok 99 - [G2-13] Advanced Hybrid and Youth convergence outputs are unaffected by this pass
   ---
-  duration_ms: 1.083399
+  duration_ms: 0.730035
   type: 'test'
   ...
 # Subtest: [G1-7] a malformed Week 3 aborts the whole generic-run repair, leaving Weeks 1/2/4 untouched
 ok 100 - [G1-7] a malformed Week 3 aborts the whole generic-run repair, leaving Weeks 1/2/4 untouched
   ---
-  duration_ms: 0.672245
+  duration_ms: 0.505481
   type: 'test'
   ...
 # Subtest: [G1-8] a missing Week 3 block aborts the whole generic-run repair
 ok 101 - [G1-8] a missing Week 3 block aborts the whole generic-run repair
   ---
-  duration_ms: 0.423694
+  duration_ms: 0.428797
   type: 'test'
   ...
 # Subtest: [G1-9] a later week that parses but has an unparseable aerobic dose aborts the whole repair
 ok 102 - [G1-9] a later week that parses but has an unparseable aerobic dose aborts the whole repair
   ---
-  duration_ms: 0.623732
+  duration_ms: 0.684057
   type: 'test'
   ...
 # Subtest: [G1-10] a later week without a spare aerobic slot aborts the whole repair
 ok 103 - [G1-10] a later week without a spare aerobic slot aborts the whole repair
   ---
-  duration_ms: 1.153965
+  duration_ms: 1.897852
   type: 'test'
   ...
 # Subtest: [G1-11] when all four weeks are valid the repair still applies to exactly four weeks
 ok 104 - [G1-11] when all four weeks are valid the repair still applies to exactly four weeks
   ---
-  duration_ms: 1.737407
+  duration_ms: 1.79568
   type: 'test'
   ...
 # Subtest: [G2-14] a Week 2 spike that reverts to the Week 1 baseline for the rest of the block is rejected
 not ok 105 - [G2-14] a Week 2 spike that reverts to the Week 1 baseline for the rest of the block is rejected
   ---
-  duration_ms: 0.351295
+  duration_ms: 0.331023
   type: 'test'
   location: '/home/runner/work/raz-coaching-platform/raz-coaching-platform/phase14/test/coaching_spec_v1_live_convergence.test.js:584:1'
   failureType: 'testCodeFailure'
@@ -1039,7 +1039,7 @@ not ok 105 - [G2-14] a Week 2 spike that reverts to the Week 1 baseline for the 
 # Subtest: [G2-15] a single large isolated spike is not sufficient on its own
 not ok 106 - [G2-15] a single large isolated spike is not sufficient on its own
   ---
-  duration_ms: 0.350744
+  duration_ms: 0.392353
   type: 'test'
   location: '/home/runner/work/raz-coaching-platform/raz-coaching-platform/phase14/test/coaching_spec_v1_live_convergence.test.js:594:1'
   failureType: 'testCodeFailure'
@@ -1067,163 +1067,163 @@ not ok 106 - [G2-15] a single large isolated spike is not sufficient on its own
 # Subtest: [G2-16] volume build carried into a distance extension and then tapered passes
 ok 107 - [G2-16] volume build carried into a distance extension and then tapered passes
   ---
-  duration_ms: 0.172338
+  duration_ms: 0.186498
   type: 'test'
   ...
 # Subtest: [G2-17] a gain transformed into a different progression dimension before the taper passes
 ok 108 - [G2-17] a gain transformed into a different progression dimension before the taper passes
   ---
-  duration_ms: 0.155292
+  duration_ms: 0.141641
   type: 'test'
   ...
 # Subtest: AH-02 rejects two substantial >=80% squat exposures in the same high-concurrency week
 ok 109 - AH-02 rejects two substantial >=80% squat exposures in the same high-concurrency week
   ---
-  duration_ms: 14.692132
+  duration_ms: 14.595552
   type: 'test'
   ...
 # Subtest: AH-04 rejects demanding OAP exposures on consecutive days
 ok 110 - AH-04 rejects demanding OAP exposures on consecutive days
   ---
-  duration_ms: 2.880601
+  duration_ms: 2.910868
   type: 'test'
   ...
 # Subtest: AH-06 rejects automatic overload of an explicitly maintained running pathway
 ok 111 - AH-06 rejects automatic overload of an explicitly maintained running pathway
   ---
-  duration_ms: 2.667128
+  duration_ms: 2.632124
   type: 'test'
   ...
 # Subtest: Youth hard rules allow a technically safe program while soft/context rules still produce review signals
 ok 112 - Youth hard rules allow a technically safe program while soft/context rules still produce review signals
   ---
-  duration_ms: 6.455699
+  duration_ms: 7.095009
   type: 'test'
   ...
 # Subtest: YG-01 rejects youth acquisition work with no quality-based stop rule
 ok 113 - YG-01 rejects youth acquisition work with no quality-based stop rule
   ---
-  duration_ms: 1.02328
+  duration_ms: 0.981199
   type: 'test'
   ...
 # Subtest: T3K-02 rejects a four-week development block that uses only 400 m intervals
 ok 114 - T3K-02 rejects a four-week development block that uses only 400 m intervals
   ---
-  duration_ms: 2.494759
+  duration_ms: 2.033774
   type: 'test'
   ...
 # Subtest: T3K-05 rejects a primary quality run 24h after substantial lower-body strength
 ok 115 - T3K-05 rejects a primary quality run 24h after substantial lower-body strength
   ---
-  duration_ms: 1.106554
+  duration_ms: 1.049891
   type: 'test'
   ...
 # Subtest: T3K-06 rejects simultaneous ruck load, distance and pace progression
 ok 116 - T3K-06 rejects simultaneous ruck load, distance and pace progression
   ---
-  duration_ms: 1.45859
+  duration_ms: 1.424608
   type: 'test'
   ...
 # Subtest: context brief contains the frozen priority hierarchy and avatar-specific rules
 ok 117 - context brief contains the frozen priority hierarchy and avatar-specific rules
   ---
-  duration_ms: 0.843481
+  duration_ms: 0.82052
   type: 'test'
   ...
 # Subtest: continuous faster-than-current race prescription cannot equal or exceed current race duration
 ok 118 - continuous faster-than-current race prescription cannot equal or exceed current race duration
   ---
-  duration_ms: 4.667657
+  duration_ms: 7.790433
   type: 'test'
   ...
 # Subtest: shorter interval work is not rejected by the continuous-race sanity check
 ok 119 - shorter interval work is not rejected by the continuous-race sanity check
   ---
-  duration_ms: 1.07067
+  duration_ms: 1.803442
   type: 'test'
   ...
 # Subtest: running prompt anchors current race performance and smallest-useful-variable progression
 ok 120 - running prompt anchors current race performance and smallest-useful-variable progression
   ---
-  duration_ms: 0.871162
+  duration_ms: 1.265842
   type: 'test'
   ...
 # Subtest: unbenchmarked variation load repair changes only the related unbenchmarked lift
 ok 121 - unbenchmarked variation load repair changes only the related unbenchmarked lift
   ---
-  duration_ms: 1.272402
+  duration_ms: 2.072652
   type: 'test'
   ...
 # Subtest: final QA applies endurance integrity to Weeks 2-4, not only Week 1
 ok 122 - final QA applies endurance integrity to Weeks 2-4, not only Week 1
   ---
-  duration_ms: 5.688262
+  duration_ms: 8.019764
   type: 'test'
   ...
 # Subtest: [NC] a note may not claim more sets than the row prescribes
 ok 123 - [NC] a note may not claim more sets than the row prescribes
   ---
-  duration_ms: 4.440407
+  duration_ms: 6.642557
   type: 'test'
   ...
 # Subtest: [NC] a note may not claim a set reduction that did not happen
 ok 124 - [NC] a note may not claim a set reduction that did not happen
   ---
-  duration_ms: 2.434158
+  duration_ms: 1.584105
   type: 'test'
   ...
 # Subtest: [NC] a genuine set reduction keeps its note untouched
 ok 125 - [NC] a genuine set reduction keeps its note untouched
   ---
-  duration_ms: 0.414289
+  duration_ms: 0.51771
   type: 'test'
   ...
 # Subtest: [NC] a note may not reference reps that are not prescribed, or a scheme that disagrees
 ok 126 - [NC] a note may not reference reps that are not prescribed, or a scheme that disagrees
   ---
-  duration_ms: 0.631754
+  duration_ms: 0.647783
   type: 'test'
   ...
 # Subtest: [NC] an attempt ceiling above the prescribed total is clamped to the prescription
 ok 127 - [NC] an attempt ceiling above the prescribed total is clamped to the prescription
   ---
-  duration_ms: 0.471936
+  duration_ms: 0.435517
   type: 'test'
   ...
 # Subtest: [NC] qualitative coaching, safety and symptom language is never rewritten
 ok 128 - [NC] qualitative coaching, safety and symptom language is never rewritten
   ---
-  duration_ms: 0.411736
+  duration_ms: 0.474756
   type: 'test'
   ...
 # Subtest: [NC] warm-up drill schemes inside warm-up rows are left alone
 ok 129 - [NC] warm-up drill schemes inside warm-up rows are left alone
   ---
-  duration_ms: 0.376032
+  duration_ms: 0.353336
   type: 'test'
   ...
 # Subtest: [NC] the pass is idempotent on the live artifacts
 ok 130 - [NC] the pass is idempotent on the live artifacts
   ---
-  duration_ms: 10.486844
+  duration_ms: 7.683284
   type: 'test'
   ...
 # Subtest: [NC] every v32 live note defect is repaired and Tactical needs no repair
 ok 131 - [NC] every v32 live note defect is repaired and Tactical needs no repair
   ---
-  duration_ms: 3.086483
+  duration_ms: 2.958909
   type: 'test'
   ...
 # Subtest: [AH] strict OAP gains a stated build-week progression axis without any added volume
 ok 132 - [AH] strict OAP gains a stated build-week progression axis without any added volume
   ---
-  duration_ms: 3.249647
+  duration_ms: 3.184565
   type: 'test'
   ...
 # Subtest: [AH] the build-standard cue does not increase sets week over week
 not ok 133 - [AH] the build-standard cue does not increase sets week over week
   ---
-  duration_ms: 3.444218
+  duration_ms: 3.653673
   type: 'test'
   location: '/home/runner/work/raz-coaching-platform/raz-coaching-platform/phase14/test/final_coaching_coherence_v33.test.js:131:1'
   failureType: 'testCodeFailure'
@@ -1264,13 +1264,13 @@ not ok 133 - [AH] the build-standard cue does not increase sets week over week
 # Subtest: [AH] OAP build standards are idempotent and skip non-hybrid intakes
 ok 134 - [AH] OAP build standards are idempotent and skip non-hybrid intakes
   ---
-  duration_ms: 1.160084
+  duration_ms: 1.141017
   type: 'test'
   ...
 # Subtest: [T3K] the block states an explicit weekly running-volume anchor tied to the demonstrated baseline
 not ok 135 - [T3K] the block states an explicit weekly running-volume anchor tied to the demonstrated baseline
   ---
-  duration_ms: 23.140257
+  duration_ms: 18.134003
   type: 'test'
   location: '/home/runner/work/raz-coaching-platform/raz-coaching-platform/phase14/test/final_coaching_coherence_v33.test.js:162:1'
   failureType: 'testCodeFailure'
@@ -1296,7 +1296,7 @@ not ok 135 - [T3K] the block states an explicit weekly running-volume anchor tie
 # Subtest: [T3K] anchoring adds no session, no distance and no impact
 not ok 136 - [T3K] anchoring adds no session, no distance and no impact
   ---
-  duration_ms: 3.202156
+  duration_ms: 1.907136
   type: 'test'
   location: '/home/runner/work/raz-coaching-platform/raz-coaching-platform/phase14/test/final_coaching_coherence_v33.test.js:173:1'
   failureType: 'testCodeFailure'
@@ -1318,19 +1318,19 @@ not ok 136 - [T3K] anchoring adds no session, no distance and no impact
 # Subtest: [T3K] three meaningful running exposures and one primary quality session survive
 ok 137 - [T3K] three meaningful running exposures and one primary quality session survive
   ---
-  duration_ms: 2.512936
+  duration_ms: 1.430077
   type: 'test'
   ...
 # Subtest: [T3K] the anchor is idempotent and skipped when no baseline is documented
 ok 138 - [T3K] the anchor is idempotent and skipped when no baseline is documented
   ---
-  duration_ms: 6.481187
+  duration_ms: 3.690167
   type: 'test'
   ...
 # Subtest: [YG] generic note synchronization preserves the accepted Youth architecture
 not ok 139 - [YG] generic note synchronization preserves the accepted Youth architecture
   ---
-  duration_ms: 2.029684
+  duration_ms: 1.171492
   type: 'test'
   location: '/home/runner/work/raz-coaching-platform/raz-coaching-platform/phase14/test/final_coaching_coherence_v33.test.js:210:1'
   failureType: 'testCodeFailure'
@@ -1449,163 +1449,163 @@ not ok 139 - [YG] generic note synchronization preserves the accepted Youth arch
 # Subtest: Dumbbell Reverse Lunge resolves to the canonical closed-set exercise
 ok 140 - Dumbbell Reverse Lunge resolves to the canonical closed-set exercise
   ---
-  duration_ms: 2.154901
+  duration_ms: 2.276565
   type: 'test'
   ...
 # Subtest: controlled Weighted descriptor resolves to an existing canonical base movement
 ok 141 - controlled Weighted descriptor resolves to an existing canonical base movement
   ---
-  duration_ms: 0.731794
+  duration_ms: 0.83351
   type: 'test'
   ...
 # Subtest: event-distance prefix is not treated as a new exercise identity
 ok 142 - event-distance prefix is not treated as a new exercise identity
   ---
-  duration_ms: 0.275712
+  duration_ms: 0.283882
   type: 'test'
   ...
 # Subtest: cool-down purpose prefix is removed before canonical run lookup
 ok 143 - cool-down purpose prefix is removed before canonical run lookup
   ---
-  duration_ms: 0.241852
+  duration_ms: 0.268309
   type: 'test'
   ...
 # Subtest: run warm-up and cool-down suffixes resolve to canonical Run
 ok 144 - run warm-up and cool-down suffixes resolve to canonical Run
   ---
-  duration_ms: 0.435541
+  duration_ms: 0.398232
   type: 'test'
   ...
 # Subtest: hard-substitute canonicalizes known aliases before marking true hallucinations for review
 ok 145 - hard-substitute canonicalizes known aliases before marking true hallucinations for review
   ---
-  duration_ms: 1.164631
+  duration_ms: 1.239312
   type: 'test'
   ...
 # Subtest: server owns formula marker metadata and strips model-provided markers first
 ok 146 - server owns formula marker metadata and strips model-provided markers first
   ---
-  duration_ms: 1.21782
+  duration_ms: 1.327804
   type: 'test'
   ...
 # Subtest: compact runtime prompt preserves explicitly stated current direct endurance frequency
 ok 147 - compact runtime prompt preserves explicitly stated current direct endurance frequency
   ---
-  duration_ms: 0.344435
+  duration_ms: 0.339174
   type: 'test'
   ...
 # Subtest: unbenchmarked variation load repair remains wired before coaching QA
 ok 148 - unbenchmarked variation load repair remains wired before coaching QA
   ---
-  duration_ms: 3.683195
+  duration_ms: 3.768583
   type: 'test'
   ...
 # Subtest: youth primary-skill-order repair remains wired before coaching QA
 ok 149 - youth primary-skill-order repair remains wired before coaching QA
   ---
-  duration_ms: 0.482541
+  duration_ms: 0.506202
   type: 'test'
   ...
 # Subtest: production semantic QA uses ProgramModel for strength-day accounting, direct goal exposure and weekly volume
 ok 150 - production semantic QA uses ProgramModel for strength-day accounting, direct goal exposure and weekly volume
   ---
-  duration_ms: 0.403473
+  duration_ms: 0.485903
   type: 'test'
   ...
 # Subtest: client output cleanliness is enforced inside QA and again on the exact save-boundary string
 ok 151 - client output cleanliness is enforced inside QA and again on the exact save-boundary string
   ---
-  duration_ms: 1.750486
+  duration_ms: 0.451892
   type: 'test'
   ...
 # Subtest: all repairable validator failures use one grounded internal repair path
 ok 152 - all repairable validator failures use one grounded internal repair path
   ---
-  duration_ms: 0.350073
+  duration_ms: 0.401867
   type: 'test'
   ...
 # Subtest: repair strategy escapes a poisoned candidate with a fresh grounded regeneration
 ok 153 - repair strategy escapes a poisoned candidate with a fresh grounded regeneration
   ---
-  duration_ms: 0.316383
+  duration_ms: 0.424872
   type: 'test'
   ...
 # Subtest: surgical repair preserves the complete accumulated QA contract instead of only the newest failure
 ok 154 - surgical repair preserves the complete accumulated QA contract instead of only the newest failure
   ---
-  duration_ms: 0.477523
+  duration_ms: 0.669576
   type: 'test'
   ...
 # Subtest: repair prompt forbids review placeholders and unrelated conditioning substitutions
 ok 155 - repair prompt forbids review placeholders and unrelated conditioning substitutions
   ---
-  duration_ms: 0.453507
+  duration_ms: 0.449438
   type: 'test'
   ...
 # Subtest: safe validator-code trace exists only when QA diagnostics are requested
 ok 156 - safe validator-code trace exists only when QA diagnostics are requested
   ---
-  duration_ms: 0.625656
+  duration_ms: 0.806759
   type: 'test'
   ...
 # Subtest: hard-substitute delivery path is removed and exhaustion fails closed
 ok 157 - hard-substitute delivery path is removed and exhaustion fails closed
   ---
-  duration_ms: 0.735309
+  duration_ms: 0.761653
   type: 'test'
   ...
 # Subtest: the exact client-visible program is revalidated immediately before persistence
 ok 158 - the exact client-visible program is revalidated immediately before persistence
   ---
-  duration_ms: 0.376072
+  duration_ms: 0.357792
   type: 'test'
   ...
 # Subtest: repair architecture has enough bounded wall-clock headroom
 ok 159 - repair architecture has enough bounded wall-clock headroom
   ---
-  duration_ms: 0.765664
+  duration_ms: 0.272085
   type: 'test'
   ...
 # Subtest: production package builds through the single final pipeline lock
 ok 160 - production package builds through the single final pipeline lock
   ---
-  duration_ms: 0.357023
+  duration_ms: 1.025955
   type: 'test'
   ...
 # Subtest: patch preserves real weekdays and maps only placeholder/session labels
 ok 161 - patch preserves real weekdays and maps only placeholder/session labels
   ---
-  duration_ms: 1.326183
+  duration_ms: 1.448043
   type: 'test'
   ...
 # Subtest: guard logic preserves Mon Tue Wed Fri Sun while allowing Session placeholders to map
 ok 162 - guard logic preserves Mon Tue Wed Fri Sun while allowing Session placeholders to map
   ---
-  duration_ms: 1.361655
+  duration_ms: 1.386352
   type: 'test'
   ...
 # Subtest: fresh Program Pass preserves intake draft but overrides stale personal token
 ok 163 - fresh Program Pass preserves intake draft but overrides stale personal token
   ---
-  duration_ms: 1.020726
+  duration_ms: 0.878607
   type: 'test'
   ...
 # Subtest: handstand component coverage reads ProgramModel display_name for wall and balance rows
 ok 164 - handstand component coverage reads ProgramModel display_name for wall and balance rows
   ---
-  duration_ms: 11.455843
+  duration_ms: 12.43515
   type: 'test'
   ...
 # Subtest: handstand component coverage still rejects kick-up-only programming
 ok 165 - handstand component coverage still rejects kick-up-only programming
   ---
-  duration_ms: 2.163994
+  duration_ms: 2.314852
   type: 'test'
   ...
 # Subtest: raw Youth component gate rejects missing wall capacity before production restores the explicit acquisition floor
 not ok 166 - raw Youth component gate rejects missing wall capacity before production restores the explicit acquisition floor
   ---
-  duration_ms: 110.20331
+  duration_ms: 80.819621
   type: 'test'
   location: '/home/runner/work/raz-coaching-platform/raz-coaching-platform/phase14/test/goal_component_production_bundle.test.js:28:1'
   failureType: 'testCodeFailure'
@@ -1625,7 +1625,7 @@ not ok 166 - raw Youth component gate rejects missing wall capacity before produ
 # Subtest: production repairable bundle still accepts the corrected Youth golden program
 not ok 167 - production repairable bundle still accepts the corrected Youth golden program
   ---
-  duration_ms: 61.145223
+  duration_ms: 56.662913
   type: 'test'
   location: '/home/runner/work/raz-coaching-platform/raz-coaching-platform/phase14/test/goal_component_production_bundle.test.js:55:1'
   failureType: 'testCodeFailure'
@@ -1647,313 +1647,313 @@ not ok 167 - production repairable bundle still accepts the corrected Youth gold
 # Subtest: roadmap classifier covers launch-critical advanced families and endurance side quests
 ok 168 - roadmap classifier covers launch-critical advanced families and endurance side quests
   ---
-  duration_ms: 2.066518
+  duration_ms: 2.26637
   type: 'test'
   ...
 # Subtest: roadmaps encode stages, mandatory components, advancement and regression instead of flat aliases
 ok 169 - roadmaps encode stages, mandatory components, advancement and regression instead of flat aliases
   ---
-  duration_ms: 0.39481
+  duration_ms: 0.460064
   type: 'test'
   ...
 # Subtest: HSPU, 90-degree HSPU and press-to-handstand remain distinct coaching adaptations
 ok 170 - HSPU, 90-degree HSPU and press-to-handstand remain distinct coaching adaptations
   ---
-  duration_ms: 0.42792
+  duration_ms: 0.51795
   type: 'test'
   ...
 # Subtest: press-to-handstand roadmap requires direct press entry rather than accepting kick-ups as a substitute
 ok 171 - press-to-handstand roadmap requires direct press entry rather than accepting kick-ups as a substitute
   ---
-  duration_ms: 0.457324
+  duration_ms: 0.562617
   type: 'test'
   ...
 # Subtest: 90-degree HSPU roadmap requires freestanding strength and transition control rather than generic wall HSPU volume
 ok 172 - 90-degree HSPU roadmap requires freestanding strength and transition control rather than generic wall HSPU volume
   ---
-  duration_ms: 0.30166
+  duration_ms: 0.27612
   type: 'test'
   ...
 # Subtest: advanced calisthenics primary plus marathon side quest keeps both roadmaps and preserves priority tiers
 ok 173 - advanced calisthenics primary plus marathon side quest keeps both roadmaps and preserves priority tiers
   ---
-  duration_ms: 0.403323
+  duration_ms: 0.542888
   type: 'test'
   ...
 # Subtest: developing handstand fails when program has kick-ups but no substantive wall-static component
 ok 174 - developing handstand fails when program has kick-ups but no substantive wall-static component
   ---
-  duration_ms: 7.583275
+  duration_ms: 9.784248
   type: 'test'
   ...
 # Subtest: developing handstand passes when wall-static capacity and independent balance are both trained
 ok 175 - developing handstand passes when wall-static capacity and independent balance are both trained
   ---
-  duration_ms: 3.096368
+  duration_ms: 4.175008
   type: 'test'
   ...
 # Subtest: warm-up-only wall mention does not satisfy handstand capacity component
 ok 176 - warm-up-only wall mention does not satisfy handstand capacity component
   ---
-  duration_ms: 1.034457
+  duration_ms: 1.21086
   type: 'test'
   ...
 # Subtest: athlete with established repeatable freestanding handstand is not forced back to wall-static acquisition work
 ok 177 - athlete with established repeatable freestanding handstand is not forced back to wall-static acquisition work
   ---
-  duration_ms: 0.786666
+  duration_ms: 0.992666
   type: 'test'
   ...
 # Subtest: five tolerated MMA sessions do not hard-fail MRV before meaningful program volume is added
 ok 178 - five tolerated MMA sessions do not hard-fail MRV before meaningful program volume is added
   ---
-  duration_ms: 11.954148
+  duration_ms: 11.683222
   type: 'test'
   ...
 # Subtest: high sport baseline still leaves a hard ceiling for excessive added gym push volume
 ok 179 - high sport baseline still leaves a hard ceiling for excessive added gym push volume
   ---
-  duration_ms: 3.221255
+  duration_ms: 3.406906
   type: 'test'
   ...
 # Subtest: high sport accounting remains per-week and never sums the four-week block
 ok 180 - high sport accounting remains per-week and never sums the four-week block
   ---
-  duration_ms: 0.870851
+  duration_ms: 0.952807
   type: 'test'
   ...
 # Subtest: goals remain before current performance markers in the intake flow
 ok 181 - goals remain before current performance markers in the intake flow
   ---
-  duration_ms: 1.88625
+  duration_ms: 2.590722
   type: 'test'
   ...
 # Subtest: specific lifting-day polish reveals the limited-day panel
 ok 182 - specific lifting-day polish reveals the limited-day panel
   ---
-  duration_ms: 0.335582
+  duration_ms: 0.361698
   type: 'test'
   ...
 # Subtest: heavy deadlift warmup gets movement drills and load-derived ramp sets
 ok 183 - heavy deadlift warmup gets movement drills and load-derived ramp sets
   ---
-  duration_ms: 3.924136
+  duration_ms: 4.149099
   type: 'test'
   ...
 # Subtest: pulling warmup gets scapular preparation and weighted pull-up ramping
 ok 184 - pulling warmup gets scapular preparation and weighted pull-up ramping
   ---
-  duration_ms: 1.482556
+  duration_ms: 2.646585
   type: 'test'
   ...
 # Subtest: authored running-specific warmup is preserved instead of overwritten
 ok 185 - authored running-specific warmup is preserved instead of overwritten
   ---
-  duration_ms: 1.16398
+  duration_ms: 1.207155
   type: 'test'
   ...
 # Subtest: deployed package starts through pass preflight then secure wrapper
 ok 186 - deployed package starts through pass preflight then secure wrapper
   ---
-  duration_ms: 1.848553
+  duration_ms: 1.676673
   type: 'test'
   ...
 # Subtest: secure wrapper exposes required launch routes and protections
 ok 187 - secure wrapper exposes required launch routes and protections
   ---
-  duration_ms: 0.453668
+  duration_ms: 0.401888
   type: 'test'
   ...
 # Subtest: Program Pass usage finalizes only after a job reaches done
 ok 188 - Program Pass usage finalizes only after a job reaches done
   ---
-  duration_ms: 0.433648
+  duration_ms: 0.442868
   type: 'test'
   ...
 # Subtest: successful persistence precedes done status for build and adjustment jobs
 ok 189 - successful persistence precedes done status for build and adjustment jobs
   ---
-  duration_ms: 1.290179
+  duration_ms: 1.306072
   type: 'test'
   ...
 # Subtest: client delivery fails closed on review and support placeholders
 ok 190 - client delivery fails closed on review and support placeholders
   ---
-  duration_ms: 1.484679
+  duration_ms: 1.317399
   type: 'test'
   ...
 # Subtest: intake preflight blocks malformed expensive requests
 ok 191 - intake preflight blocks malformed expensive requests
   ---
-  duration_ms: 0.479396
+  duration_ms: 0.423189
   type: 'test'
   ...
 # Subtest: Tactical live-QA fixture uses a launch-valid training location
 ok 192 - Tactical live-QA fixture uses a launch-valid training location
   ---
-  duration_ms: 0.435751
+  duration_ms: 0.406885
   type: 'test'
   ...
 # Subtest: analytics allowlist rejects customer content fields
 ok 193 - analytics allowlist rejects customer content fields
   ---
-  duration_ms: 0.210555
+  duration_ms: 0.206767
   type: 'test'
   ...
 # Subtest: privacy notice documents consent deletion retention and separate entitlement
 ok 194 - privacy notice documents consent deletion retention and separate entitlement
   ---
-  duration_ms: 0.604904
+  duration_ms: 0.584909
   type: 'test'
   ...
 # Subtest: launch UI gates intake early, injects consent and deletion, and stores no admin secrets
 ok 195 - launch UI gates intake early, injects consent and deletion, and stores no admin secrets
   ---
-  duration_ms: 0.796991
+  duration_ms: 0.756705
   type: 'test'
   ...
 # Subtest: sqlite entitlement record survives coaching-data deletion design
 ok 196 - sqlite entitlement record survives coaching-data deletion design
   ---
-  duration_ms: 37.591989
+  duration_ms: 29.095232
   type: 'test'
   ...
 # Subtest: commercial QA helper stays CSP-safe and credential-free
 ok 197 - commercial QA helper stays CSP-safe and credential-free
   ---
-  duration_ms: 1.099604
+  duration_ms: 1.461112
   type: 'test'
   ...
 # Subtest: commercial QA helper uses the deployed Program Pass API contracts
 ok 198 - commercial QA helper uses the deployed Program Pass API contracts
   ---
-  duration_ms: 0.269323
+  duration_ms: 0.29578
   type: 'test'
   ...
 # Subtest: commercial QA helper covers the remaining adjustment and export matrix checks
 ok 199 - commercial QA helper covers the remaining adjustment and export matrix checks
   ---
-  duration_ms: 0.235853
+  duration_ms: 0.22913
   type: 'test'
   ...
 # Subtest: repeatability requires two successful core-avatar runs on unchanged coaching logic
 ok 200 - repeatability requires two successful core-avatar runs on unchanged coaching logic
   ---
-  duration_ms: 2.916078
+  duration_ms: 2.825882
   type: 'test'
   ...
 # Subtest: repeatability fails closed when any core live avatar is missing or failed
 ok 201 - repeatability fails closed when any core live avatar is missing or failed
   ---
-  duration_ms: 0.221651
+  duration_ms: 0.234208
   type: 'test'
   ...
 # Subtest: manual production review requires at least 9 out of 10 for every core avatar
 ok 202 - manual production review requires at least 9 out of 10 for every core avatar
   ---
-  duration_ms: 0.452046
+  duration_ms: 0.466975
   type: 'test'
   ...
 # Subtest: manual review is invalid if it targets a different logic SHA
 ok 203 - manual review is invalid if it targets a different logic SHA
   ---
-  duration_ms: 0.176834
+  duration_ms: 0.177013
   type: 'test'
   ...
 # Subtest: empirical XLSX review requires exact sheet order and exact weekly columns
 ok 204 - empirical XLSX review requires exact sheet order and exact weekly columns
   ---
-  duration_ms: 0.367019
+  duration_ms: 0.339945
   type: 'test'
   ...
 # Subtest: empirical XLSX review requires Session A/B, no permanent Day column, and working hyperlinks
 ok 205 - empirical XLSX review requires Session A/B, no permanent Day column, and working hyperlinks
   ---
-  duration_ms: 0.235231
+  duration_ms: 0.233697
   type: 'test'
   ...
 # Subtest: [AH] held OHP weeks keep the work row, the warm-up ramp target and the narrative in agreement
 ok 206 - [AH] held OHP weeks keep the work row, the warm-up ramp target and the narrative in agreement
   ---
-  duration_ms: 13.077557
+  duration_ms: 10.5388
   type: 'test'
   ...
 # Subtest: [AH] the ramp sync survives decimal ramp steps (the defect that made it silently no-op)
 ok 207 - [AH] the ramp sync survives decimal ramp steps (the defect that made it silently no-op)
   ---
-  duration_ms: 1.345982
+  duration_ms: 0.971084
   type: 'test'
   ...
 # Subtest: [AH] OHP work/ramp coherence is stable across a repeated normalization pass
 ok 208 - [AH] OHP work/ramp coherence is stable across a repeated normalization pass
   ---
-  duration_ms: 3.293713
+  duration_ms: 2.328352
   type: 'test'
   ...
 # Subtest: [T3K] a non-running modality instance of the flag is cleared, not just the running one
 ok 209 - [T3K] a non-running modality instance of the flag is cleared, not just the running one
   ---
-  duration_ms: 14.737808
+  duration_ms: 10.829453
   type: 'test'
   ...
 # Subtest: [T3K] normalization clears every modality instance of the event-progression flag
 ok 210 - [T3K] normalization clears every modality instance of the event-progression flag
   ---
-  duration_ms: 5.935432
+  duration_ms: 3.858056
   type: 'test'
   ...
 # Subtest: [T3K] an inline "5 x 800 m" scheme with Sets=1 is recognized and canonicalized
 ok 211 - [T3K] an inline "5 x 800 m" scheme with Sets=1 is recognized and canonicalized
   ---
-  duration_ms: 1.902343
+  duration_ms: 1.431719
   type: 'test'
   ...
 # Subtest: [T3K] the ruck row gains a current-capacity pace without extra volume, load or sessions
 ok 212 - [T3K] the ruck row gains a current-capacity pace without extra volume, load or sessions
   ---
-  duration_ms: 1.315767
+  duration_ms: 0.84734
   type: 'test'
   ...
 # Subtest: [T3K] shin-symptom gating survives every repair
 ok 213 - [T3K] shin-symptom gating survives every repair
   ---
-  duration_ms: 1.215276
+  duration_ms: 0.733711
   type: 'test'
   ...
 # Subtest: [T3K] the running repair does not mutate the rucking row into a run, or vice versa
 ok 214 - [T3K] the running repair does not mutate the rucking row into a run, or vice versa
   ---
-  duration_ms: 1.698388
+  duration_ms: 1.47953
   type: 'test'
   ...
 # Subtest: [T3K] an already-valid program is not mutated by the event-progression repair
 ok 215 - [T3K] an already-valid program is not mutated by the event-progression repair
   ---
-  duration_ms: 1.774312
+  duration_ms: 1.509965
   type: 'test'
   ...
 # Subtest: [T3K] normalization is idempotent
 ok 216 - [T3K] normalization is idempotent
   ---
-  duration_ms: 2.665714
+  duration_ms: 2.817079
   type: 'test'
   ...
 # Subtest: [T3K] the convergence contract never claims success while a flag survives
 ok 217 - [T3K] the convergence contract never claims success while a flag survives
   ---
-  duration_ms: 1.342267
+  duration_ms: 1.416086
   type: 'test'
   ...
 # Subtest: [T3K] a non-Tactical intake is untouched and reports why
 ok 218 - [T3K] a non-Tactical intake is untouched and reports why
   ---
-  duration_ms: 0.178297
+  duration_ms: 0.192055
   type: 'test'
   ...
 # Subtest: manual 9+ Youth candidate passes production QA with visible progression intent
 not ok 219 - manual 9+ Youth candidate passes production QA with visible progression intent
   ---
-  duration_ms: 95.6285
+  duration_ms: 104.975378
   type: 'test'
   location: '/home/runner/work/raz-coaching-platform/raz-coaching-platform/phase14/test/manual_9plus_candidate.test.js:16:1'
   failureType: 'testCodeFailure'
@@ -1973,109 +1973,109 @@ not ok 219 - manual 9+ Youth candidate passes production QA with visible progres
 # Subtest: manual 9+ Tactical 3K candidate passes production QA with priority-subordinated GPP
 ok 220 - manual 9+ Tactical 3K candidate passes production QA with priority-subordinated GPP
   ---
-  duration_ms: 79.38135
+  duration_ms: 62.546611
   type: 'test'
   ...
 # Subtest: youth flexible scheduling rejects invented weekdays
 ok 221 - youth flexible scheduling rejects invented weekdays
   ---
-  duration_ms: 11.50729
+  duration_ms: 10.856312
   type: 'test'
   ...
 # Subtest: youth skill work must precede support strength
 ok 222 - youth skill work must precede support strength
   ---
-  duration_ms: 2.990029
+  duration_ms: 2.799923
   type: 'test'
   ...
 # Subtest: youth handstand attempt volume cannot progress by piling on sets
 ok 223 - youth handstand attempt volume cannot progress by piling on sets
   ---
-  duration_ms: 1.086214
+  duration_ms: 0.883113
   type: 'test'
   ...
 # Subtest: youth ring dip working sets stay below a known fresh ceiling
 ok 224 - youth ring dip working sets stay below a known fresh ceiling
   ---
-  duration_ms: 1.169488
+  duration_ms: 1.521282
   type: 'test'
   ...
 # Subtest: advanced hybrid rejects repeated squat work that assumes future target capacity
 ok 225 - advanced hybrid rejects repeated squat work that assumes future target capacity
   ---
-  duration_ms: 1.509897
+  duration_ms: 1.745896
   type: 'test'
   ...
 # Subtest: advanced hybrid requires explicit per-side OAP dosing
 ok 226 - advanced hybrid requires explicit per-side OAP dosing
   ---
-  duration_ms: 0.960236
+  duration_ms: 1.250169
   type: 'test'
   ...
 # Subtest: advanced hybrid rejects a long run immediately before heavy squat
 ok 227 - advanced hybrid rejects a long run immediately before heavy squat
   ---
-  duration_ms: 1.800632
+  duration_ms: 2.256846
   type: 'test'
   ...
 # Subtest: gross non-goal GPP volume is trimmed deterministically before spending another AI repair attempt
 ok 228 - gross non-goal GPP volume is trimmed deterministically before spending another AI repair attempt
   ---
-  duration_ms: 94.483679
+  duration_ms: 87.423831
   type: 'test'
   ...
 # Subtest: MRV repair fails closed instead of cutting a named direct goal to make the spreadsheet pass
 ok 229 - MRV repair fails closed instead of cutting a named direct goal to make the spreadsheet pass
   ---
-  duration_ms: 5.832688
+  duration_ms: 5.832403
   type: 'test'
   ...
 # Subtest: empty OpenAI output is classified as a transient provider failure for the existing provider retry loop
 ok 230 - empty OpenAI output is classified as a transient provider failure for the existing provider retry loop
   ---
-  duration_ms: 0.980366
+  duration_ms: 1.361605
   type: 'test'
   ...
 # Subtest: empty-output runtime patch is idempotent
 ok 231 - empty-output runtime patch is idempotent
   ---
-  duration_ms: 0.224816
+  duration_ms: 0.280306
   type: 'test'
   ...
 # Subtest: empty-output runtime patch fails closed if the expected generated-runtime anchor drifts
 ok 232 - empty-output runtime patch fails closed if the expected generated-runtime anchor drifts
   ---
-  duration_ms: 0.399768
+  duration_ms: 0.537409
   type: 'test'
   ...
 # Subtest: pre-live roadmap understands normal coaching lingo without misrouting goal families
 ok 233 - pre-live roadmap understands normal coaching lingo without misrouting goal families
   ---
-  duration_ms: 2.967506
+  duration_ms: 2.835906
   type: 'test'
   ...
 # Subtest: all launch roadmap families have a real zero-to-advanced structure, not name-only aliases
 ok 234 - all launch roadmap families have a real zero-to-advanced structure, not name-only aliases
   ---
-  duration_ms: 0.44156
+  duration_ms: 0.468186
   type: 'test'
   ...
 # Subtest: demonstrated strict OAP phrasing routes an advanced athlete from achieved state, not prerequisites
 ok 235 - demonstrated strict OAP phrasing routes an advanced athlete from achieved state, not prerequisites
   ---
-  duration_ms: 4.246478
+  duration_ms: 3.430871
   type: 'test'
   ...
 # Subtest: privacyScrub keeps formula QA server-side and never appends an internal marker to the client program
 ok 236 - privacyScrub keeps formula QA server-side and never appends an internal marker to the client program
   ---
-  duration_ms: 1.236148
+  duration_ms: 0.937114
   type: 'test'
   ...
 # Subtest: golden Youth gymnastics passes the full deterministic production validation chain
 not ok 237 - golden Youth gymnastics passes the full deterministic production validation chain
   ---
-  duration_ms: 91.027597
+  duration_ms: 102.721998
   type: 'test'
   location: '/home/runner/work/raz-coaching-platform/raz-coaching-platform/phase14/test/production_chain_golden.test.js:62:1'
   failureType: 'testCodeFailure'
@@ -2095,37 +2095,37 @@ not ok 237 - golden Youth gymnastics passes the full deterministic production va
 # Subtest: golden Tactical 3K passes the full deterministic production validation chain
 ok 238 - golden Tactical 3K passes the full deterministic production validation chain
   ---
-  duration_ms: 69.311579
+  duration_ms: 66.733095
   type: 'test'
   ...
 # Subtest: Youth primary skills cannot repeat an unchanged prescription for all four weeks
 ok 239 - Youth primary skills cannot repeat an unchanged prescription for all four weeks
   ---
-  duration_ms: 27.231765
+  duration_ms: 30.702952
   type: 'test'
   ...
 # Subtest: Tactical missing GPP is repaired locally but unrelated strength-session defects still fail closed
 ok 240 - Tactical missing GPP is repaired locally but unrelated strength-session defects still fail closed
   ---
-  duration_ms: 23.699826
+  duration_ms: 35.275171
   type: 'test'
   ...
 # Subtest: Tactical 3K with only two strength days fails semantic strength-session accounting
 ok 241 - Tactical 3K with only two strength days fails semantic strength-session accounting
   ---
-  duration_ms: 19.78476
+  duration_ms: 30.67441
   type: 'test'
   ...
 # Subtest: Tactical 3K cannot turn the direct ruck into a fourth run
 ok 242 - Tactical 3K cannot turn the direct ruck into a fourth run
   ---
-  duration_ms: 22.500738
+  duration_ms: 34.235896
   type: 'test'
   ...
 # Subtest: Tactical 3K cannot remove direct pull-up work while preserving three strength days
 not ok 243 - Tactical 3K cannot remove direct pull-up work while preserving three strength days
   ---
-  duration_ms: 21.047727
+  duration_ms: 36.590175
   type: 'test'
   location: '/home/runner/work/raz-coaching-platform/raz-coaching-platform/phase14/test/production_chain_golden.test.js:143:1'
   failureType: 'testCodeFailure'
@@ -2150,7 +2150,7 @@ not ok 243 - Tactical 3K cannot remove direct pull-up work while preserving thre
 # Subtest: Youth bar muscle-up omission is rejected semantically then restored only for explicit acquisition intake
 not ok 244 - Youth bar muscle-up omission is rejected semantically then restored only for explicit acquisition intake
   ---
-  duration_ms: 21.336333
+  duration_ms: 36.420544
   type: 'test'
   location: '/home/runner/work/raz-coaching-platform/raz-coaching-platform/phase14/test/production_chain_golden.test.js:159:1'
   failureType: 'testCodeFailure'
@@ -2172,7 +2172,7 @@ not ok 244 - Youth bar muscle-up omission is rejected semantically then restored
 # Subtest: Youth independent-balance omission is rejected semantically then restored only for explicit acquisition intake
 not ok 245 - Youth independent-balance omission is rejected semantically then restored only for explicit acquisition intake
   ---
-  duration_ms: 44.786106
+  duration_ms: 50.035218
   type: 'test'
   location: '/home/runner/work/raz-coaching-platform/raz-coaching-platform/phase14/test/production_chain_golden.test.js:185:1'
   failureType: 'testCodeFailure'
@@ -2194,499 +2194,499 @@ not ok 245 - Youth independent-balance omission is rejected semantically then re
 # Subtest: Youth gymnastics fails closed on invented home-gym equipment
 ok 246 - Youth gymnastics fails closed on invented home-gym equipment
   ---
-  duration_ms: 28.334828
+  duration_ms: 33.938533
   type: 'test'
   ...
 # Subtest: ProgramModel separates strength, running and ruck semantics on a hybrid week
 ok 247 - ProgramModel separates strength, running and ruck semantics on a hybrid week
   ---
-  duration_ms: 7.855211
+  duration_ms: 11.400681
   type: 'test'
   ...
 # Subtest: SPORT_DAY_COUPLING regression: endurance-only days do not count toward requested strength sessions
 ok 248 - SPORT_DAY_COUPLING regression: endurance-only days do not count toward requested strength sessions
   ---
-  duration_ms: 5.015206
+  duration_ms: 7.564548
   type: 'test'
   ...
 # Subtest: SPORT_DAY_COUPLING regression: two strength days still fail when three are requested
 ok 249 - SPORT_DAY_COUPLING regression: two strength days still fail when three are requested
   ---
-  duration_ms: 1.344199
+  duration_ms: 1.928648
   type: 'test'
   ...
 # Subtest: weekly volume regression: four valid weeks are never summed against one weekly reference
 ok 250 - weekly volume regression: four valid weeks are never summed against one weekly reference
   ---
-  duration_ms: 1.621464
+  duration_ms: 2.072601
   type: 'test'
   ...
 # Subtest: weekly volume regression: a genuinely gross single-week overload still fails closed
 ok 251 - weekly volume regression: a genuinely gross single-week overload still fails closed
   ---
-  duration_ms: 0.676421
+  duration_ms: 0.819438
   type: 'test'
   ...
 # Subtest: semantic goal parsing treats hyphens as presentation and preserves specific named goals
 ok 252 - semantic goal parsing treats hyphens as presentation and preserves specific named goals
   ---
-  duration_ms: 1.1641
+  duration_ms: 1.309397
   type: 'test'
   ...
 # Subtest: compound maintenance goals produce multiple explicit goal families
 ok 253 - compound maintenance goals produce multiple explicit goal families
   ---
-  duration_ms: 0.2673
+  duration_ms: 0.271874
   type: 'test'
   ...
 # Subtest: coaching notes cannot turn a pull-up into direct bar muscle-up exposure
 ok 254 - coaching notes cannot turn a pull-up into direct bar muscle-up exposure
   ---
-  duration_ms: 1.346122
+  duration_ms: 1.434593
   type: 'test'
   ...
 # Subtest: coaching notes cannot turn wall holding into freestanding handstand balance exposure
 ok 255 - coaching notes cannot turn wall holding into freestanding handstand balance exposure
   ---
-  duration_ms: 0.852084
+  duration_ms: 0.893579
   type: 'test'
   ...
 # Subtest: 10 km ruck remains ruck even when the note discusses 3K running priorities
 ok 256 - 10 km ruck remains ruck even when the note discusses 3K running priorities
   ---
-  duration_ms: 0.659506
+  duration_ms: 0.824937
   type: 'test'
   ...
 # Subtest: failed initial generation leaves the paid Program Pass retryable and unconsumed
 ok 257 - failed initial generation leaves the paid Program Pass retryable and unconsumed
   ---
-  duration_ms: 23.79156
+  duration_ms: 20.236881
   type: 'test'
   ...
 # Subtest: successful initial generation consumes the build exactly once after completion
 ok 258 - successful initial generation consumes the build exactly once after completion
   ---
-  duration_ms: 5.140814
+  duration_ms: 4.301285
   type: 'test'
   ...
 # Subtest: failed adjustment does not consume an included adjustment
 ok 259 - failed adjustment does not consume an included adjustment
   ---
-  duration_ms: 4.709178
+  duration_ms: 4.675502
   type: 'test'
   ...
 # Subtest: commercial middleware finalizes only done jobs and explicitly permits retry of an activated uncompleted pass
 ok 260 - commercial middleware finalizes only done jobs and explicitly permits retry of an activated uncompleted pass
   ---
-  duration_ms: 1.521815
+  duration_ms: 1.610404
   type: 'test'
   ...
 # Subtest: production specialist rules include component-aware handstand roadmap
 ok 261 - production specialist rules include component-aware handstand roadmap
   ---
-  duration_ms: 4.94444
+  duration_ms: 4.860928
   type: 'test'
   ...
 # Subtest: advanced calisthenics plus marathon side quest emits priority-aware dual roadmap
 ok 262 - advanced calisthenics plus marathon side quest emits priority-aware dual roadmap
   ---
-  duration_ms: 3.899408
+  duration_ms: 3.38939
   type: 'test'
   ...
 # Subtest: roadmap does not collapse advanced weighted pulling into generic bodyweight progression
 ok 263 - roadmap does not collapse advanced weighted pulling into generic bodyweight progression
   ---
-  duration_ms: 1.253353
+  duration_ms: 0.90139
   type: 'test'
   ...
 # Subtest: top set plus back-off rows produce one ramp to the heaviest target per movement
 ok 264 - top set plus back-off rows produce one ramp to the heaviest target per movement
   ---
-  duration_ms: 5.147203
+  duration_ms: 4.784143
   type: 'test'
   ...
 # Subtest: authored running warm-up is preserved while remaining eligible for other same-day prep
 ok 265 - authored running warm-up is preserved while remaining eligible for other same-day prep
   ---
-  duration_ms: 2.899584
+  duration_ms: 2.862667
   type: 'test'
   ...
 # Subtest: missing warm-up row is inserted for heavy strength and every loaded movement receives one ramp
 ok 266 - missing warm-up row is inserted for heavy strength and every loaded movement receives one ramp
   ---
-  duration_ms: 1.045012
+  duration_ms: 1.107136
   type: 'test'
   ...
 # Subtest: hard-run warm-up and heavy strength ramp coexist on a combined day
 ok 267 - hard-run warm-up and heavy strength ramp coexist on a combined day
   ---
-  duration_ms: 0.992954
+  duration_ms: 1.189989
   type: 'test'
   ...
 # Subtest: production start always runs launch:prepare before the server
 ok 268 - production start always runs launch:prepare before the server
   ---
-  duration_ms: 2.827136
+  duration_ms: 2.732883
   type: 'test'
   ...
 # Subtest: launch runtime pins approved spreadsheet exporter after legacy parser and before app initialization
 ok 269 - launch runtime pins approved spreadsheet exporter after legacy parser and before app initialization
   ---
-  duration_ms: 0.317865
+  duration_ms: 0.310582
   type: 'test'
   ...
 # Subtest: approved weekly spreadsheet contract is exactly 11 columns and never exposes Day as a data column
 ok 270 - approved weekly spreadsheet contract is exactly 11 columns and never exposes Day as a data column
   ---
-  duration_ms: 1.266293
+  duration_ms: 1.267845
   type: 'test'
   ...
 # Subtest: approved exporter renders day/session labels as section bands before the 11-column table
 ok 271 - approved exporter renders day/session labels as section bands before the 11-column table
   ---
-  duration_ms: 0.223443
+  duration_ms: 0.250963
   type: 'test'
   ...
 # Subtest: flexible schedules export Session A/B rather than invented weekdays
 ok 272 - flexible schedules export Session A/B rather than invented weekdays
   ---
-  duration_ms: 0.30163
+  duration_ms: 0.303651
   type: 'test'
   ...
 # Subtest: approved exporter remains the final client spreadsheet implementation
 ok 273 - approved exporter remains the final client spreadsheet implementation
   ---
-  duration_ms: 0.19391
+  duration_ms: 0.206056
   type: 'test'
   ...
 # Subtest: client spreadsheet uses the canonical six-tab Youth gymnastics structure
 ok 274 - client spreadsheet uses the canonical six-tab Youth gymnastics structure
   ---
-  duration_ms: 1.294856
+  duration_ms: 1.405089
   type: 'test'
   ...
 # Subtest: week sheets preserve the approved 11-column client coaching layout
 ok 275 - week sheets preserve the approved 11-column client coaching layout
   ---
-  duration_ms: 0.402031
+  duration_ms: 0.46379
   type: 'test'
   ...
 # Subtest: overview and warm-up are first-class client sheets rather than README prose
 ok 276 - overview and warm-up are first-class client sheets rather than README prose
   ---
-  duration_ms: 0.309733
+  duration_ms: 0.370471
   type: 'test'
   ...
 # Subtest: every exercise has a usable hyperlink path even without a curated direct demo
 ok 277 - every exercise has a usable hyperlink path even without a curated direct demo
   ---
-  duration_ms: 0.194961
+  duration_ms: 0.301388
   type: 'test'
   ...
 # Subtest: premium parity exporter overrides the legacy exporter before app initialization
 ok 278 - premium parity exporter overrides the legacy exporter before app initialization
   ---
-  duration_ms: 0.277865
+  duration_ms: 0.36341
   type: 'test'
   ...
 # Subtest: verified high-concurrency hybrid may count a one-set compound/advanced-skill microdose as the fourth strength day
 ok 279 - verified high-concurrency hybrid may count a one-set compound/advanced-skill microdose as the fourth strength day
   ---
-  duration_ms: 3.644787
+  duration_ms: 2.540167
   type: 'test'
   ...
 # Subtest: one-set compound day does not satisfy ordinary requested strength frequency outside verified high concurrency
 ok 280 - one-set compound day does not satisfy ordinary requested strength frequency outside verified high concurrency
   ---
-  duration_ms: 0.371124
+  duration_ms: 0.306025
   type: 'test'
   ...
 # Subtest: high-concurrency cardio/core-only day still cannot masquerade as a requested strength microdose
 ok 281 - high-concurrency cardio/core-only day still cannot masquerade as a requested strength microdose
   ---
-  duration_ms: 0.567438
+  duration_ms: 0.458522
   type: 'test'
   ...
 # Subtest: two one-set resistance rows on a normal day count as two meaningful resistance sets
 ok 282 - two one-set resistance rows on a normal day count as two meaningful resistance sets
   ---
-  duration_ms: 0.311536
+  duration_ms: 0.203552
   type: 'test'
   ...
 # Subtest: strength-session patch is idempotent once marker is present
 ok 283 - strength-session patch is idempotent once marker is present
   ---
-  duration_ms: 0.326768
+  duration_ms: 0.220218
   type: 'test'
   ...
 # Subtest: approved Tactical 3K golden has complete strength sessions and single-lever interval progression
 ok 284 - approved Tactical 3K golden has complete strength sessions and single-lever interval progression
   ---
-  duration_ms: 138.490315
+  duration_ms: 138.59729
   type: 'test'
   ...
 # Subtest: weekly push/core totals cannot hide a token deadlift-only third gym session
 ok 285 - weekly push/core totals cannot hide a token deadlift-only third gym session
   ---
-  duration_ms: 3.842143
+  duration_ms: 4.434264
   type: 'test'
   ...
 # Subtest: shin-history 3K build cannot increase interval work and pace materially in the same step
 ok 286 - shin-history 3K build cannot increase interval work and pace materially in the same step
   ---
-  duration_ms: 4.325194
+  duration_ms: 3.634885
   type: 'test'
   ...
 # Subtest: Week 1 interval prescription cannot leap straight past the demonstrated repeat benchmark
 ok 287 - Week 1 interval prescription cannot leap straight past the demonstrated repeat benchmark
   ---
-  duration_ms: 3.203558
+  duration_ms: 4.745607
   type: 'test'
   ...
 # Subtest: Week 4 may express faster 3K speed only when interval work is reduced from the peak build
 ok 288 - Week 4 may express faster 3K speed only when interval work is reduced from the peak build
   ---
-  duration_ms: 3.249827
+  duration_ms: 3.249662
   type: 'test'
   ...
 # Subtest: generation brief states complete gym sessions and benchmark-anchored single-lever 3K progression
 ok 289 - generation brief states complete gym sessions and benchmark-anchored single-lever 3K progression
   ---
-  duration_ms: 1.096449
+  duration_ms: 0.648665
   type: 'test'
   ...
 # Subtest: production build applies bounded Tactical endurance identity normalization after compositional vocabulary
 ok 290 - production build applies bounded Tactical endurance identity normalization after compositional vocabulary
   ---
-  duration_ms: 0.95029
+  duration_ms: 1.087517
   type: 'test'
   ...
 # Subtest: QA-only hallucination diagnostics expose rejected names from direct or aggregate failures
 ok 291 - QA-only hallucination diagnostics expose rejected names from direct or aggregate failures
   ---
-  duration_ms: 0.269854
+  duration_ms: 0.239627
   type: 'test'
   ...
 # Subtest: Tactical 3K event repair reuses an existing run and protects the time budget
 ok 292 - Tactical 3K event repair reuses an existing run and protects the time budget
   ---
-  duration_ms: 1.337659
+  duration_ms: 1.033156
   type: 'test'
   ...
 # Subtest: Tactical GPP normalizer restores only the missing low-cost push/core floor on existing strength days
 ok 293 - Tactical GPP normalizer restores only the missing low-cost push/core floor on existing strength days
   ---
-  duration_ms: 23.930545
+  duration_ms: 22.808694
   type: 'test'
   ...
 # Subtest: Tactical GPP normalizer is idempotent after the floor is restored
 ok 294 - Tactical GPP normalizer is idempotent after the floor is restored
   ---
-  duration_ms: 14.837757
+  duration_ms: 13.093619
   type: 'test'
   ...
 # Subtest: Tactical GPP brief exposes exact canonical support vocabulary instead of open-ended family labels
 ok 295 - Tactical GPP brief exposes exact canonical support vocabulary instead of open-ended family labels
   ---
-  duration_ms: 2.218977
+  duration_ms: 2.196947
   type: 'test'
   ...
 # Subtest: internal repair contract preserves Tactical support roles when fixing exercise names
 ok 296 - internal repair contract preserves Tactical support roles when fixing exercise names
   ---
-  duration_ms: 0.320369
+  duration_ms: 0.420024
   type: 'test'
   ...
 # Subtest: approved Tactical golden respects the explicit five-calendar-day budget and sensible impact clustering
 ok 297 - approved Tactical golden respects the explicit five-calendar-day budget and sensible impact clustering
   ---
-  duration_ms: 18.055515
+  duration_ms: 13.699389
   type: 'test'
   ...
 # Subtest: live-like seven-day Tactical layout fails the explicit calendar budget and impact clustering rules
 ok 298 - live-like seven-day Tactical layout fails the explicit calendar budget and impact clustering rules
   ---
-  duration_ms: 5.259851
+  duration_ms: 4.989358
   type: 'test'
   ...
 # Subtest: priority pull-up work cannot be concentrated on adjacent days when both exposures are substantive
 ok 299 - priority pull-up work cannot be concentrated on adjacent days when both exposures are substantive
   ---
-  duration_ms: 2.841857
+  duration_ms: 2.92568
   type: 'test'
   ...
 # Subtest: known strict pull-up max calibrates repeated submaximal work instead of allowing 4x10-12 at RPE 8
 ok 300 - known strict pull-up max calibrates repeated submaximal work instead of allowing 4x10-12 at RPE 8
   ---
-  duration_ms: 6.589028
+  duration_ms: 6.582487
   type: 'test'
   ...
 # Subtest: non-priority Tactical pushing stays a support dose rather than matching the priority volume budget
 ok 301 - non-priority Tactical pushing stays a support dose rather than matching the priority volume budget
   ---
-  duration_ms: 11.473137
+  duration_ms: 8.21879
   type: 'test'
   ...
 # Subtest: tactical manual acceptance requires explicit weighted pull identity and +kg load when benchmarked
 ok 302 - tactical manual acceptance requires explicit weighted pull identity and +kg load when benchmarked
   ---
-  duration_ms: 16.478909
+  duration_ms: 16.202461
   type: 'test'
   ...
 # Subtest: tactical weighted pulling cannot repeat a demonstrated 5-rep benchmark as near-max multi-set volume
 ok 303 - tactical weighted pulling cannot repeat a demonstrated 5-rep benchmark as near-max multi-set volume
   ---
-  duration_ms: 4.505724
+  duration_ms: 4.503046
   type: 'test'
   ...
 # Subtest: tactical manual acceptance rejects strength-style kg x reps ruck warm-up prose
 ok 304 - tactical manual acceptance rejects strength-style kg x reps ruck warm-up prose
   ---
-  duration_ms: 0.31402
+  duration_ms: 0.308449
   type: 'test'
   ...
 # Subtest: specific warm-up enrichment never creates a strength-style ramp for Backpack Carry
 ok 305 - specific warm-up enrichment never creates a strength-style ramp for Backpack Carry
   ---
-  duration_ms: 3.811196
+  duration_ms: 3.280848
   type: 'test'
   ...
 # Subtest: inserts a canonical submaximal weighted pull floor when exposure is absent
 ok 306 - inserts a canonical submaximal weighted pull floor when exposure is absent
   ---
-  duration_ms: 12.982072
+  duration_ms: 22.254571
   type: 'test'
   ...
 # Subtest: reduces near-benchmark multi-set weighted pulling instead of copying the benchmark
 ok 307 - reduces near-benchmark multi-set weighted pulling instead of copying the benchmark
   ---
-  duration_ms: 2.871862
+  duration_ms: 3.861512
   type: 'test'
   ...
 # Subtest: converts ambiguous same-day generic loaded pull-up instead of adding duplicate pulling volume
 ok 308 - converts ambiguous same-day generic loaded pull-up instead of adding duplicate pulling volume
   ---
-  duration_ms: 1.499782
+  duration_ms: 2.000675
   type: 'test'
   ...
 # Subtest: is idempotent for an already safe explicit weighted exposure
 ok 309 - is idempotent for an already safe explicit weighted exposure
   ---
-  duration_ms: 0.695389
+  duration_ms: 0.365764
   type: 'test'
   ...
 # Subtest: validateEquipmentAgainstLocation: Assault Bike forbidden in outdoor_park
 ok 310 - validateEquipmentAgainstLocation: Assault Bike forbidden in outdoor_park
   ---
-  duration_ms: 4.130383
+  duration_ms: 4.255097
   type: 'test'
   ...
 # Subtest: validateExercisesAgainstDictionary: invented name flagged, real ladder rung accepted
 ok 311 - validateExercisesAgainstDictionary: invented name flagged, real ladder rung accepted
   ---
-  duration_ms: 0.871953
+  duration_ms: 1.024914
   type: 'test'
   ...
 # Subtest: enforceUnilateralIntensityFloor: locked-out TRX Squat fails for elite pistol athlete
 ok 312 - enforceUnilateralIntensityFloor: locked-out TRX Squat fails for elite pistol athlete
   ---
-  duration_ms: 0.93739
+  duration_ms: 0.954829
   type: 'test'
   ...
 # Subtest: reformatWarmupCells: three semicolon drills become one row, newline-separated
 ok 313 - reformatWarmupCells: three semicolon drills become one row, newline-separated
   ---
-  duration_ms: 0.51514
+  duration_ms: 0.468536
   type: 'test'
   ...
 # Subtest: enforceIntradayConditioningOrder: Airbike moved after Back Squat
 ok 314 - enforceIntradayConditioningOrder: Airbike moved after Back Squat
   ---
-  duration_ms: 1.782704
+  duration_ms: 1.77566
   type: 'test'
   ...
 # Subtest: validateSportDayCoupling: adjacent hard sport is advisory; explicit <4h same-day collision fails
 ok 315 - validateSportDayCoupling: adjacent hard sport is advisory; explicit <4h same-day collision fails
   ---
-  duration_ms: 1.806741
+  duration_ms: 1.791725
   type: 'test'
   ...
 # Subtest: validateWeeklyVolumeBudget: sport + strength pull volume exceeds MRV
 ok 316 - validateWeeklyVolumeBudget: sport + strength pull volume exceeds MRV
   ---
-  duration_ms: 1.41869
+  duration_ms: 1.453131
   type: 'test'
   ...
 # Subtest: reformatWarmupCells: single drill untouched, Hebrew prefix preserved
 ok 317 - reformatWarmupCells: single drill untouched, Hebrew prefix preserved
   ---
-  duration_ms: 0.537754
+  duration_ms: 0.506353
   type: 'test'
   ...
 # Subtest: validateExercisesAgainstDictionary rejects fabricated 90-degree wall HSPU even if phrased cleanly
 ok 318 - validateExercisesAgainstDictionary rejects fabricated 90-degree wall HSPU even if phrased cleanly
   ---
-  duration_ms: 0.385657
+  duration_ms: 0.419834
   type: 'test'
   ...
 # Subtest: validateExercisesAgainstDictionary rejects wall-supported Human Flag inventions
 ok 319 - validateExercisesAgainstDictionary rejects wall-supported Human Flag inventions
   ---
-  duration_ms: 0.463593
+  duration_ms: 0.457961
   type: 'test'
   ...
 # Subtest: validateSportDayCoupling: gym day availability and requested session count are hard constraints
 ok 320 - validateSportDayCoupling: gym day availability and requested session count are hard constraints
   ---
-  duration_ms: 0.95037
+  duration_ms: 0.991905
   type: 'test'
   ...
 # Subtest: coreExerciseName strips (bar) equipment qualifier
 ok 321 - coreExerciseName strips (bar) equipment qualifier
   ---
-  duration_ms: 2.426686
+  duration_ms: 2.228574
   type: 'test'
   ...
 # Subtest: coreExerciseName strips (Weighted Vest) equipment qualifier
 ok 322 - coreExerciseName strips (Weighted Vest) equipment qualifier
   ---
-  duration_ms: 0.746616
+  duration_ms: 0.798507
   type: 'test'
   ...
 # Subtest: coreExerciseName strips (Parallel Bars) equipment qualifier
 ok 323 - coreExerciseName strips (Parallel Bars) equipment qualifier
   ---
-  duration_ms: 0.192597
+  duration_ms: 0.197794
   type: 'test'
   ...
 # Subtest: getGoalFamily maps planche and front-lever phrases
 ok 324 - getGoalFamily maps planche and front-lever phrases
   ---
-  duration_ms: 1.025042
+  duration_ms: 1.091934
   type: 'test'
   ...
 # Subtest: selectRungForSkill: tuck-planche 15s athlete selects Advanced Tuck or higher
 ok 325 - selectRungForSkill: tuck-planche 15s athlete selects Advanced Tuck or higher
   ---
-  duration_ms: 0.741318
+  duration_ms: 0.756856
   type: 'test'
   ...
 # Subtest: validateAndCalibrateSkills throws SKILL_UNDER_PROGRAMMED for tuck-planche athlete on Planche Lean
 ok 326 - validateAndCalibrateSkills throws SKILL_UNDER_PROGRAMMED for tuck-planche athlete on Planche Lean
   ---
-  duration_ms: 7.128664
+  duration_ms: 7.277351
   type: 'test'
   ...
 # Subtest: validateAndCalibrateSkills throws SKILL_PREREQ_VIOLATION for Iron Cross without ring evidence
 ok 327 - validateAndCalibrateSkills throws SKILL_PREREQ_VIOLATION for Iron Cross without ring evidence
   ---
-  duration_ms: 0.688839
+  duration_ms: 0.646201
   type: 'test'
   ...
 # Subtest: Human Flag goal without vertical structure gates: prereq violation on over-program, metadata note when at rung 0
 not ok 328 - Human Flag goal without vertical structure gates: prereq violation on over-program, metadata note when at rung 0
   ---
-  duration_ms: 2.014981
+  duration_ms: 2.019753
   type: 'test'
   location: '/home/runner/work/raz-coaching-platform/raz-coaching-platform/phase14/test/v20_skills.test.js:115:1'
   failureType: 'testCodeFailure'
@@ -2712,121 +2712,121 @@ not ok 328 - Human Flag goal without vertical structure gates: prereq violation 
 # Subtest: Hebrew goal phrases route to the correct advanced skill family
 ok 329 - Hebrew goal phrases route to the correct advanced skill family
   ---
-  duration_ms: 1.066534
+  duration_ms: 1.093566
   type: 'test'
   ...
 # Subtest: 90-degree HSPU ladder never emits the fabricated wall 90-degree variation
 ok 330 - 90-degree HSPU ladder never emits the fabricated wall 90-degree variation
   ---
-  duration_ms: 0.827197
+  duration_ms: 0.876133
   type: 'test'
   ...
 # Subtest: planche uses 20s lean readiness anchor and stronger straddle threshold
 ok 331 - planche uses 20s lean readiness anchor and stronger straddle threshold
   ---
-  duration_ms: 2.955597
+  duration_ms: 2.951609
   type: 'test'
   ...
 # Subtest: human flag readiness includes push, pull and lateral trunk base
 ok 332 - human flag readiness includes push, pull and lateral trunk base
   ---
-  duration_ms: 0.235221
+  duration_ms: 0.280778
   type: 'test'
   ...
 # Subtest: HSPU graph contains belly-to-wall and never contains 90-degree wall HSPU
 ok 333 - HSPU graph contains belly-to-wall and never contains 90-degree wall HSPU
   ---
-  duration_ms: 0.424204
+  duration_ms: 0.403159
   type: 'test'
   ...
 # Subtest: benchmark parser reads dips and HSPU wall orientations
 ok 334 - benchmark parser reads dips and HSPU wall orientations
   ---
-  duration_ms: 3.532259
+  duration_ms: 3.726981
   type: 'test'
   ...
 # Subtest: 90-degree HSPU alias no longer maps to fabricated wall variation
 ok 335 - 90-degree HSPU alias no longer maps to fabricated wall variation
   ---
-  duration_ms: 12.697017
+  duration_ms: 12.325447
   type: 'test'
   ...
 # Subtest: engine contract has no legacy one-progression hard rule
 ok 336 - engine contract has no legacy one-progression hard rule
   ---
-  duration_ms: 5.01114
+  duration_ms: 5.055657
   type: 'test'
   ...
 # Subtest: sport scheduling does not hard-ban hard-day lifting
 ok 337 - sport scheduling does not hard-ban hard-day lifting
   ---
-  duration_ms: 3.286832
+  duration_ms: 3.498782
   type: 'test'
   ...
 # Subtest: density dosing is method-specific rather than one fixed percentage band
 ok 338 - density dosing is method-specific rather than one fixed percentage band
   ---
-  duration_ms: 3.554392
+  duration_ms: 5.560278
   type: 'test'
   ...
 # Subtest: Supabase usage tracking failure cannot hard-block program generation
 ok 339 - Supabase usage tracking failure cannot hard-block program generation
   ---
-  duration_ms: 0.776661
+  duration_ms: 1.237861
   type: 'test'
   ...
 # Subtest: fatigue model avoids mystical fixed CNS and spinal clocks
 ok 340 - fatigue model avoids mystical fixed CNS and spinal clocks
   ---
-  duration_ms: 2.933784
+  duration_ms: 2.294402
   type: 'test'
   ...
 # Subtest: volume landmarks are dynamic heuristics
 ok 341 - volume landmarks are dynamic heuristics
   ---
-  duration_ms: 2.678253
+  duration_ms: 1.502975
   type: 'test'
   ...
 # Subtest: pain routing is not a pain-number formula
 ok 342 - pain routing is not a pain-number formula
   ---
-  duration_ms: 2.831322
+  duration_ms: 1.559509
   type: 'test'
   ...
 # Subtest: mobility is task-triggered and test-retest based
 ok 343 - mobility is task-triggered and test-retest based
   ---
-  duration_ms: 0.674519
+  duration_ms: 0.641564
   type: 'test'
   ...
 # Subtest: plyometrics are quality-first and sport-aware
 ok 344 - plyometrics are quality-first and sport-aware
   ---
-  duration_ms: 0.926525
+  duration_ms: 0.667122
   type: 'test'
   ...
 # Subtest: Supabase operations retry transient transport failures through the shared wrapper
 ok 345 - Supabase operations retry transient transport failures through the shared wrapper
   ---
-  duration_ms: 1.201386
+  duration_ms: 1.178192
   type: 'test'
   ...
 # Subtest: intake draft persists across refresh and failed builds
 ok 346 - intake draft persists across refresh and failed builds
   ---
-  duration_ms: 1.361045
+  duration_ms: 1.336237
   type: 'test'
   ...
 # Subtest: spreadsheet keeps ambiguous rep ranges as text
 ok 347 - spreadsheet keeps ambiguous rep ranges as text
   ---
-  duration_ms: 1.076098
+  duration_ms: 1.178633
   type: 'test'
   ...
 # Subtest: spreadsheet includes client program context without internal scores
 not ok 348 - spreadsheet includes client program context without internal scores
   ---
-  duration_ms: 3.386932
+  duration_ms: 2.711923
   type: 'test'
   location: '/home/runner/work/raz-coaching-platform/raz-coaching-platform/phase14/test/v24_spreadsheet_contract.test.js:15:1'
   failureType: 'testCodeFailure'
@@ -3081,7 +3081,7 @@ not ok 348 - spreadsheet includes client program context without internal scores
 # Subtest: spreadsheet supports Hebrew RTL
 not ok 349 - spreadsheet supports Hebrew RTL
   ---
-  duration_ms: 0.8236
+  duration_ms: 0.91449
   type: 'test'
   location: '/home/runner/work/raz-coaching-platform/raz-coaching-platform/phase14/test/v24_spreadsheet_contract.test.js:21:1'
   failureType: 'testCodeFailure'
@@ -3336,297 +3336,305 @@ not ok 349 - spreadsheet supports Hebrew RTL
 # Subtest: every skill graph rung resolves through deterministic exercise dictionary
 ok 350 - every skill graph rung resolves through deterministic exercise dictionary
   ---
-  duration_ms: 2.065417
+  duration_ms: 2.361822
   type: 'test'
   ...
 # Subtest: every skill graph complementary exercise resolves through deterministic dictionary
 ok 351 - every skill graph complementary exercise resolves through deterministic dictionary
   ---
-  duration_ms: 0.499326
+  duration_ms: 0.559331
   type: 'test'
   ...
 # Subtest: all current Supabase operations use the shared operation-level wrapper
 ok 352 - all current Supabase operations use the shared operation-level wrapper
   ---
-  duration_ms: 1.528605
+  duration_ms: 1.401194
   type: 'test'
   ...
 # Subtest: jobs clients and usage retain explicit local mirrors during transport failures
 ok 353 - jobs clients and usage retain explicit local mirrors during transport failures
   ---
-  duration_ms: 0.309863
+  duration_ms: 0.324863
   type: 'test'
   ...
 # Subtest: foreground client persistence and reads still reject non-transient Supabase errors
 ok 354 - foreground client persistence and reads still reject non-transient Supabase errors
   ---
-  duration_ms: 0.297224
+  duration_ms: 0.328248
   type: 'test'
   ...
 # Subtest: best-effort background writes update local mirrors before remote persistence
 ok 355 - best-effort background writes update local mirrors before remote persistence
   ---
-  duration_ms: 0.437665
+  duration_ms: 0.462718
   type: 'test'
   ...
 # Subtest: health check reports degraded transport without declaring app dead
 ok 356 - health check reports degraded transport without declaring app dead
   ---
-  duration_ms: 0.213098
+  duration_ms: 0.217273
   type: 'test'
   ...
 # Subtest: [V34-1] a 2-rep OAP athlete chasing 4 reps gets multi-rep specificity, not only singles
 ok 357 - [V34-1] a 2-rep OAP athlete chasing 4 reps gets multi-rep specificity, not only singles
   ---
-  duration_ms: 2.5357
+  duration_ms: 4.431549
   type: 'test'
   ...
 # Subtest: [V34-1b] the brief states rep-outcome specificity only when the goal exceeds demonstrated capacity
 ok 358 - [V34-1b] the brief states rep-outcome specificity only when the goal exceeds demonstrated capacity
   ---
-  duration_ms: 4.220398
+  duration_ms: 4.465049
   type: 'test'
   ...
 # Subtest: [V34-2] hard sport the previous day penalises that gym day for a primary neural exposure
 ok 359 - [V34-2] hard sport the previous day penalises that gym day for a primary neural exposure
   ---
-  duration_ms: 0.66248
+  duration_ms: 0.642796
   type: 'test'
   ...
 # Subtest: [V34-3] an explicitly low-cost microdose may occupy the least fresh day
 ok 360 - [V34-3] an explicitly low-cost microdose may occupy the least fresh day
   ---
-  duration_ms: 0.482401
+  duration_ms: 0.513533
   type: 'test'
   ...
 # Subtest: [V34-3b] readiness is derived from the schedule, never from fixed weekdays
 ok 361 - [V34-3b] readiness is derived from the schedule, never from fixed weekdays
   ---
-  duration_ms: 0.42157
+  duration_ms: 0.428447
   type: 'test'
   ...
 # Subtest: [V34-3c] readiness placement actually reaches the planner and honours hysteresis
 ok 362 - [V34-3c] readiness placement actually reaches the planner and honours hysteresis
   ---
-  duration_ms: 39.271173
+  duration_ms: 36.78769
   type: 'test'
   ...
 # Subtest: [V34-4] adequate wall capacity requires a reduced-support balance drill
 ok 363 - [V34-4] adequate wall capacity requires a reduced-support balance drill
   ---
-  duration_ms: 0.884111
+  duration_ms: 0.721393
   type: 'test'
   ...
 # Subtest: [V34-5] a 4 x 2 row cannot claim 4 attempts per set
 ok 364 - [V34-5] a 4 x 2 row cannot claim 4 attempts per set
   ---
-  duration_ms: 3.378339
+  duration_ms: 2.234542
   type: 'test'
   ...
 # Subtest: [V34-5b] a total-attempt claim must equal sets x reps
 ok 365 - [V34-5b] a total-attempt claim must equal sets x reps
   ---
-  duration_ms: 1.493342
+  duration_ms: 2.234282
   type: 'test'
   ...
 # Subtest: [V34-6] an RPE-selected row may not reference a load that was never established
 ok 366 - [V34-6] an RPE-selected row may not reference a load that was never established
   ---
-  duration_ms: 1.061997
+  duration_ms: 0.779038
   type: 'test'
   ...
 # Subtest: [V34-7] an unconditional "add one set" cannot survive an unchanged prescription
 ok 367 - [V34-7] an unconditional "add one set" cannot survive an unchanged prescription
   ---
-  duration_ms: 0.862109
+  duration_ms: 0.594244
   type: 'test'
   ...
 # Subtest: [V34-7b] the release gate throws a retriable error rather than inventing a fix
 ok 368 - [V34-7b] the release gate throws a retriable error rather than inventing a fix
   ---
-  duration_ms: 0.891653
+  duration_ms: 0.675845
   type: 'test'
   ...
 # Subtest: [V34-8] session duration counts rests and transitions, not just work
 ok 369 - [V34-8] session duration counts rests and transitions, not just work
   ---
-  duration_ms: 1.563938
+  duration_ms: 4.113656
   type: 'test'
   ...
 # Subtest: [V34-9] weekly running accounting includes interval reps and warm-up/cooldown
 ok 370 - [V34-9] weekly running accounting includes interval reps and warm-up/cooldown
   ---
-  duration_ms: 1.172402
+  duration_ms: 1.059746
   type: 'test'
   ...
 # Subtest: [V34-9b] a plan inside the tolerated baseline raises no volume signal
 ok 371 - [V34-9b] a plan inside the tolerated baseline raises no volume signal
   ---
-  duration_ms: 0.309592
+  duration_ms: 0.229461
   type: 'test'
   ...
 # Subtest: [V34-10] symptom response targets the provocative or newest stressor, not always easy running
 ok 372 - [V34-10] symptom response targets the provocative or newest stressor, not always easy running
   ---
-  duration_ms: 0.430654
+  duration_ms: 0.361498
   type: 'test'
   ...
 # Subtest: [V34-11] maintenance defaults to hold across build weeks
 ok 373 - [V34-11] maintenance defaults to hold across build weeks
   ---
-  duration_ms: 0.245217
+  duration_ms: 0.182581
   type: 'test'
   ...
 # Subtest: [V34-12] excessive secondary pulling is flagged against an endurance primary
 ok 374 - [V34-12] excessive secondary pulling is flagged against an endurance primary
   ---
-  duration_ms: 0.359337
+  duration_ms: 0.240708
   type: 'test'
   ...
 # Subtest: [V34-13] heavily concurrent athletes get an intra-session stop rule
 ok 375 - [V34-13] heavily concurrent athletes get an intra-session stop rule
   ---
-  duration_ms: 0.386287
+  duration_ms: 0.243502
   type: 'test'
   ...
 # Subtest: [V34-14] the accepted v33 artifacts stay parseable and raise only the known +50 kg defect
 ok 376 - [V34-14] the accepted v33 artifacts stay parseable and raise only the known +50 kg defect
   ---
-  duration_ms: 4.309
+  duration_ms: 2.776579
   type: 'test'
   ...
 # Subtest: [V34-15] accounting runs cleanly on all three accepted artifacts
 ok 377 - [V34-15] accounting runs cleanly on all three accepted artifacts
   ---
-  duration_ms: 3.83426
+  duration_ms: 2.724742
   type: 'test'
   ...
 # Subtest: [V34-15b] the brief is empty for an intake with none of the triggering facts
 ok 378 - [V34-15b] the brief is empty for an intake with none of the triggering facts
   ---
-  duration_ms: 0.215652
+  duration_ms: 0.166578
+  type: 'test'
+  ...
+# V34_RELEASE_DIAGNOSTIC_HYBRID={"ok":false,"flags":[{"code":"CLIENT_OUTPUT_NOT_READY"}],"clientCleanMatches":["[REVIEW]"]}
+# V34_RELEASE_DIAGNOSTIC_YOUTH={"ok":false,"flags":[{"code":"EXERCISE_HALLUCINATION"},{"code":"GOAL_COMPONENT_COVERAGE_MISSING"},{"code":"YOUTH_FLEXIBLE_SCHEDULE_INVENTED_WEEKDAYS"}],"clientCleanMatches":[]}
+# Subtest: [V34 diagnostic] expose release-critical aggregate failures without changing behavior
+ok 379 - [V34 diagnostic] expose release-critical aggregate failures without changing behavior
+  ---
+  duration_ms: 140.801298
   type: 'test'
   ...
 # Subtest: deterministic Youth consolidation retains Week 3 reps while lowering set cost
-ok 379 - deterministic Youth consolidation retains Week 3 reps while lowering set cost
+ok 380 - deterministic Youth consolidation retains Week 3 reps while lowering set cost
   ---
-  duration_ms: 14.99468
+  duration_ms: 22.162033
   type: 'test'
   ...
 # Subtest: deterministic Youth consolidation keeps the earned Week 3 band with lower volume
-ok 380 - deterministic Youth consolidation keeps the earned Week 3 band with lower volume
+ok 381 - deterministic Youth consolidation keeps the earned Week 3 band with lower volume
   ---
-  duration_ms: 2.2947
+  duration_ms: 3.163714
   type: 'test'
   ...
 # Subtest: volume-only handstand reset is repaired with explicit Week 3 quality retention, not extra attempts
-ok 381 - volume-only handstand reset is repaired with explicit Week 3 quality retention, not extra attempts
+ok 382 - volume-only handstand reset is repaired with explicit Week 3 quality retention, not extra attempts
   ---
-  duration_ms: 1.693401
+  duration_ms: 2.420159
   type: 'test'
   ...
 # Subtest: ambiguous duplicate Week 3 rows are not guessed at and remain fail-closed
-ok 382 - ambiguous duplicate Week 3 rows are not guessed at and remain fail-closed
+ok 383 - ambiguous duplicate Week 3 rows are not guessed at and remain fail-closed
   ---
-  duration_ms: 1.601133
+  duration_ms: 1.965612
   type: 'test'
   ...
 # Subtest: shared production bundle wires Youth Week 4 consolidation before semantic validation
-ok 383 - shared production bundle wires Youth Week 4 consolidation before semantic validation
+ok 384 - shared production bundle wires Youth Week 4 consolidation before semantic validation
   ---
-  duration_ms: 0.397143
+  duration_ms: 0.492652
   type: 'test'
   ...
 # Subtest: Youth acquisition normalizer restores missing bar-specific direct work and wall-supported handstand capacity
-ok 384 - Youth acquisition normalizer restores missing bar-specific direct work and wall-supported handstand capacity
+ok 385 - Youth acquisition normalizer restores missing bar-specific direct work and wall-supported handstand capacity
   ---
-  duration_ms: 29.7948
+  duration_ms: 29.761182
   type: 'test'
   ...
 # Subtest: Youth acquisition normalizer is idempotent once the required floor exists
-ok 385 - Youth acquisition normalizer is idempotent once the required floor exists
+ok 386 - Youth acquisition normalizer is idempotent once the required floor exists
   ---
-  duration_ms: 11.658895
+  duration_ms: 12.665642
   type: 'test'
   ...
 # Subtest: Youth live convergence patch locks ring vocabulary and live repair contracts
-ok 386 - Youth live convergence patch locks ring vocabulary and live repair contracts
+ok 387 - Youth live convergence patch locks ring vocabulary and live repair contracts
   ---
-  duration_ms: 1.147965
+  duration_ms: 1.557075
   type: 'test'
   ...
 # Subtest: known 12-rep pull-up max accepts submaximal 3x8 and rejects repeated 3x10
-ok 387 - known 12-rep pull-up max accepts submaximal 3x8 and rejects repeated 3x10
+ok 388 - known 12-rep pull-up max accepts submaximal 3x8 and rejects repeated 3x10
   ---
-  duration_ms: 10.941954
+  duration_ms: 12.63034
   type: 'test'
   ...
 # Subtest: Notes cannot turn a generic Pull-up into direct bar-muscle-up exposure
-ok 388 - Notes cannot turn a generic Pull-up into direct bar-muscle-up exposure
+ok 389 - Notes cannot turn a generic Pull-up into direct bar-muscle-up exposure
   ---
-  duration_ms: 8.258483
+  duration_ms: 12.809586
   type: 'test'
   ...
 # Subtest: session-quality normalizer relabels contradictory transition row and clears direct coverage
-ok 389 - session-quality normalizer relabels contradictory transition row and clears direct coverage
+ok 390 - session-quality normalizer relabels contradictory transition row and clears direct coverage
   ---
-  duration_ms: 3.460071
+  duration_ms: 3.992717
   type: 'test'
   ...
 # Subtest: missing bar transition is inserted in each active Youth acquisition session
-ok 390 - missing bar transition is inserted in each active Youth acquisition session
+ok 391 - missing bar transition is inserted in each active Youth acquisition session
   ---
-  duration_ms: 1.770065
+  duration_ms: 2.200241
   type: 'test'
   ...
 # Subtest: duplicate static handstand capacity is removed when an explicit wall hold already exists
-ok 391 - duplicate static handstand capacity is removed when an explicit wall hold already exists
+ok 392 - duplicate static handstand capacity is removed when an explicit wall hold already exists
   ---
-  duration_ms: 1.24495
+  duration_ms: 1.633169
   type: 'test'
   ...
 # Subtest: duplicate mislabeled and canonical transition rows collapse to one direct skill row
-ok 392 - duplicate mislabeled and canonical transition rows collapse to one direct skill row
+ok 393 - duplicate mislabeled and canonical transition rows collapse to one direct skill row
   ---
-  duration_ms: 0.813326
+  duration_ms: 1.118032
   type: 'test'
   ...
 # Subtest: youth handstand and bar muscle-up drills are accepted canonical exercises
-ok 393 - youth handstand and bar muscle-up drills are accepted canonical exercises
+ok 394 - youth handstand and bar muscle-up drills are accepted canonical exercises
   ---
-  duration_ms: 3.445951
+  duration_ms: 3.6786
   type: 'test'
   ...
 # Subtest: dictionary still blocks genuinely unknown invented youth skill names
-ok 394 - dictionary still blocks genuinely unknown invented youth skill names
+ok 395 - dictionary still blocks genuinely unknown invented youth skill names
   ---
-  duration_ms: 0.845053
+  duration_ms: 0.792909
   type: 'test'
   ...
 # Subtest: deterministic youth skill-order repair changes order only and clears freshness failure
-ok 395 - deterministic youth skill-order repair changes order only and clears freshness failure
+ok 396 - deterministic youth skill-order repair changes order only and clears freshness failure
   ---
-  duration_ms: 17.465042
+  duration_ms: 17.760298
   type: 'test'
   ...
 # Subtest: Youth acquisition normalizer creates safe visible Weeks 1-3 progression and Week 4 consolidation
-ok 396 - Youth acquisition normalizer creates safe visible Weeks 1-3 progression and Week 4 consolidation
+ok 397 - Youth acquisition normalizer creates safe visible Weeks 1-3 progression and Week 4 consolidation
   ---
-  duration_ms: 18.753397
+  duration_ms: 18.808266
   type: 'test'
   ...
 # Subtest: Youth visible progression normalization is idempotent
-ok 397 - Youth visible progression normalization is idempotent
+ok 398 - Youth visible progression normalization is idempotent
   ---
-  duration_ms: 0.862138
+  duration_ms: 0.909403
   type: 'test'
   ...
-1..397
-# tests 397
+1..398
+# tests 398
 # suites 0
-# pass 359
+# pass 360
 # fail 38
 # cancelled 0
 # skipped 0
 # todo 0
-# duration_ms 2933.01383
+# duration_ms 3062.301628
