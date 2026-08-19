@@ -65,10 +65,41 @@ function rewriteWeek(program, parsed) {
   return program.replace(parsed.re, parsed.match[1] + inner + parsed.match[3]);
 }
 
-function pressDoseFields(parsed) {
-  return ['weight', 'sets', 'reps', 'rest', 'target rpe']
-    .map((key) => parsed.index[key])
-    .filter(Number.isInteger);
+function syncHeldPressCues(program, weekNumber, exerciseName, heldWeight) {
+  const parsed = parseWeek(program, weekNumber);
+  if (!parsed || !heldWeight) return { program, changed: false };
+  const target = parsed.rows.find((cells) => rowName(parsed, cells).toLowerCase() === exerciseName.toLowerCase());
+  if (!target) return { program, changed: false };
+  const day = rowDay(parsed, target);
+  let changed = false;
+
+  if (Number.isInteger(parsed.index.notes) && /^overhead press$/i.test(exerciseName)) {
+    const desired = `Hold the Week 1 strict-press dose at ${heldWeight} in this build week; progress rep quality and bar speed, not load. No layback or grindy lockouts.`;
+    if (target[parsed.index.notes] !== desired) {
+      target[parsed.index.notes] = desired;
+      changed = true;
+    }
+  }
+
+  if (/^overhead press$/i.test(exerciseName) && Number.isInteger(parsed.index.notes)) {
+    for (const cells of parsed.rows) {
+      if (rowDay(parsed, cells) !== day || !isWarmup(rowName(parsed, cells))) continue;
+      const before = String(cells[parsed.index.notes] || '');
+      const after = before.replace(/(Ramp Overhead Press:[^.]*?before\s+)[^.;]+?(\s+work sets\.)/i, `$1${heldWeight}$2`);
+      if (after !== before) {
+        cells[parsed.index.notes] = after;
+        changed = true;
+      }
+    }
+  }
+
+  return { program: changed ? rewriteWeek(program, parsed) : program, changed };
+}
+
+function syncHighConcurrencyNarrative(program) {
+  return String(program || '')
+    .replace(/with OHP progressed at a recoverable dose/gi, 'with OHP held at a recoverable build-week dose so primary goals and MMA recovery stay protected')
+    .replace(/The long run progresses by (?:a )?small distance (?:bumps|increase)[^.]*\./gi, 'The long run may stay at the current tolerated dose when primary-goal progress and MMA recovery take priority.');
 }
 
 // Secondary OHP is deliberately held stable in build weeks for a high-concurrency
@@ -98,15 +129,13 @@ function stabilizeSecondaryPressDose(program, intake = {}) {
     const parsed = parseWeek(candidate, week);
     if (!parsed) continue;
     let changed = false;
-    const fields = pressDoseFields(parsed);
+    const changedExercises = new Set();
     for (const cells of parsed.rows) {
       const name = rowName(parsed, cells);
       const base = baselineByName.get(name.toLowerCase());
       if (!base) continue;
-      const baseFields = pressDoseFields(baseline);
-      // Headers are contract-stable, but map by field name so this remains robust
-      // if column positions are ever rearranged in a non-production fixture.
       const keys = ['weight', 'sets', 'reps', 'rest', 'target rpe'];
+      let rowChanged = false;
       for (const key of keys) {
         const dst = parsed.index[key];
         const src = baseline.index[key];
@@ -114,12 +143,27 @@ function stabilizeSecondaryPressDose(program, intake = {}) {
         if (cells[dst] !== base[src]) {
           cells[dst] = base[src];
           changed = true;
+          rowChanged = true;
         }
       }
-      if (changed) repairs.push({ week, exercise: name, action: 'hold_secondary_press_at_week1_dose' });
+      if (rowChanged) changedExercises.add(name);
     }
     if (changed) candidate = rewriteWeek(candidate, parsed);
+
+    for (const name of baselineByName.keys()) {
+      const baselineCells = baselineByName.get(name);
+      const heldWeight = Number.isInteger(baseline.index.weight) ? baselineCells[baseline.index.weight] : '';
+      const synced = syncHeldPressCues(candidate, week, name, heldWeight);
+      candidate = synced.program;
+      if (synced.changed) changedExercises.add(name);
+    }
+
+    for (const name of changedExercises) {
+      repairs.push({ week, exercise: name, action: 'hold_secondary_press_at_week1_dose_and_sync_cues' });
+    }
   }
+
+  candidate = syncHighConcurrencyNarrative(candidate);
   return { program: candidate, repairs };
 }
 
