@@ -42,7 +42,7 @@ jobs:
           git apply --check /tmp/v34.patch
           git apply /tmp/v34.patch
 
-      - name: Apply final readiness mapping and hysteresis correction
+      - name: Apply final readiness mapping and release corrections
         if: steps.ready.outputs.ready == 'true'
         shell: python
         run: |
@@ -63,6 +63,17 @@ jobs:
           s = s.replace(old2, new2, 1)
           p.write_text(s)
 
+          # A commercial-gym intake that explicitly says standard bodyweight stations
+          # has enough evidence for a pull-up station. Do not weaken ring hard gates or
+          # explicit location/equipment exclusions.
+          sp = Path('phase14/engine/skill_progressions.js')
+          ss = sp.read_text()
+          equip_old = 'case "pull_up_bar": return /pull[-\\s]?up bar|chin[-\\s]?up bar|monkey bar|doorframe|door frame|calisthenics|outdoor[_\\s]?park|\\bpull[-\\s]?up\\b/.test(text);'
+          equip_new = 'case "pull_up_bar": return /pull[-\\s]?up bar|chin[-\\s]?up bar|monkey bar|doorframe|door frame|calisthenics|outdoor[_\\s]?park|bodyweight station|\\bpull[-\\s]?up\\b/.test(text);'
+          if equip_old not in ss:
+              raise SystemExit('pull-up equipment inference anchor not found')
+          sp.write_text(ss.replace(equip_old, equip_new, 1))
+
           t = Path('phase14/test/v34_coaching_architecture.test.js')
           ts = t.read_text()
           marker = "// 4. Handstand reduced-support"
@@ -80,12 +91,12 @@ jobs:
 
       - name: Install dependencies
         if: steps.ready.outputs.ready == 'true'
-        run: npm ci --ignore-scripts
+        run: npm ci
 
       - name: Run v34 tests
         if: steps.ready.outputs.ready == 'true'
         working-directory: phase14
-        run: node --test test/v34_coaching_architecture.test.js
+        run: node --test test/v34_coaching_architecture.test.js test/pre_live_roadmap_lingo_release.test.js
 
       - name: Syntax check modified engine files
         if: steps.ready.outputs.ready == 'true'
@@ -98,6 +109,7 @@ jobs:
           node --check engine/v34_prescription_consistency.js
           node --check engine/v34_readiness.js
           node --check engine/v34_workload_accounting.js
+          node --check engine/skill_progressions.js
 
       - name: Run regression tests
         if: steps.ready.outputs.ready == 'true'
