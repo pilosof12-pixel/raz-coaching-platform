@@ -60,8 +60,7 @@ jobs:
           new2 = """  if (oapGoal && oap!=null && oap>=2 && oapReadinessDays.length) {\n    const current = days.find(x => sessions[x].includes('OAP_STRICT'));\n    const best = readinessScoreFor(oapReadinessDays[0]);\n    const currentScore = readinessScoreFor(current);\n    const shouldMove = !current || !currentScore || !best || (best.score - currentScore.score >= 1);\n    if (shouldMove) {\n      const d = oapReadinessDays[0];\n      for (const x of days) sessions[x]=sessions[x].filter(v=>v!=='OAP_STRICT');\n      sessions[d].unshift('OAP_STRICT');\n    }\n  }"""
           if old2 not in s:
               raise SystemExit('OAP placement anchor not found')
-          s = s.replace(old2, new2, 1)
-          p.write_text(s)
+          p.write_text(s.replace(old2, new2, 1))
 
           sp = Path('phase14/engine/skill_progressions.js')
           ss = sp.read_text()
@@ -74,10 +73,8 @@ jobs:
           oap_parse_new = '    one_arm_pull_up: firstIntAfter(t, /(\\d+)\\s*one[-\\s]?arm\\s*pull/) || firstIntAfter(t, /one[-\\s]?arm\\s*pull[-\\s]?ups?[^0-9]{0,24}(\\d+)/),'
           if oap_parse_old not in ss:
               raise SystemExit('OAP benchmark parser anchor not found')
-          ss = ss.replace(oap_parse_old, oap_parse_new, 1)
-          sp.write_text(ss)
+          sp.write_text(ss.replace(oap_parse_old, oap_parse_new, 1))
 
-          # Loaded carries and rucks are distance/time locomotion, not barbell lifts.
           wu = Path('phase14/engine/specific_warmup_enrichment.js')
           ws = wu.read_text()
           ramp_anchor = "export function rampText(exercise, load) {\n"
@@ -106,10 +103,12 @@ jobs:
               if mu_anchor not in es:
                   raise SystemExit('Youth muscle-up dictionary anchor not found')
               es = es.replace(mu_anchor, '  "Strict Chest-to-Bar Pull-up", "Explosive Hip-to-Bar Pull-up", "Bar Muscle-up Transition Drill",\n', 1)
+          review_mutation = '        out = annotateFamilyRow(out, family, maxPrescribed, note, isHebrew);\n'
+          if es.count(review_mutation) < 2:
+              raise SystemExit('skill advisory client-note anchors not found')
+          es = es.replace(review_mutation, '', 2)
           ed.write_text(es)
 
-          # YG-07 must reject actual failure prescriptions without flagging explicit
-          # anti-failure coaching such as "do not train to failure".
           cq = Path('phase14/engine/coaching_spec_v1_quality.js')
           qs = cq.read_text()
           yg_old = """    if (/to failure|amrap|forced rep|grind(?:er|ing)?|until failure/i.test(`${notes} ${exercise?.dose?.reps_raw || ''}`)) {\n      fail("""
@@ -117,6 +116,22 @@ jobs:
           if yg_old not in qs:
               raise SystemExit('YG-07 failure-language anchor not found')
           cq.write_text(qs.replace(yg_old, yg_new, 1))
+
+          # Repair the Youth golden fixture itself: it is a flexible two-session
+          # benchmark, so it must not fabricate weekdays or non-canonical names.
+          gf = Path('phase14/test/fixtures/golden_programs.js')
+          gs = gf.read_text()
+          y0 = gs.index('function youthWeek(week) {')
+          y1 = gs.index('export function youthGymnasticsGoldenProgram()', y0)
+          youth = gs[y0:y1]
+          youth = youth.replace("['Mon',", "['Session A',").replace("['Thu',", "['Session B',")
+          youth = youth.replace("'Band-Assisted Bar Muscle-up Transition Drill'", "'Bar Muscle-up Transition Drill'")
+          youth = youth.replace("'Strict Ring Dip'", "'Ring Dip'").replace("'Strict Pull-up'", "'Pull-up'")
+          wall_anchor = "    ['Session A', 'Strict Chest-to-Bar Pull-up',"
+          if wall_anchor not in youth:
+              raise SystemExit('Youth golden wall-hold insertion anchor not found')
+          youth = youth.replace(wall_anchor, "    ['Session A', 'Wall Handstand Hold', 'BW', '2', '15-25 sec', '60-90s', '5-6', 'Wall-supported line and shoulder-capacity work. Keep it crisp and stop well before fatigue.', ''],\n" + wall_anchor, 1)
+          gf.write_text(gs[:y0] + youth + gs[y1:])
 
           sheet = Path('phase14/public/spreadsheet.js')
           xs = sheet.read_text()
@@ -134,11 +149,10 @@ jobs:
           t = Path('phase14/test/v34_coaching_architecture.test.js')
           ts = t.read_text()
           marker = "// 4. Handstand reduced-support"
-          extra = """const plannerIntake = (gymDays, sportSchedule) => ({\n  days_per_week: gymDays.length,\n  available_gym_days: gymDays,\n  primary_goals: ['4 One arm pullups'],\n  current_numbers: 'One-Arm Pull-up: 2 strict reps each arm',\n  sport_schedule: sportSchedule,\n});\nconst oapDay = (brief) => {\n  const line = brief.split('\\n').find((l) => /OAP_STRICT/.test(l));\n  return line ? line.trim().replace(/^\\*\\s*/, '').split(':')[0] : null;\n};\n\ntest('[V34-3c] readiness placement actually reaches the planner and honours hysteresis', async () => {\n  const { buildDeterministicBrief } = await import('../engine/phase15_planner.js');\n  const { gymDayReadiness } = await import('../engine/v34_readiness.js');\n\n  const better = plannerIntake(['Mon', 'Wed'], [{ day: 'Tue', intensity: 'hard' }]);\n  const betterScores = gymDayReadiness(better, { gymDays: ['Mon', 'Wed'] }).days;\n  assert.equal(betterScores[0].day, 'mon');\n  assert.ok(betterScores[0].score - betterScores[1].score >= 1);\n  assert.equal(oapDay(buildDeterministicBrief(better)), 'Mon');\n\n  const mirrored = plannerIntake(['Mon', 'Wed'], [{ day: 'Sun', intensity: 'hard' }]);\n  assert.equal(oapDay(buildDeterministicBrief(mirrored)), 'Wed');\n\n  const tied = plannerIntake(['Mon', 'Wed'], []);\n  const tiedScores = gymDayReadiness(tied, { gymDays: ['Mon', 'Wed'] }).days;\n  assert.equal(tiedScores[0].score - tiedScores[1].score, 0);\n  assert.equal(oapDay(buildDeterministicBrief(tied)), 'Wed');\n});\n\n"""
+          extra = """const plannerIntake = (gymDays, sportSchedule) => ({\n  days_per_week: gymDays.length,\n  available_gym_days: gymDays,\n  primary_goals: ['4 One arm pullups'],\n  current_numbers: 'One-Arm Pull-up: 2 strict reps each arm',\n  sport_schedule: sportSchedule,\n});\nconst oapDay = (brief) => {\n  const line = brief.split('\\n').find((l) => /OAP_STRICT/.test(l));\n  return line ? line.trim().replace(/^\\*\\s*/, '').split(':')[0] : null;\n};\n\ntest('[V34-3c] readiness placement actually reaches the planner and honours hysteresis', async () => {\n  const { buildDeterministicBrief } = await import('../engine/phase15_planner.js');\n  const { gymDayReadiness } = await import('../engine/v34_readiness.js');\n  const better = plannerIntake(['Mon', 'Wed'], [{ day: 'Tue', intensity: 'hard' }]);\n  const betterScores = gymDayReadiness(better, { gymDays: ['Mon', 'Wed'] }).days;\n  assert.equal(betterScores[0].day, 'mon');\n  assert.ok(betterScores[0].score - betterScores[1].score >= 1);\n  assert.equal(oapDay(buildDeterministicBrief(better)), 'Mon');\n  const mirrored = plannerIntake(['Mon', 'Wed'], [{ day: 'Sun', intensity: 'hard' }]);\n  assert.equal(oapDay(buildDeterministicBrief(mirrored)), 'Wed');\n  const tied = plannerIntake(['Mon', 'Wed'], []);\n  const tiedScores = gymDayReadiness(tied, { gymDays: ['Mon', 'Wed'] }).days;\n  assert.equal(tiedScores[0].score - tiedScores[1].score, 0);\n  assert.equal(oapDay(buildDeterministicBrief(tied)), 'Wed');\n});\n\n"""
           if marker not in ts:
               raise SystemExit('test insertion marker not found')
-          ts = ts.replace(marker, extra + marker, 1)
-          t.write_text(ts)
+          t.write_text(ts.replace(marker, extra + marker, 1))
 
       - uses: actions/setup-node@v4
         if: steps.ready.outputs.ready == 'true'
@@ -153,9 +167,9 @@ jobs:
       - name: Run v34 and release-critical focused tests
         if: steps.ready.outputs.ready == 'true'
         working-directory: phase14
-        run: node --test test/v34_coaching_architecture.test.js test/pre_live_roadmap_lingo_release.test.js test/tactical_manual_acceptance.test.js test/youth_skill_dictionary.test.js test/coaching_spec_v1_convergence_regressions.test.js
+        run: node --test test/v34_coaching_architecture.test.js test/pre_live_roadmap_lingo_release.test.js test/tactical_manual_acceptance.test.js test/youth_skill_dictionary.test.js test/coaching_spec_v1_convergence_regressions.test.js test/advanced_hybrid_launch_acceptance.test.js test/youth_gymnastics_manual_acceptance.test.js test/production_chain_golden.test.js
 
-      - name: Syntax check modified engine files
+      - name: Syntax check modified files
         if: steps.ready.outputs.ready == 'true'
         working-directory: phase14
         run: |
@@ -172,6 +186,7 @@ jobs:
           node --check engine/exercise_dictionary.js
           node --check engine/coaching_spec_v1_quality.js
           node --check public/spreadsheet.js
+          node --check test/fixtures/golden_programs.js
 
       - name: Run regression tests
         if: steps.ready.outputs.ready == 'true'
@@ -197,7 +212,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          rm -rf .github/v34-patch .github/workflows/apply-v34-coaching.yml .github/workflows/apply-v34-final-commit.yml .github/v34-final-commit.patch.b64 .github/v34-workflow-kick*.txt .github/v34-regression-failure.txt
+          rm -rf .github/v34-patch .github/workflows/apply-v34-coaching.yml .github/workflows/apply-v34-final-commit.yml .github/v34-final-commit.patch.b64 .github/v34-workflow-kick*.txt .github/v34-regression-failure.txt phase14/test/v34_release_diagnostics.test.js
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add -A
