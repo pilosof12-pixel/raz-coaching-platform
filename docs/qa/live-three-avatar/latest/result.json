@@ -1,25 +1,25 @@
 {
-  "timestamp": "2026-08-19T03:56:02.489Z",
+  "timestamp": "2026-08-19T04:10:06.402Z",
   "base": "https://raz-coaching-platform.onrender.com",
-  "head_sha": "dc7dbc947b985b75f4cc862e79c91fa176584bdc",
-  "runtime": "launch-acceptance-v30c-coaching-spec-v1-fixed-deploy-20260819",
+  "head_sha": "c7b9859bcf605bc2d5f94738235192adc6ae15e8",
+  "runtime": "launch-acceptance-v30d-coaching-spec-v1-convergence-20260819",
   "results": [
     {
       "id": "advanced_hybrid",
-      "job_id": "40d8d85f77616e011225cbc6e3679319",
+      "job_id": "f2d1295723e26a02ba1ff5e41d99bcb3",
       "ok": false,
       "status": "error",
       "stage": "refining",
       "attempt": 4,
-      "detail": "internal repair: COACH_SPEC_V1_AH_RECOVERY_HIERARCHY_OVERLOADED",
+      "detail": "internal repair: COACH_SPEC_V1_AH_ADJACENT_HIGH_STRESS_PULLING",
       "last_seen_status": "error",
-      "error": "Internal coaching QA could not repair the candidate program after multiple passes. No client-facing program was saved. Please retry the build. QA trace: A1:COACH_SPEC_V1_AH_RECOVERY_HIERARCHY_OVERLOADED+EVENT_PROGRESSING_SESSION_MISSING -> A2:COACH_SPEC_V1_AH_RECOVERY_HIERARCHY_OVERLOADED -> A3:COACH_SPEC_V1_AH_RECOVERY_HIERARCHY_OVERLOADED -> A4:COACH_SPEC_V1_AH_RECOVERY_HIERARCHY_OVERLOADED. [QA:INTERNAL_QA_REPAIR_EXHAUSTED]",
+      "error": "Internal coaching QA could not repair the candidate program after multiple passes. No client-facing program was saved. Please retry the build. QA trace: A1:COACH_SPEC_V1_AH_ADJACENT_HIGH_STRESS_PULLING+EVENT_PROGRESSING_SESSION_MISSING -> A2:COACH_SPEC_V1_AH_ADJACENT_HIGH_STRESS_PULLING -> A3:COACH_SPEC_V1_AH_ADJACENT_HIGH_STRESS_PULLING -> A4:COACH_SPEC_V1_AH_ADJACENT_HIGH_STRESS_PULLING. [QA:INTERNAL_QA_REPAIR_EXHAUSTED]",
       "program_chars": 0,
-      "seconds": 131
+      "seconds": 133
     },
     {
       "id": "youth_gymnastics",
-      "job_id": "27acc896d9c048190ef01b7de7136717",
+      "job_id": "426c1361b1bee9a31b92616f2bcf054b",
       "ok": true,
       "status": "done",
       "stage": "finalizing",
@@ -27,12 +27,12 @@
       "detail": "saving program",
       "last_seen_status": "done",
       "error": null,
-      "program_chars": 10693,
-      "seconds": 86
+      "program_chars": 10200,
+      "seconds": 93
     },
     {
       "id": "tactical_3k",
-      "job_id": "6774c055d775b19898ac62f72380fdd3",
+      "job_id": "8bca8f920038cb82490934eb24014c44",
       "ok": true,
       "status": "done",
       "stage": "finalizing",
@@ -40,8 +40,8 @@
       "detail": "saving program",
       "last_seen_status": "done",
       "error": null,
-      "program_chars": 11894,
-      "seconds": 152
+      "program_chars": 11227,
+      "seconds": 176
     }
   ],
   "ok": false
