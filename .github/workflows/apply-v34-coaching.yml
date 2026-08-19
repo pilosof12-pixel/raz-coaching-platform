@@ -42,7 +42,7 @@ jobs:
           git apply --check /tmp/v34.patch
           git apply /tmp/v34.patch
 
-      - name: Apply final readiness mapping and hysteresis correction
+      - name: Apply final readiness mapping, hysteresis, and legacy OAP regression correction
         if: steps.ready.outputs.ready == 'true'
         shell: python
         run: |
@@ -71,6 +71,14 @@ jobs:
               raise SystemExit('test insertion marker not found')
           ts = ts.replace(marker, extra + marker, 1)
           t.write_text(ts)
+
+          legacy = Path('phase14/test/advanced_hybrid_oap.test.js')
+          body = legacy.read_text()
+          stale = "assert.match(brief, /submaximal singles|1[-–]2 clean single|clean singles/i);"
+          modern = "assert.match(brief, /priority set of 1[-–]2 clean strict reps|clean singles/i);"
+          if stale not in body:
+              raise SystemExit('legacy OAP assertion anchor not found')
+          legacy.write_text(body.replace(stale, modern, 1))
 
       - uses: actions/setup-node@v4
         if: steps.ready.outputs.ready == 'true'
