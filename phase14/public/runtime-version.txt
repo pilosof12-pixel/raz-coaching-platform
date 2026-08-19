@@ -1,1 +1,1 @@
-launch-acceptance-v30b-coaching-spec-v1-redeploy-20260819
+launch-acceptance-v30c-coaching-spec-v1-fixed-deploy-20260819
