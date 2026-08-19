@@ -1,0 +1,25 @@
+
+> raz-coaching-platform@1.0.0 phase15:build
+> node ../scripts/apply_elite_guardrails.mjs && node ../scripts/apply_final_normalization.mjs && node ../scripts/apply_endurance_semantic_guardrails.mjs && node scripts/apply_goal_progression_graph_fix.mjs && node scripts/apply_advanced_skill_state_fix.mjs && node scripts/apply_skill_annotation_cleanliness_fix.mjs && node scripts/apply_goal_component_release_gate.mjs && node scripts/apply_strength_session_microdose_accounting.mjs && node scripts/apply_tactical_manual_acceptance.mjs && node scripts/apply_fixed_day_lastmile_guard.mjs && node scripts/build_phase15_runtime.mjs && node scripts/apply_compositional_exercise_vocabulary.mjs && node scripts/apply_tactical_endurance_vocabulary.mjs && node scripts/apply_named_skill_goal_fix.mjs && node scripts/apply_youth_gymnastics_parity.mjs && node scripts/apply_tactical_3k_parity.mjs && node scripts/final_pipeline_lock.mjs && node scripts/apply_advanced_hybrid_oap_pipeline_wiring.mjs && node scripts/apply_progression_gpp_coaching.mjs && node scripts/apply_aggregate_repair_validation.mjs && node scripts/apply_openai_empty_output_retry.mjs && node scripts/apply_repair_convergence_policy.mjs && node scripts/apply_youth_live_convergence.mjs && node scripts/apply_youth_visible_progression_fix.mjs && node scripts/apply_coaching_spec_v1.mjs && node scripts/apply_live_qa_diagnostics.mjs && node scripts/apply_advanced_hybrid_oap_repair_feedback.mjs
+
+/home/runner/work/raz-coaching-platform/raz-coaching-platform/phase14/engine/phase15_program_qa.js: already current
+/home/runner/work/raz-coaching-platform/raz-coaching-platform/phase14/engine/phase15_elite_guardrails.js: already current
+/home/runner/work/raz-coaching-platform/raz-coaching-platform/phase14/engine/exercise_dictionary.js: already current
+/home/runner/work/raz-coaching-platform/raz-coaching-platform/phase14/engine/phase15_source_router.js: already current
+/home/runner/work/raz-coaching-platform/raz-coaching-platform/phase14/engine/exercise_dictionary.js: already current
+/home/runner/work/raz-coaching-platform/raz-coaching-platform/phase14/server.js: already current
+/home/runner/work/raz-coaching-platform/raz-coaching-platform/phase14/scripts/build_phase15_runtime.mjs: already current
+/home/runner/work/raz-coaching-platform/raz-coaching-platform/phase14/engine/phase15_elite_guardrails.js: already current
+/home/runner/work/raz-coaching-platform/raz-coaching-platform/phase14/engine/phase15_final_qa.js: already current
+goal_progression_graph.js: ProgramModel display-name identity fixed
+file:///home/runner/work/raz-coaching-platform/raz-coaching-platform/phase14/scripts/apply_advanced_skill_state_fix.mjs:26
+  if (count !== 1) throw new Error(`skill_progressions OAP benchmark anchor expected once, found ${count}`);
+                         ^
+
+Error: skill_progressions OAP benchmark anchor expected once, found 0
+    at file:///home/runner/work/raz-coaching-platform/raz-coaching-platform/phase14/scripts/apply_advanced_skill_state_fix.mjs:26:26
+    at ModuleJob.run (node:internal/modules/esm/module_job:343:25)
+    at async onImport.tracePromise.__proto__ (node:internal/modules/esm/loader:681:26)
+    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:117:5)
+
+Node.js v22.23.2
