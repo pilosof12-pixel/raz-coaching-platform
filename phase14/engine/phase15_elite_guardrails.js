@@ -111,7 +111,7 @@ function meaningfulModalityRows(parsed, def) {
   return rows;
 }
 
-function eventProgressionBearing(item) {
+export function eventProgressionBearing(item) {
   const s=`${item.ctx} ${item.dose}`;
   const explicitTarget = /(?:\b(?:interval|threshold|critical speed|critical power|race pace|goal pace|target pace|2k pace|3k pace|5k pace|10k pace|marathon pace|split target|stroke rate|cadence|power target|pace target)\b|\b\d+:\d+(?:-\d+:\d+)?\s*\/\s*500m\b|\b\d+(?::\d+)?\s*\/\s*km\b|\b\d+(?:\.\d+)?\s*(?:km\/h|kph|watts?|w)\b|\bprogress(?:ion|ively)?\b)/i.test(s);
   // A standard interval can encode its event-specific target as repetition distance
@@ -244,7 +244,8 @@ export function endurancePerformanceIntegrityFlags(program, intake={}, parsed=nu
     }); // MARATHON-LONG-RUN-PROGRESSION
     if(eventGoal && !rows.some(eventProgressionBearing) && !marathonLongRunProgression) flags.push({
       code:'EVENT_PROGRESSING_SESSION_MISSING',
-      message:`The ${def.key} performance goal '${text}' has no progression-bearing event-specific session in Week 1. For marathon preparation, an explicitly identified long run with a prescribed duration/distance is a valid event-specific progression anchor; other events still require their source-supported pace/power/split/interval or equivalent progression.`
+      message:`The ${def.key} performance goal '${text}' has no progression-bearing event-specific session in Week 1. For marathon preparation, an explicitly identified long run with a prescribed duration/distance is a valid event-specific progression anchor; other events still require their source-supported pace/power/split/interval or equivalent progression.`,
+      details:{ key: def.key }
     });
   }
   return flags;

@@ -10,6 +10,8 @@ import {
   normalizeYouthSkillAcquisitionQuality,
   normalizeTactical3KRaceSpecificity,
 } from '../engine/coaching_spec_v1_convergence_normalizer.js';
+import { validatePhase15FinalProgram } from '../engine/phase15_final_qa.js';
+import { Phase15QualityError } from '../engine/phase15_program_qa.js';
 
 const header = 'Day\tExercise\tWeight\tSets\tReps\tRest\tTarget RPE\tNotes\tResults';
 function block(week, rows) {
@@ -53,6 +55,171 @@ test('Tactical convergence creates 400 -> 600 -> 800 race-specific development a
   assert.match(repaired.program, /START_WEEK3_TSV[\s\S]*Tue\tRun\t800 m @ 3:27-3:34\t4\t800 m/);
   assert.match(repaired.program, /Mon\tBack Squat\t122\.5 kg\t2\t5\t3 min\t7\t/);
   assert.equal(validateTactical3KCoachingSpecV1(repaired.program, tacticalLiveIntake).ok, true);
+});
+
+function week1Block(program) {
+  return program.match(/START_WEEK1_TSV\s*\n([\s\S]*?)\nEND_WEEK1_TSV/i)[1];
+}
+
+// Reproduces the live v30f Tactical failure shape: a recognized "Run" key
+// row with sets >= 2 and a real repetition distance, but no clock/pace
+// target anywhere in its dose -- the exact gap that made every live attempt
+// exhaust on EVENT_PROGRESSING_SESSION_MISSING even after the other three
+// Tactical defects converged.
+function tactical400OnlyNoWeek1Pace() {
+  return fourWeeks((week) => [
+    `Mon\tBack Squat\t${[120,122.5,125,120][week-1]} kg\t3\t5\t3 min\t7.5\tMaintenance squat.\t`,
+    `Tue\tRun\tN/A\t${[6,7,7,5][week-1]}\t400 m\t2:00\t8\tRun at RPE 8, controlled effort based on current fitness.\t`,
+    `Thu\tBackpack Carry\t20 kg, 9:30/km\t1\t${[8,8.5,9,8][week-1]} km\tN/A\t6\tControlled ruck.\t`,
+  ], 'If shin symptoms return, hold the newest run or ruck progression, reduce impact, and repeat the prior tolerated week.');
+}
+
+test('Tactical Week 1 with no pace/clock-anchored key session triggers EVENT_PROGRESSING_SESSION_MISSING before repair', () => {
+  assert.throws(
+    () => validatePhase15FinalProgram(tactical400OnlyNoWeek1Pace(), tacticalLiveIntake),
+    (err) => err instanceof Phase15QualityError && err.flags.some((f) => f.code === 'EVENT_PROGRESSING_SESSION_MISSING'),
+  );
+});
+
+test('Tactical convergence canonicalizes the existing Week 1 key row into a legitimate event-specific session instead of adding one', () => {
+  const repaired = normalizeTactical3KRaceSpecificity(tactical400OnlyNoWeek1Pace(), tacticalLiveIntake);
+  assert.equal(repaired.repaired, true);
+  assert.ok(repaired.repairs.some((r) => r.type === 'tactical_3k_week1_event_session_canonicalized'));
+  assert.match(repaired.program, /START_WEEK1_TSV[\s\S]*Tue\tRun\t400 m @ \d{1,2}:\d{2}-\d{1,2}:\d{2}\t6\t400 m/);
+});
+
+test('[D] after repair the EVENT_PROGRESSING_SESSION_MISSING path is silent, and the program still passes the frozen Tactical spec', () => {
+  const repaired = normalizeTactical3KRaceSpecificity(tactical400OnlyNoWeek1Pace(), tacticalLiveIntake);
+  // This minimal fixture is not a full 3-day program (it omits the pull-up
+  // secondary-goal exposure and load benchmarks), so it can still legitimately
+  // trip unrelated goal/benchmark flags; assert only that the specific flag
+  // this patch targets is gone, not that every unrelated validator is silent.
+  let caught = null;
+  try { validatePhase15FinalProgram(repaired.program, tacticalLiveIntake); } catch (e) { caught = e; }
+  assert.equal(caught === null || !caught.flags?.some((f) => f.code === 'EVENT_PROGRESSING_SESSION_MISSING'), true);
+  assert.equal(validateTactical3KCoachingSpecV1(repaired.program, tacticalLiveIntake).ok, true);
+});
+
+test('Week 2/3 still develop past 400 m rather than collapsing back to a 400-only block after the Week 1 fix', () => {
+  const repaired = normalizeTactical3KRaceSpecificity(tactical400OnlyNoWeek1Pace(), tacticalLiveIntake);
+  assert.match(repaired.program, /START_WEEK2_TSV[\s\S]*Tue\tRun\t600 m @ [\d:]+-[\d:]+\t4\t600 m/);
+  assert.match(repaired.program, /START_WEEK3_TSV[\s\S]*Tue\tRun\t800 m @ [\d:]+-[\d:]+\t4\t800 m/);
+});
+
+test('repaired Week 1 pace is anchored to current 13:30 3K capacity, not aspirational sub-12:00 goal pace', () => {
+  const repaired = normalizeTactical3KRaceSpecificity(tactical400OnlyNoWeek1Pace(), tacticalLiveIntake);
+  const m = repaired.program.match(/START_WEEK1_TSV[\s\S]*?Tue\tRun\t400 m @ (\d{1,2}):(\d{2})-(\d{1,2}):(\d{2})\t/);
+  assert.ok(m, 'expected a canonical 400m clock-paced Week 1 row');
+  const lowSec = Number(m[1]) * 60 + Number(m[2]);
+  // Current 13:30 3K implies ~108s/400m; sub-12:00 goal pace would be ~96s/400m or faster.
+  // A current-capacity-anchored prescription must stay slower than goal pace.
+  assert.ok(lowSec > 100, `expected current-capacity pace slower than aspirational goal pace, got ${m[0]}`);
+});
+
+test('the key run stays protected from substantial preceding lower-body strength (T3K-05) after Week 1 canonicalization', () => {
+  const adjacent = fourWeeks(() => [
+    'Mon\tBack Squat\t140 kg\t4\t6\t3 min\t8.5\tHeavy squat day.\t',
+    'Tue\tRun\tN/A\t6\t400 m\t2:00\t8\tRun at RPE 8, controlled effort based on current fitness.\t',
+  ], 'If shin symptoms return, hold the newest run or ruck progression, reduce impact, and repeat the prior tolerated week.');
+  const repaired = normalizeTactical3KRaceSpecificity(adjacent, tacticalLiveIntake);
+  assert.doesNotThrow(() => validateTactical3KCoachingSpecV1(repaired.program, tacticalLiveIntake));
+});
+
+test('prior shin-splint history keeps its explicit symptom-gated progression language after the Week 1 repair', () => {
+  const repaired = normalizeTactical3KRaceSpecificity(tactical400OnlyNoWeek1Pace(), tacticalLiveIntake);
+  assert.match(repaired.program, /shin symptoms return, hold the newest run or ruck progression/i);
+});
+
+test('[E] the Week 1 event-progression repair is idempotent (second pass is byte-identical)', () => {
+  const once = normalizeTactical3KRaceSpecificity(tactical400OnlyNoWeek1Pace(), tacticalLiveIntake);
+  const twice = normalizeTactical3KRaceSpecificity(once.program, tacticalLiveIntake);
+  assert.equal(twice.repaired, false);
+  assert.equal(twice.program, once.program);
+});
+
+test('[F] the Week 1 repair does not add a duplicate key run row', () => {
+  const repaired = normalizeTactical3KRaceSpecificity(tactical400OnlyNoWeek1Pace(), tacticalLiveIntake);
+  const runRows = week1Block(repaired.program).split('\n').filter((line) => /^Tue\tRun\t/.test(line));
+  assert.equal(runRows.length, 1);
+});
+
+test('an already-progression-bearing Week 1 row is left untouched by the new repair', () => {
+  const repaired = normalizeTactical3KRaceSpecificity(tactical400Only(), tacticalLiveIntake);
+  assert.equal(repaired.repairs.some((r) => r.type === 'tactical_3k_week1_event_session_canonicalized'), false);
+});
+
+// [A] Week 1 already contains one legitimate progression-bearing running row
+// (current-capacity clock target present) plus a second, unrelated RPE-only
+// interval row. The real validator semantics are "does Week 1 contain AT
+// LEast one progression-bearing row", so this program already passes and the
+// new repair must not touch it -- even though a naive "fix every non-bearing
+// row" implementation would incorrectly rewrite the second row.
+function tacticalWeek1MixedBearingAndNonBearing() {
+  return fourWeeks((week) => week === 1
+    ? [
+      // RPE 7 (not 7.5+) so the pre-existing, unrelated T3K-05 preceding-strength
+      // trim does not also fire here -- this fixture isolates the new Week 1
+      // event-progression repair specifically.
+      'Mon\tBack Squat\t120 kg\t3\t5\t3 min\t7\tMaintenance squat.\t',
+      'Tue\tRun\t400 m @ 1:42-1:45\t6\t400 m\t2:00\t8\tPrimary 3K quality, current-capacity paced.\t',
+      'Thu\tRun\tN/A\t4\t300 m\t2:00\t7\tEasy strides, RPE only, not the primary quality session.\t',
+    ]
+    : [
+      `Mon\tBack Squat\t${[null,122.5,125,120][week-1]} kg\t3\t5\t3 min\t7\tMaintenance squat.\t`,
+      `Tue\tRun\t400 m @ ${['','1:42-1:45','1:40-1:43','1:38-1:40'][week-1]}\t${[null,7,7,5][week-1]}\t400 m\t2:00\t8\tPrimary 3K quality.\t`,
+      `Thu\tBackpack Carry\t20 kg, 9:30/km\t1\t${[null,8.5,9,8][week-1]} km\tN/A\t6\tControlled ruck.\t`,
+    ], 'If shin symptoms return, hold the newest run or ruck progression, reduce impact, and repeat the prior tolerated week.');
+}
+
+test('[A] Week 1 with one bearing row plus one non-bearing row already satisfies the validator, so the new repair does nothing', () => {
+  const program = tacticalWeek1MixedBearingAndNonBearing();
+  const repaired = normalizeTactical3KRaceSpecificity(program, tacticalLiveIntake);
+  assert.equal(repaired.repairs.some((r) => r.type === 'tactical_3k_week1_event_session_canonicalized'), false);
+  assert.equal(week1Block(repaired.program), week1Block(program));
+});
+
+// [B] The key row itself (not just the block-level intro note) carries
+// row-local shin-symptom/readiness language and no clock target. Canonicalizing
+// the row must append the event-specific cue, never replace the row's own
+// safety/readiness text.
+function tacticalWeek1RowLocalShinNote() {
+  return fourWeeks((week) => [
+    `Mon\tBack Squat\t${[120,122.5,125,120][week-1]} kg\t3\t5\t3 min\t7.5\tMaintenance squat.\t`,
+    week === 1
+      ? 'Tue\tRun\tN/A\t5\t400 m\t2:30\t8\tIf shin symptoms return, stop the session, reduce impact, and repeat the prior tolerated dose.\t'
+      : `Tue\tRun\t400 m @ ${['','1:42-1:45','1:40-1:43','1:38-1:40'][week-1]}\t${[null,7,7,5][week-1]}\t400 m\t2:00\t8\tPrimary 3K quality.\t`,
+    `Thu\tBackpack Carry\t20 kg, 9:30/km\t1\t${[8,8.5,9,8][week-1]} km\tN/A\t6\tControlled ruck.\t`,
+  ]);
+}
+
+test('[B] row-local shin-symptom/readiness language on the key row survives canonicalization', () => {
+  const repaired = normalizeTactical3KRaceSpecificity(tacticalWeek1RowLocalShinNote(), tacticalLiveIntake);
+  assert.ok(repaired.repairs.some((r) => r.type === 'tactical_3k_week1_event_session_canonicalized'));
+  assert.match(
+    week1Block(repaired.program),
+    /If shin symptoms return, stop the session, reduce impact, and repeat the prior tolerated dose\./i,
+  );
+  assert.match(week1Block(repaired.program), /Tue\tRun\t400 m @ \d{1,2}:\d{2}-\d{1,2}:\d{2}\t5\t400 m/);
+  assert.equal(validateTactical3KCoachingSpecV1(repaired.program, tacticalLiveIntake).ok, true);
+});
+
+// [C] The AI used a near-miss but clearly running-related exercise name
+// ("Running Intervals") instead of the canonical "Run"/"Zone-2 Run" label.
+// It must still be found and canonicalized rather than missed.
+function tacticalWeek1RunningIntervalsName() {
+  return fourWeeks((week) => [
+    `Mon\tBack Squat\t${[120,122.5,125,120][week-1]} kg\t3\t5\t3 min\t7.5\tMaintenance squat.\t`,
+    week === 1
+      ? 'Tue\tRunning Intervals\tN/A\t5\t400 m\t2:30\t8\tControlled effort based on current fitness.\t'
+      : `Tue\tRun\t400 m @ ${['','1:42-1:45','1:40-1:43','1:38-1:40'][week-1]}\t${[null,7,7,5][week-1]}\t400 m\t2:00\t8\tPrimary 3K quality.\t`,
+    `Thu\tBackpack Carry\t20 kg, 9:30/km\t1\t${[8,8.5,9,8][week-1]} km\tN/A\t6\tControlled ruck.\t`,
+  ]);
+}
+
+test('[C] "Running Intervals" is recognized as the intended existing key row (sets >= 2, parseable distance)', () => {
+  const repaired = normalizeTactical3KRaceSpecificity(tacticalWeek1RunningIntervalsName(), tacticalLiveIntake);
+  assert.ok(repaired.repairs.some((r) => r.type === 'tactical_3k_week1_event_session_canonicalized'));
+  assert.match(week1Block(repaired.program), /Tue\tRun\t400 m @ \d{1,2}:\d{2}-\d{1,2}:\d{2}\t5\t400 m/);
 });
 
 const youthLiveIntake = {

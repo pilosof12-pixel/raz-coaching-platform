@@ -1,4 +1,5 @@
 import { isHighConcurrencyHybrid } from './advanced_hybrid_concurrency.js';
+import { endurancePerformanceIntegrityFlags, eventProgressionBearing } from './phase15_elite_guardrails.js';
 
 const WEEKDAYS = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'];
 
@@ -81,7 +82,12 @@ function rebuild(candidate, parsed) {
   return candidate.replace(parsed.re, parsed.match[1] + inner + parsed.match[3]);
 }
 function isWarmup(name) { return /^\s*\[WARMUP\]/i.test(String(name || '')); }
-function isRunName(name) { return /^\s*(?:Run|Zone-2 Run)\s*$/i.test(String(name || '')); }
+// Bounded near-miss matcher: catches "Run", "Interval Run", "Running
+// Intervals", "Zone-2 Run Intervals" (the word "run"/"running" appears
+// somewhere in the name) without matching arbitrary unrelated exercise
+// names. Always combined with a sets>=2 + parseable-distance gate (see
+// isKeyIntervalRow), so an easy/long single-set run is never matched.
+function isRunName(name) { return /\brun(?:ning)?\b/i.test(String(name || '')); }
 function isKeyIntervalRow(parsed, cells) {
   if (isWarmup(cells[parsed.exercise]) || !isRunName(cells[parsed.exercise])) return false;
   return (firstNum(cells[parsed.sets]) ?? 0) >= 2 && Number.isFinite(parseDistanceMeters(cells[parsed.reps]));
@@ -309,6 +315,74 @@ export function normalizeTactical3KRaceSpecificity(program, intake = {}) {
   const distances = snapshots.map((x) => x.distance).filter(Number.isFinite);
   const allShort = distances.length > 0 && distances.every((d) => d <= 400);
   const current = current3kSeconds(intake);
+
+  // EVENT_PROGRESSING_SESSION_MISSING convergence. That validator only checks
+  // Week 1 (phase15_elite_guardrails.js endurancePerformanceIntegrityFlags)
+  // and its real semantics are "does Week 1 as a whole contain at least one
+  // progression-bearing running row" -- not "does every running row qualify".
+  // Ask the actual validator first, on Week 1 as parsed, so an already-valid
+  // program (one legitimate row plus an unrelated RPE-only row) is left
+  // untouched. Only when the validator would genuinely still reject Week 1 do
+  // we select and canonicalize the intended key row.
+  if (Number.isFinite(current)) {
+    const week1 = parseWeek(candidate, 1);
+    if (week1) {
+      const guardrailParsed = {
+        idx: { day: week1.day, exercise: week1.exercise, weight: week1.load, sets: week1.sets, reps: week1.reps, notes: week1.notes },
+        rows: week1.rows.map((cells) => ({ cells })),
+      };
+      const week1Flags = endurancePerformanceIntegrityFlags(candidate, intake, guardrailParsed);
+      // The validator evaluates every modality goal independently (e.g. a
+      // concurrent rucking goal can also emit this code) -- only the running
+      // instance of the flag is this repair's concern, so filter on details.key
+      // rather than treating any occurrence of the code as "running is missing".
+      const stillMissing = week1Flags.some((f) => f.code === 'EVENT_PROGRESSING_SESSION_MISSING' && f.details?.key === 'running');
+      if (stillMissing) {
+        const target = intervalRows(week1).find(({ cells }) => {
+          const ctx = `${cells[week1.exercise] || ''} ${Number.isInteger(week1.notes) ? cells[week1.notes] || '' : ''}`;
+          const dose = `${cells[week1.reps] || ''} ${Number.isInteger(week1.load) ? cells[week1.load] || '' : ''} ${Number.isInteger(week1.notes) ? cells[week1.notes] || '' : ''}`;
+          return !eventProgressionBearing({ ctx, dose });
+        });
+        if (target) {
+          const { cells, row } = target;
+          const distance = parseDistanceMeters(cells[week1.reps]) || 400;
+          const low = current * (distance / 3000) * 0.97;
+          const high = current * (distance / 3000) * 1.00;
+          const before = {
+            exercise: cells[week1.exercise],
+            load: Number.isInteger(week1.load) ? cells[week1.load] : null,
+            sets: cells[week1.sets],
+            reps: cells[week1.reps],
+          };
+          cells[week1.exercise] = 'Run';
+          cells[week1.reps] = `${distance} m`;
+          if (Number.isInteger(week1.load)) cells[week1.load] = `${distance} m @ ${formatClock(low)}-${formatClock(high)}`;
+          if (Number.isInteger(week1.notes)) {
+            // Append, never replace: existing coaching/safety language (shin
+            // symptom gating, readiness rules, technical cues) must survive.
+            cells[week1.notes] = addCue(
+              cells[week1.notes],
+              `Anchored to current ${formatClock(current)} 3K capacity, not goal pace; even splits, no sprint finish.`,
+              'anchored to current',
+            );
+          }
+          repairs.push({
+            type: 'tactical_3k_week1_event_session_canonicalized',
+            week: 1,
+            row,
+            before,
+            after: {
+              exercise: cells[week1.exercise],
+              load: Number.isInteger(week1.load) ? cells[week1.load] : null,
+              sets: cells[week1.sets],
+              reps: cells[week1.reps],
+            },
+          });
+          candidate = rebuild(candidate, week1);
+        }
+      }
+    }
+  }
 
   if (allShort && Number.isFinite(current)) {
     const targets = {
