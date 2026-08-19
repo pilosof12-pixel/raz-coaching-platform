@@ -1,2 +1,3 @@
 trigger v34 apply workflow
 synchronize
+after-base-workflow-registered
