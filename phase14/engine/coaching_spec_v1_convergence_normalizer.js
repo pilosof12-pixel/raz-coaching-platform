@@ -295,6 +295,32 @@ function current3kSeconds(intake = {}) {
 function intervalRows(parsed) {
   return parsed.rows.map((cells, row) => ({ cells, row })).filter(({ cells }) => isKeyIntervalRow(parsed, cells));
 }
+function parseMinutes(raw) {
+  const m = String(raw || '').match(/(\d+(?:\.\d+)?)\s*(?:min|minutes?)\b/i);
+  return m ? Number(m[1]) : null;
+}
+// A generic aerobic running row: a real running exposure that carries no
+// interval structure (so isKeyIntervalRow cannot see it and Stage 2 has nothing
+// to canonicalize). Its aerobic size is used to pick the lowest-risk slot.
+function genericRunRows(parsed) {
+  return parsed.rows
+    .map((cells, row) => ({ cells, row }))
+    .filter(({ cells }) => !isWarmup(cells[parsed.exercise])
+      && isRunName(cells[parsed.exercise])
+      && !isKeyIntervalRow(parsed, cells))
+    .map((entry) => {
+      const reps = entry.cells[parsed.reps];
+      const km = parseKm(reps);
+      const minutes = parseMinutes(reps);
+      // Rank by aerobic size so the athlete's largest aerobic exposure survives.
+      const size = Number.isFinite(km) ? km * 6 : (Number.isFinite(minutes) ? minutes : null);
+      return { ...entry, size };
+    });
+}
+function shinImpactHistory(intake = {}) {
+  // Hyphenated "shin-splint" is the common intake spelling, so match both forms.
+  return /shin[- ]?splint|shin pain|medial tibial|tibial stress/.test(lower(`${txt(intake.injuries)} ${txt(intake.notes)} ${txt(intake.pain)}`));
+}
 function priorWeekdayName(day) {
   const idx = dayIndex(day);
   return idx < 0 ? null : WEEKDAYS[(idx + 6) % 7];
@@ -379,6 +405,83 @@ export function normalizeTactical3KRaceSpecificity(program, intake = {}) {
             },
           });
           candidate = rebuild(candidate, week1);
+        } else {
+          // Stage 1b: Week 1 genuinely needs an event-specific session but carries no
+          // structured interval row to canonicalize -- the model produced only generic
+          // aerobic running. Repurpose the SMALLEST existing running slot in each week,
+          // and only where a second generic running exposure remains, so the athlete
+          // keeps real aerobic work and no session, day or weekly impact is added.
+          //
+          // The final-QA endurance floor re-runs on Weeks 2-4 as well, so a Week-1-only
+          // rewrite provably cannot converge. Either the whole block gets a coherent
+          // progression or nothing is mutated: a half-repaired program is not an
+          // improvement. If any week lacks a spare aerobic slot, converting its only
+          // easy run would erase a required exposure, so this fails closed instead.
+          const plan = {
+            1: { distance: 600, sets: 4, lowMul: 0.98, highMul: 1.00, rest: '2:30-3:00', rpe: '8', role: 'Establishes the primary 3K-specific session at current capacity.' },
+            2: { distance: 600, sets: 5, lowMul: 0.98, highMul: 1.00, rest: '2:30-3:00', rpe: '8', role: 'Adds one repetition of quality volume at the same pace.' },
+            3: { distance: 800, sets: 4, lowMul: 0.96, highMul: 0.99, rest: '2:30-3:00', rpe: '8-8.5', role: 'Extends to longer race-specific repetitions.' },
+            4: { distance: 600, sets: 4, lowMul: 0.95, highMul: 0.97, rest: '3:00', rpe: '8-8.5', role: 'Reduces quality volume and sharpens pace for realisation.' },
+          };
+          const PLANNED_WEEKS = Object.keys(plan).length;
+          const slots = [];
+          for (let week = 1; week <= PLANNED_WEEKS; week++) {
+            const parsed = week === 1 ? week1 : parseWeek(candidate, week);
+            // A week that is missing or unparseable cannot be planned, so the whole
+            // repair is abandoned. Skipping it would mutate the weeks around it and
+            // leave a half-repaired block, which is exactly what must not happen.
+            if (!parsed) { slots.length = 0; break; }
+            const generic = genericRunRows(parsed).filter((x) => Number.isFinite(x.size));
+            // A spare slot means at least one other generic aerobic run survives, and
+            // the slot we would repurpose must have a parseable aerobic dose to rank.
+            if (generic.length < 2) { slots.length = 0; break; }
+            slots.push({ week, parsed, pick: generic.sort((a, b) => a.size - b.size)[0] });
+          }
+          // All-or-nothing: every planned week must have produced a safe slot before
+          // any cell is written. A shorter list means at least one week was rejected.
+          if (slots.length === PLANNED_WEEKS) {
+            const gate = shinImpactHistory(intake)
+              ? ' Hold or shorten this session and reduce the newest impact stressor first if shin symptoms return.'
+              : '';
+            for (const { week, parsed, pick } of slots) {
+              const { cells, row } = pick;
+              const t = plan[week];
+              const low = current * (t.distance / 3000) * t.lowMul;
+              const high = current * (t.distance / 3000) * t.highMul;
+              const before = {
+                exercise: cells[parsed.exercise],
+                load: Number.isInteger(parsed.load) ? cells[parsed.load] : null,
+                sets: cells[parsed.sets],
+                reps: cells[parsed.reps],
+              };
+              cells[parsed.exercise] = 'Run';
+              cells[parsed.sets] = String(t.sets);
+              cells[parsed.reps] = `${t.distance} m`;
+              if (Number.isInteger(parsed.load)) cells[parsed.load] = `${t.distance} m @ ${formatClock(low)}-${formatClock(high)}`;
+              if (Number.isInteger(parsed.rest)) cells[parsed.rest] = t.rest;
+              if (Number.isInteger(parsed.effort)) cells[parsed.effort] = t.rpe;
+              if (Number.isInteger(parsed.notes)) {
+                cells[parsed.notes] = addCue(
+                  cells[parsed.notes],
+                  `Repurposed the lowest-volume easy run into the primary 3K-specific session; the remaining easy run keeps the aerobic exposure. ${t.role} Anchored to current ${formatClock(current)} 3K capacity, not goal pace; even splits, full recovery between reps.${gate}`,
+                  'repurposed the lowest-volume easy run',
+                );
+              }
+              repairs.push({
+                type: 'tactical_3k_event_session_from_generic_run',
+                week,
+                row,
+                before,
+                after: {
+                  exercise: cells[parsed.exercise],
+                  load: Number.isInteger(parsed.load) ? cells[parsed.load] : null,
+                  sets: cells[parsed.sets],
+                  reps: cells[parsed.reps],
+                },
+              });
+              candidate = rebuild(candidate, parsed);
+            }
+          }
         }
       }
     }

@@ -361,6 +361,121 @@ function lowerBodyStrengthStress(day) {
     return (sets(exercise) >= 3 && totalReps(exercise) >= 9 && rpe >= 7.5) || (sets(exercise) >= 2 && rpe >= 8.5);
   });
 }
+// Per-repetition clock target for a key interval row, e.g. "400 m @ 1:42-1:45"
+// yields 102s. Reuses the same clock idiom as paceSecondsPerKm but keeps the
+// value per repetition so it can be normalised against the rep distance below.
+function repClockSeconds(exercise) {
+  const raw = `${exercise?.dose?.load || ''} ${exercise?.dose?.reps_raw || ''} ${exercise?.notes || ''}`;
+  const matches = [...raw.matchAll(/\b(\d{1,2}):(\d{2})\b/g)].map((m) => Number(m[1]) * 60 + Number(m[2])).filter(Number.isFinite);
+  return matches.length ? Math.min(...matches) : null;
+}
+function restSeconds(exercise) {
+  const raw = String(exercise?.dose?.rest || '');
+  const clock = raw.match(/\b(\d{1,2}):(\d{2})\b/);
+  if (clock) return Number(clock[1]) * 60 + Number(clock[2]);
+  const min = raw.match(/(\d+(?:\.\d+)?)\s*(?:min|minutes?)\b/i);
+  if (min) return Number(min[1]) * 60;
+  const sec = raw.match(/(\d+(?:\.\d+)?)\s*(?:sec|secs|seconds?)\b/i);
+  return sec ? Number(sec[1]) : null;
+}
+// Aggregate the week's key event-specific running work into the coaching
+// dimensions T3K-08 reasons about. Multiple key rows in one week are summed for
+// volume, and represented by their longest repetition and fastest normalised
+// velocity, so a week is compared on what it actually demands.
+function eventSessionSnapshot(week) {
+  const rows = keyIntervalRows(week).map((x) => x.exercise);
+  if (!rows.length) return null;
+  let volume = 0;
+  let distance = null;
+  let paceSecPerKm = null;
+  let rest = null;
+  for (const exercise of rows) {
+    const d = distanceMeters(exercise);
+    const reps = sets(exercise);
+    if (Number.isFinite(d) && reps > 0) {
+      volume += d * reps;
+      if (distance == null || d > distance) distance = d;
+      const clock = repClockSeconds(exercise);
+      if (Number.isFinite(clock) && d > 0) {
+        const normalised = clock / (d / 1000);
+        if (paceSecPerKm == null || normalised < paceSecPerKm) paceSecPerKm = normalised;
+      }
+    }
+    const r = restSeconds(exercise);
+    if (Number.isFinite(r) && (rest == null || r > rest)) rest = r;
+  }
+  if (!(volume > 0) || !Number.isFinite(distance)) return null;
+  return { week: week.week, volume_m: volume, distance_m: distance, pace_s_per_km: paceSecPerKm, rest_s: rest };
+}
+// T3K-08: the frozen brief already requires that "race specificity must increase
+// across the block". T3K-02 only rejects an all-400 m block and
+// EVENT_PROGRESSING_SESSION_MISSING only proves Week 1 has a key session, so a
+// legitimate-looking session repeated identically for four weeks passes both.
+// Enforce real week-over-week development on measured dose only -- never on
+// wording -- while accepting any coherent periodisation rather than one model.
+// Runs last in the Tactical validator so genuine safety/structure violations
+// (T3K-05 preceding strength, T3K-06 ruck stacking, T3K-07 symptom gate) keep
+// reporting first, matching the authored safety-before-specificity priority.
+function tactical3KEventProgressionFailure(model) {
+  const eventWeeks = (model.weeks || []).map(eventSessionSnapshot).filter(Boolean).sort((a, b) => a.week - b.week);
+  if (eventWeeks.length < 3) return null;
+  const base = eventWeeks[0];
+  const later = eventWeeks.slice(1);
+  const gained = (s) => {
+    const longer = s.distance_m >= base.distance_m * 1.05;
+    const bigger = s.volume_m >= base.volume_m * 1.08;
+    const faster = Number.isFinite(s.pace_s_per_km) && Number.isFinite(base.pace_s_per_km)
+      && s.pace_s_per_km <= base.pace_s_per_km * 0.985;
+    // Density: same-or-more quality work at same-or-better velocity on less rest.
+    const denser = Number.isFinite(s.rest_s) && Number.isFinite(base.rest_s)
+      && s.rest_s <= base.rest_s * 0.90
+      && s.volume_m >= base.volume_m * 0.98
+      && (!Number.isFinite(s.pace_s_per_km) || !Number.isFinite(base.pace_s_per_km) || s.pace_s_per_km <= base.pace_s_per_km * 1.005);
+    return { longer, bigger, faster, denser, any: longer || bigger || faster || denser };
+  };
+  if (!later.some((s) => gained(s).any)) {
+    return {
+      code: 'COACH_SPEC_V1_T3K_EVENT_PROGRESSION_STATIC',
+      amendment: 'Coaching Specification v1.0 T3K-08: the primary 3K event-specific session repeats the same measured dose across the block, so there is no week-over-week race-specific development. Progress at least one coaching-meaningful dimension of the key session across the build weeks - repetition distance, repetition count / total quality volume, per-repetition clock target, or session density (equivalent work on less recovery). Changing only the wording, labels or coaching notes is not progression. A build-then-taper shape is welcome: the final week may reduce volume while holding or sharpening intensity.',
+      details: { event_weeks: eventWeeks },
+    };
+  }
+  // Retention: an isolated mid-block spike is not a developmental trajectory. By
+  // the end of the build phase the block must still hold a gain over the Week 1
+  // baseline in SOME dimension - the same one it gained, or another it was
+  // transformed into. The final week is allowed to be the carrier instead, which
+  // keeps a legitimate late peak / realisation week valid, but a block whose
+  // build weeks all revert to baseline is rejected. This is what separates
+  // "W1 4x600, W2 5x600, W3 4x600, W4 4x600" (gain thrown away, no taper
+  // rationale) from "W1 4x600, W2 5x600, W3 4x800, W4 3x600 faster" (gain
+  // extended into distance, then tapered).
+  const lastBuild = later.length > 1 ? later[later.length - 2] : null;
+  const finalWeek = later[later.length - 1];
+  if (lastBuild && !gained(lastBuild).any && !gained(finalWeek).any) {
+    return {
+      code: 'COACH_SPEC_V1_T3K_EVENT_PROGRESSION_NOT_RETAINED',
+      amendment: `Coaching Specification v1.0 T3K-08: the primary 3K session gains earlier in the block but Week ${lastBuild.week} onward returns to the Week 1 baseline, so no event-specific development is retained into the end of the build. One isolated spike is not a progression narrative. Either carry the gained quality forward - hold it, extend repetition distance, add quality volume, sharpen the per-repetition clock, or tighten recovery - or make the final week a genuine taper that preserves or sharpens intensity while volume comes down.`,
+      details: { baseline: base, last_build_week: lastBuild, final_week: finalWeek },
+    };
+  }
+  // Random oscillation guard: an intermediate build week that drops below the
+  // Week 1 baseline on volume while gaining nothing on distance, velocity or
+  // density is not periodisation. The final week is exempt because a taper is
+  // expected to reduce volume by design.
+  const regressed = later.slice(0, -1).find((s) => {
+    const g = gained(s);
+    return s.volume_m <= base.volume_m * 0.92 && !g.longer && !g.faster && !g.denser;
+  });
+  if (regressed) {
+    return {
+      code: 'COACH_SPEC_V1_T3K_EVENT_PROGRESSION_INCOHERENT',
+      amendment: `Coaching Specification v1.0 T3K-08: Week ${regressed.week} reduces the primary 3K quality session below the Week 1 baseline without gaining repetition distance, per-repetition velocity or session density, so the block oscillates instead of developing. Give the build weeks a defensible direction - hold or advance the key session, and reserve genuine volume reduction for a final taper/realisation week that preserves or sharpens intensity.`,
+      details: { week: regressed.week, baseline: base, regressed },
+    };
+  }
+  return null;
+}
+
 function ruckSnapshot(week) {
   const row = work(week).map((x) => x.exercise).find(isRuck);
   if (!row) return null;
@@ -428,6 +543,9 @@ export function validateTactical3KCoachingSpecV1(program, intake = {}, suppliedM
       {},
     );
   }
+
+  const progression = tactical3KEventProgressionFailure(model);
+  if (progression) fail(progression.code, progression.amendment, progression.details);
 
   return { ok: true, skipped: false, model };
 }

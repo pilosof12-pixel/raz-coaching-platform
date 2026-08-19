@@ -276,3 +276,347 @@ test('Advanced Hybrid convergence holds secondary long-run distance at the toler
   assert.doesNotMatch(repaired.program, /\t21 km\t|\t22 km\t/);
   assert.equal((repaired.program.match(/\t20 km\t/g) || []).length, 4);
 });
+
+// ---------------------------------------------------------------------------
+// Architectural hardening pass: Gap 1 (Week 1 generic-running-only deterministic
+// repair) and Gap 2 (T3K-08 real cross-week event progression enforcement).
+// ---------------------------------------------------------------------------
+
+// Two generic aerobic runs per week: repurposing the smaller one still leaves a
+// real aerobic exposure, so a deterministic event session can be created safely.
+function tacticalGenericRunsWithSpareSlot() {
+  return fourWeeks(() => [
+    'Mon\tBack Squat\t120 kg\t3\t5\t3 min\t7\tMaintenance squat.\t',
+    'Tue\tRun\tEasy conversational pace\t1\t25 min\tN/A\t4\tShorter easy aerobic run.\t',
+    'Thu\tBackpack Carry\t20 kg, 9:30/km\t1\t8 km\tN/A\t6\tControlled ruck.\t',
+    'Fri\tRun\tEasy conversational pace\t1\t40 min\tN/A\t5\tLonger easy aerobic run.\t',
+  ], 'If shin symptoms return, hold the newest run or ruck progression, reduce impact, and repeat the prior tolerated week.');
+}
+
+// Exactly one aerobic run per week: converting it would erase the athlete's only
+// easy running exposure, so the normalizer must fail closed instead.
+function tacticalSingleEssentialZone2() {
+  return fourWeeks(() => [
+    'Mon\tBack Squat\t120 kg\t3\t5\t3 min\t7\tMaintenance squat.\t',
+    'Tue\tRun\tEasy conversational pace\t1\t30 min\tN/A\t5\tOnly aerobic run of the week.\t',
+    'Thu\tBackpack Carry\t20 kg, 9:30/km\t1\t8 km\tN/A\t6\tControlled ruck.\t',
+  ], 'If shin symptoms return, hold the newest run or ruck progression, reduce impact, and repeat the prior tolerated week.');
+}
+
+test('[G1-1] generic Zone 2 plus a spare running slot converges deterministically into a real event session', () => {
+  const repaired = normalizeTactical3KRaceSpecificity(tacticalGenericRunsWithSpareSlot(), tacticalLiveIntake);
+  assert.equal(repaired.repaired, true);
+  assert.equal(repaired.repairs.filter((r) => r.type === 'tactical_3k_event_session_from_generic_run').length, 4);
+  // The smaller Tuesday run became the key session; the longer Friday run survives.
+  assert.match(week1Block(repaired.program), /Tue\tRun\t600 m @ \d{1,2}:\d{2}-\d{1,2}:\d{2}\t4\t600 m/);
+  assert.equal((repaired.program.match(/^Fri\tRun\tEasy conversational pace/gm) || []).length, 4);
+  // The specific validator this repair targets is now silent across every week.
+  let caught = null;
+  try { validatePhase15FinalProgram(repaired.program, tacticalLiveIntake); } catch (e) { caught = e; }
+  assert.equal(caught === null || !caught.flags?.some((f) => f.code === 'EVENT_PROGRESSING_SESSION_MISSING'), true);
+  assert.equal(validateTactical3KCoachingSpecV1(repaired.program, tacticalLiveIntake).ok, true);
+});
+
+test('[G1-2] a single essential Zone 2 run with no spare slot fails closed and fabricates nothing', () => {
+  const program = tacticalSingleEssentialZone2();
+  const repaired = normalizeTactical3KRaceSpecificity(program, tacticalLiveIntake);
+  assert.equal(repaired.repairs.some((r) => r.type === 'tactical_3k_event_session_from_generic_run'), false);
+  assert.equal(repaired.program, program);
+  // Failing closed means the blocker is still reported rather than papered over.
+  assert.throws(
+    () => validatePhase15FinalProgram(program, tacticalLiveIntake),
+    (err) => err instanceof Phase15QualityError && err.flags.some((f) => f.code === 'EVENT_PROGRESSING_SESSION_MISSING'),
+  );
+});
+
+test('[G1-3] an existing legitimate Week 1 interval plus Zone 2 is byte-stable for the generic-run repair', () => {
+  const program = fourWeeks((week) => [
+    'Mon\tBack Squat\t120 kg\t3\t5\t3 min\t7\tMaintenance squat.\t',
+    `Tue\tRun\t400 m @ ${['1:42-1:45','1:42-1:45','1:40-1:43','1:38-1:40'][week-1]}\t${[6,7,7,5][week-1]}\t400 m\t2:00\t8\tPrimary 3K quality.\t`,
+    'Wed\tRun\tEasy conversational pace\t1\t30 min\tN/A\t4\tEasy aerobic run.\t',
+    'Fri\tRun\tEasy conversational pace\t1\t40 min\tN/A\t5\tLonger easy aerobic run.\t',
+  ], 'If shin symptoms return, hold the newest run or ruck progression, reduce impact, and repeat the prior tolerated week.');
+  const repaired = normalizeTactical3KRaceSpecificity(program, tacticalLiveIntake);
+  assert.equal(repaired.repairs.some((r) => r.type === 'tactical_3k_event_session_from_generic_run'), false);
+  assert.equal((repaired.program.match(/^\w+\tRun\tEasy conversational pace/gm) || []).length, 8);
+});
+
+test('[G1-4] the generic-run repair is idempotent and creates no duplicate event row', () => {
+  const once = normalizeTactical3KRaceSpecificity(tacticalGenericRunsWithSpareSlot(), tacticalLiveIntake);
+  const twice = normalizeTactical3KRaceSpecificity(once.program, tacticalLiveIntake);
+  assert.equal(twice.repaired, false);
+  assert.equal(twice.program, once.program);
+  const keyRows = week1Block(once.program).split('\n').filter((line) => /^Tue\tRun\t600 m/.test(line));
+  assert.equal(keyRows.length, 1);
+  // Row count is unchanged: a slot was repurposed, not appended.
+  assert.equal(week1Block(once.program).split('\n').length, week1Block(tacticalGenericRunsWithSpareSlot()).split('\n').length);
+});
+
+test('[G1-5] row-local and block-level symptom/readiness language survives the generic-run repair', () => {
+  const repaired = normalizeTactical3KRaceSpecificity(tacticalGenericRunsWithSpareSlot(), tacticalLiveIntake);
+  assert.match(repaired.program, /shin symptoms return, hold the newest run or ruck progression/i);
+  assert.match(week1Block(repaired.program), /Shorter easy aerobic run\./);
+  assert.match(week1Block(repaired.program), /reduce the newest impact stressor first if shin symptoms return/i);
+});
+
+test('[G1-6] a non-Tactical intake gets no Tactical repair at all', () => {
+  const program = tacticalGenericRunsWithSpareSlot();
+  const repaired = normalizeTactical3KRaceSpecificity(program, advancedLiveIntake);
+  assert.equal(repaired.repaired, false);
+  assert.equal(repaired.program, program);
+});
+
+// --- Gap 2: T3K-08 cross-week event progression -----------------------------
+
+function keyRow(sets, distance, clock, rest, note) {
+  return `Tue\tRun\t${distance} m @ ${clock}\t${sets}\t${distance} m\t${rest}\t8\t${note}\t`;
+}
+function tacticalBlockWithKeySessions(specs) {
+  return fourWeeks((week) => [
+    'Mon\tBack Squat\t120 kg\t3\t5\t3 min\t7\tMaintenance squat.\t',
+    specs[week - 1],
+    `Thu\tBackpack Carry\t20 kg, 9:30/km\t1\t${[8,8.5,9,8][week-1]} km\tN/A\t6\tControlled ruck.\t`,
+  ], 'If shin symptoms return, hold the newest run or ruck progression, reduce impact, and repeat the prior tolerated week.');
+}
+function t3kVerdict(program) {
+  try {
+    validateTactical3KCoachingSpecV1(program, tacticalLiveIntake);
+    return 'pass';
+  } catch (err) {
+    return err?.code || 'unknown';
+  }
+}
+
+test('[G2-1] an identical 600 m session repeated for four weeks is rejected as static', () => {
+  const verdict = t3kVerdict(tacticalBlockWithKeySessions([
+    keyRow(4, 600, '2:35', '2:30', 'Build.'),
+    keyRow(4, 600, '2:35', '2:30', 'Build.'),
+    keyRow(4, 600, '2:35', '2:30', 'Build.'),
+    keyRow(4, 600, '2:35', '2:30', 'Build.'),
+  ]));
+  assert.equal(verdict, 'COACH_SPEC_V1_T3K_EVENT_PROGRESSION_STATIC');
+});
+
+test('[G2-2] the same dose with escalating wording in the notes is still rejected', () => {
+  const verdict = t3kVerdict(tacticalBlockWithKeySessions([
+    keyRow(4, 600, '2:35', '2:30', 'Build phase.'),
+    keyRow(4, 600, '2:35', '2:30', 'Progress phase: progression focus.'),
+    keyRow(4, 600, '2:35', '2:30', 'Peak week, progressively sharper.'),
+    keyRow(4, 600, '2:35', '2:30', 'Realisation: progression complete.'),
+  ]));
+  assert.equal(verdict, 'COACH_SPEC_V1_T3K_EVENT_PROGRESSION_STATIC');
+});
+
+test('[G2-3] a trivial rest-only tweak is not accepted as event progression', () => {
+  const verdict = t3kVerdict(tacticalBlockWithKeySessions([
+    keyRow(4, 600, '2:35', '2:30', 'A.'),
+    keyRow(4, 600, '2:35', '2:29', 'B.'),
+    keyRow(4, 600, '2:35', '2:28', 'C.'),
+    keyRow(4, 600, '2:35', '2:30', 'D.'),
+  ]));
+  assert.equal(verdict, 'COACH_SPEC_V1_T3K_EVENT_PROGRESSION_STATIC');
+});
+
+test('[G2-4] the live v30k build-extend-taper shape passes', () => {
+  const verdict = t3kVerdict(tacticalBlockWithKeySessions([
+    keyRow(5, 400, '1:42-1:45', '2:15', 'Establish current-capacity quality.'),
+    keyRow(6, 400, '1:42-1:45', '2:15', 'Volume progresses, pace stable.'),
+    keyRow(4, 600, '2:33-2:37', '2:30', 'Longer race-specific repetitions.'),
+    keyRow(4, 400, '1:39-1:41', '3:00', 'Lower volume, sharper pace, more recovery.'),
+  ]));
+  assert.equal(verdict, 'pass');
+});
+
+test('[G2-5] one plateau week followed by real progression and a taper passes', () => {
+  const verdict = t3kVerdict(tacticalBlockWithKeySessions([
+    keyRow(4, 600, '2:39-2:42', '2:30', 'Establish.'),
+    keyRow(4, 600, '2:39-2:42', '2:30', 'Hold the dose while readiness settles.'),
+    keyRow(4, 800, '3:27-3:34', '2:30', 'Extend to longer repetitions.'),
+    keyRow(4, 600, '2:34-2:37', '3:00', 'Taper volume, sharpen pace.'),
+  ]));
+  assert.equal(verdict, 'pass');
+});
+
+test('[G2-6] a Week 4 taper that reduces volume at maintained pace is not flagged as regression', () => {
+  const verdict = t3kVerdict(tacticalBlockWithKeySessions([
+    keyRow(4, 600, '2:39-2:42', '2:30', 'Establish.'),
+    keyRow(5, 600, '2:39-2:42', '2:30', 'Build volume.'),
+    keyRow(6, 600, '2:39-2:42', '2:30', 'Peak volume.'),
+    keyRow(3, 600, '2:39-2:42', '3:00', 'Taper: fewer reps, same pace.'),
+  ]));
+  assert.equal(verdict, 'pass');
+});
+
+test('[G2-7] progression carried by session density alone passes', () => {
+  const verdict = t3kVerdict(tacticalBlockWithKeySessions([
+    keyRow(4, 600, '2:39-2:42', '3:00', 'Establish with full recovery.'),
+    keyRow(4, 600, '2:39-2:42', '2:40', 'Same quality work on less recovery.'),
+    keyRow(4, 600, '2:39-2:42', '2:20', 'Denser again at the same pace.'),
+    keyRow(4, 600, '2:34-2:37', '3:00', 'Sharpen with recovery restored.'),
+  ]));
+  assert.equal(verdict, 'pass');
+});
+
+test('[G2-8] random oscillation with no defensible direction is rejected', () => {
+  const verdict = t3kVerdict(tacticalBlockWithKeySessions([
+    keyRow(4, 600, '2:39-2:42', '2:30', 'A.'),
+    keyRow(3, 500, '2:12-2:15', '2:30', 'B.'),
+    keyRow(5, 400, '1:45-1:48', '2:00', 'C.'),
+    keyRow(4, 450, '1:58-2:00', '2:30', 'D.'),
+  ]));
+  assert.match(verdict, /^COACH_SPEC_V1_T3K_EVENT_PROGRESSION_(?:STATIC|INCOHERENT)$/);
+});
+
+test('[G2-9] an intermediate week collapsing below baseline is rejected as incoherent even when a later week develops', () => {
+  const verdict = t3kVerdict(tacticalBlockWithKeySessions([
+    keyRow(4, 600, '2:39-2:42', '2:30', 'Establish.'),
+    keyRow(3, 500, '2:15', '2:30', 'Unexplained collapse.'),
+    keyRow(4, 800, '3:27-3:34', '2:30', 'Extend.'),
+    keyRow(4, 600, '2:34-2:37', '3:00', 'Taper.'),
+  ]));
+  assert.equal(verdict, 'COACH_SPEC_V1_T3K_EVENT_PROGRESSION_INCOHERENT');
+});
+
+test('[G2-10] fewer than three weeks of key sessions is treated as insufficient evidence, not a violation', () => {
+  const program = fourWeeks((week) => (week <= 2
+    ? ['Mon\tBack Squat\t120 kg\t3\t5\t3 min\t7\tMaintenance squat.\t', keyRow(4, 600, '2:39-2:42', '2:30', 'Key session.')]
+    : ['Mon\tBack Squat\t120 kg\t3\t5\t3 min\t7\tMaintenance squat.\t']),
+  'If shin symptoms return, hold the newest run or ruck progression, reduce impact, and repeat the prior tolerated week.');
+  assert.equal(t3kVerdict(program), 'pass');
+});
+
+test('[G2-11] the new cross-week rule never fires for a non-Tactical intake', () => {
+  const staticBlock = tacticalBlockWithKeySessions([
+    keyRow(4, 600, '2:35', '2:30', 'Build.'),
+    keyRow(4, 600, '2:35', '2:30', 'Build.'),
+    keyRow(4, 600, '2:35', '2:30', 'Build.'),
+    keyRow(4, 600, '2:35', '2:30', 'Build.'),
+  ]);
+  assert.equal(validateTactical3KCoachingSpecV1(staticBlock, advancedLiveIntake).skipped, true);
+  assert.equal(validateTactical3KCoachingSpecV1(staticBlock, youthLiveIntake).skipped, true);
+});
+
+test('[G2-12] the deterministic generic-run repair produces a block that satisfies the new cross-week rule', () => {
+  const repaired = normalizeTactical3KRaceSpecificity(tacticalGenericRunsWithSpareSlot(), tacticalLiveIntake);
+  assert.equal(t3kVerdict(repaired.program), 'pass');
+});
+
+test('[G2-13] Advanced Hybrid and Youth convergence outputs are unaffected by this pass', () => {
+  const advanced = normalizeAdvancedHybridSecondaryRunStability(
+    fourWeeks((week) => [
+      'Mon\tBack Squat\t170 kg\t3\t3\t3 min\t8\tPrimary squat.\t',
+      `Tue\tRun\tConversational easy pace\t1\t${[20,21,22,20][week-1]} km\tN/A\t5-6\tSecondary marathon run.\t`,
+    ]),
+    advancedLiveIntake,
+  );
+  assert.equal(advanced.repaired, true);
+  assert.equal((advanced.program.match(/\t20 km\t/g) || []).length, 4);
+
+  const youth = normalizeYouthSkillAcquisitionQuality(youthProgram(), youthLiveIntake);
+  assert.equal(youth.repaired, true);
+  assert.match(youth.program, /START_WEEK3_TSV[\s\S]*Controlled Handstand Kick-up\tBodyweight\t4\t3\t/);
+  // Tactical repairs must not leak into either avatar.
+  assert.equal(normalizeTactical3KRaceSpecificity(youthProgram(), youthLiveIntake).repaired, false);
+});
+
+// ---------------------------------------------------------------------------
+// Review round 2: (1) Stage 1b must be strictly all-or-nothing across all four
+// planned weeks; (2) T3K-08 must reject a transient spike that collapses back to
+// the Week 1 baseline before the final week.
+// ---------------------------------------------------------------------------
+
+const GENERIC_WEEK_ROWS = [
+  'Mon\tBack Squat\t120 kg\t3\t5\t3 min\t7\tMaintenance squat.\t',
+  'Tue\tRun\tEasy conversational pace\t1\t25 min\tN/A\t4\tShorter easy aerobic run.\t',
+  'Fri\tRun\tEasy conversational pace\t1\t40 min\tN/A\t5\tLonger easy aerobic run.\t',
+];
+function genericBlock(week, rows = GENERIC_WEEK_ROWS) {
+  return `START_WEEK${week}_TSV\n${header}\n${rows.join('\n')}\nEND_WEEK${week}_TSV`;
+}
+function assertNoGenericRunRepair(program) {
+  const repaired = normalizeTactical3KRaceSpecificity(program, tacticalLiveIntake);
+  assert.equal(repaired.repairs.filter((r) => r.type === 'tactical_3k_event_session_from_generic_run').length, 0);
+  assert.equal(repaired.program, program);
+}
+
+test('[G1-7] a malformed Week 3 aborts the whole generic-run repair, leaving Weeks 1/2/4 untouched', () => {
+  assertNoGenericRunRepair([
+    genericBlock(1), genericBlock(2),
+    genericBlock(3, ['Mon\tBack Squat\tBROKEN ROW']),
+    genericBlock(4),
+  ].join('\n\n'));
+});
+
+test('[G1-8] a missing Week 3 block aborts the whole generic-run repair', () => {
+  assertNoGenericRunRepair([genericBlock(1), genericBlock(2), genericBlock(4)].join('\n\n'));
+});
+
+test('[G1-9] a later week that parses but has an unparseable aerobic dose aborts the whole repair', () => {
+  assertNoGenericRunRepair([
+    genericBlock(1), genericBlock(2),
+    genericBlock(3, [
+      'Mon\tBack Squat\t120 kg\t3\t5\t3 min\t7\tMaintenance squat.\t',
+      'Tue\tRun\tEasy conversational pace\t1\tas needed\tN/A\t4\tShorter easy aerobic run.\t',
+      'Fri\tRun\tEasy conversational pace\t1\tuntil fatigue\tN/A\t5\tLonger easy aerobic run.\t',
+    ]),
+    genericBlock(4),
+  ].join('\n\n'));
+});
+
+test('[G1-10] a later week without a spare aerobic slot aborts the whole repair', () => {
+  assertNoGenericRunRepair([
+    genericBlock(1), genericBlock(2), genericBlock(3),
+    genericBlock(4, [
+      'Mon\tBack Squat\t120 kg\t3\t5\t3 min\t7\tMaintenance squat.\t',
+      'Tue\tRun\tEasy conversational pace\t1\t30 min\tN/A\t5\tOnly aerobic run of the week.\t',
+    ]),
+  ].join('\n\n'));
+});
+
+test('[G1-11] when all four weeks are valid the repair still applies to exactly four weeks', () => {
+  const program = [1, 2, 3, 4].map((week) => genericBlock(week)).join('\n\n');
+  const repaired = normalizeTactical3KRaceSpecificity(program, tacticalLiveIntake);
+  const applied = repaired.repairs.filter((r) => r.type === 'tactical_3k_event_session_from_generic_run');
+  assert.equal(applied.length, 4);
+  assert.deepEqual(applied.map((r) => r.week), [1, 2, 3, 4]);
+});
+
+test('[G2-14] a Week 2 spike that reverts to the Week 1 baseline for the rest of the block is rejected', () => {
+  const verdict = t3kVerdict(tacticalBlockWithKeySessions([
+    keyRow(4, 600, '2:39-2:42', '2:30', 'Establish.'),
+    keyRow(5, 600, '2:39-2:42', '2:30', 'One bigger week.'),
+    keyRow(4, 600, '2:39-2:42', '2:30', 'Back to baseline.'),
+    keyRow(4, 600, '2:39-2:42', '2:30', 'Still baseline.'),
+  ]));
+  assert.equal(verdict, 'COACH_SPEC_V1_T3K_EVENT_PROGRESSION_NOT_RETAINED');
+});
+
+test('[G2-15] a single large isolated spike is not sufficient on its own', () => {
+  const verdict = t3kVerdict(tacticalBlockWithKeySessions([
+    keyRow(4, 600, '2:39-2:42', '2:30', 'Establish.'),
+    keyRow(8, 600, '2:39-2:42', '2:30', 'Large isolated spike.'),
+    keyRow(4, 600, '2:39-2:42', '2:30', 'Baseline again.'),
+    keyRow(4, 600, '2:39-2:42', '2:30', 'Baseline again.'),
+  ]));
+  assert.equal(verdict, 'COACH_SPEC_V1_T3K_EVENT_PROGRESSION_NOT_RETAINED');
+});
+
+test('[G2-16] volume build carried into a distance extension and then tapered passes', () => {
+  const verdict = t3kVerdict(tacticalBlockWithKeySessions([
+    keyRow(4, 600, '2:39-2:42', '2:30', 'Establish.'),
+    keyRow(5, 600, '2:39-2:42', '2:30', 'Build quality volume.'),
+    keyRow(4, 800, '3:27-3:34', '2:30', 'Extend repetition distance.'),
+    keyRow(3, 600, '2:34-2:37', '3:00', 'Taper: less volume, sharper pace.'),
+  ]));
+  assert.equal(verdict, 'pass');
+});
+
+test('[G2-17] a gain transformed into a different progression dimension before the taper passes', () => {
+  const verdict = t3kVerdict(tacticalBlockWithKeySessions([
+    keyRow(4, 600, '2:39-2:42', '3:00', 'Establish.'),
+    keyRow(5, 600, '2:39-2:42', '3:00', 'Volume progresses.'),
+    keyRow(5, 600, '2:39-2:42', '2:20', 'Same work, recovery tightened.'),
+    keyRow(4, 600, '2:34-2:37', '3:00', 'Taper and sharpen.'),
+  ]));
+  assert.equal(verdict, 'pass');
+});
