@@ -73,6 +73,12 @@ if '"Bar Muscle-up Transition Drill"' not in es:
     if mu_anchor not in es:
         raise SystemExit('Youth muscle-up dictionary anchor not found')
     es = es.replace(mu_anchor, '  "Strict Chest-to-Bar Pull-up", "Explosive Hip-to-Bar Pull-up", "Bar Muscle-up Transition Drill",\n', 1)
+# Explicit home equipment must not be discarded by the location whitelist. Rings
+# are a normal home-gym attachment and are still required to be named in intake.
+home_anchor = '    "pull_up_bar", "bands", "kettlebells",\n  ])],\n  ["garage_gym"'
+if home_anchor not in es:
+    raise SystemExit('home-gym equipment whitelist anchor not found')
+es = es.replace(home_anchor, '    "pull_up_bar", "bands", "kettlebells", "rings",\n  ])],\n  ["garage_gym"', 1)
 review_mutation = '        out = annotateFamilyRow(out, family, maxPrescribed, note, isHebrew);\n'
 if es.count(review_mutation) < 2:
     raise SystemExit('skill advisory client-note anchors not found')
@@ -98,6 +104,8 @@ gs = gf.read_text()
 y0 = gs.index('function youthWeek(week) {')
 y1 = gs.index('export function youthGymnasticsGoldenProgram()', y0)
 youth = gs[y0:y1]
+youth = youth.replace("const kickA = ['4', '5', '6', '4']", "const kickA = ['4', '5', '5', '4']")
+youth = youth.replace("const kickB = ['5', '5', '6', '4']", "const kickB = ['5', '5', '5', '4']")
 youth = youth.replace("['Mon',", "['Session A',").replace("['Thu',", "['Session B',")
 youth = youth.replace("'Band-Assisted Bar Muscle-up Transition Drill'", "'Bar Muscle-up Transition Drill'")
 youth = youth.replace("'Strict Ring Dip'", "'Ring Dip'").replace("'Strict Pull-up'", "'Pull-up'")
@@ -106,6 +114,14 @@ if wall_anchor not in youth:
     raise SystemExit('Youth golden wall-hold insertion anchor not found')
 youth = youth.replace(wall_anchor, "    ['Session A', 'Wall Handstand Hold', 'BW', '2', '15-25 sec', '60-90s', '5-6', 'Wall-supported line and shoulder-capacity work. Keep it crisp and stop well before fatigue.', ''],\n" + wall_anchor, 1)
 gf.write_text(gs[:y0] + youth + gs[y1:])
+
+# Keep regression fixtures aligned with the canonical flexible-session identity.
+pt = Path('phase14/test/production_chain_golden.test.js')
+ps = pt.read_text()
+ps = ps.replace("cells[0] === 'Mon' ? '4' : '5'", "cells[0] === 'Session A' ? '4' : '5'")
+ps = ps.replace("cells[1] === 'Band-Assisted Bar Muscle-up Transition Drill'", "cells[1] === 'Bar Muscle-up Transition Drill'")
+ps = ps.replace("cells[1] = 'Strict Pull-up';", "cells[1] = 'Pull-up';")
+pt.write_text(ps)
 
 sheet = Path('phase14/public/spreadsheet.js')
 xs = sheet.read_text()
