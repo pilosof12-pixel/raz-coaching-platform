@@ -43,6 +43,15 @@ jobs:
           python .github/scripts/apply_v34_final_corrections.py
           npm ci
           cd phase14
+          node --input-type=module <<'NODE'
+          import { collectRepairableValidationFailures } from './engine/repairable_validation_bundle.js';
+          import { YOUTH_GYMNASTICS_INTAKE, youthGymnasticsGoldenProgram } from './test/fixtures/golden_programs.js';
+          import { TACTICAL_3K_INTAKE, tactical3KGoldenProgram } from './test/fixtures/golden_programs.js';
+          const y=collectRepairableValidationFailures(youthGymnasticsGoldenProgram(),YOUTH_GYMNASTICS_INTAKE);
+          const t=collectRepairableValidationFailures(tactical3KGoldenProgram(),TACTICAL_3K_INTAKE);
+          console.log('OBS_YOUTH_FLAGS='+JSON.stringify((y.flags||[]).map(f=>({code:f.code,amendment:f.amendment,details:f.details}))));
+          console.log('OBS_TACTICAL_FLAGS='+JSON.stringify((t.flags||[]).map(f=>({code:f.code,amendment:f.amendment,details:f.details}))));
+          NODE
           node --test test/v34_coaching_architecture.test.js test/pre_live_roadmap_lingo_release.test.js test/tactical_manual_acceptance.test.js test/youth_skill_dictionary.test.js test/coaching_spec_v1_convergence_regressions.test.js test/advanced_hybrid_launch_acceptance.test.js test/youth_gymnastics_manual_acceptance.test.js test/production_chain_golden.test.js
           node --check engine/phase15_planner.js
           node --check engine/phase15_quality_rules.js
