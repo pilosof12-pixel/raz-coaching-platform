@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="robots" content="noindex,nofollow" />
+  <title>RAZ Performance — Tactical 3K Live QA</title>
+  <style>
+    :root{--bg:#080909;--panel:#121414;--line:#2a3030;--teal:#18d3c5;--text:#f4f5f5;--muted:#b8c0c0;--red:#ff6767;--ok:#66e38a}
+    *{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font-family:Arial,Helvetica,sans-serif}.wrap{max-width:720px;margin:0 auto;padding:28px 18px 60px}.card{background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:20px}.eyebrow{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--teal);font-weight:800}.muted{color:var(--muted);font-size:13px;line-height:1.5}label{display:block;margin:18px 0 7px;font-size:13px;font-weight:700}input{width:100%;background:#181b1b;border:1px solid var(--line);color:var(--text);border-radius:10px;padding:12px;font-size:16px}button{margin-top:14px;width:100%;background:var(--teal);color:#04211f;border:0;border-radius:11px;padding:13px;font-size:15px;font-weight:800}button:disabled{opacity:.55}.row{margin-top:12px;padding:11px 12px;border:1px solid var(--line);border-radius:10px;background:#181b1b;font-size:13px;line-height:1.45}.pass{border-color:rgba(102,227,138,.5);color:var(--ok)}.fail{border-color:rgba(255,103,103,.5);color:var(--red)}code{display:block;margin-top:8px;word-break:break-all;color:var(--teal)}.hidden{display:none}.warn{margin-top:14px;padding:11px;border:1px solid rgba(255,190,70,.4);border-radius:10px;color:#ffe4a8;font-size:12px}.program-sample{white-space:pre-wrap;max-height:340px;overflow:auto;color:var(--muted);font:12px/1.45 ui-monospace,SFMono-Regular,Menlo,monospace}
+  </style>
+</head>
+<body>
+  <main class="wrap"><section class="card">
+    <div class="eyebrow">Controlled staging QA</div>
+    <h1>Tactical 3K live test</h1>
+    <p class="muted">Synthetic tactical-selection-style athlete: 13:30 3K, one weekly 20 kg ruck, strong pull-ups and three strength sessions. The test checks whether the live generator preserves the real performance priorities instead of adding military-themed fatigue for its own sake.</p>
+    <div class="warn">Use one fresh unused test Program Pass. If the server asks unexpected clarification questions, this page stops before generation so the pass should remain unconsumed.</div>
+    <label for="qa-pass">Unused Program Pass</label>
+    <input id="qa-pass" type="password" maxlength="32" autocomplete="off" spellcheck="false" placeholder="Paste 32-character Program Pass" />
+    <button id="qa-run" type="button">Run Tactical 3K live QA</button>
+    <div id="qa-results"></div>
+    <div id="qa-token-wrap" class="hidden"><p class="muted">Personal return code reserved for this build and failed-build recovery. It becomes the normal return code only after the initial program is successfully saved:</p><code id="qa-token"></code><button id="qa-copy" type="button">Copy personal code</button></div>
+    <div id="qa-program-wrap" class="hidden"><p class="muted">Generated program excerpt for manual coaching review:</p><div id="qa-program" class="row program-sample"></div></div>
+  </section></main>
+  <script src="live-qa-tactical.js"></script>
+</body>
+</html>

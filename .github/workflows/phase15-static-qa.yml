@@ -3,116 +3,126 @@ name: Phase 15 Static Coaching QA
 on:
   push:
     paths:
-      - 'phase14/engine/phase15_planner.js'
-      - 'phase14/engine/phase15_specialist_rules.js'
-      - 'phase14/engine/overcoming_gravity_rules.js'
-      - 'phase14/engine/skill_progressions.js'
-      - 'phase14/engine/phase15_program_qa.js'
-      - 'phase14/engine/phase15_final_qa.js'
-      - 'phase14/engine/phase15_quality_rules.js'
-      - 'phase14/engine/exercise_dictionary.js'
-      - 'phase14/storage.js'
-      - 'phase14/admin_qa_routes.js'
-      - 'phase14/scripts/build_phase15_runtime.mjs'
-      - 'phase14/scripts/apply_avatar_gap_fixes.mjs'
-      - 'phase14/test/phase15_planner_regression.test.mjs'
-      - 'phase14/test/phase15_specialist_rules.test.mjs'
-      - 'phase14/test/exercise_demo_coverage.test.mjs'
-      - 'phase14/public/exerciseDemos.js'
-      - 'phase14/public/spreadsheet.js'
-      - 'phase14/public/index.html'
-      - 'phase14/public/privacy.html'
-      - 'phase14/public/terms.html'
-      - 'phase14/data/lib/exerciseDemos.js'
-      - 'phase14/data/exercise_demos.json'
-      - 'phase14/data/exercise_demo_overrides.json'
-      - 'phase14/public/data/exercise_demo_overrides.json'
+      - 'phase14/**'
       - '.github/workflows/phase15-static-qa.yml'
   workflow_dispatch:
 
 permissions:
-  contents: write
+  contents: read
 
 jobs:
   static-qa:
     runs-on: ubuntu-latest
-    timeout-minutes: 6
+    timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
           node-version: '20'
-      - name: Apply deterministic avatar gap fixes
-        run: node phase14/scripts/apply_avatar_gap_fixes.mjs
-      - id: qa
-        name: Run deterministic coaching and product regressions
-        continue-on-error: true
+          cache: 'npm'
+          cache-dependency-path: phase14/package-lock.json
+
+      - name: Install production dependencies
+        run: |
+          cd phase14
+          npm ci
+
+      - name: Build exact production coaching runtime
+        run: |
+          cd phase14
+          npm run phase15:build
+
+      - name: Run deterministic coaching and product regressions
         run: |
           set +e
           cd phase14
-          : > ../.github/phase15-static-qa-log.txt
           failed=0
           runcheck() {
             label="$1"; shift
-            echo "===== $label =====" | tee -a ../.github/phase15-static-qa-log.txt
-            "$@" >> ../.github/phase15-static-qa-log.txt 2>&1
-            code=$?
-            echo "EXIT=$code" | tee -a ../.github/phase15-static-qa-log.txt
-            if [ "$code" -ne 0 ]; then failed=1; fi
+            echo "===== $label ====="
+            tmp="$(mktemp)"
+            "$@" 2>&1 | tee "$tmp"
+            code=${PIPESTATUS[0]}
+            echo "EXIT=$code"
+            if [ "$code" -ne 0 ]; then
+              failed=1
+              msg="$(tail -n 30 "$tmp")"
+              msg="${msg//'%'/'%25'}"
+              msg="${msg//$'\r'/'%0D'}"
+              msg="${msg//$'\n'/'%0A'}"
+              echo "::error title=${label}::${msg}"
+            fi
+            rm -f "$tmp"
           }
           runcheck planner_regression node --test test/phase15_planner_regression.test.mjs
           runcheck specialist_rules node --test test/phase15_specialist_rules.test.mjs
+          runcheck youth_gymnastics_parity node --test test/youth_gymnastics_parity.test.mjs
+          runcheck tactical_3k_hybrid node --test test/tactical_3k_hybrid_parity.test.mjs
+          runcheck compositional_exercise_vocabulary node --test test/compositional_exercise_vocabulary.test.mjs
+          runcheck program_model_semantics node --test test/program_model_semantics.test.js
+          runcheck golden_youth_good node --test --test-name-pattern='golden Youth gymnastics' test/production_chain_golden.test.js
+          runcheck golden_tactical_good node --test --test-name-pattern='golden Tactical 3K' test/production_chain_golden.test.js
+          runcheck production_chain_golden node --test test/production_chain_golden.test.js
+          runcheck client_output_cleanliness node --test test/client_output_cleanliness.test.js
+          runcheck program_pass_commercial_invariants node --test test/program_pass_commercial_invariants.test.js
+          runcheck final_pipeline_lock node --test test/final_pipeline_lock.test.js
+          runcheck spreadsheet_product_parity node --test test/spreadsheet_product_parity.test.js
           if [ -f test/exercise_demo_coverage.test.mjs ]; then runcheck demo_coverage node --test test/exercise_demo_coverage.test.mjs; fi
-          runcheck build_runtime node scripts/build_phase15_runtime.mjs
+          for f in test/*.test.js; do
+            runcheck "file_$(basename "$f")" node --test "$f"
+          done
+          # Idempotency must exercise the exact same chain Render uses. A partial
+          # runtime rebuild can intentionally discard later production patches and
+          # therefore is not a meaningful production-parity check.
+          runcheck rebuild_exact_production npm run phase15:build
           runcheck syntax_runtime node --check server.phase15.js
           runcheck syntax_server node --check server.js
           runcheck syntax_storage node --check storage.js
           runcheck syntax_admin node --check admin_qa_routes.js
           runcheck syntax_spreadsheet node --check public/spreadsheet.js
+          runcheck syntax_spreadsheet_parity node --check public/spreadsheet-parity.js
+          runcheck syntax_tactical_live_qa node --check public/live-qa-tactical.js
           runcheck syntax_dictionary node --check engine/exercise_dictionary.js
+          runcheck syntax_program_model node --check engine/program_model.js
+          runcheck syntax_goal_semantics node --check engine/program_goal_semantics.js
+          runcheck syntax_semantic_qa node --check engine/semantic_program_qa.js
+          runcheck syntax_client_output_qa node --check engine/client_output_qa.js
+          runcheck syntax_production_validation node --check engine/production_validation.js
+          runcheck syntax_repairable_validation_bundle node --check engine/repairable_validation_bundle.js
           runcheck syntax_planner node --check engine/phase15_planner.js
           runcheck syntax_specialist node --check engine/phase15_specialist_rules.js
           runcheck syntax_overcoming_gravity node --check engine/overcoming_gravity_rules.js
           runcheck syntax_program_qa node --check engine/phase15_program_qa.js
           runcheck syntax_final_qa node --check engine/phase15_final_qa.js
           runcheck syntax_quality node --check engine/phase15_quality_rules.js
-          runcheck grep_v4 grep -q 'deterministic-skeleton-v4' server.phase15.js
+          runcheck syntax_elite_guardrails node --check engine/phase15_elite_guardrails.js
+          runcheck syntax_tactical_patch node --check scripts/apply_tactical_3k_parity.mjs
+          runcheck syntax_tactical_endurance_vocabulary node --check scripts/apply_tactical_endurance_vocabulary.mjs
+          runcheck syntax_aggregate_repair_validation node --check scripts/apply_aggregate_repair_validation.mjs
+          runcheck syntax_live_qa_diagnostics node --check scripts/apply_live_qa_diagnostics.mjs
+          runcheck grep_v5 grep -q 'deterministic-skeleton-v5' server.phase15.js
           runcheck grep_final_qa grep -q 'validatePhase15FinalProgram' server.phase15.js
-          runcheck grep_direct_skill_protection grep -q 'if (!OPENAI_API_KEY)' server.phase15.js
+          runcheck grep_semantic_qa grep -q 'PROGRAM-MODEL-SEMANTIC-QA-WIRED' server.phase15.js
+          runcheck grep_client_cleanliness_inloop grep -q 'CLIENT-OUTPUT-CLEANLINESS-INLOOP' server.phase15.js
+          runcheck grep_client_cleanliness_save grep -q 'SAVE-BOUNDARY-CLIENT-CLEANLINESS' server.phase15.js
+          runcheck grep_internal_repair grep -q 'INTERNAL_QUALITY_REPAIR_ARCHITECTURE' server.phase15.js
+          runcheck grep_repair_budget grep -q 'INTERNAL-QA-REPAIR-BUDGET' server.phase15.js
+          runcheck grep_repair_exhaustion grep -q 'INTERNAL_QA_REPAIR_EXHAUSTED' server.phase15.js
+          runcheck grep_aggregate_repair grep -q 'AGGREGATE-REPAIR-VALIDATION-RUNTIME' server.phase15.js
+          runcheck grep_aggregate_feedback grep -q 'AGGREGATE-ROLE-PRESERVING-FEEDBACK' server.phase15.js
+          runcheck grep_endurance_execution_composition grep -q 'ENDURANCE-EXECUTION-COMPOSITION' engine/exercise_dictionary.js
+          runcheck grep_endurance_alias_hook grep -q 'ENDURANCE-CANONICAL-ALIAS-HOOK' engine/exercise_dictionary.js
+          runcheck grep_qa_unknown_names grep -q 'QA-DIAGNOSTIC-UNKNOWN-NAMES' server.phase15.js
+          runcheck grep_direct_skill_protection grep -q 'OPENAI-DIRECT-SKILL-CALIBRATION-GUARD' server.phase15.js
           runcheck grep_normalizer grep -q 'normalizeOpenAIExerciseNames' server.phase15.js
           runcheck grep_fast_path grep -q 'fast new-client intake persist' server.phase15.js
           runcheck grep_specialist grep -q 'buildSpecialistRules' engine/phase15_planner.js
           runcheck grep_og grep -q 'overcomingGravityRulesForFamily' engine/phase15_specialist_rules.js
           runcheck grep_chest_row grep -q 'Chest-Supported Row' engine/exercise_dictionary.js
           runcheck grep_admin_route grep -q 'registerAdminQaRoutes' server.phase15.js
-          runcheck grep_warmup_tab grep -q 'Warm-Up Protocol' public/spreadsheet.js
+          runcheck grep_warmup_tab grep -q "addWorksheet('Warm-Up')" public/spreadsheet-parity.js
+          runcheck grep_overview_tab grep -q "addWorksheet('Overview')" public/spreadsheet-parity.js
+          runcheck grep_spreadsheet_override grep -q 'window.buildStrengthSpreadsheet=buildParitySpreadsheet' public/spreadsheet-parity.js
           runcheck grep_privacy grep -q '/privacy.html' public/index.html
+          runcheck full_phase14_check npm run check
           exit "$failed"
-      - name: Write static QA result
-        if: always()
-        env:
-          QA_OUTCOME: ${{ steps.qa.outcome }}
-          SHA: ${{ github.sha }}
-        run: |
-          node - <<'NODE'
-          const fs=require('fs');
-          fs.writeFileSync('.github/phase15-static-qa-result.json', JSON.stringify({
-            timestamp:new Date().toISOString(),
-            tested_sha:process.env.SHA,
-            outcome:process.env.QA_OUTCOME,
-            ok:process.env.QA_OUTCOME==='success'
-          },null,2));
-          NODE
-      - name: Commit patched sources and QA result
-        if: always()
-        run: |
-          git config user.name 'RAZ static QA bot'
-          git config user.email 'actions@users.noreply.github.com'
-          git pull --rebase origin main || true
-          git add phase14/engine/exercise_dictionary.js phase14/scripts/build_phase15_runtime.mjs .github/phase15-static-qa-result.json .github/phase15-static-qa-log.txt
-          if git diff --cached --quiet; then exit 0; fi
-          git commit -m 'Record Phase 15 avatar fixes and static QA result'
-          git push
-      - name: Fail if QA failed
-        if: steps.qa.outcome != 'success'
-        run: exit 1

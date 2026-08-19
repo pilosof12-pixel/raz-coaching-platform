@@ -1,0 +1,64 @@
+name: Fetch Live Failure Summaries
+
+on:
+  push:
+    paths:
+      - '.github/workflows/fetch-live-tactical-failures.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  fetch:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Fetch exact failed live jobs
+        env:
+          BASE_URL: https://raz-coaching-platform.onrender.com
+          JOB_YOUTH: 4ee9238598662af0f31e05487ba2b38d
+          JOB_TACTICAL: 7d21f25cbebd82bd2d6693cb3135100c
+        run: |
+          mkdir -p docs/qa/live-failures
+          node <<'NODE'
+          const fs = require('fs');
+          const base = process.env.BASE_URL;
+          const jobs = [
+            {label:'v12_youth_gymnastics', id:process.env.JOB_YOUTH},
+            {label:'v12_tactical_3k', id:process.env.JOB_TACTICAL},
+          ];
+          (async()=>{
+            const out=[];
+            for (const job of jobs) {
+              const r = await fetch(base + '/api/job/' + encodeURIComponent(job.id), {headers:{accept:'application/json','cache-control':'no-cache'}});
+              const text = await r.text();
+              let data={}; try{data=JSON.parse(text)}catch{}
+              out.push({
+                label:job.label,
+                job_id:job.id,
+                http_status:r.status,
+                status:data.status||null,
+                stage:data.stage||null,
+                attempt:data.attempt||null,
+                detail:data.detail||null,
+                error:data.error||null,
+                has_program:typeof data.program==='string' && data.program.length>0,
+                program_chars:typeof data.program==='string'?data.program.length:0,
+              });
+            }
+            fs.writeFileSync('docs/qa/live-failures/v12-failures.json',JSON.stringify(out,null,2));
+          })().catch(e=>{console.error(e);process.exit(1)});
+          NODE
+      - name: Commit sanitized failure summaries
+        run: |
+          git config user.name 'RAZ live QA bot'
+          git config user.email 'actions@users.noreply.github.com'
+          git pull --rebase origin privacy-security-hardening || true
+          git add docs/qa/live-failures/v12-failures.json
+          if git diff --cached --quiet; then exit 0; fi
+          git commit -m 'Record exact v12 live failure summaries'
+          git push origin HEAD:privacy-security-hardening

@@ -1,0 +1,324 @@
+// Youth-gymnastics product parity exporter.
+// Overrides the older raw Strength Block workbook with the approved client structure:
+// Overview -> Warm-Up -> Week 1 -> Week 2 -> Week 3 -> Week 4.
+(() => {
+  const NAVY = 'FF0B1324';
+  const NAVY_2 = 'FF16213A';
+  const BAND = 'FF111C32';
+  const HEADER = 'FF263757';
+  const BODY = 'FFECFDF5';
+  const LABEL = 'FFF2F5F9';
+  const WHITE = 'FFFFFFFF';
+  const TEXT = 'FF111827';
+  const LINK = 'FF0563C1';
+
+  const toList = (v) => Array.isArray(v) ? v.filter(Boolean).map(String) : (v ? [String(v)] : []);
+  const text = (v) => v == null ? '' : String(v);
+  const joinGoals = (v) => toList(v).join('; ');
+  const clean = (v) => text(v).replace(/\s+/g, ' ').trim();
+
+  function fill(cell, argb) {
+    cell.fill = { type:'pattern', pattern:'solid', fgColor:{argb} };
+  }
+  function font(cell, opts={}) {
+    cell.font = { name:'Calibri', size: opts.size || 11, bold: !!opts.bold, italic: !!opts.italic,
+      color:{argb: opts.color || TEXT}, underline: !!opts.underline };
+  }
+  function align(cell, opts={}) {
+    cell.alignment = { vertical:'middle', horizontal:opts.horizontal || 'left', wrapText:true };
+  }
+  function styleRange(ws, range, opts={}) {
+    ws.getCell(range.split(':')[0]);
+    ws.getRow(1);
+    const r = ws.getCell(range.split(':')[0]);
+    void r;
+    ws.getRange ? null : null;
+  }
+  function styleCells(ws, startRow, endRow, startCol, endCol, opts={}) {
+    for (let r=startRow; r<=endRow; r++) for (let c=startCol; c<=endCol; c++) {
+      const cell = ws.getRow(r).getCell(c);
+      if (opts.fill) fill(cell, opts.fill);
+      font(cell, opts);
+      align(cell, {horizontal:opts.horizontal || 'left'});
+      if (opts.border) cell.border = opts.border;
+    }
+  }
+  function mergeTitle(ws, row, endCol, value, bg, size, color=WHITE) {
+    ws.mergeCells(row,1,row,endCol);
+    const cell = ws.getRow(row).getCell(1);
+    cell.value = value;
+    fill(cell,bg); font(cell,{size,bold:true,color}); align(cell);
+    ws.getRow(row).height = Math.max(20, size + 8);
+  }
+
+  function block(textValue, n) {
+    const re = new RegExp(`START_WEEK${n}_TSV([\\s\\S]*?)END_WEEK${n}_TSV`, 'i');
+    const m = text(textValue).match(re);
+    return m ? m[1].replace(/```(?:tsv|text|plaintext)?/gi,'').trim() : '';
+  }
+  function splitLine(line, delim) {
+    if (delim === '\t') return line.split('\t').map(x=>x.trim().replace(/^"|"$/g,''));
+    // CSV fallback used only when a legacy build emits commas rather than tabs.
+    const out=[]; let cur='', q=false;
+    for (let i=0;i<line.length;i++) {
+      const ch=line[i];
+      if (ch==='"') { if(q && line[i+1]==='"'){cur+='"';i++;} else q=!q; }
+      else if(ch===',' && !q){out.push(cur.trim());cur='';}
+      else cur+=ch;
+    }
+    out.push(cur.trim()); return out;
+  }
+  function parseWeek(program, n) {
+    const raw=block(program,n); if(!raw) return {week:n,headers:[],rows:[]};
+    const lines=raw.split(/\r?\n/).filter(x=>x.trim());
+    if(!lines.length) return {week:n,headers:[],rows:[]};
+    const delim=lines[0].includes('\t')?'\t':',';
+    const headers=splitLine(lines[0],delim);
+    const rows=lines.slice(1).map(l=>splitLine(l,delim));
+    return {week:n,headers,rows};
+  }
+  function idx(headers, names) {
+    const h=headers.map(x=>clean(x).toLowerCase());
+    for(const name of names){ const i=h.indexOf(name); if(i>=0) return i; }
+    return -1;
+  }
+  function normalizedRows(week) {
+    const h=week.headers;
+    const iDay=idx(h,['day']);
+    const iEx=idx(h,['exercise']);
+    const iLoad=idx(h,['weight','load','load / target','target']);
+    const iSets=idx(h,['sets']);
+    const iReps=idx(h,['reps','reps / duration','repetitions']);
+    const iRest=idx(h,['rest']);
+    const iEffort=idx(h,['target rpe','rpe','effort','rir']);
+    const iNotes=idx(h,['notes','coaching note','note']);
+    return week.rows.map(r=>({
+      day:iDay>=0?clean(r[iDay]):'', exercise:iEx>=0?clean(r[iEx]):'', load:iLoad>=0?clean(r[iLoad]):'',
+      sets:iSets>=0?clean(r[iSets]):'', reps:iReps>=0?clean(r[iReps]):'', rest:iRest>=0?clean(r[iRest]):'',
+      effort:iEffort>=0?clean(r[iEffort]):'', notes:iNotes>=0?clean(r[iNotes]):''
+    })).filter(r=>r.exercise);
+  }
+  function sessions(week) {
+    const rows=normalizedRows(week).filter(r=>!/^\s*\[(?:WARMUP|חימום)\]/i.test(r.exercise));
+    const out=[]; let current=null;
+    for(const r of rows){
+      if(r.day && (!current || r.day!==current.day)){ current={day:r.day,rows:[]}; out.push(current); }
+      if(!current){ current={day:'Session',rows:[]}; out.push(current); }
+      current.rows.push(r);
+    }
+    return out;
+  }
+  function warmupRows(week) {
+    return normalizedRows(week).filter(r=>/^\s*\[(?:WARMUP|חימום)\]/i.test(r.exercise));
+  }
+
+  function ageFromIntake(intake={}) {
+    const direct=Number(intake.age || intake.age_years || 0); if(direct>0) return direct;
+    const m=(`${text(intake.notes)} ${text(intake.current_numbers)}`).match(/(?:athlete\s+is|age\s*[:=]?)\s*(\d{1,2})\b/i);
+    return m?Number(m[1]):null;
+  }
+  function hasGoal(intake, re) { return re.test(`${joinGoals(intake.primary_goals)} ${joinGoals(intake.secondary_goals)}`); }
+  function equipmentText(intake) { return clean(intake.equipment) || 'Bodyweight / equipment as listed in intake'; }
+  function painText(intake) {
+    if(typeof intake.injuries==='string' && intake.injuries.trim()) return clean(intake.injuries);
+    if(intake.pain?.active) return clean(intake.pain.description || 'Active pain / limitation reported');
+    return 'None reported';
+  }
+  function benchmarkText(intake) {
+    const parts=[];
+    if(clean(intake.current_numbers)) parts.push(clean(intake.current_numbers));
+    if(intake.clarification_answers && typeof intake.clarification_answers==='object') {
+      for(const v of Object.values(intake.clarification_answers)) if(clean(v)) parts.push(clean(v));
+    }
+    return parts.join(' | ');
+  }
+  function fallbackDemo(name) {
+    const direct = window.ExerciseDemos?.resolveExerciseDemo ? window.ExerciseDemos.resolveExerciseDemo(name) : null;
+    if(direct?.url) return direct.url;
+    return 'https://www.youtube.com/results?search_query=' + encodeURIComponent(clean(name) + ' exercise demo').replace(/%20/g,'+');
+  }
+  function setHyperlink(cell, name) {
+    const url=fallbackDemo(name);
+    cell.value={text:url,hyperlink:url,tooltip:'Open exercise demonstration'};
+    font(cell,{size:10,color:LINK,underline:true}); align(cell);
+    return url;
+  }
+
+  function profileRows(intake={}) {
+    const rows=[]; const age=ageFromIntake(intake); const benchmarks=benchmarkText(intake);
+    if(age) rows.push(['Age',String(age)]);
+    if(intake.bodyweight || intake.weight_kg) rows.push(['Bodyweight',clean(intake.bodyweight || intake.weight_kg)]);
+    const p=joinGoals(intake.primary_goals); if(p) rows.push(['Primary goals',p]);
+    const s=joinGoals(intake.secondary_goals); if(s) rows.push(['Secondary goal',s]);
+    if(hasGoal(intake,/bar muscle.?up/i) && intake.clarification_answers?.benchmark_bar_muscle_up)
+      rows.push(['Muscle-up / pulling baseline',clean(intake.clarification_answers.benchmark_bar_muscle_up)]);
+    if(hasGoal(intake,/handstand/i) && intake.clarification_answers?.benchmark_handstand)
+      rows.push(['Handstand baseline',clean(intake.clarification_answers.benchmark_handstand)]);
+    if(/pistol/i.test(text(intake.current_numbers))) rows.push(['Lower-body benchmark',clean(intake.current_numbers)]);
+    else if(benchmarks && !rows.some(r=>/baseline|benchmark/i.test(r[0]))) rows.push(['Current benchmarks',benchmarks]);
+    rows.push(['Training frequency',`${Number(intake.days_per_week||0)||''} structured sessions/week`.trim()]);
+    rows.push(['Equipment',equipmentText(intake)]);
+    if(clean(intake.sport)) rows.push(['Concurrent sport',clean(intake.sport)]);
+    rows.push(['Pain / injury',painText(intake)]);
+    return rows.filter(r=>r[1]);
+  }
+
+  function sessionLabel(intake, session, i) {
+    const flexible=String(intake.gym_availability_mode||'').toLowerCase()==='flexible' && !(intake.available_gym_days||[]).length;
+    return flexible ? `Session ${String.fromCharCode(65+i)}` : (session.day || `Session ${String.fromCharCode(65+i)}`);
+  }
+  function sessionType(session) {
+    const s=session.rows.map(r=>r.exercise).join(' ');
+    const tags=[];
+    if(/handstand/i.test(s)) tags.push('Handstand');
+    if(/bar muscle.?up|muscle.?up transition/i.test(s)) tags.push('Bar muscle-up');
+    if(/squat|lunge|pistol|deadlift|jump|sprint/i.test(s)) tags.push('Athletic / lower-body strength');
+    if(/pull.?up|chin.?up|row/i.test(s) && tags.length<3) tags.push('Pull strength');
+    if(/press|push.?up|dip/i.test(s) && tags.length<3) tags.push('Push strength');
+    return tags.slice(0,3).join(' + ') || 'Strength / skill session';
+  }
+  function sessionPurpose(session, i) {
+    const s=session.rows.map(r=>r.exercise).join(' ');
+    if(/handstand/i.test(s) && /bar muscle.?up|muscle.?up transition/i.test(s)) {
+      return i===0 ? 'Fresh skill practice; bar-specific pulling/transition; push/pull foundation; lower-body strength where relevant.'
+        : 'Second direct exposure to both primary skills; complementary strength; preserve quality and athleticism.';
+    }
+    return 'Primary work first; supporting strength and accessories follow without displacing the stated goals.';
+  }
+
+  function programRules(intake={}) {
+    const rules=[]; const age=ageFromIntake(intake);
+    rules.push('Progress the main goals only when rep quality and the prescribed effort remain intact.');
+    if(hasGoal(intake,/bar muscle.?up/i)) rules.push('Bar muscle-up progress stays bar-specific: direct transition practice plus high/explosive pulling; generic pulling is support, not a replacement.');
+    if(hasGoal(intake,/freestanding handstand|handstand balance/i)) rules.push('Handstand progress is judged by better kick-up control, alignment and independent balance — not wall-hold duration alone.');
+    if(age && age<18) rules.push('Skill quality comes before fatigue. No max-effort grinders or repeated failed attempts; stop when speed, position or confidence clearly deteriorates.');
+    if(intake.pain?.active || (intake.injuries && !/none/i.test(String(intake.injuries)))) rules.push('Pain rule: stop or regress any movement that clearly worsens the reported issue; do not force the planned variation.');
+    rules.push('If time or recovery is limited, remove the lowest-priority accessory before cutting the primary skill/strength exposure.');
+    rules.push('Video cells use a curated direct demo when available; otherwise they link to an exercise-specific YouTube search.');
+    return rules;
+  }
+
+  function renderOverview(ws, intake, week1) {
+    ws.views=[{showGridLines:false}];
+    ws.getColumn(1).width=28; ws.getColumn(2).width=62; ws.getColumn(3).width=18; ws.getColumn(4).width=48;
+    mergeTitle(ws,1,4, ageFromIntake(intake)&&ageFromIntake(intake)<18 ? 'RAZ — YOUTH PERFORMANCE PROGRAM' : 'RAZ — INDIVIDUALIZED PERFORMANCE PROGRAM', NAVY,16);
+    mergeTitle(ws,2,4,'4-WEEK INDIVIDUALIZED TRAINING BLOCK',NAVY_2,10,'FFDCE7F7');
+    let row=4;
+    const hdr=['ATHLETE PROFILE','DETAIL','',''];
+    hdr.forEach((v,i)=>{const c=ws.getRow(row).getCell(i+1);c.value=v;fill(c,HEADER);font(c,{bold:true,color:WHITE});align(c,{horizontal:'center'});});
+    row++;
+    for(const [k,v] of profileRows(intake)){
+      const a=ws.getRow(row).getCell(1), b=ws.getRow(row).getCell(2); a.value=k;b.value=v;
+      fill(a,LABEL);font(a,{bold:true});align(a);font(b);align(b); ws.mergeCells(row,2,row,4); row++;
+    }
+    row++;
+    for(let c=1;c<=4;c++){const x=ws.getRow(row).getCell(c);fill(x,HEADER);font(x,{bold:true,color:WHITE});align(x,{horizontal:'center'});}
+    ['WEEKLY STRUCTURE','TYPE','PRIORITY','COACHING PURPOSE'].forEach((v,i)=>ws.getRow(row).getCell(i+1).value=v);
+    row++;
+    const ss=sessions(week1);
+    ss.forEach((s,i)=>{
+      ws.getRow(row).getCell(1).value=sessionLabel(intake,s,i);
+      ws.getRow(row).getCell(2).value=sessionType(s);
+      ws.getRow(row).getCell(3).value='MANDATORY';
+      ws.getRow(row).getCell(4).value=sessionPurpose(s,i);
+      for(let c=1;c<=4;c++){font(ws.getRow(row).getCell(c));align(ws.getRow(row).getCell(c));} row++;
+    });
+    row++;
+    mergeTitle(ws,row,4,'PROGRAM RULES',BAND,11); row++;
+    for(const rule of programRules(intake)){
+      ws.mergeCells(row,1,row,4); const c=ws.getRow(row).getCell(1); c.value='• '+rule; font(c); align(c); ws.getRow(row).height=30; row++;
+    }
+  }
+
+  function derivedWarmup(session, intake) {
+    const names=session.rows.map(r=>r.exercise).join(' '); const out=[];
+    if(/handstand/i.test(names)) {
+      out.push(['WRIST / SHOULDER','Wrist Rock / Palm Pulse','1 × 8–10 each','20–30 s','Prepare wrists for handstand loading','Gentle, pain-free range.']);
+      out.push(['SHOULDER','Scapular Push-up','1 × 8','30 s','Prime shoulder control','Smooth reps; no fatigue.']);
+    }
+    if(/pull.?up|chin.?up|muscle.?up|row/i.test(names)) out.push(['PULL','Scapular Pull-up','1 × 6','30–45 s','Prime active hang and pulling mechanics','Elbows straight; full control.']);
+    if(/bar muscle.?up|muscle.?up transition/i.test(names) && /band/i.test(equipmentText(intake)))
+      out.push(['MUSCLE-UP','Easy Band-Assisted Bar Muscle-up','2 × 1','60 s','Rehearse bar path and turnover','Use more assistance than work sets.']);
+    if(/squat|lunge|pistol|jump|sprint/i.test(names)) {
+      out.push(['LOWER','Leg Swings','1 × 8 / side','20–30 s','Prepare hips and legs','Short and dynamic.']);
+      if(/jump|sprint/i.test(names)) out.push(['JUMP PREP','Pogo Jumps','2 × 10','30–45 s','Prepare ankle stiffness and landing rhythm','Quiet contacts.']);
+    }
+    if(/press|dip|push.?up/i.test(names) && !/handstand/i.test(names)) out.push(['PRESS','Shoulder CARs','1 × 5 / side','30 s','Prepare shoulder range','Smooth, controlled circles.']);
+    if(!out.length) out.push(['GENERAL','Easy movement + joint prep','3–5 min','—','Raise temperature without fatigue','Stay conversational and fresh.']);
+    return out.slice(0,5);
+  }
+
+  function renderWarmup(ws, intake, week1) {
+    ws.views=[{showGridLines:false}];
+    [19,30,18,14,38,44,38].forEach((w,i)=>ws.getColumn(i+1).width=w);
+    mergeTitle(ws,1,7,'RAZ — WARM-UP + SKILL PREP',NAVY,16);
+    mergeTitle(ws,2,7,'Keep preparation short, specific and non-fatiguing. Primary skills are practiced while fresh.',NAVY_2,10,'FFDCE7F7');
+    let row=4; const ss=sessions(week1); const explicit=warmupRows(week1);
+    ss.forEach((s,i)=>{
+      mergeTitle(ws,row,7,`${sessionLabel(intake,s,i).toUpperCase()}  |  ${sessionType(s).toUpperCase()}`,BAND,11); row++;
+      ['Section','Movement / Target','Dose','Rest','Purpose','Video','Notes'].forEach((v,j)=>{const c=ws.getRow(row).getCell(j+1);c.value=v;fill(c,HEADER);font(c,{bold:true,color:WHITE});align(c,{horizontal:'center'});}); row++;
+      let items=[];
+      // If machine output supplied warm-up rows for this day, preserve them; otherwise derive a concise specific warm-up.
+      const same=explicit.filter(x=>!x.day || x.day===s.day);
+      if(same.length) items=same.map(x=>['PREP',x.exercise.replace(/^\s*\[(?:WARMUP|חימום)\]\s*/i,''),x.reps||x.sets||'',x.rest||'',x.notes||'Session-specific preparation','',x.notes||'']);
+      else items=derivedWarmup(s,intake);
+      for(const item of items){
+        const vals=[item[0],item[1],item[2],item[3],item[4],'',item[5]];
+        vals.forEach((v,j)=>{const c=ws.getRow(row).getCell(j+1);c.value=v;fill(c,BODY);font(c);align(c);});
+        setHyperlink(ws.getRow(row).getCell(6),item[1]); ws.getRow(row).height=32; row++;
+      }
+      row++;
+    });
+  }
+
+  function weekIntent(n) {
+    return n===1?'FOUNDATION • Establish repeatable positions and clean goal-specific reps':
+      n===2?'BUILD • Add a small amount of quality work without chasing fatigue':
+      n===3?'SPECIFICITY • Progress the smallest useful variable while preserving execution':
+      'CONSOLIDATE • Keep quality high, reduce unnecessary fatigue and assess readiness';
+  }
+  function rowStatus(r) { return /\boptional\b/i.test(`${r.exercise} ${r.notes}`)?'OPTIONAL':'MANDATORY'; }
+  function renderWeek(ws, intake, week) {
+    ws.views=[{showGridLines:false,state:'frozen',ySplit:8}];
+    [29,23,9,17,14,16,50,13,38,14,9].forEach((w,i)=>ws.getColumn(i+1).width=w);
+    mergeTitle(ws,1,11,ageFromIntake(intake)&&ageFromIntake(intake)<18?'RAZ — YOUTH PERFORMANCE':'RAZ — PERFORMANCE',NAVY,16);
+    mergeTitle(ws,2,11,`INDIVIDUALIZED TRAINING BLOCK • WEEK ${week.week}`,NAVY_2,10,'FFDCE7F7');
+    mergeTitle(ws,4,11,`WEEK INTENT • ${weekIntent(week.week)}`,BAND,11);
+    let row=6; const ss=sessions(week);
+    ss.forEach((s,i)=>{
+      mergeTitle(ws,row,11,`${sessionLabel(intake,s,i).toUpperCase()}  |  ${sessionType(s).toUpperCase()}  •  MANDATORY`,BAND,11); row++;
+      ws.mergeCells(row,1,row,11); const prep=ws.getRow(row).getCell(1); prep.value=`WARM-UP • Use ${sessionLabel(intake,s,i)} protocol in the Warm-Up tab`; font(prep,{italic:true,color:'FF475569'});align(prep);row++;
+      const headers=['Exercise','Load / Target','Sets','Reps / Duration','Rest','Effort','Coaching Note','Log','Video','Status','Done'];
+      headers.forEach((v,j)=>{const c=ws.getRow(row).getCell(j+1);c.value=v;fill(c,HEADER);font(c,{bold:true,color:WHITE});align(c,{horizontal:'center'});}); row++;
+      for(const r of s.rows){
+        const vals=[r.exercise,r.load,r.sets,r.reps,r.rest,r.effort,r.notes,'','',rowStatus(r),''];
+        vals.forEach((v,j)=>{const c=ws.getRow(row).getCell(j+1);c.value=v;fill(c,BODY);font(c);align(c,{horizontal:[2,3,4,5,6,9,10,11].includes(j+1)?'center':'left'});});
+        setHyperlink(ws.getRow(row).getCell(9),r.exercise); ws.getRow(row).height=34; row++;
+      }
+      row+=2;
+    });
+    mergeTitle(ws,row,11,'COACH NOTES',BAND,11); row++;
+    for(const rule of programRules(intake).slice(0,4)){
+      ws.mergeCells(row,1,row,11); const c=ws.getRow(row).getCell(1); c.value='• '+rule; font(c);align(c);ws.getRow(row).height=28;row++;
+    }
+  }
+
+  async function buildParitySpreadsheet(program, intake={}) {
+    if(!window.ExcelJS) throw new Error('Spreadsheet engine did not load. Check your connection and try again.');
+    if(window.ExerciseDemos?.load){ try{await window.ExerciseDemos.load();}catch(e){console.warn('Exercise demo library unavailable; using search-link fallback.',e);} }
+    const weeks=[1,2,3,4].map(n=>parseWeek(program,n));
+    if(weeks.some(w=>!w.rows.length)) throw new Error('The program is missing one or more week tables, so the premium spreadsheet could not be built safely.');
+    const wb=new ExcelJS.Workbook(); wb.creator='RAZ Performance Coaching Engine'; wb.created=new Date();
+    renderOverview(wb.addWorksheet('Overview'),intake,weeks[0]);
+    renderWarmup(wb.addWorksheet('Warm-Up'),intake,weeks[0]);
+    weeks.forEach(w=>renderWeek(wb.addWorksheet(`Week ${w.week}`),intake,w));
+    const buffer=await wb.xlsx.writeBuffer();
+    const blob=new Blob([buffer],{type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'});
+    const url=URL.createObjectURL(blob); const a=document.createElement('a');
+    a.href=url; a.download='RAZ_4_Week_Performance_Program.xlsx'; document.body.appendChild(a);a.click();a.remove();URL.revokeObjectURL(url);
+    return weeks.reduce((n,w)=>n+normalizedRows(w).filter(r=>!/^\s*\[(?:WARMUP|חימום)\]/i.test(r.exercise)).length,0);
+  }
+
+  // Preserve parser helpers from spreadsheet.js, but make this the only client export path.
+  window.buildStrengthSpreadsheet=buildParitySpreadsheet;
+})();

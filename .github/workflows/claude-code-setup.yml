@@ -1,0 +1,25 @@
+name: Claude Code Setup
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - privacy-security-hardening
+    paths:
+      - '.github/workflows/claude-code-setup.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  verify-claude-code:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install Claude Code
+        uses: pleaseai/setup-claude-code@v1.1.4
+
+      - name: Verify Claude Code
+        run: claude --version

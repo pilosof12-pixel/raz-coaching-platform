@@ -1,0 +1,122 @@
+name: Live Youth Finalization Diagnostic
+
+on:
+  push:
+    paths:
+      - '.github/workflows/live-youth-finalization-diagnostic.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  youth:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: privacy-security-hardening
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Wait for exact diagnostic runtime on Render
+        env:
+          BASE_URL: https://raz-coaching-platform.onrender.com
+          EXPECTED_RUNTIME: launch-acceptance-v12-youth-session-quality-fixed
+        run: |
+          node <<'NODE'
+          const base=process.env.BASE_URL;
+          const expected=process.env.EXPECTED_RUNTIME;
+          const sleep=ms=>new Promise(r=>setTimeout(r,ms));
+          let last='';
+          for(let i=0;i<120;i++){
+            try{
+              const r=await fetch(base+'/runtime-version.txt?qa='+Date.now(),{headers:{'cache-control':'no-cache','accept':'text/plain'}});
+              last=(await r.text()).trim();
+              if(r.ok&&last===expected){console.log('EXACT_RUNTIME_OK',expected);process.exit(0);}
+            }catch(e){last=String(e?.message||e);}
+            if(i<119) await sleep(5000);
+          }
+          throw new Error(`exact runtime not deployed: expected=${expected} last=${last}`);
+          NODE
+      - name: Generate Youth only and capture finalization diagnostics
+        env:
+          BASE_URL: https://raz-coaching-platform.onrender.com
+          ADMIN_PROVISION_KEY: ${{ secrets.ADMIN_PROVISION_KEY }}
+        run: |
+          mkdir -p docs/qa/live-youth-finalization
+          node <<'NODE'
+          import fs from 'node:fs';
+          const base=process.env.BASE_URL;
+          const adminKey=process.env.ADMIN_PROVISION_KEY||'';
+          const sleep=ms=>new Promise(r=>setTimeout(r,ms));
+          const now=()=>new Date().toISOString();
+          if(!adminKey) throw new Error('ADMIN_PROVISION_KEY missing');
+          const intake={
+            age:13,
+            language:'en',
+            experience:'intermediate',
+            primary_goals:['Achieve first bar muscle-up','Achieve a freestanding handstand'],
+            secondary_goals:['Build a strong general push and pull foundation while maintaining lower-body athleticism'],
+            days_per_week:2,
+            session_length:'60 min',
+            gym_availability_mode:'flexible',
+            available_gym_days:[],
+            training_location:'home_gym',
+            equipment:'Home setup: rings, pull-up bar, resistance bands and bench. No external weights.',
+            current_numbers:'Pistol squat established; ring muscle-up achieved; about 12 strict pull-ups and 6 good ring dips. Wall-facing handstand about 15 seconds; back-to-wall about 20 seconds. Controlled kick-ups are improving, but there is no reliable unsupported balance time yet.',
+            clarification_answers:{
+              benchmark_bar_muscle_up:'Cannot perform a bar muscle-up yet. Can perform a ring muscle-up. About 12 strict pull-ups and 6 good ring dips.',
+              benchmark_handstand:'Wall-facing handstand about 15 seconds; back-to-wall about 20 seconds. Controlled kick-ups are improving, but there is no reliable unsupported balance time yet.'
+            },
+            injuries:'None reported',
+            pain:{active:false},
+            sport:'',
+            sport_schedule:[],
+            mobility:{active:false},
+            sleep_hours:'8-9',
+            recovery_rating:'Good',
+            notes:'Athlete is 13 years old. Two structured sessions per week. Rings, pull-up bar, bands and bench only. No external weights. Skill quality before fatigue; no grinders or repeated failed attempts.',
+            qa_diagnostics:true,
+            privacy_consent:{health_data:true,policy_version:'2026-08-15',consented_at:now()}
+          };
+          async function req(path,opt={}){
+            const r=await fetch(base+path,opt);
+            const text=await r.text(); let j={}; try{j=JSON.parse(text)}catch{}
+            return {r,j,text};
+          }
+          const issue=await req('/api/admin/program-pass',{method:'POST',headers:{'content-type':'application/json','x-admin-provision-key':adminKey},body:JSON.stringify({count:1})});
+          if(!issue.r.ok||!issue.j?.codes?.[0]) throw new Error('Program Pass provisioning failed: '+issue.r.status);
+          const build=await req('/api/build',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({intake,pass_code:issue.j.codes[0]})});
+          if(build.r.status!==202||!build.j?.job_id) throw new Error('Youth build not accepted: '+build.r.status+' '+build.text.slice(0,300));
+          const started=Date.now(); let job={};
+          for(let i=0;i<300;i++){
+            await sleep(2000);
+            try{({j:job}=await req('/api/job/'+encodeURIComponent(build.j.job_id)));}catch{}
+            if(job?.status==='done'||job?.status==='error') break;
+          }
+          const result={
+            timestamp:now(),
+            job_id:build.j.job_id,
+            status:job?.status||'timeout',
+            stage:job?.stage||null,
+            attempt:job?.attempt||null,
+            detail:job?.detail||null,
+            error:job?.error||null,
+            program_chars:typeof job?.program==='string'?job.program.length:0,
+            seconds:Math.round((Date.now()-started)/1000),
+          };
+          if(typeof job?.program==='string'&&job.program.length) fs.writeFileSync('docs/qa/live-youth-finalization/program.txt',job.program);
+          fs.writeFileSync('docs/qa/live-youth-finalization/result.json',JSON.stringify(result,null,2));
+          console.log(JSON.stringify(result));
+          if(job?.status!=='done') process.exitCode=1;
+          NODE
+      - name: Upload Youth diagnostic evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: youth-finalization-diagnostic-${{ github.run_id }}
+          path: docs/qa/live-youth-finalization/
+          if-no-files-found: error
+          retention-days: 7

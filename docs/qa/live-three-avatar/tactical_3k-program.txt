@@ -1,0 +1,108 @@
+Here is your four-week program, designed to improve your 3 km run, 10 km ruck, and strict pull-ups while maintaining your strength and athleticism.
+
+The program is structured across five training days to effectively balance your running, rucking, and strength goals while managing impact and recovery, especially given your shin-splint history. We'll use your current performance markers to build a progressive plan.
+
+For your running, we'll start with intervals based on your recent 400m pace and gradually progress either the pace or the total work, but not both simultaneously, to manage shin impact. Your ruck will progress similarly, focusing on maintaining the 20 kg load while improving pace or distance. Pull-up progression will involve increasing reps or adding load where appropriate.
+
+Remember to prioritize recovery, especially sleep and nutrition. If you experience any shin irritation or other pain, reduce the intensity or volume of the provocative activity and focus on pain-free movement. You can substitute a run with a lower-impact aerobic activity like cycling or rowing if needed, but aim to return to running as soon as symptoms allow.
+
+---
+### Weeks 2-4 Progression:
+
+**Running:** We'll gradually increase the total work or slightly improve the pace of your interval sessions, ensuring your shins tolerate the load. Easy runs will maintain aerobic base. Week 4 will consolidate and allow for a slightly faster expression of speed on intervals.
+**Rucking:** We'll aim to improve your pace or slightly extend the distance of your 20 kg ruck, carefully monitoring your recovery and shin response.
+**Strength:** For Back Squat, Deadlift, and Overhead Press, you'll aim to hit the top of the rep range at the target RPE, then increase the load slightly in subsequent weeks. Weighted Pull-ups will progress by adding reps or a small amount of load. Strict Pull-ups will focus on increasing quality reps per set. Support work will remain consistent to provide a stable base.
+
+---
+
+START_WEEK1_TSV
+Day	Exercise	Weight	Sets	Reps	Rest	Target RPE	Notes	Results
+Mon	[WARMUP]	Bodyweight	1	5 min	N/A	N/A	Easy jogging, dynamic drills, a few strides.	
+Mon	Back Squat	140 kg	3	5	3 min	RPE 8	Focus on clean reps.	
+Mon	Weighted Pull-up	+30 kg	3	5	2 min	RPE 8	Maintain strict form.	
+Mon	Push-up	Bodyweight	2	10-15	90 sec	RPE 7-8	Controlled tempo.	
+Mon	Side Plank	Bodyweight	2	30 sec/side	60 sec	RPE 7	Brace core, keep body straight.	
+Mon	Run	Zone 2	1	30 min	N/A	RPE 5-6	Easy, conversational pace.	
+Tue	[WARMUP]	Bodyweight	1	5 min	N/A	N/A	Easy jogging, dynamic drills, a few strides.	
+Tue	Run	Intervals	6	400 m	1:45	RPE 8.5	3K-specific intervals. Target 1:42-1:45 pace (approx. 4:15-4:22/km), full recovery between efforts. This session anchors your 3K progression.	
+Wed	Deadlift	180 kg	3	3	3 min	RPE 8	Maintain strong, controlled form.	
+Wed	Overhead Press	65 kg	3	5	2 min	RPE 8	Strict press, full lockout.	
+Wed	Reverse Lunge	Bodyweight	3	8-10/side	90 sec	RPE 7	Controlled movement, good balance.	
+Wed	Strict Pull-up	Bodyweight	3	8-10	2 min	RPE 8	Focus on quality reps, full range of motion.	
+Wed	Hanging Leg Raise	Bodyweight	2	10-15	60 sec	RPE 7	Focus on lower abs, avoid swinging.	
+Thu	Backpack Carry	20 kg	1	8 km	N/A	RPE 6-7	Target 8 km in approx. 72-74 min (9:00-9:15/km pace). This session anchors your ruck progression.	
+Fri	[WARMUP]	Bodyweight	1	5 min	N/A	N/A	Easy jogging, dynamic drills, a few strides.	
+Fri	Dumbbell Shoulder Press	RPE-selected	1	8-10	90 sec	RPE 7-8	Controlled reps.	
+Fri	Dumbbell Row	RPE-selected	3	8-10/side	90 sec	RPE 7-8	Focus on back contraction.	
+Fri	Machine Hamstring Curl	Bodyweight	3	10-15	60 sec	RPE 7	Control the eccentric.	
+Fri	Run	Zone 2	1	30 min	N/A	RPE 5-6	Easy, conversational pace.	
+END_WEEK1_TSV
+
+START_WEEK2_TSV
+Day	Exercise	Weight	Sets	Reps	Rest	Target RPE	Notes	Results
+Mon	[WARMUP]	Bodyweight	1	5 min	N/A	N/A	Easy jogging, dynamic drills, a few strides.	
+Mon	Back Squat	140 kg	3	5	3 min	RPE 8	Aim for clean reps at the top of the range.	
+Mon	Weighted Pull-up	+30 kg	3	6	2 min	RPE 8	Maintain strict form, aim for 6 reps.	
+Mon	Push-up	Bodyweight	2	12-18	90 sec	RPE 7-8	Controlled tempo.	
+Mon	Side Plank	Bodyweight	2	30 sec/side	60 sec	RPE 7	Brace core, keep body straight.	
+Mon	Run	Zone 2	1	30 min	N/A	RPE 5-6	Easy, conversational pace.	
+Tue	[WARMUP]	Bodyweight	1	5 min	N/A	N/A	Easy jogging, dynamic drills, a few strides.	
+Tue	Run	Intervals	7	400 m	1:45	RPE 8.5	3K-specific intervals. Target 1:42-1:45 pace (approx. 4:15-4:22/km), full recovery between efforts. Increased volume.	
+Wed	Deadlift	180 kg	3	3	3 min	RPE 8	Maintain strong, controlled form.	
+Wed	Overhead Press	65 kg	3	5	2 min	RPE 8	Strict press, full lockout.	
+Wed	Reverse Lunge	Bodyweight	3	8-10/side	90 sec	RPE 7	Controlled movement, good balance.	
+Wed	Strict Pull-up	Bodyweight	3	9-11	2 min	RPE 8	Focus on quality reps, full range of motion.	
+Wed	Hanging Leg Raise	Bodyweight	2	10-15	60 sec	RPE 7	Focus on lower abs, avoid swinging.	
+Thu	Backpack Carry	20 kg	1	8 km	N/A	RPE 6-7	Target 8 km in approx. 70-72 min (8:45-9:00/km pace) OR maintain Week 1 pace for 8.5 km.	
+Fri	[WARMUP]	Bodyweight	1	5 min	N/A	N/A	Easy jogging, dynamic drills, a few strides.	
+Fri	Dumbbell Shoulder Press	RPE-selected	1	8-10	90 sec	RPE 7-8	Controlled reps.	
+Fri	Dumbbell Row	RPE-selected	3	8-10/side	90 sec	RPE 7-8	Focus on back contraction.	
+Fri	Machine Hamstring Curl	Bodyweight	3	10-15	60 sec	RPE 7	Control the eccentric.	
+Fri	Run	Zone 2	1	30 min	N/A	RPE 5-6	Easy, conversational pace.	
+END_WEEK2_TSV
+
+START_WEEK3_TSV
+Day	Exercise	Weight	Sets	Reps	Rest	Target RPE	Notes	Results
+Mon	[WARMUP]	Bodyweight	1	5 min	N/A	N/A	Easy jogging, dynamic drills, a few strides.	
+Mon	Back Squat	142.5 kg	3	5	3 min	RPE 8.5	Slight increase in load, focus on maintaining reps.	
+Mon	Weighted Pull-up	+32.5 kg	3	5	2 min	RPE 8.5	Slight increase in load, focus on maintaining reps.	
+Mon	Push-up	Bodyweight	2	15-20	90 sec	RPE 7-8	Controlled tempo.	
+Mon	Side Plank	Bodyweight	2	30 sec/side	60 sec	RPE 7	Brace core, keep body straight.	
+Mon	Run	Zone 2	1	30 min	N/A	RPE 5-6	Easy, conversational pace.	
+Tue	[WARMUP]	Bodyweight	1	5 min	N/A	N/A	Easy jogging, dynamic drills, a few strides.	
+Tue	Run	Intervals	6	400 m	1:40	RPE 9	3K-specific intervals. Target 1:40 pace (approx. 4:10/km), full recovery between efforts. Higher pace, reduced volume.	
+Wed	Deadlift	182.5 kg	3	3	3 min	RPE 8.5	Slight increase in load, maintain strong form.	
+Wed	Overhead Press	67.5 kg	3	5	2 min	RPE 8.5	Slight increase in load, strict press.	
+Wed	Reverse Lunge	Bodyweight	3	8-10/side	90 sec	RPE 7	Controlled movement, good balance.	
+Wed	Strict Pull-up	Bodyweight	3	7-9	2 min	RPE 8	Focus on quality reps, full range of motion.	
+Wed	Hanging Leg Raise	Bodyweight	2	10-15	60 sec	RPE 7	Focus on lower abs, avoid swinging.	
+Thu	Backpack Carry	20 kg	1	9 km	N/A	RPE 7	Target 9 km in approx. 81-83 min (9:00-9:15/km pace). Increased distance.	
+Fri	[WARMUP]	Bodyweight	1	5 min	N/A	N/A	Easy jogging, dynamic drills, a few strides.	
+Fri	Dumbbell Shoulder Press	RPE-selected	1	8-10	90 sec	RPE 7-8	Controlled reps.	
+Fri	Dumbbell Row	RPE-selected	3	8-10/side	90 sec	RPE 7-8	Focus on back contraction.	
+Fri	Machine Hamstring Curl	Bodyweight	3	10-15	60 sec	RPE 7	Control the eccentric.	
+Fri	Run	Zone 2	1	30 min	N/A	RPE 5-6	Easy, conversational pace.	
+END_WEEK3_TSV
+
+START_WEEK4_TSV
+Day	Exercise	Weight	Sets	Reps	Rest	Target RPE	Notes	Results
+Mon	[WARMUP]	Bodyweight	1	5 min	N/A	N/A	Easy jogging, dynamic drills, a few strides.	
+Mon	Back Squat	142.5 kg	3	4-5	3 min	RPE 8	Consolidate strength, focus on quality.	
+Mon	Weighted Pull-up	+32.5 kg	3	4-5	2 min	RPE 8	Consolidate strength, focus on quality.	
+Mon	Push-up	Bodyweight	2	15-20	90 sec	RPE 7	Maintain quality reps.	
+Mon	Side Plank	Bodyweight	2	30 sec/side	60 sec	RPE 7	Brace core, keep body straight.	
+Mon	Run	Zone 2	1	25 min	N/A	RPE 5-6	Slightly reduced duration for recovery.	
+Tue	[WARMUP]	Bodyweight	1	5 min	N/A	N/A	Easy jogging, dynamic drills, a few strides.	
+Tue	Run	Intervals	5	400 m	1:38	RPE 9	3K-specific intervals. Faster pace (approx. 4:05/km), reduced volume for expression.	
+Wed	Deadlift	182.5 kg	3	2-3	3 min	RPE 8	Consolidate strength, focus on quality.	
+Wed	Overhead Press	67.5 kg	3	4-5	2 min	RPE 8	Consolidate strength, strict press.	
+Wed	Strict Pull-up	Bodyweight	3	7-9	2 min	RPE 8	Aim to match or exceed Week 3 quality reps.	
+Wed	Reverse Lunge	Bodyweight	2	8-10/side	90 sec	RPE 6-7	Reduced volume, focus on movement quality.	
+Wed	Hanging Leg Raise	Bodyweight	2	10-15	60 sec	RPE 7	Focus on lower abs, avoid swinging.	
+Thu	Backpack Carry	20 kg	1	8 km	N/A	RPE 6-7	Target 8 km in approx. 70-72 min (8:45-9:00/km pace). Reduced distance for recovery.	
+Fri	[WARMUP]	Bodyweight	1	5 min	N/A	N/A	Easy jogging, dynamic drills, a few strides.	
+Fri	Dumbbell Shoulder Press	RPE-selected	1	8-10	90 sec	RPE 7	Reduced volume, controlled reps.	
+Fri	Dumbbell Row	RPE-selected	2	8-10/side	90 sec	RPE 7	Reduced volume, focus on back contraction.	
+Fri	Machine Hamstring Curl	Bodyweight	2	10-15	60 sec	RPE 7	Reduced volume, control the eccentric.	
+Fri	Run	Zone 2	1	25 min	N/A	RPE 5-6	Slightly reduced duration for recovery.	
+END_WEEK4_TSV

@@ -8,6 +8,14 @@ import {
   painToleranceGate,
   estimateSessionMinutes,
 } from "./phase15_quality_rules.js";
+import {
+  elitePromptRules,
+  goalDoseFlags,
+  unbenchmarkedVariationLoadFlags,
+  strengthSessionAccountingFlags,
+  endurancePerformanceIntegrityFlags,
+  exactPrimaryMovementFlags,
+} from "./phase15_elite_guardrails.js";
 
 function norm(s) { return String(s || "").toLowerCase().trim(); }
 
@@ -96,6 +104,42 @@ function asksStrengthDays(intake) {
   return /strength sessions?|strength days?|full[_\s-]?body|strength/.test(text);
 }
 
+export function specificModalityRequirement(intake = {}) {
+  const goals = `${goalText(intake, "primary_goals")} | ${goalText(intake, "secondary_goals")}`.toLowerCase();
+  const sport = String(intake?.sport || '').toLowerCase();
+  const scheduled = Array.isArray(intake?.sport_schedule) && intake.sport_schedule.length > 0;
+  const defs = [
+    { key:'running', goal:/\b(?:5\s*k(?:m)?|10\s*k(?:m)?|half[- ]?marathon|marathon|running|run goal|sprint(?:ing)?|mile time)\b/i, exposure:/\b(?:run|running|jog|jogging|treadmill|sprint)\b/i, external:/\b(?:run|running|track|sprint)\b/i },
+    { key:'swimming', goal:/\b(?:swim|swimming|freestyle|backstroke|breaststroke|butterfly|pool time)\b/i, exposure:/\b(?:swim|swimming|pool|freestyle|backstroke|breaststroke|butterfly)\b/i, external:/\b(?:swim|swimming)\b/i },
+    { key:'rowing', goal:/\b(?:rowing|rower|erg(?:ometer)?|concept ?2|(?:2|5)\s*k\s*row|500\s*m\s*row|1000\s*m\s*row)\b/i, exposure:/\b(?:rower|rowing|erg|concept ?2)\b/i, external:/\b(?:rowing|rower|crew)\b/i },
+    { key:'cycling', goal:/\b(?:cycling|cyclist|bike time trial|cycling time trial|road bike|criterium)\b/i, exposure:/\b(?:bike|cycling|cycle|airbike|assault bike|stationary bike)\b/i, external:/\b(?:cycling|cyclist|road bike)\b/i },
+  ];
+  const def = defs.find(x => x.goal.test(goals));
+  if (!def) return null; // generic conditioning/aerobic goals remain engine-selected
+  return { key:def.key, exposure:def.exposure, externalSatisfied: scheduled && def.external.test(sport) };
+}
+
+export function hasSpecificModalityExposure(program, intake = {}) {
+  const req = specificModalityRequirement(intake);
+  if (!req || req.externalSatisfied) return true;
+  const parsed = parseBlock(program);
+  if (!parsed) return false;
+  const e = parsed.idx.exercise, notes = parsed.idx.notes, reps = parsed.idx.reps, weight = parsed.idx.weight, sets = parsed.idx.sets;
+  return parsed.rows.some(row => {
+    const ex = row.cells[e] || '';
+    if (/^\s*\[WARMUP\]/i.test(ex)) return false;
+    const note = notes >= 0 ? row.cells[notes] || '' : '';
+    const ctx = `${ex} ${note}`;
+    if (!req.exposure.test(ctx)) return false;
+    const dose = `${reps >= 0 ? row.cells[reps] || "" : ""} ${weight >= 0 ? row.cells[weight] || "" : ""} ${note}`;
+    const minuteValues = [...dose.matchAll(/(\d+(?:\.\d+)?)\s*(?:min|minutes?)\b/gi)].map(m => Number(m[1]));
+    const setCount = Math.max(1, Number(sets >= 0 ? row.cells[sets] || 1 : 1) || 1);
+    const continuousEnough = minuteValues.some(n => n >= 15 || n * setCount >= 15); // MEANINGFUL-SPECIFIC-SETS-DURATION
+    const distanceOrIntervals = /\b\d+(?:\.\d+)?\s*(?:km|m)\b/i.test(dose) || /\b\d+\s*(?:x|×)\s*\d+(?:\.\d+)?\s*(?:m|km|min|minutes?)\b/i.test(dose);
+    return continuousEnough || distanceOrIntervals; // MEANINGFUL-SPECIFIC-DOSE
+  });
+}
+
 function firstNumber(s) {
   const m = String(s || "").match(/\d+(?:\.\d+)?/);
   return m ? Number(m[0]) : null;
@@ -111,17 +155,21 @@ export function phase15PromptRules(intake = {}) {
     "A real secondary strength progression goal needs meaningful weekly dose rather than token maintenance when recovery permits.",
     "Session duration is a ceiling, not a target to fill. Remove low-priority accessories before cutting primary specificity.",
     "Judge total day stress from gym plus sport plus recovery.",
+    "SPORT-SPECIFICITY RULE: when a client names a specific sport modality or event as a performance goal, preserve at least one direct exposure to that modality. Cross-training may supplement it but must not completely replace it. Generic conditioning/aerobic goals with no stated modality remain coach-selected.",
     "Power work goes after preparation and before fatigue-producing heavy strength when power quality is the intent.",
     "Pain history is a tolerance gate, not a diagnosis. Preserve tolerated training and gate provocative spinal-loading accessories.",
     "CLIENT CLEANLINESS HARD RULE: never output [REVIEW], contact-support text, placeholder rows, QA labels or unresolved internal language. Such output is rejected and never saved to a client.",
   ];
+  rules.push(...elitePromptRules(intake)); // ELITE-GUARDRAILS-PROMPT-WIRED
   if (/squat/i.test(primary) && /(max|1\s*rm|exceed|over\s*\d+)/i.test(primary) && /(?:x|×)\s*(?:6|7|8|9|10|11|12)\b|(?:6|7|8|9|10|11|12)\s*reps?/i.test(primary)) {
     rules.push("DUAL BOX-SQUAT HARD RULE: Week 1 needs (A) max-strength box-squat work at 1-5 reps and (B) separate rep-strength box-squat work at >=6 reps or explicit high-rep back-off progression. Speed doubles do not satisfy the rep target.");
   }
   if (oap != null && oap >= 2) rules.push(`ADVANCED OAP HARD RULE: athlete owns ${oap} strict reps. Week 1 needs two advanced unilateral-specific exposures with strict OAP present; assisted doubles/triples may be the second. Eccentrics cannot be a main exposure.`);
   if (ohp) rules.push(`OHP HARD RULE: current about ${ohp.current} kg, target ${ohp.target} kg. Use at least one direct strict Overhead Press exposure plus a second meaningful vertical-press exposure. Purposeful Push Press or another verified press variation may provide overload/power/volume; variation must have a clear job and may not remove direct strict-OHP practice.`);
   if (asksLowFatigueAerobicOnly(intake)) rules.push("AEROBIC HARD RULE: use 2-3 low-fatigue Zone 2 exposures, normally >=20 min for a meaningful dedicated exposure. No unrequested intervals, threshold, VO2, AMRAP or sprint conditioning.");
-  if (asksStrengthDays(intake) && Number(intake.days_per_week) > 0) rules.push(`STRENGTH-DAY HARD RULE: all ${Number(intake.days_per_week)} requested gym days must contain real strength or advanced-skill work. A cardio-only gym day does not count.`);
+  const modalityReq = specificModalityRequirement(intake);
+  if (modalityReq && !modalityReq.externalSatisfied) rules.push(`MODALITY-SPECIFIC HARD RULE: ${modalityReq.key} is an explicit performance goal. Include at least one meaningful direct ${modalityReq.key} exposure in Week 1, not merely a warm-up or token micro-dose, and preserve modality-specific practice across the block. Cross-training may supplement it but cannot replace the named modality.`);
+  if (asksStrengthDays(intake) && Number(intake.days_per_week) > 0) rules.push(`STRENGTH-DAY RULE: ${Number(intake.days_per_week)} is the requested/available gym-session count, not a demand that every day be heavy. Low-cost accessory, rehab-oriented resistance, or advanced-skill work can be appropriate when sport load is high. A cardio-only day does not count as a strength day, and the program must not silently replace requested strength work with conditioning; if recovery requires a deliberate reduction, explain that tradeoff plainly.`);
   rules.push(`Derived goal qualities: ${JSON.stringify(decomposed)}.`);
   rules.push(oap == null ? "No reliable strict OAP benchmark parsed." : `Parsed strict OAP capacity: ${oap}. Stage guidance: ${JSON.stringify(advancedOapPrescription(oap))}.`);
   rules.push(limit == null ? "No numeric session ceiling parsed." : `Session ceiling: ${limit} minutes.`);
@@ -145,6 +193,13 @@ export function validatePhase15Program(program, intake = {}) {
   if (!parsed) throw new Phase15QualityError([{ code:"TSV_PARSE_FAIL", message:"Week 1 TSV could not be parsed." }]);
   const flags = [];
 
+  // Avatar-agnostic integrity floor. Coaching dose itself remains source-authored.
+  flags.push(...goalDoseFlags(raw, intake, parsed));
+  flags.push(...unbenchmarkedVariationLoadFlags(intake, parsed));
+  flags.push(...strengthSessionAccountingFlags(raw, intake, parsed)); // ELITE-GUARDRAILS-FINAL-QA-WIRED
+  flags.push(...endurancePerformanceIntegrityFlags(raw, intake, parsed)); // ENDURANCE-PRESERVATION-FINAL-QA-WIRED
+  flags.push(...exactPrimaryMovementFlags(raw, intake, parsed)); // EXACT-PRIMARY-MOVEMENT-FINAL-QA-WIRED
+
   if (/\[REVIEW\]|contact\s+support|placeholder(?:\s+exercise|\s+row)?|could not be safely generated/i.test(raw)) {
     flags.push({ code:"CLIENT_OUTPUT_NOT_READY", message:"Program contains unresolved review/support/placeholder text. Reject rather than exposing it to a client." });
   }
@@ -162,6 +217,11 @@ export function validatePhase15Program(program, intake = {}) {
   }
 
   const primary = goalText(intake, "primary_goals"), secondary = goalText(intake, "secondary_goals"), all = `${primary} | ${secondary}`;
+
+  const modalityReq = specificModalityRequirement(intake);
+  if (modalityReq && !hasSpecificModalityExposure(raw, intake)) {
+    flags.push({ code:"SPORT_MODALITY_SPECIFICITY_MISSING", message:`${modalityReq.key} is an explicit performance goal but Week 1 contains no meaningful direct ${modalityReq.key} exposure. Cross-training cannot fully replace the named modality.` });
+  }
 
   if (/squat/i.test(primary) && /(max|1\s*rm|over\s*\d+|exceed)/i.test(primary) && /(?:x|×)\s*(?:6|7|8|9|10|11|12)\b|(?:6|7|8|9|10|11|12)\s*reps?/i.test(primary)) {
     const ex = parsed.idx.exercise, reps = parsed.idx.reps, rpe = parsed.idx["target rpe"];

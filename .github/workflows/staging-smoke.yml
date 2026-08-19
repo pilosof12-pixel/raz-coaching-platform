@@ -1,0 +1,108 @@
+name: Live staging smoke
+
+on:
+  push:
+    paths:
+      - '.github/workflows/staging-smoke.yml'
+      - 'phase14/public/runtime-version.txt'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  smoke:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - name: Verify live Render surface against exact checkout fingerprint
+        env:
+          BASE_URL: https://raz-coaching-platform.onrender.com
+        run: |
+          EXPECTED_RUNTIME="$(tr -d '\r\n' < phase14/public/runtime-version.txt)"
+          export EXPECTED_RUNTIME
+          echo "EXPECTED_RUNTIME=$EXPECTED_RUNTIME"
+          node <<'NODE'
+          const base = process.env.BASE_URL;
+          const expectedRuntime = String(process.env.EXPECTED_RUNTIME || '').trim();
+          if (!expectedRuntime) throw new Error('checkout runtime fingerprint is empty');
+          const sleep = ms => new Promise(r => setTimeout(r, ms));
+          async function get(path, attempts = 8) {
+            let last = '';
+            for (let i = 0; i < attempts; i++) {
+              try {
+                const accept = path.endsWith('.html') || path === '/' ? 'text/html' : path.endsWith('.js') || path.endsWith('.css') || path.endsWith('.txt') ? 'text/plain' : 'application/json';
+                const r = await fetch(base + path, { headers: { accept, 'cache-control': 'no-cache' } });
+                const text = await r.text();
+                last = `status=${r.status} body=${text.slice(0, 1000)}`;
+                if (r.ok) return { status: r.status, text, headers: Object.fromEntries(r.headers) };
+              } catch (e) { last = String(e?.message || e); }
+              if (i + 1 < attempts) await sleep(3000);
+            }
+            throw new Error(`${path} unavailable: ${last}`);
+          }
+          async function waitForContent(path, predicate, label, attempts = 120) {
+            let last = '';
+            for (let i = 0; i < attempts; i++) {
+              try {
+                const res = await get(path, 1);
+                last = res.text;
+                if (predicate(res.text)) return res;
+              } catch (e) { last = String(e?.message || e); }
+              if (i + 1 < attempts) await sleep(5000);
+            }
+            throw new Error(`${label} not deployed after wait; last=${last.slice(0, 1200)}`);
+          }
+
+          const runtimeVersion = await waitForContent(
+            '/runtime-version.txt',
+            text => text.trim() === expectedRuntime,
+            `exact checkout runtime ${expectedRuntime}`
+          );
+          console.log('RUNTIME_VERSION', runtimeVersion.text.trim());
+
+          const health = await get('/api/health');
+          console.log('HEALTH', health.text);
+          const h = JSON.parse(health.text);
+          if (h.ok !== true) throw new Error(`health not ok: ${health.text}`);
+
+          const passConfig = await waitForContent(
+            '/api/program-pass-config',
+            text => { try { return JSON.parse(text)?.quality_gate_version === 'advanced-hybrid-v2'; } catch { return false; } },
+            'Advanced Hybrid numeric repair quality gate backend',
+            60
+          );
+          console.log('PROGRAM_PASS_CONFIG', passConfig.text);
+          const pc = JSON.parse(passConfig.text);
+          if (typeof pc.enforced !== 'boolean') throw new Error(`program pass config missing enforced boolean: ${passConfig.text}`);
+          if (pc.enforced !== true) throw new Error(`controlled staging enforcement is unexpectedly off: ${passConfig.text}`);
+          if (Number(pc.access_days) !== 56) throw new Error(`Program Pass access window drifted: ${passConfig.text}`);
+          if (Number(pc.adjustments) !== 6) throw new Error(`Program Pass adjustment allowance drifted: ${passConfig.text}`);
+          if (pc.quality_gate_version !== 'advanced-hybrid-v2') throw new Error(`coaching quality gate marker drifted: ${passConfig.text}`);
+
+          const privacy = await get('/privacy.html');
+          if (!privacy.text.includes('pilosof12@gmail.com')) throw new Error('deployed privacy contact is stale');
+          if (!/Delete my data/i.test(privacy.text)) throw new Error('deployed privacy deletion copy missing');
+
+          const app = await waitForContent('/', text => text.includes('viewport-fit=cover') && text.includes('src="intake-polish.js"'), 'latest launch/iPhone shell');
+          if (!/RAZ/i.test(app.text)) throw new Error('app shell does not look like RAZ coaching platform');
+          const legacyPos = app.text.indexOf('src="spreadsheet.js"');
+          const parityPos = app.text.indexOf('src="spreadsheet-parity.js"');
+          const appJsPos = app.text.indexOf('src="app.js"');
+          if (!(legacyPos >= 0 && parityPos > legacyPos && appJsPos > parityPos)) throw new Error(`deployed spreadsheet script order is wrong: legacy=${legacyPos} parity=${parityPos} app=${appJsPos}`);
+          const goalPos = app.text.indexOf('id="goal_primary_1"');
+          const markerPos = app.text.indexOf('id="performance-block"');
+          if (!(goalPos >= 0 && markerPos > goalPos)) throw new Error(`deployed intake order wrong: goals=${goalPos} markers=${markerPos}`);
+
+          const intakePolish = await waitForContent('/intake-polish.js', text => text.includes("mode.value || '').toLowerCase() === 'limited'"), 'specific-day selector fix');
+          const mobileCss = await waitForContent('/launch-mobile.css', text => ['safe-area-inset-top','safe-area-inset-bottom','@media(max-width:390px)','overflow-x:hidden','min-height:44px'].every(needle => text.includes(needle)), 'iPhone safe-area mobile CSS');
+          const exporter = await get('/spreadsheet-parity.js');
+          const expectedHeaders = "const headers=['Exercise','Load / Target','Sets','Reps / Duration','Rest','Effort','Coaching Note','Log','Video','Status','Done']";
+          if (!exporter.text.includes(expectedHeaders)) throw new Error('deployed approved 11-column spreadsheet contract missing');
+          if (!exporter.text.includes('window.buildStrengthSpreadsheet=buildParitySpreadsheet')) throw new Error('deployed parity exporter does not own client export path');
+          if (!exporter.text.includes('const ss=sessions(week)')) throw new Error('deployed exporter is not grouping days/sessions as section bands');
+          if (!exporter.text.includes('mergeTitle(ws,row,11,`${sessionLabel(intake,s,i).toUpperCase()}')) throw new Error('deployed exporter section-band renderer missing');
+
+          console.log(JSON.stringify({ ok: true, expected_runtime: expectedRuntime, runtime_version: runtimeVersion.text.trim(), health: h, program_pass_config: pc, privacy: true, app: true, intake_polish: intakePolish.status, iphone_mobile: mobileCss.status, spreadsheet_export: true }));
+          NODE

@@ -1,0 +1,55 @@
+name: Fetch Live Tactical Job
+
+on:
+  push:
+    paths:
+      - '.github/workflows/fetch-live-tactical-job.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  fetch:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Fetch exact completed live Tactical job
+        env:
+          JOB_ID: d74d47cde82b9a4570b6f6c19d74ad9d
+          BASE_URL: https://raz-coaching-platform.onrender.com
+        run: |
+          mkdir -p docs/qa/live-tactical
+          node <<'NODE'
+          const fs = require('fs');
+          const sleep = ms => new Promise(r => setTimeout(r, ms));
+          const base = process.env.BASE_URL;
+          const jobId = process.env.JOB_ID;
+          (async()=>{
+            let data = null;
+            for (let i=0;i<12;i++) {
+              try {
+                const r = await fetch(base + '/api/job/' + encodeURIComponent(jobId), { headers:{accept:'application/json'} });
+                const text = await r.text();
+                if (r.ok && text.trim().startsWith('{')) { data = JSON.parse(text); break; }
+              } catch (_) {}
+              await sleep(1500);
+            }
+            if (!data) throw new Error('Could not fetch live job');
+            fs.writeFileSync('docs/qa/live-tactical/job.json', JSON.stringify({status:data.status,stage:data.stage,attempt:data.attempt,error:data.error||null,program_chars:typeof data.program==='string'?data.program.length:0}, null, 2));
+            if (data.status !== 'done' || typeof data.program !== 'string' || data.program.length < 500) throw new Error('Job is not a completed program');
+            fs.writeFileSync('docs/qa/live-tactical/program.txt', data.program);
+          })().catch(e=>{console.error(e);process.exit(1)});
+          NODE
+      - name: Commit live Tactical snapshot
+        run: |
+          git config user.name 'RAZ live QA bot'
+          git config user.email 'actions@users.noreply.github.com'
+          git pull --rebase origin privacy-security-hardening || true
+          git add docs/qa/live-tactical/job.json docs/qa/live-tactical/program.txt
+          if git diff --cached --quiet; then exit 0; fi
+          git commit -m 'Record exact live Tactical acceptance program'
+          git push origin HEAD:privacy-security-hardening

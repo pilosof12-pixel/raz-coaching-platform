@@ -36,6 +36,14 @@
     .grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
     @media(max-width:560px){.grid2{grid-template-columns:1fr}}
     .row-help{font-size:12px;color:var(--muted);margin-top:5px}
+    .privacy-box{margin-top:18px;padding:14px 15px;border:1px solid var(--line);border-radius:11px;background:rgba(24,211,197,.055);font-size:12.5px;color:#d7e4e2}
+    .privacy-box p{margin:0 0 9px}
+    .consent-row{display:flex;align-items:flex-start;gap:9px;cursor:pointer;color:#e5efed;font-weight:500;margin:0}
+    .consent-row input{width:auto;margin:3px 0 0;accent-color:var(--teal);flex:0 0 auto}
+    .danger-zone{margin-top:18px;padding:14px 15px;border:1px solid rgba(255,84,84,.45);border-radius:11px;background:rgba(255,84,84,.045)}
+    .danger-zone h4{margin:0 0 5px;font-size:14px;color:#ffd1d1}
+    .danger-zone p{margin:0 0 10px;font-size:12.5px;color:var(--muted)}
+    .btn.danger{background:transparent;color:#ff8d8d;border:1px solid rgba(255,84,84,.65)}
     /* sport-day chips */
     .sport-grid{display:flex;flex-direction:column;gap:8px}
     .sport-day{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
@@ -72,18 +80,13 @@
     .lang-btn[disabled]{opacity:.5;cursor:not-allowed}
     .lang-toggle-compact .lang-btn{padding:6px 12px;font-size:13px}
     .program-head{display:flex;align-items:flex-start;justify-content:space-between;gap:14px;flex-wrap:wrap;margin-bottom:12px}
-    /* Right-to-left rendering when program is Hebrew */
     #program-render[dir="rtl"] table{direction:rtl}
     #program-render[dir="rtl"] th,#program-render[dir="rtl"] td{text-align:right}
-    /* program display */
-    /* legacy raw block (fallback only) — clean sans-serif, readable */
     #program-card pre{white-space:pre-wrap;word-break:break-word;background:var(--panel2);border:1px solid var(--line);
       border-radius:10px;padding:18px;font-size:14.5px;line-height:1.65;font-family:var(--font);color:#eef3f2;overflow-x:auto}
-    /* readable program: narrative blocks + real table */
     #program-render{font-family:var(--font);color:#eef3f2;font-size:14.5px;line-height:1.65}
     #program-render .prog-narrative{word-break:break-word;margin:0 0 18px;color:#dfe8e6}
     #program-render .prog-narrative.after{margin:20px 0 0}
-    /* rendered markdown inside the coaching narrative */
     #program-render .prog-narrative p{margin:0 0 12px;color:#dfe8e6}
     #program-render .prog-narrative h4.prog-h{font-size:17px;font-weight:800;letter-spacing:-.01em;
       margin:24px 0 10px;padding-bottom:6px;border-bottom:1px solid var(--line);color:#fff}
@@ -142,18 +145,16 @@
       <p>Answer a few questions about your goals, experience, and any injuries. The engine builds a complete, individualized program, then turn it into a spreadsheet in one click. Come back any time to adjust it.</p>
     </section>
 
-    <!-- RETURNING CLIENT -->
     <section class="card" id="returning-card">
       <h3>Returning?</h3>
-      <p class="hint">Already built a program? Paste the personal code you saved to load it back and make adjustments.</p>
+      <p class="hint">Already built a program? Paste the personal code you saved to load it back and make adjustments. Treat this code like a password.</p>
       <div class="grid2">
-        <input type="text" id="return-token" placeholder="Your personal code" />
+        <input type="text" id="return-token" placeholder="Your personal code" autocomplete="off" spellcheck="false" />
         <button class="btn ghost" id="load-btn" type="button">Load my program</button>
       </div>
       <div class="status" id="return-status"></div>
     </section>
 
-    <!-- QUESTIONNAIRE -->
     <section class="card" id="intake-card">
       <h3>Your intake</h3>
       <p class="hint">Be specific. The more precise your goal, the sharper your program. <span class="req">*</span> = required.</p>
@@ -171,7 +172,7 @@
 
       <label>Primary goals <span class="req">*</span></label>
       <textarea id="goal_primary" placeholder="List your top priorities, one per line. e.g.&#10;200 kg back squat&#10;100 kg strict overhead press&#10;one-arm pull-up&#10;MMA / sparring conditioning"></textarea>
-      <div class="row-help">List every result that matters most — one per line. They all get equal top priority in your program. A load, a rep count, a skill, a sport, a time.</div>
+      <div class="row-help">List every result that matters most, one per line. They all get equal top priority in your program.</div>
 
       <label>Secondary goals (optional)</label>
       <textarea id="goal_secondary" placeholder="Nice-to-haves, one per line. e.g.&#10;add some muscle&#10;stay generally conditioned"></textarea>
@@ -228,7 +229,7 @@
       </select>
       <div id="equipment_specify_wrap" class="hidden" style="margin-top:10px">
         <textarea id="equipment" placeholder="List what you've got. e.g. barbell + rack + plates to 180 kg, adjustable dumbbells to 40 kg, pull-up bar, bands, bench. No machines."></textarea>
-        <div class="row-help">Only list what you actually have access to — the engine builds strictly within it.</div>
+        <div class="row-help">Only list what you actually have access to. The engine builds strictly within it.</div>
       </div>
 
       <label>Current strength / relevant numbers (optional but helpful)</label>
@@ -237,6 +238,7 @@
 
       <label>Injuries, pain, or movements to avoid (optional)</label>
       <textarea id="injuries" placeholder="e.g. right knee aches on deep squats; old shoulder issue overhead. Write 'none' if all clear."></textarea>
+      <div class="row-help">This information is used to modify training, not to diagnose or treat an injury. Seek qualified medical care for severe, worsening, unexplained, neurological, or traumatic symptoms.</div>
 
       <label>Training split preference</label>
       <select id="split_pref">
@@ -256,6 +258,14 @@
       <label>Anything else for your coach (optional)</label>
       <textarea id="notes" placeholder="Preferences, schedule constraints, what you've tried before…"></textarea>
 
+      <div class="privacy-box">
+        <p>Your intake and program are stored so you can return and make adjustments. Information you submit is processed by the platform and its AI service providers to generate your coaching program. Read the <a href="privacy.html" target="_blank" rel="noopener">Privacy Policy</a>.</p>
+        <label class="consent-row" for="health-consent">
+          <input type="checkbox" id="health-consent" />
+          <span>I consent to the collection and processing of the health, injury and training information I choose to provide for the purpose of generating and adjusting my program.</span>
+        </label>
+      </div>
+
       <div class="center">
         <button class="btn" id="build-btn" type="button">
           <span id="build-label">Build my program</span>
@@ -264,7 +274,6 @@
       <div class="status" id="build-status" style="text-align:center"></div>
     </section>
 
-    <!-- PROGRAM -->
     <section class="card hidden" id="program-card">
       <div class="program-head">
         <div>
@@ -278,10 +287,9 @@
       </div>
       <div class="status" id="prog-lang-status" style="margin-top:6px"></div>
 
-      <!-- SAVE CODE — shown FIRST, before the program, so it can't be missed -->
       <div class="save-note save-note-strong" id="save-note">
         <div class="save-title">Save this code before you go</div>
-        <p class="save-why">This is the only way back to your program. Copy it somewhere safe (notes app, screenshot, or email it to yourself). Without it you'll have to start a brand new program from scratch, and you won't be able to load this one or adjust it later.</p>
+        <p class="save-why">This code is the key to your saved coaching data. Treat it like a password. Anyone who has it can load your program and intake and make adjustments. Without it, you may not be able to recover this program.</p>
         <code id="token-display"></code>
         <div style="margin-top:10px"><button class="btn" id="copy-token" type="button" style="padding:9px 16px;font-size:13.5px">Copy my code</button></div>
         <div class="status" id="token-status" style="margin-top:8px"></div>
@@ -299,16 +307,23 @@
       <div class="divider"></div>
 
       <h3>Adjust your program</h3>
-      <p class="hint">Tell the engine in plain English what changed. It updates only what's needed — everything else stays the same.</p>
+      <p class="hint">Tell the engine in plain English what changed. It updates only what's needed. Everything else stays the same.</p>
       <textarea id="adjust-input" placeholder="e.g. My knee feels good now, let's load squats fuller. And I only have 30 minutes on day 2 this week."></textarea>
       <div class="btn-row">
         <button class="btn" id="adjust-btn" type="button">Update my program</button>
       </div>
       <div class="status" id="adjust-status"></div>
+
+      <div class="danger-zone">
+        <h4>Delete my stored coaching data</h4>
+        <p>This permanently deletes the saved intake, current program, adjustment history, usage records and related generation jobs for this personal code. This cannot be undone.</p>
+        <button class="btn danger" id="delete-data-btn" type="button">Delete my data</button>
+        <div class="status" id="delete-data-status"></div>
+      </div>
     </section>
 
     <footer>
-      AI Coaching Engine · Your data stays private to your program. &copy; <span id="yr"></span> Raz Pilosof
+      AI Coaching Engine · &copy; <span id="yr"></span> Raz Pilosof · <a href="privacy.html">Privacy</a>
     </footer>
   </div>
 
@@ -316,5 +331,6 @@
   <script src="exerciseDemos.js"></script>
   <script src="spreadsheet.js"></script>
   <script src="app.js"></script>
+  <script src="privacy-controls.js"></script>
 </body>
 </html>

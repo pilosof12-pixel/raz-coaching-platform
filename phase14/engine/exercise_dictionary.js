@@ -140,6 +140,7 @@ const DICTIONARY_LIST = [
   "Weighted Vest Hill Sprint", "Sled Push", "Sled Drag", "Prowler Push",
   "Stair Sprint", "Jump Rope", "Skipping", "Shuttle Run", "Bear Hug Carry",
   "Burpee EMOM", "Sandbag Carry", "Backpack Carry",
+  "Run", "Bike", "Swim", "Rowing Ergometer",
   "Zone-2 Bike", "Zone-2 Row", "Zone-2 Run", "Assault Bike", "Airbike Intervals",
   // --- Warmup / mobility drills (so prep chains land on real names) ---
   "Jumping Jacks", "Arm Circles", "Leg Swings", "Cat-Cow", "Bird-Dog",
@@ -161,7 +162,7 @@ const DICTIONARY_LIST = [
   "Weighted Pistol Squat", "Weighted Push-up", "Weighted Pull-up",
 ];
 
-export const EXERCISE_DICTIONARY = new Set(DICTIONARY_LIST);
+export const EXERCISE_DICTIONARY = new Set(DICTIONARY_LIST); // ENDURANCE-MODALITY-CANONICAL-SET
 
 // ---------------------------------------------------------------------------
 // 2. ALIASES (non-canonical spelling -> canonical). Matching is normalized, so
@@ -216,6 +217,28 @@ const ALIAS_LIST = [
   ["Chest Supported DB Row", "Chest-Supported Row"],
   ["Chest-Supported DB Row", "Chest-Supported Row"],
   ["Dumbbell Hammer Curl", "Hammer Curl"],
+  ["Zone-2 Rower", "Zone-2 Row"],
+  ["Bicep Curl", "Dumbbell Curl"],
+  ["Bicep Curl (Dumbbell)", "Dumbbell Curl"],
+  ["Passive Hang", "Dead Hang"],
+  ["Swimming", "Swim"],
+  ["Cycling", "Bike"],
+  ["Running", "Run"], // ENDURANCE-LIVE-ALIAS-SET
+  ["Run (Intervals)", "Run"],
+  ["Running Intervals", "Run"],
+  ["Cool-down Jog/Walk", "Run"],
+  ["Cooldown Jog/Walk", "Run"],
+  ["Jog/Walk", "Run"],
+  ["Walk/Jog", "Run"],
+  ["Easy Jog/Walk", "Run"],
+  ["Easy Walk/Jog", "Run"], // STRUCTURAL-COOLDOWN-ALIASES
+  ["Run Cool-down", "Run"],
+  ["Run Cooldown", "Run"],
+  ["Run Warm-up", "Run"],
+  ["Run Warmup", "Run"], // RUN-PURPOSE-SUFFIX-ALIASES
+  ["Parallel Box Squat", "Box Squat to Parallel"], // PING-PONG-BOX-SQUAT-ALIAS
+  ["Dumbbell Reverse Lunge", "Reverse Lunge"], // FINAL-LIVE-ALIAS-SET
+  ["Run (Treadmill)", "Treadmill"], // FINAL-LIVE-ALIAS-SET-2
   ["DB Overhead Press", "Dumbbell Overhead Press"],
   ["Dumbbell OHP", "Dumbbell Overhead Press"],
   ["DB Floor Press", "Dumbbell Floor Press"],
@@ -344,6 +367,7 @@ const EQUIP_LIST = [
   ["Seated Row Machine", ["machine"]], ["Assault Bike", ["assault_bike"]],
   ["Rower", ["rower"]], ["Treadmill", ["treadmill"]], ["Ski Erg", ["ski_erg"]],
   ["Stationary Bike", ["bike"]], ["Elliptical", ["elliptical"]],
+  ["Bike", ["bike"]], ["Swim", ["pool"]], ["Rowing Ergometer", ["rower"]],
   // sled / conditioning gear
   ["Sled Push", ["sled"]], ["Sled Drag", ["sled"]], ["Prowler Push", ["sled"]],
   ["Weighted Vest Hill Sprint", ["weighted_vest", "hill"]],
@@ -464,6 +488,7 @@ export function normalizeEquipmentTokens(equipment) {
     if (/assault bike|air bike|echo bike|fan bike/.test(s)) add("assault_bike");
     if (/\brower\b|row erg|concept ?2/.test(s)) add("rower");
     if (/treadmill/.test(s)) add("treadmill");
+    if (/\bpool\b|swimming pool|swim access/.test(s)) add("pool");
     if (/ski erg|skierg/.test(s)) add("ski_erg");
     if (/\bbike\b|spin bike|stationary bike/.test(s) && !/assault|air|echo|fan/.test(s)) add("bike");
     if (/weighted vest|weight vest/.test(s)) add("weighted_vest");
@@ -584,6 +609,7 @@ function hebNorm(s) {
 }
 
 const NORM_DICT = new Set([...EXERCISE_DICTIONARY].map(norm));
+const NORM_DICT_CANONICAL = new Map([...EXERCISE_DICTIONARY].map((name) => [norm(name), name])); // LEADING-DESCRIPTOR-CANONICALIZATION
 const NORM_ALIAS = new Map([...EXERCISE_ALIASES].map(([k, v]) => [norm(k), v]));
 
 // The deterministic skill graph is itself a curated authoritative source.
@@ -647,6 +673,8 @@ export function isWarmupCell(cell) {
 export function coreExerciseName(cell, isHebrew = false) {
   let s = String(cell || "").trim().replace(/^"|"$/g, "").trim();
   s = s.replace(/^\[(?:WARMUP|חימום)\]\s*/i, "");
+  s = s.replace(/^\[(?:COOL[- ]?DOWN|COOLDOWN)\]\s*(?:easy\s+)?/i, ""); // COOLDOWN-PREFIX-NORMALIZATION
+  s = s.replace(/^\d+(?:\.\d+)?\s*(?:km|k|m)\s+(?=run\b)/i, ""); // RUN-EVENT-PREFIX-NORMALIZATION
   // Drop a leading label like "General prep:" / "Specific ramp:" / Hebrew equivalents.
   s = s.replace(/^[^:]{0,32}:\s*/, (m) => (/(prep|ramp|primer|הכנה|ראמפ|פריימר|חימום)/i.test(m) ? "" : m));
   // Hebrew-first parenthetical "עברית (English)" OR annotation parenthetical.
@@ -686,6 +714,12 @@ export function matchDictionary(core) {
   if (NORM_DICT.has(n)) return { status: "hit" };
   if (NORM_SKILL_GRAPH.has(n)) return { status: "hit" };
   if (NORM_ALIAS.has(n)) return { status: "alias", canonical: NORM_ALIAS.get(n) };
+  for (const prefix of ["weighted "]) {
+    if (n.startsWith(prefix)) {
+      const base = n.slice(prefix.length).trim();
+      if (NORM_DICT_CANONICAL.has(base)) return { status: "alias", canonical: NORM_DICT_CANONICAL.get(base) };
+    }
+  }
   let toks = n.split(" ");
   while (toks.length > 1 && MODIFIER_SET.has(toks[toks.length - 1])) {
     toks = toks.slice(0, -1);
@@ -842,7 +876,13 @@ export function hardSubstituteHallucinations(program, intake = {}) {
     const cell = cells[ctx.exIdx];
     if (isWarmupCell(cell)) return null;
     const core = coreExerciseName(cell, isHebrew);
-    if (!core || matchDictionary(core).status !== "miss") return null;
+    if (!core) return null;
+    const matched = matchDictionary(core);
+    if (matched.status === "alias") {
+      cells[ctx.exIdx] = cell.replace(core, matched.canonical); // HARD-SUBSTITUTE-CANONICALIZES-ALIASES
+      return cells;
+    }
+    if (matched.status !== "miss") return null;
     cells[ctx.exIdx] = "[REVIEW] " + cell.trim();
     const notesIdx = ctx.header.indexOf("notes");
     if (notesIdx >= 0 && notesIdx < cells.length) cells[notesIdx] = note;

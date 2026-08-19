@@ -23,38 +23,122 @@ jobs:
         with:
           node-version: 22
           cache: npm
-      - name: Apply pending last-mile source patch
-        run: node scripts/apply_lastmile_clean.mjs
+      - name: Apply pending source-aligned QA patches
+        run: |
+          node scripts/apply_lastmile_clean.mjs
+          node scripts/apply_elite_guardrails.mjs
+          node scripts/apply_endurance_acceptance_fixes.mjs
+          node scripts/apply_final_runtime_integration.mjs
+          node scripts/apply_final_normalization.mjs
+          node scripts/apply_endurance_semantic_guardrails.mjs
       - run: npm ci
       - run: npm test
       - run: node --check server.js
-      - name: Validate Phase 15 generated runtime
+      - name: Validate root launch reference layer
         run: |
+          node --check server_secure.js
+          node --check entitlements.js
+          node --check analytics.js
+          node --check public/privacy-controls.js
+          node --check public/analytics-client.js
+      - name: Validate deployed Phase 15 runtime and launch layer
+        run: |
+          node --check scripts/apply_endurance_acceptance_fixes.mjs
+          node --check scripts/apply_final_runtime_integration.mjs
+          node --check scripts/apply_final_normalization.mjs
+          node --check scripts/apply_endurance_semantic_guardrails.mjs
           node --check phase14/server.js
           node --check phase14/scripts/build_phase15_runtime.mjs
+          node --check phase14/scripts/final_pipeline_lock.mjs
+          node --check phase14/scripts/apply_launch_runtime.mjs
           node --check phase14/engine/phase15_source_router.js
+          node --check phase14/engine/phase15_runtime_patches.js
+          node --check phase14/engine/phase15_program_qa.js
+          node --check phase14/engine/phase15_elite_guardrails.js
+          node --check phase14/engine/phase15_final_qa.js
+          node --check phase14/intake_clarification.js
+          node --check phase14/public/clarification-controls.js
+          node --check phase14/public/spreadsheet-parity.js
           node --test phase14/test/phase15_source_grounding.test.mjs
+          node --test phase14/test/phase15_runtime_patches.test.mjs
+          node --test phase14/test/intake_clarification.test.mjs
+          node --test phase14/test/phase15_goal_specificity.test.mjs
+          node --test phase14/test/phase15_elite_guardrails.test.mjs
+          node --test phase14/test/phase15_final_qa.test.mjs
+          node --test phase14/test/endurance_semantic_guardrails.test.js
+          node --test phase14/test/final_normalization.test.js
+          node --test phase14/test/final_pipeline_lock.test.js
+          node --test phase14/test/spreadsheet_product_parity.test.js
+          grep -q 'PRODUCTION-RUNTIME-PATCH-WIRED' phase14/scripts/build_phase15_runtime.mjs
+          grep -q 'FINAL-LIVE-ALIAS-SET' phase14/engine/exercise_dictionary.js
+          grep -q 'RUN-EVENT-PREFIX-NORMALIZATION' phase14/engine/exercise_dictionary.js
+          grep -q 'ENDURANCE-TSV-FIELD-CONTRACT' phase14/engine/phase15_runtime_patches.js
+          grep -q 'DEMO-COVERAGE-ADVISORY-NOT-BLOCKING' phase14/engine/phase15_final_qa.js
+          grep -q 'CONTINUOUS-RACE-BENCHMARK-INTEGRITY' phase14/engine/phase15_elite_guardrails.js
+          grep -q 'CONTINUOUS-RACE-BENCHMARK-PROMPT' phase14/engine/phase15_elite_guardrails.js
+          grep -q 'ENDURANCE-ALL-WEEKS-FINAL-QA' phase14/engine/phase15_final_qa.js
           node phase14/scripts/build_phase15_runtime.mjs
+          node phase14/scripts/final_pipeline_lock.mjs
+          node phase14/scripts/apply_launch_runtime.mjs
           node --check phase14/server.phase15.js
+          node --check phase14/server_secure.js
+          node --check phase14/entitlements.js
+          node --check phase14/analytics.js
+          node --check phase14/privacy_store.js
+          node --check phase14/intake_validation.js
+          node --check phase14/intake_clarification.js
+          node --check phase14/public/clarification-controls.js
+          node --check phase14/public/launch-controls.js
+          node --check phase14/public/spreadsheet-parity.js
+          node --test phase14/test/launch_security_privacy.test.js
           node --test phase14/test/phase15_planner_regression.test.mjs
           node --test phase14/test/phase15_specialist_rules.test.mjs
           grep -q 'deterministic-skeleton-v5.2.10-source-grounded' phase14/server.phase15.js
           grep -q 'SOURCE-GROUNDING HARD CONTRACT' phase14/server.phase15.js
-          grep -q 'EXERCISE CLOSED SET' phase14/server.phase15.js
+          grep -q 'Do not use generic model memory to invent training principles' phase14/server.phase15.js
           grep -q 'CURATED COACHING SOURCE EXCERPTS' phase14/server.phase15.js
+          grep -q 'EXERCISE CLOSED SET' phase14/server.phase15.js
           grep -q 'CANONICAL EXERCISE CATALOG' phase14/server.phase15.js
           grep -q 'buildPhase15SourceGrounding(ENGINE, intake, EXERCISE_DICTIONARY)' phase14/server.phase15.js
-          grep -q 'WARRIOR / ATHLETIC HYPERTROPHY RULE' phase14/server.phase15.js
-          grep -q 'PARK-ONLY HARD STOP' phase14/server.phase15.js
-          grep -q 'CALENDAR HARD STOP' phase14/server.phase15.js
-          grep -q 'UNRESOLVED_CLIENT_REVIEW' phase14/server.phase15.js
+          grep -q 'source-aligned: only explicit density goals require density rows' phase14/server.phase15.js
+          grep -q 'LEGACY-FORMULA-SCOPE-NARROWED' phase14/server.phase15.js
+          grep -q 'SERVER-OWNED-FORMULA-MARKER' phase14/server.phase15.js
+          grep -q 'INTERNAL_QUALITY_REPAIR_ARCHITECTURE' phase14/server.phase15.js
+          grep -q 'INTERNAL-QA-REPAIR-BUDGET' phase14/server.phase15.js
+          grep -q 'INTERNAL_QA_REPAIR_EXHAUSTED' phase14/server.phase15.js
+          grep -q 'SAVE-BOUNDARY-FINAL-QA' phase14/server.phase15.js
+          grep -q "cells\[6\] = 'N/A'" phase14/server.phase15.js
+          grep -q 'SOURCE-LABEL-CLIENT-SCRUB' phase14/server.phase15.js
+          grep -q 'ENDURANCE TARGET ANCHOR' phase14/server.phase15.js
+          grep -q 'ENDURANCE-TSV-FIELD-CONTRACT' phase14/server.phase15.js
+          grep -q 'OpenAI provider unavailable; using source-grounded Gemini fallback' phase14/server.phase15.js
+          grep -q 'ELITE-GUARDRAILS-FINAL-QA-WIRED' phase14/engine/phase15_program_qa.js
+          grep -q 'ENDURANCE-PRESERVATION-FINAL-QA-WIRED' phase14/engine/phase15_program_qa.js
+          grep -q 'EXACT-PRIMARY-MOVEMENT-FINAL-QA-WIRED' phase14/engine/phase15_program_qa.js
+          grep -q 'MEANINGFUL-SPECIFIC-SETS-DURATION' phase14/engine/phase15_program_qa.js
+          grep -q 'EXACT-VARIATION-KEY' phase14/engine/phase15_elite_guardrails.js
+          grep -q 'TARGET_MODALITY_EXPOSURE_REDUCED' phase14/engine/phase15_elite_guardrails.js
+          grep -q 'EVENT_PROGRESSING_SESSION_MISSING' phase14/engine/phase15_elite_guardrails.js
+          grep -q 'MEANINGFUL-INTERVAL-SETS-DURATION' phase14/engine/phase15_elite_guardrails.js
+          grep -q 'PAIN-SENSITIVE-SQUAT-SUBSTITUTION' phase14/engine/phase15_elite_guardrails.js
+          grep -q 'ROWING-500M-SPLIT-PROGRESSION' phase14/engine/phase15_elite_guardrails.js
+          grep -q 'ENDURANCE-MODALITY-CANONICAL-SET' phase14/engine/exercise_dictionary.js
+          grep -q 'ENDURANCE-LIVE-ALIAS-SET' phase14/engine/exercise_dictionary.js
+          grep -q 'FINAL-LIVE-ALIAS-SET' phase14/engine/exercise_dictionary.js
+          grep -q 'ENDURANCE-MODALITY-CATALOG-ROUTING' phase14/engine/phase15_source_router.js
+          grep -q 'spreadsheet-parity.js' phase14/public/index.html
+          grep -q 'clarification-controls.js' phase14/public/index.html
+          grep -q 'launch-controls.js' phase14/public/index.html
+          grep -q 'launch-mobile.css' phase14/public/index.html
+          grep -q 'invalidateCoachingDataCache' phase14/storage.js
+          grep -q 'invalidateCoachingDataCache' phase14/privacy_store.js
       - name: Commit tested production patch
         env:
           TARGET_BRANCH: ${{ github.head_ref || github.ref_name }}
         run: |
           git config user.name 'RAZ regression bot'
           git config user.email 'actions@users.noreply.github.com'
-          git add phase14/server.js phase14/scripts/build_phase15_runtime.mjs
+          git add phase14/server.js phase14/scripts/build_phase15_runtime.mjs phase14/engine/phase15_program_qa.js phase14/engine/phase15_elite_guardrails.js phase14/engine/phase15_final_qa.js phase14/engine/exercise_dictionary.js phase14/engine/phase15_source_router.js phase14/engine/phase15_runtime_patches.js
           if git diff --cached --quiet; then echo 'No source patch to commit'; exit 0; fi
-          git commit -m 'Apply source-grounded Phase 15 v5.2.10 runtime'
+          git commit -m 'Apply source-aligned Phase 15 integrity guardrails'
           git push origin HEAD:${TARGET_BRANCH}

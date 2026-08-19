@@ -1,7 +1,31 @@
 // Phase 15 curated-source router.
 // Grounds compact generation in the authored RAZ coaching engine.
 
+import fs from 'node:fs';
+
 const STOP = new Set(['about','after','again','also','around','because','before','between','build','client','could','days','from','goal','goals','have','into','like','more','most','only','other','over','program','session','sessions','some','than','that','their','them','then','they','this','training','using','very','want','week','weekly','what','when','where','which','while','with','without','work','would','your']);
+
+function loadEnduranceCorpus() {
+  const sourceFiles = [
+    './endurance_runtime_parts/part01_foundations.md',
+    './endurance_runtime_parts/part02_programming.md',
+    './endurance_runtime_parts/part03_application.md',
+  ];
+  const text = sourceFiles
+    .map((p) => fs.readFileSync(new URL(p, import.meta.url), 'utf8').trim())
+    .join('\n\n');
+  if (
+    text.length < 12000 ||
+    !/ARTICLE 11[\s\S]*Conditioning Decision System/i.test(text) ||
+    !/ENGINE-WIDE DECISION HIERARCHY/i.test(text) ||
+    !/Do not strengthen a rule beyond what this source pack says/i.test(text)
+  ) {
+    throw new Error('ENDURANCE_SOURCE_CORPUS_INVALID');
+  }
+  return text;
+}
+
+const ENDURANCE_CORPUS = loadEnduranceCorpus();
 
 function normalizeText(v) {
   if (Array.isArray(v)) return v.map(normalizeText).join(' ');
@@ -21,8 +45,8 @@ function sourceCorpus(engineText) {
   return start >= 0 ? full.slice(start) : full;
 }
 
-function chunkCorpus(engineText, maxChunkChars = 1800) {
-  const paras = sourceCorpus(engineText).split(/\n{2,}/).map(x => x.trim()).filter(x => x.length >= 80);
+function chunkText(full, maxChunkChars = 1800) {
+  const paras = String(full || '').split(/\n{2,}/).map(x => x.trim()).filter(x => x.length >= 80);
   const chunks = [];
   let buf = '';
   for (const p of paras) {
@@ -33,51 +57,101 @@ function chunkCorpus(engineText, maxChunkChars = 1800) {
   return chunks;
 }
 
+function chunkCorpus(engineText, maxChunkChars = 1800) {
+  return chunkText(sourceCorpus(engineText), maxChunkChars);
+}
+
+function rawIntake(intake = {}) { return normalizeText(intake).toLowerCase(); }
+
+export function isEnduranceRelevant(intake = {}) {
+  const raw = rawIntake(intake);
+  return /\b(?:cardio|conditioning|endurance|aerobic|zone\s*2|vo2|maximal aerobic|threshold|critical\s+(?:speed|power)|3\s*k(?:m)?|5\s*k(?:m)?|10\s*k(?:m)?|half[- ]?marathon|marathon|run(?:ning)?|row(?:ing|er)?|erg(?:ometer)?|cycling|cyclist|bike|swim(?:ming)?|triathlon|ironman|repeated sprint|work capacity)\b/i.test(raw);
+}
+
 export function sourceRoutingTerms(intake = {}) {
-  const raw = normalizeText(intake).toLowerCase();
+  const raw = rawIntake(intake);
   const terms = new Set();
-  for (const token of raw.match(/[a-z][a-z0-9-]{3,}/g) || []) if (!STOP.has(token)) terms.add(token);
+  for (const token of raw.match(/[a-z][a-z0-9-]{2,}/g) || []) if (!STOP.has(token)) terms.add(token);
   const add = xs => xs.forEach(x => terms.add(x));
   if (/hypertroph|muscle|physique|body composition/.test(raw)) add(['hypertrophy','muscle growth','training volume','proximity to failure','rir','rpe']);
   if (/strength|weighted pull|weighted chin|weighted dip|calisthen/.test(raw)) add(['strength','maximal strength','weighted calisthenics','specificity','load progression']);
   if (/explos|athlet|power|warrior|batman|jump|sprint|plyometric/.test(raw)) add(['power','plyometric','jump','sprint','explosive','velocity loss','full recovery']);
   if (/park|outdoor|rings|pull-up bar|dip bars/.test(raw)) add(['bodyweight','rings','pull-up','dip','unilateral','limited external load','calisthenics']);
-  if (/zone\s*2|aerobic|conditioning|work capacity/.test(raw)) add(['aerobic','zone 2','conditioning','work capacity','interference','concurrent training']);
-  if (/bjj|jiu|mma|wrestl|combat|sport/.test(raw)) add(['sport','concurrent training','fatigue','recovery','interference']);
-  if (/pain|injur|tendon|elbow|shoulder|knee|back|sciatica/.test(raw)) add(['pain','tendon','load management','return to loading','symptom response']);
+  if (/zone\s*2|aerobic|conditioning|cardio|endurance|work capacity/.test(raw)) add(['aerobic','low intensity','zone 2','conditioning','work capacity','interference','concurrent training','recovery cost','intensity distribution']);
+  if (/vo2|maximal aerobic/.test(raw)) add(['vo2max','interval training','high aerobic power','time near vo2max','long intervals','short intervals']);
+  if (/threshold|tempo|critical speed|critical power/.test(raw)) add(['threshold','critical speed','critical power','sustainable intensity','pace','intensity domain']);
+  if (/3\s*k|5\s*k|10\s*k|half[- ]?marathon|marathon|run(?:ning)?/.test(raw)) add(['running','running pace','event specific','economy','tissue tolerance','threshold','vo2max','modality specificity']);
+  if (/row(?:ing|er)?|erg(?:ometer)?|concept ?2/.test(raw)) add(['rowing','rowing pace','rowing power','stroke rate','modality specificity']);
+  if (/cycling|cyclist|bike|criterium/.test(raw)) add(['cycling','power','watts','modality specificity','low eccentric']);
+  if (/swim(?:ming)?|freestyle|pool/.test(raw)) add(['swimming','swim pace','technique','economy','modality specificity']);
+  if (/triathlon|ironman|multisport/.test(raw)) add(['triathlon','multisport','swim','bike','run','separate intensity anchors','event specific']);
+  if (/bjj|jiu|mma|wrestl|boxing|combat|sport/.test(raw)) add(['sport','combat','concurrent training','fatigue','recovery','interference','sport practice','repeated high intensity']);
+  if (/pain|injur|tendon|elbow|shoulder|knee|back|sciatica/.test(raw)) add(['pain','tendon','load management','return to loading','symptom response','impact tolerance']);
   return [...terms];
 }
 
 function scoreChunk(chunk, terms) {
   const low = chunk.toLowerCase(); let score = 0;
   for (const term of terms) if (low.includes(term)) score += term.includes(' ') ? 5 : term.length >= 9 ? 3 : 1;
-  if (/article\s+n\d+|source|evidence|knowledge layer/i.test(chunk)) score += 1;
+  if (/article\s+\d+|decision rules|programming implications|source synthesis|source traceability/i.test(chunk)) score += 2;
   return score;
 }
 
-export function retrieveCuratedCoachingExcerpts(engineText, intake = {}, options = {}) {
-  const maxChars = Number(options.maxChars || 5200);
-  const maxChunks = Number(options.maxChunks || 3);
-  const terms = sourceRoutingTerms(intake);
-  const scored = chunkCorpus(engineText).map((text,index)=>({text,index,score:scoreChunk(text,terms)})).filter(x=>x.score>0).sort((a,b)=>b.score-a.score||a.index-b.index);
-  const selected=[]; let used=0;
-  for (const item of scored) {
-    if (selected.length >= maxChunks) break;
-    if (used + item.text.length > maxChars && selected.length >= 2) continue;
-    selected.push(item); used += item.text.length;
+function ranked(chunks, terms, kind) {
+  return chunks.map((text,index)=>({text,index,kind,score:scoreChunk(text,terms)})).filter(x=>x.score>0).sort((a,b)=>b.score-a.score||a.index-b.index);
+}
+
+function takeWithin(selected, candidates, count, maxChars, usedRef) {
+  for (const item of candidates) {
+    if (selected.filter(x => x.kind === item.kind).length >= count) break;
+    if (selected.some(x => x.kind === item.kind && x.index === item.index)) continue;
+    if (usedRef.value + item.text.length > maxChars && selected.length >= 2) continue;
+    selected.push(item); usedRef.value += item.text.length;
   }
+}
+
+export function retrieveCuratedCoachingExcerpts(engineText, intake = {}, options = {}) {
+  const endurance = isEnduranceRelevant(intake);
+  const maxChars = Number(options.maxChars || (endurance ? 8600 : 5200));
+  const maxChunks = Number(options.maxChunks || (endurance ? 5 : 3));
+  const terms = sourceRoutingTerms(intake);
+  const base = ranked(chunkCorpus(engineText), terms, 'RAZ BASE');
+  const end = endurance ? ranked(chunkText(ENDURANCE_CORPUS), terms, 'ENDURANCE CLUSTER') : [];
+  const selected=[]; const used={value:0};
+
+  if (endurance) {
+    // Reserve both source families for hybrid cases: the new endurance cluster supplies
+    // physiology/prescription while the original RAZ corpus preserves strength, skill,
+    // injury and other authored coaching logic. This prevents either side crowding out the other.
+    takeWithin(selected, end, Math.min(3, maxChunks), maxChars, used);
+    if (selected.length < maxChunks) takeWithin(selected, base, Math.min(2, maxChunks-selected.length), maxChars, used);
+    const merged = [...end, ...base].sort((a,b)=>b.score-a.score||a.index-b.index);
+    for (const item of merged) {
+      if (selected.length >= maxChunks) break;
+      if (selected.some(x => x.kind===item.kind && x.index===item.index)) continue;
+      if (used.value + item.text.length > maxChars) continue;
+      selected.push(item); used.value += item.text.length;
+    }
+  } else {
+    takeWithin(selected, base, maxChunks, maxChars, used);
+  }
+
   if (!selected.length) throw new Error('SOURCE_GROUNDING_NO_RELEVANT_EXCERPTS');
-  return selected.map((x,i)=>'SOURCE EXCERPT '+(i+1)+'\n'+x.text).join('\n\n');
+  return selected.map((x,i)=>`${x.kind} SOURCE EXCERPT ${i+1}\n${x.text}`).join('\n\n');
 }
 
 function exerciseFamilyTerms(intake = {}) {
-  const raw = normalizeText(intake).toLowerCase();
+  const raw = rawIntake(intake);
   const terms = new Set(['warm-up','plank','dead bug','pallof','carry','row','push-up','pull-up','chin-up']);
   const add = xs => xs.forEach(x => terms.add(x));
   if (/one-arm|oap|weighted chin|weighted pull/.test(raw)) add(['one-arm','weighted pull-up','weighted chin-up','archer pull-up','pull-up','chin-up']);
   if (/squat|box squat|lower body|leg/.test(raw)) add(['squat','box squat','split squat','lunge','hip thrust','leg press','hamstring curl','calf raise']);
   if (/overhead press|\bohp\b|push press|shoulder/.test(raw)) add(['overhead press','push press','dumbbell shoulder press','lateral raise','face pull']);
-  if (/zone\s*2|aerobic|conditioning/.test(raw)) add(['zone-2','bike','row','run','treadmill','assault bike']);
+  if (/zone\s*2|aerobic|conditioning|cardio|endurance|3\s*k|5\s*k|10\s*k|marathon|run/.test(raw)) add(['zone-2','bike','row','run','treadmill','assault bike','sprint']);
+  if (/row(?:ing|er)?|erg/.test(raw)) add(['row','rower']);
+  if (/cycling|bike/.test(raw)) add(['bike','assault bike']);
+  if (/swim|swimming|freestyle|pool/.test(raw)) add(['swim']);
+  if (/triathlon|multisport|ironman/.test(raw)) add(['swim','bike','run']); // ENDURANCE-MODALITY-CATALOG-ROUTING
   if (/bjj|mma|wrestl|combat/.test(raw)) add(['neck','pallof','carry','row','hip thrust','copenhagen','side plank']);
   if (/planche/.test(raw)) add(['planche']);
   if (/front lever/.test(raw)) add(['front lever']);
@@ -105,7 +179,7 @@ export function canonicalExerciseCatalog(exerciseDictionary, intake = {}) {
 export function buildPhase15SourceGrounding(engineText, intake, exerciseDictionary) {
   return [
     '=== CURATED COACHING SOURCE EXCERPTS ===',
-    'These excerpts come from the authored RAZ coaching knowledge engine built from the supplied coaching logic/articles/books. Treat them as internal evidence, not client-facing copy.',
+    'These excerpts come from the authored RAZ coaching knowledge engine and the approved source-grounded Endurance / Conditioning cluster. Treat them as internal evidence, not client-facing copy. Do not use generic model memory to fill an unresolved source gap.',
     retrieveCuratedCoachingExcerpts(engineText, intake),
     '',
     '=== CANONICAL EXERCISE CATALOG ===',

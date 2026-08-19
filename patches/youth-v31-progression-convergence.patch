@@ -1,0 +1,134 @@
+diff --git a/phase14/engine/coaching_spec_v1_convergence_normalizer.js b/phase14/engine/coaching_spec_v1_convergence_normalizer.js
+index 6cec9d5..0000000 100644
+--- a/phase14/engine/coaching_spec_v1_convergence_normalizer.js
++++ b/phase14/engine/coaching_spec_v1_convergence_normalizer.js
+@@ -194,6 +194,45 @@ function isTransition(name) { return /^\s*Bar Muscle-up Transition Drill\s*$/i.
+ function isFullMuscleUp(name) { return /^\s*(?:Banded Muscle-up|Bar Muscle-up|Muscle-up)\s*$/i.test(String(name || '')); }
+ function isPowerName(name) { return /explosive hip-to-bar|box jump|broad jump|sprint/i.test(String(name || '')); }
+ 
++function youthVisibleProgressionTargets(week) {
++  const handstand = {
++    1: { sets: '3', reps: '2', note: 'Six high-quality entries is a ceiling, not a quota; stop earlier if balance quality deteriorates.' },
++    2: { sets: '4', reps: '2', note: 'Up to eight high-quality entries only if Week 1 stayed crisp; otherwise repeat the prior ceiling.' },
++    3: { sets: '4', reps: '3', note: 'Up to twelve high-quality entries only if control remains stable; stop before fatigue-driven misses.' },
++    4: { sets: '3', reps: '2', note: 'Consolidation week: reduce attempt exposure and retain only high-quality independent balance practice.' },
++  }[week];
++  const transition = {
++    1: { load: 'Moderate band assistance for a smooth, repeatable bar turnover' },
++    2: { load: 'Slightly lighter band assistance if every Week 1 turnover was clean' },
++    3: { load: 'Lightest band assistance that still preserves a clean bar turnover' },
++    4: { load: 'Moderate band assistance for crisp consolidation singles' },
++  }[week];
++  return { handstand, transition };
++}
++
++function applyYouthVisiblePrimaryProgression(parsed, week, intake, repairs) {
++  const primary = lower(goals(intake, 'primary'));
++  const targets = youthVisibleProgressionTargets(week);
++  let changed = false;
++  parsed.rows.forEach((cells, row) => {
++    const name = String(cells[parsed.exercise] || '').trim();
++    if (/freestanding handstand|unsupported handstand|handstand balance/i.test(primary) && isHandstandEntry(name)) {
++      const before = { sets: cells[parsed.sets], reps: cells[parsed.reps] };
++      cells[parsed.sets] = targets.handstand.sets;
++      cells[parsed.reps] = targets.handstand.reps;
++      if (Number.isInteger(parsed.notes)) cells[parsed.notes] = addCue(cells[parsed.notes], targets.handstand.note, week === 4 ? 'consolidation week' : 'high-quality entries');
++      if (before.sets !== cells[parsed.sets] || before.reps !== cells[parsed.reps]) {
++        repairs.push({ type: 'youth_handstand_visible_progression', week, row, before, after: { sets: cells[parsed.sets], reps: cells[parsed.reps] } });
++        changed = true;
++      }
++    }
++    if (/bar muscle[- ]?up/i.test(primary) && isTransition(name) && Number.isInteger(parsed.load)) {
++      const before = cells[parsed.load];
++      cells[parsed.load] = targets.transition.load;
++      if (before !== cells[parsed.load]) {
++        repairs.push({ type: 'youth_bar_transition_assistance_progression', week, row, before, after: cells[parsed.load] });
++        changed = true;
++      }
++    }
++  });
++  return changed;
++}
++
+ export function normalizeYouthSkillAcquisitionQuality(program, intake = {}) {
+   const original = String(program || '');
+   const athleteAge = Number(intake.age || intake.age_years || 0);
+@@ -272,6 +311,8 @@ export function normalizeYouthSkillAcquisitionQuality(program, intake = {}) {
+       }
+     });
+ 
++    if (applyYouthVisiblePrimaryProgression(parsed, week, intake, repairs)) changed = true;
++
+     if (needsFullBar) {
+       const hasFull = parsed.rows.some((cells) => !isWarmup(cells[parsed.exercise]) && isFullMuscleUp(cells[parsed.exercise]));
+       if (!hasFull) {
+diff --git a/phase14/test/live_v30m_convergence_regressions.test.js b/phase14/test/live_v30m_convergence_regressions.test.js
+index 6e0909b..0000000 100644
+--- a/phase14/test/live_v30m_convergence_regressions.test.js
++++ b/phase14/test/live_v30m_convergence_regressions.test.js
+@@ -2,9 +2,12 @@ import test from 'node:test';
+ import assert from 'node:assert/strict';
+ 
+ import { enrichSpecificWarmups } from '../engine/specific_warmup_enrichment.js';
+ import { normalizeAdvancedHybridOHPComplement } from '../engine/advanced_hybrid_ohp_normalizer.js';
+-import { normalizeTactical3KRaceSpecificity } from '../engine/coaching_spec_v1_convergence_normalizer.js';
++import { normalizeTactical3KRaceSpecificity, normalizeYouthSkillAcquisitionQuality } from '../engine/coaching_spec_v1_convergence_normalizer.js';
+ import { endurancePerformanceIntegrityFlags } from '../engine/phase15_elite_guardrails.js';
++import { validateProgressionArchitectureSemantic } from '../engine/coaching_progression_gpp.js';
++import { validateYouthProgressionQualitySemantic } from '../engine/coaching_acceptance_quality.js';
+ import { ADVANCED_HYBRID_LAUNCH_INTAKE } from './fixtures/advanced_hybrid_launch.js';
+@@ -111,6 +114,53 @@ test('[AH] OHP work/ramp coherence is stable across a repeated normalization pas
+   assert.equal(normalizeAdvancedHybridOHPComplement(stable, ADVANCED_HYBRID_LAUNCH_INTAKE).program, stable);
+ });
+ 
++// --- Youth visible progression ---------------------------------------------
++
++const YOUTH_INTAKE = {
++  age: 13,
++  experience: 'intermediate',
++  primary_goals: ['Achieve first bar muscle-up', 'Achieve a freestanding handstand'],
++  secondary_goals: ['Build a strong general push and pull foundation while maintaining lower-body athleticism'],
++  days_per_week: 2,
++  equipment: 'Home setup: rings, pull-up bar, resistance bands and bench. No external weights.',
++  current_numbers: 'Pistol squat established; ring muscle-up achieved; about 12 strict pull-ups and 6 good ring dips. Wall-facing handstand about 15 seconds; back-to-wall about 20 seconds.',
++  clarification_answers: { benchmark_bar_muscle_up: 'Cannot perform a bar muscle-up yet. Can perform a ring muscle-up. About 12 strict pull-ups and 6 good ring dips.' },
++  notes: 'Athlete is 13 years old. Skill quality before fatigue; no grinders or repeated failed attempts.',
++};
++
++function youthStaticCandidate() {
++  return fourWeeks(() => [
++    'Mon\tBar Muscle-up Transition Drill\tModerate band assistance\t3\t1\t90 sec\t6\tClean turnover practice; stop after any technical deterioration.\t',
++    'Mon\tBanded Muscle-up\tModerate band assistance\t2\t1\t90 sec\t6\tIntegrated assisted full-skill singles.\t',
++    'Thu\tControlled Handstand Kick-up\tBodyweight\t3\t2\t60 sec\t6\tControlled independent entries; stop when balance quality drops.\t',
++    'Thu\tRing Row\tBodyweight\t3\t8\t90 sec\t6\tGeneral pull foundation.\t',
++  ]);
++}
++
++test('[YG] deterministic normalizer creates visible Weeks 1-3 progression without forcing failure-volume', () => {
++  const out = normalizeYouthSkillAcquisitionQuality(youthStaticCandidate(), YOUTH_INTAKE).program;
++  assert.doesNotThrow(() => validateProgressionArchitectureSemantic(out, YOUTH_INTAKE));
++  assert.doesNotThrow(() => validateYouthProgressionQualitySemantic(out, YOUTH_INTAKE));
++
++  const w1 = out.match(/START_WEEK1_TSV[\s\S]*?END_WEEK1_TSV/)[0];
++  const w2 = out.match(/START_WEEK2_TSV[\s\S]*?END_WEEK2_TSV/)[0];
++  const w3 = out.match(/START_WEEK3_TSV[\s\S]*?END_WEEK3_TSV/)[0];
++  const w4 = out.match(/START_WEEK4_TSV[\s\S]*?END_WEEK4_TSV/)[0];
++  assert.match(w1, /Bar Muscle-up Transition Drill\tModerate band assistance/);
++  assert.match(w2, /Bar Muscle-up Transition Drill\tSlightly lighter band assistance/);
++  assert.match(w3, /Bar Muscle-up Transition Drill\tLightest band assistance/);
++  assert.match(w1, /Controlled Handstand Kick-up\tBodyweight\t3\t2\t/);
++  assert.match(w2, /Controlled Handstand Kick-up\tBodyweight\t4\t2\t/);
++  assert.match(w3, /Controlled Handstand Kick-up\tBodyweight\t4\t3\t/);
++  assert.match(w4, /Controlled Handstand Kick-up\tBodyweight\t3\t2\t/);
++  assert.match(w4, /Consolidation week/i);
++});
++
++test('[YG] visible progression normalization is idempotent', () => {
++  const once = normalizeYouthSkillAcquisitionQuality(youthStaticCandidate(), YOUTH_INTAKE).program;
++  const twice = normalizeYouthSkillAcquisitionQuality(once, YOUTH_INTAKE).program;
++  assert.equal(twice, once);
++});
++
+ // --- Tactical 3K -----------------------------------------------------------
+ 
+ const TACTICAL_INTAKE = {

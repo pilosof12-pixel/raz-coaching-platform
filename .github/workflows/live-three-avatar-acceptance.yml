@@ -1,0 +1,161 @@
+name: Live Three Avatar Acceptance
+
+on:
+  push:
+    paths:
+      - '.github/workflows/live-three-avatar-acceptance.yml'
+      - 'phase14/public/runtime-version.txt'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  acceptance:
+    if: github.event_name == 'workflow_dispatch' || contains(github.event.head_commit.message, '[RUN-LIVE-ACCEPTANCE]')
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Wait for exact checkout runtime on Render
+        env:
+          BASE_URL: https://raz-coaching-platform.onrender.com
+        run: |
+          EXPECTED_RUNTIME="$(tr -d '\r\n' < phase14/public/runtime-version.txt)"
+          export EXPECTED_RUNTIME
+          node <<'NODE'
+          const base=process.env.BASE_URL;
+          const expected=String(process.env.EXPECTED_RUNTIME||'').trim();
+          if(!expected) throw new Error('checkout runtime fingerprint is empty');
+          const sleep=ms=>new Promise(r=>setTimeout(r,ms));
+          let last='';
+          for(let i=0;i<120;i++){
+            try{
+              const r=await fetch(base+'/runtime-version.txt?qa='+Date.now(),{headers:{'cache-control':'no-cache','accept':'text/plain'}});
+              last=(await r.text()).trim();
+              if(r.ok&&last===expected){console.log('EXACT_RUNTIME_OK',expected);process.exit(0);}
+            }catch(e){last=String(e?.message||e);}
+            if(i<119) await sleep(5000);
+          }
+          throw new Error(`exact runtime not deployed: expected=${expected} last=${last}`);
+          NODE
+      - name: Run Hybrid Youth Tactical through live website API
+        id: live_generation
+        env:
+          BASE_URL: https://raz-coaching-platform.onrender.com
+          ADMIN_PROVISION_KEY: ${{ secrets.ADMIN_PROVISION_KEY }}
+        run: |
+          mkdir -p docs/qa/live-three-avatar
+          rm -f docs/qa/live-three-avatar/result.json docs/qa/live-three-avatar/advanced_hybrid-program.txt docs/qa/live-three-avatar/youth_gymnastics-program.txt docs/qa/live-three-avatar/tactical_3k-program.txt
+          node <<'NODE'
+          import fs from 'node:fs';
+          const base=process.env.BASE_URL;
+          const adminKey=process.env.ADMIN_PROVISION_KEY||'';
+          const sleep=ms=>new Promise(r=>setTimeout(r,ms));
+          const now=()=>new Date().toISOString();
+          const consent=()=>({health_data:true,policy_version:'2026-08-15',consented_at:now()});
+          if(!adminKey) throw new Error('ADMIN_PROVISION_KEY missing');
+
+          const hybrid={id:'advanced_hybrid',intake:{
+            age:30,language:'en',primary_goals:['220kg back squat','4 One arm pullups'],secondary_goals:['100kg overhead press','Marathon'],maintenance_goals:['Maintain muscle mass'],goal_priority_model:'tiered_equal_primary',experience:'advanced',days_per_week:4,gym_availability_mode:'limited',available_gym_days:['Mon','Tue','Fri','Sun'],equipment:'Full commercial gym — all standard barbells, dumbbells, racks, machines, cables and bodyweight stations available.',training_location:'commercial_gym',sport:'MMA',sport_sessions_per_week:5,sport_schedule:[{day:'Tue',intensity:'moderate'},{day:'Wed',intensity:'hard'},{day:'Thu',intensity:'moderate'},{day:'Fri',intensity:'hard'},{day:'Sat',intensity:'moderate'}],sleep_hours:'7-8 hours',recovery_rating:'Good',current_numbers:['Back Squat: 205 kg 1RM','One-Arm Pull-up: 2 strict reps each arm','Overhead Press: 80 kg x 4','Weighted Chin-up: +80 kg 1RM','Running: 1 session a week, about 20 km total, longest recent run about 20 km'].join('\n'),clarification_answers:{running_current_exposure:'Currently 1 run per week, about 20 km total, with the longest recent run about 20 km.'},injuries:'None reported',notes:'Advanced hybrid athlete. Primary strength and calisthenics goals outrank the marathon side quest. Preserve MMA quality and recovery. Current running is 1 run per week, about 20 km total, with the longest recent run about 20 km.',qa_diagnostics:true,privacy_consent:consent()
+          }};
+          const youth={id:'youth_gymnastics',intake:{
+            age:13,language:'en',experience:'intermediate',primary_goals:['Achieve first bar muscle-up','Achieve a freestanding handstand'],secondary_goals:['Build a strong general push and pull foundation while maintaining lower-body athleticism'],days_per_week:2,session_length:'60 min',gym_availability_mode:'flexible',available_gym_days:[],training_location:'home_gym',equipment:'Home setup: rings, pull-up bar, resistance bands and bench. No external weights.',current_numbers:'Pistol squat established; ring muscle-up achieved; about 12 strict pull-ups and 6 good ring dips. Wall-facing handstand about 15 seconds; back-to-wall about 20 seconds. Controlled kick-ups are improving, but there is no reliable unsupported balance time yet.',clarification_answers:{benchmark_bar_muscle_up:'Cannot perform a bar muscle-up yet. Can perform a ring muscle-up. About 12 strict pull-ups and 6 good ring dips.',benchmark_handstand:'Wall-facing handstand about 15 seconds; back-to-wall about 20 seconds. Controlled kick-ups are improving, but there is no reliable unsupported balance time yet.'},injuries:'None reported',pain:{active:false},sport:'',sport_schedule:[],mobility:{active:false},sleep_hours:'8-9',recovery_rating:'Good',notes:'Athlete is 13 years old. Two structured sessions per week. Rings, pull-up bar, bands and bench only. No external weights. Skill quality before fatigue; no grinders or repeated failed attempts.',qa_diagnostics:true,privacy_consent:consent()
+          }};
+          const tactical={id:'tactical_3k',intake:{
+            age:27,language:'en',experience:'advanced',primary_goals:['Improve 3 km from 13:30 to sub-12:00'],secondary_goals:['Improve 10 km ruck with 20 kg from 95 min toward 82 min','Improve strict pull-ups from 14 toward 18-20'],maintenance_goals:['Maintain useful squat and deadlift strength while staying athletic and relatively weight-stable'],goal_priority_model:'tiered',days_per_week:3,session_duration_minutes:60,gym_availability_mode:'flexible',available_gym_days:[],training_location:'commercial_gym',equipment:'Full gym, track/road access, hills, pull-up bar, 20 kg ruck/backpack, 30 kg sandbag and sled.',current_numbers:['3 km: 13:30','10 km ruck with 20 kg: 95 min','Back Squat: 140 kg x 5','Deadlift: 180 kg x 3','Overhead Press: 65 kg x 5','Weighted Pull-up: +30 kg x 5','Strict Pull-ups: 14 reps','Push-ups: 55 clean reps in 2 min'].join('\n'),performance_markers:['3 km: 13:30','10 km ruck with 20 kg: 95 min'],injuries:'Previous shin-splint irritation with abrupt running-volume increases; currently asymptomatic.',pain:{active:false,description:'',severity:'',character:'',next_day_baseline:'normal',tolerated_movements:'Current 18-20 km/week running and one 8-10 km ruck with 20 kg are tolerated without symptoms.'},sport:'',sport_schedule:[],mobility:{active:false,limitation:''},sleep_hours:'7-8',recovery_rating:'Good',notes:['Currently runs 3 sessions per week, about 18-20 km/week: one interval session, one easy run and one longer aerobic run.','Currently does 1 ruck per week, usually 8-10 km with 20 kg.','Recent 400 m repeats are around 1:42-1:45 with adequate recovery for repeatability.','Previous shin-splint irritation happened when running volume increased abruptly; currently asymptomatic at present running and ruck volume.','Can train across five calendar days and is comfortable combining compatible easy running or rucking with a strength day when sensible.','Wants combat-ready / special-operations-style fitness without random punishment circuits or unnecessary mass gain.'].join(' '),qa_diagnostics:true,privacy_consent:consent()
+          }};
+
+          async function req(path,opt={}){const r=await fetch(base+path,opt);const text=await r.text();let j={};try{j=JSON.parse(text)}catch{};return {r,j,text};}
+          async function issuePass(){const x=await req('/api/admin/program-pass',{method:'POST',headers:{'content-type':'application/json','x-admin-provision-key':adminKey},body:JSON.stringify({count:1})});if(!x.r.ok||!x.j?.codes?.[0])throw new Error('Program Pass provisioning failed: '+x.r.status);return x.j.codes[0];}
+          async function runAvatar(a){
+            const pass=await issuePass();
+            const b=await req('/api/build',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({intake:a.intake,pass_code:pass})});
+            if(b.r.status!==202||!b.j?.job_id)return {id:a.id,ok:false,error:'build not accepted '+b.r.status+' '+b.text.slice(0,300)};
+            let job={};
+            let lastSeen=null;
+            let consecutive404=0;
+            let lastSignature='';
+            const started=Date.now();
+            for(let i=0;i<360;i++){
+              await sleep(2000);
+              try{
+                const poll=await req('/api/job/'+encodeURIComponent(b.j.job_id));
+                if(poll.r.ok){
+                  job=poll.j||{};
+                  lastSeen={...job};
+                  consecutive404=0;
+                  const sig=[job.status,job.stage,job.attempt,job.detail].map((x)=>String(x??'')).join('|');
+                  if(sig!==lastSignature){
+                    console.log(JSON.stringify({id:a.id,poll:true,status:job.status||null,stage:job.stage||null,attempt:job.attempt??null,detail:job.detail||null,seconds:Math.round((Date.now()-started)/1000)}));
+                    lastSignature=sig;
+                  }
+                  if(job?.status==='done'||job?.status==='error') break;
+                } else if(poll.r.status===404){
+                  consecutive404++;
+                  if(consecutive404>=5) break;
+                }
+              }catch(e){
+                console.warn(JSON.stringify({id:a.id,poll_error:String(e?.message||e)}));
+              }
+            }
+            const disappeared=consecutive404>=5;
+            const timedOut=!disappeared&&job?.status!=='done'&&job?.status!=='error';
+            const rec={
+              id:a.id,
+              job_id:b.j.job_id,
+              ok:job?.status==='done'&&typeof job?.program==='string'&&job.program.length>500,
+              status:job?.status==='done'||job?.status==='error' ? job.status : (disappeared?'job_disappeared':(timedOut?'timeout':job?.status||'timeout')),
+              stage:job?.stage||lastSeen?.stage||null,
+              attempt:job?.attempt??lastSeen?.attempt??null,
+              detail:job?.detail||lastSeen?.detail||null,
+              last_seen_status:lastSeen?.status||null,
+              error:job?.error||(disappeared?'Job state disappeared after successful earlier polling.':null),
+              program_chars:typeof job?.program==='string'?job.program.length:0,
+              seconds:Math.round((Date.now()-started)/1000)
+            };
+            if(rec.ok)fs.writeFileSync(`docs/qa/live-three-avatar/${a.id}-program.txt`,job.program);
+            return rec;
+          }
+          const result={timestamp:now(),base,head_sha:process.env.GITHUB_SHA||null,runtime:fs.readFileSync('phase14/public/runtime-version.txt','utf8').trim(),results:[]};
+          for(const a of [hybrid,youth,tactical]){const rec=await runAvatar(a);result.results.push(rec);console.log(JSON.stringify(rec));}
+          result.ok=result.results.every(x=>x.ok);
+          fs.writeFileSync('docs/qa/live-three-avatar/result.json',JSON.stringify(result,null,2));
+          if(!result.ok)process.exitCode=1;
+          NODE
+      - name: Upload website acceptance evidence
+        if: always() && steps.live_generation.outcome != 'skipped'
+        uses: actions/upload-artifact@v4
+        with:
+          name: three-avatar-acceptance-${{ github.run_id }}-${{ github.run_attempt }}
+          path: docs/qa/live-three-avatar/
+          if-no-files-found: error
+          retention-days: 14
+      - name: Publish synthetic QA evidence to branch
+        if: always() && github.ref_name == 'privacy-security-hardening' && steps.live_generation.outcome != 'skipped'
+        run: |
+          if [ ! -f docs/qa/live-three-avatar/result.json ]; then
+            echo "No fresh result.json to publish"
+            exit 0
+          fi
+          mkdir -p docs/qa/live-three-avatar/latest
+          cp docs/qa/live-three-avatar/result.json docs/qa/live-three-avatar/latest/result.json
+          for f in advanced_hybrid-program.txt youth_gymnastics-program.txt tactical_3k-program.txt; do
+            if [ -f "docs/qa/live-three-avatar/$f" ]; then
+              cp "docs/qa/live-three-avatar/$f" "docs/qa/live-three-avatar/latest/$f"
+            else
+              rm -f "docs/qa/live-three-avatar/latest/$f"
+            fi
+          done
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add docs/qa/live-three-avatar/latest
+          if git diff --cached --quiet; then
+            echo "QA evidence unchanged"
+            exit 0
+          fi
+          git commit -m "Record latest synthetic live acceptance evidence [skip ci]"
+          git push origin "HEAD:${GITHUB_REF_NAME}"

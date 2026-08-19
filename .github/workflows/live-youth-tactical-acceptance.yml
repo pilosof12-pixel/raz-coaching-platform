@@ -1,0 +1,168 @@
+name: Live Youth and Tactical Acceptance
+
+on:
+  push:
+    paths:
+      - '.github/workflows/live-youth-tactical-acceptance.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  acceptance:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Run two controlled live Program Pass builds
+        env:
+          BASE_URL: https://raz-coaching-platform.onrender.com
+          ADMIN_PROVISION_KEY: ${{ secrets.ADMIN_PROVISION_KEY }}
+        run: |
+          mkdir -p docs/qa/live-youth-tactical
+          node <<'NODE'
+          import fs from 'node:fs';
+
+          const base = process.env.BASE_URL;
+          const adminKey = process.env.ADMIN_PROVISION_KEY || '';
+          const outDir = 'docs/qa/live-youth-tactical';
+          const sleep = ms => new Promise(r => setTimeout(r, ms));
+          const now = () => new Date().toISOString();
+          const consent = () => ({ health_data:true, policy_version:'2026-08-15', consented_at:now() });
+
+          const youth = {
+            id:'youth_gymnastics',
+            intake:{
+              age:13,
+              language:'en',
+              experience:'intermediate',
+              primary_goals:['Achieve first bar muscle-up','Achieve a freestanding handstand'],
+              secondary_goals:['Build a strong general push and pull foundation while maintaining lower-body athleticism'],
+              days_per_week:2,
+              session_length:'60 min',
+              gym_availability_mode:'flexible',
+              available_gym_days:[],
+              training_location:'home_gym',
+              equipment:'Home setup: rings, pull-up bar, resistance bands and bench. No external weights.',
+              current_numbers:'Pistol squat established; ring muscle-up achieved; about 12 strict pull-ups and 6 good ring dips. Wall-facing handstand about 15 seconds; back-to-wall about 20 seconds. Controlled kick-ups are improving, but there is no reliable unsupported balance time yet.',
+              clarification_answers:{
+                benchmark_bar_muscle_up:'Cannot perform a bar muscle-up yet. Can perform a ring muscle-up. About 12 strict pull-ups and 6 good ring dips.',
+                benchmark_handstand:'Wall-facing handstand about 15 seconds; back-to-wall about 20 seconds. Controlled kick-ups are improving, but there is no reliable unsupported balance time yet.'
+              },
+              injuries:'None reported',
+              pain:{active:false},
+              sport:'', sport_schedule:[],
+              mobility:{active:false},
+              sleep_hours:'8-9', recovery_rating:'Good',
+              notes:'Athlete is 13 years old. Two structured sessions per week. Rings, pull-up bar, bands and bench only. No external weights. Skill quality before fatigue; no grinders or repeated failed attempts.',
+              privacy_consent:consent()
+            }
+          };
+
+          const tactical = {
+            id:'tactical_3k',
+            intake:{
+              age:27,
+              language:'en',
+              experience:'advanced',
+              primary_goals:['Improve 3 km from 13:30 to sub-12:00'],
+              secondary_goals:['Improve 10 km ruck with 20 kg from 95 min toward 82 min','Improve strict pull-ups from 14 toward 18-20'],
+              maintenance_goals:['Maintain useful squat and deadlift strength while staying athletic and relatively weight-stable'],
+              goal_priority_model:'tiered',
+              days_per_week:3,
+              session_duration_minutes:60,
+              gym_availability_mode:'flexible',
+              available_gym_days:[],
+              training_location:'commercial_gym',
+              equipment:'Full gym, track/road access, hills, pull-up bar, 20 kg ruck/backpack, 30 kg sandbag and sled.',
+              current_numbers:['3 km: 13:30','10 km ruck with 20 kg: 95 min','Back Squat: 140 kg x 5','Deadlift: 180 kg x 3','Overhead Press: 65 kg x 5','Weighted Pull-up: +30 kg x 5','Strict Pull-ups: 14 reps','Push-ups: 55 clean reps in 2 min'].join('\n'),
+              performance_markers:['3 km: 13:30','10 km ruck with 20 kg: 95 min'],
+              injuries:'Previous shin-splint irritation with abrupt running-volume increases; currently asymptomatic.',
+              pain:{active:false,description:'',severity:'',character:'',next_day_baseline:'normal',tolerated_movements:'Current 18-20 km/week running and one 8-10 km ruck with 20 kg are tolerated without symptoms.'},
+              sport:'', sport_schedule:[], mobility:{active:false,limitation:''},
+              sleep_hours:'7-8', recovery_rating:'Good',
+              notes:['Currently runs 3 sessions per week, about 18-20 km/week: one interval session, one easy run and one longer aerobic run.','Currently does 1 ruck per week, usually 8-10 km with 20 kg.','Recent 400 m repeats are around 1:42-1:45 with adequate recovery for repeatability.','Previous shin-splint irritation happened when running volume increased abruptly; currently asymptomatic at present running and ruck volume.','Can train across five calendar days and is comfortable combining compatible easy running or rucking with a strength day when sensible.','Wants combat-ready / special-operations-style fitness without random punishment circuits or unnecessary mass gain.'].join(' '),
+              privacy_consent:consent()
+            }
+          };
+
+          async function jsonFetch(path, options={}, attempts=4){
+            let last='';
+            for(let i=0;i<attempts;i++){
+              try{
+                const r=await fetch(base+path,options);
+                const text=await r.text();
+                last=`status=${r.status} body=${text.slice(0,500)}`;
+                let json={}; try{json=JSON.parse(text);}catch{}
+                return {r,json,text};
+              }catch(e){last=String(e?.message||e);await sleep(1500);}
+            }
+            throw new Error(`request failed ${path}: ${last}`);
+          }
+
+          async function issuePass(){
+            if(!adminKey) throw new Error('ADMIN_PROVISION_KEY secret is not configured for this workflow. No Program Pass was issued and no generation was attempted.');
+            const {r,json}=await jsonFetch('/api/admin/program-pass',{method:'POST',headers:{'content-type':'application/json','x-admin-provision-key':adminKey},body:JSON.stringify({count:1})});
+            if(!r.ok || !json?.codes?.[0]) throw new Error(`Program Pass provisioning failed: status=${r.status} body=${JSON.stringify(json)}`);
+            return json.codes[0];
+          }
+
+          async function runAvatar(avatar){
+            const record={id:avatar.id,started_at:now(),ok:false,build_attempts:0};
+            const passCode=await issuePass();
+            for(let outer=1;outer<=2;outer++){
+              record.build_attempts=outer;
+              const {r:br,json:bj}=await jsonFetch('/api/build',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({intake:avatar.intake,pass_code:passCode})});
+              if(br.status===422){record.clarification=bj;throw new Error(`${avatar.id}: unexpected clarification required: ${JSON.stringify(bj)}`);}
+              if(br.status!==202 || !bj?.job_id) throw new Error(`${avatar.id}: build not accepted status=${br.status} body=${JSON.stringify(bj)}`);
+              const started=Date.now();
+              let job=null;
+              for(let i=0;i<210;i++){
+                await sleep(2000);
+                try{({json:job}=await jsonFetch('/api/job/'+encodeURIComponent(bj.job_id),{},2));}catch{continue;}
+                if(job?.status==='done' || job?.status==='error') break;
+              }
+              record.seconds=Math.round((Date.now()-started)/1000);
+              record.job_status=job?.status||'timeout';
+              record.job_stage=job?.stage||null;
+              record.job_attempt=job?.attempt||null;
+              if(job?.status==='done' && typeof job.program==='string' && job.program.length>500){
+                record.ok=true; record.completed_at=now(); record.program_chars=job.program.length;
+                fs.writeFileSync(`${outDir}/${avatar.id}-program.txt`,job.program);
+                return record;
+              }
+              record.last_error=job?.error||'generation timeout';
+              if(outer===1) await sleep(2000);
+            }
+            throw new Error(`${avatar.id}: generation failed after retry: ${record.last_error}`);
+          }
+
+          const result={timestamp:now(),base,avatars:[],ok:false};
+          let failed=false;
+          for(const avatar of [youth,tactical]){
+            try{result.avatars.push(await runAvatar(avatar));}
+            catch(e){failed=true;result.avatars.push({id:avatar.id,ok:false,error:String(e?.message||e)});}
+          }
+          result.ok=!failed && result.avatars.every(x=>x.ok);
+          fs.writeFileSync(`${outDir}/result.json`,JSON.stringify(result,null,2));
+          console.log(JSON.stringify(result));
+          if(!result.ok) process.exit(1);
+          NODE
+
+      - name: Commit sanitized live acceptance outputs
+        if: always()
+        run: |
+          git config user.name 'RAZ live acceptance bot'
+          git config user.email 'actions@users.noreply.github.com'
+          git pull --rebase origin privacy-security-hardening || true
+          git add docs/qa/live-youth-tactical/result.json docs/qa/live-youth-tactical/*-program.txt 2>/dev/null || true
+          if git diff --cached --quiet; then exit 0; fi
+          git commit -m 'Record live Youth and Tactical acceptance outputs'
+          git push origin HEAD:privacy-security-hardening
+
+# Final v6 website acceptance trigger: 2026-08-17T06:34+10:00

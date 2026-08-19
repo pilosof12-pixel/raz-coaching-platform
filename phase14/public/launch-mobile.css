@@ -1,0 +1,60 @@
+.launch-privacy-box,.launch-pass-box{margin:18px 0;padding:14px 15px;border:1px solid #2a3030;border-radius:11px;background:rgba(24,211,197,.055);font-size:12.5px;color:#d7e4e2}.launch-privacy-box p,.launch-danger p{margin:0 0 9px}.launch-consent-row{display:flex;align-items:flex-start;gap:8px;cursor:pointer}.launch-consent-row input{width:auto!important;margin:3px 0 0;flex:0 0 auto}.launch-pass-box label{display:block;margin-bottom:7px}.launch-pass-box input{width:100%}.launch-help{font-size:12px;opacity:.75;margin-top:6px}.launch-danger{margin-top:20px;padding:14px 15px;border:1px solid rgba(255,84,84,.45);border-radius:11px;background:rgba(255,84,84,.045)}.launch-danger-btn{background:transparent!important;color:#ff9696!important;border:1px solid rgba(255,84,84,.65)!important}
+
+/* Launch mobile polish: preserve desktop layout while making iPhone-sized
+   viewports feel native, stable, and safe around the notch/home indicator. */
+html,body{max-width:100%;overflow-x:hidden}body{-webkit-text-size-adjust:100%;text-size-adjust:100%}.wrap{padding-left:max(20px,env(safe-area-inset-left));padding-right:max(20px,env(safe-area-inset-right));padding-bottom:max(80px,calc(56px + env(safe-area-inset-bottom)))}.prog-table-wrap{max-width:100%;overscroll-behavior-inline:contain}.wizard-actions{padding-bottom:max(22px,calc(14px + env(safe-area-inset-bottom)))}
+
+/* Real job-state progress. This mirrors /api/job stages emitted by the backend;
+   it is not a fake percentage or arbitrary timer. */
+.generation-progress{margin:14px 0 6px;padding:14px;border:1px solid rgba(24,211,197,.28);border-radius:14px;background:rgba(24,211,197,.045)}
+.generation-progress.hidden{display:none}.generation-progress-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:12px}.generation-progress-head strong{font-size:14px}.generation-progress-head span{font-size:12px;color:#9aa7a5}.generation-progress-steps{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:6px}.generation-step{display:flex;flex-direction:column;gap:6px;min-width:0;padding:8px 6px;border-radius:9px;background:#171a1a;color:#889292}.generation-step span{display:grid;place-items:center;width:22px;height:22px;border-radius:50%;border:1px solid #394141;font-size:11px;font-weight:700}.generation-step b{font-size:10.5px;line-height:1.25;font-weight:600}.generation-step.active{background:rgba(24,211,197,.09);color:#e7f8f6}.generation-step.active span{border-color:#18d3c5;color:#18d3c5}.generation-step.complete{color:#a9c8c4}.generation-step.complete span{background:#18d3c5;border-color:#18d3c5;color:#071111}.generation-progress-detail{margin-top:11px;font-size:12px;line-height:1.45;color:#c7d5d3}
+
+@media(max-width:600px){
+  input,select,textarea{font-size:16px!important;min-height:44px}
+  .btn,button{min-height:44px;touch-action:manipulation}
+  .grid2,.btn-row{grid-template-columns:1fr!important}
+  .btn-row .btn,.center .btn{width:100%}
+  table{font-size:12px}
+  #program-render{overflow-x:auto;-webkit-overflow-scrolling:touch}
+  .wrap{padding-top:max(20px,env(safe-area-inset-top));padding-left:max(14px,env(safe-area-inset-left));padding-right:max(14px,env(safe-area-inset-right));padding-bottom:max(72px,calc(48px + env(safe-area-inset-bottom)))}
+  .card{margin:14px 0;padding:18px}
+  .intake-topline,.wizard-step,.wizard-actions{padding-left:16px!important;padding-right:16px!important}
+  .wizard-actions{gap:10px;align-items:stretch}
+  .wizard-actions .btn{min-width:0;padding-left:16px;padding-right:16px}
+  .intake-summary{grid-template-columns:1fr!important}
+  .summary-item{min-width:0}
+  .sport-day{align-items:flex-start}
+  .sport-day .daybtn{flex-basis:58px}
+  .sport-day .intensity{flex:1;min-width:0;flex-wrap:wrap}
+  .sport-day .ibtn{padding:7px 9px}
+  .trust-row span{font-size:11px}
+  .choice-row{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+  .choice-btn{width:100%;padding:10px 8px}
+  .performance-row{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}
+  .performance-row button{grid-column:2;justify-self:end;padding:7px 10px}
+  .prog-table-wrap{width:100%;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-gutter:stable}
+  table.prog-table{min-width:680px}
+  .save-note-strong{padding:14px}
+  .save-note-strong code{max-width:100%;overflow-wrap:anywhere}
+  .generation-progress{padding:12px}.generation-progress-steps{grid-template-columns:1fr}.generation-step{display:grid;grid-template-columns:28px 1fr;align-items:center;gap:8px;padding:8px}.generation-step b{font-size:11.5px}.generation-progress-detail{font-size:12.5px}
+}
+
+@media(max-width:390px){
+  .wrap{padding-left:max(10px,env(safe-area-inset-left));padding-right:max(10px,env(safe-area-inset-right))}
+  .card{padding:15px;border-radius:14px}
+  .intake-topline,.wizard-step,.wizard-actions{padding-left:14px!important;padding-right:14px!important}
+  .hero h2{font-size:23px;line-height:1.18}
+  .wizard-actions{display:grid;grid-template-columns:minmax(0,.85fr) minmax(0,1.35fr)}
+  .wizard-actions .btn{width:100%;margin-left:0!important;font-size:14px;padding:12px 10px}
+  .choice-row{grid-template-columns:1fr}
+  .lang-toggle{width:100%;display:grid;grid-template-columns:1fr 1fr}
+  .lang-btn{width:100%;padding:9px 8px}
+  .program-head{gap:10px}
+  .program-head .lang-toggle{width:auto;display:inline-flex}
+  .program-head .lang-btn{width:auto}
+}
+
+@media(orientation:landscape) and (max-height:500px){
+  .wrap{padding-top:max(10px,env(safe-area-inset-top));padding-bottom:max(30px,calc(18px + env(safe-area-inset-bottom)))}
+  .hero{margin-top:12px}
+}

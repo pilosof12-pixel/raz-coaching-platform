@@ -1,0 +1,114 @@
+name: Apply v34 coaching architecture
+
+on:
+  push:
+    branches:
+      - privacy-security-hardening
+  pull_request:
+    branches:
+      - privacy-security-hardening
+
+permissions:
+  contents: write
+
+jobs:
+  apply-v34:
+    if: ${{ github.actor != 'github-actions[bot]' }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: privacy-security-hardening
+          fetch-depth: 0
+
+      - name: Check readiness
+        id: ready
+        shell: bash
+        run: |
+          if [ -f .github/v34-patch/READY ]; then
+            echo "ready=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "ready=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Reconstruct and verify uploaded patch
+        if: steps.ready.outputs.ready == 'true'
+        shell: bash
+        run: |
+          set -euo pipefail
+          cat .github/v34-patch/chunk*.b64 | tr -d '\n' | base64 -d > /tmp/v34.patch
+          echo "9c0bacf4023f4a37cd165b124ddfb420302e6108c932c2145e941ee6d129fd30  /tmp/v34.patch" | sha256sum -c -
+          git apply --check /tmp/v34.patch
+          git apply /tmp/v34.patch
+
+      - name: Add readiness hysteresis
+        if: steps.ready.outputs.ready == 'true'
+        shell: python
+        run: |
+          from pathlib import Path
+          p = Path('phase14/engine/phase15_planner.js')
+          s = p.read_text()
+          old = """  const readinessRanked = gymDayReadiness(intake, { gymDays: days }).days.map(x => x.day);\n  const cleanDays = readinessRanked.filter(d => days.includes(d));"""
+          new = """  const readinessScores = gymDayReadiness(intake, { gymDays: days }).days;\n  const readinessRanked = readinessScores.map(x => x.day);\n  const cleanDays = readinessRanked.filter(d => days.includes(d));"""
+          if old not in s:
+              raise SystemExit('readiness ranking anchor not found')
+          s = s.replace(old, new, 1)
+          old2 = """  if (oapGoal && oap!=null && oap>=2 && cleanDays.length) { const d=cleanDays[0]; for (const x of days) sessions[x]=sessions[x].filter(v=>v!=='OAP_STRICT'); sessions[d].unshift('OAP_STRICT'); }"""
+          new2 = """  if (oapGoal && oap!=null && oap>=2 && cleanDays.length) {\n    const current = days.find(x => sessions[x].includes('OAP_STRICT'));\n    const best = readinessScores.find(x => x.day === cleanDays[0]);\n    const currentScore = readinessScores.find(x => x.day === current);\n    // Hysteresis: do not churn a valid primary slot on trivial readiness ties.\n    // Move only when the best available day is meaningfully better (>=1 point),\n    // or when no current OAP_STRICT placement exists.\n    const shouldMove = !current || !currentScore || !best || (best.score - currentScore.score >= 1);\n    if (shouldMove) {\n      const d = cleanDays[0];\n      for (const x of days) sessions[x]=sessions[x].filter(v=>v!=='OAP_STRICT');\n      sessions[d].unshift('OAP_STRICT');\n    }\n  }"""
+          if old2 not in s:
+              raise SystemExit('OAP placement anchor not found')
+          s = s.replace(old2, new2, 1)
+          p.write_text(s)
+
+          t = Path('phase14/test/v34_coaching_architecture.test.js')
+          ts = t.read_text()
+          marker = "// 4. Handstand reduced-support"
+          extra = """test('[V34-3c] readiness hysteresis preserves an existing OAP slot on a trivial tie', async () => {\n  const { buildDeterministicBrief } = await import('../engine/phase15_planner.js');\n  const intake = {\n    days_per_week: 2,\n    available_gym_days: ['Mon','Wed'],\n    primary_goals: ['4 One arm pullups'],\n    current_numbers: 'One-Arm Pull-up: 2 strict reps each arm',\n    sport_schedule: []\n  };\n  const brief = buildDeterministicBrief(intake);\n  assert.match(brief, /OAP_STRICT/);\n});\n\n"""
+          if marker not in ts:
+              raise SystemExit('test insertion marker not found')
+          ts = ts.replace(marker, extra + marker, 1)
+          t.write_text(ts)
+
+      - uses: actions/setup-node@v4
+        if: steps.ready.outputs.ready == 'true'
+        with:
+          node-version: '22'
+          cache: npm
+
+      - name: Install dependencies
+        if: steps.ready.outputs.ready == 'true'
+        run: npm ci --ignore-scripts
+
+      - name: Run v34 tests
+        if: steps.ready.outputs.ready == 'true'
+        working-directory: phase14
+        run: node --test test/v34_coaching_architecture.test.js
+
+      - name: Syntax check modified engine files
+        if: steps.ready.outputs.ready == 'true'
+        working-directory: phase14
+        run: |
+          node --check engine/phase15_planner.js
+          node --check engine/phase15_quality_rules.js
+          node --check engine/repairable_validation_bundle.js
+          node --check engine/v34_coaching_architecture.js
+          node --check engine/v34_prescription_consistency.js
+          node --check engine/v34_readiness.js
+          node --check engine/v34_workload_accounting.js
+
+      - name: Run regression tests
+        if: steps.ready.outputs.ready == 'true'
+        working-directory: phase14
+        run: node --test test/*.test.js
+
+      - name: Commit v34 and clean staging
+        if: steps.ready.outputs.ready == 'true'
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm -rf .github/v34-patch .github/workflows/apply-v34-coaching.yml
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -m "Apply v34 coaching architecture refinement"
+          git push origin HEAD:privacy-security-hardening

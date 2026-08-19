@@ -1,3 +1,2 @@
-trigger 2026-08-10T11:38+07:00
-post-Overcoming-Gravity live validation
-latency + demo coverage + two gymnastics-heavy avatars
+trigger 2026-08-13T22:58+10:00
+one-off Adaptive Intake / Ping-Pong live stress validation rerun

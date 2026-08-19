@@ -1277,7 +1277,7 @@ function stripAndFlagFormulaViolations(s, intake) {
     // labeled OR the movement clearly has a current rep max we can anchor to.
     const repBenchmark = movement && movement in maxReps ? maxReps[movement] : null;
     if (repBenchmark == null || repBenchmark <= 0) continue; // unparseable -> skip
-    if (!isDensityLabeled && !movement) continue;
+    if (!isDensityLabeled) continue; // ordinary lower-load strength sets may exceed a current rep benchmark; only density/endurance rows use this ceiling
     const repsVal = firstNumber(repsCell);
     if (repsVal == null || repsVal <= 0) continue;
     const isTest = /\b(test|max reps|assessment|amrap)\b/i.test(ctx);
@@ -1535,6 +1535,7 @@ function phase15LastMileTsv(tsv, intake) {
 
 function privacyScrub(text, intake) {
   if (!text) return text;
+  text = text.replace(/<!--\s*QA_FORMULA_VIOLATION_COUNT:\s*\d+\s*-->/gi, ""); // SERVER-AUTHORITATIVE-FORMULA-MARKER
 
   // Formula validator (defense-in-depth) runs on the FULL text first, because
   // it must inspect the START_WEEK1_TSV row block. It anchors per-set loads to
@@ -1574,13 +1575,11 @@ function privacyScrub(text, intake) {
   // these only swap whole words, never touch tabs, newlines, or column count).
   if (tsv) tsv = phase15LastMileTsv(scrubForbiddenWords(fixInvalidExerciseNames(tsv)), intake);
 
-  let out = tsv ? prose.trim() + "\n\n" + tsv : prose.trim();
-  // Append the hidden violation-count marker so _meta.violations can be exposed
-  // downstream without a DB schema change. Never rendered in the client UI.
-  if (fv.violations > 0) {
-    out += "\n<!-- QA_FORMULA_VIOLATION_COUNT: " + fv.violations + " -->";
-  }
-  return out;
+  const out = tsv ? prose.trim() + "\n\n" + tsv : prose.trim();
+  // Formula-band findings are server-side diagnostics only. Never encode internal
+  // QA state into the client program: the save-boundary cleanliness gate correctly
+  // rejects QA markers, and client-visible program text must remain transport-clean.
+  return out; // FORMULA-QA-SERVER-SIDE-ONLY
 }
 
 // ---------- App ----------
@@ -1760,7 +1759,14 @@ async function runBuildJob(jobId, token, intake) {
     await store.finishJob(jobId, "done", program, null, now);
   } catch (e) {
     console.error("build job error:", e);
-    await store.finishJob(jobId, "error", null, e.message || "Engine error.", Date.now());
+    const qaCodes = intake?.qa_diagnostics ? [...new Set([
+      e?.code,
+      ...(Array.isArray(e?.flags) ? e.flags.map((flag) => flag?.code) : []),
+      ...(Array.isArray(e?.details?.violations) ? e.details.violations.flatMap((v) => [v?.code, v?.type]) : []),
+    ].map((code) => String(code || '')).filter((code) => /^[A-Z0-9_]+$/.test(code)))].slice(0, 8) : [];
+    const baseError = e?.message || e?.code || "Engine error.";
+    const jobError = qaCodes.length ? `${baseError} [QA:${qaCodes.join("+")}]` : baseError;
+    await store.finishJob(jobId, "error", null, jobError, Date.now());
   }
 }
 

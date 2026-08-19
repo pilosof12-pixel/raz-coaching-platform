@@ -1,0 +1,27 @@
+name: Production dependency audit
+
+on:
+  push:
+    branches:
+      - privacy-security-hardening
+      - main
+  pull_request:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - name: Install locked production dependencies
+        run: npm ci
+      - name: Report audit and block high or critical vulnerabilities
+        run: npm audit --omit=dev --audit-level=high

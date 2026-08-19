@@ -1,0 +1,55 @@
+name: Fetch Live Youth Job
+
+on:
+  push:
+    paths:
+      - '.github/workflows/fetch-live-youth-job.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  fetch:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Fetch exact completed live Youth job
+        env:
+          JOB_ID: bcf21a365a59f1ced9cdf0c16bea57a8
+          BASE_URL: https://raz-coaching-platform.onrender.com
+        run: |
+          mkdir -p docs/qa/live-youth
+          node <<'NODE'
+          const fs = require('fs');
+          const sleep = ms => new Promise(r => setTimeout(r, ms));
+          const base = process.env.BASE_URL;
+          const jobId = process.env.JOB_ID;
+          (async()=>{
+            let data = null;
+            for (let i=0;i<12;i++) {
+              try {
+                const r = await fetch(base + '/api/job/' + encodeURIComponent(jobId), { headers:{accept:'application/json'} });
+                const text = await r.text();
+                if (r.ok && text.trim().startsWith('{')) { data = JSON.parse(text); break; }
+              } catch (_) {}
+              await sleep(1500);
+            }
+            if (!data) throw new Error('Could not fetch live job');
+            fs.writeFileSync('docs/qa/live-youth/job.json', JSON.stringify({status:data.status,stage:data.stage,attempt:data.attempt,error:data.error||null,program_chars:typeof data.program==='string'?data.program.length:0}, null, 2));
+            if (data.status !== 'done' || typeof data.program !== 'string' || data.program.length < 500) throw new Error('Job is not a completed program');
+            fs.writeFileSync('docs/qa/live-youth/program.txt', data.program);
+          })().catch(e=>{console.error(e);process.exit(1)});
+          NODE
+      - name: Commit live Youth snapshot
+        run: |
+          git config user.name 'RAZ live QA bot'
+          git config user.email 'actions@users.noreply.github.com'
+          git pull --rebase origin privacy-security-hardening || true
+          git add docs/qa/live-youth/job.json docs/qa/live-youth/program.txt
+          if git diff --cached --quiet; then exit 0; fi
+          git commit -m 'Record exact live Youth acceptance program'
+          git push origin HEAD:privacy-security-hardening
