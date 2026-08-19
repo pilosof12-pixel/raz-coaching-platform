@@ -69,10 +69,15 @@ jobs:
           equip_new = 'case "pull_up_bar": return /pull[-\\s]?up bar|chin[-\\s]?up bar|monkey bar|doorframe|door frame|calisthenics|outdoor[_\\s]?park|bodyweight station|\\bpull[-\\s]?up\\b/.test(text);'
           if equip_old not in ss:
               raise SystemExit('pull-up equipment inference anchor not found')
-          sp.write_text(ss.replace(equip_old, equip_new, 1))
+          ss = ss.replace(equip_old, equip_new, 1)
+          oap_parse_old = '    one_arm_pull_up: firstIntAfter(t, /(\\d+)\\s*one[-\\s]?arm\\s*pull/),'
+          oap_parse_new = '    one_arm_pull_up: firstIntAfter(t, /(\\d+)\\s*one[-\\s]?arm\\s*pull/) || firstIntAfter(t, /one[-\\s]?arm\\s*pull[-\\s]?ups?[^0-9]{0,24}(\\d+)/),'
+          if oap_parse_old not in ss:
+              raise SystemExit('OAP benchmark parser anchor not found')
+          ss = ss.replace(oap_parse_old, oap_parse_new, 1)
+          sp.write_text(ss)
 
           # Loaded carries and rucks are distance/time locomotion, not barbell lifts.
-          # Never manufacture kg x reps ramp sets for them.
           wu = Path('phase14/engine/specific_warmup_enrichment.js')
           ws = wu.read_text()
           ramp_anchor = "export function rampText(exercise, load) {\n"
@@ -81,8 +86,6 @@ jobs:
               raise SystemExit('warm-up ramp anchor not found')
           wu.write_text(ws.replace(ramp_anchor, ramp_guard, 1))
 
-          # Validate ruck warm-up semantics against the raw machine block as well as
-          # the parsed warm-up role so malformed kg x reps prose cannot slip through.
           tm = Path('phase14/engine/tactical_manual_acceptance.js')
           ms = tm.read_text()
           tactical_anchor = "export function validateTacticalManualAcceptanceSemantic(program, intake = {}, suppliedModel = null) {\n  if (!isTacticalIntake(intake)) return { ok: true, skipped: true };\n"
@@ -91,8 +94,6 @@ jobs:
               raise SystemExit('tactical warm-up validation anchor not found')
           tm.write_text(ms.replace(tactical_anchor, tactical_guard, 1))
 
-          # The accepted Youth architecture uses these two explicit skill drills.
-          # Keep the dictionary closed while recognizing those exact canonical names.
           ed = Path('phase14/engine/exercise_dictionary.js')
           es = ed.read_text()
           if '"Controlled Handstand Kick-up"' not in es:
@@ -107,8 +108,16 @@ jobs:
               es = es.replace(mu_anchor, '  "Strict Chest-to-Bar Pull-up", "Explosive Hip-to-Bar Pull-up", "Bar Muscle-up Transition Drill",\n', 1)
           ed.write_text(es)
 
-          # Restore Hebrew RTL behavior in the approved premium workbook without
-          # changing the agreed sheet order or eleven-column weekly layout.
+          # YG-07 must reject actual failure prescriptions without flagging explicit
+          # anti-failure coaching such as "do not train to failure".
+          cq = Path('phase14/engine/coaching_spec_v1_quality.js')
+          qs = cq.read_text()
+          yg_old = """    if (/to failure|amrap|forced rep|grind(?:er|ing)?|until failure/i.test(`${notes} ${exercise?.dose?.reps_raw || ''}`)) {\n      fail("""
+          yg_new = """    const failureText = `${notes} ${exercise?.dose?.reps_raw || ''}`\n      .replace(/\\b(?:do not|don't|never)\\s+(?:train\\s+)?to failure\\b/gi, '')\n      .replace(/\\bstop[^.\\n]{0,60}before[^.\\n]{0,30}failure\\b/gi, '')\n      .replace(/\\bno grinding\\b/gi, '');\n    if (/to failure|amrap|forced rep|grind(?:er|ing)?|until failure/i.test(failureText)) {\n      fail("""
+          if yg_old not in qs:
+              raise SystemExit('YG-07 failure-language anchor not found')
+          cq.write_text(qs.replace(yg_old, yg_new, 1))
+
           sheet = Path('phase14/public/spreadsheet.js')
           xs = sheet.read_text()
           text_anchor = '  function setTextCell(cell,value){ cell.value=value==null?"":String(value); cell.numFmt="@"; return cell.value; }\n'
@@ -144,7 +153,7 @@ jobs:
       - name: Run v34 and release-critical focused tests
         if: steps.ready.outputs.ready == 'true'
         working-directory: phase14
-        run: node --test test/v34_coaching_architecture.test.js test/pre_live_roadmap_lingo_release.test.js test/tactical_manual_acceptance.test.js test/youth_skill_dictionary.test.js
+        run: node --test test/v34_coaching_architecture.test.js test/pre_live_roadmap_lingo_release.test.js test/tactical_manual_acceptance.test.js test/youth_skill_dictionary.test.js test/coaching_spec_v1_convergence_regressions.test.js
 
       - name: Syntax check modified engine files
         if: steps.ready.outputs.ready == 'true'
@@ -161,6 +170,7 @@ jobs:
           node --check engine/specific_warmup_enrichment.js
           node --check engine/tactical_manual_acceptance.js
           node --check engine/exercise_dictionary.js
+          node --check engine/coaching_spec_v1_quality.js
           node --check public/spreadsheet.js
 
       - name: Run regression tests
