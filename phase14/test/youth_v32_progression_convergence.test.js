@@ -4,6 +4,7 @@ import assert from 'node:assert/strict';
 import { normalizeYouthSkillAcquisitionQuality } from '../engine/coaching_spec_v1_convergence_normalizer.js';
 import { validateProgressionArchitectureSemantic } from '../engine/coaching_progression_gpp.js';
 import { validateYouthProgressionQualitySemantic } from '../engine/coaching_acceptance_quality.js';
+import { validateYouthConsolidationRetentionSemantic } from '../engine/coaching_consolidation_quality.js';
 
 const HEADER = 'Day\tExercise\tWeight\tSets\tReps\tRest\tTarget RPE\tNotes\tResults';
 const block = (w, rows) => `START_WEEK${w}_TSV\n${HEADER}\n${rows.join('\n')}\nEND_WEEK${w}_TSV`;
@@ -34,6 +35,7 @@ test('Youth acquisition normalizer creates safe visible Weeks 1-3 progression an
   const out = normalizeYouthSkillAcquisitionQuality(staticCandidate(), INTAKE).program;
   assert.doesNotThrow(() => validateProgressionArchitectureSemantic(out, INTAKE));
   assert.doesNotThrow(() => validateYouthProgressionQualitySemantic(out, INTAKE));
+  assert.doesNotThrow(() => validateYouthConsolidationRetentionSemantic(out, INTAKE));
 
   const w1 = out.match(/START_WEEK1_TSV[\s\S]*?END_WEEK1_TSV/)[0];
   const w2 = out.match(/START_WEEK2_TSV[\s\S]*?END_WEEK2_TSV/)[0];
@@ -43,11 +45,12 @@ test('Youth acquisition normalizer creates safe visible Weeks 1-3 progression an
   assert.match(w1, /Bar Muscle-up Transition Drill\tModerate band assistance/);
   assert.match(w2, /Bar Muscle-up Transition Drill\tSlightly lighter band assistance/);
   assert.match(w3, /Bar Muscle-up Transition Drill\tLightest band assistance/);
+  assert.match(w4, /Bar Muscle-up Transition Drill\tLightest band assistance/);
   assert.match(w1, /Controlled Handstand Kick-up\tBodyweight\t3\t2\t/);
   assert.match(w2, /Controlled Handstand Kick-up\tBodyweight\t4\t2\t/);
   assert.match(w3, /Controlled Handstand Kick-up\tBodyweight\t4\t3\t/);
-  assert.match(w4, /Controlled Handstand Kick-up\tBodyweight\t3\t2\t/);
-  assert.match(w4, /Consolidation week/i);
+  assert.match(w4, /Controlled Handstand Kick-up\tBodyweight\t3\t3\t/);
+  assert.match(w4, /best clean Week 3 balance/i);
 });
 
 test('Youth visible progression normalization is idempotent', () => {
