@@ -21,13 +21,43 @@ test/fixtures/golden_programs.js: already current
 Goal-component release gate complete.
 /home/runner/work/raz-coaching-platform/raz-coaching-platform/phase14/engine/phase15_elite_guardrails.js: already current
 engine/repairable_validation_bundle.js: tactical launch quality applied
-file:///home/runner/work/raz-coaching-platform/raz-coaching-platform/phase14/scripts/apply_tactical_manual_acceptance.mjs:15
+engine/specific_warmup_enrichment.js: already current
+Tactical manual acceptance + ruck warm-up representation wiring complete.
+/home/runner/work/raz-coaching-platform/raz-coaching-platform/phase14/server.js: fixed-day last-mile guard applied
+built server.phase15.js with deterministic skeleton v5 quality hardening + direct-skill protection + variation-aware final QA
+Applied controlled compositional exercise vocabulary patch.
+/home/runner/work/raz-coaching-platform/raz-coaching-platform/phase14/engine/exercise_dictionary.js: Tactical endurance identity normalization applied
+/home/runner/work/raz-coaching-platform/raz-coaching-platform/phase14/engine/tactical_3k_gpp_quality.js: canonical Tactical endurance/support prompt names current
+Applied named gymnastics skill goal direct-exposure fix.
+engine/exercise_dictionary.js home_gym rings: already current (1 block)
+engine/exercise_dictionary.js: Youth gymnastics parity applied
+engine/phase15_planner.js: Youth gymnastics parity applied
+Youth gymnastics coaching parity patch complete.
+engine/phase15_elite_guardrails.js: Tactical 3K parity applied
+engine/exercise_dictionary.js: Tactical 3K parity applied
+Tactical 3K coaching parity patch complete.
+Phase15 final pipeline locked: semantic ProgramModel QA + specific warmup enrichment + hybrid grounded repair + fail-closed save boundary
+Advanced Hybrid OAP coaching axis and repair-loop convergence are wired before final QA.
+engine/phase15_planner.js: progression/GPP coaching applied
+server.phase15.js: progression/GPP coaching applied
+Progression architecture + youth progression/consolidation quality + tactical GPP/schedule/dose/3K quality + high-concurrency hybrid planning + warm-up production wiring complete.
+/home/runner/work/raz-coaching-platform/raz-coaching-platform/phase14/server.phase15.js: aggregate repair validation wired
+/home/runner/work/raz-coaching-platform/raz-coaching-platform/phase14/server.phase15.js: empty OpenAI output classified as transient
+/home/runner/work/raz-coaching-platform/raz-coaching-platform/phase14/server.phase15.js: repair convergence policy applied
+engine/exercise_dictionary.js: Youth live convergence applied
+server.phase15.js: Youth live convergence applied
+server.phase15.js: Youth live convergence applied
+Youth live convergence policy complete.
+Youth visible primary progression helpers: already current
+Youth visible progression call: already current
+Youth v32 visible progression convergence applied.
+file:///home/runner/work/raz-coaching-platform/raz-coaching-platform/phase14/scripts/apply_coaching_spec_v1.mjs:19
     if (count !== 1) throw new Error(`${rel} / ${t.label}: expected one anchor, found ${count}`);
                            ^
 
-Error: engine/specific_warmup_enrichment.js / do not strength-ramp loaded marching: expected one anchor, found 0
-    at patch (file:///home/runner/work/raz-coaching-platform/raz-coaching-platform/phase14/scripts/apply_tactical_manual_acceptance.mjs:15:28)
-    at file:///home/runner/work/raz-coaching-platform/raz-coaching-platform/phase14/scripts/apply_tactical_manual_acceptance.mjs:38:1
+Error: engine/coaching_spec_v1_quality.js / youth failure matcher: expected one anchor, found 0
+    at patch (file:///home/runner/work/raz-coaching-platform/raz-coaching-platform/phase14/scripts/apply_coaching_spec_v1.mjs:19:28)
+    at file:///home/runner/work/raz-coaching-platform/raz-coaching-platform/phase14/scripts/apply_coaching_spec_v1.mjs:35:1
     at ModuleJob.run (node:internal/modules/esm/module_job:343:25)
     at async onImport.tracePromise.__proto__ (node:internal/modules/esm/loader:681:26)
     at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:117:5)
