@@ -8,22 +8,51 @@ const p = path.join(root, 'engine', 'exercise_dictionary.js');
 let src = fs.readFileSync(p, 'utf8');
 let changed = false;
 
-const gatedOld = `      // Gated but nothing over-prescribed: leave a non-fatal note if any row exists.\n      if (maxPrescribed >= 0) {\n        const note = \`[REVIEW] \${family} gated — \${selection.reason}\`;\n        out = annotateFamilyRow(out, family, maxPrescribed, note, isHebrew);\n        annotations.push({ family, type: "gated", note });\n      }`;
-const gatedNew = `      // Gated but nothing over-prescribed: keep the coaching signal as structured\n      // QA metadata only. Internal review markers must never enter client output.\n      if (maxPrescribed >= 0) {\n        const note = \`\${family} gated — \${selection.reason}\`;\n        annotations.push({ family, type: "gated", note });\n      }`;
-if (src.includes(gatedOld)) {
-  src = src.replace(gatedOld, gatedNew);
+const marker = '// SKILL-ANNOTATIONS-INTERNAL-ONLY';
+
+const gatedReview = '        const note = `[REVIEW] ${family} gated — ${selection.reason}`;';
+const gatedClean = '        const note = `${family} gated — ${selection.reason}`;';
+if (src.includes(gatedReview)) {
+  src = src.replace(gatedReview, gatedClean);
   changed = true;
 }
 
-const freqOld = `      if (actual > 0 && actual < recommended) {\n        const note = \`[REVIEW] Frequency below skill-family recommendation (\${actual}x/week vs recommended \${recommended}x/week)\`;\n        out = annotateFamilyRow(out, family, maxPrescribed, note, isHebrew);\n        annotations.push({ family, type: "frequency", actual, recommended, note });\n      }`;
-const freqNew = `      if (actual > 0 && actual < recommended) {\n        const note = \`Frequency below skill-family recommendation (\${actual}x/week vs recommended \${recommended}x/week)\`;\n        annotations.push({ family, type: "frequency", actual, recommended, note });\n      }`;
-if (src.includes(freqOld)) {
-  src = src.replace(freqOld, freqNew);
+const freqReview = '        const note = `[REVIEW] Frequency below skill-family recommendation (${actual}x/week vs recommended ${recommended}x/week)`;';
+const freqClean = '        const note = `Frequency below skill-family recommendation (${actual}x/week vs recommended ${recommended}x/week)`;';
+if (src.includes(freqReview)) {
+  src = src.replace(freqReview, freqClean);
   changed = true;
 }
 
-if (!src.includes('Internal review markers must never enter client output.')) {
-  throw new Error('skill annotation cleanliness patch did not apply');
+// Older runtimes wrote these internal advisories into the client Notes cell.
+// V34 may already have removed the mutation lines before this build patch runs.
+const mutation = '        out = annotateFamilyRow(out, family, maxPrescribed, note, isHebrew);\n';
+let removed = 0;
+while (src.includes(mutation) && removed < 2) {
+  src = src.replace(mutation, '');
+  removed += 1;
+  changed = true;
+}
+
+if (!src.includes(marker)) {
+  const anchor = '      // Gated but nothing over-prescribed: leave a non-fatal note if any row exists.\n';
+  const alreadyCleanAnchor = '      // Gated but nothing over-prescribed: keep the coaching signal as structured\n';
+  if (src.includes(anchor)) {
+    src = src.replace(anchor, `      ${marker}\n      // Gated but nothing over-prescribed: keep the coaching signal as structured QA metadata only.\n`);
+    changed = true;
+  } else if (src.includes(alreadyCleanAnchor)) {
+    src = src.replace(alreadyCleanAnchor, `      ${marker}\n${alreadyCleanAnchor}`);
+    changed = true;
+  } else {
+    throw new Error('skill annotation cleanliness anchor missing');
+  }
+}
+
+if (/\[REVIEW\]\s*(?:Frequency below skill-family recommendation|\$\{family\} gated)/.test(src)) {
+  throw new Error('skill annotation cleanliness left a client review marker behind');
+}
+if (src.includes('out = annotateFamilyRow(out, family, maxPrescribed, note, isHebrew);')) {
+  throw new Error('skill annotation cleanliness left a client-note mutation behind');
 }
 
 if (changed) fs.writeFileSync(p, src);
