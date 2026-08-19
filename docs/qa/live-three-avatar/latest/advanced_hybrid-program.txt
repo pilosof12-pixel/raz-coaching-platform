@@ -1,89 +1,94 @@
-Priority stays on squat and One-Arm Pull-up quality, with OHP progressed at a recoverable dose and marathon work kept to one real weekly run so MMA quality stays intact. Friday is intentionally low-cost; if MMA fatigue is high, cut the final accessory there first.
+Primary work stays centered on strict One-Arm Pull-up quality and two weekly Back Squat exposures, with strict Overhead Press progressing without stealing freshness from MMA. Running stays at 1 direct weekly exposure as a recoverable marathon pathway.
 
-Weeks 2-4: add load only if the prior week stayed inside the target RPE with clean reps. One-Arm Pull-up progression comes from cleaner singles and less assistance, not from piling on extra strict sets. The long run progresses by small distance bumps only.
+Weeks 2-4: only move loads or assistance down if Week 1 lands inside the stated RPE with clean reps. For strict One-Arm Pull-up, keep the hard set count stable through Week 3 and progress by cleaner singles and slightly less help on the assisted day; Week 4 trims fatigue but keeps the best earned standard.
 
-If elbows get cranky, keep strict One-Arm Pull-up reps very clean and reduce assistance-demand before reducing ROM; if shoulders feel beat up, swap Push Press for Dumbbell Shoulder Press at the same RPE; if knees/hips feel unusually heavy from MMA, keep Friday Back Squat at the low end of the load range and preserve bar speed.
+If elbows or biceps tendon feel cranky, keep strict One-Arm Pull-up reps crisp, lengthen rest, and reduce Assisted One-Arm Pull-up assistance progression for that week. If knees or low back feel beat up from MMA, keep both Back Squat exposures but trim the lowest-priority accessory first.
 
 START_WEEK1_TSV
 Day	Exercise	Weight	Sets	Reps	Rest	Target RPE	Notes	Results
-Mon	[WARMUP] Band Pull-Apart Warm-up	Light	2	15	45s	4	Scap and upper-back prep before pulling and pressing.; Squat-and-reach x 6; Bodyweight squat x 8; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Band shoulder pass-through x 10; Wall slide x 8; Ramp Back Squat: 65 kg x 5, 100 kg x 3, 127.5 kg x 1-2 before 165 kg work sets.; Keep the warm-up specific and non-fatiguing.	
-Mon	One-Arm Pull-up	Bodyweight	4	1 each side	2-3 min	8	Lead with weaker arm; clean full ROM; stop at least 1 rep before technical failure.	
-Mon	Back Squat	165 kg	3	3	3-4 min	7.5	Compact heavy exposure; brace hard and keep all reps crisp.	
-Mon	Push Press	RPE-selected load	3	3	2-3 min	7	Clear overload/support for OHP without grinding; dip-drive vertical.	
-Tue	[WARMUP] Deep Squat Hold	Bodyweight	2	30s	30s	3	Open hips and ankles, then start assisted pulling fresh.; Squat-and-reach x 6; Bodyweight squat x 8; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Keep the warm-up specific and non-fatiguing.	
-Tue	Assisted One-Arm Pull-up	Minimum assistance needed	2	1 per arm	2 min	6-6.5	Use the least help that keeps symmetrical clean reps each arm. Recovery-first pulling microdose: technical adjacent-day exposure only, keep it at RPE 6-6.5 or easier and stop well before local fatigue.	
-Tue	Dumbbell Bulgarian Split Squat	RPE-selected load	2	8 each leg	90s	6.5	Support lower-body strength with low fatigue; smooth tempo.	
-Tue	Chest-Supported Row	RPE-selected load	2	8	90s	7	Upper-back support without extra low-back fatigue.	
-Fri	[WARMUP] Band Pull-Apart Warm-up	Light	2	15	45s	4	Quick prep; keep this whole session low cost.; Squat-and-reach x 6; Bodyweight squat x 8; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Ramp Back Squat: 55 kg x 5, 80 kg x 3, 105 kg x 1-2 before 135 kg work sets.; Keep the warm-up specific and non-fatiguing.	
-Fri	Back Squat	135 kg	2	5	2-3 min	6.5	Lower-cost volume/specificity exposure; fast concentric, no grind.	
-Fri	Chin-up	RPE-selected load	2	4	2-3 min	7.5	Bilateral strength reserve for One-Arm Pull-up; elbows and grip should feel fresh enough.	
-Fri	Neck Isometric	Bodyweight	2	20s each direction	45s	6	Front, back, and each side; steady pressure, no straining.	
-Sun	[WARMUP] Band Pull-Apart Warm-up	Light	2	15	45s	4	Prime shoulders before strict pressing.; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Band shoulder pass-through x 10; Wall slide x 8; Ramp Overhead Press: 27.5 kg x 5, 40 kg x 3, 52.5 kg x 1-2 before 67.5 kg work sets.; Keep the warm-up specific and non-fatiguing.	
-Sun	Overhead Press	67.5 kg	4	4	2-3 min	7.5	Direct strict-OHP progression; no layback or grindy lockouts.	
-Sun	Barbell Hip Thrust	RPE-selected load	3	6	2 min	7	Posterior-chain support for squat with lower systemic cost.	
-Sun	Cable Row	RPE-selected load	2	8	90s	7	Keep torso quiet; clean squeeze and full reach.	
-Thu	Run	N/A	1	18 km	N/A	5-6	Easy long run for marathon pathway; relaxed conversational pace, no pace chasing.	
+Mon	[WARMUP] Back Squat	60-140 kg ramp	4	3	60-90 sec	N/A	Compact ramp to work sets; do not fatigue.; Squat-and-reach x 6; Bodyweight squat x 8; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Band shoulder pass-through x 10; Wall slide x 8; Ramp Back Squat: 65 kg x 5, 100 kg x 3, 127.5 kg x 1-2 before 165 kg work sets.; Keep the warm-up specific and non-fatiguing.	
+Mon	One-Arm Pull-up	Bodyweight	5	1 each side	2-3 min	8	Start with weaker arm; all singles clean, no grinding, stop at least 1 rep before technical failure.	
+Mon	Push Press	RPE-selected load	3	3	2-3 min	7.5	Secondary vertical-press overload; crisp leg drive and solid lockout.	
+Mon	Back Squat	165 kg	1	3	3-4 min	8	Heavy top set; braced, controlled descent, no grindy third rep.	
+Mon	Back Squat	155 kg	2	3	3-4 min	7.5	Back-off sets after top set; match depth and bar speed quality.	
+Tue	[WARMUP] Assisted One-Arm Pull-up	Easy assistance ramp	2	2 each side	60 sec	N/A	Find minimum assistance that allows clean symmetrical reps.; Squat-and-reach x 6; Bodyweight squat x 8; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Keep the warm-up specific and non-fatiguing.	
+Tue	Assisted One-Arm Pull-up	RPE-selected assistance	2	1 per arm	2 min	6-6.5	Same-day MMA friendly; clean full ROM, no twisting or kipping. Recovery-first pulling microdose: technical adjacent-day exposure only, keep it at RPE 6-6.5 or easier and stop well before local fatigue.	
+Tue	Dumbbell Bulgarian Split Squat	RPE-selected load	2	6 each side	90-120 sec	7	Compact lower support only; leave 2-3 reps in reserve.	
+Tue	Chest-Supported Row	RPE-selected load	2	8	90 sec	7	Upper-back support without extra elbow stress.	
+Thu	Run	RPE-selected easy pace	1	18 km	N/A	5-6	Long run only; relaxed conversational effort clearly easy throughout.	
+Fri	[WARMUP] Chin-up	Bodyweight	2	3	60 sec	N/A	Easy ramp; save elbows for loaded work.; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Keep the warm-up specific and non-fatiguing.	
+Fri	Chin-up	RPE-selected load	3	4	2-3 min	7.5	Bilateral strength reserve for One-Arm Pull-up; if elbows feel off, keep load and lower RPE rather than forcing reps.	
+Fri	Hip Thrust	RPE-selected load	2	6	90-120 sec	7	Low-cost posterior-chain support.	
+Fri	Side Plank	Bodyweight	2	30 sec each side	45-60 sec	6	Brace hard; low-cost trunk stiffness work.	
+Fri	Neck Isometric	Bodyweight	2	20 sec each direction	30-45 sec	6	Flexion, extension, and each side bend within each set; easy robustness dose.	
+Sun	[WARMUP] Overhead Press	20-55 kg ramp	3	3	60-90 sec	N/A	Compact ramp; keep shoulders fresh.; Squat-and-reach x 6; Bodyweight squat x 8; Band shoulder pass-through x 10; Wall slide x 8; Ramp Overhead Press: 27.5 kg x 5, 40 kg x 3, 52.5 kg x 1-2 before 67.5 kg work sets.; Ramp Back Squat: 55 kg x 5, 85 kg x 3, 110 kg x 1-2 before 140 kg work sets.; Keep the warm-up specific and non-fatiguing.	
+Sun	Overhead Press	67.5 kg	4	4	2-3 min	7.5	Direct strict press exposure; no layback.	
+Sun	Back Squat	140 kg	3	5	2-3 min	6.5	Lower-cost volume/specificity exposure; smooth reps, no grind.	
+Sun	Machine Hamstring Curl	RPE-selected load	2	8	60-90 sec	7	Short posterior-chain support; first accessory to cut if fatigue is high.	
 END_WEEK1_TSV
-
 START_WEEK2_TSV
 Day	Exercise	Weight	Sets	Reps	Rest	Target RPE	Notes	Results
-Mon	[WARMUP] Band Pull-Apart Warm-up	Light	2	15	45s	4	Scap and upper-back prep before pulling and pressing.; Squat-and-reach x 6; Bodyweight squat x 8; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Band shoulder pass-through x 10; Wall slide x 8; Ramp Back Squat: 67.5 kg x 5, 100 kg x 3, 130 kg x 1-2 before 167.5 kg work sets.; Keep the warm-up specific and non-fatiguing.	
-Mon	One-Arm Pull-up	Bodyweight	4	1 each side	2-3 min	8	Same strict single count; aim for cleaner path and stronger top position.	
-Mon	Back Squat	167.5 kg	3	3	3-4 min	8	Add load only if Week 1 stayed crisp.	
-Mon	Push Press	RPE-selected load	3	3	2-3 min	7	Small load increase only if timing stayed sharp.	
-Tue	[WARMUP] Deep Squat Hold	Bodyweight	2	30s	30s	3	Open hips and ankles, then start assisted pulling fresh.; Squat-and-reach x 6; Bodyweight squat x 8; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Keep the warm-up specific and non-fatiguing.	
-Tue	Assisted One-Arm Pull-up	Slightly less assistance than Week 1	2	1 per arm	2 min	6-6.5	Keep reps symmetrical and clean; reduce help before adding fatigue. Recovery-first pulling microdose: technical adjacent-day exposure only, keep it at RPE 6-6.5 or easier and stop well before local fatigue.	
-Tue	Dumbbell Bulgarian Split Squat	RPE-selected load	2	8 each leg	90s	6.5	Hold stable unless recovery feels excellent.	
-Tue	Chest-Supported Row	RPE-selected load	2	8	90s	7	Hold stable and smooth.	
-Fri	[WARMUP] Band Pull-Apart Warm-up	Light	2	15	45s	4	Quick prep; keep this whole session low cost.; Squat-and-reach x 6; Bodyweight squat x 8; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Ramp Back Squat: 55 kg x 5, 85 kg x 3, 110 kg x 1-2 before 140 kg work sets.; Keep the warm-up specific and non-fatiguing.	
-Fri	Back Squat	140 kg	2	5	2-3 min	6.5	Same low-cost role; bar speed first.	
-Fri	Chin-up	RPE-selected load	2	4	2-3 min	7.5	Support strength only; do not chase failure.	
-Fri	Neck Isometric	Bodyweight	2	20s each direction	45s	6	Front, back, and each side; steady pressure, no straining.	
-Sun	[WARMUP] Band Pull-Apart Warm-up	Light	2	15	45s	4	Prime shoulders before strict pressing.; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Band shoulder pass-through x 10; Wall slide x 8; Ramp Overhead Press: 27.5 kg x 5, 42.5 kg x 3, 55 kg x 1-2 before 70 kg work sets.; Keep the warm-up specific and non-fatiguing.	
-Sun	Overhead Press	67.5 kg	4	4	2-3 min	7.5	Add load only if all Week 1 reps were clean.	
-Sun	Barbell Hip Thrust	RPE-selected load	3	6	2 min	7	Hold or add a small amount if recovery is good.	
-Sun	Cable Row	RPE-selected load	2	8	90s	7	Keep torso quiet; clean squeeze and full reach.	
-Thu	Run	N/A	1	18 km	N/A	5-6	Easy long run; keep it clearly below threshold. Secondary endurance is held at the Week 1 tolerated dose so primary squat/One-Arm Pull-up progress and MMA recovery keep the recovery budget.	
+Mon	[WARMUP] Back Squat	60-145 kg ramp	4	3	60-90 sec	N/A	Compact ramp to work sets; do not fatigue.; Squat-and-reach x 6; Bodyweight squat x 8; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Band shoulder pass-through x 10; Wall slide x 8; Ramp Back Squat: 67.5 kg x 5, 100 kg x 3, 130 kg x 1-2 before 167.5 kg work sets.; Keep the warm-up specific and non-fatiguing.	
+Mon	One-Arm Pull-up	Bodyweight	5	1 each side	2-3 min	8	Start with weaker arm; aim for cleaner path and firmer top position than Week 1.	
+Mon	Push Press	RPE-selected load	3	3	2-3 min	7.5	Add load only if Week 1 lockouts were crisp.	
+Mon	Back Squat	167.5 kg	1	3	3-4 min	8	Increase only if Week 1 top set stayed clean at target RPE.	
+Mon	Back Squat	157.5 kg	2	3	3-4 min	7.5	Back-off sets after top set; match depth and bar speed quality.	
+Tue	[WARMUP] Assisted One-Arm Pull-up	Easy assistance ramp	2	2 each side	60 sec	N/A	Find minimum assistance that allows clean symmetrical reps.; Squat-and-reach x 6; Bodyweight squat x 8; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Keep the warm-up specific and non-fatiguing.	
+Tue	Assisted One-Arm Pull-up	RPE-selected assistance	2	1 per arm	2 min	6-6.5	Use slightly less assistance than Week 1 only if both arms stayed clean. Recovery-first pulling microdose: technical adjacent-day exposure only, keep it at RPE 6-6.5 or easier and stop well before local fatigue.	
+Tue	Dumbbell Bulgarian Split Squat	RPE-selected load	2	6 each side	90-120 sec	7	Compact lower support only; leave 2-3 reps in reserve.	
+Tue	Chest-Supported Row	RPE-selected load	2	8	90 sec	7	Upper-back support without extra elbow stress.	
+Thu	Run	RPE-selected easy pace	1	18 km	N/A	5-6	Long run only; relaxed conversational effort clearly easy throughout. Secondary endurance is held at the Week 1 tolerated dose so primary squat/One-Arm Pull-up progress and MMA recovery keep the recovery budget.	
+Fri	[WARMUP] Chin-up	Bodyweight	2	3	60 sec	N/A	Easy ramp; save elbows for loaded work.; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Keep the warm-up specific and non-fatiguing.	
+Fri	Chin-up	RPE-selected load	3	4	2-3 min	7.5	Only increase if Week 1 reps were strong and elbows felt good.	
+Fri	Hip Thrust	RPE-selected load	2	6	90-120 sec	7	Low-cost posterior-chain support.	
+Fri	Side Plank	Bodyweight	2	30 sec each side	45-60 sec	6	Brace hard; low-cost trunk stiffness work.	
+Fri	Neck Isometric	Bodyweight	2	20 sec each direction	30-45 sec	6	Flexion, extension, and each side bend within each set; easy robustness dose.	
+Sun	[WARMUP] Overhead Press	20-57.5 kg ramp	3	3	60-90 sec	N/A	Compact ramp; keep shoulders fresh.; Squat-and-reach x 6; Bodyweight squat x 8; Band shoulder pass-through x 10; Wall slide x 8; Ramp Overhead Press: 27.5 kg x 5, 42.5 kg x 3, 55 kg x 1-2 before 70 kg work sets.; Ramp Back Squat: 57.5 kg x 5, 85 kg x 3, 110 kg x 1-2 before 142.5 kg work sets.; Keep the warm-up specific and non-fatiguing.	
+Sun	Overhead Press	67.5 kg	4	4	2-3 min	7.5	Hold the Week 1 strict-press dose at 67.5 kg in this build week; progress rep quality and bar speed, not load. No layback or grindy lockouts.	
+Sun	Back Squat	142.5 kg	3	5	2-3 min	6.5	Lower-cost volume/specificity exposure; smooth reps, no grind.	
+Sun	Machine Hamstring Curl	RPE-selected load	2	8	60-90 sec	7	Short posterior-chain support; first accessory to cut if fatigue is high.	
 END_WEEK2_TSV
-
 START_WEEK3_TSV
 Day	Exercise	Weight	Sets	Reps	Rest	Target RPE	Notes	Results
-Mon	[WARMUP] Band Pull-Apart Warm-up	Light	2	15	45s	4	Scap and upper-back prep before pulling and pressing.; Squat-and-reach x 6; Bodyweight squat x 8; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Band shoulder pass-through x 10; Wall slide x 8; Ramp Back Squat: 67.5 kg x 5, 102.5 kg x 3, 132.5 kg x 1-2 before 170 kg work sets.; Keep the warm-up specific and non-fatiguing.	
-Mon	One-Arm Pull-up	Bodyweight	4	1 each side	2-3 min	8-8.5	Same strict single count; best-quality singles of the block, still short of breakdown.	
-Mon	Back Squat	170 kg	3	3	3-4 min	8	Only take this bump if Week 2 moved well.	
-Mon	Push Press	RPE-selected load	3	3	2-3 min	7	Slight overload if shoulders feel good; otherwise repeat Week 2.	
-Tue	[WARMUP] Deep Squat Hold	Bodyweight	2	30s	30s	3	Open hips and ankles, then start assisted pulling fresh.; Squat-and-reach x 6; Bodyweight squat x 8; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Keep the warm-up specific and non-fatiguing.	
-Tue	Assisted One-Arm Pull-up	Same or slightly less assistance than Week 2	2	1 per arm	2 min	6-6.5	Add reps only if Week 2 assistance and symmetry were solid. Recovery-first pulling microdose: technical adjacent-day exposure only, keep it at RPE 6-6.5 or easier and stop well before local fatigue.	
-Tue	Dumbbell Bulgarian Split Squat	RPE-selected load	2	8 each leg	90s	6.5	Keep this supportive, not exhausting.	
-Tue	Chest-Supported Row	RPE-selected load	2	8	90s	7	Hold stable and smooth.	
-Fri	[WARMUP] Band Pull-Apart Warm-up	Light	2	15	45s	4	Quick prep; keep this whole session low cost.; Squat-and-reach x 6; Bodyweight squat x 8; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Ramp Back Squat: 57.5 kg x 5, 85 kg x 3, 110 kg x 1-2 before 142.5 kg work sets.; Keep the warm-up specific and non-fatiguing.	
-Fri	Back Squat	142.5 kg	2	5	2-3 min	6.5	Low-cost specificity; preserve freshness for MMA and next week.	
-Fri	Chin-up	RPE-selected load	2	4	2-3 min	8	Heavy enough to matter, still submaximal and elbow-friendly.	
-Fri	Neck Isometric	Bodyweight	2	20s each direction	45s	6	Front, back, and each side; steady pressure, no straining.	
-Sun	[WARMUP] Band Pull-Apart Warm-up	Light	2	15	45s	4	Prime shoulders before strict pressing.; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Band shoulder pass-through x 10; Wall slide x 8; Ramp Overhead Press: 30 kg x 5, 42.5 kg x 3, 57.5 kg x 1-2 before 72.5 kg work sets.; Keep the warm-up specific and non-fatiguing.	
-Sun	Overhead Press	67.5 kg	4	4	2-3 min	7.5	Take only if Week 2 was clean; otherwise repeat 70 kg.	
-Sun	Barbell Hip Thrust	RPE-selected load	3	6	2 min	7-7.5	Small load bump only if recovery remains good.	
-Sun	Cable Row	RPE-selected load	2	8	90s	7	Keep torso quiet; clean squeeze and full reach.	
-Thu	Run	N/A	1	18 km	N/A	5-6	Easy long run; match distance with calm aerobic pacing. Secondary endurance is held at the Week 1 tolerated dose so primary squat/One-Arm Pull-up progress and MMA recovery keep the recovery budget.	
+Mon	[WARMUP] Back Squat	60-150 kg ramp	4	3	60-90 sec	N/A	Compact ramp to work sets; do not fatigue.; Squat-and-reach x 6; Bodyweight squat x 8; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Band shoulder pass-through x 10; Wall slide x 8; Ramp Back Squat: 67.5 kg x 5, 102.5 kg x 3, 132.5 kg x 1-2 before 170 kg work sets.; Keep the warm-up specific and non-fatiguing.	
+Mon	One-Arm Pull-up	Bodyweight	5	1 each side	2-3 min	8-8.5	Start with weaker arm; keep set count stable and earn better singles, not more fatigue.	
+Mon	Push Press	RPE-selected load	3	3	2-3 min	7.5	Add load only if Week 2 lockouts were crisp.	
+Mon	Back Squat	170 kg	1	3	3-4 min	8-8.5	Only use if Week 2 stayed inside target RPE with clean depth.	
+Mon	Back Squat	160 kg	2	3	3-4 min	7.5-8	Back-off sets after top set; match depth and bar speed quality.	
+Tue	[WARMUP] Assisted One-Arm Pull-up	Easy assistance ramp	2	2 each side	60 sec	N/A	Find minimum assistance that allows clean symmetrical reps.; Squat-and-reach x 6; Bodyweight squat x 8; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Keep the warm-up specific and non-fatiguing.	
+Tue	Assisted One-Arm Pull-up	RPE-selected assistance	2	1 per arm	2 min	6-6.5	Use the least help that still gives clean doubles per arm. Recovery-first pulling microdose: technical adjacent-day exposure only, keep it at RPE 6-6.5 or easier and stop well before local fatigue.	
+Tue	Dumbbell Bulgarian Split Squat	RPE-selected load	2	6 each side	90-120 sec	7	Compact lower support only; leave 2-3 reps in reserve.	
+Tue	Chest-Supported Row	RPE-selected load	2	8	90 sec	7	Upper-back support without extra elbow stress.	
+Thu	Run	RPE-selected easy pace	1	18 km	N/A	5-6	Long run only; stay easy enough to finish with stable form and breathing. Secondary endurance is held at the Week 1 tolerated dose so primary squat/One-Arm Pull-up progress and MMA recovery keep the recovery budget.	
+Fri	[WARMUP] Chin-up	Bodyweight	2	3	60 sec	N/A	Easy ramp; save elbows for loaded work.; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Keep the warm-up specific and non-fatiguing.	
+Fri	Chin-up	RPE-selected load	3	4	2-3 min	7.5-8	Only increase if Week 2 was clean and elbows/grip felt normal.	
+Fri	Hip Thrust	RPE-selected load	2	6	90-120 sec	7	Low-cost posterior-chain support.	
+Fri	Side Plank	Bodyweight	2	30 sec each side	45-60 sec	6	Brace hard; low-cost trunk stiffness work.	
+Fri	Neck Isometric	Bodyweight	2	20 sec each direction	30-45 sec	6	Flexion, extension, and each side bend within each set; easy robustness dose.	
+Sun	[WARMUP] Overhead Press	20-60 kg ramp	3	3	60-90 sec	N/A	Compact ramp; keep shoulders fresh.; Squat-and-reach x 6; Bodyweight squat x 8; Band shoulder pass-through x 10; Wall slide x 8; Ramp Overhead Press: 30 kg x 5, 42.5 kg x 3, 57.5 kg x 1-2 before 72.5 kg work sets.; Ramp Back Squat: 57.5 kg x 5, 87.5 kg x 3, 112.5 kg x 1-2 before 145 kg work sets.; Keep the warm-up specific and non-fatiguing.	
+Sun	Overhead Press	67.5 kg	4	4	2-3 min	7.5	Hold the Week 1 strict-press dose at 67.5 kg in this build week; progress rep quality and bar speed, not load. No layback or grindy lockouts.	
+Sun	Back Squat	145 kg	3	5	2-3 min	6.5-7	Lower-cost volume/specificity exposure; smooth reps, no grind.	
+Sun	Machine Hamstring Curl	RPE-selected load	2	8	60-90 sec	7	Short posterior-chain support; first accessory to cut if fatigue is high.	
 END_WEEK3_TSV
-
 START_WEEK4_TSV
 Day	Exercise	Weight	Sets	Reps	Rest	Target RPE	Notes	Results
-Mon	[WARMUP] Band Pull-Apart Warm-up	Light	2	15	45s	4	Scap and upper-back prep before pulling and pressing.; Squat-and-reach x 6; Bodyweight squat x 8; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Band shoulder pass-through x 10; Wall slide x 8; Ramp Back Squat: 67.5 kg x 5, 100 kg x 3, 130 kg x 1-2 before 167.5 kg work sets.; Keep the warm-up specific and non-fatiguing.	
-Mon	One-Arm Pull-up	Bodyweight	3	1 each side	2-3 min	8	Keep the best Week 3 rep standard with one fewer set.	
-Mon	Back Squat	167.5 kg	2	3	3-4 min	7.5	Consolidate; keep speed and positions sharp.	
-Mon	Push Press	RPE-selected load	2	3	2-3 min	6.5-7	Reduced volume; keep it snappy.	
-Tue	[WARMUP] Deep Squat Hold	Bodyweight	2	30s	30s	3	Open hips and ankles, then start assisted pulling fresh.; Squat-and-reach x 6; Bodyweight squat x 8; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Keep the warm-up specific and non-fatiguing.	
-Tue	Assisted One-Arm Pull-up	Best Week 3 assistance	2	1 per arm	2 min	6-6.5	Keep the cleaner assistance standard with less total work. Recovery-first pulling microdose: technical adjacent-day exposure only, keep it at RPE 6-6.5 or easier and stop well before local fatigue.	
-Tue	Dumbbell Bulgarian Split Squat	RPE-selected load	2	8 each leg	90s	6	Hold easy and technical.	
-Tue	Chest-Supported Row	RPE-selected load	2	8	90s	6.5	Smooth reps; no need to push loading.	
-Fri	[WARMUP] Band Pull-Apart Warm-up	Light	2	15	45s	4	Quick prep; keep this whole session low cost.; Squat-and-reach x 6; Bodyweight squat x 8; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Ramp Back Squat: 55 kg x 5, 80 kg x 3, 105 kg x 1-2 before 135 kg work sets.; Keep the warm-up specific and non-fatiguing.	
-Fri	Back Squat	135 kg	2	5	2-3 min	6	Easy specificity and bar speed only.	
-Fri	Chin-up	RPE-selected load	2	4	2-3 min	7	Hold support strength without adding fatigue.	
-Fri	Neck Isometric	Bodyweight	1	20s each direction	45s	6	First accessory to skip if combat fatigue is high.	
-Sun	[WARMUP] Band Pull-Apart Warm-up	Light	2	15	45s	4	Prime shoulders before strict pressing.; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Band shoulder pass-through x 10; Wall slide x 8; Ramp Overhead Press: 27.5 kg x 5, 42.5 kg x 3, 55 kg x 1-2 before 70 kg work sets.; Keep the warm-up specific and non-fatiguing.	
-Sun	Overhead Press	70 kg	3	4	2-3 min	7.5	Retain clean Week 2-3 movement quality with slightly less total work.	
-Sun	Barbell Hip Thrust	RPE-selected load	2	6	2 min	6.5	Reduce fatigue, keep pattern.	
-Sun	Cable Row	RPE-selected load	2	8	90s	6.5	Keep torso quiet; clean squeeze and full reach.	
-Thu	Run	N/A	1	16 km	N/A	5-6	Easy long run consolidation week; finish feeling like you could keep going.	
+Mon	[WARMUP] Back Squat	60-145 kg ramp	4	3	60-90 sec	N/A	Compact ramp to work sets; do not fatigue.; Squat-and-reach x 6; Bodyweight squat x 8; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Band shoulder pass-through x 10; Wall slide x 8; Ramp Back Squat: 67.5 kg x 5, 102.5 kg x 3, 132.5 kg x 1-2 before 170 kg work sets.; Keep the warm-up specific and non-fatiguing.	
+Mon	One-Arm Pull-up	Bodyweight	4	1 each side	2-3 min	8	Keep the best Week 3 standard; reduce one set rather than chasing extra fatigue.	
+Mon	Push Press	RPE-selected load	2	3	2-3 min	7	Hold or slightly reduce load; crisp supportive work only.	
+Mon	Back Squat	170 kg	1	2	3-4 min	8	Retain heavy specificity with less fatigue; use 167.5 kg if Week 3 overshot RPE.	
+Mon	Back Squat	155 kg	1	3	3-4 min	7.5	Single back-off set only; keep bar speed clean.	
+Tue	[WARMUP] Assisted One-Arm Pull-up	Easy assistance ramp	2	2 each side	60 sec	N/A	Find minimum assistance that allows clean symmetrical reps.; Squat-and-reach x 6; Bodyweight squat x 8; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Keep the warm-up specific and non-fatiguing.	
+Tue	Assisted One-Arm Pull-up	RPE-selected assistance	2	1 per arm	2 min	6-6.5	Hold the best Week 3 assistance standard if clean; do not force harder reps. Recovery-first pulling microdose: technical adjacent-day exposure only, keep it at RPE 6-6.5 or easier and stop well before local fatigue.	
+Tue	Dumbbell Bulgarian Split Squat	RPE-selected load	2	6 each side	90-120 sec	6.5	Compact lower support only; keep it comfortable this week.	
+Tue	Chest-Supported Row	RPE-selected load	2	8	90 sec	6.5	Upper-back support without extra elbow stress.	
+Thu	Run	RPE-selected easy pace	1	16 km	N/A	5	Consolidation long run; keep it easy and fresh, not a test.	
+Fri	[WARMUP] Chin-up	Bodyweight	2	3	60 sec	N/A	Easy ramp; save elbows for loaded work.; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Keep the warm-up specific and non-fatiguing.	
+Fri	Chin-up	RPE-selected load	2	4	2-3 min	7	Low-cost support only; keep elbows happy.	
+Fri	Hip Thrust	RPE-selected load	2	6	90-120 sec	6.5	Low-cost posterior-chain support.	
+Fri	Side Plank	Bodyweight	2	30 sec each side	45-60 sec	6	Brace hard; low-cost trunk stiffness work.	
+Fri	Neck Isometric	Bodyweight	2	20 sec each direction	30-45 sec	6	Flexion, extension, and each side bend within each set; easy robustness dose.	
+Sun	[WARMUP] Overhead Press	20-55 kg ramp	3	3	60-90 sec	N/A	Compact ramp; keep shoulders fresh.; Squat-and-reach x 6; Bodyweight squat x 8; Band shoulder pass-through x 10; Wall slide x 8; Ramp Overhead Press: 27.5 kg x 5, 42.5 kg x 3, 55 kg x 1-2 before 70 kg work sets.; Ramp Back Squat: 55 kg x 5, 85 kg x 3, 110 kg x 1-2 before 140 kg work sets.; Keep the warm-up specific and non-fatiguing.	
+Sun	Overhead Press	70 kg	3	4	2-3 min	7.5	Hold this load only if Week 3 stayed clean and within target; otherwise repeat 67.5 kg with the same volume.	
+Sun	Back Squat	140 kg	2	5	2-3 min	6.5	Lower-cost volume/specificity exposure; smooth reps, no grind.	
+Sun	Machine Hamstring Curl	RPE-selected load	1	8	60-90 sec	6.5	Optional and first to cut if sport fatigue is high.	
 END_WEEK4_TSV

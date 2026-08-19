@@ -1,12 +1,12 @@
 {
-  "timestamp": "2026-08-19T10:23:01.892Z",
+  "timestamp": "2026-08-19T10:57:25.061Z",
   "base": "https://raz-coaching-platform.onrender.com",
-  "head_sha": "eb6645c1717300aee5743ef633f572d23d27be0e",
-  "runtime": "launch-acceptance-v30l-coaching-spec-v1-tactical-architecture-hardened-20260819",
+  "head_sha": "ee3afeba58e2617ef685f14dea87c98c9fd710e5",
+  "runtime": "launch-acceptance-v30m-hybrid-coherence-v1-20260819",
   "results": [
     {
       "id": "advanced_hybrid",
-      "job_id": "33e28f33f8ac36356dc8d59bfc2b75d3",
+      "job_id": "d368e82f0a5dbd20f595c8ec3c83f48c",
       "ok": true,
       "status": "done",
       "stage": "finalizing",
@@ -14,12 +14,12 @@
       "detail": "saving program",
       "last_seen_status": "done",
       "error": null,
-      "program_chars": 12661,
-      "seconds": 74
+      "program_chars": 14203,
+      "seconds": 76
     },
     {
       "id": "youth_gymnastics",
-      "job_id": "a4459b93a8e4c36990d3e8d88da7b4cd",
+      "job_id": "6664b24bebe63847c67c7024e6ba7657",
       "ok": true,
       "status": "done",
       "stage": "finalizing",
@@ -27,21 +27,21 @@
       "detail": "saving program",
       "last_seen_status": "done",
       "error": null,
-      "program_chars": 12953,
-      "seconds": 48
+      "program_chars": 13606,
+      "seconds": 112
     },
     {
       "id": "tactical_3k",
-      "job_id": "186d9723acc6dcbb4dea7766092314cd",
+      "job_id": "8737380bbf7ca7950a1f1fa12c549cc3",
       "ok": false,
       "status": "error",
-      "stage": "generating",
-      "attempt": 3,
-      "detail": "regenerating after quality check",
+      "stage": "refining",
+      "attempt": 4,
+      "detail": "internal repair: EVENT_PROGRESSING_SESSION_MISSING",
       "last_seen_status": "error",
-      "error": "OpenAI returned no output_text content. [QA:OPENAI_EMPTY_OUTPUT]",
+      "error": "Internal coaching QA could not repair the candidate program after multiple passes. No client-facing program was saved. Please retry the build. QA trace: A1:SPORT_DAY_COUPLING_VIOLATION+TACTICAL_SCHEDULE_ARCHITECTURE_VIOLATION+EVENT_PROGRESSING_SESSION_MISSING -> A2:EVENT_PROGRESSING_SESSION_MISSING -> A3:TACTICAL_SCHEDULE_ARCHITECTURE_VIOLATION+EVENT_PROGRESSING_SESSION_MISSING -> A4:EVENT_PROGRESSING_SESSION_MISSING. [QA:INTERNAL_QA_REPAIR_EXHAUSTED]",
       "program_chars": 0,
-      "seconds": 156
+      "seconds": 176
     }
   ],
   "ok": false
