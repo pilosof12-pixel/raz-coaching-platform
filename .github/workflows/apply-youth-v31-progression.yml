@@ -5,7 +5,7 @@ on:
     branches: [privacy-security-hardening]
     paths:
       - 'patches/youth-v31-progression-convergence.patch'
-      - '.github/workflows/apply-youth-v31-progression.yml'
+      - 'qa-triggers/youth-v32.txt'
 
 permissions:
   contents: write
