@@ -47,7 +47,7 @@ jobs:
           cp docs/qa/live-three-avatar/youth_gymnastics-program.txt docs/qa/live-three-avatar/latest/youth_gymnastics-program.txt
           cp docs/qa/live-three-avatar/tactical_3k-program.txt docs/qa/live-three-avatar/latest/tactical_3k-program.txt
           npm ci
-          node --test phase14/test/final_coaching_coherence_v33.test.js
+          (cd phase14 && node --test test/final_coaching_coherence_v33.test.js)
           rm -f docs/qa/live-three-avatar/latest/advanced_hybrid-program.txt docs/qa/live-three-avatar/latest/youth_gymnastics-program.txt docs/qa/live-three-avatar/latest/tactical_3k-program.txt
       - name: Commit v33
         if: steps.ready.outputs.ready == 'true'
