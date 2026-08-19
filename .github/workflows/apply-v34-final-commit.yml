@@ -1,0 +1,85 @@
+name: Apply v34 final commit
+
+on:
+  push:
+    branches:
+      - privacy-security-hardening
+
+permissions:
+  contents: write
+
+jobs:
+  apply-v34-final:
+    if: ${{ github.actor != 'github-actions[bot]' }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: privacy-security-hardening
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+
+      - name: Check final payload
+        id: ready
+        shell: bash
+        run: |
+          if [ -f .github/v34-final-commit.patch.b64 ]; then
+            echo "ready=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "ready=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Apply final v34 patch
+        if: steps.ready.outputs.ready == 'true'
+        shell: bash
+        run: |
+          set -euo pipefail
+          base64 -d .github/v34-final-commit.patch.b64 > /tmp/v34-final.patch
+          echo "Final patch checksum:"
+          sha256sum /tmp/v34-final.patch
+          echo "43a93dee79ce0b07e3aba881cb9df7fcb463e304b16e4d548383f89a4992ca1c  /tmp/v34-final.patch" | sha256sum -c -
+          git apply --check /tmp/v34-final.patch
+          git apply /tmp/v34-final.patch
+
+      - name: Install dependencies
+        if: steps.ready.outputs.ready == 'true'
+        run: npm ci --ignore-scripts
+
+      - name: Run dedicated v34 tests
+        if: steps.ready.outputs.ready == 'true'
+        working-directory: phase14
+        run: node --test test/v34_coaching_architecture.test.js
+
+      - name: Syntax checks
+        if: steps.ready.outputs.ready == 'true'
+        working-directory: phase14
+        run: |
+          node --check engine/phase15_planner.js
+          node --check engine/phase15_quality_rules.js
+          node --check engine/repairable_validation_bundle.js
+          node --check engine/v34_coaching_architecture.js
+          node --check engine/v34_prescription_consistency.js
+          node --check engine/v34_readiness.js
+          node --check engine/v34_workload_accounting.js
+
+      - name: Run full regression suite
+        if: steps.ready.outputs.ready == 'true'
+        working-directory: phase14
+        run: node --test test/*.test.js
+
+      - name: Commit final v34 engine
+        if: steps.ready.outputs.ready == 'true'
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm -f .github/v34-final-commit.patch.b64
+          rm -f .github/workflows/apply-v34-final-commit.yml
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -m "Apply v34 coaching architecture refinement"
+          git push origin HEAD:privacy-security-hardening
