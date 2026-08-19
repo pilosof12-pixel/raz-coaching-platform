@@ -1,12 +1,12 @@
 {
-  "timestamp": "2026-08-19T06:50:34.358Z",
+  "timestamp": "2026-08-19T10:23:01.892Z",
   "base": "https://raz-coaching-platform.onrender.com",
-  "head_sha": "d08db343468f61b6b13c798f476ab1bee697d23b",
-  "runtime": "launch-acceptance-v30k-coaching-spec-v1-advanced-oap-coaching-aligned-20260819",
+  "head_sha": "eb6645c1717300aee5743ef633f572d23d27be0e",
+  "runtime": "launch-acceptance-v30l-coaching-spec-v1-tactical-architecture-hardened-20260819",
   "results": [
     {
       "id": "advanced_hybrid",
-      "job_id": "6a496c4033c8a66ad382165204aa76a2",
+      "job_id": "33e28f33f8ac36356dc8d59bfc2b75d3",
       "ok": true,
       "status": "done",
       "stage": "finalizing",
@@ -14,12 +14,12 @@
       "detail": "saving program",
       "last_seen_status": "done",
       "error": null,
-      "program_chars": 14762,
-      "seconds": 78
+      "program_chars": 12661,
+      "seconds": 74
     },
     {
       "id": "youth_gymnastics",
-      "job_id": "d5947e73dd82c29e65d4f912bfb9dfca",
+      "job_id": "a4459b93a8e4c36990d3e8d88da7b4cd",
       "ok": true,
       "status": "done",
       "stage": "finalizing",
@@ -27,22 +27,22 @@
       "detail": "saving program",
       "last_seen_status": "done",
       "error": null,
-      "program_chars": 12193,
-      "seconds": 46
+      "program_chars": 12953,
+      "seconds": 48
     },
     {
       "id": "tactical_3k",
-      "job_id": "8f992f43801201c7bf40e763a8ab7415",
-      "ok": true,
-      "status": "done",
-      "stage": "finalizing",
-      "attempt": 0,
-      "detail": "saving program",
-      "last_seen_status": "done",
-      "error": null,
-      "program_chars": 11642,
-      "seconds": 87
+      "job_id": "186d9723acc6dcbb4dea7766092314cd",
+      "ok": false,
+      "status": "error",
+      "stage": "generating",
+      "attempt": 3,
+      "detail": "regenerating after quality check",
+      "last_seen_status": "error",
+      "error": "OpenAI returned no output_text content. [QA:OPENAI_EMPTY_OUTPUT]",
+      "program_chars": 0,
+      "seconds": 156
     }
   ],
-  "ok": true
+  "ok": false
 }
