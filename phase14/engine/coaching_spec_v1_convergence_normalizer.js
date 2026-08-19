@@ -88,9 +88,36 @@ function isWarmup(name) { return /^\s*\[WARMUP\]/i.test(String(name || '')); }
 // names. Always combined with a sets>=2 + parseable-distance gate (see
 // isKeyIntervalRow), so an easy/long single-set run is never matched.
 function isRunName(name) { return /\brun(?:ning)?\b/i.test(String(name || '')); }
+// The model does not always split an interval prescription into Sets + Reps. It
+// frequently writes the whole scheme inside one cell ("5 x 800 m") and leaves
+// Sets at 1. Reading the repetition count only from the Sets column made those
+// rows invisible to the key-interval detector, so the Week 1 event-progression
+// repair silently declined on exactly the programs that needed it. Recover the
+// scheme from the cell text when the Sets column does not carry it.
+function inlineIntervalScheme(raw) {
+  const s = String(raw || '');
+  const forward = s.match(/\b(\d{1,2})\s*(?:x|×)\s*(\d{2,4})\s*m\b/i);
+  if (forward) return { sets: Number(forward[1]), distance: Number(forward[2]) };
+  const reverse = s.match(/\b(\d{2,4})\s*m\s*(?:x|×)\s*(\d{1,2})\b/i);
+  if (reverse) return { sets: Number(reverse[2]), distance: Number(reverse[1]) };
+  return null;
+}
+// Resolve the effective repetition count and repetition distance for a running
+// row, whichever way the model chose to express them.
+function intervalScheme(parsed, cells) {
+  const setsCol = firstNum(cells[parsed.sets]) ?? 0;
+  const repsDistance = parseDistanceMeters(cells[parsed.reps]);
+  if (setsCol >= 2 && Number.isFinite(repsDistance)) return { sets: setsCol, distance: repsDistance };
+  for (const idx of [parsed.reps, parsed.load]) {
+    if (!Number.isInteger(idx)) continue;
+    const inline = inlineIntervalScheme(cells[idx]);
+    if (inline && inline.sets >= 2 && inline.distance >= 100) return inline;
+  }
+  return null;
+}
 function isKeyIntervalRow(parsed, cells) {
   if (isWarmup(cells[parsed.exercise]) || !isRunName(cells[parsed.exercise])) return false;
-  return (firstNum(cells[parsed.sets]) ?? 0) >= 2 && Number.isFinite(parseDistanceMeters(cells[parsed.reps]));
+  return intervalScheme(parsed, cells) !== null;
 }
 function isLowerStrengthName(name) {
   return /^\s*(?:Back Squat|Front Squat|Deadlift|Conventional Deadlift|Romanian Deadlift|Split Squat|Bulgarian Split Squat|Reverse Lunge|Forward Lunge|Walking Lunge)\s*$/i.test(String(name || ''));
@@ -326,10 +353,89 @@ function priorWeekdayName(day) {
   return idx < 0 ? null : WEEKDAYS[(idx + 6) % 7];
 }
 
+// Current demonstrated ruck pace, e.g. "10 km ruck with 20 kg: 95 min" -> 570 s/km.
+// Used to anchor a ruck prescription to real capacity, never to goal pace.
+function currentRuckPaceSecPerKm(intake = {}) {
+  const source = `${txt(intake.current_numbers)} ${txt(intake.performance_markers)} ${txt(intake.clarification_answers)}`;
+  const m = source.match(/(\d+(?:\.\d+)?)\s*km[^\n|]{0,40}?ruck[^\n|]{0,40}?:?\s*(\d{2,3})\s*min/i)
+    || source.match(/ruck[^\n|]{0,40}?(\d+(?:\.\d+)?)\s*km[^\n|]{0,40}?(\d{2,3})\s*min/i);
+  if (!m) return null;
+  const km = Number(m[1]);
+  const minutes = Number(m[2]);
+  if (!(km > 0) || !(minutes > 0)) return null;
+  return (minutes * 60) / km;
+}
+function isRuckRowName(name) {
+  return /\b(?:ruck(?:ing)?|ruck march|loaded march|pack march|backpack march|backpack carry)\b/i.test(String(name || ''));
+}
+function hasClockTarget(raw) { return /\b\d{1,2}:\d{2}\b/.test(String(raw || '')); }
+
+// The rucking goal is a second, independent event goal for this athlete, and the
+// validator evaluates it separately from running. A ruck row that states load and
+// distance but no pace target is not progression-bearing, so it raises the very
+// same EVENT_PROGRESSING_SESSION_MISSING code under details.key === 'rucking'.
+// No running repair can ever clear it. Anchor the EXISTING ruck row to the
+// athlete's demonstrated ruck pace: no added session, distance or load, and the
+// same pace band in every week so no second variable starts progressing (T3K-06).
+function annotateRuckPace(candidate, intake, repairs) {
+  const paceSec = currentRuckPaceSecPerKm(intake);
+  if (!Number.isFinite(paceSec)) return { program: candidate, changed: false };
+  const band = `${formatClock(paceSec)}-${formatClock(paceSec + 10)}/km`;
+  let program = candidate;
+  let changed = false;
+  for (let week = 1; week <= 4; week++) {
+    const parsed = parseWeek(program, week);
+    if (!parsed || !Number.isInteger(parsed.load)) continue;
+    let weekChanged = false;
+    parsed.rows.forEach((cells, row) => {
+      const name = cells[parsed.exercise];
+      if (isWarmup(name) || !isRuckRowName(name)) return;
+      const load = String(cells[parsed.load] || '');
+      if (hasClockTarget(load)) return;
+      if (!/\d/.test(load)) return;
+      cells[parsed.load] = `${load.trim()} @ ${band}`;
+      if (Number.isInteger(parsed.notes)) {
+        cells[parsed.notes] = addCue(
+          cells[parsed.notes],
+          `Pace anchored to the current demonstrated ruck capacity (${formatClock(paceSec)}/km), not goal pace; hold load and distance while pace settles.`,
+          'pace anchored to the current demonstrated ruck capacity',
+        );
+      }
+      repairs.push({ type: 'tactical_ruck_event_pace_anchored', week, row });
+      weekChanged = true;
+      changed = true;
+    });
+    if (weekChanged) program = rebuild(program, parsed);
+  }
+  return { program, changed };
+}
+
+// Convergence contract helper. Re-parses the given program's Week 1 and asks the
+// REAL validator whether the running instance of EVENT_PROGRESSING_SESSION_MISSING
+// is still present. Never infer success from what was written -- measure it.
+function eventFlagKeys(program, intake) {
+  const week1 = parseWeek(program, 1);
+  if (!week1) return null;
+  const guardrailParsed = {
+    idx: { day: week1.day, exercise: week1.exercise, weight: week1.load, sets: week1.sets, reps: week1.reps, notes: week1.notes },
+    rows: week1.rows.map((cells) => ({ cells })),
+  };
+  return endurancePerformanceIntegrityFlags(program, intake, guardrailParsed)
+    .filter((f) => f.code === 'EVENT_PROGRESSING_SESSION_MISSING')
+    .map((f) => f.details?.key || 'unknown');
+}
+function runningEventFlagPresent(program, intake) {
+  const keys = eventFlagKeys(program, intake);
+  return keys === null ? null : keys.includes('running');
+}
+
 export function normalizeTactical3KRaceSpecificity(program, intake = {}) {
   const original = String(program || '');
-  if (!isTactical3KLike(intake)) return { program: original, repaired: false, repairs: [] };
+  if (!isTactical3KLike(intake)) return { program: original, repaired: false, repairs: [], event_progression: { applicable: false, unrepaired_reason: 'not_tactical_3k_like' } };
 
+  // Entry state, measured with the real validator so the postcondition below can
+  // tell 'was never broken' apart from 'was broken and is still broken'.
+  const entryRunningFlag = runningEventFlagPresent(original, intake);
   let candidate = original;
   const repairs = [];
   const snapshots = [];
@@ -371,7 +477,10 @@ export function normalizeTactical3KRaceSpecificity(program, intake = {}) {
         });
         if (target) {
           const { cells, row } = target;
-          const distance = parseDistanceMeters(cells[week1.reps]) || 400;
+          // Use the resolved scheme so an inline "5 x 800 m" prescription keeps its
+          // real repetition count instead of inheriting a Sets cell of 1.
+          const scheme = intervalScheme(week1, cells);
+          const distance = (scheme && scheme.distance) || parseDistanceMeters(cells[week1.reps]) || 400;
           const low = current * (distance / 3000) * 0.97;
           const high = current * (distance / 3000) * 1.00;
           const before = {
@@ -381,6 +490,7 @@ export function normalizeTactical3KRaceSpecificity(program, intake = {}) {
             reps: cells[week1.reps],
           };
           cells[week1.exercise] = 'Run';
+          if (scheme && (firstNum(cells[week1.sets]) ?? 0) < 2) cells[week1.sets] = String(scheme.sets);
           cells[week1.reps] = `${distance} m`;
           if (Number.isInteger(week1.load)) cells[week1.load] = `${distance} m @ ${formatClock(low)}-${formatClock(high)}`;
           if (Number.isInteger(week1.notes)) {
@@ -551,5 +661,36 @@ export function normalizeTactical3KRaceSpecificity(program, intake = {}) {
     if (changed) candidate = rebuild(candidate, parsed);
   }
 
-  return { program: candidate, repaired: repairs.length > 0, repairs };
+  const ruckAnchor = annotateRuckPace(candidate, intake, repairs);
+  candidate = ruckAnchor.program;
+
+  // Convergence contract. The Week 1 running event-progression defect is the one
+  // this normalizer exists to close, so its outcome is measured against the real
+  // validator rather than inferred from what was written. The result always
+  // states either that the running flag is gone, or a deterministic reason why it
+  // could not be repaired safely. It must never report a repair while returning a
+  // candidate that still carries the same running flag.
+  const post = runningEventFlagPresent(candidate, intake);
+  const postKeys = eventFlagKeys(candidate, intake);
+  const eventRepairs = repairs.filter((r) => /week1_event_session|event_session_from_generic_run/.test(r.type));
+  const event_progression = {
+    applicable: true,
+    repair_attempted: entryRunningFlag === true,
+    target_row_found: eventRepairs.length > 0,
+    post_repair_event_bearing: post === false,
+    post_repair_running_flag: post,
+    // Every modality the validator still rejects, so a non-running instance (e.g.
+    // the concurrent rucking goal) can never masquerade as a cleared running flag.
+    post_repair_flag_keys: postKeys,
+    unrepaired_reason: null,
+  };
+  if (Array.isArray(postKeys) && postKeys.length && !event_progression.unrepaired_reason) {
+    event_progression.unrepaired_reason = `event_flag_remains:${[...new Set(postKeys)].sort().join(',')}`;
+  }
+  if (entryRunningFlag === true && post !== false) {
+    event_progression.unrepaired_reason = eventRepairs.length > 0
+      ? 'repair_applied_but_flag_persists'
+      : (Number.isFinite(current) ? 'no_safe_repair_target' : 'no_current_3k_benchmark');
+  }
+  return { program: candidate, repaired: repairs.length > 0, repairs, event_progression };
 }

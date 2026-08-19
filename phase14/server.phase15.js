@@ -1,0 +1,2239 @@
+// Raz AI Coaching Platform — backend "brain"
+// Portable Express server. Runs the v10.8 coaching engine via Gemini and stores
+// each client's program privately (per-client token). Works on any Node host.
+//
+// Two ways to power the AI, auto-detected at startup:
+//   1) PRODUCTION: your own Gemini API key  -> set GEMINI_API_KEY env var
+//   2) LOCAL TEST: Perplexity sandbox proxy -> set USE_PPLX_PROXY=1 (dev only)
+//
+// Storage: Supabase (Postgres) when SUPABASE_URL + SUPABASE_ANON_KEY are set;
+// otherwise SQLite at data/data.db for local dev. See storage.js.
+
+import express from "express";
+import rateLimit from "express-rate-limit";
+import fs from "node:fs";
+import path from "node:path";
+import crypto from "node:crypto";
+import { fileURLToPath } from "node:url";
+import { makeStorage } from "./storage.js";
+import { phase15PromptRules, repairPhase15Program } from "./engine/phase15_program_qa.js";
+import { validatePhase15FinalProgram } from "./engine/phase15_final_qa.js";
+import { buildDeterministicBrief } from "./engine/phase15_planner.js";
+import { buildPhase15SourceGrounding } from "./engine/phase15_source_router.js";
+import { EXERCISE_DICTIONARY } from "./engine/exercise_dictionary.js";
+import { registerAdminQaRoutes } from "./admin_qa_routes.js";
+// Engine v19: deterministic post-generation validators (dependency-free module,
+// also imported directly by test/v19_validators.test.js).
+import {
+  validateExercisesAgainstDictionary,
+  validateAndCalibrateSkills,
+  validateEquipmentAgainstLocation,
+  enforceUnilateralIntensityFloor,
+  enforceIntradayConditioningOrder,
+  validateSportDayCoupling,
+  validateWeeklyVolumeBudget,
+  reformatWarmupCells,
+  hardSubstitute,
+  RETRIABLE_CODES,
+} from "./engine/exercise_dictionary.js";
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const PORT = process.env.PORT || 8000;
+
+// ---------- Load the v10.8 engine instructions (system prompt) ----------
+const ENGINE = fs.readFileSync(
+  path.join(__dirname, "engine", "engine_instructions.txt"),
+  "utf8"
+);
+
+// ---------- Storage (Supabase in prod when configured; SQLite for local dev) ----------
+const store = await makeStorage();
+
+// ---------- Rate limits (cost guard) ----------
+const DAILY_BUILDS = Number(process.env.DAILY_BUILDS || 2);
+const DAILY_ADJUSTS = Number(process.env.DAILY_ADJUSTS || 8);
+
+// ---------- Gemini call (your key in prod; proxy in local dev) ----------
+const USE_PPLX_PROXY = process.env.USE_PPLX_PROXY === "1";
+const GEMINI_API_KEY = process.env.GEMINI_API_KEY || "";
+const GEMINI_MODEL = process.env.GEMINI_MODEL || "gemini-2.5-flash";
+const OPENAI_API_KEY = process.env.OPENAI_API_KEY || "";
+const OPENAI_MODEL = process.env.OPENAI_MODEL || "gpt-5.4";
+const OPENAI_REASONING_EFFORT = process.env.OPENAI_REASONING_EFFORT || "low";
+const OPENAI_MAX_OUTPUT_TOKENS = Number(process.env.OPENAI_MAX_OUTPUT_TOKENS || 14000);
+const AI_REQUEST_TIMEOUT_MS = Number(process.env.AI_REQUEST_TIMEOUT_MS || (OPENAI_API_KEY ? 120000 : 110000));
+const BUILD_JOB_TIMEOUT_MS = Number(process.env.BUILD_JOB_TIMEOUT_MS || (OPENAI_API_KEY ? 180000 : 210000));
+let lastAIUsage = null;
+let lastBuildTiming = null;
+
+// ---------- Reasoning budget (program QUALITY, env-switchable) ----------
+// 2.5-flash is a thinking model. The engine's GOAL-COVERAGE PRE-FLIGHT GATE is
+// genuine reasoning work: before writing any rows the model must build an internal
+// goal table, apply the priority-frequency floor (top-2 goals get >=2 direct
+// exposures), and kill near-empty filler days. With thinkingBudget:0 the model
+// tends to write the rule-respecting prose but SKIP the gate computation, so it
+// satisfies ">=1 exposure each" and pads the leftover day instead of giving the
+// top goals their second exposure. Giving it a real budget lets it actually run
+// the gate. Default 4096; set THINKING_BUDGET=0 to revert to the old fast/cheap
+// behaviour. -1 lets the model decide dynamically.
+const THINKING_BUDGET = Number(
+  process.env.THINKING_BUDGET === undefined ? 8192 : process.env.THINKING_BUDGET
+);
+
+let genaiClient = null;
+async function getGenAI() {
+  if (genaiClient) return genaiClient;
+  const { GoogleGenAI } = await import("@google/genai");
+  genaiClient = new GoogleGenAI({ apiKey: GEMINI_API_KEY });
+  return genaiClient;
+}
+
+// ---------- Context caching (cost optimization, ZERO quality change) ----------
+// The ~360K-token engine is byte-for-byte identical on every request. Caching it
+// lets Google bill the cached input at the lower cached rate instead of re-reading
+// the full engine each time. CRITICAL: this does NOT change what the model sees or
+// produces — the cache stores the EXACT same ENGINE text as the systemInstruction,
+// same model, same generation params. It is purely a billing/storage feature.
+//
+// Safety design:
+//  - Caching is OFF unless ENABLE_ENGINE_CACHE=1 (so it can be toggled with no deploy).
+//  - The cache is created lazily and reused while valid; we refresh before TTL expiry.
+//  - On ANY cache error (create/expire/reference) we fall back to the inline
+//    systemInstruction path below, which is the exact behaviour we ship today.
+//    The client never receives a different or degraded program because of caching.
+const ENABLE_ENGINE_CACHE = process.env.ENABLE_ENGINE_CACHE === "1";
+const CACHE_TTL_SECONDS = Number(process.env.ENGINE_CACHE_TTL || 1800); // 30 min default
+let cacheState = { name: null, expiresAt: 0 };
+
+async function getEngineCacheName() {
+  if (!ENABLE_ENGINE_CACHE) return null;
+  const now = Date.now();
+  // Reuse the live cache if it still has comfortable headroom (>60s) before expiry.
+  if (cacheState.name && now < cacheState.expiresAt - 60_000) return cacheState.name;
+  try {
+    const ai = await getGenAI();
+    const cache = await ai.caches.create({
+      model: GEMINI_MODEL,
+      config: {
+        systemInstruction: ENGINE, // EXACT same engine text as the inline path
+        ttl: `${CACHE_TTL_SECONDS}s`,
+        displayName: "raz-engine-v11",
+      },
+    });
+    cacheState = { name: cache.name, expiresAt: now + CACHE_TTL_SECONDS * 1000 };
+    console.log(`engine cache created: ${cache.name} (ttl ${CACHE_TTL_SECONDS}s)`);
+    return cacheState.name;
+  } catch (e) {
+    // Any failure -> disable cache for this request; the caller falls back to inline.
+    console.warn(`engine cache create failed, using inline engine: ${e && e.message}`);
+    cacheState = { name: null, expiresAt: 0 };
+    return null;
+  }
+}
+
+// Calls the model with the engine as system instruction. Returns plain text.
+// A program is degenerate/invalid if it's too short, missing the machine TSV
+// markers, or collapsed into a run of repeated punctuation (a rare large-prompt
+// failure mode where the model emits e.g. a long line of dashes). We retry when
+// this happens so a client never receives garbage.
+function isValidProgram(p) {
+  if (!p || typeof p !== "string") return false;
+  const t = p.trim();
+  if (t.length < 800) return false;
+  // Collapsed/degenerate: too few LETTERS relative to length (dashes/dots/spam).
+  // NOTE: we count letters from ANY script (Latin, Hebrew, Cyrillic, CJK, etc.)
+  // via the Unicode Letter property. The previous [A-Za-z]-only check rejected
+  // valid Hebrew programs as "degenerate" and drove the 5-attempt retry loop
+  // into failure when intake.language == 'he'.
+  let letters = 0;
+  try {
+    letters = (t.match(/\p{L}/gu) || []).length;
+  } catch (_e) {
+    // Extremely old Node without \p{L} support: fall back to Latin + Hebrew.
+    letters = (t.match(/[A-Za-z\u0590-\u05FF]/g) || []).length;
+  }
+  if (letters / t.length < 0.25) return false;
+  // Whitespace-run collapse: a rare large-prompt MAX_TOKENS failure where the model
+  // emits a single enormous run of spaces/newlines (seen as a 1M+ char blob). A real
+  // program never contains a 400+ char unbroken whitespace run, so reject and retry.
+  if (/[ \t]{400,}|\n{200,}/.test(p)) return false;
+  // Must contain the machine block markers the rest of the app and the UI rely on.
+  // These are STRUCTURAL tokens that stay literal English per LOCALIZATION_RULES,
+  // so they are safe to check regardless of the program's language.
+  if (!t.includes("START_WEEK1_TSV") || !t.includes("END_WEEK1_TSV")) return false;
+  return true;
+}
+
+const OPENAI_COMPACT_DEVELOPER = [
+  "You are the RAZ Performance coaching model inside a deterministic programming system.",
+  "SOURCE-GROUNDING HARD CONTRACT: programming policy must come from the DETERMINISTIC PROGRAM SKELETON, PHASE 15 QUALITY GATE, GOAL-SPECIFIC SPECIALIST RULES, and CURATED COACHING SOURCE EXCERPTS supplied for this athlete. Do not use generic model memory to invent training principles, progressions, set-volume policy, conditioning policy, recovery policy or exercise variations that are absent from those authored sources.",
+  "EXERCISE CLOSED SET: every Exercise-column value must be an exact canonical name from CANONICAL EXERCISE CATALOG, except the permitted [WARMUP] prefix. Do not paraphrase, pluralize, qualify or rename exercises. Known aliases are normalized by the deterministic server and are not permission to emit free-form synonyms.",
+  "The server has already extracted the athlete constraints and built the required weekly skeleton. Your job is NOT to redesign the skeleton. Your job is to calibrate exact exercises, sets, reps, load ranges, RPE/RIR, rest, warm-ups, four-week progression and concise client-facing coaching language.",
+  "Respect every item in DETERMINISTIC PROGRAM SKELETON and PHASE 15 QUALITY GATE as mandatory. Never delete a required exposure. Never add hard conditioning that conflicts with the supplied conditioning rule. Never regress a demonstrated advanced skill to a lower main progression stage.",
+  "Direct skill practice and support strength are different layers. Weighted Chin-up or Weighted Pull-up can support One-Arm Pull-up, just as wall HSPU can support freestanding HSPU, but support work never replaces the required direct skill exposures.",
+  "Use realistic current-performance anchors. Goal numbers are targets, not current capacities. ENDURANCE TARGET ANCHOR: a future goal pace, power or split is not automatically a sustainable current training intensity. Calibrate endurance sessions from supplied current performance plus the routed authored sources; use goal pace only in a dose the athlete can plausibly execute from current capacity. ENDURANCE-TSV-FIELD-CONTRACT: for interval rows, Sets is interval count, Reps is work distance or duration, Weight carries the external pace/power/split target when one is prescribed, Rest is actual between-interval recovery duration, Target RPE is internal effort only when useful, and Notes explains execution. Never put target pace or split in the Rest column. For continuous endurance rows, Reps is total duration/distance and Rest is N/A. Prefer low fatigue and specificity when sport load is high. Do not assign a high RPE to a load that is obviously too light for the athlete's current benchmark.",
+  "CURRENT-DIRECT-MODALITY-FREQUENCY: when the intake explicitly states a current weekly frequency for the same named endurance modality the athlete wants to improve, do not silently reduce that direct modality frequency and replace it with cross-training. Preserve the stated direct frequency unless injury/recovery constraints require a deliberate reduction, in which case explain the tradeoff explicitly. Cross-training may supplement but not silently replace those current direct exposures.",
+  "WEIGHTED CALISTHENICS BENCHMARK ANCHOR: when a current weighted pull-up, chin-up or dip benchmark is supplied at the same rep count as a programmed set, the prescription must reconcile with that demonstrated added load. RPE 8-8.5 work should normally use at least about 90% of the demonstrated added load; if you intentionally use a substantially lighter maintenance load, lower the stated RPE to match rather than pretending the lighter load is RPE 8.",
+  "If no current benchmark is supplied for a loaded lift, do NOT invent exact kilograms. Put RPE-selected load in Weight and calibrate through Target RPE/RIR. Exact kg prescriptions require a supplied benchmark or a clear deterministic anchor. CURRENT-CAPACITY CALIBRATION: for the same canonical weighted movement, a work set with equal or fewer reps must not be labelled high-RPE at a materially lighter external load than a demonstrated clean higher-rep benchmark unless it is explicitly a technique/recovery exposure. For an unbenchmarked close variation, do not pretend a clearly easier unloaded dose is high-RPE; use RPE-selected load or state the low-cost purpose.",
+  "For an athlete who already demonstrates Advanced Tuck Planche and wants Full Planche, retain Advanced Tuck for most quality volume but add a small controlled next-rung bridge exposure, normally Straddle Planche or a verified assisted next-rung variation. Do not spend all four weeks only adding seconds to Advanced Tuck.",
+  "SKILL-RUNG CEILING: do not prescribe an unassisted skill more than one rung above the athlete's demonstrated benchmark. A Tuck Planche athlete may train Advanced Tuck Planche as the next rung, but must not receive unassisted Straddle Planche until Advanced Tuck ability is actually demonstrated.",
+  "For an athlete who already demonstrates Advanced Tuck Front Lever and wants Full Front Lever, retain Advanced Tuck for most quality volume but add a small controlled next-rung bridge exposure, normally Single-Leg Front Lever or a verified assisted Straddle Front Lever. Do not spend all four weeks only adding seconds to Advanced Tuck.",
+  "Do not prescribe generic Planche Push-up for 3-5 reps unless the intake explicitly demonstrates that dynamic skill. When dynamic planche support is useful but unbenchmarked, use Pseudo Planche Push-up instead.",
+  "If gym plus sport occupies all seven calendar days, make at least one gym session explicitly low-cost and recovery-contingent. Keep that day skill-quality biased, avoid hard lower-body loading, and make the final accessory easy to remove when sport fatigue is high.",
+  "Use purposeful variation when useful. A strict OHP goal needs at least one direct strict OHP exposure, while a second vertical-press exposure may use a different stimulus such as Push Press if that has a clear overload, power or fatigue-management purpose.",
+  "CANONICAL NAMES FOR THIS PATH: use Overhead Press or Standing Barbell Overhead Press, not 'Strict overhead press'. Use Dumbbell Shoulder Press, not 'Dumbbell Overhead Press'. Use Dumbbell Bench Press, not 'Dumbbell Floor Press'. Use Side Plank instead of Copenhagen Plank on this verified client path. Use Sprint, not Short Sprint. Use Chin-up or Pull-up instead of Ring Chin-up. Use Ring Hamstring Curl, not Ring Leg Curl. Use Ring Push-up, not Rings Push-up. Use Reverse Lunge, not Step Back Lunge. Use Reverse Lunge, not Step Back Lunge. Use One-Arm Pull-up and Assisted One-Arm Pull-up exactly for advanced OAP work.",
+  "PARK-ONLY HARD STOP: when training_location is an outdoor/calisthenics park, use ONLY equipment explicitly listed in the intake. Never prescribe Box Jump without an explicit box/bench, and never prescribe Bike/Row/Rower conditioning without that machine. Use Broad Jump, Split Squat Jump or short maximal Sprint work for power, and use Zone-2 Run with brisk walking/easy jogging for aerobic work when no machine exists.",
+  "CALENDAR HARD STOP: when available_gym_days is supplied, every week must use exactly those days. If the intake identifies mandatory versus optional sessions, preserve that hierarchy; the optional day must remain dispensable without breaking progression.",
+  "WARRIOR / ATHLETIC HYPERTROPHY RULE: for a park-only client whose goal combines hypertrophy, strength and athleticism, the two mandatory sessions must carry the progression. Across those two days include at least 6 meaningful lower-body strength/hypertrophy sets total, with challenging unilateral knee-dominant work plus posterior-chain work. Use the available belt load, tempo, pauses and ROM to make limited external load productive. When loadable belt/plates are explicitly available and no limitation prevents loading, mandatory lower-body strength/hypertrophy work should not default to bodyweight by habit; if no direct benchmark exists, use RPE-selected belt load rather than inventing kilograms. Power work must be neural/quality focused, not conditioning: Broad Jumps use full resets; short acceleration sprints use roughly 90-95% speed-quality effort with about 2-3 minutes full recovery and stop before speed drops. For Sprint rows, Target RPE is N/A because speed quality, not strength-set RPE, defines intensity. The optional third day may add easy volume but must not be required for progression.",
+  "STRUCTURE HARD CONTRACT: output exactly one START_WEEK1_TSV...END_WEEK1_TSV block, one START_WEEK2_TSV...END_WEEK2_TSV block, one START_WEEK3_TSV...END_WEEK3_TSV block, and one START_WEEK4_TSV...END_WEEK4_TSV block. Never restart a week block per day.",
+  "Every TSV block uses EXACTLY this header: Day\tExercise\tWeight\tSets\tReps\tRest\tTarget RPE\tNotes\tResults. Results stays blank. One physical row equals one TSV row. Never put literal newlines inside a TSV cell.",
+  "Never emit a 0-set or 0-rep explanatory placeholder row. If equipment forbids an exercise, omit the forbidden row and prescribe the valid substitute directly.",
+  "Do not emit [REVIEW], QA labels, internal scores, support messages, placeholders, or invented exercise names. [WARMUP] is the only permitted bracketed row prefix.",
+  "Power/throw/jump primers come after preparation and before heavy strength. Keep sessions within the supplied hard time cap. Narrative must match the final TSV exactly.",
+  "Return only a short client-ready intro, a short weeks 2-4 progression note, pain/substitution guidance relevant to this athlete, then the four TSV blocks."
+].join("\n");
+
+function extractOpenAIIntake(userContent) {
+  const src = String(userContent || "");
+  const marker = "=== CLIENT INTAKE ===";
+  const start = src.indexOf(marker);
+  if (start < 0) return null;
+  const tail = src.slice(start + marker.length).trimStart();
+  const end = tail.indexOf("\n===");
+  const jsonText = (end >= 0 ? tail.slice(0, end) : tail).trim();
+  try { return JSON.parse(jsonText); } catch (_e) { return null; }
+}
+
+function buildOpenAICompactUser(userContent) {
+  const src = String(userContent || "");
+  if (!/A NEW CLIENT has submitted/i.test(src)) return src;
+  const intake = extractOpenAIIntake(src);
+  if (!intake) throw new Error("OpenAI compact path could not parse intake JSON.");
+  const skeleton = buildDeterministicBrief(intake);
+  const quality = phase15PromptRules(intake);
+  const sourceGrounding = buildPhase15SourceGrounding(ENGINE, intake, EXERCISE_DICTIONARY);
+  return [
+    "=== CLIENT INTAKE ===",
+    JSON.stringify(intake),
+    "",
+    skeleton,
+    "",
+    quality,
+    "",
+    sourceGrounding,
+    "",
+    "=== COMPACT OUTPUT CONTRACT ===",
+    "Exactly the requested number of gym days must appear in every week block.",
+    "If available_gym_days is supplied, use those exact days and preserve any mandatory/optional hierarchy stated in the intake.",
+    "For outdoor-park clients, do not invent a box, bench, bike, rower, cable or machine. Use only listed bars/rings/loading plus ground-based jumps, sprints and walking/easy running as appropriate.",
+    "Keep direct cable lateral raises and face pulls when explicitly requested as maintenance.",
+    "Use canonical/common exercise names. Do not expose internal labels.",
+    "If a loaded lift has no current benchmark, use RPE-selected load rather than making up kilograms.",
+    "If a weighted pull-up, chin-up or dip benchmark exists at the programmed rep count, keep the programmed added load and RPE consistent with that demonstrated performance; do not rebuild toward a load the athlete already owns.",
+    "Never jump an unassisted gymnastics skill more than one rung above the demonstrated benchmark.",
+    "Advanced Tuck Planche or Front Lever athletes pursuing the full skill need a small next-rung bridge exposure while retaining the owned rung for volume.",
+    "When gym plus sport fills all seven days, one gym session must be explicitly low-cost/recovery-contingent.",
+    "Warm-up rows use [WARMUP] and remain compact. Do not emit a fake Warm-up / Prep exercise row.",
+    "No markdown program table is needed. The TSV blocks are the source of truth.",
+    "All four weeks must preserve the same goal hierarchy. Apply progression only where the deterministic/source-grounded plan selects it; maintenance/support qualities may remain stable or reduce to protect the primary goal.",
+    "Do not change a maintenance/support row merely to make later weeks look progressive. Stable maintenance is valid when the source-grounded goal hierarchy calls for maintenance.",
+    "When a supplied marathon rule says one progression lever per transition, copy non-selected running-category prescriptions unchanged from the prior week; within quality work, change pace OR accumulated work, not both.",
+    "When a marathon intake supplies current weekly running distance, Week 1 direct running distance must not exceed it. Treat supplied current volume as the starting anchor and begin progression in later weeks.",
+    "Every physical TSV data row in every week must contain exactly nine tab-separated cells matching the required header; never insert an extra set/reps/rest/RPE field or an embedded tab inside a cell.",
+    "Week 4 is not automatically a deload. Consolidate or trim only when justified by the athlete constraints.",
+  ].join("\n");
+}
+
+function hasCurrentBenchmark(intake, re) {
+  const src = JSON.stringify(intake?.current_numbers || intake?.performance_markers || intake?.current_strength || "");
+  return re.test(src);
+}
+
+function normalizeOpenAIExerciseNames(text, intake = null) {
+  let t = String(text || "");
+  const replacements = [
+    [/\tStrict overhead press\t/gi, "\tOverhead Press\t"],
+    [/\tStrict Overhead Press\t/g, "\tOverhead Press\t"],
+    [/\tDumbbell Overhead Press\t/gi, "\tDumbbell Shoulder Press\t"],
+    [/\tDB Overhead Press\t/gi, "\tDumbbell Shoulder Press\t"],
+    [/\tDumbbell OHP\t/gi, "\tDumbbell Shoulder Press\t"],
+    [/\tDumbbell Floor Press\t/gi, "\tDumbbell Bench Press\t"],
+    [/\tDB Floor Press\t/gi, "\tDumbbell Bench Press\t"],
+    [/\tStationary bike Zone 2\t/gi, "\tZone-2 Bike\t"],
+    [/\tStationary Bike Zone 2\t/g, "\tZone-2 Bike\t"],
+    [/\tBike Zone 2\t/gi, "\tZone-2 Bike\t"],
+    [/\tMed ball chest throw\t/gi, "\tBox Jump\t"],
+    [/\tMedicine ball chest throw\t/gi, "\tBox Jump\t"],
+    [/\tBroad Jump\t/gi, "\tBox Jump\t"],
+    [/\tCopenhagen Plank\t/gi, "\tSide Plank\t"],
+    [/\tChest Supported Row\t/gi, "\tChest-Supported Row\t"],
+    [/\tChest-Supported DB Row\t/gi, "\tChest-Supported Row\t"],
+    [/\tDumbbell Hammer Curl\t/gi, "\tHammer Curl\t"],
+  ];
+  for (const [re, repl] of replacements) t = t.replace(re, repl);
+
+  const noPressBenchmark = !hasCurrentBenchmark(intake, /(?:overhead press|\bohp\b)[^\d]{0,50}\d+(?:\.\d+)?\s*kg/i);
+  const noHingeBenchmark = !hasCurrentBenchmark(intake, /(?:romanian deadlift|\brdl\b|deadlift)[^\d]{0,50}\d+(?:\.\d+)?\s*kg/i);
+  const noPlanchePushupBenchmark = !hasCurrentBenchmark(intake, /planche push.?up[^\d]{0,50}\d+/i);
+  const noAdvancedTuckPlancheBenchmark = !hasCurrentBenchmark(intake, /advanced tuck planche/i);
+
+  const out = [];
+  for (const line of t.split("\n")) {
+    if (!line.includes("\t")) { out.push(line); continue; }
+    const cells = line.split("\t");
+    if (cells.length !== 9 || /^Day$/i.test(cells[0])) { out.push(line); continue; }
+    const ex = String(cells[1] || "").trim();
+    const sets = String(cells[3] || "").trim();
+    const reps = String(cells[4] || "").trim();
+    if (!/^\s*\[WARMUP\]/i.test(ex) && (/^0(?:\.0+)?$/.test(sets) || /^0(?:\.0+)?$/.test(reps))) continue;
+    if (noAdvancedTuckPlancheBenchmark && /^Straddle Planche$/i.test(ex)) continue;
+    if (noPressBenchmark && /^(?:Overhead Press|Standing Barbell Overhead Press|Dumbbell Shoulder Press)$/i.test(ex) && /\d+(?:\.\d+)?\s*kg/i.test(cells[2] || "")) cells[2] = "RPE-selected load";
+    if (noHingeBenchmark && /^(?:Romanian Deadlift|Dumbbell Romanian Deadlift)$/i.test(ex) && /\d+(?:\.\d+)?\s*kg/i.test(cells[2] || "")) cells[2] = "RPE-selected load";
+    if (noPlanchePushupBenchmark && /^Planche Push-up$/i.test(ex)) cells[1] = "Pseudo Planche Push-up";
+    out.push(cells.join("\t"));
+  }
+  return out.join("\n");
+}
+
+async function runEngineRaw(userContent) {
+  let sourceGroundedGeminiFallback = false;
+  if (OPENAI_API_KEY) {
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), AI_REQUEST_TIMEOUT_MS);
+    const started = Date.now();
+    try {
+      const intake = extractOpenAIIntake(userContent);
+      const compactUser = buildOpenAICompactUser(userContent);
+      const developerChars = OPENAI_COMPACT_DEVELOPER.length;
+      const sourceUserChars = String(userContent || "").length;
+      const sentUserChars = compactUser.length;
+      if (developerChars > 20000) throw new Error("OpenAI developer prompt unexpectedly large.");
+      if (/A NEW CLIENT has submitted/i.test(String(userContent || "")) && sentUserChars > 45000) throw new Error("OpenAI compact build prompt exceeded 45000 characters.");
+      console.log("OpenAI Phase15 prompt layout:", JSON.stringify({ developer_chars: developerChars, source_user_chars: sourceUserChars, sent_user_chars: sentUserChars, legacy_engine_chars_not_sent: ENGINE.length, execution_path: "deterministic-skeleton-v5.2.10-source-grounded" }));
+      const r = await fetch("https://api.openai.com/v1/responses", {
+        method: "POST",
+        headers: {
+          "Authorization": "Bearer " + OPENAI_API_KEY,
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          model: OPENAI_MODEL,
+          input: [
+            { role: "developer", content: OPENAI_COMPACT_DEVELOPER },
+            { role: "user", content: compactUser }
+          ],
+          reasoning: { effort: OPENAI_REASONING_EFFORT },
+          max_output_tokens: OPENAI_MAX_OUTPUT_TOKENS,
+          prompt_cache_key: "raz-phase15-source-grounded-v5-2-10"
+        }),
+        signal: controller.signal
+      });
+      const data = await r.json().catch(() => ({}));
+      if (!r.ok) {
+        const msg = data?.error?.message || ("OpenAI HTTP " + r.status);
+        throw new Error(msg);
+      }
+      const text = (data.output || [])
+        .flatMap(item => item?.content || [])
+        .filter(c => c?.type === "output_text" && typeof c.text === "string")
+        .map(c => c.text)
+        .join("");
+      const u = data.usage || {};
+      const input = Number(u.input_tokens || 0);
+      const output = Number(u.output_tokens || 0);
+      const cached = Number(u.input_tokens_details?.cached_tokens || 0);
+      const reasoning = Number(u.output_tokens_details?.reasoning_tokens || 0);
+      lastAIUsage = {
+        provider: "openai", model: OPENAI_MODEL, reasoning_effort: OPENAI_REASONING_EFFORT,
+        input_tokens: input, cached_input_tokens: cached, output_tokens: output, reasoning_tokens: reasoning,
+        developer_chars: developerChars, source_user_prompt_chars: sourceUserChars, sent_user_prompt_chars: sentUserChars,
+        legacy_engine_chars_not_sent: ENGINE.length, execution_path: "deterministic-skeleton-v5.2.10-source-grounded",
+        elapsed_ms: Date.now() - started
+      };
+      console.log("OpenAI generation usage:", JSON.stringify(lastAIUsage));
+      if (!text) throw new Error("OpenAI returned no output_text content.");
+      return normalizeOpenAIExerciseNames(text, intake);
+    } catch (e) {
+      const providerMessage = String(e?.message || e || '');
+      const providerUnavailable = e?.name === 'AbortError' || /(no credits remaining|insufficient[_ -]?quota|quota|rate limit|too many requests|\b429\b|\b5\d\d\b|temporar|timeout|timed out|service unavailable|overloaded)/i.test(providerMessage);
+      if (!GEMINI_API_KEY || !providerUnavailable) throw e;
+      console.warn('OpenAI provider unavailable; using source-grounded Gemini fallback:', providerMessage);
+      userContent = buildOpenAICompactUser(userContent);
+      sourceGroundedGeminiFallback = true;
+    } finally {
+      clearTimeout(timer);
+    }
+  }
+  if (USE_PPLX_PROXY) {
+    // LOCAL DEV ONLY: route through the Perplexity sandbox proxy (Anthropic SDK).
+    const { default: Anthropic } = await import("@anthropic-ai/sdk");
+    const client = new Anthropic();
+    const msg = await client.messages.create({
+      model: process.env.PPLX_MODEL || "gemini_3_flash",
+      max_tokens: 8000,
+      system: ENGINE,
+      messages: [{ role: "user", content: userContent }],
+    });
+    return msg.content.map((c) => (c.type === "text" ? c.text : "")).join("");
+  }
+  // PRODUCTION: your own Gemini API key.
+  if (!GEMINI_API_KEY) {
+    throw new Error("GEMINI_API_KEY is not set. Add your Google AI Studio key to run the engine.");
+  }
+  const ai = await getGenAI();
+
+  // Shared generation params. These are IDENTICAL whether or not caching is used
+  // — caching only changes HOW the engine is supplied (referenced vs. inline),
+  // never the model, temperature, token ceiling, or thinking config. So the
+  // produced program is the same quality either way.
+  // 2.5-flash is a thinking model. We now give it a real thinking budget so it
+  // actually RUNS the Goal-Coverage Pre-Flight Gate (forces 2nd exposures for the
+  // top goals and kills near-empty filler days) instead of skipping that reasoning.
+  // Thinking tokens count against maxOutputTokens, so the ceiling must comfortably
+  // hold BOTH the thinking pass AND the long visible v11 program. With a 4k thinking
+  // budget the old 32768 ceiling could clip a dense program, so we lift it to 40960.
+  const genParams = {
+    temperature: 0.3,
+    maxOutputTokens: 49152,
+    thinkingConfig: { thinkingBudget: THINKING_BUDGET },
+    // The SDK supports per-request HTTP timeouts. A stalled provider call must
+    // fail clearly instead of leaving the user on "Building" indefinitely.
+    httpOptions: { timeout: AI_REQUEST_TIMEOUT_MS },
+  };
+
+  // Try the cached-engine path first (cost saving). The cache holds the EXACT
+  // same ENGINE text as systemInstruction, so when we reference it we must NOT
+  // also pass systemInstruction inline (the engine would otherwise be supplied
+  // twice). Same content reaches the model, just billed at the cached rate.
+  const cacheName = sourceGroundedGeminiFallback ? null : await getEngineCacheName();
+  if (cacheName) {
+    try {
+      const resp = await ai.models.generateContent({
+        model: GEMINI_MODEL,
+        contents: userContent,
+        config: { ...genParams, cachedContent: cacheName },
+      });
+      return resp.text;
+    } catch (e) {
+      // Cache may have expired or been evicted server-side between create and use.
+      // Invalidate and fall through to the inline path so the request still succeeds
+      // with the exact same engine and quality.
+      console.warn(`cached generate failed, retrying inline: ${e && e.message}`);
+      cacheState = { name: null, expiresAt: 0 };
+    }
+  }
+
+  // INLINE path (today's exact behaviour): send the full engine as systemInstruction.
+  const resp = await ai.models.generateContent({
+    model: GEMINI_MODEL,
+    contents: userContent,
+    config: { ...genParams, systemInstruction: sourceGroundedGeminiFallback ? OPENAI_COMPACT_DEVELOPER : ENGINE },
+  });
+  return resp.text;
+}
+
+// Wrapper: call the engine, validate the result, and retry a couple of times if
+// the model returned a degenerate/invalid program. Each attempt is independent,
+// so an intermittent collapse is recovered transparently.
+async function runEngine(userContent) {
+  const MAX_ATTEMPTS = 5;
+  let last = "";
+  for (let attempt = 1; attempt <= MAX_ATTEMPTS; attempt++) {
+    last = await runEngineRaw(userContent);
+    if (isValidProgram(last)) return last;
+    console.warn(
+      `runEngine: invalid/degenerate output on attempt ${attempt}/${MAX_ATTEMPTS} ` +
+        `(len=${last ? last.trim().length : 0}); retrying`
+    );
+  }
+  // All attempts failed validation — surface a clear error rather than garbage.
+  throw new Error(
+    "The program generator returned an unusable result after multiple attempts. Please try again."
+  );
+}
+
+// ---------- Prompt builders ----------
+const CLIENT_OUTPUT_CONTRACT = [
+  "OUTPUT CONTRACT (client-facing — this text is shown directly to the paying client):",
+  "- Write ONLY the client-facing deliverable. Do NOT print your internal reasoning, planning sections, or coach-only analysis.",
+  "- ABSOLUTELY FORBIDDEN anywhere in the output (these are internal labels the client must never see):",
+  "  * weekly training-state names: Push, Maintain, Reduce (do not label the week or any block with these words). NOTE: 'Deload' is allowed in client output as a normal recovery-week term.",
+  "  * internal abbreviations: MEV, MAV, MRV, SQS, EVU, LTOS, VCS",
+  "  * any 'Art. N' / article-number citation",
+  "  * training-tier labels: T1, T2, T3, T4, novice/intermediate/advanced/elite used as a TIER label",
+  "  * a 'Stress' column or any internal stress/exposure-routing label as a visible column (Stress, Main Goal Exposure, Session Focus, Intensity, Maintenance, Support, Trunk as table columns)",
+  "  * percentage-of-max-set figures, raw internal scores",
+  "- ALLOWED and encouraged: RPE, RIR, Zone 2-5, rest times, plain coaching explanations in normal language.",
+  "- WRITE LIKE A REAL HUMAN COACH, NOT LIKE AI. Do NOT use em-dashes or en-dashes (— or –) anywhere. Use commas, full stops, or 'and' instead. Avoid the stock AI phrasing patterns (no 'it's not just X, it's Y', no 'let's dive in', no overuse of dashes for emphasis). Plain hyphens inside words (pull-up, one-arm) and inside number ranges (8-12) are fine.",
+  "- THE WEEK 1 TABLE MUST HAVE EXACTLY THESE 7 COLUMNS, IN THIS ORDER, AND NO OTHERS: Day | Exercise | Sets | Reps/Duration | Load/RIR | Rest | Notes. Do NOT add a 'Session Focus', 'Stress', 'Main Goal Exposure', 'Intensity', 'Purpose', 'Modification', or any other extra column. If you want to convey a day's theme or the purpose of an exercise, put it in plain words inside the Notes cell or in the intro paragraph — never as its own column. A table with more than 7 columns, or with any internal-routing column, is a HARD FAIL.",
+  "- Deliver, in this order and in plain client language:",
+  "  1) A short, friendly intro: what this program is built to achieve for them and how it's structured (no jargon labels).",
+  "  2) The Week 1 training table with EXACTLY the 7 columns above (Day, Exercise, Sets, Reps/Duration, Load or RPE/RIR, Rest, Notes) — no extra columns.",
+  "  3) A short 'How to progress weeks 2-4' note in plain language.",
+  "  4) Pain/injury guidance and substitutions relevant to THIS client only.",
+  "  5) The machine block: START_WEEK1_TSV ... END_WEEK1_TSV with columns Day, Exercise, Weight, Sets, Reps, Rest, Target RPE, Notes, Results (Results empty). Plain text only, no LaTeX.",
+].join("\n");
+
+// Rules that tell the engine how to interpret the structured intake fields.
+// These keep multi-goal, split, equipment and sport-schedule handling consistent
+// regardless of which model runs.
+const INTAKE_HANDLING_RULES = [
+  "=== HOW TO READ THIS INTAKE ===",
+  "- 'primary_goals' contains 1-2 EQUAL top-priority goals. Do NOT silently rank Primary #1 above Primary #2. Give each a meaningful progression dose when they can coexist inside the available time and recovery budget. If they materially conflict, say so in plain client language and bias the block toward the combination with the best expected progress rather than pretending both can be maximized.",
+  "- 'secondary_goals' contains lower-priority aims. Progress them when compatible, otherwise hold them at a maintenance or exposure dose so they do not compromise primary goals.",
+  "- 'maintenance_goals' contains qualities the athlete explicitly wants preserved. Use the minimum useful dose needed to preserve them; do not turn maintenance into another full progression target.",
+  "- MULTI-GOAL RULE: there is NO arbitrary 'only one quality may progress' ceiling. The number of progressing qualities is decided by overlap, specificity, training age, sport load, session time, and recovery. Two relatively independent primary qualities may both progress in the same block. Highly competing qualities may require one to progress while the other is maintained.",
+  "- 'performance_markers' and 'current_numbers' are CURRENT benchmarks. Anchor prescriptions to these current capacities, never to goal numbers or old PRs unless the intake explicitly says an old PR is still representative.",
+  "- 'pain' is structured load-tolerance information, not a diagnosis. A red-flag symptom character (radiating/numbness/tingling, locking/giving-way/instability, or severe acute symptoms) routes away from provocative loading and toward professional review. Mild stable local symptoms may use a lower-demand variation when the athlete explicitly reports that variation as tolerable and symptoms do not remain meaningfully worse the next day. Pain score is a signal, never a formula equating 5/10 pain with 5/10 mechanical load.",
+  "- 'mobility' is goal-triggered. If mobility.active is false, do not inject a generic mobility circuit. If true, identify the exact range/position that blocks a named goal, then choose the lowest-cost useful intervention: strength through the needed ROM / loaded end-range work when appropriate, targeted positional or stretching work when needed, and retest the actual goal position. Mobility work supports the strength/sport program; it does not replace specific training.",
+  "- Preserve healthy-limb and pain-free training where appropriate. A unilateral symptom does NOT automatically delete training for the unaffected side. Do not increase total weekly load on the same turn that a new significant injury is reported.",
+  "- 'split_preference' tells you the client's preferred week structure: 'coach_decide' = choose the optimal split; 'full_body' = full-body; 'ppl' = push/pull/legs; 'upper_lower' = upper/lower. Honour an explicit choice unless it conflicts with days_per_week, sport load, or safety, then choose the closest workable option and explain briefly.",
+  "- 'equipment' is the equipment they actually have. Select exercises strictly from within it and the training-location whitelist.",
+  "- 'language' is 'en' or 'he'. Apply LOCALIZATION_RULES.",
+  "- 'sport_schedule' is an ARRAY of { day, intensity }. Treat every sport session as real training stress, but do not assume hard sport and heavy lifting can never share a day. Same-day stress consolidation can be appropriate when the athlete has sufficient spacing and recovery; if timing is unknown, use the conservative option and avoid stacking the highest-fatigue lower-body work on a hard sport day.",
+  "- 'sleep_hours' and 'recovery_rating' modify the dose, not the athlete's identity. Poor recovery trims optional volume first while preserving the most specific primary exposures when tolerable.",
+  "- 'days_per_week' is the number of gym training days. Build exactly that many gym sessions.",
+  "- 'available_gym_days' is a hard calendar constraint when present. Choose gym days only from that list. If it is empty and gym_availability_mode is flexible, you may choose the best days around the sport schedule.",
+  "- 'same_day_gap_hours' / sport_schedule[].gap_hours tells you the usual separation available when gym and sport share a day. Use it to decide whether stress consolidation is appropriate; <4h requires a lower-fatigue gym solution, while 4-8h can support deliberate hard+hard consolidation when priorities and tolerance justify it.",
+].join("\n");
+
+// =================================================================
+// PERIODISATION + DENSITY + SPORT-DAY HARD PRESCRIPTION RULES (v11)
+// =================================================================
+// These are POSITIVE PRESCRIPTION GATES, not advisory text. The engine
+// instructions describe the WHAT (models, methods); these rules describe
+// the HOW for THIS request: the model must SELECT, COMMIT, and APPLY one
+// periodisation model and the correct density/endurance methods, with
+// session structure driven by the sport_schedule. The output contract
+// still hides the labels from the client; these gates only force the
+// model to ACTUALLY USE the knowledge layer instead of treating it as
+// reference material.
+
+const PERIODISATION_PRESCRIPTION_RULES = [
+  "=== PERIODISATION MODEL SELECTION (MANDATORY) ===",
+  "Choose the simplest model that fits THIS athlete's goals, training history, schedule, and current block. Training age alone never forces a model.",
+  "",
+  "  * LINEAR / DOUBLE PROGRESSION: strong default for beginners and also valid for advanced athletes on stable accessory or hypertrophy work where simple progression is still working.",
+  "  * DUP / undulating loading: useful when the same lift or pattern needs multiple weekly exposures with different stress or specificity. Do not choose it merely because the athlete also plays a sport.",
+  "  * BLOCK EMPHASIS: useful when several qualities compete enough that all cannot receive full progression resources simultaneously. Emphasize one or more compatible priorities and hold strongly competing qualities at maintenance.",
+  "  * CONJUGATE / rotating special exercises: use only when it fits the athlete's training history, exercise proficiency, goal, and preference. Advanced strength athlete does NOT automatically mean Conjugate or Westside.",
+  "  * HIGH/LOW ORGANIZATION: use as a weekly stress-organization strategy when consolidating high neural or sport demands creates clearer recovery days. It can coexist with other progression models; it is not mandatory solely because an athlete is over 40 or sleeps poorly.",
+  "  * REALIZATION / PEAKING: use only when a real test or competition window exists or the client explicitly wants a peak.",
+  "",
+  "The model must be visible in the prescriptions, but never force novelty for novelty's sake. Stable main-lift practice is preferred when specificity is the goal. Do not rotate a competition lift away simply because a model allows variation.",
+  "If multiple primary goals are compatible, they may each receive progression. If they compete strongly, use block emphasis or maintenance strategically. Explain the tradeoff in plain language rather than hiding it behind a model label.",
+].join("\n");
+
+const DENSITY_AND_ENDURANCE_RULES = [
+  "=== DENSITY, ENDURANCE & SUBMAXIMAL METHOD ASSIGNMENT (MANDATORY) ===",
+  "The intake will frequently contain endurance, work-capacity, calisthenics-volume, conditioning, or grappling-gas-tank goals. For EACH such goal, you MUST include AT LEAST ONE qualifying row per week in the Week 1 TSV. Qualifying methods:",
+  "",
+  "  * REP-ENDURANCE / DENSITY SETS: anchor to the athlete's current clean max, but choose per-set reps by METHOD. Straight sets/ladders are submaximal and repeatable; EMOM/cluster/rest-pause deliberately use smaller mini-sets. Do not force a universal percentage band.",
+  "",
+  "  * EMOM (Every Minute On the Minute): for conditioning, work-capacity, sport-specific gas. Format: 'EMOM 10 min: 5 reps' or '10 rounds, on the minute'. Choose load/reps so the athlete finishes each round with 15-30s rest.",
+  "",
+  "  * AMRAP DENSITY BLOCK: 'As many rounds as possible in X minutes' with a fixed couplet/triplet. Use for grappling/MMA gas, hybrid-athlete conditioning.",
+  "",
+  "  * TEMPO INTERVALS / ZONE 2 / MAS WORK: for aerobic base, recovery, masters athletes, and any 'lose fat / improve cardio' goal. Format: 'Zone 2 30-45 min' or 'Tempo: 6x200m at 75% effort, 60s rest'. Place on LOW CNS days when High/Low model is in effect.",
+  "",
+  "  * THRESHOLD / VO2 INTERVALS: for athletes with measurable cardio goals (5k time, fight conditioning). 4-6 min hard / equal rest, 3-5 rounds.",
+  "",
+  "  * STATIC HOLD / TUT: for gymnastics holds (planche, lever, L-sit, handstand). Use repeatable submaximal holds or a validated assisted/regressed variation. Fixed unassisted holds must not exceed the athlete's demonstrated clean max unless explicitly testing.",
+  "",
+  "ASSIGNMENT LOGIC:",
+  "  - Calisthenics-skill goal (muscle-up, OAP, HSPU) -> minimum 1 density row + 1 skill/strength row per week.",
+  "  - Grappling/MMA/BJJ gas-tank goal -> minimum 1 EMOM or AMRAP density block per week, scheduled on a moderate or non-sport day.",
+  "  - Hypertrophy goal -> Repeated Effort (8-15 reps at 65-80% intensity) is the bulk of work, with density rows as accessory finishers.",
+  "  - Max strength goal -> ME or top-set work is primary; density/endurance rows are NOT the main driver here, but 1 sub-max accessory row per movement pattern is still appropriate.",
+  "  - Endurance / fat loss / Zone 2 goal -> minimum 2 aerobic rows (Zone 2 OR threshold OR MAS) per week.",
+  "",
+  "If a primary goal would NORMALLY demand a density/endurance row and you omit it, that is a HARD FAIL of the goal-coverage gate. The validator runs server-side and will surface QA_FORMULA_VIOLATION markers in _meta.",
+].join("\n");
+
+const SPORT_DAY_COUPLING_RULES = [
+  "=== SPORT-DAY COUPLING (MANDATORY) ===",
+  "The sport_schedule is the skeleton the gym week wraps around. Use the sport's intensity, tissue overlap, and likely recovery cost rather than treating every sport day as identical.",
+  "",
+  "1. HARD sport: high-intensity rolling/sparring, hard intervals, competition practice. This is a high-stress exposure.",
+  "2. MODERATE sport: normal class, normal rolling, moderate run, ordinary practice.",
+  "3. LIGHT sport: drilling, technique, easy aerobic, recovery practice.",
+  "",
+  "PLACEMENT RULES:",
+  "- Build the gym calendar only after reading every sport day and intensity. The hardest gym exposure for a primary goal should land where expected quality is highest across the WHOLE week, not automatically on the nearest empty day.",
+  "- Protect the cleanest exposure for each primary goal. Do not place the most technically demanding or failure-prone lifting immediately after a hard overlapping sport session unless deliberate same-day stress consolidation is the best weekly solution and there is adequate spacing.",
+  "- Stress consolidation is allowed: a hard lift and hard sport session MAY share a day when the athlete has adequate separation (preferably 4-8 hours), fueling, and tolerance. If strength/power is the primary goal, lift first. If sport performance is the primary goal, protect the sport and reduce the gym dose.",
+  "- If gym and sport must share a day with less than ~4 hours separation, reduce gym fatigue cost first: keep the most specific exposure, trim redundant accessory volume, avoid grinding compounds, and choose low-overlap work.",
+  "- Treat the day before and day after hard sport as REVIEW WINDOWS, not forbidden windows. Use tissue overlap, athlete tolerance, primary-goal priority and the remaining weekly options to decide whether the lift stays high, becomes moderate, or moves.",
+  "- Running creates more lower-body eccentric/impact overlap than low-impact cycling or easy swimming; grappling adds grip, elbow-flexor, neck, trunk, hip and posterior-chain stress; striking adds shoulder/trunk/footwork stress. Do not assign the same sport penalty to every modality.",
+  "- Light/technical sport can coexist with substantial gym work when overlap is low. Moderate sport usually supports moderate gym work, or high work in a relatively non-overlapping primary pattern.",
+  "- Never add conditioning simply because there is an empty day. Conditioning must serve a named goal or a demonstrated capacity need.",
+  "",
+  "CLIENT-FACING PROOF: briefly explain why the hardest gym days sit where they do relative to the athlete's sport week. Do not claim one scheduling rule is universal.",
+].join("\n");
+
+
+const CALISTHENICS_PROGRESSION_RULES = [
+  "=== CALISTHENICS / GYMNASTICS SKILL PROGRESSION (MANDATORY) ===",
+  "Calisthenics skills (HSPU, OAP, planche, lever, muscle-up, pistol, press handstand) are built by overloading the EXACT TARGET MOVEMENT through controlled variation, not by substituting a different skill that 'looks similar'. You must distinguish three things and never confuse them:",
+  "",
+  "  1) The TARGET skill (the goal). e.g. '3 reps of Freestanding 90-Degree HSPU, full ROM'.",
+  "  2) The current best PERFORMANCE on that target skill (what they can do today).",
+  "  3) The BRIDGE EXERCISE: a variation of the SAME target skill that overloads the missing capacity.",
+  "",
+  "LEGITIMATE BRIDGE-EXERCISE VARIATIONS (build these from the TARGET skill, not from a different ladder):",
+  "  * ECCENTRIC: perform only the lowering phase of the target skill, 3-6 s, kick down or step off at the bottom. Use when concentric strength is the limiter.",
+  "  * ISOMETRIC HOLD: hold the hardest position of the target for 3-10 s (top, bottom, sticking point - usually 90 deg / parallel for press skills, lockout for pulling skills). Use when positional strength is the limiter.",
+  "  * PARTIAL ROM: perform the target skill through a shortened range (top half, bottom half, sticking-point window). Use to overload a specific portion of the strength curve.",
+  "  * ASSISTED TARGET: use ONLY an assistance method that exists as a real, named variation in the exercise library or skill graph. Never create a new skill by attaching 'wall', 'band', 'supported', or 'assisted' to the target name.",
+  "  * REDUCED-LOAD TARGET (for weighted variants): same skill, lower added weight. Use when load tolerance is the limiter.",
+  "  * VOLUME AT A SIMPLER OWNED VARIATION: high quality sets of an EASIER variation of the SAME skill family (e.g. wall HSPU full ROM volume) ONLY to build work capacity. Never the SOLE prescription when the gap is positional strength on the target itself.",
+  "",
+  "FORBIDDEN SUBSTITUTIONS (these are hard fails, NOT progressions):",
+  "  * Prescribing a STRADDLE variant when the goal is a FULL (legs-together) variant. Straddle is a different skill with different leverage and mobility demands. Allowed only if the intake explicitly cites compression/pike mobility as the current limiter, AND the Notes cell states that reason in one sentence.",
+  "  * '90-Degree HSPU' does not exist as a valid progression in this system. Do not invent it. Build the base with belly-to-wall / wall HSPU strength and deficit HSPU, while separately building freestanding balance and then exposing the athlete to the real 90-degree transition with valid eccentric, partial or coach-assisted methods that exist in the library.",
+  "  * Any wall-supported or wall-assisted Human Flag variation. Human Flag uses a proper vertical structure; do not invent a wall-supported tuck flag.",
+  "  * Prescribing the goal phrase as the working exercise when the athlete cannot perform even 1 clean rep / 5 s hold of it. 'Full Planche', 'One-Arm Pull-up', 'Freestanding 90-Degree HSPU' are GOALS in that case, not prescriptions.",
+  "  * Skipping the variation type the gap actually demands. If the gap is the bottom of the ROM, do NOT prescribe a top-half partial. Match the variation to the limiter.",
+  "",
+  "SKILL-FAMILY REFERENCE (use to locate the athlete's current best within the same family - NOT a substitute for variation-based bridges):",
+  "",
+  "  HSPU family (push vertical, chest-to-wall and freestanding are SEPARATE families):",
+  "    BASE STRENGTH TRACK: Pike Push-up -> Elevated Pike -> Wall HSPU full ROM -> Deficit Wall HSPU. This develops vertical pressing capacity; it is NOT a 90-degree skill progression by itself.",
+  "    FREESTANDING CONTROL TRACK: Freestanding Handstand Hold -> Freestanding HSPU negative -> Freestanding HSPU -> deeper / deficit freestanding HSPU when owned.",
+  "    90-DEGREE TARGET TRACK: once base pressing and freestanding control are adequate, use only real target-specific exposures from the library or verified skill graph, such as controlled 90-degree eccentric / partial transition / the canonical 90-Degree Handstand Push-Up. Never synthesize a wall 90-degree version.",
+  "",
+  "  OAP family: Weighted Pull-up -> Archer -> Typewriter -> Assisted OAP -> OAP Eccentric -> OAP partial ROM -> OAP isometric at sticking point -> Full OAP -> Weighted OAP.",
+  "",
+  "  Planche: holds, presses, and press-to-handstand work are separate expressions. Use the athlete's exact goal expression. Do not assume a straddle hold is mandatory for a full-planche goal if a different verified route better fits the athlete.",
+  "  Front Lever and Back Lever: distinguish static holds from rows, pulls and raises. Assistance or eccentric work must be a real library entry, not a generated name.",
+  "  Human Flag: use only verified flag variations on an actual vertical structure. No wall-supported inventions.",
+  "  Iron Cross, Maltese, Victorian and other ring strength: prerequisites and connective-tissue exposure matter. Use ring-specific verified entries only and never manufacture a band/negative variation unless that exact entry exists in the authoritative library.",
+  "  One-Arm Pull-up: weighted bilateral strength, unilateral assisted work, eccentric/isometric work and the full skill are different tools. Preserve side-specific loading when one side is symptomatic and a lower-demand verified variation is tolerated.",
+  "  Muscle-up: bar and rings are different skill contexts. Use the exact apparatus and verified progression route named in the library.",
+  "  One-Arm Handstand, handstand walk and press-to-handstand: balance skill progressions are not interchangeable with HSPU strength progressions. Do not use wall support to fake ownership of a freestanding target.",
+  "",
+  "PRESCRIPTION ALGORITHM (apply for every calisthenics goal):",
+  "  STEP 1: From the intake, identify (a) the TARGET skill (with full descriptor: legs together vs straddle, wall vs freestanding, full vs partial ROM) and (b) the athlete's current best within that same family.",
+  "  STEP 2: Identify the LIMITER: concentric strength, eccentric control, positional strength at a specific angle, balance, load tolerance, or work capacity.",
+  "  STEP 3: Build the prescription from the variation TYPES above, matched to the limiter:",
+  "    - Concentric weakness -> Eccentric of the target.",
+  "    - Sticking-point weakness -> Isometric hold at that angle on the target, plus partial-ROM work at that window.",
+  "    - Cannot own any phase of the target -> Assisted target, OR step down one rung in the SAME family and accumulate volume there before re-attempting the target's eccentric.",
+  "    - Work capacity gap -> Volume at the simpler owned variation in the SAME family, plus skill exposure on the target.",
+  "  STEP 4: Write the bridge exercise into the Exercise cell with its FULL descriptor. Example acceptable cells:",
+  "    - 'Freestanding 90-Degree HSPU Eccentric (5 s lower)'",
+  "    - 'Freestanding 90-Degree HSPU Isometric Hold (3 s at 90 deg)'",
+  "    - 'Wall HSPU Full ROM, Deficit' (only if the goal is in the WALL family)",
+  "    - 'OAP Eccentric (4 s lower)'",
+  "    - 'OAP Isometric Hold at 90 deg elbow'",
+  "  STEP 5: In Notes, state the bridge logic in one sentence. Example: 'You hold a freestanding handstand 30 s and can do 3 wall HSPU at the 90-deg depth. Today's row trains the freestanding 90-deg position itself via slow eccentrics, because the wall version will not transfer the freestanding balance demand.'",
+  "  STEP 6: Never replace a target-skill bridge with a different-family substitute 'because it works similar muscles'. If you cannot honestly write the Notes sentence in Step 5 linking the prescription to the target skill, the prescription is wrong.",
+  "",
+  "HARD FAILS (validator will flag):",
+  "  - Inventing a skill variation by adding wall, supported, banded, assisted, eccentric, negative, or partial to a name that is not explicitly present in the library or verified skill graph.",
+  "  - Prescribing a straddle variant when the goal is a full (legs-together) variant, with no mobility limiter cited.",
+  "  - Printing the goal phrase as the prescribed exercise when the athlete cannot perform 1 clean rep / 5 s hold of it.",
+  "  - Prescribing only volume at a simpler variation with no eccentric / isometric / partial-ROM / assisted exposure to the target skill itself.",
+  "",
+  "=== ELITE_SKILL_PROGRESSION_RULES (v20 addendum — code enforces these downstream) ===",
+  "- Iron Cross, Maltese, Victorian: ring-required, hard-gate. Do NOT program unless prerequisites in `current_numbers` clearly demonstrate: 3+ years straight-arm training, 5+ strict muscle-ups, 30s straddle L-sit, 10+ weighted pull-ups at BW+30%. Even when programming, always start at Straddle L Ring Support -> Bulgarian Dip Hold. Do NOT jump to Iron Cross Negative unless athlete has previously trained band-assisted Iron Cross.",
+  "- Human Flag: requires vertical structure (pole or sturdy vertical bar). Prerequisites: 15 strict pull-ups + 20s straight-arm side plank.",
+  "- Planche: floor OR parallelettes. Progression is Planche Lean (30s clean) -> Tuck Planche (15s) -> Advanced Tuck (15s) -> Straddle (10s) -> Half-Lay (5s) -> Full (3s). NEVER skip more than 1 rung.",
+  "- One-Arm Handstand: prerequisite is 30s freestanding handstand hold.",
+  "- Rung selection is NOT the LLM's guess — the engine calls selectRungForSkill(family, benchmarks, intake) and programs that rung. Working dose comes from the rung's dose object. If you over-program past a gate, the code throws SKILL_PREREQ_VIOLATION; if you under-program below the athlete's demonstrated rung, it throws SKILL_UNDER_PROGRAMMED.",
+].join("\n");
+
+const RIR_LOAD_RANGE_RULES = [
+  "=== RIR + REPS -> KG LOAD RANGE (MANDATORY when 1RM is known) ===",
+  "When the intake provides a 1RM (or estimated 1RM, or recent heavy single) for a barbell lift (back squat, front squat, deadlift, conventional/sumo, bench press, overhead press, hip thrust, power clean, snatch, clean, jerk), AND that exercise appears in the week, the Weight column for that row MUST contain a numeric kg RANGE, not a generic 'RPE-based load' phrase.",
+  "",
+  "RIR ALONE IS NOT ENOUGH. The %1RM depends on BOTH reps and RIR. Use the table below.",
+  "",
+  "RPE / RIR -> %1RM TABLE (Zourdos-Helms, use exact values):",
+  "",
+  "  Reps    RIR 0    RIR 1    RIR 2    RIR 3    RIR 4",
+  "  ----    -----    -----    -----    -----    -----",
+  "  1       100.0    95.5     92.2     89.2     86.3",
+  "  2       95.5     92.2     89.2     86.3     83.7",
+  "  3       92.2     89.2     86.3     83.7     81.1",
+  "  4       89.2     86.3     83.7     81.1     78.6",
+  "  5       86.3     83.7     81.1     78.6     76.1",
+  "  6       83.7     81.1     78.6     76.1     73.6",
+  "  7       81.1     78.6     76.1     73.6     71.0",
+  "  8       78.6     76.1     73.6     71.0     68.5",
+  "  9       76.1     73.6     71.0     68.5     66.0",
+  "  10      73.6     71.0     68.5     66.0     63.5",
+  "",
+  "(For reps > 10 or RIR > 4, subtract ~2.5% per additional rep or per additional RIR. For RIR > 5 the relationship breaks down and you should switch to the prescription style described in DENSITY_AND_ENDURANCE_RULES.)",
+  "",
+  "LOAD-RANGE CALCULATOR (apply this for every barbell row where the athlete has a 1RM on file):",
+  "  STEP 1: Look up the %1RM for the prescribed (reps, RIR) cell. If the intake gives RPE, convert: RPE 10=RIR 0, RPE 9=RIR 1, RPE 8=RIR 2, RPE 7=RIR 3, RPE 6=RIR 4.",
+  "  STEP 2: Compute midpoint kg = 1RM * (%1RM / 100).",
+  "  STEP 3: Apply a +/-3% band: low = midpoint * 0.97, high = midpoint * 1.03.",
+  "  STEP 4: Round LOW down to the nearest 2.5 kg, round HIGH up to the nearest 2.5 kg.",
+  "  STEP 5: Emit as 'LOW-HIGH kg' in the Weight column.",
+  "",
+  "WORKED EXAMPLES (use these as ground truth - your math must reproduce them):",
+  "  - Back squat 1RM 200 kg, 2 reps @ RIR 2 -> 89.2% -> 178.4 midpoint -> band 173.0-183.8 -> '172.5-185 kg'.",
+  "  - Back squat 1RM 200 kg, 3 reps @ RIR 2 -> 86.3% -> 172.6 midpoint -> band 167.4-177.8 -> '165-180 kg'.",
+  "  - Back squat 1RM 200 kg, 5 reps @ RIR 2 -> 81.1% -> 162.2 midpoint -> band 157.3-167.1 -> '155-170 kg'.",
+  "  - Bench press 1RM 120 kg, 5 reps @ RIR 1 -> 83.7% -> 100.4 midpoint -> band 97.4-103.4 -> '97.5-105 kg'.",
+  "  - Deadlift 1RM 240 kg, 1 rep @ RIR 1 -> 95.5% -> 229.2 midpoint -> band 222.3-236.0 -> '220-237.5 kg'.",
+  "  - Overhead press 1RM 70 kg, 3 reps @ RIR 3 -> 83.7% -> 58.6 midpoint -> band 56.8-60.3 -> '55-62.5 kg'.",
+  "",
+  "WHEN NOT TO EMIT A KG RANGE:",
+  "  - If the intake has NO 1RM for that lift -> Weight column reads 'RPE 7-8' (or whatever target) and Notes adds 'no 1RM on file, load to target RIR'.",
+  "  - For bodyweight calisthenics -> Weight column reads 'BW', or 'BW + Xkg' for weighted variants. No range needed.",
+  "  - For accessories with no max -> 'RPE 7-8' is acceptable.",
+  "  - For density / EMOM / AMRAP / Zone 2 / interval work -> use the format from DENSITY_AND_ENDURANCE_RULES.",
+  "",
+  "OUTPUT CONTRACT INTEGRATION:",
+  "  - In the client-facing 7-column table, the Load/RIR column reads like '172.5-185 kg @ RIR 2'.",
+  "  - In the TSV machine block, the Weight cell reads '172.5-185 kg' and the Target RPE cell reads 'RIR 2' (or 'RPE 8').",
+  "  - If the athlete's 1RM is OLD (intake flags it as >3 months old) or marked 'estimated', state that in Notes: 'range based on estimated 1RM of 200 kg, recalibrate after the first heavy session'.",
+].join("\n");
+
+const MULTI_WEEK_BLOCK_RULES = [
+  "=== 4-WEEK BLOCK OUTPUT (MANDATORY, MODEL-DRIVEN) ===",
+  "You are delivering a 4-week BLOCK. The week-to-week change must be governed by the periodisation MODEL you already selected in PERIODISATION_PRESCRIPTION_RULES, and by the block's PHASE in the broader macrocycle. Do not apply a generic 'week 1 baseline, week 4 deload' template independent of the model.",
+  "",
+  "STEP 1: BLOCK PHASE.",
+  "Identify the block's PHASE from the intake (primary goals + sport_schedule + competition date if present):",
+  "  - ACCUMULATION: build volume / work capacity. Volume is the primary progressing variable.",
+  "  - INTENSIFICATION: build strength / skill. Intensity (load or skill difficulty) is the primary progressing variable; volume is held or trimmed.",
+  "  - REALIZATION / PEAKING: express trained capacity. Intensity is high, volume drops sharply; the last week is a test or competition.",
+  "  - MAINTENANCE: hold a quality while another is prioritised. Minimum effective dose, no progression target this block.",
+  "  - DELOAD: planned recovery block. Volume and intensity both drop.",
+  "If the intake does not name the phase, INFER it from primary goals and state the inference in your hidden reasoning. Default for a hybrid athlete with no competition window is ACCUMULATION.",
+  "",
+  "STEP 2: APPLY THE SELECTED MODEL'S OWN PROGRESSION ACROSS THE 4 WEEKS.",
+  "The model you chose in PERIODISATION_PRESCRIPTION_RULES has its OWN week-to-week progression rules. Apply them:",
+  "",
+  "  LINEAR PROGRESSION (beginner): change exactly ONE variable per week. For ACCUMULATION add 1 rep per set OR add 2.5 kg per week. For INTENSIFICATION add 2.5-5 kg per week, hold reps. Week 4 holds the prior week's load (consolidation) unless a true deload is needed. Same exercises every week.",
+  "",
+  "  DAILY UNDULATING PERIODISATION (DUP): the heavy/moderate/light day character within the week is preserved. Week-to-week, progress each day type independently. A Week 4 deload is used only when readiness, accumulated fatigue, competition timing, or the planned phase calls for it; otherwise consolidate or continue the wave without forcing a calendar deload.",
+  "",
+  "  CONJUGATE / rotating special exercises: rotate only when variation solves a real specificity or weak-point need. Dynamic effort is optional and load is chosen for velocity/quality, not a mandatory 50/55/60 wave. Week 4 may deload, consolidate, or continue depending on readiness and the larger plan.",
+  "",
+  "  BLOCK EMPHASIS / BLOCK PERIODISATION: allocate progression resources to compatible priorities and maintain strongly competing qualities. Do not force a mid-block quality switch. Week 4 is chosen from continue / consolidate / deload / transition peak according to readiness and the athlete's real calendar.",
+  "",
+  "  HIGH/LOW ORGANIZATION: the High/Low split is a stress-organization tool, not an age category. Progress the priority variable while keeping low days genuinely low. Do not automatically convert a high day to low in Week 4 unless fatigue/readiness calls for it.",
+  "",
+  "  PEAKING / REALIZATION BLOCK (when block phase = REALIZATION, regardless of base model): W1 heavy triples at RIR 2-3, W2 heavy doubles at RIR 1-2, W3 heavy singles at RIR 0-1 with accessories cut by 50%, W4 OPENERS + TEST (one true 1RM attempt or competition; minimal other work). This overrides the base model's default W4.",
+  "",
+  "STEP 3: HARD INVARIANTS ACROSS THE BLOCK.",
+  "  - Sport schedule structure (which days are HARD/MODERATE/LIGHT sport) does NOT change week to week unless the intake states it does. The gym week wraps around the same skeleton across all 4 weeks.",
+  "  - Calisthenics bridge exercises (chosen per CALISTHENICS_PROGRESSION_RULES) stay the same across the block UNLESS the athlete progresses past them mid-block. Volume / hold time / load on the bridge is what progresses week to week, not the exercise itself.",
+  "  - Exercise selection on the main slots stays stable across the block (linear / DUP / block / high-low). Conjugate is the exception: ME variation rotates by design.",
+  "  - The RIR/load math in RIR_LOAD_RANGE_RULES is applied per row per week using the WEEK-SPECIFIC reps and RIR.",
+  "",
+  "STEP 4: OUTPUT FORMAT (HARD REQUIREMENT).",
+  "After the Week 1 client-facing table, emit FOUR machine blocks in order:",
+  "  START_WEEK1_TSV ... END_WEEK1_TSV",
+  "  START_WEEK2_TSV ... END_WEEK2_TSV",
+  "  START_WEEK3_TSV ... END_WEEK3_TSV",
+  "  START_WEEK4_TSV ... END_WEEK4_TSV",
+  "Each block has the SAME 9 columns as Week 1 (Day, Exercise, Weight, Sets, Reps, Rest, Target RPE, Notes, Results-empty). Each block contains the FULL week (not just diffs). For any row that CHANGED from the prior week, the Notes cell states the change in plain language: 'volume up 1 set', 'load +2.5 kg', 'RIR drops to 1, drop back-off volume', 'deload, sets halved', 'realization: open at 90% then attempt 1RM'.",
+  "",
+  "STEP 5: CLIENT-FACING SUMMARY.",
+  "Keep the 'How to progress weeks 2-4' paragraph in plain language. Explicitly name the structural intent without using internal labels: 'Volume climbs across weeks 2 and 3, then week 4 cuts back to let you absorb the work', or 'Week 1 builds heavy triples, week 2 doubles, week 3 singles, week 4 is your max attempt'. The TSV blocks are the source of truth; this paragraph is the human-readable summary of the same intent.",
+  "",
+  "HARD FAILS (validator will flag):",
+  "  - Any of START_WEEK2_TSV / START_WEEK3_TSV / START_WEEK4_TSV missing.",
+  "  - All 4 weeks numerically identical when the selected model is anything other than pure beginner LINEAR PROGRESSION at the consolidation phase.",
+  "  - Week 4 blindly deloading or blindly progressing without a stated readiness, phase, or competition rationale.",
+  "  - Week 4 of a REALIZATION block not containing a singles/opener/test row (no peak landed).",
+  "  - Sport schedule day-of-week placement changing week to week without an intake-stated reason.",
+  "  - Calisthenics bridge exercise swapping mid-block without a stated reason ('athlete now owns prior bridge, progressing to next' is acceptable).",
+].join("\n");
+
+
+const WARMUP_RULES = [
+  "=== WARM-UP PRESCRIPTION (MANDATORY for every training day) ===",
+  "Every training day in the TSV blocks MUST begin with a Warm-up group: a few rows that come BEFORE the working sets of that day. These warm-up rows are part of the same day; they go inside the same Day grouping as the rest of the session. Apply this whether or not the athlete also has sport that day.",
+  "",
+  "STRUCTURE: Warm-up = (A) General Prep + (B) Specific Ramp-up for the main lift(s).",
+  "",
+  "PART A - GENERAL PREP (5-8 minutes, ~3 rows):",
+  "Choose 3 prep movements that match the MAIN MOVEMENT PATTERNS of the day. Pulse raiser first, then 2 targeted mobility/activation rows. Use this menu (pick by pattern, not by random):",
+  "",
+  "  PULSE-RAISER (always row 1 of any day): 3-5 min easy. Options:",
+  "    - Bike or rower, easy",
+  "    - Skip / rope, easy",
+  "    - Brisk treadmill walk on incline",
+  "    - Easy shadow-grappling movement (only if the athlete trains BJJ and that day is also a sport day, otherwise use bike/rower/skip)",
+  "",
+  "  SQUAT PATTERN (back squat, front squat, pistol, box squat, split squat): pick 2 of",
+  "    - Ankle dorsiflexion drill (wall-touch knee-to-wall) 2x8/side",
+  "    - 90/90 hip rotations 2x6/side",
+  "    - Goblet squat hold or bodyweight squat to depth 2x5 with 3s pause",
+  "    - Banded glute bridge 2x10",
+  "    - Cossack squat 2x5/side",
+  "",
+  "  HINGE PATTERN (deadlift conventional/sumo, RDL, good morning, hip thrust): pick 2 of",
+  "    - Glute bridge 2x10",
+  "    - 90/90 hip switches 2x6/side",
+  "    - Cat-cow + thoracic extension 2x8",
+  "    - Single-leg RDL bodyweight 2x6/side",
+  "    - Kettlebell deadlift light 2x5",
+  "",
+  "  PUSH VERTICAL (overhead press, push press, HSPU work, handstand work): pick 2 of",
+  "    - Wrist circles + wrist push-up prep 2x8/direction",
+  "    - Shoulder CARs (controlled articular rotations) 1x3/side",
+  "    - Banded shoulder dislocates 2x10",
+  "    - Pike walk-ups against wall 2x5",
+  "    - Scapular push-ups 2x8",
+  "",
+  "  PUSH HORIZONTAL (bench press, push-up, dip, ring work): pick 2 of",
+  "    - Banded shoulder dislocates or pass-throughs 2x10",
+  "    - Push-up plus (scapular protraction) 2x8",
+  "    - Band pull-apart 2x12",
+  "    - Light empty-bar bench setup drill 2x5 (paused at chest)",
+  "",
+  "  PULL VERTICAL (pull-up, weighted pull-up, OAP work, muscle-up): pick 2 of",
+  "    - Dead hang 2x20-30s",
+  "    - Scapular pull-ups (active hang to scap retraction) 2x8",
+  "    - Band pull-apart 2x12",
+  "    - Light banded lat pulldown 2x10",
+  "",
+  "  PULL HORIZONTAL (row, inverted row, sled-row): pick 2 of",
+  "    - Band pull-apart 2x12",
+  "    - Scapular wall-slide 2x8",
+  "    - Banded face-pull 2x12",
+  "    - Inverted row bodyweight 2x6",
+  "",
+  "  OLY/EXPLOSIVE (clean, snatch, power variations, jumps): pick 2 of",
+  "    - Empty bar muscle-clean / muscle-snatch 2x5",
+  "    - Overhead squat with PVC/empty bar 2x5",
+  "    - Banded hip flexor 2x10/side",
+  "    - Pogo hops or low box jump 2x5",
+  "",
+  "  PURE CONDITIONING DAY (no main lift, just intervals/zone work): just the pulse-raiser + 1 activation row matching the modality (e.g. high-knees + a-skips before runs; arm circles + scap pulls before a rower interval).",
+  "",
+  "PART B - SPECIFIC RAMP-UP (for the day's MAIN LIFT, before working sets):",
+  "The ramp uses the same 1RM the athlete provided, the same %1RM table from RIR_LOAD_RANGE_RULES, and the working-set load you already calculated. Output AS ITS OWN ROWS (one row per ramp set) right before the working sets of that lift.",
+  "",
+  "  BARBELL MAIN LIFT WITH 1RM ON FILE (squat, deadlift, bench, OHP, hip thrust, clean):",
+  "    Compute working-set %1RM (call it W%) from the Patch B table.",
+  "    Emit ramp sets sized to the gap between the bar and W%:",
+  "      - Empty bar x 8 reps (always)",
+  "      - 40% of 1RM x 5 reps",
+  "      - 55% of 1RM x 3 reps",
+  "      - 70% of 1RM x 2 reps (skip if W% < 70%)",
+  "      - 85% of 1RM x 1 rep (skip if W% < 80%)",
+  "      - 92% of 1RM x 1 rep (only if W% >= 88%, i.e. RIR <= 1 at low reps)",
+  "    Round each ramp load to the nearest 2.5 kg. Notes column: 'ramp set, ~60-90s rest between'. The ramp Weight column emits a SINGLE number (e.g. '140 kg'), not a range - this is calibration, not autoregulation.",
+  "",
+  "  WEIGHTED CALISTHENICS MAIN LIFT (weighted pull-up, weighted dip, weighted ring chin-up):",
+  "    Build the ramp from the prescribed added load. Example for a weighted pull-up working set of BW + 30 kg x 5:",
+  "      - Bodyweight pull-up x 5 reps",
+  "      - BW + 10 kg x 3 reps",
+  "      - BW + 20 kg x 2 reps",
+  "      - BW + 30 kg working sets",
+  "    Each step ~33-50% of the added load. Round added load to the nearest 2.5 kg.",
+  "",
+  "  PURE BODYWEIGHT MAIN SKILL (HSPU, OAP, planche hold, lever, muscle-up, pistol):",
+  "    The ramp is NOT load-based, it is skill-graded. Use this pattern:",
+  "      - 1 set of the simplest owned variation in the SAME family at ~40% effort (e.g. wall HSPU partial x 3, or pike push-up x 5).",
+  "      - 1 set of the NEXT variation up at ~70% effort (e.g. wall HSPU full ROM x 2, or wall walk x 1).",
+  "      - The working sets of the bridge exercise from CALISTHENICS_PROGRESSION_RULES.",
+  "    The ramp must STOP one rung below the working bridge to avoid pre-fatiguing the target skill. Notes column: 'skill primer, NOT to fatigue'.",
+  "",
+  "  DENSITY / INTERVAL DAYS (EMOM, AMRAP, Zone 2, conditioning intervals):",
+  "    No specific ramp. The pulse-raiser + 1 movement-specific activation IS the warm-up.",
+  "",
+  "PART C - OUTPUT FORMAT IN TSV (COMPACT - mandatory):",
+  "To keep the workbook readable on a phone, COLLAPSE the warm-up into AT MOST TWO rows per day:",
+  "",
+  "  ROW 1 = General Prep (ONE single row that combines the pulse-raiser AND both mobility/activation movements). Format:",
+  "    Exercise cell: '[WARMUP] General prep: <pulse-raiser>, <duration>; <activation 1>, <sets x reps>; <activation 2>, <sets x reps>'",
+  "    Example: '[WARMUP] General prep: Bike easy, 3 min; Banded shoulder dislocates, 2x10; 90/90 hip rotations, 2x6/side'",
+  "    Weight cell: 'BW'",
+  "    Sets/Reps: '1' / 'see exercise'",
+  "    Rest: '60s between movements'",
+  "    Target RPE: '4-5 / easy'",
+  "    Notes: short intent line.",
+  "",
+  "  ROW 2 = Specific Ramp for the main lift (ONE single row listing the entire ramp chain). Format:",
+  "    Exercise cell: '[WARMUP] <Main lift name> ramp: <set1> -> <set2> -> ... -> last set'",
+  "    Example: '[WARMUP] Standing Barbell Overhead Press ramp: bar x 8 -> 35 kg x 5 -> 50 kg x 3 -> 62.5 kg x 2 -> 77.5 kg x 1'",
+  "    Weight cell: 'see exercise' (the loads are in the chain).",
+  "    Sets cell: total ramp set count (e.g. 5).",
+  "    Reps cell: 'as listed'.",
+  "    Rest: '60-90s between ramp sets'.",
+  "    Target RPE: 'progressive, top set ~RPE 7'.",
+  "    Notes: 'ramp into working sets'.",
+  "",
+  "If the day has TWO main lifts (e.g. squat + bench on the same day), emit ONE general-prep row (no repetition) and TWO separate ramp rows, each in the chain format above, placed immediately before that lift's working sets.",
+  "",
+  "For a pure-bodyweight skill day, ROW 2 is the skill primer expressed inline: '[WARMUP] Freestanding 90-deg HSPU skill primer: Pike push-up x 5 -> Wall HSPU partial x 2'.",
+  "",
+  "For density / interval days, emit ONLY ROW 1 (general prep) and skip ROW 2.",
+  "",
+  "Rows then continue in order: working sets of main lift -> accessory work. Use '[WARMUP]' prefix ONLY on the prep rows. Do NOT emit one row per ramp set. Do NOT emit one row per mobility drill. Compact format is mandatory.",
+  "",
+  "PART D - 4-WEEK BLOCK BEHAVIOUR:",
+  "General prep rows are STABLE across all 4 weeks (same movements, same sets/reps). The specific ramp rows recalculate per week using the week-specific working set %1RM (loads scale up or down as the working set does).",
+  "",
+  "HARD FAILS (validator will flag):",
+  "  - A training day with a main barbell lift and no '[WARMUP] <lift> ramp:' row above its working sets.",
+  "  - A pure-bodyweight skill day (HSPU/OAP/planche/lever) with no '[WARMUP] ... skill primer:' row.",
+  "  - Emitting more than one '[WARMUP] General prep' row per day, or one row per individual mobility drill, or one row per ramp set. The compact format collapses all prep into a single chain string.",
+  "  - General prep movements that do not match the day's main movement pattern (e.g. ankle dorsiflexion drill on a pure bench/OHP day).",
+  "  - Ramp set loads that do not reconcile with the athlete's 1RM (e.g. '85%' computed off a different number than the working set used).",
+].join("\n");
+
+const LOCATION_EQUIPMENT_RULES = [
+  "=== TRAINING LOCATION EQUIPMENT WHITELIST (HARD-STOP, NO EXCEPTIONS) ===",
+  "The intake carries TWO independent equipment signals that BOTH constrain selection:",
+  "  1) 'training_location' — the physical environment the athlete will train in for this block.",
+  "  2) 'equipment' — the free-form list of gear they explicitly told you they own or can access.",
+  "",
+  "You must build an EFFECTIVE EQUIPMENT SET = INTERSECTION of (a) what the environment could plausibly contain and (b) what they explicitly listed. If either side excludes an item, that item does NOT exist for this program. This is a hard-stop array filter, not a soft preference.",
+  "",
+  "ENVIRONMENT DEFAULTS (upper bound of what MAY be available — the intake still has to confirm each item):",
+  "",
+  "  * commercial_gym: barbells, dumbbells (full range), racks, benches (flat/incline/decline), squat/leg-press/hack machines, lat pulldown, cable stack, pulley crossovers, smith machine, rower, bike, treadmill, plyo boxes, pull-up bar, dip bars, GHD, reverse-hyper, glute-ham, sled + turf lane if listed, kettlebells if listed, bands if listed, gymnastic rings if listed.",
+  "",
+  "  * home_gym: ONLY what they list — typically barbell + plates, rack, bench, one pair of dumbbells or adjustable dumbbells, pull-up bar, bands, kettlebells. No cables, no sled, no leg-press, no lat-pulldown, no GHD unless explicitly listed.",
+  "",
+  "  * garage_gym: same posture as home_gym. Assume no cables, no machines, no sled unless explicitly listed. Turf/prowler lane is possible but ONLY if listed.",
+  "",
+  "  * outdoor_park / calisthenics_park: bodyweight only, plus pull-up bar, dip bars, parallel bars, benches (for step-ups / dips / Bulgarian split squats), rings if they bring them, resistance bands if they bring them, sprint lane / grass, stairs, hill. NO barbell, NO dumbbells, NO sled, NO machines, NO cables, NO plates. If they need loaded work, use a weighted vest or backpack ONLY if listed.",
+  "",
+  "  * hotel_room / travel: bodyweight only, plus bands if listed. No pull-up bar unless they confirmed a doorframe bar. No dip bars, no plates, no barbell, no cables, no sled.",
+  "",
+  "  * home_bodyweight: bodyweight only, plus what they explicitly list (bands, doorframe bar, dumbbells, sandbag, etc). No barbell, no rack unless listed.",
+  "",
+  "HARD FILTER ALGORITHM (apply per exercise, before writing any row):",
+  "  STEP A: Read the exercise's REQUIRED equipment list (implicit — e.g. Sled Push requires 'sled'; Cable Row requires 'cable stack'; Back Squat requires 'barbell + rack + plates').",
+  "  STEP B: For each required item, check the EFFECTIVE EQUIPMENT SET (environment default INTERSECT athlete-listed equipment).",
+  "  STEP C: If any required item is missing from the effective set, the exercise is FORBIDDEN. Do not weaken it, do not substitute silently — pick a different exercise that hits the same stimulus using only owned equipment. State the substitution reason in the Notes cell if the athlete named the forbidden exercise as a goal or preference.",
+  "",
+  "ENVIRONMENT-SPECIFIC FORBIDDEN EXAMPLES (illustrative, non-exhaustive):",
+  "  * outdoor_park: sled push, sled drag, barbell back squat, barbell deadlift, cable row, lat pulldown, leg press, GHD raise, hack squat, machine hamstring curl, reverse-hyper, prowler (unless the athlete brings one).",
+  "  * hotel_room: pull-up (unless doorframe bar listed), dip, barbell anything, sled anything, box jump onto a hotel table.",
+  "  * home_gym without cables: cable crossover, lat pulldown, cable row, cable face-pull. Substitute band or free-weight variants.",
+  "  * home_gym without sled: sled push, sled drag, prowler. Substitute heavy carries, hill sprints if outdoors is accessible, or high-rep bodyweight/kettlebell density blocks.",
+  "",
+  "OUTPUT REQUIREMENT: In the client-facing intro paragraph (plain language, no labels), briefly acknowledge the training location and what it constrained if the athlete named a goal that required forbidden gear. Example: 'Because you train in a park, we swapped the sled work you asked about for hill sprints and heavy carries — same stimulus, no sled needed.'",
+  "",
+  "HARD FAILS (validator will flag):",
+  "  - Any Exercise cell that requires equipment not in the effective set (e.g. 'Sled Push' when training_location = outdoor_park and 'sled' is not in equipment).",
+  "  - Any Exercise cell requiring a barbell when training_location = outdoor_park, hotel_room, or home_bodyweight (unless the athlete explicitly listed a barbell).",
+  "  - Any Exercise cell requiring a cable machine when training_location = home_gym or garage_gym without 'cable stack' listed.",
+  "  - Silent substitution: swapping a forbidden exercise without a Notes cell explanation if the athlete had named the forbidden movement in goals/preferences.",
+].join("\n");
+
+const WARMUP_CEILING_RULES = [
+  "=== WARM-UP DIFFICULTY CEILING (HARD RULE) ===",
+  "Every warm-up movement — General Prep AND Specific Ramp — must sit STRICTLY BELOW the working exercise it precedes in difficulty, technical complexity, and intensity. Warm-ups exist to prepare the target movement, not to compete with it or pre-fatigue it.",
+  "",
+  "TIER DEFINITION (ordinal, use the skill-family ladders from CALISTHENICS_PROGRESSION_RULES as the authoritative ordering):",
+  "",
+  "  * For BODYWEIGHT / GYMNASTICS main skills, the warm-up rung index in the same family MUST be strictly less than the working exercise's rung index. Never equal, never higher. Concrete cases (memorise these — they are the ones the engine has been getting wrong):",
+  "      - Working = 'Tuck Front Lever Hold'. Warm-up ramp may use: Dead Hang, Scapular Pull-up, Bent-Arm Hang, Tuck Front Lever NEGATIVE (short 3-5 s lower, NOT full hold), Tuck Front Lever ISOMETRIC at ~50% target time. Warm-up may NEVER use: Advanced Tuck Front Lever, Single-Leg Tuck, Straddle Front Lever, or any variation ABOVE Tuck.",
+  "      - Working = 'Tuck Human Flag Hold'. Warm-up ramp may use: Side Plank, Side Plank Hip Dip, Vertical Pull to Tuck (short 2-3 s pull-in), Tuck Human Flag NEGATIVE (short lower). Warm-up may NEVER use: One-Leg Tuck Human Flag, Straddle Human Flag, Full Human Flag.",
+  "      - Working = 'Wall Handstand Push-Up (full ROM)'. Warm-up ramp may use: Pike Push-up, Elevated Pike Push-up, Wall Handstand Hold, Wall HSPU Partial ROM (top-half, ~40% depth). Warm-up may NEVER use: Wall HSPU full ROM at working depth, Box Pike Push-up at working depth, Deficit Wall HSPU, or 90-degree Wall HSPU.",
+  "      - Working = 'Freestanding 90-Degree HSPU'. Warm-up ramp may use: Freestanding Handstand Hold, Freestanding HSPU Negative (short 3-5 s lower to a shallower depth than the 90-deg target). Warm-up may NEVER use: Freestanding HSPU full ROM at target depth, Deficit Freestanding HSPU.",
+  "      - Working = 'One-Arm Pull-up'. Warm-up ramp may use: Dead Hang, Scapular Pull-up, Strict Two-Arm Pull-up (submax volume), Archer Pull-up (submax). Warm-up may NEVER use: Weighted OAP, OAP Eccentric AT WORKING DEPTH, or any variation above the athlete's owned OAP rung.",
+  "",
+  "  * For BARBELL and DUMBBELL main lifts, the warm-up ramp already lives at LOWER %1RM than the working set (see WARMUP_RULES Part B). Never insert a mobility/activation drill that is itself a harder loaded movement than the working lift (e.g. a heavy front-squat mobility complex before a moderate back-squat working set).",
+  "",
+  "  * For CONDITIONING / DENSITY days, the pulse-raiser and activation must be strictly lower CNS/joint demand than the working intervals (Zone 1-2 pulse-raiser before Zone 4 intervals; light shadow drilling before hard sparring).",
+  "",
+  "CEILING VALIDATION ALGORITHM (apply before emitting any warm-up row):",
+  "  STEP 1: Identify the day's working exercise(s) and, for each, its skill-family rung index (or its %1RM for loaded lifts).",
+  "  STEP 2: For every warm-up candidate movement, look up its rung index in the SAME family (or its %1RM equivalent).",
+  "  STEP 3: If warm-up index >= working index (or warm-up %1RM > working %1RM at more than 1 rep), the candidate is FORBIDDEN. Replace it with a lower-rung variation, or drop it in favour of general mobility/activation drills that are not part of the target ladder at all.",
+  "  STEP 4: The last ramp rung must sit ONE STEP BELOW the working exercise, never equal to it. This preserves the primer role (prepare the pattern) and prevents pre-fatigue of the target.",
+  "",
+  "HARD FAILS (validator will flag — these are the specific bugs from the current live spreadsheet):",
+  "  - Warm-up cell containing 'Advanced Tuck' when the working exercise is 'Tuck Front Lever Hold'.",
+  "  - Warm-up cell containing 'One-Leg Tuck Human Flag' or higher when the working exercise is 'Tuck Human Flag Hold'.",
+  "  - Warm-up cell containing 'Box Pike Push-Up' at working depth, 'Deficit Wall HSPU', or '90-Degree HSPU' when the working exercise is 'Wall Handstand Push-Up'.",
+  "  - Any warm-up movement whose skill-family rung index is >= the working exercise's rung index.",
+  "  - Any warm-up ramp for a barbell lift whose top ramp set is at or above the working set %1RM at the same or lower rep count.",
+].join("\n");
+
+const UNILATERAL_LEG_INTENSITY_RULES = [
+  "=== UNILATERAL LEG RELATIVE-INTENSITY CALIBRATION (MANDATORY on leg days) ===",
+  "Single-leg movement patterns do NOT share a common load anchor. Prescribing '10 x 10 kg' across pistol / Bulgarian split squat / step-up / single-leg RDL is a bug: it collapses very different relative-intensity profiles into a single number and produces under-stimulating targets.",
+  "",
+  "USE THIS CROSS-PATTERN INTENSITY MAP (rough %-of-bilateral squat 1RM for a working set of 5-8 reps at ~RIR 2, per LEG):",
+  "  * PISTOL SQUAT (bodyweight or +load): ~30-35% of back-squat 1RM per side is a typical working load ceiling for a strong intermediate; loaded pistol at BW + 10 kg for 10 reps clean = elite relative strength.",
+  "  * BULGARIAN SPLIT SQUAT (front foot loaded, rear foot elevated ~30 cm): ~55-65% of back-squat 1RM per side for a 5-8 rep working set at RIR 2. This is a HIGHER loaded movement than pistol because the trailing leg passively supports and the ROM is shorter through the target hip.",
+  "  * REAR-FOOT-ELEVATED STEP-UP / SINGLE-LEG BOX SQUAT: ~50-60% of back-squat 1RM per side.",
+  "  * FRONT-LOADED / GOBLET SPLIT SQUAT: ~40-50% of back-squat 1RM per side (front-load limits loading; use only when hardware caps out on rear-foot version).",
+  "  * SINGLE-LEG ROMANIAN DEADLIFT (hinge, NOT squat): ~35-45% of deadlift 1RM per side, or ~50-70% of back-squat 1RM per side, whichever is lower. SL RDL is a POSTERIOR-CHAIN movement — its intensity anchor is the deadlift, not the squat.",
+  "  * SINGLE-LEG HIP THRUST: ~40-50% of bilateral hip-thrust 1RM per side, or ~40-50% of back-squat 1RM per side if no hip-thrust 1RM is known.",
+  "",
+  "CROSS-PATTERN TRANSLATION (mandatory when the athlete owns one pattern and you are prescribing another):",
+  "  STEP 1: Identify the athlete's OWNED unilateral pattern and its clean working weight (from current_numbers or the previous week's Results).",
+  "  STEP 2: Translate that owned load into an estimated bilateral back-squat 1RM using the % anchors above.",
+  "  STEP 3: From the estimated back-squat 1RM, derive the target working load for EACH other unilateral pattern using the % anchors.",
+  "  STEP 4: Reconcile with the RIR_LOAD_RANGE_RULES %1RM table using the derived bilateral 1RM. The unilateral working load is (target %1RM × derived bilateral 1RM × unilateral-pattern coefficient).",
+  "  STEP 5: Round to the nearest 2.5 kg. If the resulting load is BELOW what the athlete could grind out for 15+ reps at that pattern, you are under-prescribing — recheck the math or apply the equipment-cap fallback below.",
+  "",
+  "WORKED EXAMPLE (the specific case this rule fixes):",
+  "  Athlete owns Pistol Squat at BW 78 kg + 10 kg x 10 reps clean at ~RIR 2. Total loaded system per side = 88 kg for 10 reps at RIR 2. That maps (via RIR_LOAD_RANGE_RULES: 10 reps @ RIR 2 = ~65% of 1RM) to a per-side pistol 1RM of ~135 kg. Per-side pistol 1RM ≈ 33% of back-squat 1RM ⇒ estimated back-squat 1RM ≈ 400 kg. That is not credible from a single data point, so bracket: use the LOWER bound of the % anchor (30%) ⇒ back-squat 1RM ≈ 290 kg. Bracket further with any deadlift or squat number the athlete gave you.",
+  "  Bulgarian split squat target = 55-65% of ~200-290 kg bracketed bilateral squat = 110-180 kg TOTAL (i.e. 55-90 kg per hand as dumbbells, or a loaded barbell). NEVER 10 kg.",
+  "  SL RDL target = 35-45% of bracketed deadlift (or 50-70% of bracketed back-squat) = at minimum 60-100 kg TOTAL (per side loading, 30-50 kg per hand as dumbbells).",
+  "",
+  "EQUIPMENT-CAP FALLBACK (apply when hardware CANNOT reach the calibrated target load):",
+  "The rule is: NEVER drop the target stimulus to match a low load ceiling. Instead pivot to an alternate progressive-overload vector that hits the same total stimulus rating. Choose from these vectors in order:",
+  "  1) TEMPO / ECCENTRIC LOADING: 4-6 s eccentric on every rep, or 3-3-3 pause (down-pause-up). Doubles time-under-tension at the capped load.",
+  "  2) 1.5-REP or PARTIAL PULSING: 1.5 reps (full rep + half rep) at the capped load. Substantial local overload without adding external weight.",
+  "  3) PLYOMETRIC / EXPLOSIVE ADDITION: pair the capped-load set with a matched plyometric (e.g. Bulgarian split squat capped at 30 kg + Split Squat Jump x 5 immediately after). Contrast method — heavy neural drive from the plyo compensates for the load cap.",
+  "  4) SPRINT / HILL / SLED SUBSTITUTION: replace one accessory slot with 4-8 short sprints (10-30 m) or 4-8 hill sprints. Uses the same posterior-chain and quad musculature at supramaximal-intent output.",
+  "  5) REDUCED REST / DENSITY: cut inter-set rest to 30-45 s and add sets. Metabolic stress substitutes for absolute load.",
+  "  6) CLUSTER SETS at the capped load: 5x(3+3+3) with 15 s intra-set rest. More total reps at high quality than a straight set.",
+  "",
+  "OUTPUT REQUIREMENT: When any fallback vector is chosen, the Notes cell must state (in plain client language) WHY. Example: 'DBs cap at 40 kg per hand — we're using 5-second lowers plus a jump split-squat pairing to keep the stimulus at the right level.'",
+  "",
+  "HARD FAILS (validator will flag):",
+  "  - Prescribing the SAME load across pistol / Bulgarian / SL RDL / step-up for the same athlete.",
+  "  - Prescribing < 30% of estimated bilateral squat 1RM on Bulgarian split squat for an athlete who owns a loaded pistol at BW+10 kg or higher.",
+  "  - Prescribing < 30% of estimated deadlift 1RM on SL RDL when equipment IS available for higher load.",
+  "  - Silent load-cap acceptance: emitting an under-stimulating load with no Notes cell explanation of an equipment cap AND no fallback vector applied.",
+].join("\n");
+
+const LOCALIZATION_RULES = [
+  "=== LANGUAGE / LOCALIZATION (MANDATORY when intake.language is set) ===",
+  "The intake carries an optional 'language' field. If it is 'he' (Hebrew), the CLIENT-FACING prose is written in Hebrew. If it is 'en' or missing, everything stays in English.",
+  "",
+  "WHAT LOCALIZES (translate to Hebrew when language == 'he'):",
+  "  * The intro paragraph (why this week is structured this way).",
+  "  * The 'How to progress weeks 2-4' paragraph.",
+  "  * Every Exercise cell name (translate the exercise name; keep the exercise recognisable — e.g. 'סקוואט אחורי (Back Squat)' the first time it appears in a week, then just Hebrew after).",
+  "  * Every Notes cell (all client-facing coaching language).",
+  "  * The Target RPE cell descriptor ('קל / בינוני / קשה').",
+  "  * The Rest cell descriptor.",
+  "",
+  "WHAT MUST STAY IN ENGLISH (structural tokens — the parser and spreadsheet builder depend on them):",
+  "  * The TSV column headers, EXACTLY: 'Day\\tExercise\\tWeight\\tSets\\tReps\\tRest\\tTarget RPE\\tNotes\\tResults'.",
+  "  * The day-of-week token in the Day column, EXACTLY: 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'. The spreadsheet parser regex-matches these tokens; Hebrew day names break the day-boundary borders and per-week tabs.",
+  "  * The '[WARMUP]' prefix at the start of any warm-up Exercise cell. The validator regex-matches this literal.",
+  "  * Numeric values (weights, sets, reps) in Western Arabic digits, kg unit, seconds/minutes with 's'/'min'.",
+  "  * The week-block header labels: 'WEEK1', 'WEEK2', 'WEEK3', 'WEEK4' and 'PASTE_WEEK1'/etc if used.",
+  "",
+  "OUTPUT LAYOUT (RTL safety):",
+  "  * Hebrew text inside a cell reads right-to-left; the spreadsheet renderer handles cell direction automatically. Do NOT wrap Hebrew in any BiDi markers.",
+  "  * Do NOT reorder columns or rows for RTL. The parser expects the same column order regardless of language.",
+  "  * When mixing Hebrew and Latin in one cell (e.g. exercise name plus load), put the Hebrew phrase first, then a space, then the Latin fragment (e.g. 'סקוואט אחורי, 100 kg').",
+  "",
+  "TERMINOLOGY DICTIONARY (canonical translations — use these consistently):",
+  "  * Warm-up = חימום ; General prep = הכנה כללית ; Specific ramp = ראמפ ספציפי ; skill primer = פריימר טכני",
+  "  * Sets = סטים ; Reps = חזרות ; Rest = מנוחה ; Weight = משקל ; Notes = הערות ; Target RPE = RPE יעד ; Results = תוצאות",
+  "  * Heavy day = יום כבד ; Moderate day = יום בינוני ; Speed day = יום מהירות ; Recovery = התאוששות ; Deload = פריקה",
+  "  * Back Squat = סקוואט אחורי ; Front Squat = סקוואט קדמי ; Deadlift = דדליפט ; RDL = דדליפט רומני ; Bench Press = לחיצת חזה ; Overhead Press = לחיצת כתפיים ; Pull-up = מתח ; Chin-up = מתח בהחזקת סופינציה ; Dip = דיפ ; Row = חתירה ; Hip Thrust = היפ ת'ראסט",
+  "  * Bulgarian Split Squat = ספליט סקוואט בולגרי ; Pistol Squat = פיסטול סקוואט ; Single-Leg RDL = דדליפט רומני על רגל אחת ; Step-Up = עלייה על ספסל",
+  "  * Wall Handstand Push-Up = לחיצת עמידת ידיים על הקיר ; Freestanding HSPU = לחיצת עמידת ידיים חופשית ; Front Lever = פרונט לבר ; Human Flag = דגל אנושי ; Planche = פלאנץ' ; Muscle-Up = מאסל-אפ ; One-Arm Pull-up = מתח יד אחת",
+  "  * Zone 2 = זון 2 ; EMOM = EMOM ; AMRAP = AMRAP ; tempo = טמפו ; eccentric = אקסצנטרי ; RIR = RIR",
+  "",
+  "HARD FAILS (validator will flag):",
+  "  - Client-facing prose (intro paragraph, notes) in English when language == 'he'.",
+  "  - Day column containing anything other than Mon/Tue/Wed/Thu/Fri/Sat/Sun.",
+  "  - Column headers translated (must stay the fixed English tokens).",
+  "  - '[WARMUP]' prefix translated (must stay literal English).",
+  "  - Weights in non-metric units (must be kg; Hebrew locale still uses kg for strength).",
+].join("\n");
+
+function buildPrompt(intake) {
+  return [
+    "A NEW CLIENT has submitted their intake. Build their Week 1 program now.",
+    "Use ONLY the data in this intake. Do not use any remembered profile, saved info, or in-instruction example.",
+    "",
+    "=== CLIENT INTAKE ===",
+    JSON.stringify(intake, null, 2),
+    "",
+        INTAKE_HANDLING_RULES,
+    "",
+    PERIODISATION_PRESCRIPTION_RULES,
+    "",
+    DENSITY_AND_ENDURANCE_RULES,
+    "",
+    SPORT_DAY_COUPLING_RULES,
+    "",
+    CALISTHENICS_PROGRESSION_RULES,
+    "",
+    RIR_LOAD_RANGE_RULES,
+    "",
+    MULTI_WEEK_BLOCK_RULES,
+    "",
+    WARMUP_RULES,
+    "",
+    WARMUP_CEILING_RULES,
+    "",
+    UNILATERAL_LEG_INTENSITY_RULES,
+    "",
+    LOCATION_EQUIPMENT_RULES,
+    "",
+    LOCALIZATION_RULES,
+    "",
+    phase15PromptRules(intake),
+    "",
+    CLIENT_OUTPUT_CONTRACT,
+  ].join("\n");
+}
+
+function adjustPrompt(intake, currentProgram, changeRequest) {
+  return [
+    "This is an ADJUSTMENT turn for an EXISTING client. Apply a SURGICAL DIFF —",
+    "change ONLY what the client's request requires; keep everything else identical.",
+    "Do NOT regenerate the whole program from scratch.",
+    "",
+    "=== CLIENT INTAKE (original) ===",
+    JSON.stringify(intake, null, 2),
+    "",
+        INTAKE_HANDLING_RULES,
+    "",
+    PERIODISATION_PRESCRIPTION_RULES,
+    "",
+    DENSITY_AND_ENDURANCE_RULES,
+    "",
+    SPORT_DAY_COUPLING_RULES,
+    "",
+    CALISTHENICS_PROGRESSION_RULES,
+    "",
+    RIR_LOAD_RANGE_RULES,
+    "",
+    MULTI_WEEK_BLOCK_RULES,
+    "",
+    WARMUP_RULES,
+    "",
+    WARMUP_CEILING_RULES,
+    "",
+    UNILATERAL_LEG_INTENSITY_RULES,
+    "",
+    LOCATION_EQUIPMENT_RULES,
+    "",
+    LOCALIZATION_RULES,
+    "",
+    "=== CURRENT PROGRAM (their existing plan) ===",
+    currentProgram,
+    "",
+    "=== WHAT THE CLIENT SAYS CHANGED ===",
+    changeRequest,
+    "",
+    "Return the updated program. Start with a short 'Changes this week:' note listing only",
+    "what you changed and why, then the full updated program including a fresh",
+    "START_WEEK1_TSV ... END_WEEK1_TSV block.",
+    "",
+    phase15PromptRules(intake),
+    "",
+    CLIENT_OUTPUT_CONTRACT,
+  ].join("\n");
+}
+
+// ---------- Server-side privacy safety-net ----------
+// Even with the output contract, a weaker model may slip an internal label through.
+// This is a LAST-RESORT scrub of obvious banned tokens in the client-facing prose.
+// It is conservative: it only neutralizes clear internal-label leaks, never touches
+// exercise names, RPE/RIR, or the TSV machine block.
+// Applies the forbidden-label substitutions that are SAFE to run anywhere,
+// including inside the TSV machine block (single words -> client-safe synonyms).
+// Deterministic exercise-name corrector. The engine instructs the model never to
+// print a raw/loose goal phrase (e.g. "90-Degree Wall HSPU") as an exercise name,
+// but a large prompt + a fast model can still leak one. This is a hard code-level
+// safety net: it rewrites known-invalid or non-standard exercise names to the real
+// progression name from the skill ladder, regardless of which model produced them.
+// Order matters: most specific patterns first.
+const EXERCISE_FIXES = [
+  // --- HSPU family: "90-degree (wall) HSPU/handstand push-up" is NOT a real exercise. ---
+  // A 90-degree HSPU is a GOAL (lower to 90 deg of elbow flexion); the real working
+  // movement is a wall handstand push-up to that range. Map the invalid combos.
+  [/\b(?:wall\s+)?90[-\s]?degree\s+wall\s+(hspu|handstand\s+push[-\s]?ups?)\b/gi, "Wall Handstand Push-up"],
+  [/\bwall\s+90[-\s]?degree\s+(hspu|handstand\s+push[-\s]?ups?)\b/gi, "Wall Handstand Push-up"],
+  [/\b90[-\s]?degree\s+(hspu|handstand\s+push[-\s]?ups?)\b/gi, "Wall Handstand Push-up"],
+  // Bare "HSPU" acronym in a client-facing context -> spelled out, real name.
+  [/\bwall\s+hspu\s+negatives?\b/gi, "Wall Handstand Push-up Negative"],
+  [/\bdeficit\s+wall\s+hspu\b/gi, "Deficit Wall Handstand Push-up"],
+  [/\bwall\s+hspu\b/gi, "Wall Handstand Push-up"],
+  [/\bfreestanding\s+hspu\b/gi, "Freestanding Handstand Push-up"],
+  [/\bhspu\b/gi, "Handstand Push-up"],
+  // --- OAP family: "one-arm pull-up" goal printed as the raw goal, not a progression. ---
+  // We only normalise the acronym; band/eccentric variants are valid as written.
+  [/\boap\b/gi, "One-Arm Pull-up"],
+];
+function fixInvalidExerciseNames(s) {
+  if (!s) return s;
+  for (const [re, repl] of EXERCISE_FIXES) s = s.replace(re, repl);
+  return s;
+}
+
+function scrubForbiddenWords(s) {
+  if (!s) return s;
+  s = s.replace(/\b(?:RAZ BASE |ENDURANCE )?SOURCE EXCERPT\s*\d+\b/gi, 'the coaching plan'); // SOURCE-LABEL-CLIENT-SCRUB
+  // Weekly training-state names -> client-safe synonyms (any context/case).
+  // 'Deload' is intentionally NOT scrubbed: it is standard, client-friendly
+  // recovery-week language and athletes expect to see it.
+  s = s.replace(/\b(Push|Maintain|Reduce)\b(?=\s+(?:for|block|week|phase|state|everything|on)\b)/g, "focus");
+  // Spelled-out internal score/label names (catch BEFORE the abbreviation pass so the
+  // parenthetical abbreviation is removed with its phrase). "Skill Quality Score (SQS)"
+  // -> "movement quality"; drop any trailing numeric value too (e.g. "SQS 0.7").
+  s = s.replace(/\bskill\s+quality\s+score\s*(?:\((?:SQS)\))?(?:\s*(?:below|under|of|=|:)?\s*[0-9.]+)?/gi, "movement quality");
+  // Internal volume abbreviations.
+  s = s.replace(/\b(MEV|MAV|MRV|SQS|EVU|LTOS|VCS)\b/g, "target volume");
+  // Spinal Debt internal term.
+  s = s.replace(/\bspinal\s+debt\b/gi, "lower-back fatigue");
+  // Art. N citations.
+  s = s.replace(/\(?\bArt\.?\s?\d+[a-z]?\)?/gi, "");
+  return s;
+}
+
+// Remove forbidden internal-routing COLUMNS from any markdown table.
+// The word-scrubber can't fix structure, so if the model emits a table with
+// columns like 'Stress' / 'Main Goal Exposure' / 'Session Focus' / 'Intensity'
+// / 'Purpose' / 'Modification', we drop those columns entirely and keep the rest.
+const FORBIDDEN_COL = /^(stress|main goal exposure|session focus|intensity|exposure|maintenance|support|trunk|purpose|modification|focus|weekly state|training state)$/i;
+function stripForbiddenColumns(md) {
+  if (!md) return md;
+  const lines = md.split("\n");
+  const isRow = (l) => /^\s*\|.*\|\s*$/.test(l);
+  const cells = (l) => l.trim().replace(/^\|/, "").replace(/\|$/, "").split("|").map((c) => c.trim());
+  const out = [];
+  let i = 0;
+  while (i < lines.length) {
+    // Detect a table: a header row, then a separator row of dashes.
+    if (isRow(lines[i]) && i + 1 < lines.length && /^\s*\|[\s:|-]+\|\s*$/.test(lines[i + 1])) {
+      const header = cells(lines[i]);
+      const dropIdx = header
+        .map((h, idx) => (FORBIDDEN_COL.test(h.replace(/\*/g, "").trim()) ? idx : -1))
+        .filter((x) => x >= 0);
+      if (dropIdx.length === 0) { out.push(lines[i]); i++; continue; }
+      const keep = (arr) => arr.filter((_, idx) => !dropIdx.includes(idx));
+      // header + separator
+      out.push("| " + keep(header).join(" | ") + " |");
+      out.push("|" + keep(cells(lines[i + 1])).map(() => "---").join("|") + "|");
+      i += 2;
+      // body rows
+      while (i < lines.length && isRow(lines[i]) && !/^\s*\|[\s:|-]+\|\s*$/.test(lines[i])) {
+        const row = cells(lines[i]);
+        // pad short rows so column indices line up before dropping
+        while (row.length < header.length) row.push("");
+        out.push("| " + keep(row).join(" | ") + " |");
+        i++;
+      }
+      continue;
+    }
+    out.push(lines[i]);
+    i++;
+  }
+  return out.join("\n");
+}
+
+// Remove the em-dash / en-dash "AI tell" so the program reads like a human wrote it.
+// This runs ONLY on prose (the TSV machine block is split off before this is called),
+// and it is written to be SAFE around the things a dash is legitimately part of:
+//   - markdown table separator rows  |---|---|  (left untouched)
+//   - hyphenated words: pull-up, push-up, one-arm, 90-degree, Zone 2-5
+//   - numeric ranges: 8-12 reps, 60-90s, RPE 7-8
+// It only rewrites em/en dashes and a spaced hyphen used as a sentence connector.
+function dehyphenateProse(s) {
+  if (!s) return s;
+  return s.split("\n").map((line) => {
+    // Never touch a markdown table separator row (e.g. |---|:--:|---|).
+    if (/^\s*\|[\s:|-]+\|\s*$/.test(line)) return line;
+    // Inside table rows, only the dashes WITHIN cell text matter; the same
+    // word-boundary rules below are safe there too, so we treat all lines alike.
+    let l = line;
+    // 1) Em/en dash used as a parenthetical or clause break, with spaces around it:
+    //    "squats — they build..."  ->  "squats, they build..."
+    l = l.replace(/\s+[\u2014\u2013]\s+/g, ", ");
+    // 2) Em/en dash with NO spaces between words (rarer): "strength—power" -> "strength, power"
+    l = l.replace(/([A-Za-z0-9])[\u2014\u2013]([A-Za-z0-9])/g, "$1, $2");
+    // 3) A spaced ASCII hyphen used as a clause connector: " - " -> ", "
+    //    (a real range like 8-12 has NO surrounding spaces, so it is untouched)
+    l = l.replace(/\s+-\s+/g, ", ");
+    // 4) Any leftover bare em/en dash -> comma+space, then tidy doubles.
+    l = l.replace(/[\u2014\u2013]/g, ", ");
+    // Cosmetic cleanup from the substitutions above.
+    l = l.replace(/,\s*,/g, ",").replace(/,\s*\./g, ".").replace(/\(\s*,\s*/g, "(").replace(/\s+,/g, ",");
+    return l;
+  }).join("\n");
+}
+
+// Remove any markdown pipe table (and an immediately-preceding heading like
+// "### Week 1 Training Schedule") from the PROSE body. The Week 1 program is
+// rendered by the client from the START_WEEK1_TSV block only, so a second table
+// in the narrative is redundant, breaks the layout, and the user explicitly
+// asked for it gone. This is a deterministic belt-and-suspenders strip that runs
+// regardless of whether the model obeyed the no-pipe-table prompt rule.
+// Operates on PROSE ONLY (TSV is split off before this is called), so it can
+// never damage the machine block.
+function stripBodyProgramTable(s) {
+  if (!s || s.indexOf("|") === -1) return s;
+  const lines = s.split("\n");
+  const isTableRow = (l) => /^\s*\|.*\|\s*$/.test(l);
+  // A heading that introduces the redundant week table; remove it with the table.
+  const isTableHeading = (l) =>
+    /^\s*#{1,6}\s*.*(week\s*1|training schedule|base microcycle|weekly schedule|microcycle).*$/i.test(l);
+  const out = [];
+  for (let i = 0; i < lines.length; i++) {
+    // Detect the start of a pipe table: a header row followed by a separator row
+    // (|---|---|) on the next non-empty line. Standard markdown table shape.
+    if (isTableRow(lines[i])) {
+      let j = i + 1;
+      // allow the separator to be the immediate next line
+      if (j < lines.length && /^\s*\|[\s:|-]+\|\s*$/.test(lines[j])) {
+        // This is a real markdown table. Consume all contiguous table rows.
+        let k = j + 1;
+        while (k < lines.length && isTableRow(lines[k])) k++;
+        // Drop a heading line and blank lines that directly precede the table.
+        while (out.length && out[out.length - 1].trim() === "") out.pop();
+        if (out.length && isTableHeading(out[out.length - 1])) out.pop();
+        while (out.length && out[out.length - 1].trim() === "") out.pop();
+        // Skip blank lines and a lone "---" horizontal rule that often wraps the table.
+        while (k < lines.length && (lines[k].trim() === "" || /^\s*-{3,}\s*$/.test(lines[k]))) k++;
+        // Also drop a horizontal rule left immediately before the table.
+        while (out.length && /^\s*-{3,}\s*$/.test(out[out.length - 1])) out.pop();
+        while (out.length && out[out.length - 1].trim() === "") out.pop();
+        i = k - 1; // continue after the table block
+        continue;
+      }
+    }
+    out.push(lines[i]);
+  }
+  // Collapse any triple+ blank lines left behind.
+  return out.join("\n").replace(/\n{3,}/g, "\n\n");
+}
+
+// ---------------------------------------------------------------------------
+// Capacity validator (defense-in-depth)
+// ---------------------------------------------------------------------------
+// The engine instructions are the primary lever; this is the server-side net.
+// It parses current benchmarks and rejects only clearly impossible fixed doses:
+// an unassisted static hold longer than the demonstrated clean max, or fixed
+// density reps above the demonstrated clean max when the row is not a test.
+// Method-specific submaximal dosing is intentionally left to the coaching layer;
+// there is no universal rep-percentage or hold-time band enforced here.
+// When current capacity cannot be parsed, the row is skipped to avoid false positives.
+
+const STATIC_TERMS = [
+  "hold", "iron cross", "planche", "lever", "l-sit", "l sit", "lsit",
+  "handstand", "tuck", "straddle", "maltese", "victorian", "manna",
+];
+const DENSITY_LABELS = ["density", "endurance", "submaximal", "submax"];
+
+// Canonical movement buckets -> keyword aliases used to match an intake max to a row.
+const MOVEMENT_ALIASES = {
+  "push-up": ["push-up", "push up", "pushup", "press-up", "pressup"],
+  "pull-up": ["pull-up", "pull up", "pullup", "chin-up", "chin up", "chinup"],
+  "dip": ["dip"],
+  "muscle-up": ["muscle-up", "muscle up", "muscleup"],
+  "squat": ["squat"],
+  "row": ["inverted row", "bodyweight row", " row"],
+  "iron cross": ["iron cross"],
+  "planche": ["planche"],
+  "front lever": ["front lever"],
+  "back lever": ["back lever"],
+  "lever": ["lever"],
+  "handstand": ["handstand", "hspu"],
+  "l-sit": ["l-sit", "l sit", "lsit"],
+};
+
+// Pull every string field out of the (possibly nested) intake so we can scan
+// it for "<N> <movement>" rep maxes and "<N>s <position>" hold maxes.
+function collectIntakeStrings(intake) {
+  const out = [];
+  const walk = (v) => {
+    if (v == null) return;
+    if (typeof v === "string") { out.push(v); return; }
+    if (typeof v === "number") { out.push(String(v)); return; }
+    if (Array.isArray(v)) { v.forEach(walk); return; }
+    if (typeof v === "object") { Object.values(v).forEach(walk); return; }
+  };
+  // Prioritise the fields most likely to hold the current benchmark, but fall
+  // back to scanning everything (current_strength / goal_specifics / etc.).
+  const priority = [
+    "current_strength", "current", "goal_specifics", "goal_primary",
+    "primary_goals", "secondary_goals", "notes",
+  ];
+  for (const k of priority) if (intake && intake[k] != null) walk(intake[k]);
+  walk(intake);
+  return out;
+}
+
+// Find which canonical movement a piece of text refers to (first alias hit).
+function matchMovement(text) {
+  const lower = (text || "").toLowerCase();
+  for (const [canon, aliases] of Object.entries(MOVEMENT_ALIASES)) {
+    if (aliases.some((a) => lower.includes(a))) return canon;
+  }
+  return null;
+}
+
+// Parse current-max benchmarks from the intake.
+//  - current_max_reps: { movement -> reps }  (largest stated number per movement)
+//  - current_max_hold_sec: { position -> seconds } (largest stated hold per position)
+function parseCurrentMax(intake) {
+  const reps = {};
+  const holdSec = {};
+  if (!intake || typeof intake !== "object") return { reps, holdSec };
+  const strings = collectIntakeStrings(intake);
+  for (const raw of strings) {
+    const text = String(raw);
+    const lower = text.toLowerCase();
+
+    // Hold seconds: "5s straddle", "2 sec iron cross", "20-second handstand".
+    // The CURRENT max hold is the benchmark we want; a goal hold ("want 20s")
+    // is larger and must NOT be taken as the max. Use the same current-vs-goal
+    // disambiguation as reps: skip goal-phrased numbers, and when ambiguous keep
+    // the SMALLER value (current ability is the lower of current vs goal).
+    const holdRe = /(\d+(?:\.\d+)?)\s*(?:s\b|sec\b|secs\b|second[s]?\b|-second)/gi;
+    let hm;
+    while ((hm = holdRe.exec(lower)) !== null) {
+      const val = parseFloat(hm[1]);
+      if (!Number.isFinite(val) || val <= 0) continue;
+      // Look at a window around the number for a static position name.
+      const around = lower.slice(Math.max(0, hm.index - 40), hm.index + 40);
+      if (!STATIC_TERMS.some((t) => around.includes(t))) continue;
+      const isGoalish = /\b(want|goal|target|aim|reach|chasing|get to)\b/.test(around);
+      const isCurrentish = /\b(max|current|now|currently|best|can hold|hold for|clean)\b/.test(around) || /\bmax\b/.test(lower);
+      if (isGoalish && !isCurrentish) continue; // a pure goal number, not the max
+      const mv = matchMovement(around) || STATIC_TERMS.find((t) => around.includes(t));
+      if (!mv) continue;
+      if (!(mv in holdSec)) holdSec[mv] = val;
+      else holdSec[mv] = Math.min(holdSec[mv], val); // current max is the lower one
+    }
+
+    // Rep maxes: "20 push-ups max", "max 20 push-ups", "20 strict push-ups".
+    // Only treat as a CURRENT max when the context reads like a current ability,
+    // not a goal target (avoid "want 100 push-ups").
+    const repRe = /(\d+)\s*(push-?ups?|pull-?ups?|chin-?ups?|dips?|muscle-?ups?|squats?|rows?|reps?)/gi;
+    let rm;
+    while ((rm = repRe.exec(lower)) !== null) {
+      const val = parseInt(rm[1], 10);
+      if (!Number.isFinite(val) || val <= 0) continue;
+      const around = lower.slice(Math.max(0, rm.index - 30), rm.index + 30);
+      // Skip obvious goal phrasing ("want", "goal", "target", "in one set" as a target).
+      const isGoalish = /\b(want|goal|target|aim|reach|chasing|get to)\b/.test(around);
+      const isCurrentish = /\b(max|current|now|currently|best|strict|can do|hit)\b/.test(around) || /max/.test(lower);
+      const mv = matchMovement(around);
+      if (!mv) continue;
+      // Prefer current-context numbers; if both a current and a goal number exist
+      // for the same movement, keep the SMALLER (current is the lower benchmark).
+      if (isGoalish && !isCurrentish) continue;
+      if (!(mv in reps)) reps[mv] = val;
+      else reps[mv] = Math.min(reps[mv], val); // current max is the lower of the two
+    }
+  }
+  return { reps, holdSec };
+}
+
+// Parse the TSV machine block into header + rows (tab- or comma-delimited).
+function parseTsvBlock(block) {
+  const inner = block
+    .replace(/^[\s\S]*?START_WEEK1_TSV/i, "")
+    .replace(/END_WEEK1_TSV[\s\S]*$/i, "")
+    .trim();
+  const lines = inner.split("\n").map((l) => l.replace(/\r$/, "")).filter((l) => l.trim());
+  if (lines.length < 2) return null;
+  const delim = lines[0].includes("\t") ? "\t" : lines[0].includes(",") ? "," : null;
+  if (!delim) return null;
+  const cells = (l) => l.split(delim).map((c) => c.trim());
+  const header = cells(lines[0]).map((h) => h.toLowerCase());
+  const rows = lines.slice(1).map(cells);
+  return { header, rows, delim };
+}
+
+// Pull the first per-set number from a cell like "13", "13-17", "3x15", "5s", "0.8-1.4s".
+function firstNumber(str) {
+  const m = String(str || "").match(/(\d+(?:\.\d+)?)/);
+  return m ? parseFloat(m[1]) : null;
+}
+
+function stripAndFlagFormulaViolations(s, intake) {
+  if (!s || typeof s !== "string") return { violations: 0, flags: [] };
+  const tsvMatch = s.match(/(START_WEEK1_TSV[\s\S]*?END_WEEK1_TSV)/);
+  if (!tsvMatch) return { violations: 0, flags: [] };
+
+  const { reps: maxReps, holdSec: maxHold } = parseCurrentMax(intake);
+  const parsed = parseTsvBlock(tsvMatch[1]);
+  if (!parsed) return { violations: 0, flags: [] };
+
+  const idx = (name) => parsed.header.indexOf(name);
+  const exIdx = idx("exercise");
+  // Reps / hold can live under a few header names depending on the column set.
+  const repsIdx = [idx("reps"), idx("reps/duration"), idx("duration")].find((i) => i >= 0);
+  const notesIdx = idx("notes");
+
+  const flags = [];
+  for (const row of parsed.rows) {
+    const exercise = (exIdx >= 0 ? row[exIdx] : row.join(" ")) || "";
+    const notes = (notesIdx >= 0 ? row[notesIdx] : "") || "";
+    const repsCell = repsIdx >= 0 ? row[repsIdx] : "";
+    const ctx = (exercise + " " + notes + " " + repsCell).toLowerCase();
+
+    const isStatic = STATIC_TERMS.some((t) => ctx.includes(t));
+    const isDensityLabeled = DENSITY_LABELS.some((t) => ctx.includes(t));
+    const movement = matchMovement(ctx);
+
+    if (isStatic) {
+      // Static-hold TUT check (only when we know the athlete's current max hold).
+      let benchmark = movement && movement in maxHold ? maxHold[movement] : null;
+      if (benchmark == null) {
+        const term = STATIC_TERMS.find((t) => ctx.includes(t) && t in maxHold);
+        if (term) benchmark = maxHold[term];
+      }
+      if (benchmark == null || benchmark <= 0) continue; // unparseable -> skip
+      const holdVal = firstNumber(repsCell);
+      if (holdVal == null) continue;
+      const isTest = /\b(test|max hold|assessment|attempt)\b/i.test(ctx);
+      const isAssisted = /\b(assisted|band|foot assisted|counterweight)\b/i.test(ctx);
+      if (!isTest && !isAssisted && holdVal > benchmark) {
+        flags.push(`static-hold-exceeds-current-max: "${exercise.slice(0, 40)}" prescribes ${holdVal}s vs demonstrated clean max ${benchmark}s`);
+      }
+      continue;
+    }
+
+    // Rep-endurance / density check. Only run when the row is density/endurance
+    // labeled OR the movement clearly has a current rep max we can anchor to.
+    const repBenchmark = movement && movement in maxReps ? maxReps[movement] : null;
+    if (repBenchmark == null || repBenchmark <= 0) continue; // unparseable -> skip
+    if (!isDensityLabeled) continue; // ordinary lower-load strength sets may exceed a current rep benchmark; only density/endurance rows use this ceiling
+    const repsVal = firstNumber(repsCell);
+    if (repsVal == null || repsVal <= 0) continue;
+    const isTest = /\b(test|max reps|assessment|amrap)\b/i.test(ctx);
+    if (!isTest && repsVal > repBenchmark) {
+      flags.push(`fixed-density-reps-exceed-current-max: "${exercise.slice(0, 40)}" prescribes ${repsVal} fixed reps vs demonstrated clean max ${repBenchmark}`);
+    }
+  }
+
+    // -------------------------------------------------------------------
+  // NEW: density/endurance ABSENCE check (Path Z mission 2 verification)
+  // -------------------------------------------------------------------
+  // If the intake declares an endurance/conditioning/calisthenics-volume
+  // goal, the week MUST contain at least one density/EMOM/AMRAP/Zone 2
+  // /threshold row. Absence is a goal-coverage HARD FAIL.
+  try {
+    const goalText = JSON.stringify({
+      p: intake?.primary_goals, s: intake?.secondary_goals,
+      g: intake?.goal_specifics, c: intake?.current_strength, n: intake?.notes,
+    }).toLowerCase();
+    const DENSITY_DEMANDING_GOAL = /(?:emom|amrap|density)/; // source-aligned: only explicit density goals require density rows
+    const demandsDensity = DENSITY_DEMANDING_GOAL.test(goalText);
+    if (demandsDensity) {
+      const tsvLower = (tsvMatch[1] || "").toLowerCase();
+      const HAS_DENSITY_ROW = /(emom|amrap|zone\s*2|threshold|tempo interval|mas\b|density|amrap|every minute|on the minute|max reps|reps to failure|rpe 9|rpe 10)/;
+      if (!HAS_DENSITY_ROW.test(tsvLower)) {
+        flags.push(
+          "density-goal-coverage-fail: intake declares an endurance/conditioning/volume goal but the Week 1 TSV contains zero density/EMOM/AMRAP/Zone 2 rows"
+        );
+      }
+    }
+  } catch (e) {
+    // Defensive: never let validator errors break the program return.
+    console.warn("density-absence check failed:", e && e.message);
+  }
+
+  // -------------------------------------------------------------------
+  // Periodisation-structure consistency check
+  // -------------------------------------------------------------------
+  // Training age alone does NOT require DUP or Conjugate. Only enforce
+  // intra-week variation when the generated program explicitly claims an
+  // undulating / DUP / conjugate model. Stable specific practice can be the
+  // correct choice for advanced athletes.
+  try {
+    const claimsVariableModel = /\b(DUP|daily undulating|undulating|conjugate|dynamic effort|max effort)\b/i.test(String(s));
+    if (claimsVariableModel) {
+      const rowsByMovement = {};
+      for (const row of parsed.rows) {
+        const ex = ((exIdx >= 0 ? row[exIdx] : "") || "").toLowerCase();
+        const repsCell = repsIdx >= 0 ? row[repsIdx] : "";
+        const mv = matchMovement(ex);
+        if (!mv) continue;
+        if (!rowsByMovement[mv]) rowsByMovement[mv] = new Set();
+        const n = firstNumber(repsCell);
+        if (n != null) rowsByMovement[mv].add(Math.round(n));
+      }
+      for (const [mv, buckets] of Object.entries(rowsByMovement)) {
+        const occurrences = parsed.rows.filter((r) => {
+          const ex = ((exIdx >= 0 ? r[exIdx] : "") || "").toLowerCase();
+          return matchMovement(ex) === mv;
+        }).length;
+        if (occurrences >= 2 && buckets.size < 2) {
+          flags.push(`periodisation-model-mismatch: "${mv}" repeats ${occurrences}x without variation although the output claims an undulating/conjugate model`);
+        }
+      }
+    }
+  } catch (e) {
+    console.warn("periodisation-structure check failed:", e && e.message);
+  }
+
+  // -------------------------------------------------------------------
+  // Sport-day coupling consistency check
+  // -------------------------------------------------------------------
+  // The deterministic exercise_dictionary validator owns hard sport-coupling
+  // failures. This formula pass only flags an explicit short-gap collision.
+  // It must never re-introduce a blanket ban on same-day stress consolidation.
+  try {
+    const schedule = Array.isArray(intake?.sport_schedule) ? intake.sport_schedule : [];
+    const shortGapHardDays = schedule
+      .filter((x) => x && /hard/i.test(String(x.intensity || "")) && Number.isFinite(Number(x.gap_hours)) && Number(x.gap_hours) < 4)
+      .map((x) => String(x.day || "").toLowerCase().trim());
+    if (shortGapHardDays.length) {
+      const dayIdxLocal = idx("day");
+      const HIGH_FATIGUE_LOWER = /(back squat|front squat|deadlift|conventional deadlift|sumo deadlift|heavy squat|heavy deadlift|max effort lower|heavy single|heavy triple)/i;
+      for (const row of parsed.rows) {
+        const dayCell = dayIdxLocal >= 0 ? String(row[dayIdxLocal] || "").toLowerCase().trim() : "";
+        if (!dayCell || !shortGapHardDays.some((d) => dayCell.includes(d) || d.includes(dayCell))) continue;
+        const ex = (exIdx >= 0 ? row[exIdx] : "") || "";
+        const notes = (notesIdx >= 0 ? row[notesIdx] : "") || "";
+        if (HIGH_FATIGUE_LOWER.test(ex + " " + notes)) {
+          flags.push(`sport-short-gap-conflict: "${String(ex).slice(0, 40)}" scheduled within <4h of explicitly hard sport on "${dayCell}"`);
+        }
+      }
+    }
+  } catch (e) {
+    console.warn("sport-day coupling formula check failed:", e && e.message);
+  }
+
+  // Detection only: never mutate the program here. privacyScrub owns final
+  // output assembly and appends the hidden violation-count marker once.
+  const formulaOnlyFlags = flags.filter((flag) => /^(?:static-hold-exceeds-current-max|fixed-density-reps-exceed-current-max):/.test(String(flag)));
+  return { violations: formulaOnlyFlags.length, flags: formulaOnlyFlags }; // LEGACY-FORMULA-SCOPE-NARROWED
+}
+
+// Extract the violation count embedded by the validator (for _meta.violations).
+function readViolationCount(program) {
+  if (!program || typeof program !== "string") return 0;
+  const m = program.match(/QA_FORMULA_VIOLATION_COUNT:\s*(\d+)/);
+  return m ? parseInt(m[1], 10) : 0;
+}
+
+function phase15LastMileTsv(tsv, intake) {
+  if (!tsv) return tsv;
+  const benchmark = JSON.stringify(intake?.current_numbers || intake?.performance_markers || intake?.current_strength || '').toLowerCase();
+  const hasAdvancedTuckPlanche = /advanced tuck planche/.test(benchmark);
+  const hasAdvancedTuckFrontLever = /advanced tuck front lever/.test(benchmark);
+  const hasSingleLegFrontLever = /single[- ]leg front lever/.test(benchmark);
+  const location = String(intake?.training_location || '').toLowerCase();
+  const equipmentText = JSON.stringify(intake?.equipment || '').toLowerCase();
+  const parkOnly = /outdoor|park/.test(location);
+  const explicitNoBox = /\bno\s+(?:plyo\s+)?box\b/.test(equipmentText);
+  const explicitNoBench = /\bno\s+bench\b/.test(equipmentText);
+  const hasBoxOrBench = (/\bbox\b/.test(equipmentText) && !explicitNoBox) || (/\bbench\b/.test(equipmentText) && !explicitNoBench);
+  const hasBike = /bike|airbike|assault|echo/.test(equipmentText);
+  const hasRower = /rower|rowing machine|concept ?2/.test(equipmentText);
+  const availableDays = Array.isArray(intake?.available_gym_days) ? intake.available_gym_days.map((d) => String(d || '').trim()).filter(Boolean) : [];
+  const requestedDays = Number(intake?.days_per_week || 0);
+  let dayMap = new Map();
+  const out = [];
+  for (const line of String(tsv).split('\n')) {
+    if (!line.includes('\t')) {
+      if (/START_WEEK\d+_TSV/.test(line)) dayMap = new Map();
+      out.push(line); continue;
+    }
+    const cells = line.split('\t');
+    if (cells.length !== 9 || /^Day$/i.test(cells[0])) { out.push(line); continue; }
+    if (availableDays.length === requestedDays && requestedDays > 0) {
+      const rawDay = String(cells[0] || '').trim();
+      if (rawDay) {
+        if (!dayMap.has(rawDay)) dayMap.set(rawDay, availableDays[dayMap.size] || rawDay);
+        cells[0] = dayMap.get(rawDay);
+      }
+    }
+    let ex = String(cells[1] || '').trim();
+    if (/\[REVIEW\].*Paused Back Squat|^Paused Back Squat$/i.test(ex)) {
+      cells[1] = 'Pause Squat';
+      cells[7] = 'Controlled 1-2 second pause, crisp bar speed, keep the prescribed RPE honest.';
+      ex = cells[1];
+    }
+    if (/\[REVIEW\].*Copenhagen Plank|^Copenhagen Plank$/i.test(ex)) {
+      cells[1] = 'Side Plank';
+      cells[7] = 'Brace hard and keep hips stacked; stop before position degrades.';
+      ex = cells[1];
+    }
+    if (/\[REVIEW\].*Ring Push-up|^Ring Push-up$/i.test(ex)) {
+      cells[1] = 'Ring Push-up';
+      cells[7] = 'Keep the rings stable, body rigid, and stop 1-2 reps before form breaks.';
+      ex = cells[1];
+    }
+    if (/\[REVIEW\].*Ring Hamstring Curl|^Ring Hamstring Curl$/i.test(ex)) {
+      cells[1] = 'Ring Hamstring Curl';
+      cells[7] = 'Keep hips extended and curl the heels toward you under control; shorten the lever if needed.';
+      ex = cells[1];
+    }
+    if (/\[REVIEW\].*Pistol Squat to Box or Bench|^Pistol Squat to Box or Bench$/i.test(ex)) {
+      cells[1] = 'Pistol Squat to Box or Bench';
+      cells[7] = 'Use a controlled box/bench height that allows stable single-leg mechanics; lower the target over time.';
+      ex = cells[1];
+    }
+    if (/\[REVIEW\].*Ring Rollout|^Ring Rollout$/i.test(ex)) {
+      cells[1] = 'Ring Rollout';
+      cells[7] = 'Brace hard, keep ribs down, and only extend as far as you can control without lumbar extension.';
+      ex = cells[1];
+    }
+    if (/\[REVIEW\].*Hanging Knee Raise|^Hanging Knee Raise$/i.test(ex)) {
+      cells[1] = 'Hanging Knee Raise';
+      cells[7] = 'Control the pelvis, avoid swinging, and raise the knees with the trunk braced.';
+      ex = cells[1];
+    }
+    if (parkOnly && !hasBoxOrBench && /^Step-up$/i.test(ex)) {
+      cells[1] = 'Reverse Lunge';
+      cells[7] = 'Ground-based unilateral leg work. Use a controlled 3-second eccentric and add belt load only if the setup stays stable.';
+      ex = cells[1];
+    }
+    if (parkOnly && !hasBoxOrBench && /^Box Jump$/i.test(ex)) {
+      cells[1] = 'Broad Jump';
+      cells[7] = 'Maximum-quality horizontal jump. Reset fully between reps and stop as soon as distance or landing quality drops.';
+      ex = cells[1];
+    }
+    if (parkOnly && !hasBike && /^Zone-2 Bike$/i.test(ex)) {
+      cells[1] = 'Zone-2 Run';
+      cells[7] = 'Use a brisk walk or very easy jog that keeps breathing conversational; do not turn this into intervals.';
+      ex = cells[1];
+    }
+    if (parkOnly && !hasRower && /^Zone-2 Row$/i.test(ex)) {
+      cells[1] = 'Zone-2 Run';
+      cells[7] = 'Use a brisk walk or very easy jog that keeps breathing conversational; do not turn this into intervals.';
+      ex = cells[1];
+    }
+    if (/\[REVIEW\].*Step Back Lunge|^Step Back Lunge$/i.test(ex)) {
+      cells[1] = 'Reverse Lunge';
+      cells[7] = 'Use a controlled step-back lunge with stable knee tracking. Add belt/plate load only while balance and range stay clean.';
+      ex = cells[1];
+    }
+    if (/\[REVIEW\].*Ring Leg Curl|^Ring Leg Curl$/i.test(ex)) {
+      cells[1] = 'Ring Hamstring Curl';
+      cells[7] = 'Keep hips extended and control the eccentric. Adjust body position to stay 1-2 reps in reserve.';
+      ex = cells[1];
+    }
+    if (/\[REVIEW\].*Rings Push-up|^Rings Push-up$/i.test(ex)) {
+      cells[1] = 'Ring Push-up';
+      cells[7] = 'Keep the rings stable, body rigid and shoulders controlled. Progress range or loading only while reps stay clean.';
+      ex = cells[1];
+    }
+    if (/\[REVIEW\].*Short Sprint|^Short Sprint$/i.test(ex)) {
+      cells[1] = 'Sprint';
+      cells[7] = 'Maximum-quality short sprint. Accelerate hard, recover fully, and stop if speed drops noticeably.';
+      ex = cells[1];
+    }
+    if (/\[REVIEW\].*Ring Chin-up|^Ring Chin-up$/i.test(ex)) {
+      cells[1] = 'Chin-up';
+      cells[7] = 'Use the pull-up bar or rings with a supinated/neutral grip; keep reps strict and leave 1-2 reps in reserve.';
+      ex = cells[1];
+    }
+    if (parkOnly && !hasBoxOrBench && /^Box Jump$/i.test(ex)) {
+      cells[1] = 'Broad Jump';
+      cells[7] = 'Maximum-quality horizontal jump. Reset fully between reps and stop as soon as distance or landing quality drops.';
+      ex = cells[1];
+    }
+    if (parkOnly && !hasBike && /^Zone-2 Bike$/i.test(ex)) {
+      cells[1] = 'Zone-2 Run';
+      cells[7] = 'Use a brisk walk or very easy jog that keeps breathing conversational; do not turn this into intervals.';
+      ex = cells[1];
+    }
+    if (parkOnly && !hasRower && /^Zone-2 Row$/i.test(ex)) {
+      cells[1] = 'Zone-2 Run';
+      cells[7] = 'Use a brisk walk or very easy jog that keeps breathing conversational; do not turn this into intervals.';
+      ex = cells[1];
+    }
+    if (!hasAdvancedTuckPlanche && /^Straddle Planche$/i.test(ex)) continue;
+    if (hasAdvancedTuckFrontLever && !hasSingleLegFrontLever && /^Straddle Front Lever$/i.test(ex)) {
+      cells[1] = 'Single-Leg Front Lever';
+      cells[7] = 'Next-rung bridge. Alternate lead leg and stop before body line degrades.';
+      ex = cells[1];
+    }
+    // ENDURANCE-ALIAS-LASTMILE: exact aliases only, never free-form exercise invention.
+    if (/^(?:\[REVIEW\]\s*)?Zone-2 Rower$/i.test(ex)) { cells[1] = 'Zone-2 Row'; cells[7] = 'Low-intensity rowing. Keep output controlled and repeatable, and use pace or power as the external anchor.'; ex = cells[1]; }
+    if (/^(?:\[REVIEW\]\s*)?Bicep Curl(?: \(Dumbbell\))?$/i.test(ex)) { cells[1] = 'Dumbbell Curl'; cells[7] = 'Controlled accessory work. Keep the prescribed effort and stop before form deteriorates.'; ex = cells[1]; }
+    if (/^(?:\[REVIEW\]\s*)?Passive Hang$/i.test(ex)) { cells[1] = 'Dead Hang'; cells[7] = 'Relax into a controlled hang with a secure grip; stop before grip or shoulder position deteriorates.'; ex = cells[1]; }
+    if (/^(?:\[REVIEW\]\s*)?Dumbbell Reverse Lunge$/i.test(ex)) { cells[1] = 'Reverse Lunge'; cells[7] = 'Use dumbbells for a controlled reverse lunge and keep the prescribed RPE honest.'; ex = cells[1]; } // FINAL-REVERSE-LUNGE-LASTMILE
+    if (/^(?:\[REVIEW\]\s*)?Swimming$/i.test(ex)) { cells[1] = 'Swim'; cells[7] = 'Use swim pace and technique quality as the primary external anchors for this session.'; ex = cells[1]; }
+    if (/^(?:\[REVIEW\]\s*)?Cycling$/i.test(ex)) { cells[1] = 'Bike'; cells[7] = 'Use cycling power or pace as the primary external anchor and keep the prescribed session intent.'; ex = cells[1]; }
+    if (/^(?:\[REVIEW\]\s*)?Running$/i.test(ex)) { cells[1] = 'Run'; cells[7] = 'Use running pace as the primary external anchor and keep the prescribed session intent.'; ex = cells[1]; }
+    if (/^(?:\[REVIEW\]\s*)?Run \(Treadmill\)$/i.test(ex)) { cells[1] = 'Treadmill'; ex = cells[1]; }
+    if (/^(?:\[REVIEW\]\s*)?(?:\[(?:COOL ?DOWN|COOLDOWN)\]\s*)?(?:Cool[- ]?down\s+)?(?:Easy\s*)?(?:Jog(?:\s*\/\s*Walk)?|Walk(?:\s*\/\s*Jog)?)$/i.test(ex)) continue; // FINAL-COOLDOWN-LASTMILE
+    if (/^(?:Run|Treadmill|Rowing Ergometer|Swim|Bike)$/i.test(ex) && /^(?:N\/?A|none|)$/i.test(String(cells[2] || '').trim())) {
+      const targetMatch = String(cells[7] || '').match(/(?:target\s*)?(~?\d+:\d+(?:-\d+:\d+)?\s*\/(?:km|500m|100m)|~?\d+(?:\.\d+)?(?:-\d+(?:\.\d+)?)?\s*(?:km\/h|kph|watts?|w)\b)/i);
+      if (targetMatch) cells[2] = targetMatch[1].replace(/\s+/g, ' '); // ENDURANCE-EXTERNAL-TARGET-LASTMILE
+    }
+    if (/^Sprint$/i.test(ex)) {
+      cells[6] = 'N/A';
+      const sprintNote = String(cells[7] || '').trim();
+      if (!/(speed|velocity|quality|%)/i.test(sprintNote)) cells[7] = sprintNote ? sprintNote + ' Speed/quality target governs intensity; stop before speed drops.' : 'Speed/quality target governs intensity; stop before speed drops.';
+    }
+    out.push(cells.join('\t'));
+  }
+  const cleaned = out.join('\n');
+  if (/\[REVIEW\]|contact\s+support|could not be safely generated/i.test(cleaned)) {
+    const leaked = cleaned.split('\n').filter((line) => /\[REVIEW\]|contact\s+support|could not be safely generated/i.test(line)).slice(0, 5).join(' || ');
+    const err = new Error('Final client QA blocked unresolved review/support text: ' + leaked);
+    err.code = 'UNRESOLVED_CLIENT_REVIEW';
+    throw err;
+  }
+  return cleaned;
+}
+
+function privacyScrub(text, intake) {
+  if (!text) return text;
+  text = text.replace(/\n?<!--\s*QA_FORMULA_VIOLATION_COUNT:[\s\S]*?-->/gi, ''); // SERVER-OWNED-FORMULA-MARKER
+  text = text.replace(/<!--\s*QA_FORMULA_VIOLATION_COUNT:\s*\d+\s*-->/gi, ""); // SERVER-AUTHORITATIVE-FORMULA-MARKER
+
+  // Formula validator (defense-in-depth) runs on the FULL text first, because
+  // it must inspect the START_WEEK1_TSV row block. It anchors per-set loads to
+  // the athlete's current-max benchmarks parsed from the intake. It never edits
+  // the program; it returns a violation count + flags, which we log server-side
+  // and surface as a hidden marker on the output (read back into _meta.violations).
+  const fv = stripAndFlagFormulaViolations(text, intake);
+  if (fv.violations > 0) {
+    console.warn(
+      `[engine recalibration] ${fv.violations} formula-band violation(s) detected:\n  - ` +
+        fv.flags.join("\n  - ")
+    );
+  }
+
+  // Split off the TSV machine block so we never alter its STRUCTURE.
+  const startIdx = text.indexOf("START_WEEK1_TSV");
+  let prose = startIdx === -1 ? text : text.slice(0, startIdx);
+  let tsv = startIdx === -1 ? "" : text.slice(startIdx);
+
+  // Remove any redundant Week 1 program table from the narrative body (the
+  // client renders the week from the TSV block only). Deterministic guarantee.
+  prose = stripBodyProgramTable(prose);
+
+  // Strip forbidden internal columns from the markdown table in the prose part.
+  prose = stripForbiddenColumns(prose);
+
+  // Correct any invalid/non-standard exercise names to real ladder names.
+  prose = fixInvalidExerciseNames(prose);
+
+  // Remove a 'Weekly State: ...' line entirely.
+  prose = prose.replace(/^.*Weekly\s*State.*$/gim, "").trim();
+  // Apply word substitutions to prose, then collapse double spaces.
+  prose = scrubForbiddenWords(prose).replace(/[ ]{2,}/g, " ");
+  // Strip the em-dash AI tell so it reads human-written (prose only, TSV untouched).
+  prose = dehyphenateProse(prose);
+  // Apply the SAME single-word substitutions to the TSV block (structure preserved:
+  // these only swap whole words, never touch tabs, newlines, or column count).
+  if (tsv) tsv = phase15LastMileTsv(scrubForbiddenWords(fixInvalidExerciseNames(tsv)), intake);
+
+  const out = tsv ? prose.trim() + "\n\n" + tsv : prose.trim();
+  // Formula-band findings are server-side diagnostics only. Never encode internal
+  // QA state into the client program: the save-boundary cleanliness gate correctly
+  // rejects QA markers, and client-visible program text must remain transport-clean.
+  return out; // FORMULA-QA-SERVER-SIDE-ONLY
+}
+
+// ---------- App ----------
+const app = express();
+registerAdminQaRoutes(app, store);
+// Render and most production hosts sit behind a reverse proxy. Trust the first
+// proxy hop so rate limiting sees the real client IP instead of the proxy IP.
+app.set("trust proxy", 1);
+app.disable("x-powered-by");
+app.use(express.json({ limit: "256kb" }));
+app.use(express.static(path.join(__dirname, "public")));
+
+const apiLimiter = rateLimit({
+  windowMs: 60 * 1000,
+  max: 20,
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+app.use("/api/", apiLimiter);
+
+// Health
+app.get("/api/health", async (req, res) => {
+  try {
+    const storageHealth = await store.healthCheck();
+    const aiConfigured = USE_PPLX_PROXY || Boolean(OPENAI_API_KEY) || Boolean(GEMINI_API_KEY);
+    const ok = Boolean(storageHealth?.ok) && aiConfigured;
+    res.status(ok ? 200 : 503).json({
+      ok,
+      mode: USE_PPLX_PROXY ? "pplx-proxy(dev)" : OPENAI_API_KEY ? "openai" : GEMINI_API_KEY ? "gemini" : "no-key",
+      model: USE_PPLX_PROXY ? process.env.PPLX_MODEL || "gemini_3_flash" : OPENAI_API_KEY ? OPENAI_MODEL : GEMINI_MODEL,
+      openai_execution_path: OPENAI_API_KEY ? "deterministic-skeleton-v5.2.10-source-grounded" : null,
+      openai_legacy_engine_chars_not_sent: OPENAI_API_KEY ? ENGINE.length : null,
+      openai_compact_developer_chars: OPENAI_API_KEY ? OPENAI_COMPACT_DEVELOPER.length : null,
+      last_ai_usage: lastAIUsage,
+      last_build_timing: lastBuildTiming,
+      storage: store.backend,
+      storage_ok: Boolean(storageHealth?.ok),
+      ai_configured: aiConfigured,
+      thinking_budget: THINKING_BUDGET,
+      cache: {
+        enabled: ENABLE_ENGINE_CACHE,
+        ttl_seconds: CACHE_TTL_SECONDS,
+        active: Boolean(cacheState.name) && Date.now() < cacheState.expiresAt,
+      },
+    });
+  } catch (e) {
+    console.error("health check failed:", e);
+    res.status(503).json({
+      ok: false,
+      storage: store.backend,
+      storage_ok: false,
+      ai_configured: USE_PPLX_PROXY || Boolean(OPENAI_API_KEY) || Boolean(GEMINI_API_KEY),
+      error: "Service dependency check failed.",
+    });
+  }
+});
+
+// ---------- Async job runner ----------
+// Engine calls can take ~30-60s. On free hosts (e.g. Render free tier) a long
+// synchronous request times out and the program comes back truncated. So we
+// return a job id immediately and generate in the background; the client polls
+// GET /api/job/:id until status is "done" (or "error").
+
+// Engine v19: generate a program AND run it through the deterministic
+// post-generation validators, wrapping the existing 5-attempt retry loop.
+//
+// Pipeline per attempt (spec order):
+//   1. fixInvalidExerciseNames            (existing regex normalizer)
+//   2. validateExercisesAgainstDictionary (aliases corrected in place; throws EXERCISE_HALLUCINATION)
+//   3. validateAndCalibrateSkills         (skill-progression gate/rung check; throws SKILL_PREREQ_VIOLATION / SKILL_UNDER_PROGRAMMED)
+//   4. validateEquipmentAgainstLocation   (throws EQUIPMENT_VIOLATION)
+//   5. enforceUnilateralIntensityFloor    (throws UNILATERAL_UNDERSTIMULATION)
+//   6. enforceIntradayConditioningOrder   (reorders in place; throws INTRADAY_ORDER_VIOLATION)
+//   7. validateSportDayCoupling           (throws SPORT_DAY_COUPLING_VIOLATION)
+//   8. validateWeeklyVolumeBudget         (throws WEEKLY_MRV_EXCEEDED)
+//   9. reformatWarmupCells                 (combine warmup drills into one cell, newline-separated)
+// scrubForbiddenWords / stripForbiddenColumns run afterwards inside privacyScrub.
+//
+// Each validator throws a retriable error carrying an amended user message. The
+// amendments ACCUMULATE across attempts (append, never replace). After a given
+// error code has failed 3 times we downgrade to a deterministic hard-substitute
+// pass rather than failing the whole build.
+async function generateValidatedProgram(intake, onProgress = async () => {}) {
+  const MAX_ATTEMPTS = OPENAI_API_KEY ? 1 : 3;
+  const basePrompt = buildPrompt(intake);
+  const amendments = [];
+  const failCounts = Object.create(null);
+  let lastValid = null;
+  const deadline = Date.now() + BUILD_JOB_TIMEOUT_MS;
+
+  for (let attempt = 1; attempt <= MAX_ATTEMPTS; attempt++) {
+    if (Date.now() >= deadline) {
+      const err = new Error("Program generation exceeded the safe time limit. Please retry; your intake has been saved.");
+      err.code = "BUILD_TIMEOUT";
+      throw err;
+    }
+    await onProgress("generating", attempt, attempt === 1 ? "initial generation" : "regenerating after quality check");
+    const userContent = amendments.length
+      ? basePrompt + "\n\n" + amendments.join("\n\n")
+      : basePrompt;
+    const raw = await runEngineRaw(userContent);
+    if (!isValidProgram(raw)) {
+      console.warn(
+        `generateValidatedProgram: invalid/degenerate output attempt ${attempt}/${MAX_ATTEMPTS} ` +
+          `(len=${raw ? raw.trim().length : 0}); retrying`
+      );
+      await onProgress("refining", attempt, "structural output check failed");
+      continue;
+    }
+    let program = fixInvalidExerciseNames(raw); // step 1
+    try {
+      await onProgress("validating", attempt, "exercise and coaching validators");
+      const dict = validateExercisesAgainstDictionary(program, intake); // step 2
+      program = dict.program;
+      if (!OPENAI_API_KEY) {
+        const skills = validateAndCalibrateSkills(program, intake); // legacy path only
+        program = skills.program;
+      }
+      validateEquipmentAgainstLocation(program, intake);        // step 4
+      enforceUnilateralIntensityFloor(program, intake);         // step 5
+      program = enforceIntradayConditioningOrder(program, intake); // step 6
+      validateSportDayCoupling(program, intake);                // step 7
+      validateWeeklyVolumeBudget(program, intake);              // step 8
+      program = reformatWarmupCells(program);                   // step 9
+      program = repairPhase15Program(program);                    // step 10: safe ordering only
+      validatePhase15FinalProgram(program, intake);              // step 11: variation-aware final QA
+      await onProgress("finalizing", attempt, "quality checks passed including Phase 15 v5");
+      return program;
+    } catch (err) {
+      if (err && err.code && RETRIABLE_CODES.has(err.code)) {
+        lastValid = program;
+        failCounts[err.code] = (failCounts[err.code] || 0) + 1;
+        console.warn(
+          `generateValidatedProgram: ${err.code} on attempt ${attempt}/${MAX_ATTEMPTS} ` +
+            `(count=${failCounts[err.code]})`
+        );
+        await onProgress("refining", attempt, err.code);
+        if (failCounts[err.code] >= 2 || attempt === MAX_ATTEMPTS) {
+          console.warn(`generateValidatedProgram: deterministic hard-substitute for ${err.code}`);
+          program = hardSubstitute(err.code, program, intake);
+          await onProgress("finalizing", attempt, `deterministic correction for ${err.code}`);
+          return reformatWarmupCells(program);
+        }
+        if (!amendments.includes(err.amendment)) amendments.push(err.amendment);
+        continue;
+      }
+      throw err;
+    }
+  }
+  if (lastValid) {
+    for (const code of Object.keys(failCounts)) lastValid = hardSubstitute(code, lastValid, intake);
+    await onProgress("finalizing", MAX_ATTEMPTS, "using last structurally valid program after deterministic corrections");
+    return reformatWarmupCells(lastValid);
+  }
+  throw new Error(
+    "The program generator returned an unusable result after multiple attempts. Please try again."
+  );
+}
+
+async function runBuildJob(jobId, token, intake, isNewToken = false) {
+  const progress = async (stage, attempt = 0, detail = null) => {
+    try { await store.updateJobProgress(jobId, stage, attempt, detail, Date.now()); }
+    catch (e) { console.warn("job progress update failed:", e && e.message); }
+  };
+  const buildStarted = Date.now();
+  await progress("preparing", 0, isNewToken ? "fast new-client intake persist" : "saving intake and preparing engine");
+  let persistMs = 0;
+  try {
+    const persistStarted = Date.now();
+    const startedAt = Date.now();
+    const intakeJSON = JSON.stringify(intake);
+    if (isNewToken) {
+      await store.upsertClient(token, intakeJSON, "", startedAt);
+    } else {
+      const existing = await store.getClient(token);
+      await store.upsertClient(token, intakeJSON, existing?.program || "", startedAt);
+    }
+    persistMs = Date.now() - persistStarted;
+  } catch (persistErr) {
+    console.error("pre-build intake persist failed:", persistErr);
+  }
+  try {
+    const generationStarted = Date.now();
+    const program = privacyScrub(await generateValidatedProgram(intake, progress), intake);
+    const generationAndQaMs = Date.now() - generationStarted;
+    await progress("finalizing", 0, "saving program");
+    const saveStarted = Date.now();
+    const now = Date.now();
+    const intakeJSON = JSON.stringify(intake);
+    await store.upsertClient(token, intakeJSON, program, now);
+    await store.finishJob(jobId, "done", program, null, Date.now());
+    const saveToVisibleMs = Date.now() - saveStarted;
+    lastBuildTiming = { total_ms: Date.now() - buildStarted, pre_persist_ms: persistMs, generation_and_qa_ms: generationAndQaMs, openai_ms: lastAIUsage?.elapsed_ms || null, save_to_visible_ms: saveToVisibleMs };
+    console.log("Phase15 build timing:", JSON.stringify(lastBuildTiming));
+    Promise.allSettled([
+      store.addHistory(token, "build", intakeJSON, program, Date.now()),
+      store.bumpUsage(token, "build")
+    ]).then(results => {
+      for (const r of results) if (r.status === "rejected") console.warn("post-finish bookkeeping failed:", r.reason?.message || r.reason);
+    });
+  } catch (e) {
+    console.error("build job error:", e);
+    const qaCodes = intake?.qa_diagnostics ? [...new Set([
+      e?.code,
+      ...(Array.isArray(e?.flags) ? e.flags.map((flag) => flag?.code) : []),
+      ...(Array.isArray(e?.details?.violations) ? e.details.violations.flatMap((v) => [v?.code, v?.type]) : []),
+    ].map((code) => String(code || '')).filter((code) => /^[A-Z0-9_]+$/.test(code)))].slice(0, 8) : [];
+    const baseError = e?.message || e?.code || "Engine error.";
+    const jobError = qaCodes.length ? `${baseError} [QA:${qaCodes.join("+")}]` : baseError;
+    await store.finishJob(jobId, "error", null, jobError, Date.now());
+  }
+}
+
+async function runAdjustJob(jobId, token, changeRequest) {
+  try {
+    const client = await store.getClient(token);
+    if (!client) throw new Error("No saved program for this client yet.");
+    const intake = JSON.parse(client.intake);
+    const program = privacyScrub(await runEngine(adjustPrompt(intake, client.program, changeRequest)), intake);
+    const now = Date.now();
+    await store.updateClientProgram(token, program, now);
+    await store.addHistory(token, "adjust", changeRequest, program, now);
+    await store.bumpUsage(token, "adjust");
+    await store.finishJob(jobId, "done", program, null, now);
+  } catch (e) {
+    console.error("adjust job error:", e);
+    await store.finishJob(jobId, "error", null, e.message || "Engine error.", Date.now());
+  }
+}
+
+// Build a new program (new client OR re-build for a token) -> returns a job id
+app.post("/api/build", async (req, res) => {
+  try {
+    const intake = req.body?.intake;
+    if (!intake || typeof intake !== "object") {
+      return res.status(400).json({ error: "Missing intake." });
+    }
+    let token = (req.body?.token || "").trim();
+    if (!token) token = crypto.randomBytes(16).toString("hex");
+
+    const u = await store.getUsage(token);
+    if (u.builds >= DAILY_BUILDS) {
+      return res.status(429).json({
+        error: `You've reached today's program-build limit (${DAILY_BUILDS}). Try again tomorrow or use Adjust.`,
+      });
+    }
+
+    const jobId = crypto.randomBytes(16).toString("hex");
+    await store.createJob(jobId, token, "build", Date.now());
+    // fire-and-forget; do not await
+    runBuildJob(jobId, token, intake, !req.body?.token);
+    res.status(202).json({ job_id: jobId, token, status: "pending" });
+  } catch (e) {
+    console.error("build error:", e);
+    res.status(500).json({ error: e.message || "Engine error." });
+  }
+});
+
+// Adjust an existing program (surgical diff) -> returns a job id
+// Change program language (en <-> he) WITHOUT rebuilding the whole plan.
+// Persists intake.language and triggers an adjust-style translation job so
+// prose, exercise names and Notes are re-emitted in the target language
+// while structural TSV tokens (columns, day names, [WARMUP] prefix, loads)
+// stay unchanged.
+async function runSetLanguageJob(jobId, token, targetLang) {
+  try {
+    const client = await store.getClient(token);
+    if (!client) throw new Error("No saved program for this client yet.");
+    const intake = JSON.parse(client.intake);
+    const previousLang = intake.language || "en";
+    intake.language = targetLang;
+    const now = Date.now();
+    // Persist the language change FIRST so future adjusts inherit it even if
+    // the translation step fails.
+    await store.upsertClient(token, JSON.stringify(intake), client.program, now);
+
+    const targetName = targetLang === "he" ? "Hebrew" : "English";
+    const changeRequest = [
+      `LANGUAGE CHANGE ONLY. Translate this entire program from ${previousLang === "he" ? "Hebrew" : "English"} to ${targetName}.`,
+      "Do NOT change any loads, sets, reps, rest times, RPE targets, days, or exercise selection.",
+      "Do NOT rebuild the program. Only re-emit every client-facing string in the target language.",
+      "Obey LOCALIZATION_RULES exactly: structural TSV tokens (column headers, Mon/Tue/... day tokens, [WARMUP] prefix, WEEK1..WEEK4 labels, kg/s/min units and numeric values) remain in English regardless of target language.",
+      `intake.language is now '${targetLang}' — keep it that way.`,
+    ].join(" ");
+    const program = privacyScrub(await runEngine(adjustPrompt(intake, client.program, changeRequest)), intake);
+    const finishedAt = Date.now();
+    await store.updateClientProgram(token, program, finishedAt);
+    await store.addHistory(token, "adjust", `[language:${targetLang}] ${changeRequest}`, program, finishedAt);
+    await store.finishJob(jobId, "done", program, null, finishedAt);
+  } catch (e) {
+    console.error("set-language job error:", e);
+    await store.finishJob(jobId, "error", null, e.message || "Engine error.", Date.now());
+  }
+}
+
+app.post("/api/set-language", async (req, res) => {
+  try {
+    const token = (req.body?.token || "").trim();
+    const language = (req.body?.language || "").trim().toLowerCase();
+    if (!token) return res.status(400).json({ error: "Missing client token." });
+    if (language !== "en" && language !== "he") {
+      return res.status(400).json({ error: "Language must be 'en' or 'he'." });
+    }
+    const client = await store.getClient(token);
+    if (!client) return res.status(404).json({ error: "No saved program for this client yet." });
+
+    // Fast path: if the requested language already matches the stored intake,
+    // there is nothing to translate. Return the current program immediately.
+    const intake = JSON.parse(client.intake);
+    if ((intake.language || "en") === language) {
+      return res.json({ status: "nochange", token, language });
+    }
+
+    // Language change counts against the adjust quota because it uses the
+    // same engine path.
+    const u = await store.getUsage(token);
+    if (u.adjusts >= DAILY_ADJUSTS) {
+      return res.status(429).json({
+        error: `You've reached today's adjustment limit (${DAILY_ADJUSTS}). Try again tomorrow.`,
+      });
+    }
+
+    const jobId = crypto.randomBytes(16).toString("hex");
+    await store.createJob(jobId, token, "adjust", Date.now());
+    runSetLanguageJob(jobId, token, language);
+    res.status(202).json({ job_id: jobId, token, status: "pending", language });
+  } catch (e) {
+    console.error("set-language error:", e);
+    res.status(500).json({ error: e.message || "Engine error." });
+  }
+});
+
+app.post("/api/adjust", async (req, res) => {
+  try {
+    const token = (req.body?.token || "").trim();
+    const changeRequest = (req.body?.request || "").trim();
+    if (!token) return res.status(400).json({ error: "Missing client token." });
+    if (!changeRequest) return res.status(400).json({ error: "Tell me what changed." });
+
+    const client = await store.getClient(token);
+    if (!client) return res.status(404).json({ error: "No saved program for this client yet." });
+
+    const u = await store.getUsage(token);
+    if (u.adjusts >= DAILY_ADJUSTS) {
+      return res.status(429).json({
+        error: `You've reached today's adjustment limit (${DAILY_ADJUSTS}). Try again tomorrow.`,
+      });
+    }
+
+    const jobId = crypto.randomBytes(16).toString("hex");
+    await store.createJob(jobId, token, "adjust", Date.now());
+    runAdjustJob(jobId, token, changeRequest);
+    res.status(202).json({ job_id: jobId, token, status: "pending" });
+  } catch (e) {
+    console.error("adjust error:", e);
+    res.status(500).json({ error: e.message || "Engine error." });
+  }
+});
+
+// Poll a job until it is done/error
+app.get("/api/job/:id", async (req, res) => {
+  try {
+    const job = await store.getJob(req.params.id);
+    if (!job) return res.status(404).json({ error: "Job not found." });
+    res.json({
+      job_id: job.id,
+      token: job.token,
+      kind: job.kind,
+      status: job.status, // pending | done | error
+      stage: job.stage || (job.status === "pending" ? "queued" : job.status),
+      attempt: Number(job.attempt || 0),
+      detail: job.detail || undefined,
+      program: job.status === "done" ? job.program : undefined,
+      error: job.status === "error" ? job.error : undefined,
+      _meta: job.status === "done" ? { violations: readViolationCount(job.program) } : undefined,
+    });
+  } catch (e) {
+    console.error("job lookup error:", e);
+    res.status(503).json({ error: "Temporary storage error. Please retry." });
+  }
+});
+
+// Load a returning client's saved program
+app.get("/api/program/:token", async (req, res) => {
+  try {
+    const client = await store.getClient(req.params.token);
+    if (!client) return res.status(404).json({ error: "Not found." });
+    // A token whose only build failed will have an empty program string but a
+    // stored intake (we pre-persist before running the engine). Signal that
+    // clearly so the client can offer a one-click rebuild with the same token.
+    const program = client.program || "";
+    const rebuildable = !program.trim();
+    res.json({
+      token: client.token,
+      intake: JSON.parse(client.intake),
+      program,
+      updated_at: client.updated_at,
+      rebuildable,
+      _meta: { violations: readViolationCount(program) },
+    });
+  } catch (e) {
+    console.error("program lookup error:", e);
+    res.status(503).json({ error: "Temporary storage error. Please retry." });
+  }
+});
+
+const httpServer = app.listen(PORT, () => {
+  console.log(`Coaching platform on :${PORT} (mode: ${USE_PPLX_PROXY ? "pplx-proxy" : GEMINI_API_KEY ? "gemini" : "no-key"}, storage: ${store.backend})`);
+  if (!USE_PPLX_PROXY && !GEMINI_API_KEY) {
+    console.warn("GEMINI_API_KEY is not configured; /api/health will report not ready.");
+  }
+});
+
+function shutdown(signal) {
+  console.log(`${signal} received; closing HTTP server...`);
+  httpServer.close(() => process.exit(0));
+  setTimeout(() => process.exit(1), 10_000).unref();
+}
+
+process.once("SIGTERM", () => shutdown("SIGTERM"));
+process.once("SIGINT", () => shutdown("SIGINT"));

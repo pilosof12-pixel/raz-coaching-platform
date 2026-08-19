@@ -1,4 +1,5 @@
 import { isHighConcurrencyHybrid } from './advanced_hybrid_concurrency.js';
+import { rampText } from './specific_warmup_enrichment.js';
 
 function arr(v) { return Array.isArray(v) ? v : v ? [v] : []; }
 function secondaryText(intake = {}) { return arr(intake.secondary_goals).map(String).join(' | '); }
@@ -65,6 +66,14 @@ function rewriteWeek(program, parsed) {
   return program.replace(parsed.re, parsed.match[1] + inner + parsed.match[3]);
 }
 
+// Top ramp step implied by rampText for a given work load, so the warm-up row's
+// own load range can be kept consistent with the ramp it prescribes.
+function rampTopStepKg(heldWeight) {
+  const ramp = rampText('Overhead Press', heldWeight);
+  const steps = [...String(ramp).matchAll(/(\d+(?:\.\d+)?)\s*kg\s*x/gi)].map((m) => Number(m[1])).filter(Number.isFinite);
+  return steps.length ? Math.max(...steps) : null;
+}
+
 function syncHeldPressCues(program, weekNumber, exerciseName, heldWeight) {
   const parsed = parseWeek(program, weekNumber);
   if (!parsed || !heldWeight) return { program, changed: false };
@@ -82,13 +91,39 @@ function syncHeldPressCues(program, weekNumber, exerciseName, heldWeight) {
   }
 
   if (/^overhead press$/i.test(exerciseName) && Number.isInteger(parsed.index.notes)) {
+    // Regenerate the whole ramp sentence from the load actually prescribed on the
+    // work row, rather than string-patching only the trailing target. The previous
+    // patch-in-place approach used `[^.]*?`, which cannot cross the decimal point
+    // in a 2.5 kg ramp step ("27.5 kg x 5"), so it silently no-opped on every real
+    // program and left both the intermediate steps and the target stale.
+    const freshRamp = rampText('Overhead Press', heldWeight);
     for (const cells of parsed.rows) {
       if (rowDay(parsed, cells) !== day || !isWarmup(rowName(parsed, cells))) continue;
       const before = String(cells[parsed.index.notes] || '');
-      const after = before.replace(/(Ramp Overhead Press:[^.]*?before\s+)[^.;]+?(\s+work sets\.)/i, `$1${heldWeight}$2`);
+      let after = before;
+      if (freshRamp) {
+        after = after.replace(/Ramp Overhead Press:[\s\S]*?work sets\./i, freshRamp);
+      }
       if (after !== before) {
         cells[parsed.index.notes] = after;
         changed = true;
+      }
+      // The warm-up row's own load cell ("20-57.5 kg ramp") is model-authored and
+      // was also derived from the superseded work load. Cap its top at the ramp's
+      // real top step so the row cannot advertise a heavier ramp than the work set.
+      if (Number.isInteger(parsed.index.weight)) {
+        const topStep = rampTopStepKg(heldWeight);
+        const weightBefore = String(cells[parsed.index.weight] || '');
+        if (topStep != null) {
+          const weightAfter = weightBefore.replace(
+            /^(\s*\d+(?:\.\d+)?\s*-\s*)\d+(?:\.\d+)?(\s*kg\s*ramp\s*)$/i,
+            `$1${topStep}$2`,
+          );
+          if (weightAfter !== weightBefore) {
+            cells[parsed.index.weight] = weightAfter;
+            changed = true;
+          }
+        }
       }
     }
   }
@@ -99,6 +134,10 @@ function syncHeldPressCues(program, weekNumber, exerciseName, heldWeight) {
 function syncHighConcurrencyNarrative(program) {
   return String(program || '')
     .replace(/with OHP progressed at a recoverable dose/gi, 'with OHP held at a recoverable build-week dose so primary goals and MMA recovery stay protected')
+    // The build-week hold is deliberate, so the intro must not advertise the
+    // strict press as progressing in load while the work rows hold Week 1's dose.
+    .replace(/\bstrict Overhead Press progressing\b/gi, 'strict Overhead Press held at a recoverable build-week dose')
+    .replace(/\bstrict OHP progressing\b/gi, 'strict OHP held at a recoverable build-week dose')
     .replace(/The long run progresses by (?:a )?small distance (?:bumps|increase)[^.]*\./gi, 'The long run may stay at the current tolerated dose when primary-goal progress and MMA recovery take priority.');
 }
 
