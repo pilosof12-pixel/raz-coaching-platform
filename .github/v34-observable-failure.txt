@@ -2,7 +2,7 @@
 npm warn deprecated prebuild-install@7.1.3: No longer maintained. Please contact the author of the relevant native addon; alternatives are available.
 npm warn deprecated uuid@9.0.1: uuid@10 and below is no longer supported.  For ESM codebases, update to uuid@latest.  For CommonJS codebases, use uuid@11 (but be aware this version will likely be deprecated in 2028).
 
-added 145 packages, and audited 146 packages in 4s
+added 145 packages, and audited 146 packages in 2s
 
 26 packages are looking for funding
   run `npm fund` for details
@@ -17,55 +17,55 @@ TAP version 13
 # Subtest: advanced hybrid launch intake has a feasible program that passes the full production validation chain
 ok 1 - advanced hybrid launch intake has a feasible program that passes the full production validation chain
   ---
-  duration_ms: 143.524971
+  duration_ms: 125.301576
   type: 'test'
   ...
 # Subtest: advanced hybrid launch gate keeps marathon work secondary instead of inventing extra hard conditioning
 ok 2 - advanced hybrid launch gate keeps marathon work secondary instead of inventing extra hard conditioning
   ---
-  duration_ms: 55.519926
+  duration_ms: 40.703944
   type: 'test'
   ...
 # Subtest: AH-01 deterministic convergence holds secondary pressing at Week 1 dose
 ok 3 - AH-01 deterministic convergence holds secondary pressing at Week 1 dose
   ---
-  duration_ms: 26.491082
+  duration_ms: 24.536899
   type: 'test'
   ...
 # Subtest: YG-07 does not false-positive explicit anti-failure coaching language
 ok 4 - YG-07 does not false-positive explicit anti-failure coaching language
   ---
-  duration_ms: 4.058045
+  duration_ms: 2.38042
   type: 'test'
   ...
 # Subtest: YG-07 still rejects an actual AMRAP prescription
 ok 5 - YG-07 still rejects an actual AMRAP prescription
   ---
-  duration_ms: 1.452405
+  duration_ms: 0.81127
   type: 'test'
   ...
 # Subtest: pre-live roadmap understands normal coaching lingo without misrouting goal families
 ok 6 - pre-live roadmap understands normal coaching lingo without misrouting goal families
   ---
-  duration_ms: 3.040503
+  duration_ms: 2.719146
   type: 'test'
   ...
 # Subtest: all launch roadmap families have a real zero-to-advanced structure, not name-only aliases
 ok 7 - all launch roadmap families have a real zero-to-advanced structure, not name-only aliases
   ---
-  duration_ms: 0.416108
+  duration_ms: 0.414489
   type: 'test'
   ...
 # Subtest: demonstrated strict OAP phrasing routes an advanced athlete from achieved state, not prerequisites
 ok 8 - demonstrated strict OAP phrasing routes an advanced athlete from achieved state, not prerequisites
   ---
-  duration_ms: 4.311368
+  duration_ms: 3.765516
   type: 'test'
   ...
 # Subtest: golden Youth gymnastics passes the full deterministic production validation chain
 not ok 9 - golden Youth gymnastics passes the full deterministic production validation chain
   ---
-  duration_ms: 105.496222
+  duration_ms: 109.208902
   type: 'test'
   location: '/home/runner/work/raz-coaching-platform/raz-coaching-platform/phase14/test/production_chain_golden.test.js:62:1'
   failureType: 'testCodeFailure'
@@ -85,37 +85,37 @@ not ok 9 - golden Youth gymnastics passes the full deterministic production vali
 # Subtest: golden Tactical 3K passes the full deterministic production validation chain
 ok 10 - golden Tactical 3K passes the full deterministic production validation chain
   ---
-  duration_ms: 72.609259
+  duration_ms: 60.579992
   type: 'test'
   ...
 # Subtest: Youth primary skills cannot repeat an unchanged prescription for all four weeks
 ok 11 - Youth primary skills cannot repeat an unchanged prescription for all four weeks
   ---
-  duration_ms: 40.72738
+  duration_ms: 32.571514
   type: 'test'
   ...
 # Subtest: Tactical missing GPP is repaired locally but unrelated strength-session defects still fail closed
 ok 12 - Tactical missing GPP is repaired locally but unrelated strength-session defects still fail closed
   ---
-  duration_ms: 21.763362
+  duration_ms: 19.372476
   type: 'test'
   ...
 # Subtest: Tactical 3K with only two strength days fails semantic strength-session accounting
 ok 13 - Tactical 3K with only two strength days fails semantic strength-session accounting
   ---
-  duration_ms: 18.96748
+  duration_ms: 16.608143
   type: 'test'
   ...
 # Subtest: Tactical 3K cannot turn the direct ruck into a fourth run
 ok 14 - Tactical 3K cannot turn the direct ruck into a fourth run
   ---
-  duration_ms: 24.347656
+  duration_ms: 21.186111
   type: 'test'
   ...
 # Subtest: Tactical 3K cannot remove direct pull-up work while preserving three strength days
 not ok 15 - Tactical 3K cannot remove direct pull-up work while preserving three strength days
   ---
-  duration_ms: 25.337235
+  duration_ms: 19.484083
   type: 'test'
   location: '/home/runner/work/raz-coaching-platform/raz-coaching-platform/phase14/test/production_chain_golden.test.js:143:1'
   failureType: 'testCodeFailure'
@@ -140,7 +140,7 @@ not ok 15 - Tactical 3K cannot remove direct pull-up work while preserving three
 # Subtest: Youth bar muscle-up omission is rejected semantically then restored only for explicit acquisition intake
 not ok 16 - Youth bar muscle-up omission is rejected semantically then restored only for explicit acquisition intake
   ---
-  duration_ms: 1.685811
+  duration_ms: 1.517594
   type: 'test'
   location: '/home/runner/work/raz-coaching-platform/raz-coaching-platform/phase14/test/production_chain_golden.test.js:159:1'
   failureType: 'testCodeFailure'
@@ -160,7 +160,7 @@ not ok 16 - Youth bar muscle-up omission is rejected semantically then restored 
 # Subtest: Youth independent-balance omission is rejected semantically then restored only for explicit acquisition intake
 not ok 17 - Youth independent-balance omission is rejected semantically then restored only for explicit acquisition intake
   ---
-  duration_ms: 34.241617
+  duration_ms: 27.701049
   type: 'test'
   location: '/home/runner/work/raz-coaching-platform/raz-coaching-platform/phase14/test/production_chain_golden.test.js:185:1'
   failureType: 'testCodeFailure'
@@ -182,175 +182,175 @@ not ok 17 - Youth independent-balance omission is rejected semantically then res
 # Subtest: Youth gymnastics fails closed on invented home-gym equipment
 ok 18 - Youth gymnastics fails closed on invented home-gym equipment
   ---
-  duration_ms: 41.609878
+  duration_ms: 25.584787
   type: 'test'
   ...
 # Subtest: tactical manual acceptance requires explicit weighted pull identity and +kg load when benchmarked
 ok 19 - tactical manual acceptance requires explicit weighted pull identity and +kg load when benchmarked
   ---
-  duration_ms: 18.236494
+  duration_ms: 16.134466
   type: 'test'
   ...
 # Subtest: tactical weighted pulling cannot repeat a demonstrated 5-rep benchmark as near-max multi-set volume
 ok 20 - tactical weighted pulling cannot repeat a demonstrated 5-rep benchmark as near-max multi-set volume
   ---
-  duration_ms: 5.24325
+  duration_ms: 4.417609
   type: 'test'
   ...
 # Subtest: tactical manual acceptance rejects strength-style kg x reps ruck warm-up prose
 ok 21 - tactical manual acceptance rejects strength-style kg x reps ruck warm-up prose
   ---
-  duration_ms: 0.353971
+  duration_ms: 0.318815
   type: 'test'
   ...
 # Subtest: specific warm-up enrichment never creates a strength-style ramp for Backpack Carry
 ok 22 - specific warm-up enrichment never creates a strength-style ramp for Backpack Carry
   ---
-  duration_ms: 3.644511
+  duration_ms: 3.366952
   type: 'test'
   ...
 # Subtest: [V34-1] a 2-rep OAP athlete chasing 4 reps gets multi-rep specificity, not only singles
 ok 23 - [V34-1] a 2-rep OAP athlete chasing 4 reps gets multi-rep specificity, not only singles
   ---
-  duration_ms: 2.967216
+  duration_ms: 1.804412
   type: 'test'
   ...
 # Subtest: [V34-1b] the brief states rep-outcome specificity only when the goal exceeds demonstrated capacity
 ok 24 - [V34-1b] the brief states rep-outcome specificity only when the goal exceeds demonstrated capacity
   ---
-  duration_ms: 5.332938
+  duration_ms: 3.053665
   type: 'test'
   ...
 # Subtest: [V34-2] hard sport the previous day penalises that gym day for a primary neural exposure
 ok 25 - [V34-2] hard sport the previous day penalises that gym day for a primary neural exposure
   ---
-  duration_ms: 0.764559
+  duration_ms: 0.524722
   type: 'test'
   ...
 # Subtest: [V34-3] an explicitly low-cost microdose may occupy the least fresh day
 ok 26 - [V34-3] an explicitly low-cost microdose may occupy the least fresh day
   ---
-  duration_ms: 0.562962
+  duration_ms: 0.365184
   type: 'test'
   ...
 # Subtest: [V34-3b] readiness is derived from the schedule, never from fixed weekdays
 ok 27 - [V34-3b] readiness is derived from the schedule, never from fixed weekdays
   ---
-  duration_ms: 0.481941
+  duration_ms: 0.313998
   type: 'test'
   ...
 # Subtest: [V34-3c] readiness placement actually reaches the planner and honours hysteresis
 ok 28 - [V34-3c] readiness placement actually reaches the planner and honours hysteresis
   ---
-  duration_ms: 40.245338
+  duration_ms: 26.32097
   type: 'test'
   ...
 # Subtest: [V34-4] adequate wall capacity requires a reduced-support balance drill
 ok 29 - [V34-4] adequate wall capacity requires a reduced-support balance drill
   ---
-  duration_ms: 1.085649
+  duration_ms: 0.679123
   type: 'test'
   ...
 # Subtest: [V34-5] a 4 x 2 row cannot claim 4 attempts per set
 ok 30 - [V34-5] a 4 x 2 row cannot claim 4 attempts per set
   ---
-  duration_ms: 3.849134
+  duration_ms: 2.784363
   type: 'test'
   ...
 # Subtest: [V34-5b] a total-attempt claim must equal sets x reps
 ok 31 - [V34-5b] a total-attempt claim must equal sets x reps
   ---
-  duration_ms: 2.415585
+  duration_ms: 1.499828
   type: 'test'
   ...
 # Subtest: [V34-6] an RPE-selected row may not reference a load that was never established
 ok 32 - [V34-6] an RPE-selected row may not reference a load that was never established
   ---
-  duration_ms: 1.23107
+  duration_ms: 1.015675
   type: 'test'
   ...
 # Subtest: [V34-7] an unconditional "add one set" cannot survive an unchanged prescription
 ok 33 - [V34-7] an unconditional "add one set" cannot survive an unchanged prescription
   ---
-  duration_ms: 0.916854
+  duration_ms: 0.847254
   type: 'test'
   ...
 # Subtest: [V34-7b] the release gate throws a retriable error rather than inventing a fix
 ok 34 - [V34-7b] the release gate throws a retriable error rather than inventing a fix
   ---
-  duration_ms: 0.985441
+  duration_ms: 0.84501
   type: 'test'
   ...
 # Subtest: [V34-8] session duration counts rests and transitions, not just work
 ok 35 - [V34-8] session duration counts rests and transitions, not just work
   ---
-  duration_ms: 1.721878
+  duration_ms: 1.565164
   type: 'test'
   ...
 # Subtest: [V34-9] weekly running accounting includes interval reps and warm-up/cooldown
 ok 36 - [V34-9] weekly running accounting includes interval reps and warm-up/cooldown
   ---
-  duration_ms: 1.454418
+  duration_ms: 1.192829
   type: 'test'
   ...
 # Subtest: [V34-9b] a plan inside the tolerated baseline raises no volume signal
 ok 37 - [V34-9b] a plan inside the tolerated baseline raises no volume signal
   ---
-  duration_ms: 0.365564
+  duration_ms: 0.312696
   type: 'test'
   ...
 # Subtest: [V34-10] symptom response targets the provocative or newest stressor, not always easy running
 ok 38 - [V34-10] symptom response targets the provocative or newest stressor, not always easy running
   ---
-  duration_ms: 0.463977
+  duration_ms: 0.453346
   type: 'test'
   ...
 # Subtest: [V34-11] maintenance defaults to hold across build weeks
 ok 39 - [V34-11] maintenance defaults to hold across build weeks
   ---
-  duration_ms: 0.284542
+  duration_ms: 0.240559
   type: 'test'
   ...
 # Subtest: [V34-12] excessive secondary pulling is flagged against an endurance primary
 ok 40 - [V34-12] excessive secondary pulling is flagged against an endurance primary
   ---
-  duration_ms: 0.418262
+  duration_ms: 0.342371
   type: 'test'
   ...
 # Subtest: [V34-13] heavily concurrent athletes get an intra-session stop rule
 ok 41 - [V34-13] heavily concurrent athletes get an intra-session stop rule
   ---
-  duration_ms: 0.383577
+  duration_ms: 0.365315
   type: 'test'
   ...
 # Subtest: [V34-14] the accepted v33 artifacts stay parseable and raise only the known +50 kg defect
 ok 42 - [V34-14] the accepted v33 artifacts stay parseable and raise only the known +50 kg defect
   ---
-  duration_ms: 7.230167
+  duration_ms: 2.880376
   type: 'test'
   ...
 # Subtest: [V34-15] accounting runs cleanly on all three accepted artifacts
 ok 43 - [V34-15] accounting runs cleanly on all three accepted artifacts
   ---
-  duration_ms: 4.22096
+  duration_ms: 2.474761
   type: 'test'
   ...
 # Subtest: [V34-15b] the brief is empty for an intake with none of the triggering facts
 ok 44 - [V34-15b] the brief is empty for an intake with none of the triggering facts
   ---
-  duration_ms: 0.242423
+  duration_ms: 0.145287
   type: 'test'
   ...
 # Subtest: youth handstand and bar muscle-up drills are accepted canonical exercises
 ok 45 - youth handstand and bar muscle-up drills are accepted canonical exercises
   ---
-  duration_ms: 2.941658
+  duration_ms: 3.529595
   type: 'test'
   ...
 # Subtest: dictionary still blocks genuinely unknown invented youth skill names
 ok 46 - dictionary still blocks genuinely unknown invented youth skill names
   ---
-  duration_ms: 0.778295
+  duration_ms: 0.825411
   type: 'test'
   ...
 1..46
@@ -361,4 +361,4 @@ ok 46 - dictionary still blocks genuinely unknown invented youth skill names
 # cancelled 0
 # skipped 0
 # todo 0
-# duration_ms 631.687701
+# duration_ms 552.767855
