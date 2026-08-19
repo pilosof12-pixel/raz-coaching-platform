@@ -72,13 +72,18 @@ jobs:
           ts = ts.replace(marker, extra + marker, 1)
           t.write_text(ts)
 
-          legacy = Path('phase14/test/advanced_hybrid_oap.test.js')
-          body = legacy.read_text()
           stale = "assert.match(brief, /submaximal singles|1[-–]2 clean single|clean singles/i);"
           modern = "assert.match(brief, /priority set of 1[-–]2 clean strict reps|clean singles/i);"
-          if stale not in body:
-              raise SystemExit('legacy OAP assertion anchor not found')
-          legacy.write_text(body.replace(stale, modern, 1))
+          changed = 0
+          for legacy in Path('phase14/test').glob('*.test.js'):
+              if legacy.name == 'v34_coaching_architecture.test.js':
+                  continue
+              body = legacy.read_text()
+              if stale in body:
+                  legacy.write_text(body.replace(stale, modern, 1))
+                  changed += 1
+          if changed != 1:
+              raise SystemExit(f'expected exactly one stale legacy OAP assertion, found {changed}')
 
       - uses: actions/setup-node@v4
         if: steps.ready.outputs.ready == 'true'
