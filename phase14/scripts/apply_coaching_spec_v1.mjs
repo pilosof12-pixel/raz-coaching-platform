@@ -32,15 +32,18 @@ patch('engine/repairable_validation_bundle.js', [
     already: 'COACHING-SPEC-V1-HARD-RULES',
   },
   {
+    // IMPORTANT: anchor to one stable validator line, not adjacency between two
+    // validators. Earlier phase15:build patches legitimately insert validators in
+    // this list before Coaching Spec v1 runs in production.
     label: 'coaching spec semantic checks',
-    find: "    () => validateAdvancedHybridManualAcceptanceSemantic(candidate, intake, model),\n    () => validateTacticalScheduleArchitectureSemantic(candidate, intake, model),\n",
-    replace: "    () => validateAdvancedHybridManualAcceptanceSemantic(candidate, intake, model),\n    () => validateAdvancedHybridCoachingSpecV1(candidate, intake, model),\n    () => validateYouthCoachingSpecV1HardRules(candidate, intake, model),\n    () => validateTactical3KCoachingSpecV1(candidate, intake, model),\n    () => validateTacticalScheduleArchitectureSemantic(candidate, intake, model),\n",
+    find: "    () => validateAdvancedHybridManualAcceptanceSemantic(candidate, intake, model),\n",
+    replace: "    () => validateAdvancedHybridManualAcceptanceSemantic(candidate, intake, model),\n    () => validateAdvancedHybridCoachingSpecV1(candidate, intake, model),\n    () => validateYouthCoachingSpecV1HardRules(candidate, intake, model),\n    () => validateTactical3KCoachingSpecV1(candidate, intake, model),\n",
     already: '() => validateAdvancedHybridCoachingSpecV1(candidate, intake, model),',
   },
   {
     label: 'coaching spec final-boundary checks',
-    find: "  runRepairable(flags, () => validateAdvancedHybridManualAcceptanceSemantic(candidate, intake, finalModel));\n  runRepairable(flags, () => validateTacticalScheduleArchitectureSemantic(candidate, intake, finalModel));\n",
-    replace: "  runRepairable(flags, () => validateAdvancedHybridManualAcceptanceSemantic(candidate, intake, finalModel));\n  runRepairable(flags, () => validateAdvancedHybridCoachingSpecV1(candidate, intake, finalModel));\n  runRepairable(flags, () => validateYouthCoachingSpecV1HardRules(candidate, intake, finalModel));\n  runRepairable(flags, () => validateTactical3KCoachingSpecV1(candidate, intake, finalModel));\n  runRepairable(flags, () => validateTacticalScheduleArchitectureSemantic(candidate, intake, finalModel));\n",
+    find: "  runRepairable(flags, () => validateAdvancedHybridManualAcceptanceSemantic(candidate, intake, finalModel));\n",
+    replace: "  runRepairable(flags, () => validateAdvancedHybridManualAcceptanceSemantic(candidate, intake, finalModel));\n  runRepairable(flags, () => validateAdvancedHybridCoachingSpecV1(candidate, intake, finalModel));\n  runRepairable(flags, () => validateYouthCoachingSpecV1HardRules(candidate, intake, finalModel));\n  runRepairable(flags, () => validateTactical3KCoachingSpecV1(candidate, intake, finalModel));\n",
     already: 'validateTactical3KCoachingSpecV1(candidate, intake, finalModel)',
   },
 ]);
@@ -57,15 +60,17 @@ if (fs.existsSync(plannerPath)) {
         already: 'COACHING-SPEC-V1-BRIEF',
       },
       {
+        // Same rule as the validator bundle: do not depend on the following line
+        // remaining adjacent after earlier production patches run.
         label: 'coaching spec planner build',
-        find: "  const advancedHybridConcurrency = buildAdvancedHybridConcurrencyBrief(intake);\n  return [\n",
-        replace: "  const advancedHybridConcurrency = buildAdvancedHybridConcurrencyBrief(intake);\n  const coachingSpecV1 = buildCoachingSpecV1Brief(intake);\n  return [\n",
+        find: "  const advancedHybridConcurrency = buildAdvancedHybridConcurrencyBrief(intake);\n",
+        replace: "  const advancedHybridConcurrency = buildAdvancedHybridConcurrencyBrief(intake);\n  const coachingSpecV1 = buildCoachingSpecV1Brief(intake);\n",
         already: 'const coachingSpecV1 = buildCoachingSpecV1Brief(intake);',
       },
       {
         label: 'coaching spec planner inject',
-        find: "    advancedHybridConcurrency,\n    'Session skeleton:',\n",
-        replace: "    advancedHybridConcurrency,\n    coachingSpecV1,\n    'Session skeleton:',\n",
+        find: "    advancedHybridConcurrency,\n",
+        replace: "    advancedHybridConcurrency,\n    coachingSpecV1,\n",
         already: '    coachingSpecV1,',
       },
     ]);
