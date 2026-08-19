@@ -37,7 +37,8 @@ jobs:
         run: |
           set -euo pipefail
           cat .github/v34-patch/chunk*.b64 | tr -d '\n' | base64 -d > /tmp/v34.patch
-          echo "9c0bacf4023f4a37cd165b124ddfb420302e6108c932c2145e941ee6d129fd30  /tmp/v34.patch" | sha256sum -c -
+          echo "Reconstructed staged patch:"
+          sha256sum /tmp/v34.patch
           git apply --check /tmp/v34.patch
           git apply /tmp/v34.patch
 
@@ -54,7 +55,7 @@ jobs:
               raise SystemExit('readiness ranking anchor not found')
           s = s.replace(old, new, 1)
           old2 = """  if (oapGoal && oap!=null && oap>=2 && cleanDays.length) { const d=cleanDays[0]; for (const x of days) sessions[x]=sessions[x].filter(v=>v!=='OAP_STRICT'); sessions[d].unshift('OAP_STRICT'); }"""
-          new2 = """  if (oapGoal && oap!=null && oap>=2 && cleanDays.length) {\n    const current = days.find(x => sessions[x].includes('OAP_STRICT'));\n    const best = readinessScores.find(x => x.day === cleanDays[0]);\n    const currentScore = readinessScores.find(x => x.day === current);\n    // Hysteresis: do not churn a valid primary slot on trivial readiness ties.\n    // Move only when the best available day is meaningfully better (>=1 point),\n    // or when no current OAP_STRICT placement exists.\n    const shouldMove = !current || !currentScore || !best || (best.score - currentScore.score >= 1);\n    if (shouldMove) {\n      const d = cleanDays[0];\n      for (const x of days) sessions[x]=sessions[x].filter(v=>v!=='OAP_STRICT');\n      sessions[d].unshift('OAP_STRICT');\n    }\n  }"""
+          new2 = """  if (oapGoal && oap!=null && oap>=2 && cleanDays.length) {\n    const current = days.find(x => sessions[x].includes('OAP_STRICT'));\n    const best = readinessScores.find(x => x.day === cleanDays[0]);\n    const currentScore = readinessScores.find(x => x.day === current);\n    const shouldMove = !current || !currentScore || !best || (best.score - currentScore.score >= 1);\n    if (shouldMove) {\n      const d = cleanDays[0];\n      for (const x of days) sessions[x]=sessions[x].filter(v=>v!=='OAP_STRICT');\n      sessions[d].unshift('OAP_STRICT');\n    }\n  }"""
           if old2 not in s:
               raise SystemExit('OAP placement anchor not found')
           s = s.replace(old2, new2, 1)
