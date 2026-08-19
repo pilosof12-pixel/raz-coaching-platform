@@ -29,14 +29,14 @@ function patch(rel, transforms, { optional = false } = {}) {
 //    mistaken for a failure prescription;
 // 2) AH-01 repair feedback must name the concrete dose change required instead of
 //    asking the model to infer which lower-priority family to stop progressing;
-// 3) AH-04 adjacent pulling gets a narrow deterministic microdose repair before the
-//    same frozen hard validator runs, rather than asking the model to rediscover the
-//    same correction across repeated repair attempts.
+// 3) AH-04 adjacent pulling gets a narrow deterministic microdose repair;
+// 4) live-avatar context spelling and manual-review convergence gaps are repaired
+//    without changing any frozen hard/soft/context classification.
 patch('engine/coaching_spec_v1_quality.js', [
   {
     label: 'youth negation-aware failure classifier',
     find: 'export function validateYouthCoachingSpecV1HardRules(program, intake = {}, suppliedModel = null) {\n',
-    replace: `// COACH-SPEC-V1-YOUTH-NEGATION-AWARE\nfunction hasYouthFailureBasedPrescription(value) {\n  const raw = String(value || '');\n  // AMRAP is itself a maximal-effort prescription in this youth contract, so it\n  // remains a hard signal even if surrounding prose later says not to fail.\n  if (/\\bamrap\\b/i.test(raw)) return true;\n  const clauses = raw.split(/[.;\\n]/);\n  for (const clause of clauses) {\n    if (!/(?:to|until)\\s+failure|forced\\s+reps?|grinders?|grinding/i.test(clause)) continue;\n    const negated = /\\b(?:do\\s+not|don't|never|avoid|no|without|stop(?:\\s+well)?\\s+before|stay\\s+short\\s+of|leave[^.;\\n]{0,30}in\\s+reserve)\\b/i.test(clause);\n    if (!negated) return true;\n  }\n  return false;\n}\n\nexport function validateYouthCoachingSpecV1HardRules(program, intake = {}, suppliedModel = null) {\n`,
+    replace: `// COACH-SPEC-V1-YOUTH-NEGATION-AWARE\nfunction hasYouthFailureBasedPrescription(value) {\n  const raw = String(value || '');\n  if (/\\bamrap\\b/i.test(raw)) return true;\n  const clauses = raw.split(/[.;\\n]/);\n  for (const clause of clauses) {\n    if (!/(?:to|until)\\s+failure|forced\\s+reps?|grinders?|grinding/i.test(clause)) continue;\n    const negated = /\\b(?:do\\s+not|don't|never|avoid|no|without|stop(?:\\s+well)?\\s+before|stay\\s+short\\s+of|leave[^.;\\n]{0,30}in\\s+reserve)\\b/i.test(clause);\n    if (!negated) return true;\n  }\n  return false;\n}\n\nexport function validateYouthCoachingSpecV1HardRules(program, intake = {}, suppliedModel = null) {\n`,
     already: 'COACH-SPEC-V1-YOUTH-NEGATION-AWARE',
   },
   {
@@ -57,6 +57,12 @@ patch('engine/coaching_spec_v1_quality.js', [
     replace: "      'ADVANCED HYBRID: make goal hierarchy visible in the actual dose. Do not progress every stated quality simultaneously. Primary goals own freshness; secondary goals use minimum effective meaningful work; maintenance stays approximately stable unless explicit recovery headroom justifies development.',\n      'When two primary families coexist with multiple secondary families under heavy sport load, proactively hold secondary pressing at its Week 1 actual dose through build weeks unless the primary recovery budget clearly permits more. Do not wait for a repair pass to remove four-family progression.',\n",
     already: 'proactively hold secondary pressing at its Week 1 actual dose',
   },
+  {
+    label: 'tactical live-context classifier',
+    find: "  return /(?:tactical|military|special operations|selection|operator)/.test(tacticalContext(intake)) && /\\b3\\s*k(?:m)?\\b/.test(lower(goals(intake, 'primary')));\n",
+    replace: "  return /(?:tactical|military|special[- ]?operations|selection|operator|combat[- ]?ready|\\bruck\\b)/.test(tacticalContext(intake)) && /\\b3\\s*k(?:m)?\\b/.test(lower(goals(intake, 'primary'))); // COACH-SPEC-V1-TACTICAL-LIVE-CONTEXT\n",
+    already: 'COACH-SPEC-V1-TACTICAL-LIVE-CONTEXT',
+  },
 ]);
 
 patch('engine/repairable_validation_bundle.js', [
@@ -73,15 +79,24 @@ patch('engine/repairable_validation_bundle.js', [
     already: 'COACH-SPEC-V1-AH04-NORMALIZER',
   },
   {
+    label: 'manual review convergence imports',
+    find: "import { normalizeAdvancedHybridWeek4OapConsolidation } from './advanced_hybrid_oap_consolidation_normalizer.js';\n",
+    replace: "import { normalizeAdvancedHybridWeek4OapConsolidation } from './advanced_hybrid_oap_consolidation_normalizer.js';\nimport {\n  normalizeAdvancedHybridSecondaryRunStability,\n  normalizeYouthSkillAcquisitionQuality,\n  normalizeTactical3KRaceSpecificity,\n} from './coaching_spec_v1_convergence_normalizer.js'; // COACH-SPEC-V1-MANUAL-CONVERGENCE\n",
+    already: 'COACH-SPEC-V1-MANUAL-CONVERGENCE',
+  },
+  {
     label: 'candidate adjacent pull convergence',
     find: "  if (advancedOapConsolidation.repaired) repairs.push({ type: 'advanced_hybrid_week4_oap_consolidation', rows: advancedOapConsolidation.repairs });\n",
     replace: "  if (advancedOapConsolidation.repaired) repairs.push({ type: 'advanced_hybrid_week4_oap_consolidation', rows: advancedOapConsolidation.repairs });\n\n  const advancedPullSpacing = normalizeAdvancedHybridAdjacentPulling(candidate, intake);\n  candidate = advancedPullSpacing.program;\n  if (advancedPullSpacing.repaired) repairs.push({ type: 'advanced_hybrid_adjacent_pull_spacing', rows: advancedPullSpacing.repairs }); // COACH-SPEC-V1-AH04-CANDIDATE-REPAIR\n",
     already: 'COACH-SPEC-V1-AH04-CANDIDATE-REPAIR',
   },
   {
-    // IMPORTANT: anchor to one stable validator line, not adjacency between two
-    // validators. Earlier phase15:build patches legitimately insert validators in
-    // this list before Coaching Spec v1 runs in production.
+    label: 'candidate manual review convergence',
+    find: "  if (youthConsolidation.repaired) repairs.push({ type: 'youth_week4_consolidation', rows: youthConsolidation.repairs });\n",
+    replace: "  if (youthConsolidation.repaired) repairs.push({ type: 'youth_week4_consolidation', rows: youthConsolidation.repairs });\n\n  const advancedSecondaryRun = normalizeAdvancedHybridSecondaryRunStability(candidate, intake);\n  candidate = advancedSecondaryRun.program;\n  if (advancedSecondaryRun.repaired) repairs.push({ type: 'advanced_hybrid_secondary_run_stability', rows: advancedSecondaryRun.repairs });\n\n  const youthAcquisitionQuality = normalizeYouthSkillAcquisitionQuality(candidate, intake);\n  candidate = youthAcquisitionQuality.program;\n  if (youthAcquisitionQuality.repaired) repairs.push({ type: 'youth_skill_acquisition_quality', rows: youthAcquisitionQuality.repairs });\n\n  const tacticalRaceSpecificity = normalizeTactical3KRaceSpecificity(candidate, intake);\n  candidate = tacticalRaceSpecificity.program;\n  if (tacticalRaceSpecificity.repaired) repairs.push({ type: 'tactical_3k_race_specificity', rows: tacticalRaceSpecificity.repairs }); // COACH-SPEC-V1-MANUAL-CANDIDATE-REPAIR\n",
+    already: 'COACH-SPEC-V1-MANUAL-CANDIDATE-REPAIR',
+  },
+  {
     label: 'coaching spec semantic checks',
     find: "    () => validateAdvancedHybridManualAcceptanceSemantic(candidate, intake, model),\n",
     replace: "    () => validateAdvancedHybridManualAcceptanceSemantic(candidate, intake, model),\n    () => validateAdvancedHybridCoachingSpecV1(candidate, intake, model),\n    () => validateYouthCoachingSpecV1HardRules(candidate, intake, model),\n    () => validateTactical3KCoachingSpecV1(candidate, intake, model),\n",
@@ -92,6 +107,12 @@ patch('engine/repairable_validation_bundle.js', [
     find: "  if (finalAdvancedOap.repaired) deterministic_repairs.push({ type: 'final_advanced_hybrid_week4_oap_consolidation', rows: finalAdvancedOap.repairs });\n",
     replace: "  if (finalAdvancedOap.repaired) deterministic_repairs.push({ type: 'final_advanced_hybrid_week4_oap_consolidation', rows: finalAdvancedOap.repairs });\n\n  const finalAdvancedPullSpacing = normalizeAdvancedHybridAdjacentPulling(candidate, intake);\n  candidate = finalAdvancedPullSpacing.program;\n  if (finalAdvancedPullSpacing.repaired) deterministic_repairs.push({ type: 'final_advanced_hybrid_adjacent_pull_spacing', rows: finalAdvancedPullSpacing.repairs }); // COACH-SPEC-V1-AH04-FINAL-REPAIR\n",
     already: 'COACH-SPEC-V1-AH04-FINAL-REPAIR',
+  },
+  {
+    label: 'final manual review convergence',
+    find: "  if (finalYouthConsolidation.repaired) deterministic_repairs.push({ type: 'final_youth_week4_consolidation', rows: finalYouthConsolidation.repairs });\n",
+    replace: "  if (finalYouthConsolidation.repaired) deterministic_repairs.push({ type: 'final_youth_week4_consolidation', rows: finalYouthConsolidation.repairs });\n\n  const finalAdvancedSecondaryRun = normalizeAdvancedHybridSecondaryRunStability(candidate, intake);\n  candidate = finalAdvancedSecondaryRun.program;\n  if (finalAdvancedSecondaryRun.repaired) deterministic_repairs.push({ type: 'final_advanced_hybrid_secondary_run_stability', rows: finalAdvancedSecondaryRun.repairs });\n\n  const finalYouthAcquisitionQuality = normalizeYouthSkillAcquisitionQuality(candidate, intake);\n  candidate = finalYouthAcquisitionQuality.program;\n  if (finalYouthAcquisitionQuality.repaired) deterministic_repairs.push({ type: 'final_youth_skill_acquisition_quality', rows: finalYouthAcquisitionQuality.repairs });\n\n  const finalTacticalRaceSpecificity = normalizeTactical3KRaceSpecificity(candidate, intake);\n  candidate = finalTacticalRaceSpecificity.program;\n  if (finalTacticalRaceSpecificity.repaired) deterministic_repairs.push({ type: 'final_tactical_3k_race_specificity', rows: finalTacticalRaceSpecificity.repairs }); // COACH-SPEC-V1-MANUAL-FINAL-REPAIR\n",
+    already: 'COACH-SPEC-V1-MANUAL-FINAL-REPAIR',
   },
   {
     label: 'coaching spec final-boundary checks',
@@ -113,8 +134,6 @@ if (fs.existsSync(plannerPath)) {
         already: 'COACHING-SPEC-V1-BRIEF',
       },
       {
-        // Same rule as the validator bundle: do not depend on the following line
-        // remaining adjacent after earlier production patches run.
         label: 'coaching spec planner build',
         find: "  const advancedHybridConcurrency = buildAdvancedHybridConcurrencyBrief(intake);\n",
         replace: "  const advancedHybridConcurrency = buildAdvancedHybridConcurrencyBrief(intake);\n  const coachingSpecV1 = buildCoachingSpecV1Brief(intake);\n",
@@ -132,4 +151,4 @@ if (fs.existsSync(plannerPath)) {
   }
 }
 
-console.log('Frozen Coaching Specification v1.0 hard-rule, deterministic AH-04 repair and prompt wiring complete.');
+console.log('Frozen Coaching Specification v1.0 hard-rule, AH-04 and manual-review convergence wiring complete.');
