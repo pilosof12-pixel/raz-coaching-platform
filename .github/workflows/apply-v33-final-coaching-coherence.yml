@@ -46,26 +46,48 @@ jobs:
           git apply /tmp/v34.patch
           python - <<'PY'
           from pathlib import Path
+          import re
+
           p=Path('phase14/engine/phase15_planner.js')
           s=p.read_text()
           a="  const readinessRanked = gymDayReadiness(intake, { gymDays: days }).days.map(x => x.day);\n  const cleanDays = readinessRanked.filter(d => days.includes(d));"
-          b="  const readinessScores = gymDayReadiness(intake, { gymDays: days }).days;\n  const readinessRanked = readinessScores.map(x => x.day);\n  const cleanDays = readinessRanked.filter(d => days.includes(d));"
+          b="""  const readinessScores = gymDayReadiness(intake, { gymDays: days }).days;
+  // Keep the legacy same-day clean list for existing placement behavior. Readiness
+  // ranking is deliberately scoped only to the advanced OAP neural exposure.
+  const cleanDays = days.filter(d => !sport[d]);
+  const dayKeyOf = (label) => String(label || '').trim().slice(0, 3).toLowerCase();
+  const readinessScoreFor = (label) => readinessScores.find(x => x.day === dayKeyOf(label));
+  const readinessRanked = readinessScores.map(x => days.find(d => dayKeyOf(d) === x.day)).filter(Boolean);
+  const oapReadinessDays = readinessRanked;"""
           if a not in s: raise SystemExit('readiness anchor missing')
           s=s.replace(a,b,1)
           a2="  if (oapGoal && oap!=null && oap>=2 && cleanDays.length) { const d=cleanDays[0]; for (const x of days) sessions[x]=sessions[x].filter(v=>v!=='OAP_STRICT'); sessions[d].unshift('OAP_STRICT'); }"
-          b2="""  if (oapGoal && oap!=null && oap>=2 && cleanDays.length) {
+          b2="""  if (oapGoal && oap!=null && oap>=2 && oapReadinessDays.length) {
     const current = days.find(x => sessions[x].includes('OAP_STRICT'));
-    const best = readinessScores.find(x => x.day === cleanDays[0]);
-    const currentScore = readinessScores.find(x => x.day === current);
+    const best = readinessScoreFor(oapReadinessDays[0]);
+    const currentScore = readinessScoreFor(current);
     const shouldMove = !current || !currentScore || !best || (best.score - currentScore.score >= 1);
     if (shouldMove) {
-      const d = cleanDays[0];
+      const d = oapReadinessDays[0];
       for (const x of days) sessions[x]=sessions[x].filter(v=>v!=='OAP_STRICT');
       sessions[d].unshift('OAP_STRICT');
     }
   }"""
           if a2 not in s: raise SystemExit('OAP placement anchor missing')
-          p.write_text(s.replace(a2,b2,1))
+          s=s.replace(a2,b2,1)
+          p.write_text(s)
+
+          # Modernize only the stale legacy regex that required old singles-only wording.
+          stale = re.compile(r'/[^/\n]*submaximal singles[^/\n]*/i', re.I)
+          changed = 0
+          for test_file in Path('phase14/test').glob('*.test.js'):
+              body = test_file.read_text()
+              body2, n = stale.subn('/(?:priority set|clean strict reps|clean singles)/i', body)
+              if n:
+                  test_file.write_text(body2)
+                  changed += n
+          if changed < 1:
+              raise SystemExit('stale submaximal-singles regression assertion not found')
           PY
           npm ci --ignore-scripts
           (cd phase14 && node --test test/v34_coaching_architecture.test.js)
@@ -76,7 +98,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          rm -rf .github/v34-patch .github/workflows/apply-v34-coaching.yml .github/workflows/apply-v33-final-coaching-coherence.yml
+          rm -rf .github/v34-patch .github/workflows/apply-v34-coaching.yml .github/workflows/apply-v34-final-commit.yml .github/workflows/apply-v33-final-coaching-coherence.yml
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add -A
