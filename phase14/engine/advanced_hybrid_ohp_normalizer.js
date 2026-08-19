@@ -60,6 +60,69 @@ function chooseTargetDay(parsed) {
   return ranked[0];
 }
 
+function rewriteWeek(program, parsed) {
+  const inner = [parsed.header.join('\t'), ...parsed.rows.map((cells) => cells.join('\t'))].join('\n');
+  return program.replace(parsed.re, parsed.match[1] + inner + parsed.match[3]);
+}
+
+function pressDoseFields(parsed) {
+  return ['weight', 'sets', 'reps', 'rest', 'target rpe']
+    .map((key) => parsed.index[key])
+    .filter(Number.isInteger);
+}
+
+// Secondary OHP is deliberately held stable in build weeks for a high-concurrency
+// athlete whose primary goals are elsewhere. This is not a generic OHP rule. It is
+// a deterministic convergence rule for the frozen AH-01 hierarchy: the model may
+// not keep solving a recovery-overload rejection by re-progressing the secondary
+// press family on every repair attempt. Weeks 2-3 copy the actual Week-1 pressing
+// dose; Week 4 may remain lower for consolidation and is never increased here.
+function stabilizeSecondaryPressDose(program, intake = {}) {
+  if (!isHighConcurrencyHybrid(intake) || !/(?:overhead\s*press|\bohp\b)/i.test(secondaryText(intake))) {
+    return { program, repairs: [] };
+  }
+
+  let candidate = String(program || '');
+  const baseline = parseWeek(candidate, 1);
+  if (!baseline) return { program: candidate, repairs: [] };
+
+  const baselineByName = new Map();
+  for (const cells of baseline.rows) {
+    const name = rowName(baseline, cells);
+    if (/^(?:overhead press|push press)$/i.test(name)) baselineByName.set(name.toLowerCase(), cells);
+  }
+  if (!baselineByName.size) return { program: candidate, repairs: [] };
+
+  const repairs = [];
+  for (const week of [2, 3]) {
+    const parsed = parseWeek(candidate, week);
+    if (!parsed) continue;
+    let changed = false;
+    const fields = pressDoseFields(parsed);
+    for (const cells of parsed.rows) {
+      const name = rowName(parsed, cells);
+      const base = baselineByName.get(name.toLowerCase());
+      if (!base) continue;
+      const baseFields = pressDoseFields(baseline);
+      // Headers are contract-stable, but map by field name so this remains robust
+      // if column positions are ever rearranged in a non-production fixture.
+      const keys = ['weight', 'sets', 'reps', 'rest', 'target rpe'];
+      for (const key of keys) {
+        const dst = parsed.index[key];
+        const src = baseline.index[key];
+        if (!Number.isInteger(dst) || !Number.isInteger(src)) continue;
+        if (cells[dst] !== base[src]) {
+          cells[dst] = base[src];
+          changed = true;
+        }
+      }
+      if (changed) repairs.push({ week, exercise: name, action: 'hold_secondary_press_at_week1_dose' });
+    }
+    if (changed) candidate = rewriteWeek(candidate, parsed);
+  }
+  return { program: candidate, repairs };
+}
+
 // The Advanced Hybrid contract requires one strict OHP exposure plus one small
 // complementary vertical-press exposure. Repeated live failures showed the model
 // can preserve the important strict OHP work yet omit only Push Press on every
@@ -87,10 +150,13 @@ export function normalizeAdvancedHybridOHPComplement(program, intake = {}) {
     if (!target) continue;
     const pushRow = makePushPressRow(parsed, target.day, week);
     parsed.rows.splice(target.insertAfter, 0, pushRow);
-    const inner = [parsed.header.join('\t'), ...parsed.rows.map((cells) => cells.join('\t'))].join('\n');
-    candidate = candidate.replace(parsed.re, parsed.match[1] + inner + parsed.match[3]);
+    candidate = rewriteWeek(candidate, parsed);
     repairs.push({ week, day: target.day, exercise: 'Push Press', sets: week === 4 ? 1 : 2 });
   }
+
+  const stabilized = stabilizeSecondaryPressDose(candidate, intake);
+  candidate = stabilized.program;
+  repairs.push(...stabilized.repairs);
 
   return { program: candidate, repaired: repairs.length > 0, repairs };
 }
