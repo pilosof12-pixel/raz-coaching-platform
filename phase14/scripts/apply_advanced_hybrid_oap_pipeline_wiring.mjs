@@ -4,6 +4,7 @@ import { fileURLToPath } from 'node:url';
 export const OAP_PIPELINE_MARKER = 'ADVANCED-HYBRID-OAP-CONSOLIDATION-REPAIR-WIRED';
 export const OAP_REVALIDATION_MARKER = 'ADVANCED-HYBRID-OAP-REPAIR-REVALIDATION-NORMALIZED';
 export const OAP_COACHING_ALIGNMENT_MARKER = 'ADVANCED-HYBRID-OAP-PROGRESSION-AXIS-LOCK';
+export const OAP_REPAIR_FEEDBACK_MARKER = 'ADVANCED-HYBRID-OAP-REPAIR-VOLUME-LOCK';
 
 export function patchAdvancedHybridOapPipelineSource(input) {
   let source = String(input || '');
@@ -51,6 +52,18 @@ export function patchAdvancedHybridOapPipelineSource(input) {
     if (promptCount !== 1) throw new Error(`Advanced Hybrid OAP coaching prompt anchor expected once, found ${promptCount}`);
     const rule = '  "ADVANCED OAP PROGRESSION AXIS LOCK: when an athlete already owns strict One-Arm Pull-up reps and is in a high-concurrency strength plus combat-sport plan, do not create progression merely by adding strict OAP sets. Keep strict OAP attempt-set count stable through build weeks unless the intake or authored source specifically identifies volume tolerance as the limiter. Prefer better execution quality, rep quality within a low set count, less assistance on the assisted exposure, or another verified performance variable that does not manufacture extra fatigue. Week 4 must hold or reduce strict OAP sets versus Week 3 while preserving the best earned skill standard. Never move volume from accessories into extra strict OAP sets just to satisfy a general progression or consolidation check.", // ADVANCED-HYBRID-OAP-PROGRESSION-AXIS-LOCK';
     source = source.replace(promptAnchor, `${promptAnchor}\n${rule}`);
+  }
+
+  // Aggregate repair feedback is installed later in the startup build chain. When
+  // this patcher is run a second time at the end of that chain, strengthen the
+  // Week-4 numeric repair so the repair model cannot satisfy a lower total-set
+  // target by shifting deleted accessory volume into extra strict OAP attempts.
+  if (source.includes('ADVANCED-HYBRID-NUMERIC-REPAIR-FEEDBACK') && !source.includes(OAP_REPAIR_FEEDBACK_MARKER)) {
+    const feedbackAnchor = 'Do not replace removed sets with extra reps, harder effort, new exercises, intervals, finishers or conditioning. This is a measurable workload reduction, not a prose rewrite.';
+    const feedbackCount = source.split(feedbackAnchor).length - 1;
+    if (feedbackCount !== 1) throw new Error(`Advanced Hybrid OAP repair feedback anchor expected once, found ${feedbackCount}`);
+    const lockedFeedback = 'STRICT OAP VOLUME LOCK: preserve Week 4 direct strict One-Arm Pull-up set count at or below Week 3. Never move sets removed from accessories, bilateral pulling, pressing or lower-body work into extra strict OAP attempts. Reduce fatigue around the primary skill while retaining its best earned quality. Do not replace removed sets with extra reps, harder effort, new exercises, intervals, finishers or conditioning. This is a measurable workload reduction, not a prose rewrite. [ADVANCED-HYBRID-OAP-REPAIR-VOLUME-LOCK]';
+    source = source.replace(feedbackAnchor, lockedFeedback);
   }
 
   return source;
