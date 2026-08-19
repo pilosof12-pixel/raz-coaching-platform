@@ -1,25 +1,25 @@
 {
-  "timestamp": "2026-08-19T06:29:58.659Z",
+  "timestamp": "2026-08-19T06:50:34.358Z",
   "base": "https://raz-coaching-platform.onrender.com",
-  "head_sha": "92be908fcd844a0a9fc124e39ae08a37ac7bb997",
-  "runtime": "launch-acceptance-v30g-coaching-spec-v1-tactical-event-progression-20260819",
+  "head_sha": "d08db343468f61b6b13c798f476ab1bee697d23b",
+  "runtime": "launch-acceptance-v30k-coaching-spec-v1-advanced-oap-coaching-aligned-20260819",
   "results": [
     {
       "id": "advanced_hybrid",
-      "job_id": "fe8c6e0bf24a46e36b541b5e7eda1010",
-      "ok": false,
-      "status": "error",
-      "stage": "refining",
-      "attempt": 4,
-      "detail": "internal repair: ADVANCED_HYBRID_WEEK4_OAP_VOLUME_INCREASED",
-      "last_seen_status": "error",
-      "error": "Internal coaching QA could not repair the candidate program after multiple passes. No client-facing program was saved. Please retry the build. QA trace: A1:ADVANCED_HYBRID_WEEK4_NOT_CONSOLIDATING -> A2:ADVANCED_HYBRID_WEEK4_OAP_VOLUME_INCREASED -> A3:ADVANCED_HYBRID_WEEK4_OAP_VOLUME_INCREASED -> A4:ADVANCED_HYBRID_WEEK4_OAP_VOLUME_INCREASED. [QA:INTERNAL_QA_REPAIR_EXHAUSTED]",
-      "program_chars": 0,
-      "seconds": 143
+      "job_id": "6a496c4033c8a66ad382165204aa76a2",
+      "ok": true,
+      "status": "done",
+      "stage": "finalizing",
+      "attempt": 0,
+      "detail": "saving program",
+      "last_seen_status": "done",
+      "error": null,
+      "program_chars": 14762,
+      "seconds": 78
     },
     {
       "id": "youth_gymnastics",
-      "job_id": "a00ac06afa509dd17f1493080fe37109",
+      "job_id": "d5947e73dd82c29e65d4f912bfb9dfca",
       "ok": true,
       "status": "done",
       "stage": "finalizing",
@@ -27,12 +27,12 @@
       "detail": "saving program",
       "last_seen_status": "done",
       "error": null,
-      "program_chars": 12980,
-      "seconds": 90
+      "program_chars": 12193,
+      "seconds": 46
     },
     {
       "id": "tactical_3k",
-      "job_id": "1882a79b827230488a06cf75dcb1646c",
+      "job_id": "8f992f43801201c7bf40e763a8ab7415",
       "ok": true,
       "status": "done",
       "stage": "finalizing",
@@ -40,9 +40,9 @@
       "detail": "saving program",
       "last_seen_status": "done",
       "error": null,
-      "program_chars": 11427,
-      "seconds": 62
+      "program_chars": 11642,
+      "seconds": 87
     }
   ],
-  "ok": false
+  "ok": true
 }
