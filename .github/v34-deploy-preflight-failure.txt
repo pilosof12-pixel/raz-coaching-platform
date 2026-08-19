@@ -13,12 +13,21 @@
 /home/runner/work/raz-coaching-platform/raz-coaching-platform/phase14/engine/phase15_final_qa.js: already current
 goal_progression_graph.js: ProgramModel display-name identity fixed
 skill_progressions.js: advanced skill-state calibration applied
-file:///home/runner/work/raz-coaching-platform/raz-coaching-platform/phase14/scripts/apply_skill_annotation_cleanliness_fix.mjs:26
-  throw new Error('skill annotation cleanliness patch did not apply');
-        ^
+exercise_dictionary.js: skill annotations kept internal
+engine/repairable_validation_bundle.js: goal-component release gate applied
+engine/exercise_dictionary.js: goal-component release gate applied
+engine/client_output_qa.js: goal-component release gate applied
+test/fixtures/golden_programs.js: already current
+Goal-component release gate complete.
+/home/runner/work/raz-coaching-platform/raz-coaching-platform/phase14/engine/phase15_elite_guardrails.js: already current
+engine/repairable_validation_bundle.js: tactical launch quality applied
+file:///home/runner/work/raz-coaching-platform/raz-coaching-platform/phase14/scripts/apply_tactical_manual_acceptance.mjs:15
+    if (count !== 1) throw new Error(`${rel} / ${t.label}: expected one anchor, found ${count}`);
+                           ^
 
-Error: skill annotation cleanliness patch did not apply
-    at file:///home/runner/work/raz-coaching-platform/raz-coaching-platform/phase14/scripts/apply_skill_annotation_cleanliness_fix.mjs:26:9
+Error: engine/specific_warmup_enrichment.js / do not strength-ramp loaded marching: expected one anchor, found 0
+    at patch (file:///home/runner/work/raz-coaching-platform/raz-coaching-platform/phase14/scripts/apply_tactical_manual_acceptance.mjs:15:28)
+    at file:///home/runner/work/raz-coaching-platform/raz-coaching-platform/phase14/scripts/apply_tactical_manual_acceptance.mjs:38:1
     at ModuleJob.run (node:internal/modules/esm/module_job:343:25)
     at async onImport.tracePromise.__proto__ (node:internal/modules/esm/loader:681:26)
     at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:117:5)
