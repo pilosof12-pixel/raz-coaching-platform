@@ -91,6 +91,37 @@ jobs:
               raise SystemExit('tactical warm-up validation anchor not found')
           tm.write_text(ms.replace(tactical_anchor, tactical_guard, 1))
 
+          # The accepted Youth architecture uses these two explicit skill drills.
+          # Keep the dictionary closed while recognizing those exact canonical names.
+          ed = Path('phase14/engine/exercise_dictionary.js')
+          es = ed.read_text()
+          if '"Controlled Handstand Kick-up"' not in es:
+              hand_anchor = '  "Handstand Hold", "Handstand Walk",\n'
+              if hand_anchor not in es:
+                  raise SystemExit('Youth handstand dictionary anchor not found')
+              es = es.replace(hand_anchor, '  "Handstand Hold", "Handstand Walk", "Controlled Handstand Kick-up",\n', 1)
+          if '"Bar Muscle-up Transition Drill"' not in es:
+              mu_anchor = '  "Strict Chest-to-Bar Pull-up", "Explosive Hip-to-Bar Pull-up",\n'
+              if mu_anchor not in es:
+                  raise SystemExit('Youth muscle-up dictionary anchor not found')
+              es = es.replace(mu_anchor, '  "Strict Chest-to-Bar Pull-up", "Explosive Hip-to-Bar Pull-up", "Bar Muscle-up Transition Drill",\n', 1)
+          ed.write_text(es)
+
+          # Restore Hebrew RTL behavior in the approved premium workbook without
+          # changing the agreed sheet order or eleven-column weekly layout.
+          sheet = Path('phase14/public/spreadsheet.js')
+          xs = sheet.read_text()
+          text_anchor = '  function setTextCell(cell,value){ cell.value=value==null?"":String(value); cell.numFmt="@"; return cell.value; }\n'
+          text_new = '  function setTextCell(cell,value){ cell.value=value==null?"":String(value); cell.numFmt = "@"; return cell.value; }\n  function isHebrewProgram(text,intake){ return /[\\u0590-\\u05FF]/.test(String(text||"")+" "+JSON.stringify(intake||{})); }\n'
+          if text_anchor not in xs:
+              raise SystemExit('spreadsheet text-cell anchor not found')
+          xs = xs.replace(text_anchor, text_new, 1)
+          render_anchor = '    renderQa(wb.addWorksheet("QA Checklist"),weeks,text,intake);\n    const buffer=await wb.xlsx.writeBuffer();'
+          render_new = '    renderQa(wb.addWorksheet("QA Checklist"),weeks,text,intake);\n    const isHebrew=isHebrewProgram(text,intake);\n    wb.worksheets.forEach(ws=>{ ws.views=(ws.views&&ws.views.length?ws.views:[{}]).map(v=>({...v, rightToLeft: isHebrew})); });\n    const buffer=await wb.xlsx.writeBuffer();'
+          if render_anchor not in xs:
+              raise SystemExit('spreadsheet workbook render anchor not found')
+          sheet.write_text(xs.replace(render_anchor, render_new, 1))
+
           t = Path('phase14/test/v34_coaching_architecture.test.js')
           ts = t.read_text()
           marker = "// 4. Handstand reduced-support"
@@ -113,7 +144,7 @@ jobs:
       - name: Run v34 and release-critical focused tests
         if: steps.ready.outputs.ready == 'true'
         working-directory: phase14
-        run: node --test test/v34_coaching_architecture.test.js test/pre_live_roadmap_lingo_release.test.js test/tactical_manual_acceptance.test.js
+        run: node --test test/v34_coaching_architecture.test.js test/pre_live_roadmap_lingo_release.test.js test/tactical_manual_acceptance.test.js test/youth_skill_dictionary.test.js
 
       - name: Syntax check modified engine files
         if: steps.ready.outputs.ready == 'true'
@@ -129,6 +160,8 @@ jobs:
           node --check engine/skill_progressions.js
           node --check engine/specific_warmup_enrichment.js
           node --check engine/tactical_manual_acceptance.js
+          node --check engine/exercise_dictionary.js
+          node --check public/spreadsheet.js
 
       - name: Run regression tests
         if: steps.ready.outputs.ready == 'true'
