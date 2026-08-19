@@ -1,25 +1,25 @@
 {
-  "timestamp": "2026-08-19T04:10:06.402Z",
+  "timestamp": "2026-08-19T04:25:01.671Z",
   "base": "https://raz-coaching-platform.onrender.com",
-  "head_sha": "c7b9859bcf605bc2d5f94738235192adc6ae15e8",
-  "runtime": "launch-acceptance-v30d-coaching-spec-v1-convergence-20260819",
+  "head_sha": "9d03c771e689531a220e85836b1bd91f3e5f4c59",
+  "runtime": "launch-acceptance-v30e-coaching-spec-v1-ah04-deterministic-20260819",
   "results": [
     {
       "id": "advanced_hybrid",
-      "job_id": "f2d1295723e26a02ba1ff5e41d99bcb3",
-      "ok": false,
-      "status": "error",
-      "stage": "refining",
-      "attempt": 4,
-      "detail": "internal repair: COACH_SPEC_V1_AH_ADJACENT_HIGH_STRESS_PULLING",
-      "last_seen_status": "error",
-      "error": "Internal coaching QA could not repair the candidate program after multiple passes. No client-facing program was saved. Please retry the build. QA trace: A1:COACH_SPEC_V1_AH_ADJACENT_HIGH_STRESS_PULLING+EVENT_PROGRESSING_SESSION_MISSING -> A2:COACH_SPEC_V1_AH_ADJACENT_HIGH_STRESS_PULLING -> A3:COACH_SPEC_V1_AH_ADJACENT_HIGH_STRESS_PULLING -> A4:COACH_SPEC_V1_AH_ADJACENT_HIGH_STRESS_PULLING. [QA:INTERNAL_QA_REPAIR_EXHAUSTED]",
-      "program_chars": 0,
-      "seconds": 133
+      "job_id": "6f6694611eb32cdafabbfbd6e86cc627",
+      "ok": true,
+      "status": "done",
+      "stage": "finalizing",
+      "attempt": 0,
+      "detail": "saving program",
+      "last_seen_status": "done",
+      "error": null,
+      "program_chars": 15074,
+      "seconds": 70
     },
     {
       "id": "youth_gymnastics",
-      "job_id": "426c1361b1bee9a31b92616f2bcf054b",
+      "job_id": "3863c0a9cc5295f8e3b67a48c1e380c2",
       "ok": true,
       "status": "done",
       "stage": "finalizing",
@@ -27,12 +27,12 @@
       "detail": "saving program",
       "last_seen_status": "done",
       "error": null,
-      "program_chars": 10200,
-      "seconds": 93
+      "program_chars": 10575,
+      "seconds": 42
     },
     {
       "id": "tactical_3k",
-      "job_id": "8bca8f920038cb82490934eb24014c44",
+      "job_id": "5c8578913e1535f07d7b0dd9d4c43428",
       "ok": true,
       "status": "done",
       "stage": "finalizing",
@@ -40,9 +40,9 @@
       "detail": "saving program",
       "last_seen_status": "done",
       "error": null,
-      "program_chars": 11227,
-      "seconds": 176
+      "program_chars": 11433,
+      "seconds": 116
     }
   ],
-  "ok": false
+  "ok": true
 }
