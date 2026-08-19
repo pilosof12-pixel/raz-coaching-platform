@@ -1,12 +1,12 @@
 {
-  "timestamp": "2026-08-19T10:57:25.061Z",
+  "timestamp": "2026-08-19T12:33:01.301Z",
   "base": "https://raz-coaching-platform.onrender.com",
-  "head_sha": "ee3afeba58e2617ef685f14dea87c98c9fd710e5",
-  "runtime": "launch-acceptance-v30m-hybrid-coherence-v1-20260819",
+  "head_sha": "6868831ccb972c3915fa05d9650ebc0e05b15028",
+  "runtime": "launch-acceptance-v31-hybrid-tactical-convergence-v2-20260819",
   "results": [
     {
       "id": "advanced_hybrid",
-      "job_id": "d368e82f0a5dbd20f595c8ec3c83f48c",
+      "job_id": "8493bb2f490cccbb936d7b6c017b7b3b",
       "ok": true,
       "status": "done",
       "stage": "finalizing",
@@ -14,34 +14,34 @@
       "detail": "saving program",
       "last_seen_status": "done",
       "error": null,
-      "program_chars": 14203,
-      "seconds": 76
+      "program_chars": 14780,
+      "seconds": 82
     },
     {
       "id": "youth_gymnastics",
-      "job_id": "6664b24bebe63847c67c7024e6ba7657",
-      "ok": true,
-      "status": "done",
-      "stage": "finalizing",
-      "attempt": 0,
-      "detail": "saving program",
-      "last_seen_status": "done",
-      "error": null,
-      "program_chars": 13606,
-      "seconds": 112
-    },
-    {
-      "id": "tactical_3k",
-      "job_id": "8737380bbf7ca7950a1f1fa12c549cc3",
+      "job_id": "f4bb28638aa47453585cfd47bf366a08",
       "ok": false,
       "status": "error",
       "stage": "refining",
       "attempt": 4,
-      "detail": "internal repair: EVENT_PROGRESSING_SESSION_MISSING",
+      "detail": "internal repair: PROGRESSION_ARCHITECTURE_MISSING+YOUTH_PROGRESSION_QUALITY_MISSING",
       "last_seen_status": "error",
-      "error": "Internal coaching QA could not repair the candidate program after multiple passes. No client-facing program was saved. Please retry the build. QA trace: A1:SPORT_DAY_COUPLING_VIOLATION+TACTICAL_SCHEDULE_ARCHITECTURE_VIOLATION+EVENT_PROGRESSING_SESSION_MISSING -> A2:EVENT_PROGRESSING_SESSION_MISSING -> A3:TACTICAL_SCHEDULE_ARCHITECTURE_VIOLATION+EVENT_PROGRESSING_SESSION_MISSING -> A4:EVENT_PROGRESSING_SESSION_MISSING. [QA:INTERNAL_QA_REPAIR_EXHAUSTED]",
+      "error": "Internal coaching QA could not repair the candidate program after multiple passes. No client-facing program was saved. Please retry the build. QA trace: A1:PROGRESSION_ARCHITECTURE_MISSING+YOUTH_PROGRESSION_QUALITY_MISSING -> A2:PROGRESSION_ARCHITECTURE_MISSING+YOUTH_PROGRESSION_QUALITY_MISSING -> A3:PROGRESSION_ARCHITECTURE_MISSING+YOUTH_PROGRESSION_QUALITY_MISSING -> A4:PROGRESSION_ARCHITECTURE_MISSING+YOUTH_PROGRESSION_QUALITY_MISSING. [QA:INTERNAL_QA_REPAIR_EXHAUSTED]",
       "program_chars": 0,
-      "seconds": 176
+      "seconds": 117
+    },
+    {
+      "id": "tactical_3k",
+      "job_id": "8c524e5bb3deb9c6ddf57fb62343c525",
+      "ok": true,
+      "status": "done",
+      "stage": "finalizing",
+      "attempt": 0,
+      "detail": "saving program",
+      "last_seen_status": "done",
+      "error": null,
+      "program_chars": 11019,
+      "seconds": 88
     }
   ],
   "ok": false
