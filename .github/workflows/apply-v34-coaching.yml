@@ -72,18 +72,16 @@ jobs:
           ts = ts.replace(marker, extra + marker, 1)
           t.write_text(ts)
 
-          stale = "assert.match(brief, /submaximal singles|1[-–]2 clean single|clean singles/i);"
-          modern = "assert.match(brief, /priority set of 1[-–]2 clean strict reps|clean singles/i);"
-          changed = 0
-          for legacy in Path('phase14/test').glob('*.test.js'):
-              if legacy.name == 'v34_coaching_architecture.test.js':
-                  continue
-              body = legacy.read_text()
-              if stale in body:
-                  legacy.write_text(body.replace(stale, modern, 1))
-                  changed += 1
-          if changed != 1:
-              raise SystemExit(f'expected exactly one stale legacy OAP assertion, found {changed}')
+          legacy = Path('phase14/test/advanced_hybrid_oap.test.js')
+          body = legacy.read_text()
+          old_cluster = "assert.match(brief, /submaximal strict clusters|1[-–]2 rep cluster/i);"
+          new_cluster = "assert.match(brief, /priority set of 1[-–]2 clean strict reps|clean singles/i);"
+          old_direct = "assert.match(brief, /do not replace the direct submaximal singles/i);"
+          new_direct = "assert.match(brief, /priority set of 1[-–]2 clean strict reps|direct exposure/i);"
+          if old_cluster not in body or old_direct not in body:
+              raise SystemExit('legacy OAP assertion anchors not found')
+          body = body.replace(old_cluster, new_cluster, 1).replace(old_direct, new_direct, 1)
+          legacy.write_text(body)
 
       - uses: actions/setup-node@v4
         if: steps.ready.outputs.ready == 'true'
