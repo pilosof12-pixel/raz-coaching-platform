@@ -23,12 +23,16 @@ jobs:
       - run: npm ci
       - name: Root semantic regression
         run: node --test phase14/test/program_model_semantics.test.js
-      - name: Phase 14 focused Youth convergence QA
+      - name: Build the real Phase 14 production pipeline
         run: |
           cd phase14
           npm install
-          npm test
-      - name: Phase 14 production build and full checks
+          npm run phase15:build
+          node --check server.phase15.js
+      - name: Focused Hybrid Tactical Youth convergence QA
         run: |
           cd phase14
-          npm run check
+          node --test \
+            test/youth_v32_progression_convergence.test.js \
+            test/coaching_consolidation_quality.test.js \
+            test/live_v30m_convergence_regressions.test.js
