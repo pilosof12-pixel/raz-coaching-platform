@@ -20,11 +20,14 @@ if (!src.includes(equipmentMarker)) {
 
 const oapMarker = '// ADVANCED-SKILL-DIRECT-OAP-BENCHMARK';
 if (!src.includes(oapMarker)) {
-  const find = `    one_arm_pull_up: firstIntAfter(t, /(\\d+)\\s*one[-\\s]?arm\\s*pull/),`;
+  const legacy = `    one_arm_pull_up: firstIntAfter(t, /(\\d+)\\s*one[-\\s]?arm\\s*pull/),`;
+  const v34 = `    one_arm_pull_up: firstIntAfter(t, /(\\d+)\\s*one[-\\s]?arm\\s*pull/) || firstIntAfter(t, /one[-\\s]?arm\\s*pull[-\\s]?ups?[^0-9]{0,24}(\\d+)/),`;
   const replace = `    // ADVANCED-SKILL-DIRECT-OAP-BENCHMARK\n    // Accept both \"2 one-arm pull-ups\" and natural intake phrasing such as\n    // \"One-Arm Pull-up: 2 strict reps each arm\". Demonstrated full-skill\n    // performance must route from the achieved state, not back to prerequisites.\n    one_arm_pull_up:\n      firstIntAfter(t, /one[-\\s]?arm\\s*(?:pull|chin)(?:[-\\s]?ups?)?[^0-9]{0,30}(\\d+)/) ||\n      firstIntAfter(t, /(\\d+)\\s*(?:strict\\s*)?one[-\\s]?arm\\s*(?:pull|chin)/),`;
-  const count = src.split(find).length - 1;
-  if (count !== 1) throw new Error(`skill_progressions OAP benchmark anchor expected once, found ${count}`);
-  src = src.replace(find, replace);
+  const legacyCount = src.split(legacy).length - 1;
+  const v34Count = src.split(v34).length - 1;
+  if (legacyCount === 1 && v34Count === 0) src = src.replace(legacy, replace);
+  else if (v34Count === 1 && legacyCount === 0) src = src.replace(v34, replace);
+  else throw new Error(`skill_progressions OAP benchmark anchor expected one supported form, found legacy=${legacyCount}, v34=${v34Count}`);
   changed = true;
 }
 
