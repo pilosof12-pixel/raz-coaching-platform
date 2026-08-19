@@ -1,1 +1,2 @@
 trigger v34 apply workflow
+synchronize
