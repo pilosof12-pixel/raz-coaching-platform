@@ -63,9 +63,6 @@ jobs:
           s = s.replace(old2, new2, 1)
           p.write_text(s)
 
-          # A commercial-gym intake that explicitly says standard bodyweight stations
-          # has enough evidence for a pull-up station. Do not weaken ring hard gates or
-          # explicit location/equipment exclusions.
           sp = Path('phase14/engine/skill_progressions.js')
           ss = sp.read_text()
           equip_old = 'case "pull_up_bar": return /pull[-\\s]?up bar|chin[-\\s]?up bar|monkey bar|doorframe|door frame|calisthenics|outdoor[_\\s]?park|\\bpull[-\\s]?up\\b/.test(text);'
@@ -73,6 +70,26 @@ jobs:
           if equip_old not in ss:
               raise SystemExit('pull-up equipment inference anchor not found')
           sp.write_text(ss.replace(equip_old, equip_new, 1))
+
+          # Loaded carries and rucks are distance/time locomotion, not barbell lifts.
+          # Never manufacture kg x reps ramp sets for them.
+          wu = Path('phase14/engine/specific_warmup_enrichment.js')
+          ws = wu.read_text()
+          ramp_anchor = "export function rampText(exercise, load) {\n"
+          ramp_guard = "export function rampText(exercise, load) {\n  if (/backpack\\s+carry|ruck|loaded\\s+march|farmer(?:'s)?\\s+carry|suitcase\\s+carry/i.test(String(exercise || ''))) return '';\n"
+          if ramp_anchor not in ws:
+              raise SystemExit('warm-up ramp anchor not found')
+          wu.write_text(ws.replace(ramp_anchor, ramp_guard, 1))
+
+          # Validate ruck warm-up semantics against the raw machine block as well as
+          # the parsed warm-up role so malformed kg x reps prose cannot slip through.
+          tm = Path('phase14/engine/tactical_manual_acceptance.js')
+          ms = tm.read_text()
+          tactical_anchor = "export function validateTacticalManualAcceptanceSemantic(program, intake = {}, suppliedModel = null) {\n  if (!isTacticalIntake(intake)) return { ok: true, skipped: true };\n"
+          tactical_guard = "export function validateTacticalManualAcceptanceSemantic(program, intake = {}, suppliedModel = null) {\n  if (!isTacticalIntake(intake)) return { ok: true, skipped: true };\n  const rawProgram = String(program || '');\n  if (/ramp\\s+(?:backpack\\s+carry|ruck|loaded\\s+march)[^\\n]*\\b\\d+(?:\\.\\d+)?\\s*kg\\s*x\\s*\\d/i.test(rawProgram)) {\n    fail('TACTICAL_RUCK_WARMUP_MISREPRESENTED', 'Ruck/backpack warm-ups must use walking and ankle/calf preparation or an easy first few minutes under the pack, not strength-style kg x reps ramps.');\n  }\n"
+          if tactical_anchor not in ms:
+              raise SystemExit('tactical warm-up validation anchor not found')
+          tm.write_text(ms.replace(tactical_anchor, tactical_guard, 1))
 
           t = Path('phase14/test/v34_coaching_architecture.test.js')
           ts = t.read_text()
@@ -93,10 +110,10 @@ jobs:
         if: steps.ready.outputs.ready == 'true'
         run: npm ci
 
-      - name: Run v34 tests
+      - name: Run v34 and release-critical focused tests
         if: steps.ready.outputs.ready == 'true'
         working-directory: phase14
-        run: node --test test/v34_coaching_architecture.test.js test/pre_live_roadmap_lingo_release.test.js
+        run: node --test test/v34_coaching_architecture.test.js test/pre_live_roadmap_lingo_release.test.js test/tactical_manual_acceptance.test.js
 
       - name: Syntax check modified engine files
         if: steps.ready.outputs.ready == 'true'
@@ -110,6 +127,8 @@ jobs:
           node --check engine/v34_readiness.js
           node --check engine/v34_workload_accounting.js
           node --check engine/skill_progressions.js
+          node --check engine/specific_warmup_enrichment.js
+          node --check engine/tactical_manual_acceptance.js
 
       - name: Run regression tests
         if: steps.ready.outputs.ready == 'true'
