@@ -1,0 +1,49 @@
+name: V34 Deploy Preflight
+
+on:
+  push:
+    branches: [privacy-security-hardening]
+    paths:
+      - '.github/workflows/v34-deploy-preflight.yml'
+      - '.github/v34-deploy-preflight-trigger'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  preflight:
+    if: ${{ github.actor != 'github-actions[bot]' }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: privacy-security-hardening
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm ci
+      - name: Run exact production build preparation
+        id: prep
+        working-directory: phase14
+        shell: bash
+        run: |
+          set +e
+          (npm run phase15:build && npm run launch:prepare) 2>&1 | tee /tmp/v34-deploy-preflight.log
+          status=${PIPESTATUS[0]}
+          echo "status=$status" >> "$GITHUB_OUTPUT"
+          exit 0
+      - name: Persist failure
+        if: steps.prep.outputs.status != '0'
+        run: |
+          cp /tmp/v34-deploy-preflight.log .github/v34-deploy-preflight-failure.txt
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add .github/v34-deploy-preflight-failure.txt
+          git commit -m 'Record v34 deploy preflight failure'
+          git push origin HEAD:privacy-security-hardening
+          exit 1
+      - name: Mark success
+        if: steps.prep.outputs.status == '0'
+        run: echo 'DEPLOY_PREFLIGHT_OK'
