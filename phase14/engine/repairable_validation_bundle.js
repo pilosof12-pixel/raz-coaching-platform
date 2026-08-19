@@ -15,6 +15,7 @@ import { validatePhase15FinalProgram } from './phase15_final_qa.js';
 import { parseProgramModel } from './program_model.js';
 import { trimExcessSupportVolume } from './mrv_support_trim.js';
 import { enrichSpecificWarmups } from './specific_warmup_enrichment.js';
+import { normalizeFinalNoteCoherence } from './final_note_coherence.js'; // FINAL-NOTE-COHERENCE-WIRED
 import { normalizeAdvancedHybridWeek4OapConsolidation } from './advanced_hybrid_oap_consolidation_normalizer.js';
 import { normalizeAdvancedHybridOHPComplement } from './advanced_hybrid_ohp_normalizer.js';
 import { normalizeYouthPrimarySkillOrder } from './youth_skill_order_normalizer.js';
@@ -316,6 +317,13 @@ export function collectRepairableValidationFailures(program, intake = {}, option
   const finalYouthConsolidation = normalizeYouthWeek4Consolidation(candidate, intake);
   candidate = finalYouthConsolidation.program;
   if (finalYouthConsolidation.repaired) deterministic_repairs.push({ type: 'final_youth_week4_consolidation', rows: finalYouthConsolidation.repairs });
+
+  // Last deterministic repair: every prescription above is now settled, so any
+  // quantitative claim a note still makes about its own row can be checked
+  // against the final structured fields.
+  const finalNoteCoherence = normalizeFinalNoteCoherence(candidate, intake);
+  candidate = finalNoteCoherence.program;
+  if (finalNoteCoherence.repaired) deterministic_repairs.push({ type: 'final_note_coherence', rows: finalNoteCoherence.repairs });
 
   const finalModel = parseProgramModel(candidate, intake);
   runRepairable(flags, () => validateAdvancedHybridManualAcceptanceSemantic(candidate, intake, finalModel));

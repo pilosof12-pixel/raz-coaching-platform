@@ -179,6 +179,61 @@ function isTransition(name) { return /^\s*Bar Muscle-up Transition Drill\s*$/i.t
 function isFullMuscleUp(name) { return /^\s*(?:Banded Muscle-up|Bar Muscle-up|Muscle-up)\s*$/i.test(String(name || '')); }
 function isPowerName(name) { return /explosive hip-to-bar|box jump|broad jump|sprint/i.test(String(name || '')); }
 
+// YOUTH-V32-VISIBLE-PRIMARY-PROGRESSION
+// The youth progression validators deliberately ignore Notes-only changes. For
+// acquisition goals, make one safe prescription variable visibly develop across
+// Weeks 1-3, then consolidate in Week 4. Attempt numbers remain ceilings and
+// assistance only decreases when the previous rung was technically clean.
+function youthVisibleProgressionTargets(week) {
+  return {
+    handstand: {
+      1: { sets: '3', reps: '2', cue: 'Six high-quality entries is a ceiling, not a quota; stop earlier if balance quality deteriorates.' },
+      2: { sets: '4', reps: '2', cue: 'Up to eight high-quality entries only if Week 1 stayed crisp; otherwise repeat the prior ceiling.' },
+      3: { sets: '4', reps: '3', cue: 'Up to twelve high-quality entries only if control remains stable; stop before fatigue-driven misses.' },
+      4: { sets: '3', reps: '3', cue: 'Consolidation week: reduce set exposure while preserving the best clean Week 3 balance and entry standard; stop before fatigue-driven misses.' },
+    }[week],
+    transition: {
+      1: 'Moderate band assistance for a smooth, repeatable bar turnover',
+      2: 'Slightly lighter band assistance if every Week 1 turnover was clean',
+      3: 'Lightest band assistance that still preserves a clean bar turnover',
+      4: 'Lightest band assistance that still preserves the clean Week 3 turnover; reduce volume, not the earned assistance standard',
+    }[week],
+  };
+}
+function isHandstandBalanceAcquisitionRow(name) {
+  return /controlled handstand kick[- ]?up|freestanding handstand|wall float|toe pull|heel pull/i.test(String(name || ''));
+}
+function applyYouthVisiblePrimaryProgression(parsed, week, intake, repairs) {
+  const primary = lower(goals(intake, 'primary'));
+  const target = youthVisibleProgressionTargets(week);
+  let changed = false;
+  parsed.rows.forEach((cells, row) => {
+    const name = String(cells[parsed.exercise] || '').trim();
+    if (/freestanding handstand|unsupported handstand|handstand balance/i.test(primary) && isHandstandBalanceAcquisitionRow(name)) {
+      const before = { sets: cells[parsed.sets], reps: cells[parsed.reps] };
+      cells[parsed.sets] = target.handstand.sets;
+      cells[parsed.reps] = target.handstand.reps;
+      if (Number.isInteger(parsed.notes)) {
+        const marker = week === 4 ? 'best clean week 3 balance' : (week === 1 ? 'six high-quality entries' : week === 2 ? 'up to eight high-quality entries' : 'up to twelve high-quality entries');
+        cells[parsed.notes] = addCue(cells[parsed.notes], target.handstand.cue, marker);
+      }
+      if (before.sets !== cells[parsed.sets] || before.reps !== cells[parsed.reps]) {
+        repairs.push({ type: 'youth_handstand_visible_progression', week, row, before, after: { sets: cells[parsed.sets], reps: cells[parsed.reps] } });
+        changed = true;
+      }
+    }
+    if (/bar muscle[- ]?up/i.test(primary) && isTransition(name) && Number.isInteger(parsed.load)) {
+      const before = cells[parsed.load];
+      cells[parsed.load] = target.transition;
+      if (before !== cells[parsed.load]) {
+        repairs.push({ type: 'youth_bar_transition_assistance_progression', week, row, before, after: cells[parsed.load] });
+        changed = true;
+      }
+    }
+  });
+  return changed;
+}
+
 export function normalizeYouthSkillAcquisitionQuality(program, intake = {}) {
   const original = String(program || '');
   const athleteAge = Number(intake.age || intake.age_years || 0);
@@ -260,6 +315,8 @@ export function normalizeYouthSkillAcquisitionQuality(program, intake = {}) {
         }
       }
     });
+
+    if (applyYouthVisiblePrimaryProgression(parsed, week, intake, repairs)) changed = true; // YOUTH-V32-VISIBLE-PROGRESSION-CALL
 
     if (needsFullBar) {
       const hasFull = parsed.rows.some((cells) => !isWarmup(cells[parsed.exercise]) && isFullMuscleUp(cells[parsed.exercise]));
@@ -427,6 +484,43 @@ function eventFlagKeys(program, intake) {
 function runningEventFlagPresent(program, intake) {
   const keys = eventFlagKeys(program, intake);
   return keys === null ? null : keys.includes('running');
+}
+
+// Established weekly running baseline from the intake, e.g. "about 18-20 km/week"
+// across "3 sessions per week". Used to state the aerobic-volume intent
+// explicitly instead of letting the block drift below a tolerated workload
+// without saying so.
+function runningBaseline(intake = {}) {
+  const source = `${txt(intake.notes)} ${txt(intake.clarification_answers)} ${txt(intake.current_numbers)} ${txt(intake.pain)}`;
+  const km = source.match(/(\d{1,3})\s*(?:-|–|to)\s*(\d{1,3})\s*km\s*(?:\/|per\s*)week/i)
+    || source.match(/(?:about|around|roughly|~)?\s*(\d{1,3})\s*km\s*(?:\/|per\s*)week/i);
+  const runs = source.match(/(\d)\s*(?:runs?|running sessions?|sessions?)\s*per\s*week/i)
+    || source.match(/runs?\s*(\d)\s*(?:sessions?|times?)\s*per\s*week/i);
+  if (!km) return null;
+  return {
+    low: Number(km[1]),
+    high: km[2] ? Number(km[2]) : Number(km[1]),
+    runs: runs ? Number(runs[1]) : null,
+  };
+}
+
+// The block deliberately sits at or just below the athlete's tolerated running
+// workload while race specificity increases. That is a defensible choice with a
+// shin-load history, but it must be stated rather than left as a silent
+// under-dose. This adds guidance only -- no session, distance or impact is added.
+function anchorAerobicVolume(program, intake, repairs) {
+  const baseline = runningBaseline(intake);
+  if (!baseline) return { program, changed: false };
+  const marker = 'weekly running volume anchor';
+  if (lower(program).includes(marker)) return { program, changed: false };
+  const head = String(program).split(/START_WEEK1_TSV/i)[0];
+  if (!head.trim()) return { program, changed: false };
+  const span = baseline.low === baseline.high ? `${baseline.low} km` : `${baseline.low}-${baseline.high} km`;
+  const runs = baseline.runs ? `${baseline.runs} running exposures` : 'the established number of running exposures';
+  const line = `Weekly running volume anchor: your established, tolerated baseline is about ${span} per week across ${runs}, and this block keeps ${runs} while quality becomes more 3K-specific. Easy-run durations are set at or slightly below that baseline on purpose, so the new interval specificity is the only impact variable stepping up. While shins and next-day soreness stay normal, rebuild toward the top of your ${span} range by adding a few minutes to the easy runs first - never by adding a fourth running day or by making the easy runs faster. If shin symptoms return, cut easy-run duration first, hold the newest interval and ruck progression, and repeat the last symptom-free week before progressing again.`;
+  const updated = `${head.trimEnd()}\n\n${line}\n\n${String(program).slice(head.length).replace(/^\s*/, '')}`;
+  repairs.push({ type: 'tactical_weekly_running_volume_anchor', baseline_km: span, runs: baseline.runs });
+  return { program: updated, changed: true };
 }
 
 export function normalizeTactical3KRaceSpecificity(program, intake = {}) {
@@ -660,6 +754,9 @@ export function normalizeTactical3KRaceSpecificity(program, intake = {}) {
     }
     if (changed) candidate = rebuild(candidate, parsed);
   }
+
+  const aerobicAnchor = anchorAerobicVolume(candidate, intake, repairs);
+  candidate = aerobicAnchor.program;
 
   const ruckAnchor = annotateRuckPace(candidate, intake, repairs);
   candidate = ruckAnchor.program;
