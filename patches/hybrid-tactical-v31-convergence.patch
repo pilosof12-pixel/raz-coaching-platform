@@ -1,0 +1,534 @@
+diff --git a/phase14/engine/advanced_hybrid_ohp_normalizer.js b/phase14/engine/advanced_hybrid_ohp_normalizer.js
+index 094a28a..f85b20a 100644
+--- a/phase14/engine/advanced_hybrid_ohp_normalizer.js
++++ b/phase14/engine/advanced_hybrid_ohp_normalizer.js
+@@ -1,4 +1,5 @@
+ import { isHighConcurrencyHybrid } from './advanced_hybrid_concurrency.js';
++import { rampText } from './specific_warmup_enrichment.js';
+ 
+ function arr(v) { return Array.isArray(v) ? v : v ? [v] : []; }
+ function secondaryText(intake = {}) { return arr(intake.secondary_goals).map(String).join(' | '); }
+@@ -65,6 +66,14 @@ function rewriteWeek(program, parsed) {
+   return program.replace(parsed.re, parsed.match[1] + inner + parsed.match[3]);
+ }
+ 
++// Top ramp step implied by rampText for a given work load, so the warm-up row's
++// own load range can be kept consistent with the ramp it prescribes.
++function rampTopStepKg(heldWeight) {
++  const ramp = rampText('Overhead Press', heldWeight);
++  const steps = [...String(ramp).matchAll(/(\d+(?:\.\d+)?)\s*kg\s*x/gi)].map((m) => Number(m[1])).filter(Number.isFinite);
++  return steps.length ? Math.max(...steps) : null;
++}
++
+ function syncHeldPressCues(program, weekNumber, exerciseName, heldWeight) {
+   const parsed = parseWeek(program, weekNumber);
+   if (!parsed || !heldWeight) return { program, changed: false };
+@@ -82,14 +91,40 @@ function syncHeldPressCues(program, weekNumber, exerciseName, heldWeight) {
+   }
+ 
+   if (/^overhead press$/i.test(exerciseName) && Number.isInteger(parsed.index.notes)) {
++    // Regenerate the whole ramp sentence from the load actually prescribed on the
++    // work row, rather than string-patching only the trailing target. The previous
++    // patch-in-place approach used `[^.]*?`, which cannot cross the decimal point
++    // in a 2.5 kg ramp step ("27.5 kg x 5"), so it silently no-opped on every real
++    // program and left both the intermediate steps and the target stale.
++    const freshRamp = rampText('Overhead Press', heldWeight);
+     for (const cells of parsed.rows) {
+       if (rowDay(parsed, cells) !== day || !isWarmup(rowName(parsed, cells))) continue;
+       const before = String(cells[parsed.index.notes] || '');
+-      const after = before.replace(/(Ramp Overhead Press:[^.]*?before\s+)[^.;]+?(\s+work sets\.)/i, `$1${heldWeight}$2`);
++      let after = before;
++      if (freshRamp) {
++        after = after.replace(/Ramp Overhead Press:[\s\S]*?work sets\./i, freshRamp);
++      }
+       if (after !== before) {
+         cells[parsed.index.notes] = after;
+         changed = true;
+       }
++      // The warm-up row's own load cell ("20-57.5 kg ramp") is model-authored and
++      // was also derived from the superseded work load. Cap its top at the ramp's
++      // real top step so the row cannot advertise a heavier ramp than the work set.
++      if (Number.isInteger(parsed.index.weight)) {
++        const topStep = rampTopStepKg(heldWeight);
++        const weightBefore = String(cells[parsed.index.weight] || '');
++        if (topStep != null) {
++          const weightAfter = weightBefore.replace(
++            /^(\s*\d+(?:\.\d+)?\s*-\s*)\d+(?:\.\d+)?(\s*kg\s*ramp\s*)$/i,
++            `$1${topStep}$2`,
++          );
++          if (weightAfter !== weightBefore) {
++            cells[parsed.index.weight] = weightAfter;
++            changed = true;
++          }
++        }
++      }
+     }
+   }
+ 
+@@ -99,6 +134,10 @@ function syncHeldPressCues(program, weekNumber, exerciseName, heldWeight) {
+ function syncHighConcurrencyNarrative(program) {
+   return String(program || '')
+     .replace(/with OHP progressed at a recoverable dose/gi, 'with OHP held at a recoverable build-week dose so primary goals and MMA recovery stay protected')
++    // The build-week hold is deliberate, so the intro must not advertise the
++    // strict press as progressing in load while the work rows hold Week 1's dose.
++    .replace(/\bstrict Overhead Press progressing\b/gi, 'strict Overhead Press held at a recoverable build-week dose')
++    .replace(/\bstrict OHP progressing\b/gi, 'strict OHP held at a recoverable build-week dose')
+     .replace(/The long run progresses by (?:a )?small distance (?:bumps|increase)[^.]*\./gi, 'The long run may stay at the current tolerated dose when primary-goal progress and MMA recovery take priority.');
+ }
+ 
+diff --git a/phase14/engine/coaching_spec_v1_convergence_normalizer.js b/phase14/engine/coaching_spec_v1_convergence_normalizer.js
+index c76e465..6cec9d5 100644
+--- a/phase14/engine/coaching_spec_v1_convergence_normalizer.js
++++ b/phase14/engine/coaching_spec_v1_convergence_normalizer.js
+@@ -88,9 +88,36 @@ function isWarmup(name) { return /^\s*\[WARMUP\]/i.test(String(name || '')); }
+ // names. Always combined with a sets>=2 + parseable-distance gate (see
+ // isKeyIntervalRow), so an easy/long single-set run is never matched.
+ function isRunName(name) { return /\brun(?:ning)?\b/i.test(String(name || '')); }
++// The model does not always split an interval prescription into Sets + Reps. It
++// frequently writes the whole scheme inside one cell ("5 x 800 m") and leaves
++// Sets at 1. Reading the repetition count only from the Sets column made those
++// rows invisible to the key-interval detector, so the Week 1 event-progression
++// repair silently declined on exactly the programs that needed it. Recover the
++// scheme from the cell text when the Sets column does not carry it.
++function inlineIntervalScheme(raw) {
++  const s = String(raw || '');
++  const forward = s.match(/\b(\d{1,2})\s*(?:x|×)\s*(\d{2,4})\s*m\b/i);
++  if (forward) return { sets: Number(forward[1]), distance: Number(forward[2]) };
++  const reverse = s.match(/\b(\d{2,4})\s*m\s*(?:x|×)\s*(\d{1,2})\b/i);
++  if (reverse) return { sets: Number(reverse[2]), distance: Number(reverse[1]) };
++  return null;
++}
++// Resolve the effective repetition count and repetition distance for a running
++// row, whichever way the model chose to express them.
++function intervalScheme(parsed, cells) {
++  const setsCol = firstNum(cells[parsed.sets]) ?? 0;
++  const repsDistance = parseDistanceMeters(cells[parsed.reps]);
++  if (setsCol >= 2 && Number.isFinite(repsDistance)) return { sets: setsCol, distance: repsDistance };
++  for (const idx of [parsed.reps, parsed.load]) {
++    if (!Number.isInteger(idx)) continue;
++    const inline = inlineIntervalScheme(cells[idx]);
++    if (inline && inline.sets >= 2 && inline.distance >= 100) return inline;
++  }
++  return null;
++}
+ function isKeyIntervalRow(parsed, cells) {
+   if (isWarmup(cells[parsed.exercise]) || !isRunName(cells[parsed.exercise])) return false;
+-  return (firstNum(cells[parsed.sets]) ?? 0) >= 2 && Number.isFinite(parseDistanceMeters(cells[parsed.reps]));
++  return intervalScheme(parsed, cells) !== null;
+ }
+ function isLowerStrengthName(name) {
+   return /^\s*(?:Back Squat|Front Squat|Deadlift|Conventional Deadlift|Romanian Deadlift|Split Squat|Bulgarian Split Squat|Reverse Lunge|Forward Lunge|Walking Lunge)\s*$/i.test(String(name || ''));
+@@ -326,10 +353,89 @@ function priorWeekdayName(day) {
+   return idx < 0 ? null : WEEKDAYS[(idx + 6) % 7];
+ }
+ 
++// Current demonstrated ruck pace, e.g. "10 km ruck with 20 kg: 95 min" -> 570 s/km.
++// Used to anchor a ruck prescription to real capacity, never to goal pace.
++function currentRuckPaceSecPerKm(intake = {}) {
++  const source = `${txt(intake.current_numbers)} ${txt(intake.performance_markers)} ${txt(intake.clarification_answers)}`;
++  const m = source.match(/(\d+(?:\.\d+)?)\s*km[^\n|]{0,40}?ruck[^\n|]{0,40}?:?\s*(\d{2,3})\s*min/i)
++    || source.match(/ruck[^\n|]{0,40}?(\d+(?:\.\d+)?)\s*km[^\n|]{0,40}?(\d{2,3})\s*min/i);
++  if (!m) return null;
++  const km = Number(m[1]);
++  const minutes = Number(m[2]);
++  if (!(km > 0) || !(minutes > 0)) return null;
++  return (minutes * 60) / km;
++}
++function isRuckRowName(name) {
++  return /\b(?:ruck(?:ing)?|ruck march|loaded march|pack march|backpack march|backpack carry)\b/i.test(String(name || ''));
++}
++function hasClockTarget(raw) { return /\b\d{1,2}:\d{2}\b/.test(String(raw || '')); }
++
++// The rucking goal is a second, independent event goal for this athlete, and the
++// validator evaluates it separately from running. A ruck row that states load and
++// distance but no pace target is not progression-bearing, so it raises the very
++// same EVENT_PROGRESSING_SESSION_MISSING code under details.key === 'rucking'.
++// No running repair can ever clear it. Anchor the EXISTING ruck row to the
++// athlete's demonstrated ruck pace: no added session, distance or load, and the
++// same pace band in every week so no second variable starts progressing (T3K-06).
++function annotateRuckPace(candidate, intake, repairs) {
++  const paceSec = currentRuckPaceSecPerKm(intake);
++  if (!Number.isFinite(paceSec)) return { program: candidate, changed: false };
++  const band = `${formatClock(paceSec)}-${formatClock(paceSec + 10)}/km`;
++  let program = candidate;
++  let changed = false;
++  for (let week = 1; week <= 4; week++) {
++    const parsed = parseWeek(program, week);
++    if (!parsed || !Number.isInteger(parsed.load)) continue;
++    let weekChanged = false;
++    parsed.rows.forEach((cells, row) => {
++      const name = cells[parsed.exercise];
++      if (isWarmup(name) || !isRuckRowName(name)) return;
++      const load = String(cells[parsed.load] || '');
++      if (hasClockTarget(load)) return;
++      if (!/\d/.test(load)) return;
++      cells[parsed.load] = `${load.trim()} @ ${band}`;
++      if (Number.isInteger(parsed.notes)) {
++        cells[parsed.notes] = addCue(
++          cells[parsed.notes],
++          `Pace anchored to the current demonstrated ruck capacity (${formatClock(paceSec)}/km), not goal pace; hold load and distance while pace settles.`,
++          'pace anchored to the current demonstrated ruck capacity',
++        );
++      }
++      repairs.push({ type: 'tactical_ruck_event_pace_anchored', week, row });
++      weekChanged = true;
++      changed = true;
++    });
++    if (weekChanged) program = rebuild(program, parsed);
++  }
++  return { program, changed };
++}
++
++// Convergence contract helper. Re-parses the given program's Week 1 and asks the
++// REAL validator whether the running instance of EVENT_PROGRESSING_SESSION_MISSING
++// is still present. Never infer success from what was written -- measure it.
++function eventFlagKeys(program, intake) {
++  const week1 = parseWeek(program, 1);
++  if (!week1) return null;
++  const guardrailParsed = {
++    idx: { day: week1.day, exercise: week1.exercise, weight: week1.load, sets: week1.sets, reps: week1.reps, notes: week1.notes },
++    rows: week1.rows.map((cells) => ({ cells })),
++  };
++  return endurancePerformanceIntegrityFlags(program, intake, guardrailParsed)
++    .filter((f) => f.code === 'EVENT_PROGRESSING_SESSION_MISSING')
++    .map((f) => f.details?.key || 'unknown');
++}
++function runningEventFlagPresent(program, intake) {
++  const keys = eventFlagKeys(program, intake);
++  return keys === null ? null : keys.includes('running');
++}
++
+ export function normalizeTactical3KRaceSpecificity(program, intake = {}) {
+   const original = String(program || '');
+-  if (!isTactical3KLike(intake)) return { program: original, repaired: false, repairs: [] };
++  if (!isTactical3KLike(intake)) return { program: original, repaired: false, repairs: [], event_progression: { applicable: false, unrepaired_reason: 'not_tactical_3k_like' } };
+ 
++  // Entry state, measured with the real validator so the postcondition below can
++  // tell 'was never broken' apart from 'was broken and is still broken'.
++  const entryRunningFlag = runningEventFlagPresent(original, intake);
+   let candidate = original;
+   const repairs = [];
+   const snapshots = [];
+@@ -371,7 +477,10 @@ export function normalizeTactical3KRaceSpecificity(program, intake = {}) {
+         });
+         if (target) {
+           const { cells, row } = target;
+-          const distance = parseDistanceMeters(cells[week1.reps]) || 400;
++          // Use the resolved scheme so an inline "5 x 800 m" prescription keeps its
++          // real repetition count instead of inheriting a Sets cell of 1.
++          const scheme = intervalScheme(week1, cells);
++          const distance = (scheme && scheme.distance) || parseDistanceMeters(cells[week1.reps]) || 400;
+           const low = current * (distance / 3000) * 0.97;
+           const high = current * (distance / 3000) * 1.00;
+           const before = {
+@@ -381,6 +490,7 @@ export function normalizeTactical3KRaceSpecificity(program, intake = {}) {
+             reps: cells[week1.reps],
+           };
+           cells[week1.exercise] = 'Run';
++          if (scheme && (firstNum(cells[week1.sets]) ?? 0) < 2) cells[week1.sets] = String(scheme.sets);
+           cells[week1.reps] = `${distance} m`;
+           if (Number.isInteger(week1.load)) cells[week1.load] = `${distance} m @ ${formatClock(low)}-${formatClock(high)}`;
+           if (Number.isInteger(week1.notes)) {
+@@ -551,5 +661,36 @@ export function normalizeTactical3KRaceSpecificity(program, intake = {}) {
+     if (changed) candidate = rebuild(candidate, parsed);
+   }
+ 
+-  return { program: candidate, repaired: repairs.length > 0, repairs };
++  const ruckAnchor = annotateRuckPace(candidate, intake, repairs);
++  candidate = ruckAnchor.program;
++
++  // Convergence contract. The Week 1 running event-progression defect is the one
++  // this normalizer exists to close, so its outcome is measured against the real
++  // validator rather than inferred from what was written. The result always
++  // states either that the running flag is gone, or a deterministic reason why it
++  // could not be repaired safely. It must never report a repair while returning a
++  // candidate that still carries the same running flag.
++  const post = runningEventFlagPresent(candidate, intake);
++  const postKeys = eventFlagKeys(candidate, intake);
++  const eventRepairs = repairs.filter((r) => /week1_event_session|event_session_from_generic_run/.test(r.type));
++  const event_progression = {
++    applicable: true,
++    repair_attempted: entryRunningFlag === true,
++    target_row_found: eventRepairs.length > 0,
++    post_repair_event_bearing: post === false,
++    post_repair_running_flag: post,
++    // Every modality the validator still rejects, so a non-running instance (e.g.
++    // the concurrent rucking goal) can never masquerade as a cleared running flag.
++    post_repair_flag_keys: postKeys,
++    unrepaired_reason: null,
++  };
++  if (Array.isArray(postKeys) && postKeys.length && !event_progression.unrepaired_reason) {
++    event_progression.unrepaired_reason = `event_flag_remains:${[...new Set(postKeys)].sort().join(',')}`;
++  }
++  if (entryRunningFlag === true && post !== false) {
++    event_progression.unrepaired_reason = eventRepairs.length > 0
++      ? 'repair_applied_but_flag_persists'
++      : (Number.isFinite(current) ? 'no_safe_repair_target' : 'no_current_3k_benchmark');
++  }
++  return { program: candidate, repaired: repairs.length > 0, repairs, event_progression };
+ }
+diff --git a/phase14/engine/specific_warmup_enrichment.js b/phase14/engine/specific_warmup_enrichment.js
+index ad45e25..05a3988 100644
+--- a/phase14/engine/specific_warmup_enrichment.js
++++ b/phase14/engine/specific_warmup_enrichment.js
+@@ -30,7 +30,10 @@ function exerciseFamily(name) {
+   return 'other';
+ }
+ 
+-function rampText(exercise, load) {
++// Exported so a later load-stabilising normalizer can REGENERATE the ramp from
++// the final work prescription instead of string-patching the stale one. Warm-up
++// text must always be derived from the load actually prescribed on the day.
++export function rampText(exercise, load) {
+   const added = parseAddedKg(load);
+   if (added != null && /pull-up|chin-up/i.test(exercise)) {
+     const a = roundTo2p5(added * 0.35);
+diff --git a/phase14/test/live_v30m_convergence_regressions.test.js b/phase14/test/live_v30m_convergence_regressions.test.js
+new file mode 100644
+index 0000000..b407bf9
+--- /dev/null
++++ b/phase14/test/live_v30m_convergence_regressions.test.js
+@@ -0,0 +1,243 @@
++import test from 'node:test';
++import assert from 'node:assert/strict';
++
++import { enrichSpecificWarmups } from '../engine/specific_warmup_enrichment.js';
++import { normalizeAdvancedHybridOHPComplement } from '../engine/advanced_hybrid_ohp_normalizer.js';
++import { normalizeTactical3KRaceSpecificity } from '../engine/coaching_spec_v1_convergence_normalizer.js';
++import { endurancePerformanceIntegrityFlags } from '../engine/phase15_elite_guardrails.js';
++import { ADVANCED_HYBRID_LAUNCH_INTAKE } from './fixtures/advanced_hybrid_launch.js';
++
++// ---------------------------------------------------------------------------
++// v30m live defects.
++//   Hybrid : held OHP work row vs stale warm-up ramp target (coherence).
++//   Tactical: EVENT_PROGRESSING_SESSION_MISSING surviving four repair passes.
++// Both are exercised through the production call ORDER, not isolated functions.
++// ---------------------------------------------------------------------------
++
++const HEADER = 'Day\tExercise\tWeight\tSets\tReps\tRest\tTarget RPE\tNotes\tResults';
++const block = (w, rows) => `START_WEEK${w}_TSV\n${HEADER}\n${rows.join('\n')}\nEND_WEEK${w}_TSV`;
++const fourWeeks = (rows, intro = '') => `${intro ? `${intro}\n\n` : ''}${[1, 2, 3, 4].map((w) => block(w, rows(w))).join('\n\n')}`;
++
++// --- Advanced Hybrid -------------------------------------------------------
++
++// Week 1 presses 67.5 kg; the model proposes 70 kg in Week 2 and 72.5 kg in
++// Week 3. The high-concurrency rule holds both build weeks at the Week 1 dose,
++// so every warm-up ramp must follow the load actually prescribed.
++function hybridProposedPressProgression() {
++  const press = [67.5, 70, 72.5, 70];
++  return fourWeeks((w) => [
++    `Sun\t[WARMUP] Overhead Press\t20-${[55, 57.5, 60, 55][w - 1]} kg ramp\t3\t3\t60-90 sec\tN/A\tCompact ramp; keep shoulders fresh.; Ramp Overhead Press: 27.5 kg x 5, 42.5 kg x 3, 55 kg x 1-2 before ${press[w - 1]} kg work sets.; Keep the warm-up specific and non-fatiguing.\t`,
++    `Sun\tOverhead Press\t${press[w - 1]} kg\t4\t4\t2-3 min\t7.5\tDirect strict press exposure; no layback.\t`,
++    'Mon\tBack Squat\t170 kg\t3\t3\t3 min\t8\tPrimary squat.\t',
++    `Tue\tRun\tConversational easy pace\t1\t20 km\tN/A\t5-6\tSecondary marathon run.\t`,
++  ], 'Primary work stays centered on strict One-Arm Pull-up quality, with strict Overhead Press progressing without stealing freshness from MMA.');
++}
++
++// Production order: warm-up enrichment runs first, load stabilisation after it.
++function productionHybridSequence(program, intake) {
++  return normalizeAdvancedHybridOHPComplement(enrichSpecificWarmups(program), intake).program;
++}
++
++function pressWeek(program, week) {
++  const blk = program.match(new RegExp(`START_WEEK${week}_TSV[\\s\\S]*?END_WEEK${week}_TSV`))[0];
++  return {
++    work: blk.match(/^\w+\tOverhead Press\t([\d.]+) kg\t/m)?.[1],
++    rampTarget: blk.match(/Ramp Overhead Press:[^;]*?before ([\d.]+) kg work sets/)?.[1],
++    note: blk.match(/^\w+\tOverhead Press\t[^\t]*\t[^\t]*\t[^\t]*\t[^\t]*\t[^\t]*\t([^\t]*)\t/m)?.[1] || '',
++  };
++}
++
++test('[AH] held OHP weeks keep the work row, the warm-up ramp target and the narrative in agreement', () => {
++  const out = productionHybridSequence(hybridProposedPressProgression(), ADVANCED_HYBRID_LAUNCH_INTAKE);
++  for (const week of [2, 3]) {
++    const { work, rampTarget, note } = pressWeek(out, week);
++    assert.equal(work, '67.5', `Week ${week} work row should hold the Week 1 dose`);
++    assert.equal(rampTarget, '67.5', `Week ${week} warm-up ramp must target the load actually prescribed`);
++    assert.match(note, /hold|quality|bar speed/i, `Week ${week} note should describe a deliberate hold, not a load increase`);
++    assert.doesNotMatch(note, /increase the load|add \d+(?:\.\d+)? kg/i);
++  }
++  // Week 1 and Week 4 are untouched by the hold and must stay self-consistent.
++  for (const week of [1, 4]) {
++    const { work, rampTarget } = pressWeek(out, week);
++    assert.equal(rampTarget, work, `Week ${week} ramp target should match its own work load`);
++  }
++  assert.doesNotMatch(out, /before 72\.5 kg work sets/, 'no stale Week 3 ramp target may survive');
++  assert.equal(/before 70 kg work sets/.test(out.match(/START_WEEK2_TSV[\s\S]*?END_WEEK2_TSV/)[0]), false);
++  assert.doesNotMatch(out, /strict Overhead Press progressing/i, 'narrative must not claim load progression during a deliberate hold');
++});
++
++test('[AH] the ramp sync survives decimal ramp steps (the defect that made it silently no-op)', () => {
++  // "27.5 kg x 5" contains a period; the previous [^.]*? matcher could not cross
++  // it, so the sync never fired on any real program.
++  const out = productionHybridSequence(hybridProposedPressProgression(), ADVANCED_HYBRID_LAUNCH_INTAKE);
++  const w2 = out.match(/START_WEEK2_TSV[\s\S]*?END_WEEK2_TSV/)[0];
++  assert.match(w2, /Ramp Overhead Press: [\d.]+ kg x 5, [\d.]+ kg x 3, [\d.]+ kg x 1-2 before 67\.5 kg work sets\./);
++});
++
++test('[AH] OHP work/ramp coherence is stable across a repeated normalization pass', () => {
++  // Whole-program byte identity is NOT the invariant here: the OHP normalizer
++  // legitimately inserts the Push Press complement, which a second warm-up
++  // enrichment pass would then warm up. That composition is non-idempotent on the
++  // unpatched baseline too, so this asserts the property this fix owns -- the
++  // work row and its ramp target stay in agreement no matter how often it runs.
++  const once = productionHybridSequence(hybridProposedPressProgression(), ADVANCED_HYBRID_LAUNCH_INTAKE);
++  const twice = productionHybridSequence(once, ADVANCED_HYBRID_LAUNCH_INTAKE);
++  for (const week of [1, 2, 3, 4]) {
++    const a = pressWeek(once, week);
++    const b = pressWeek(twice, week);
++    assert.equal(a.rampTarget, a.work, `pass 1 week ${week} must agree`);
++    assert.equal(b.rampTarget, b.work, `pass 2 week ${week} must agree`);
++    assert.equal(b.work, a.work, `week ${week} work load must not drift between passes`);
++  }
++  // The normalizer itself, applied twice without re-enrichment, is a fixed point.
++  const stable = normalizeAdvancedHybridOHPComplement(once, ADVANCED_HYBRID_LAUNCH_INTAKE).program;
++  assert.equal(normalizeAdvancedHybridOHPComplement(stable, ADVANCED_HYBRID_LAUNCH_INTAKE).program, stable);
++});
++
++// --- Tactical 3K -----------------------------------------------------------
++
++const TACTICAL_INTAKE = {
++  age: 27, experience: 'advanced', days_per_week: 3,
++  primary_goals: ['Improve 3 km from 13:30 to sub-12:00'],
++  secondary_goals: ['Improve 10 km ruck with 20 kg from 95 min toward 82 min', 'Improve strict pull-ups from 14 toward 18-20'],
++  maintenance_goals: ['Maintain useful squat and deadlift strength while staying athletic and relatively weight-stable'],
++  current_numbers: ['3 km: 13:30', '10 km ruck with 20 kg: 95 min', 'Back Squat: 140 kg x 5', 'Deadlift: 180 kg x 3'].join('\n'),
++  performance_markers: ['3 km: 13:30', '10 km ruck with 20 kg: 95 min'],
++  injuries: 'Previous shin-splint irritation with abrupt running-volume increases; currently asymptomatic.',
++  notes: 'Currently runs 3 sessions per week, about 18-20 km/week. Currently does 1 ruck per week, usually 8-10 km with 20 kg. Wants combat-ready / special-operations-style fitness without random punishment circuits.',
++};
++
++function eventFlagKeys(program, intake) {
++  const m = program.match(/START_WEEK1_TSV\s*\n([\s\S]*?)\nEND_WEEK1_TSV/i);
++  if (!m) return null;
++  const lines = m[1].split('\n');
++  const hdr = lines[0].split('\t');
++  const idx = Object.fromEntries(hdr.map((h, i) => [h.trim().toLowerCase(), i]));
++  const parsed = {
++    idx: { day: idx.day, exercise: idx.exercise, weight: idx.weight, sets: idx.sets, reps: idx.reps, notes: idx.notes },
++    rows: lines.slice(1).map((l) => ({ cells: l.split('\t') })),
++  };
++  return endurancePerformanceIntegrityFlags(program, intake, parsed)
++    .filter((f) => f.code === 'EVENT_PROGRESSING_SESSION_MISSING')
++    .map((f) => f.details?.key);
++}
++
++// The v30m candidate shape: three runs a week and one ruck, with the quality
++// session expressed inline ("5 x 800 m") and Sets left at 1.
++function tacticalCandidate(qualityRow, ruckLoad = '20 kg') {
++  return fourWeeks((w) => [
++    'Mon\t[WARMUP]\tN/A\t1\t8 min\tN/A\t3\tGeneral prep.\t',
++    'Mon\tBack Squat\t120 kg\t3\t5\t3 min\t7\tMaintenance squat.\t',
++    'Mon\tPull-up\tBodyweight\t4\t6\t2 min\t7\tSubmaximal quality volume.\t',
++    'Tue\t[WARMUP] Run\tEasy jog + drills\t1\t12 min\tN/A\t3\tAnkle and calf prep.\t',
++    qualityRow(w),
++    `Thu\tBackpack Carry\t${ruckLoad}\t1\t${[8, 8.5, 9, 8][w - 1]} km\tN/A\t6\tControlled ruck walk.\t`,
++    'Fri\tDeadlift\t155 kg\t2\t3\t3 min\t7\tMaintenance pull.\t',
++    'Fri\tRun\tEasy conversational pace\t1\t35 min\tN/A\t4\tEasy aerobic run; keep it genuinely easy.\t',
++  ], 'If shin symptoms return, hold the newest run or ruck dose, reduce impact, and repeat the prior tolerated week.');
++}
++
++const INLINE_QUALITY = (w) => `Tue\tRun\tHard repeats\t1\t${[5, 6, 5, 4][w - 1]} x ${[800, 800, 1000, 800][w - 1]} m\t2:30\t8\tPrimary 3K quality session.\t`;
++const RPE_ONLY_QUALITY = (w) => `Tue\tRun\tRPE 8 effort\t${[5, 6, 5, 4][w - 1]}\t${[800, 800, 1000, 800][w - 1]} m\t2:30\t8\tPrimary 3K quality session.\t`;
++const VALID_QUALITY = (w) => `Tue\tRun\t${[400, 400, 600, 400][w - 1]} m @ 1:42-1:45\t${[5, 6, 4, 4][w - 1]}\t${[400, 400, 600, 400][w - 1]} m\t2:15\t8\tPrimary 3K quality at current capacity.\t`;
++
++test('[T3K] a non-running modality instance of the flag is cleared, not just the running one', () => {
++  // This is the v30m root cause: the surviving flag was never the running one.
++  // The rucking modality definition is installed by the phase15 build, so under a
++  // partial build there is simply no rucking goal to evaluate. Assert the
++  // invariant that holds either way: whatever modalities the validator rejects
++  // before normalization, none of them survive it.
++  const program = tacticalCandidate(VALID_QUALITY);
++  const before = eventFlagKeys(program, TACTICAL_INTAKE);
++  assert.equal(before.includes('running'), false, 'the running session here is already valid');
++  const out = normalizeTactical3KRaceSpecificity(program, TACTICAL_INTAKE);
++  assert.deepEqual(eventFlagKeys(out.program, TACTICAL_INTAKE), []);
++  if (before.includes('rucking')) {
++    // Full production build: prove the ruck row is what got repaired.
++    assert.ok(out.repairs.some((r) => r.type === 'tactical_ruck_event_pace_anchored'));
++  }
++});
++
++test('[T3K] normalization clears every modality instance of the event-progression flag', () => {
++  for (const [name, quality] of [['inline scheme', INLINE_QUALITY], ['RPE-only', RPE_ONLY_QUALITY], ['already valid', VALID_QUALITY]]) {
++    const program = tacticalCandidate(quality);
++    const out = normalizeTactical3KRaceSpecificity(program, TACTICAL_INTAKE);
++    assert.deepEqual(eventFlagKeys(out.program, TACTICAL_INTAKE), [], `${name}: flag must be gone for all modalities`);
++    assert.deepEqual(out.event_progression.post_repair_flag_keys, [], `${name}: contract must report a clean postcondition`);
++    assert.equal(out.event_progression.unrepaired_reason, null, `${name}: no unrepaired reason expected`);
++  }
++});
++
++test('[T3K] an inline "5 x 800 m" scheme with Sets=1 is recognized and canonicalized', () => {
++  const out = normalizeTactical3KRaceSpecificity(tacticalCandidate(INLINE_QUALITY), TACTICAL_INTAKE);
++  const w1 = out.program.match(/START_WEEK1_TSV[\s\S]*?END_WEEK1_TSV/)[0];
++  const row = w1.match(/^Tue\tRun\t([^\t]*)\t([^\t]*)\t([^\t]*)\t/m);
++  assert.ok(row, 'the key run row must still exist');
++  assert.ok(Number(row[2]) >= 2, `repetition count must be recovered from the inline scheme, got sets=${row[2]}`);
++  assert.match(row[1], /\d{1,2}:\d{2}/, 'the canonicalized row must carry a clock target');
++});
++
++test('[T3K] the ruck row gains a current-capacity pace without extra volume, load or sessions', () => {
++  const program = tacticalCandidate(VALID_QUALITY);
++  const out = normalizeTactical3KRaceSpecificity(program, TACTICAL_INTAKE);
++  const w1 = out.program.match(/START_WEEK1_TSV[\s\S]*?END_WEEK1_TSV/)[0];
++  const ruck = w1.match(/^Thu\tBackpack Carry\t([^\t]*)\t([^\t]*)\t([^\t]*)\t/m);
++  // 10 km in 95 min is 9:30/km: the band must be anchored there, not at goal pace.
++  assert.match(ruck[1], /20 kg @ 9:30-9:40\/km/);
++  assert.equal(ruck[2], '1', 'ruck set count unchanged');
++  assert.equal(ruck[3], '8 km', 'ruck distance unchanged');
++  // Row counts identical: annotation only, nothing inserted.
++  const rows = (p) => p.match(/START_WEEK1_TSV[\s\S]*?END_WEEK1_TSV/)[0].split('\n').length;
++  assert.equal(rows(out.program), rows(program));
++});
++
++test('[T3K] shin-symptom gating survives every repair', () => {
++  const out = normalizeTactical3KRaceSpecificity(tacticalCandidate(INLINE_QUALITY), TACTICAL_INTAKE);
++  assert.match(out.program, /If shin symptoms return, hold the newest run or ruck dose/i);
++});
++
++test('[T3K] the running repair does not mutate the rucking row into a run, or vice versa', () => {
++  const out = normalizeTactical3KRaceSpecificity(tacticalCandidate(INLINE_QUALITY), TACTICAL_INTAKE);
++  const w1 = out.program.match(/START_WEEK1_TSV[\s\S]*?END_WEEK1_TSV/)[0];
++  assert.equal((w1.match(/^Thu\tBackpack Carry\t/gm) || []).length, 1, 'exactly one ruck row remains');
++  assert.equal((w1.match(/^Tue\tRun\t/gm) || []).length, 1, 'exactly one key run row, no duplicate');
++  assert.match(w1, /^Fri\tRun\tEasy conversational pace/m, 'easy aerobic running is preserved');
++});
++
++test('[T3K] an already-valid program is not mutated by the event-progression repair', () => {
++  // Give the ruck row a pace up front so nothing is left to repair.
++  const program = tacticalCandidate(VALID_QUALITY, '20 kg @ 9:30-9:40/km');
++  assert.deepEqual(eventFlagKeys(program, TACTICAL_INTAKE), []);
++  const out = normalizeTactical3KRaceSpecificity(program, TACTICAL_INTAKE);
++  const w1 = (p) => p.match(/START_WEEK1_TSV[\s\S]*?END_WEEK1_TSV/)[0];
++  assert.equal(w1(out.program), w1(program));
++});
++
++test('[T3K] normalization is idempotent', () => {
++  const once = normalizeTactical3KRaceSpecificity(tacticalCandidate(INLINE_QUALITY), TACTICAL_INTAKE);
++  const twice = normalizeTactical3KRaceSpecificity(once.program, TACTICAL_INTAKE);
++  assert.equal(twice.program, once.program);
++  assert.deepEqual(twice.event_progression.post_repair_flag_keys, []);
++});
++
++test('[T3K] the convergence contract never claims success while a flag survives', () => {
++  const out = normalizeTactical3KRaceSpecificity(tacticalCandidate(INLINE_QUALITY), TACTICAL_INTAKE);
++  const keys = eventFlagKeys(out.program, TACTICAL_INTAKE);
++  if (keys.length) {
++    assert.ok(out.event_progression.unrepaired_reason, 'a surviving flag must carry a deterministic reason');
++  } else {
++    assert.equal(out.event_progression.unrepaired_reason, null);
++  }
++  // Diagnostics are structural only -- no client free text.
++  assert.deepEqual(
++    Object.keys(out.event_progression).sort(),
++    ['applicable', 'post_repair_event_bearing', 'post_repair_flag_keys', 'post_repair_running_flag', 'repair_attempted', 'target_row_found', 'unrepaired_reason'],
++  );
++});
++
++test('[T3K] a non-Tactical intake is untouched and reports why', () => {
++  const out = normalizeTactical3KRaceSpecificity(tacticalCandidate(INLINE_QUALITY), ADVANCED_HYBRID_LAUNCH_INTAKE);
++  assert.equal(out.repaired, false);
++  assert.equal(out.event_progression.applicable, false);
++  assert.equal(out.event_progression.unrepaired_reason, 'not_tactical_3k_like');
++});
