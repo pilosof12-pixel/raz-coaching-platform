@@ -280,7 +280,11 @@ export function validateYouthCoachingSpecV1HardRules(program, intake = {}, suppl
         { week: week.week, day: day.day, exercise: name, rest },
       );
     }
-    if (/to failure|amrap|forced rep|grind(?:er|ing)?|until failure/i.test(`${notes} ${exercise?.dose?.reps_raw || ''}`)) {
+    const failureText = `${notes} ${exercise?.dose?.reps_raw || ''}`
+      .replace(/\b(?:do not|don't|never)\s+(?:train\s+)?to failure\b/gi, '')
+      .replace(/\bstop[^.\n]{0,60}before[^.\n]{0,30}failure\b/gi, '')
+      .replace(/\bno grinding\b/gi, '');
+    if (/to failure|amrap|forced rep|grind(?:er|ing)?|until failure/i.test(failureText)) {
       fail(
         'COACH_SPEC_V1_YG_FAILURE_BASED_DEFAULT',
         `Coaching Specification v1.0 YG-07: Week ${week.week} ${day.day} uses failure/grinding language for youth work (${name}). Default youth strength/skill progression must remain technical and submaximal rather than failure-based.`,

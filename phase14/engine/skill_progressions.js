@@ -386,7 +386,7 @@ export function parseSkillBenchmarks(intake = {}) {
     archer_pull_up: firstIntAfter(t, /archer\s*(?:pull[-\s]?up)?[^0-9]*(\d+)/),
     typewriter_pull_up: firstIntAfter(t, /typewriter[^0-9]*(\d+)/),
     band_assisted_oap: firstIntAfter(t, /band[-\s]?assisted\s*(?:one[-\s]?arm|oap)[^0-9]*(\d+)/),
-    one_arm_pull_up: firstIntAfter(t, /(\d+)\s*one[-\s]?arm\s*pull/),
+    one_arm_pull_up: firstIntAfter(t, /(\d+)\s*one[-\s]?arm\s*pull/) || firstIntAfter(t, /one[-\s]?arm\s*pull[-\s]?ups?[^0-9]{0,24}(\d+)/),
   };
   out.one_arm_handstand = {
     freestanding_handstand_hold_s: g.freestanding_handstand_hold_s,
@@ -411,7 +411,7 @@ function equipText(intake) {
 function hasEquipmentToken(token, text) {
   if (AMBIENT_EQUIP.has(token)) return true;
   switch (token) {
-    case "pull_up_bar": return /pull[-\s]?up bar|chin[-\s]?up bar|monkey bar|doorframe|door frame|calisthenics|outdoor[_\s]?park|\bpull[-\s]?up\b/.test(text);
+    case "pull_up_bar": return /pull[-\s]?up bar|chin[-\s]?up bar|monkey bar|doorframe|door frame|calisthenics|outdoor[_\s]?park|bodyweight station|\bpull[-\s]?up\b/.test(text);
     case "rings": return /\brings?\b|gymnastic ring/.test(text);
     case "parallelettes": return /parallelette|paralette|\bp[-\s]?bars?\b/.test(text);
     case "parallel_bars": return /parallel bar|\bdip bar/.test(text);

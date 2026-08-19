@@ -63,7 +63,16 @@ export function advancedOapPrescription(currentStrictReps) {
   const n = Number(currentStrictReps || 0);
   if (n <= 0) return { stage:"first_rep", primary:["Assisted One-Arm Pull-up","One-Arm Pull-up Eccentric"] };
   if (n === 1) return { stage:"single_owned", primary:["One-Arm Pull-up","Assisted One-Arm Pull-up"], note:"Use clean singles plus assisted volume." };
-  if (n <= 3) return { stage:"multi_rep", primary:["One-Arm Pull-up","Assisted One-Arm Pull-up"], note:"Prioritize strict submaximal singles or clusters and lightly assisted doubles/triples. Eccentrics are optional assistance, not a main weekly exposure." };
+  // A consecutive-rep outcome is not trained by isolated singles alone. Lead the
+  // direct exposure with a readiness-dependent multi-rep priority set, then fall
+  // back to clean singles; all-singles remains valid on a poor-readiness day.
+  if (n <= 3) return {
+    stage: "multi_rep",
+    primary: ["One-Arm Pull-up", "Assisted One-Arm Pull-up"],
+    lead_set_reps: [Math.max(1, n - 1), n],
+    follow_set_reps: 1,
+    note: `Lead the direct exposure with a priority set of ${Math.max(1, n - 1)}-${n} clean strict reps per side according to readiness, then 1-2 clean singles per side (for example ${n} + 1 + 1). On a poor-readiness day ${[1, 1, 1].join(" + ")} is acceptable. Progress by cleaner multi-rep execution, more sides earning the extra rep, lower RPE and better symmetry before adding volume. Eccentrics are optional assistance, not a main weekly exposure.`,
+  };
   return { stage:"rep_strength", primary:["One-Arm Pull-up","Weighted One-Arm Pull-up"], note:"Progress density, reps, or external load while preserving strict form." };
 }
 

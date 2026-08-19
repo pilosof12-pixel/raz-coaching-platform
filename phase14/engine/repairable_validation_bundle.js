@@ -16,6 +16,7 @@ import { parseProgramModel } from './program_model.js';
 import { trimExcessSupportVolume } from './mrv_support_trim.js';
 import { enrichSpecificWarmups } from './specific_warmup_enrichment.js';
 import { normalizeFinalNoteCoherence } from './final_note_coherence.js'; // FINAL-NOTE-COHERENCE-WIRED
+import { validatePrescriptionConsistency } from './v34_prescription_consistency.js'; // V34-PRESCRIPTION-CONSISTENCY-WIRED
 import { normalizeAdvancedHybridWeek4OapConsolidation } from './advanced_hybrid_oap_consolidation_normalizer.js';
 import { normalizeAdvancedHybridOHPComplement } from './advanced_hybrid_ohp_normalizer.js';
 import { normalizeYouthPrimarySkillOrder } from './youth_skill_order_normalizer.js';
@@ -331,6 +332,9 @@ export function collectRepairableValidationFailures(program, intake = {}, option
   runRepairable(flags, () => validateKnownMaxPullUpDoseSemantic(candidate, intake, finalModel));
   runRepairable(flags, () => validateYouthConsolidationRetentionSemantic(candidate, intake, finalModel));
   runRepairable(flags, () => validateYouthSessionQualitySemantic(candidate, intake, finalModel));
+  // v34: runs AFTER every deterministic prescription repair, so it compares
+  // notes against final structured fields.
+  runRepairable(flags, () => validatePrescriptionConsistency(candidate, intake, RetriableValidationError));
   runRepairable(flags, () => validatePhase15FinalProgram(candidate, intake));
 
   return {

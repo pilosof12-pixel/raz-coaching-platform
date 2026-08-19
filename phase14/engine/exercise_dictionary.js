@@ -46,7 +46,7 @@ const DICTIONARY_LIST = [
   "Freestanding Handstand Push-up Partial", "Freestanding Handstand Push-up",
   "Deficit Freestanding Handstand Push-up", "90-Degree Freestanding Handstand Push-up",
   "Freestanding 90-Degree Handstand Push-up", "90-Degree Handstand Push-Up", "Handstand Push-up",
-  "Handstand Hold", "Handstand Walk",
+  "Handstand Hold", "Handstand Walk", "Controlled Handstand Kick-up",
   // --- OAP (one-arm pull-up) family ---
   "Weighted Pull-up", "Archer Pull-up", "Typewriter Pull-up",
   "Assisted One-Arm Pull-up", "One-Arm Pull-up Eccentric",
@@ -67,7 +67,7 @@ const DICTIONARY_LIST = [
   "Straddle Human Flag", "Full Human Flag Negative", "Full Human Flag",
   "Human Flag Hold",
   // --- Muscle-up family ---
-  "Strict Chest-to-Bar Pull-up", "Explosive Hip-to-Bar Pull-up",
+  "Strict Chest-to-Bar Pull-up", "Explosive Hip-to-Bar Pull-up", "Bar Muscle-up Transition Drill",
   "False-Grip Hold", "Banded Muscle-up", "Muscle-up Negative",
   "Strict Muscle-up", "Muscle-up", "Bar Muscle-up", "Ring Muscle-up",
   // --- Pistol / single-leg squat family ---
@@ -442,7 +442,7 @@ export const LOCATION_EQUIPMENT_WHITELIST = new Map([
   ["home_bodyweight", new Set()], // {} + intake extras (handled as union below)
   ["home_gym", new Set([
     "barbell", "rack", "plates", "bench", "adjustable_dumbbells", "dumbbells",
-    "pull_up_bar", "bands", "kettlebells",
+    "pull_up_bar", "bands", "kettlebells", "rings",
   ])],
   ["garage_gym", new Set([
     "barbell", "rack", "plates", "bench", "adjustable_dumbbells", "dumbbells",
@@ -1785,7 +1785,6 @@ export function validateAndCalibrateSkills(program, intake = {}) {
       // Gated but nothing over-prescribed: leave a non-fatal note if any row exists.
       if (maxPrescribed >= 0) {
         const note = `[REVIEW] ${family} gated — ${selection.reason}`;
-        out = annotateFamilyRow(out, family, maxPrescribed, note, isHebrew);
         annotations.push({ family, type: "gated", note });
       }
       continue;
@@ -1815,7 +1814,6 @@ export function validateAndCalibrateSkills(program, intake = {}) {
       const actual = countFamilyFrequency(out, family, maxPrescribed, isHebrew);
       if (actual > 0 && actual < recommended) {
         const note = `[REVIEW] Frequency below skill-family recommendation (${actual}x/week vs recommended ${recommended}x/week)`;
-        out = annotateFamilyRow(out, family, maxPrescribed, note, isHebrew);
         annotations.push({ family, type: "frequency", actual, recommended, note });
       }
     }

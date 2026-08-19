@@ -1,4 +1,6 @@
 import { buildSpecialistRules } from './phase15_specialist_rules.js';
+import { gymDayReadiness } from './v34_readiness.js';
+import { buildV34ArchitectureBrief } from './v34_coaching_architecture.js';
 
 function txt(v) {
   if (Array.isArray(v)) return v.map(x => typeof x === 'string' ? x : JSON.stringify(x)).join(' | ');
@@ -160,9 +162,31 @@ export function buildDeterministicBrief(intake = {}) {
   if (oapGoal && oap!=null && oap>=2) labels.push('OAP_ASSISTED_ADVANCED','OAP_STRICT'); else if (oapGoal) labels.push('OAP_SPECIFIC');
   if (strictOhpGoal) labels.push('OHP_DIRECT','OHP_SECONDARY_VARIATION');
   if (zone2Goal) labels.push('AEROBIC_BASE_SOURCE_SELECTED'); // no universal frequency floor
-  const sessions=distribute(days,labels), cleanDays=days.filter(d=>!sport[d]);
+  const sessions=distribute(days,labels);
+  // Readiness-ranked candidate days. Filtering on same-day sport alone treated the
+  // morning after a hard sport session as "clean", which is exactly how a primary
+  // high-neural exposure could land on the worst available day. Rank instead by a
+  // score that also charges for previous-day sport and recovery context.
+  const readinessScores = gymDayReadiness(intake, { gymDays: days }).days;
+  // Preserve the legacy same-day clean list for existing placement rules. Readiness
+  // ranking is intentionally scoped only to the advanced OAP neural exposure.
+  const cleanDays = days.filter(d => !sport[d]);
+  const dayKeyOf = (label) => String(label || '').trim().slice(0, 3).toLowerCase();
+  const readinessScoreFor = (label) => readinessScores.find(x => x.day === dayKeyOf(label));
+  const readinessRanked = readinessScores.map(x => days.find(d => dayKeyOf(d) === x.day)).filter(Boolean);
+  const oapReadinessDays = readinessRanked;
   if (squatDual && cleanDays.length) { const d=cleanDays.at(-1); for (const x of days) sessions[x]=sessions[x].filter(v=>v!=='BOX_SQUAT_HEAVY'); sessions[d].unshift('BOX_SQUAT_HEAVY'); }
-  if (oapGoal && oap!=null && oap>=2 && cleanDays.length) { const d=cleanDays[0]; for (const x of days) sessions[x]=sessions[x].filter(v=>v!=='OAP_STRICT'); sessions[d].unshift('OAP_STRICT'); }
+  if (oapGoal && oap!=null && oap>=2 && oapReadinessDays.length) {
+    const current = days.find(x => sessions[x].includes('OAP_STRICT'));
+    const best = readinessScoreFor(oapReadinessDays[0]);
+    const currentScore = readinessScoreFor(current);
+    const shouldMove = !current || !currentScore || !best || (best.score - currentScore.score >= 1);
+    if (shouldMove) {
+      const d = oapReadinessDays[0];
+      for (const x of days) sessions[x]=sessions[x].filter(v=>v!=='OAP_STRICT');
+      sessions[d].unshift('OAP_STRICT');
+    }
+  }
   if (strengthDaysRequested) for (const d of days) if (!sessions[d].some(x=>!/^ZONE2_/.test(x))) sessions[d].unshift('LOW_COST_STRENGTH_SUPPORT');
 
   const specialist = buildSpecialistRules(intake);
@@ -173,6 +197,7 @@ export function buildDeterministicBrief(intake = {}) {
     'Required coaching constraints:', ...required.map(x=>`* ${x}`),
     optional.length ? 'Preferred/support choices:' : '', ...optional.map(x=>`* ${x}`),
     forbidden.length ? 'Forbidden/tolerance-gated choices:' : '', ...forbidden.map(x=>`* ${x}`),
+    buildV34ArchitectureBrief(intake, { gymDays: days }),
     specialist,
     'Session skeleton:', ...days.map(d=>`* ${d}: ${sessions[d].length?sessions[d].join(', '):'low-cost strength/support only'}; ${sport[d]?`same-day sport=${sport[d]}`:'no listed sport'}.`),
     'LOW_COST_STRENGTH_SUPPORT means real low-fatigue strength selected from athlete needs, never cardio-only filler.',

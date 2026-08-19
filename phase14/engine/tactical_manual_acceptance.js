@@ -41,6 +41,10 @@ function fail(code, amendment, details = {}) {
 
 export function validateTacticalManualAcceptanceSemantic(program, intake = {}, suppliedModel = null) {
   if (!isTacticalIntake(intake)) return { ok: true, skipped: true };
+  const rawProgram = String(program || '');
+  if (/ramp\s+(?:backpack\s+carry|ruck|loaded\s+march)[^\n]*\b\d+(?:\.\d+)?\s*kg\s*x\s*\d/i.test(rawProgram)) {
+    fail('TACTICAL_RUCK_WARMUP_MISREPRESENTED', 'Ruck/backpack warm-ups must use walking and ankle/calf preparation or an easy first few minutes under the pack, not strength-style kg x reps ramps.');
+  }
   const model = suppliedModel || parseProgramModel(program, intake);
   const benchmark = weightedPullBenchmark(intake);
   const requireWeightedPull = hasPullUpGoal(intake) && Boolean(benchmark);

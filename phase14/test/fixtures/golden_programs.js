@@ -118,12 +118,12 @@ export const YOUTH_GYMNASTICS_INTAKE = {
 };
 
 function youthWeek(week) {
-  const kickA = ['4', '5', '6', '4'][week - 1];
-  const kickB = ['5', '5', '6', '4'][week - 1];
+  const kickA = ['4', '5', '5', '4'][week - 1];
+  const kickB = ['5', '5', '5', '4'][week - 1];
   const ctbSets = ['4', '4', '4', '3'][week - 1];
   const ctb = ['3', '4', '4', '4'][week - 1];
   const ringSets = ['3', '3', '3', '2'][week - 1];
-  const ring = ['5', '6', '7', '6-7'][week - 1];
+  const ring = ['4', '4', '4', '4'][week - 1];
   const pullSets = ['3', '3', '3', '2'][week - 1];
   const pull = ['6', '7', '8', '7-8'][week - 1];
   const pistolSets = ['3', '3', '3', '2'][week - 1];
@@ -138,39 +138,40 @@ function youthWeek(week) {
   ][week - 1];
 
   const rows = [
-    ['Mon', '[WARMUP] Scapular Pull-up', 'BW', '2', '5', '45s', 'N/A', 'Short non-fatiguing shoulder/scapular preparation.', ''],
-    ['Mon', 'Controlled Handstand Kick-up', 'BW', kickA, '2 attempts', '60s', 'N/A', week === 4
+    ['Session A', '[WARMUP] Scapular Pull-up', 'BW', '2', '5', '45s', 'N/A', 'Short non-fatiguing shoulder/scapular preparation.', ''],
+    ['Session A', 'Controlled Handstand Kick-up', 'BW', kickA, '2 attempts', '60s', 'N/A', week === 4
       ? 'Use the best Week 3 entry pattern. Match or improve the best clean unsupported balance quality/time with fewer total attempts; stop before misses accumulate.'
       : 'Primary handstand balance practice while fresh. Progress successful entries and independent balance quality, not fatigue.', ''],
-    ['Mon', 'Band-Assisted Bar Muscle-up Transition Drill', band, transitionSets, '2', '90s', 'N/A', week === 4
+    ['Session A', 'Bar Muscle-up Transition Drill', band, transitionSets, '2', '90s', 'N/A', week === 4
       ? 'Keep the reduced assistance earned in Weeks 2-3. Lower total volume, but do not return to the Week 1 band unless technique requires it.'
       : 'Direct bar muscle-up turnover practice. Reduce assistance only after clean symmetrical reps.', ''],
-    ['Mon', 'Strict Chest-to-Bar Pull-up', 'BW', ctbSets, ctb, '2 min', '7', week === 4
+    ['Session A', 'Wall Handstand Hold', 'BW', '2', '15-25 sec', '60-90s', '5-6', 'Wall-supported line and shoulder-capacity work. Keep it crisp and stop well before fatigue.', ''],
+    ['Session A', 'Strict Chest-to-Bar Pull-up', 'BW', ctbSets, ctb, '2 min', '7', week === 4
       ? 'Keep the Week 3 rep standard with one fewer set. Every rep should reach the same height and control.'
       : 'High-pull support for the bar muscle-up. Full recovery and chest-to-bar intent.', ''],
-    ['Mon', 'Strict Ring Dip', 'BW', ringSets, ring, '2 min', '7', week === 4
+    ['Session A', 'Ring Dip', 'BW', ringSets, ring, '2 min', '7', week === 4
       ? 'Maintain the higher rep standard from Weeks 2-3 while reducing total sets. Leave clear reserve.'
       : 'Push-strength support with clean ring control. Progress reps before making the variation harder.', ''],
-    ['Mon', 'Pistol Squat', 'BW', pistolSets, pistol, '90s', '7', week === 4
+    ['Session A', 'Pistol Squat', 'BW', pistolSets, pistol, '90s', '7', week === 4
       ? 'Maintain the progressed Week 2-3 rep standard with lower total volume. Clean depth and control; no grinders.'
       : 'Established unilateral lower-body strength. Progress clean reps conservatively; no grinders.', ''],
-    ['Thu', '[WARMUP] Wrist Prep', 'BW', '2', '30 sec', '30s', 'N/A', 'Short wrist and shoulder preparation.', ''],
-    ['Thu', 'Controlled Handstand Kick-up', 'BW', kickB, '1-2 attempts', '60s', 'N/A', week === 4
+    ['Session B', '[WARMUP] Wrist Prep', 'BW', '2', '30 sec', '30s', 'N/A', 'Short wrist and shoulder preparation.', ''],
+    ['Session B', 'Controlled Handstand Kick-up', 'BW', kickB, '1-2 attempts', '60s', 'N/A', week === 4
       ? 'Express the best Week 3 balance skill. Prioritize successful independent entries and best clean balance rather than adding attempts.'
       : 'Second direct independent-balance exposure. Accumulate successful kick-ups and better balance, not fatigue.', ''],
-    ['Thu', 'Band-Assisted Bar Muscle-up Transition Drill', band, transitionSets, '2', '90s', 'N/A', week === 4
+    ['Session B', 'Bar Muscle-up Transition Drill', band, transitionSets, '2', '90s', 'N/A', week === 4
       ? 'Preserve the lighter assistance achieved in Week 3. This is a quality consolidation exposure, not a return to baseline assistance.'
       : 'Second direct bar muscle-up exposure. Preserve bar path and turnover mechanics before reducing assistance.', ''],
-    ['Thu', 'Explosive Hip-to-Bar Pull-up', 'BW', explosiveSets, week === 3 ? '3' : '2', '2 min', '7', week === 4
+    ['Session B', 'Explosive Hip-to-Bar Pull-up', 'BW', explosiveSets, week === 3 ? '3' : '2', '2 min', '7', week === 4
       ? 'Lower the volume but match or exceed Week 3 pull height and speed. Stop immediately if explosiveness drops.'
       : 'Explosive vertical pulling support with full recovery. Stop if height or speed drops.', ''],
-    ['Thu', 'Strict Pull-up', 'BW', pullSets, pull, '2 min', '7', week === 4
+    ['Session B', 'Pull-up', 'BW', pullSets, pull, '2 min', '7', week === 4
       ? 'Retain the improved rep standard from Weeks 2-3 with fewer sets. Finish with 2-3 clean reps still in reserve.'
       : 'General pull strength support below fatigue failure. Use conservative rep progression.', ''],
-    ['Thu', 'Strict Ring Dip', 'BW', ringSets, ring, '2 min', '7', week === 4
+    ['Session B', 'Ring Dip', 'BW', ringSets, ring, '2 min', '7', week === 4
       ? 'Maintain the higher-quality Week 2-3 rep level while reducing total fatigue.'
       : 'General push strength support. Progress clean reps before difficulty.', ''],
-    ['Thu', 'Pistol Squat', 'BW', pistolSets, pistol, '90s', '7', week === 4
+    ['Session B', 'Pistol Squat', 'BW', pistolSets, pistol, '90s', '7', week === 4
       ? 'Maintain the progressed Week 2-3 rep standard with fewer sets and excellent control.'
       : 'Lower-body athletic strength with repeatable technique and no grinders.', ''],
   ];

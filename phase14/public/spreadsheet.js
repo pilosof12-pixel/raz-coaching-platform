@@ -15,7 +15,8 @@
     return String(value == null ? "" : value).replace(/<br\s*\/?>/gi,"\n").replace(/\\n/g,"\n").replace(/\*\*/g,"").replace(/`/g,"").replace(/[ \t\r\f\v]+/g," ").replace(/ *\n */g,"\n").trim();
   }
   function normalizeHeader(value){ const k=cleanCell(value).toLowerCase(); return SYNONYMS[k] || cleanCell(value); }
-  function setTextCell(cell,value){ cell.value=value==null?"":String(value); cell.numFmt="@"; return cell.value; }
+  function setTextCell(cell,value){ cell.value=value==null?"":String(value); cell.numFmt = "@"; return cell.value; }
+  function isHebrewProgram(text,intake){ return /[\u0590-\u05FF]/.test(String(text||"")+" "+JSON.stringify(intake||{})); }
   function parseDelimitedRegion(text,startMarker,endMarker){
     let raw=String(text||"").replace(/```(?:text|tsv|plaintext)?/gi,"").replace(/```/g,"").trim();
     if(startMarker&&endMarker){ const s=raw.indexOf(startMarker),e=raw.indexOf(endMarker); if(s<0||e<0||e<=s)return null; raw=raw.slice(s+startMarker.length,e).trim(); }
@@ -128,6 +129,8 @@
     renderWarmup(wb.addWorksheet("Warm-Up"),weeks);
     weeks.forEach(w=>renderWeek(wb.addWorksheet(`Week ${w.week}`),w,intake));
     renderQa(wb.addWorksheet("QA Checklist"),weeks,text,intake);
+    const isHebrew=isHebrewProgram(text,intake);
+    wb.worksheets.forEach(ws=>{ ws.views=(ws.views&&ws.views.length?ws.views:[{}]).map(v=>({...v, rightToLeft: isHebrew})); });
     const buffer=await wb.xlsx.writeBuffer(); const blob=new Blob([buffer],{type:"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"}); const url=URL.createObjectURL(blob); const a=document.createElement("a"); a.href=url; a.download="raz_individualized_training_block.xlsx"; document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url);
     return weeks.reduce((n,w)=>n+w.rows.length-1,0);
   }

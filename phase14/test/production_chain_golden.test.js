@@ -79,8 +79,8 @@ test('golden Tactical 3K passes the full deterministic production validation cha
 
 test('Youth primary skills cannot repeat an unchanged prescription for all four weeks', () => {
   const bad = rewriteRows(youthGymnasticsGoldenProgram(), (cells) => {
-    if (cells[1] === 'Controlled Handstand Kick-up') cells[3] = cells[0] === 'Mon' ? '4' : '5';
-    if (cells[1] === 'Band-Assisted Bar Muscle-up Transition Drill') cells[2] = 'BW + moderate band';
+    if (cells[1] === 'Controlled Handstand Kick-up') cells[3] = cells[0] === 'Session A' ? '4' : '5';
+    if (cells[1] === 'Bar Muscle-up Transition Drill') cells[2] = 'BW + moderate band';
     return cells;
   });
   expectFailure(bad, YOUTH_GYMNASTICS_INTAKE, 'PROGRESSION_ARCHITECTURE_MISSING');
@@ -158,8 +158,8 @@ test('Tactical 3K cannot remove direct pull-up work while preserving three stren
 
 test('Youth bar muscle-up omission is rejected semantically then restored only for explicit acquisition intake', () => {
   const bad = rewriteRows(youthGymnasticsGoldenProgram(), (cells) => {
-    if (cells[1] === 'Band-Assisted Bar Muscle-up Transition Drill') {
-      cells[1] = 'Strict Pull-up';
+    if (cells[1] === 'Bar Muscle-up Transition Drill') {
+      cells[1] = 'Pull-up';
       cells[2] = 'BW';
       cells[3] = '4';
       cells[4] = '5';

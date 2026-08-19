@@ -34,6 +34,7 @@ function exerciseFamily(name) {
 // the final work prescription instead of string-patching the stale one. Warm-up
 // text must always be derived from the load actually prescribed on the day.
 export function rampText(exercise, load) {
+  if (/backpack\s+carry|ruck|loaded\s+march|farmer(?:'s)?\s+carry|suitcase\s+carry/i.test(String(exercise || ''))) return '';
   const added = parseAddedKg(load);
   if (added != null && /pull-up|chin-up/i.test(exercise)) {
     const a = roundTo2p5(added * 0.35);
