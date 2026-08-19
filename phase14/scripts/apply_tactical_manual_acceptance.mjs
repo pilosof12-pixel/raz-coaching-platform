@@ -38,9 +38,9 @@ patch('engine/repairable_validation_bundle.js', [
 patch('engine/specific_warmup_enrichment.js', [
   {
     label: 'do not strength-ramp loaded marching',
-    find: "function rampText(exercise, load) {\n  const added = parseAddedKg(load);",
-    replace: "function rampText(exercise, load) {\n  // Loaded marching/carries are locomotion, not barbell lifts. A strength-style\n  // kg x reps ramp is nonsensical for an 8-10 km ruck and leaked into live QA.\n  // Leave ruck-specific walking/ankle-calf preparation to the authored program.\n  if (/\\b(?:backpack carry|ruck|loaded march)\\b/i.test(String(exercise || ''))) return ''; // NO-RUCK-STRENGTH-RAMP\n  const added = parseAddedKg(load);",
-    already: 'NO-RUCK-STRENGTH-RAMP',
+    find: "export function rampText(exercise, load) {\n  const added = parseAddedKg(load);",
+    replace: "export function rampText(exercise, load) {\n  // Loaded marching/carries are locomotion, not barbell lifts. A strength-style\n  // kg x reps ramp is nonsensical for a ruck and leaked into live QA.\n  if (/backpack\\s+carry|ruck|loaded\\s+march|farmer(?:'s)?\\s+carry|suitcase\\s+carry/i.test(String(exercise || ''))) return ''; // NO-RUCK-STRENGTH-RAMP\n  const added = parseAddedKg(load);",
+    already: "farmer(?:'s)?\\s+carry|suitcase\\s+carry/i.test(String(exercise || ''))) return '';",
   },
 ]);
 
