@@ -42,7 +42,7 @@ jobs:
           git apply --check /tmp/v34.patch
           git apply /tmp/v34.patch
 
-      - name: Apply final readiness mapping, hysteresis, and legacy OAP regression correction
+      - name: Apply final readiness mapping and hysteresis correction
         if: steps.ready.outputs.ready == 'true'
         shell: python
         run: |
@@ -71,17 +71,6 @@ jobs:
               raise SystemExit('test insertion marker not found')
           ts = ts.replace(marker, extra + marker, 1)
           t.write_text(ts)
-
-          legacy = Path('phase14/test/advanced_hybrid_oap.test.js')
-          body = legacy.read_text()
-          old_cluster = "assert.match(brief, /submaximal strict clusters|1[-–]2 rep cluster/i);"
-          new_cluster = "assert.match(brief, /priority set of 1[-–]2 clean strict reps|clean singles/i);"
-          old_direct = "assert.match(brief, /do not replace the direct submaximal singles/i);"
-          new_direct = "assert.match(brief, /priority set of 1[-–]2 clean strict reps|direct exposure/i);"
-          if old_cluster not in body or old_direct not in body:
-              raise SystemExit('legacy OAP assertion anchors not found')
-          body = body.replace(old_cluster, new_cluster, 1).replace(old_direct, new_direct, 1)
-          legacy.write_text(body)
 
       - uses: actions/setup-node@v4
         if: steps.ready.outputs.ready == 'true'
@@ -120,7 +109,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          rm -rf .github/v34-patch .github/workflows/apply-v34-coaching.yml .github/workflows/apply-v34-final-commit.yml
+          rm -rf .github/v34-patch .github/workflows/apply-v34-coaching.yml .github/workflows/apply-v34-final-commit.yml .github/v34-final-commit.patch.b64 .github/v34-workflow-kick*.txt
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add -A
