@@ -1,0 +1,59 @@
+name: Render-equivalent startup smoke
+
+on:
+  push:
+    branches:
+      - privacy-security-hardening
+  pull_request:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+jobs:
+  startup-smoke:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: phase14/package-lock.json
+      - name: Install deployed Phase14 dependencies
+        working-directory: phase14
+        run: npm ci
+      - name: Start exact Render runtime and verify HTTP fingerprint
+        working-directory: phase14
+        env:
+          PORT: '18000'
+          NODE_ENV: production
+          PROGRAM_PASS_ENFORCEMENT: '0'
+        run: |
+          set -euo pipefail
+          npm start > /tmp/render-startup-smoke.log 2>&1 &
+          pid=$!
+          cleanup() { kill "$pid" 2>/dev/null || true; }
+          trap cleanup EXIT
+
+          for i in $(seq 1 60); do
+            if ! kill -0 "$pid" 2>/dev/null; then
+              echo 'Render-equivalent process exited before becoming ready.'
+              cat /tmp/render-startup-smoke.log
+              exit 1
+            fi
+            if curl --fail --silent --show-error --max-time 2 \
+              http://127.0.0.1:18000/runtime-version.txt \
+              -o /tmp/runtime-version.txt; then
+              echo 'Render-equivalent startup succeeded.'
+              cat /tmp/runtime-version.txt
+              exit 0
+            fi
+            sleep 1
+          done
+
+          echo 'Render-equivalent process never exposed runtime-version.txt.'
+          cat /tmp/render-startup-smoke.log
+          exit 1
