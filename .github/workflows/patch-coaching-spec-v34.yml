@@ -1,0 +1,29 @@
+name: Patch Coaching Spec V34
+on:
+  push:
+    branches: [privacy-security-hardening]
+    paths: ['.github/patch-coaching-spec-v34-trigger']
+permissions:
+  contents: write
+jobs:
+  patch:
+    if: ${{ github.actor != 'github-actions[bot]' }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: privacy-security-hardening
+          fetch-depth: 0
+      - name: Restore full script then apply surgical V34 compatibility edit
+        run: |
+          git show c5c8cba1a124a672e1f7602d41b3edcd3db268a3:phase14/scripts/apply_coaching_spec_v1.mjs > phase14/scripts/apply_coaching_spec_v1.mjs
+          python .github/scripts/patch_coaching_spec_v34.py
+          node --check phase14/scripts/apply_coaching_spec_v1.mjs
+      - name: Commit
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          rm -f .github/scripts/patch_coaching_spec_v34.py .github/workflows/patch-coaching-spec-v34.yml .github/patch-coaching-spec-v34-trigger
+          git add -A
+          git commit -m 'Restore and patch coaching spec v34 build script'
+          git push origin HEAD:privacy-security-hardening
