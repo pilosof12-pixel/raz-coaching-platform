@@ -3,6 +3,7 @@ name: Apply v34 coaching architecture
 on:
   push:
     branches:
+      - main
       - privacy-security-hardening
   pull_request:
     branches:
