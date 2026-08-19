@@ -1,12 +1,12 @@
 {
-  "timestamp": "2026-08-19T04:25:01.671Z",
+  "timestamp": "2026-08-19T04:37:56.194Z",
   "base": "https://raz-coaching-platform.onrender.com",
-  "head_sha": "9d03c771e689531a220e85836b1bd91f3e5f4c59",
-  "runtime": "launch-acceptance-v30e-coaching-spec-v1-ah04-deterministic-20260819",
+  "head_sha": "8970c0281a5bdb29ea1200f34225884c7eb2b3cf",
+  "runtime": "launch-acceptance-v30f-coaching-spec-v1-manual-convergence-20260819",
   "results": [
     {
       "id": "advanced_hybrid",
-      "job_id": "6f6694611eb32cdafabbfbd6e86cc627",
+      "job_id": "2b8e0f58b56d97edfbb74ac80a83e8df",
       "ok": true,
       "status": "done",
       "stage": "finalizing",
@@ -14,12 +14,12 @@
       "detail": "saving program",
       "last_seen_status": "done",
       "error": null,
-      "program_chars": 15074,
-      "seconds": 70
+      "program_chars": 15450,
+      "seconds": 106
     },
     {
       "id": "youth_gymnastics",
-      "job_id": "3863c0a9cc5295f8e3b67a48c1e380c2",
+      "job_id": "00bad6cd6566737df06773dc7c08ded5",
       "ok": true,
       "status": "done",
       "stage": "finalizing",
@@ -27,22 +27,22 @@
       "detail": "saving program",
       "last_seen_status": "done",
       "error": null,
-      "program_chars": 10575,
-      "seconds": 42
+      "program_chars": 12658,
+      "seconds": 44
     },
     {
       "id": "tactical_3k",
-      "job_id": "5c8578913e1535f07d7b0dd9d4c43428",
-      "ok": true,
-      "status": "done",
-      "stage": "finalizing",
-      "attempt": 0,
-      "detail": "saving program",
-      "last_seen_status": "done",
-      "error": null,
-      "program_chars": 11433,
-      "seconds": 116
+      "job_id": "85014c5313994bcf443f7634bf7cf7f3",
+      "ok": false,
+      "status": "error",
+      "stage": "refining",
+      "attempt": 4,
+      "detail": "internal repair: EVENT_PROGRESSING_SESSION_MISSING",
+      "last_seen_status": "error",
+      "error": "Internal coaching QA could not repair the candidate program after multiple passes. No client-facing program was saved. Please retry the build. QA trace: A1:SPORT_DAY_COUPLING_VIOLATION+TACTICAL_SCHEDULE_ARCHITECTURE_VIOLATION+TACTICAL_GPP_COVERAGE_MISSING+EVENT_PROGRESSING_SESSION_MISSING -> A2:TACTICAL_SCHEDULE_ARCHITECTURE_VIOLATION+TACTICAL_GPP_COVERAGE_MISSING+EVENT_PROGRESSING_SESSION_MISSING -> A3:TACTICAL_SCHEDULE_ARCHITECTURE_VIOLATION+EVENT_PROGRESSING_SESSION_MISSING -> A4:EVENT_PROGRESSING_SESSION_MISSING. [QA:INTERNAL_QA_REPAIR_EXHAUSTED]",
+      "program_chars": 0,
+      "seconds": 161
     }
   ],
-  "ok": true
+  "ok": false
 }
