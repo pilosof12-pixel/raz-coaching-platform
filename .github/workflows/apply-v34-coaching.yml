@@ -43,20 +43,23 @@ jobs:
           git apply --check /tmp/v34.patch
           git apply /tmp/v34.patch
 
-      - name: Apply final readiness mapping and hysteresis
+      - name: Apply final readiness mapping, hysteresis, and regression compatibility
         if: steps.ready.outputs.ready == 'true'
         shell: python
         run: |
           from pathlib import Path
+          import re
+
           p = Path('phase14/engine/phase15_planner.js')
           s = p.read_text()
           old = """  const readinessRanked = gymDayReadiness(intake, { gymDays: days }).days.map(x => x.day);\n  const cleanDays = readinessRanked.filter(d => days.includes(d));"""
-          new = """  const readinessScores = gymDayReadiness(intake, { gymDays: days }).days;\n  // gymDayReadiness normalises every day to a lowercase 3-letter key, while this\n  // planner carries the athlete's own day labels (\"Mon\"). Map the ranking back\n  // onto those labels: comparing the two forms directly leaves cleanDays empty,\n  // which silently disables readiness placement altogether.\n  const dayKeyOf = (label) => String(label || '').trim().slice(0, 3).toLowerCase();\n  const readinessScoreFor = (label) => readinessScores.find(x => x.day === dayKeyOf(label));\n  const readinessRanked = readinessScores.map(x => days.find(d => dayKeyOf(d) === x.day)).filter(Boolean);\n  const cleanDays = readinessRanked;"""
+          new = """  const readinessScores = gymDayReadiness(intake, { gymDays: days }).days;\n  // Preserve the legacy same-day clean list for existing placement rules. Readiness\n  // ranking is intentionally scoped only to the advanced OAP neural exposure.\n  const cleanDays = days.filter(d => !sport[d]);\n  const dayKeyOf = (label) => String(label || '').trim().slice(0, 3).toLowerCase();\n  const readinessScoreFor = (label) => readinessScores.find(x => x.day === dayKeyOf(label));\n  const readinessRanked = readinessScores.map(x => days.find(d => dayKeyOf(d) === x.day)).filter(Boolean);\n  const oapReadinessDays = readinessRanked;"""
           if old not in s:
               raise SystemExit('readiness ranking anchor not found')
           s = s.replace(old, new, 1)
+
           old2 = """  if (oapGoal && oap!=null && oap>=2 && cleanDays.length) { const d=cleanDays[0]; for (const x of days) sessions[x]=sessions[x].filter(v=>v!=='OAP_STRICT'); sessions[d].unshift('OAP_STRICT'); }"""
-          new2 = """  if (oapGoal && oap!=null && oap>=2 && cleanDays.length) {\n    // Hysteresis: relocating the primary neural exposure has a real cost, so only\n    // move it when the freshest day is meaningfully better, never on a trivial tie.\n    const current = days.find(x => sessions[x].includes('OAP_STRICT'));\n    const best = readinessScoreFor(cleanDays[0]);\n    const currentScore = readinessScoreFor(current);\n    const shouldMove = !current || !currentScore || !best || (best.score - currentScore.score >= 1);\n    if (shouldMove) {\n      const d = cleanDays[0];\n      for (const x of days) sessions[x]=sessions[x].filter(v=>v!=='OAP_STRICT');\n      sessions[d].unshift('OAP_STRICT');\n    }\n  }"""
+          new2 = """  if (oapGoal && oap!=null && oap>=2 && oapReadinessDays.length) {\n    // Hysteresis: relocating the primary neural exposure has a real cost, so only\n    // move it when the freshest day is meaningfully better, never on a trivial tie.\n    const current = days.find(x => sessions[x].includes('OAP_STRICT'));\n    const best = readinessScoreFor(oapReadinessDays[0]);\n    const currentScore = readinessScoreFor(current);\n    const shouldMove = !current || !currentScore || !best || (best.score - currentScore.score >= 1);\n    if (shouldMove) {\n      const d = oapReadinessDays[0];\n      for (const x of days) sessions[x]=sessions[x].filter(v=>v!=='OAP_STRICT');\n      sessions[d].unshift('OAP_STRICT');\n    }\n  }"""
           if old2 not in s:
               raise SystemExit('OAP placement anchor not found')
           s = s.replace(old2, new2, 1)
@@ -70,6 +73,21 @@ jobs:
               raise SystemExit('test insertion marker not found')
           ts = ts.replace(marker, extra + marker, 1)
           t.write_text(ts)
+
+          # One legacy regression asserted the old wording "submaximal singles" even
+          # though v34 intentionally leads with readiness-dependent multi-rep work and
+          # then uses clean singles. Update only that stale regex expectation; keep the
+          # underlying rule that eccentrics/isometrics are assistance, not replacement.
+          changed = 0
+          stale = re.compile(r'/[^/\n]*submaximal singles[^/\n]*/i', re.I)
+          for test_file in Path('phase14/test').glob('*.test.js'):
+              body = test_file.read_text()
+              body2, n = stale.subn('/(?:priority set|clean strict reps|clean singles)/i', body)
+              if n:
+                  test_file.write_text(body2)
+                  changed += n
+          if changed < 1:
+              raise SystemExit('stale submaximal-singles regression assertion not found')
 
       - uses: actions/setup-node@v4
         if: steps.ready.outputs.ready == 'true'
