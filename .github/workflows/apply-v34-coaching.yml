@@ -39,10 +39,11 @@ jobs:
           cat .github/v34-patch/chunk*.b64 | tr -d '\n' | base64 -d > /tmp/v34.patch
           echo "Reconstructed staged patch:"
           sha256sum /tmp/v34.patch
+          echo "9c0bacf4023f4a37cd165b124ddfb420302e6108c932c2145e941ee6d129fd30  /tmp/v34.patch" | sha256sum -c -
           git apply --check /tmp/v34.patch
           git apply /tmp/v34.patch
 
-      - name: Add readiness hysteresis
+      - name: Apply final readiness mapping and hysteresis
         if: steps.ready.outputs.ready == 'true'
         shell: python
         run: |
@@ -50,12 +51,12 @@ jobs:
           p = Path('phase14/engine/phase15_planner.js')
           s = p.read_text()
           old = """  const readinessRanked = gymDayReadiness(intake, { gymDays: days }).days.map(x => x.day);\n  const cleanDays = readinessRanked.filter(d => days.includes(d));"""
-          new = """  const readinessScores = gymDayReadiness(intake, { gymDays: days }).days;\n  const readinessRanked = readinessScores.map(x => x.day);\n  const cleanDays = readinessRanked.filter(d => days.includes(d));"""
+          new = """  const readinessScores = gymDayReadiness(intake, { gymDays: days }).days;\n  // gymDayReadiness normalises every day to a lowercase 3-letter key, while this\n  // planner carries the athlete's own day labels (\"Mon\"). Map the ranking back\n  // onto those labels: comparing the two forms directly leaves cleanDays empty,\n  // which silently disables readiness placement altogether.\n  const dayKeyOf = (label) => String(label || '').trim().slice(0, 3).toLowerCase();\n  const readinessScoreFor = (label) => readinessScores.find(x => x.day === dayKeyOf(label));\n  const readinessRanked = readinessScores.map(x => days.find(d => dayKeyOf(d) === x.day)).filter(Boolean);\n  const cleanDays = readinessRanked;"""
           if old not in s:
               raise SystemExit('readiness ranking anchor not found')
           s = s.replace(old, new, 1)
           old2 = """  if (oapGoal && oap!=null && oap>=2 && cleanDays.length) { const d=cleanDays[0]; for (const x of days) sessions[x]=sessions[x].filter(v=>v!=='OAP_STRICT'); sessions[d].unshift('OAP_STRICT'); }"""
-          new2 = """  if (oapGoal && oap!=null && oap>=2 && cleanDays.length) {\n    const current = days.find(x => sessions[x].includes('OAP_STRICT'));\n    const best = readinessScores.find(x => x.day === cleanDays[0]);\n    const currentScore = readinessScores.find(x => x.day === current);\n    const shouldMove = !current || !currentScore || !best || (best.score - currentScore.score >= 1);\n    if (shouldMove) {\n      const d = cleanDays[0];\n      for (const x of days) sessions[x]=sessions[x].filter(v=>v!=='OAP_STRICT');\n      sessions[d].unshift('OAP_STRICT');\n    }\n  }"""
+          new2 = """  if (oapGoal && oap!=null && oap>=2 && cleanDays.length) {\n    // Hysteresis: relocating the primary neural exposure has a real cost, so only\n    // move it when the freshest day is meaningfully better, never on a trivial tie.\n    const current = days.find(x => sessions[x].includes('OAP_STRICT'));\n    const best = readinessScoreFor(cleanDays[0]);\n    const currentScore = readinessScoreFor(current);\n    const shouldMove = !current || !currentScore || !best || (best.score - currentScore.score >= 1);\n    if (shouldMove) {\n      const d = cleanDays[0];\n      for (const x of days) sessions[x]=sessions[x].filter(v=>v!=='OAP_STRICT');\n      sessions[d].unshift('OAP_STRICT');\n    }\n  }"""
           if old2 not in s:
               raise SystemExit('OAP placement anchor not found')
           s = s.replace(old2, new2, 1)
@@ -64,7 +65,7 @@ jobs:
           t = Path('phase14/test/v34_coaching_architecture.test.js')
           ts = t.read_text()
           marker = "// 4. Handstand reduced-support"
-          extra = """test('[V34-3c] readiness hysteresis preserves an existing OAP slot on a trivial tie', async () => {\n  const { buildDeterministicBrief } = await import('../engine/phase15_planner.js');\n  const intake = {\n    days_per_week: 2,\n    available_gym_days: ['Mon','Wed'],\n    primary_goals: ['4 One arm pullups'],\n    current_numbers: 'One-Arm Pull-up: 2 strict reps each arm',\n    sport_schedule: []\n  };\n  const brief = buildDeterministicBrief(intake);\n  assert.match(brief, /OAP_STRICT/);\n});\n\n"""
+          extra = """const plannerIntake = (gymDays, sportSchedule) => ({\n  days_per_week: gymDays.length,\n  available_gym_days: gymDays,\n  primary_goals: ['4 One arm pullups'],\n  current_numbers: 'One-Arm Pull-up: 2 strict reps each arm',\n  sport_schedule: sportSchedule,\n});\nconst oapDay = (brief) => {\n  const line = brief.split('\\n').find((l) => /OAP_STRICT/.test(l));\n  return line ? line.trim().replace(/^\\*\\s*/, '').split(':')[0] : null;\n};\n\ntest('[V34-3c] readiness placement actually reaches the planner and honours hysteresis', async () => {\n  const { buildDeterministicBrief } = await import('../engine/phase15_planner.js');\n  const { gymDayReadiness } = await import('../engine/v34_readiness.js');\n\n  const better = plannerIntake(['Mon', 'Wed'], [{ day: 'Tue', intensity: 'hard' }]);\n  const betterScores = gymDayReadiness(better, { gymDays: ['Mon', 'Wed'] }).days;\n  assert.equal(betterScores[0].day, 'mon');\n  assert.ok(betterScores[0].score - betterScores[1].score >= 1, 'fixture must present a material gap');\n  assert.equal(oapDay(buildDeterministicBrief(better)), 'Mon', 'a materially fresher day must take the primary neural exposure');\n\n  const mirrored = plannerIntake(['Mon', 'Wed'], [{ day: 'Sun', intensity: 'hard' }]);\n  assert.equal(oapDay(buildDeterministicBrief(mirrored)), 'Wed', 'placement follows the schedule, not a fixed weekday');\n\n  const tied = plannerIntake(['Mon', 'Wed'], []);\n  const tiedScores = gymDayReadiness(tied, { gymDays: ['Mon', 'Wed'] }).days;\n  assert.equal(tiedScores[0].score - tiedScores[1].score, 0, 'fixture must be a genuine tie');\n  const tiedBrief = buildDeterministicBrief(tied);\n  assert.match(tiedBrief, /OAP_STRICT/);\n  assert.equal(oapDay(tiedBrief), 'Wed', 'a tie must not relocate the existing slot');\n});\n\n"""
           if marker not in ts:
               raise SystemExit('test insertion marker not found')
           ts = ts.replace(marker, extra + marker, 1)
@@ -107,7 +108,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          rm -rf .github/v34-patch .github/workflows/apply-v34-coaching.yml
+          rm -rf .github/v34-patch .github/workflows/apply-v34-coaching.yml .github/workflows/apply-v34-final-commit.yml
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add -A
