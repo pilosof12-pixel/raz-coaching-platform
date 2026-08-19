@@ -1,0 +1,89 @@
+Here’s your 4-week block built to keep the 3K first, progress the ruck with one lever at a time, and give pull-ups three quality touches each week without wasting recovery.
+
+Weeks 2-4: only the main progression levers move. For the 3K work that means first adding a little interval volume, then shifting toward longer reps, then expressing a bit more speed with lower volume. For the ruck, load stays at 20 kg while pace improves gradually if shin/foot recovery stays normal.
+
+Shin guidance: if shin discomfort rises above mild during a run or the next-day baseline is worse than normal, hold the interval and ruck prescriptions at the last symptom-free week and trim easy-run duration first before touching the main strength work. If needed, keep the easy runs fully conversational and shorten them rather than forcing pace.
+
+START_WEEK1_TSV
+Day	Exercise	Weight	Sets	Reps	Rest	Target RPE	Notes	Results
+Mon	[WARMUP]	N/A	1	8 min	N/A	3	Squat-and-reach x 6; Bodyweight squat x 8; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Band shoulder pass-through x 10; Scapular push-up x 8; Ramp Back Squat: 47.5 kg x 5, 70 kg x 3, 92.5 kg x 1-2 before 117.5 kg work sets.; Ramp Weighted Pull-up: bodyweight x 5, +10 kg x 3, +20 kg x 2 before +27.5 kg work sets.; Keep the warm-up specific and non-fatiguing.	
+Mon	Back Squat	117.5 kg	2	3	3 min	6.5-7	Compact warm-up sets; crisp technique, no grind.	
+Mon	Weighted Pull-up	+22.5 kg	3	4	2.5-3 min	7-8	Dead hang each rep; keep 1-2 reps in reserve. Submaximal weighted pulling anchored below the demonstrated +30 kg x 5 benchmark; keep every rep strict.	
+Mon	Push-up	Bodyweight	2	18	90 sec	6-7	Low-cost push support; stop well before form slows.	
+Mon	Run	Easy conversational pace about 5:15-5:45/km	1	25 min	N/A	4	Append or separate later in day; relaxed aerobic work only.	
+Tue	[WARMUP] Run	Easy jog + drills + 3 x 60 m relaxed strides	1	12 min	N/A	3	Include ankle/calf prep and progressive strides before the first rep.; Keep the warm-up specific and non-fatiguing.	
+Tue	Run	5 x 400 m at 1:42-1:45 per rep	5	400 m	2:15	7.5-8	Current-capacity 3K-specific work; aim for even splits, not a flyer first rep.	
+Wed	[WARMUP]	N/A	1	8 min	N/A	3	Hip-hinge drill x 8; Glute bridge x 10; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Band shoulder pass-through x 10; Wall slide x 8; Ramp Deadlift: 62.5 kg x 5, 92.5 kg x 3, 120 kg x 1-2 before 155 kg work sets.; Ramp Overhead Press: 20 kg x 5, 32.5 kg x 3, 40 kg x 1-2 before 52.5 kg work sets.; Keep the warm-up specific and non-fatiguing.	
+Wed	Deadlift	155 kg	2	3	3 min	7	Compact warm-up sets; leave speed in reserve.	
+Wed	Overhead Press	52.5 kg	4	5	2-2.5 min	7.5	Strict reps from a still start; no layback.	
+Wed	Pull-up	Bodyweight	4	6	2 min	7	All reps clean from full hang; keep these comfortably submaximal.	
+Wed	Side Plank	Bodyweight	2	30 sec/side	45 sec	6	Brace hard; ribs down.	
+Thu	Backpack Carry	20 kg @ 9:20-9:30/km	1	9 km	N/A	6	Brisk controlled ruck walk; posture tall, no forced shuffle.	
+Fri	Reverse Lunge	RPE-selected load	3	8/leg	90-120 sec	8	Long stride, controlled knee touch or near-touch each rep.	
+Fri	Pull-up	Bodyweight	5	5	90-120 sec	7	Quality volume; smooth bar speed, no kipping.	
+Fri	Calf Raise	RPE-selected load	2	12	60 sec	7	Pause briefly at top and bottom; low-cost shin-support work.	
+Fri	Run	Easy conversational pace about 5:15-5:40/km	1	35 min	N/A	4-5	Keep this truly easy; should finish fresher than you started.	
+END_WEEK1_TSV
+
+START_WEEK2_TSV
+Day	Exercise	Weight	Sets	Reps	Rest	Target RPE	Notes	Results
+Mon	[WARMUP]	N/A	1	8 min	N/A	3	Squat-and-reach x 6; Bodyweight squat x 8; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Band shoulder pass-through x 10; Scapular push-up x 8; Ramp Back Squat: 47.5 kg x 5, 72.5 kg x 3, 92.5 kg x 1-2 before 120 kg work sets.; Ramp Weighted Pull-up: bodyweight x 5, +10 kg x 3, +20 kg x 2 before +30 kg work sets.; Keep the warm-up specific and non-fatiguing.	
+Mon	Back Squat	120 kg	2	3	3 min	7	If Week 1 moved cleanly, take the small load bump; otherwise repeat Week 1.	
+Mon	Weighted Pull-up	+22.5 kg	3	4	2.5-3 min	7-8	Match your demonstrated benchmark with clean reps, no sloppy fifths. Submaximal weighted pulling anchored below the demonstrated +30 kg x 5 benchmark; keep every rep strict.	
+Mon	Push-up	Bodyweight	2	20	90 sec	6-7	Low-cost push support; keep tension through full ROM.	
+Mon	Run	Easy conversational pace about 5:15-5:45/km	1	25 min	N/A	4	No pace push; just aerobic support.	
+Tue	[WARMUP] Run	Easy jog + drills + 3 x 60 m relaxed strides	1	12 min	N/A	3	Same warm-up; finish feeling springy, not tired.; Easy jog 6-8 min; dynamic running drills; 3 relaxed strides before the hard running work; Keep the warm-up specific and non-fatiguing.	
+Tue	Run	6 x 400 m at 1:42-1:45 per rep	6	400 m	2:15	8	Volume progresses; keep pace stable and repeatable.	
+Wed	[WARMUP]	N/A	1	8 min	N/A	3	Hip-hinge drill x 8; Glute bridge x 10; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Band shoulder pass-through x 10; Wall slide x 8; Ramp Deadlift: 65 kg x 5, 95 kg x 3, 125 kg x 1-2 before 160 kg work sets.; Ramp Overhead Press: 22.5 kg x 5, 32.5 kg x 3, 42.5 kg x 1-2 before 55 kg work sets.; Keep the warm-up specific and non-fatiguing.	
+Wed	Deadlift	160 kg	2	3	3 min	7	If bar speed is slow from Tuesday, repeat 155 kg instead.	
+Wed	Overhead Press	55 kg	4	5	2-2.5 min	7.5-8	Strict reps only; last rep should still look like a press, not a push press.	
+Wed	Pull-up	Bodyweight	4	7	2 min	7.5	Submaximal quality volume; stop one rep early if form fades.	
+Wed	Side Plank	Bodyweight	2	35 sec/side	45 sec	6	Own the position; no sagging hips.	
+Thu	Backpack Carry	20 kg @ 9:10-9:20/km	1	9 km	N/A	6-6.5	Same load and distance; only pace nudges faster if feet/shins feel normal.	
+Fri	Reverse Lunge	RPE-selected load	3	9/leg	90-120 sec	8	Add reps before load if balance or trunk stability is the limiter.	
+Fri	Pull-up	Bodyweight	5	6	90-120 sec	7.5	Still clean and controlled; no reaching failure.	
+Fri	Calf Raise	RPE-selected load	2	12	60 sec	7	Same controlled pauses.	
+Fri	Run	Easy conversational pace about 5:15-5:40/km	1	35 min	N/A	4-5	Keep cadence relaxed and impact quiet.	
+END_WEEK2_TSV
+
+START_WEEK3_TSV
+Day	Exercise	Weight	Sets	Reps	Rest	Target RPE	Notes	Results
+Mon	[WARMUP]	N/A	1	8 min	N/A	3	Squat-and-reach x 6; Bodyweight squat x 8; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Band shoulder pass-through x 10; Scapular push-up x 8; Ramp Back Squat: 50 kg x 5, 72.5 kg x 3, 95 kg x 1-2 before 122.5 kg work sets.; Ramp Weighted Pull-up: bodyweight x 5, +10 kg x 3, +20 kg x 2 before +30 kg work sets.; Keep the warm-up specific and non-fatiguing.	
+Mon	Back Squat	122.5 kg	2	3	3 min	7	Only take this if Week 2 was clearly smooth; otherwise hold 120 kg.	
+Mon	Weighted Pull-up	+22.5 kg	3	4	2.5-3 min	7-8	Volume step; keep all sets clean before chasing heavier load. Submaximal weighted pulling anchored below the demonstrated +30 kg x 5 benchmark; keep every rep strict.	
+Mon	Push-up	Bodyweight	2	20	90 sec	6-7	Same low-cost support.	
+Mon	Run	Easy conversational pace about 5:15-5:45/km	1	25 min	N/A	4	Keep it easy to protect Tuesday quality.	
+Tue	[WARMUP] Run	Easy jog + drills + 3 x 60 m relaxed strides	1	12 min	N/A	3	As prior weeks; prioritize calf/ankle readiness.; Easy jog 6-8 min; dynamic running drills; 3 relaxed strides before the hard running work; Keep the warm-up specific and non-fatiguing.	
+Tue	Run	4 x 600 m at 2:33-2:37 per rep	4	600 m	2:30	8	Progress by longer reps, not faster pace; stay controlled through rep 4.	
+Wed	[WARMUP]	N/A	1	8 min	N/A	3	Hip-hinge drill x 8; Glute bridge x 10; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Band shoulder pass-through x 10; Wall slide x 8; Ramp Deadlift: 65 kg x 5, 97.5 kg x 3, 127.5 kg x 1-2 before 162.5 kg work sets.; Ramp Overhead Press: 22.5 kg x 5, 35 kg x 3, 45 kg x 1-2 before 57.5 kg work sets.; Keep the warm-up specific and non-fatiguing.	
+Wed	Deadlift	162.5 kg	2	3	3 min	7-7.5	Only bump if recovery is good and positions stay solid.	
+Wed	Overhead Press	57.5 kg	4	5	2-2.5 min	8	Stay strict; if rep speed dies early, hold Week 2 load.	
+Wed	Pull-up	Bodyweight	5	6	2 min	7.5	Extra set for quality density, still well below all-out.	
+Wed	Side Plank	Bodyweight	2	40 sec/side	45 sec	6	Strong straight line from shoulder to ankle.	
+Thu	Backpack Carry	20 kg @ 9:00-9:10/km	1	9 km	N/A	6.5	Same load, same distance, slightly quicker turnover if symptom-free.	
+Fri	Reverse Lunge	RPE-selected load	4	8/leg	90-120 sec	8	Add a set rather than forcing sloppy heavy reps.	
+Fri	Pull-up	Bodyweight	6	5	90-120 sec	7.5	Shorter clean sets; own the first rep of every set from a dead hang.	
+Fri	Calf Raise	RPE-selected load	2	14	60 sec	7	Keep it smooth; no bouncing.	
+Fri	Run	Easy conversational pace about 5:15-5:40/km	1	35 min	N/A	4-5	This should help recovery, not compete with it.	
+END_WEEK3_TSV
+
+START_WEEK4_TSV
+Day	Exercise	Weight	Sets	Reps	Rest	Target RPE	Notes	Results
+Mon	[WARMUP]	N/A	1	8 min	N/A	3	Squat-and-reach x 6; Bodyweight squat x 8; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Band shoulder pass-through x 10; Scapular push-up x 8; Ramp Back Squat: 47.5 kg x 5, 72.5 kg x 3, 92.5 kg x 1-2 before 120 kg work sets.; Ramp Weighted Pull-up: bodyweight x 5, +12.5 kg x 3, +22.5 kg x 2 before +32.5 kg work sets.; Keep the warm-up specific and non-fatiguing.	
+Mon	Back Squat	120 kg	2	3	3 min	6.5-7	Consolidation week; keep bar speed high and leave plenty in reserve.	
+Mon	Weighted Pull-up	+32.5 kg	4	4	3 min	8	Small intensity expression with lower rep count; keep reps crisp.	
+Mon	Push-up	Bodyweight	2	15	90 sec	6	Keep the push support easy this week.	
+Mon	Run	Easy conversational pace about 5:15-5:45/km	1	20 min	N/A	4	Trim volume slightly to stay fresh for Tuesday.	
+Tue	[WARMUP] Run	Easy jog + drills + 3 x 60 m relaxed strides	1	12 min	N/A	3	Same warm-up; finish ready to run fast, not tired.; Easy jog 6-8 min; dynamic running drills; 3 relaxed strides before the hard running work; Keep the warm-up specific and non-fatiguing.	
+Tue	Run	4 x 400 m at 1:39-1:41 per rep	4	400 m	3:00	8-8.5	Controlled speed expression; faster pace only because total work comes down.	
+Wed	[WARMUP]	N/A	1	8 min	N/A	3	Hip-hinge drill x 8; Glute bridge x 10; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Band shoulder pass-through x 10; Wall slide x 8; Ramp Deadlift: 62.5 kg x 5, 92.5 kg x 3, 120 kg x 1-2 before 155 kg work sets.; Ramp Overhead Press: 22.5 kg x 5, 32.5 kg x 3, 42.5 kg x 1-2 before 55 kg work sets.; Keep the warm-up specific and non-fatiguing.	
+Wed	Deadlift	155 kg	2	3	3 min	6.5-7	Hold back slightly; this supports the run block, not the other way around.	
+Wed	Overhead Press	55 kg	3	5	2-2.5 min	7.5	Retain clean Week 2 quality with one less set.	
+Wed	Pull-up	Bodyweight	3	8	2 min	8	Clean rep quality first; stop at 7 if set speed drops hard.	
+Wed	Side Plank	Bodyweight	2	35 sec/side	45 sec	6	Brief trunk retention only.	
+Thu	Backpack Carry	20 kg @ 8:55-9:05/km	1	9 km	N/A	6.5	Only take the pace bump if Week 3 felt normal in feet, calves and shins.	
+Fri	Reverse Lunge	RPE-selected load	3	8/leg	90-120 sec	7.5	Keep these solid but not draining.	
+Fri	Pull-up	Bodyweight	4	5	90-120 sec	7	Retention volume; every rep identical.	
+Fri	Calf Raise	RPE-selected load	2	12	60 sec	7	Easy support; remove first if recovery feels tight.	
+Fri	Run	Easy conversational pace about 5:15-5:40/km	1	30 min	N/A	4	Reduced easy volume to leave room for the faster Tuesday session to land.	
+END_WEEK4_TSV
