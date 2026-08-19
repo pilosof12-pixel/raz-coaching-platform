@@ -102,14 +102,28 @@ jobs:
       - name: Run regression tests
         if: steps.ready.outputs.ready == 'true'
         working-directory: phase14
-        run: node --test test/*.test.js
+        shell: bash
+        run: |
+          set +e
+          node --test test/*.test.js 2>&1 | tee /tmp/v34-regression.log
+          status=${PIPESTATUS[0]}
+          set -e
+          if [ "$status" -ne 0 ]; then
+            cp /tmp/v34-regression.log ../.github/v34-regression-failure.txt
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git add ../.github/v34-regression-failure.txt
+            git commit -m "Record v34 regression failure"
+            git push origin HEAD:privacy-security-hardening
+            exit "$status"
+          fi
 
       - name: Commit v34 and clean staging
         if: steps.ready.outputs.ready == 'true'
         shell: bash
         run: |
           set -euo pipefail
-          rm -rf .github/v34-patch .github/workflows/apply-v34-coaching.yml .github/workflows/apply-v34-final-commit.yml .github/v34-final-commit.patch.b64 .github/v34-workflow-kick*.txt
+          rm -rf .github/v34-patch .github/workflows/apply-v34-coaching.yml .github/workflows/apply-v34-final-commit.yml .github/v34-final-commit.patch.b64 .github/v34-workflow-kick*.txt .github/v34-regression-failure.txt
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add -A
