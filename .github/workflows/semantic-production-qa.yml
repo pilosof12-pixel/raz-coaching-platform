@@ -11,6 +11,7 @@ permissions:
 jobs:
   semantic-qa:
     runs-on: ubuntu-latest
+    timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
         with:
@@ -20,5 +21,14 @@ jobs:
           node-version: 22
           cache: npm
       - run: npm ci
-      - name: Reproduce hybrid strength-day semantics
+      - name: Root semantic regression
         run: node --test phase14/test/program_model_semantics.test.js
+      - name: Phase 14 focused Youth convergence QA
+        run: |
+          cd phase14
+          npm install
+          npm test
+      - name: Phase 14 production build and full checks
+        run: |
+          cd phase14
+          npm run check
