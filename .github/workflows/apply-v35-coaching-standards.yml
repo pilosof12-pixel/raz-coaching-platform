@@ -26,17 +26,21 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          cat .github/v35-patch/chunk00.b64 \
-              .github/v35-patch/chunk01.b64 \
-              .github/v35-patch/chunk02.b64 \
-              .github/v35-patch/chunk03.b64 \
-            | base64 -d | gzip -d > /tmp/v35-coaching-standards.patch
-          actual="$(sha256sum /tmp/v35-coaching-standards.patch | awk '{print $1}')"
-          expected="1448baa8d0cc6488402b6370f388e01ecda7267282c6038daf20e56cba20970c"
-          echo "patch_sha256=$actual"
-          test "$actual" = "$expected"
-          git apply --check /tmp/v35-coaching-standards.patch
-          git apply --whitespace=nowarn /tmp/v35-coaching-standards.patch
+          echo reconstruct_patch > /tmp/v35-stage
+          : > /tmp/v35-last.log
+          {
+            cat .github/v35-patch/chunk00.b64 \
+                .github/v35-patch/chunk01.b64 \
+                .github/v35-patch/chunk02.b64 \
+                .github/v35-patch/chunk03.b64 \
+              | base64 -d | gzip -d > /tmp/v35-coaching-standards.patch
+            actual="$(sha256sum /tmp/v35-coaching-standards.patch | awk '{print $1}')"
+            expected="1448baa8d0cc6488402b6370f388e01ecda7267282c6038daf20e56cba20970c"
+            echo "patch_sha256=$actual"
+            test "$actual" = "$expected"
+            git apply --check /tmp/v35-coaching-standards.patch
+            git apply --whitespace=nowarn /tmp/v35-coaching-standards.patch
+          } 2>&1 | tee /tmp/v35-last.log
 
       - name: Setup Node
         uses: actions/setup-node@v4
@@ -47,52 +51,96 @@ jobs:
 
       - name: Install dependencies
         working-directory: phase14
-        run: npm ci
+        shell: bash
+        run: |
+          set -euo pipefail
+          echo install_dependencies > /tmp/v35-stage
+          npm ci 2>&1 | tee /tmp/v35-last.log
 
       - name: Run production build/preflight mutations
         working-directory: phase14
+        shell: bash
         run: |
-          npm run phase15:build
-          npm run launch:prepare
+          set -euo pipefail
+          echo production_build > /tmp/v35-stage
+          { npm run phase15:build && npm run launch:prepare; } 2>&1 | tee /tmp/v35-last.log
 
       - name: Syntax check V35 touched engine files
         working-directory: phase14
+        shell: bash
         run: |
-          node --check engine/coaching_spec_v1_convergence_normalizer.js
-          node --check engine/repairable_validation_bundle.js
-          node --check engine/v34_prescription_consistency.js
-          node --check engine/v34_readiness.js
-          node --check engine/v35_coaching_standards.js
+          set -euo pipefail
+          echo syntax_check > /tmp/v35-stage
+          {
+            node --check engine/coaching_spec_v1_convergence_normalizer.js
+            node --check engine/repairable_validation_bundle.js
+            node --check engine/v34_prescription_consistency.js
+            node --check engine/v34_readiness.js
+            node --check engine/v35_coaching_standards.js
+          } 2>&1 | tee /tmp/v35-last.log
 
       - name: Run focused V34/V35 coaching architecture tests
         working-directory: phase14
+        shell: bash
         run: |
+          set -euo pipefail
+          echo focused_tests > /tmp/v35-stage
           node --test \
             test/v34_coaching_architecture.test.js \
             test/v35_coaching_standards.test.js \
-            test/v35_review_regressions.test.js
+            test/v35_review_regressions.test.js 2>&1 | tee /tmp/v35-last.log
 
       - name: Run full Phase14 regression suite
         working-directory: phase14
-        run: node --test test/*.test.js
+        shell: bash
+        run: |
+          set -euo pipefail
+          echo full_regression > /tmp/v35-stage
+          node --test test/*.test.js 2>&1 | tee /tmp/v35-last.log
 
       - name: Create clean V35 engine commit
         shell: bash
         run: |
           set -euo pipefail
+          echo create_clean_commit > /tmp/v35-stage
+          : > /tmp/v35-last.log
+          {
+            git config user.name 'github-actions[bot]'
+            git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+            git reset --hard 0abbe9728b89ee67ccd2778903758407ea1f3af7
+            git apply --whitespace=nowarn /tmp/v35-coaching-standards.patch
+            git add \
+              phase14/engine/coaching_spec_v1_convergence_normalizer.js \
+              phase14/engine/repairable_validation_bundle.js \
+              phase14/engine/v34_prescription_consistency.js \
+              phase14/engine/v34_readiness.js \
+              phase14/engine/v35_coaching_standards.js \
+              phase14/test/v34_coaching_architecture.test.js \
+              phase14/test/v35_coaching_standards.test.js \
+              phase14/test/v35_review_regressions.test.js
+            git diff --cached --check
+            git commit -m 'Apply v35 coaching standards'
+            git push --force-with-lease origin HEAD:v35-coaching-standards-apply
+          } 2>&1 | tee /tmp/v35-last.log
+
+      - name: Record failure diagnostics
+        if: failure()
+        shell: bash
+        run: |
+          set +e
+          stage="$(cat /tmp/v35-stage 2>/dev/null || echo unknown)"
+          log="$(tail -n 280 /tmp/v35-last.log 2>/dev/null)"
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git reset --hard 0abbe9728b89ee67ccd2778903758407ea1f3af7
-          git apply --whitespace=nowarn /tmp/v35-coaching-standards.patch
-          git add \
-            phase14/engine/coaching_spec_v1_convergence_normalizer.js \
-            phase14/engine/repairable_validation_bundle.js \
-            phase14/engine/v34_prescription_consistency.js \
-            phase14/engine/v34_readiness.js \
-            phase14/engine/v35_coaching_standards.js \
-            phase14/test/v34_coaching_architecture.test.js \
-            phase14/test/v35_coaching_standards.test.js \
-            phase14/test/v35_review_regressions.test.js
-          git diff --cached --check
-          git commit -m 'Apply v35 coaching standards'
-          git push --force-with-lease origin HEAD:v35-coaching-standards-apply
+          git reset --hard "${GITHUB_SHA}"
+          mkdir -p .github
+          {
+            echo "V35_APPLY_FAILED"
+            echo "stage=${stage}"
+            echo "workflow_sha=${GITHUB_SHA}"
+            echo "--- last log ---"
+            printf '%s\n' "$log"
+          } > .github/v35-apply-result.txt
+          git add .github/v35-apply-result.txt
+          git commit -m 'Record V35 apply failure [skip ci]'
+          git push origin HEAD:v35-coaching-standards-apply
