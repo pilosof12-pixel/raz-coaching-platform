@@ -1,0 +1,366 @@
+V35 PRECREDIT ADVERSARIAL QA AUDIT
+Adversarial outcome: failure
+Tactical regression slice outcome: failure
+Checkout: 07ea9af413e56ef404e568dd114f677ece588230
+
+===== ADVERSARIAL QUALITY FLOOR =====
+TAP version 13
+# Subtest: [AUDIT-1] quantitative ceiling language cannot exceed sets x reps
+not ok 1 - [AUDIT-1] quantitative ceiling language cannot exceed sets x reps
+  ---
+  duration_ms: 6.533022
+  type: 'test'
+  location: '/home/runner/work/raz-coaching-platform/raz-coaching-platform/phase14/test/v35_precredit_adversarial_audit.test.js:15:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    A 4 x 3 row still advertises a 15-attempt ceiling without repair or rejection.
+    
+    true !== false
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: false
+  actual: true
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (file:///home/runner/work/raz-coaching-platform/raz-coaching-platform/phase14/test/v35_precredit_adversarial_audit.test.js:22:10)
+    Test.runInAsyncScope (node:async_hooks:214:14)
+    Test.run (node:internal/test_runner/test:1047:25)
+    Test.start (node:internal/test_runner/test:944:17)
+    startSubtestAfterBootstrap (node:internal/test_runner/harness:296:17)
+  ...
+# Subtest: [AUDIT-2] progression claims in load/target text must agree with week-over-week dose
+not ok 2 - [AUDIT-2] progression claims in load/target text must agree with week-over-week dose
+  ---
+  duration_ms: 1.03683
+  type: 'test'
+  location: '/home/runner/work/raz-coaching-platform/raz-coaching-platform/phase14/test/v35_precredit_adversarial_audit.test.js:29:1'
+  failureType: 'testCodeFailure'
+  error: 'An unchanged 3 x 1 prescription says "reduce volume" in the load field and currently escapes the progression checker.'
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: true
+  actual: false
+  operator: '=='
+  stack: |-
+    TestContext.<anonymous> (file:///home/runner/work/raz-coaching-platform/raz-coaching-platform/phase14/test/v35_precredit_adversarial_audit.test.js:35:10)
+    Test.runInAsyncScope (node:async_hooks:214:14)
+    Test.run (node:internal/test_runner/test:1047:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:744:18)
+    Test.postRun (node:internal/test_runner/test:1173:19)
+    Test.run (node:internal/test_runner/test:1101:12)
+    async startSubtestAfterBootstrap (node:internal/test_runner/harness:296:3)
+  ...
+# Subtest: [AUDIT-3] high-concurrency primary heavy day is protected from two-day long-run/gym stack
+not ok 3 - [AUDIT-3] high-concurrency primary heavy day is protected from two-day long-run/gym stack
+  ---
+  duration_ms: 8.430545
+  type: 'test'
+  location: '/home/runner/work/raz-coaching-platform/raz-coaching-platform/phase14/test/v35_precredit_adversarial_audit.test.js:42:1'
+  failureType: 'testCodeFailure'
+  error: 'Missing expected exception: The current manual acceptance gate allows Sat long run -> Sun gym -> Mon primary heavy squat without a recovery-architecture objection.'
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected:
+  operator: 'throws'
+  stack: |-
+    TestContext.<anonymous> (file:///home/runner/work/raz-coaching-platform/raz-coaching-platform/phase14/test/v35_precredit_adversarial_audit.test.js:54:10)
+    Test.runInAsyncScope (node:async_hooks:214:14)
+    Test.run (node:internal/test_runner/test:1047:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:744:18)
+    Test.postRun (node:internal/test_runner/test:1173:19)
+    Test.run (node:internal/test_runner/test:1101:12)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: [AUDIT-4] static 3K quality block is rejected even when narrative is honest
+not ok 4 - [AUDIT-4] static 3K quality block is rejected even when narrative is honest
+  ---
+  duration_ms: 0.7223
+  type: 'test'
+  location: '/home/runner/work/raz-coaching-platform/raz-coaching-platform/phase14/test/v35_precredit_adversarial_audit.test.js:77:1'
+  failureType: 'testCodeFailure'
+  error: 'Static four-week 3K quality returned pass; a 9+ gate must require a defensible build/extend/taper trend, not merely honest wording.'
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected:
+  actual: 'pass'
+  operator: 'match'
+  stack: |-
+    TestContext.<anonymous> (file:///home/runner/work/raz-coaching-platform/raz-coaching-platform/phase14/test/v35_precredit_adversarial_audit.test.js:81:10)
+    Test.runInAsyncScope (node:async_hooks:214:14)
+    Test.run (node:internal/test_runner/test:1047:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:744:18)
+    Test.postRun (node:internal/test_runner/test:1173:19)
+    Test.run (node:internal/test_runner/test:1101:12)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+1..4
+# tests 4
+# suites 0
+# pass 0
+# fail 4
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 102.172895
+
+===== TACTICAL CROSS-WEEK SLICE =====
+TAP version 13
+# Subtest: [G2-1] an identical 600 m session repeated for four weeks is rejected as static
+not ok 1 - [G2-1] an identical 600 m session repeated for four weeks is rejected as static
+  ---
+  duration_ms: 2.732312
+  type: 'test'
+  location: '/home/runner/work/raz-coaching-platform/raz-coaching-platform/phase14/test/coaching_spec_v1_live_convergence.test.js:390:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    Expected values to be strictly equal:
+    + actual - expected
+    
+    + 'pass'
+    - 'COACH_SPEC_V1_T3K_EVENT_PROGRESSION_STATIC'
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: 'COACH_SPEC_V1_T3K_EVENT_PROGRESSION_STATIC'
+  actual: 'pass'
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (file:///home/runner/work/raz-coaching-platform/raz-coaching-platform/phase14/test/coaching_spec_v1_live_convergence.test.js:397:10)
+    Test.runInAsyncScope (node:async_hooks:214:14)
+    Test.run (node:internal/test_runner/test:1047:25)
+    Test.start (node:internal/test_runner/test:944:17)
+    startSubtestAfterBootstrap (node:internal/test_runner/harness:296:17)
+  ...
+# Subtest: [G2-2] the same dose with escalating wording in the notes is still rejected
+not ok 2 - [G2-2] the same dose with escalating wording in the notes is still rejected
+  ---
+  duration_ms: 0.317372
+  type: 'test'
+  location: '/home/runner/work/raz-coaching-platform/raz-coaching-platform/phase14/test/coaching_spec_v1_live_convergence.test.js:400:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    Expected values to be strictly equal:
+    + actual - expected
+    
+    + 'pass'
+    - 'COACH_SPEC_V1_T3K_EVENT_PROGRESSION_STATIC'
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: 'COACH_SPEC_V1_T3K_EVENT_PROGRESSION_STATIC'
+  actual: 'pass'
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (file:///home/runner/work/raz-coaching-platform/raz-coaching-platform/phase14/test/coaching_spec_v1_live_convergence.test.js:407:10)
+    Test.runInAsyncScope (node:async_hooks:214:14)
+    Test.run (node:internal/test_runner/test:1047:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:744:18)
+    Test.postRun (node:internal/test_runner/test:1173:19)
+    Test.run (node:internal/test_runner/test:1101:12)
+    async startSubtestAfterBootstrap (node:internal/test_runner/harness:296:3)
+  ...
+# Subtest: [G2-3] a trivial rest-only tweak is not accepted as event progression
+not ok 3 - [G2-3] a trivial rest-only tweak is not accepted as event progression
+  ---
+  duration_ms: 1.00374
+  type: 'test'
+  location: '/home/runner/work/raz-coaching-platform/raz-coaching-platform/phase14/test/coaching_spec_v1_live_convergence.test.js:410:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    Expected values to be strictly equal:
+    + actual - expected
+    
+    + 'pass'
+    - 'COACH_SPEC_V1_T3K_EVENT_PROGRESSION_STATIC'
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: 'COACH_SPEC_V1_T3K_EVENT_PROGRESSION_STATIC'
+  actual: 'pass'
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (file:///home/runner/work/raz-coaching-platform/raz-coaching-platform/phase14/test/coaching_spec_v1_live_convergence.test.js:417:10)
+    Test.runInAsyncScope (node:async_hooks:214:14)
+    Test.run (node:internal/test_runner/test:1047:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:744:18)
+    Test.postRun (node:internal/test_runner/test:1173:19)
+    Test.run (node:internal/test_runner/test:1101:12)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: [G2-4] the live v30k build-extend-taper shape passes
+ok 4 - [G2-4] the live v30k build-extend-taper shape passes
+  ---
+  duration_ms: 0.261602
+  type: 'test'
+  ...
+# Subtest: [G2-5] one plateau week followed by real progression and a taper passes
+ok 5 - [G2-5] one plateau week followed by real progression and a taper passes
+  ---
+  duration_ms: 0.229503
+  type: 'test'
+  ...
+# Subtest: [G2-6] a Week 4 taper that reduces volume at maintained pace is not flagged as regression
+ok 6 - [G2-6] a Week 4 taper that reduces volume at maintained pace is not flagged as regression
+  ---
+  duration_ms: 0.196535
+  type: 'test'
+  ...
+# Subtest: [G2-7] progression carried by session density alone passes
+ok 7 - [G2-7] progression carried by session density alone passes
+  ---
+  duration_ms: 0.202059
+  type: 'test'
+  ...
+# Subtest: [G2-8] random oscillation with no defensible direction is rejected
+not ok 8 - [G2-8] random oscillation with no defensible direction is rejected
+  ---
+  duration_ms: 0.312888
+  type: 'test'
+  location: '/home/runner/work/raz-coaching-platform/raz-coaching-platform/phase14/test/coaching_spec_v1_live_convergence.test.js:460:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    The input did not match the regular expression /^COACH_SPEC_V1_T3K_EVENT_PROGRESSION_(?:STATIC|INCOHERENT)$/. Input:
+    
+    'pass'
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected:
+  actual: 'pass'
+  operator: 'match'
+  stack: |-
+    TestContext.<anonymous> (file:///home/runner/work/raz-coaching-platform/raz-coaching-platform/phase14/test/coaching_spec_v1_live_convergence.test.js:467:10)
+    Test.runInAsyncScope (node:async_hooks:214:14)
+    Test.run (node:internal/test_runner/test:1047:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:744:18)
+    Test.postRun (node:internal/test_runner/test:1173:19)
+    Test.run (node:internal/test_runner/test:1101:12)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: [G2-9] an intermediate week collapsing below baseline is rejected as incoherent even when a later week develops
+not ok 9 - [G2-9] an intermediate week collapsing below baseline is rejected as incoherent even when a later week develops
+  ---
+  duration_ms: 0.430522
+  type: 'test'
+  location: '/home/runner/work/raz-coaching-platform/raz-coaching-platform/phase14/test/coaching_spec_v1_live_convergence.test.js:470:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    Expected values to be strictly equal:
+    + actual - expected
+    
+    + 'pass'
+    - 'COACH_SPEC_V1_T3K_EVENT_PROGRESSION_INCOHERENT'
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: 'COACH_SPEC_V1_T3K_EVENT_PROGRESSION_INCOHERENT'
+  actual: 'pass'
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (file:///home/runner/work/raz-coaching-platform/raz-coaching-platform/phase14/test/coaching_spec_v1_live_convergence.test.js:477:10)
+    Test.runInAsyncScope (node:async_hooks:214:14)
+    Test.run (node:internal/test_runner/test:1047:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:744:18)
+    Test.postRun (node:internal/test_runner/test:1173:19)
+    Test.run (node:internal/test_runner/test:1101:12)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: [G2-10] fewer than three weeks of key sessions is treated as insufficient evidence, not a violation
+ok 10 - [G2-10] fewer than three weeks of key sessions is treated as insufficient evidence, not a violation
+  ---
+  duration_ms: 0.37276
+  type: 'test'
+  ...
+# Subtest: [G2-11] the new cross-week rule never fires for a non-Tactical intake
+ok 11 - [G2-11] the new cross-week rule never fires for a non-Tactical intake
+  ---
+  duration_ms: 0.227451
+  type: 'test'
+  ...
+# Subtest: [G2-12] the deterministic generic-run repair produces a block that satisfies the new cross-week rule
+ok 12 - [G2-12] the deterministic generic-run repair produces a block that satisfies the new cross-week rule
+  ---
+  duration_ms: 10.385048
+  type: 'test'
+  ...
+# Subtest: [G2-13] Advanced Hybrid and Youth convergence outputs are unaffected by this pass
+ok 13 - [G2-13] Advanced Hybrid and Youth convergence outputs are unaffected by this pass
+  ---
+  duration_ms: 3.479485
+  type: 'test'
+  ...
+# Subtest: [G2-14] a Week 2 spike that reverts to the Week 1 baseline for the rest of the block is rejected
+not ok 14 - [G2-14] a Week 2 spike that reverts to the Week 1 baseline for the rest of the block is rejected
+  ---
+  duration_ms: 0.289146
+  type: 'test'
+  location: '/home/runner/work/raz-coaching-platform/raz-coaching-platform/phase14/test/coaching_spec_v1_live_convergence.test.js:584:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    Expected values to be strictly equal:
+    + actual - expected
+    
+    + 'pass'
+    - 'COACH_SPEC_V1_T3K_EVENT_PROGRESSION_NOT_RETAINED'
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: 'COACH_SPEC_V1_T3K_EVENT_PROGRESSION_NOT_RETAINED'
+  actual: 'pass'
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (file:///home/runner/work/raz-coaching-platform/raz-coaching-platform/phase14/test/coaching_spec_v1_live_convergence.test.js:591:10)
+    Test.runInAsyncScope (node:async_hooks:214:14)
+    Test.run (node:internal/test_runner/test:1047:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:744:18)
+  ...
+# Subtest: [G2-15] a single large isolated spike is not sufficient on its own
+not ok 15 - [G2-15] a single large isolated spike is not sufficient on its own
+  ---
+  duration_ms: 0.208155
+  type: 'test'
+  location: '/home/runner/work/raz-coaching-platform/raz-coaching-platform/phase14/test/coaching_spec_v1_live_convergence.test.js:594:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    Expected values to be strictly equal:
+    + actual - expected
+    
+    + 'pass'
+    - 'COACH_SPEC_V1_T3K_EVENT_PROGRESSION_NOT_RETAINED'
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: 'COACH_SPEC_V1_T3K_EVENT_PROGRESSION_NOT_RETAINED'
+  actual: 'pass'
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (file:///home/runner/work/raz-coaching-platform/raz-coaching-platform/phase14/test/coaching_spec_v1_live_convergence.test.js:601:10)
+    Test.runInAsyncScope (node:async_hooks:214:14)
+    Test.run (node:internal/test_runner/test:1047:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:744:18)
+    Test.postRun (node:internal/test_runner/test:1173:19)
+    Test.run (node:internal/test_runner/test:1101:12)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: [G2-16] volume build carried into a distance extension and then tapered passes
+ok 16 - [G2-16] volume build carried into a distance extension and then tapered passes
+  ---
+  duration_ms: 0.130456
+  type: 'test'
+  ...
+# Subtest: [G2-17] a gain transformed into a different progression dimension before the taper passes
+ok 17 - [G2-17] a gain transformed into a different progression dimension before the taper passes
+  ---
+  duration_ms: 0.130256
+  type: 'test'
+  ...
+1..17
+# tests 17
+# suites 0
+# pass 10
+# fail 7
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 117.650328
