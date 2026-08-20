@@ -54,6 +54,16 @@ function repCount(raw) {
 }
 
 const ORDINALS = { second: 2, third: 3, fourth: 4, fifth: 5 };
+const NUMBER_WORDS = { one: 1, two: 2, three: 3, four: 4, five: 5, six: 6, seven: 7, eight: 8, nine: 9, ten: 10, eleven: 11, twelve: 12 };
+
+function countNoun(noun, count) {
+  const n = String(noun || '').toLowerCase();
+  if (/^attempt/.test(n)) return count === 1 ? 'attempt' : 'attempts';
+  if (/^rep/.test(n)) return count === 1 ? 'rep' : 'reps';
+  if (/^tr/.test(n)) return count === 1 ? 'try' : 'tries';
+  if (/^entr/.test(n)) return count === 1 ? 'entry' : 'entries';
+  return noun;
+}
 
 // Repair only the claim shapes below, each anchored to an explicit lexical cue
 // about this row's own sets/reps/attempts.
@@ -109,6 +119,29 @@ function repairNote(note, { sets, reps, priorSets }) {
         if (Number(n) <= prescribed) return whole;
         changes.push({ kind: 'attempt_ceiling_above_prescription', from: Number(n), to: prescribed });
         return `${verb} ${prescribed}${tail}`;
+      });
+  }
+
+  // (f) Exact "N attempts/reps/tries/entries per set" claims are objective and
+  // must agree with the row's final Reps field. This is intentionally a narrow
+  // deterministic repair: it changes only the count token (and singular/plural
+  // noun agreement), never the coaching cue around it. It closes the production
+  // loop for V34_NOTE_PER_SET_MISMATCH instead of asking the model to regenerate
+  // the same arithmetic contradiction repeatedly.
+  if (Number.isFinite(reps)) {
+    out = out.replace(/\b(\d+)(\s+(?:(?:quality|clean|good)\s+)?)(attempts?|reps?|tries|entries)(\s+per\s+set\b)/gi,
+      (whole, n, qualifier, noun, tail) => {
+        if (Number(n) === reps) return whole;
+        changes.push({ kind: 'per_set_count_claim', from: Number(n), to: reps });
+        return `${reps}${qualifier}${countNoun(noun, reps)}${tail}`;
+      });
+
+    out = out.replace(/\b(one|two|three|four|five|six|seven|eight|nine|ten|eleven|twelve)(\s+(?:(?:quality|clean|good)\s+)?)(attempts?|reps?|tries|entries)(\s+per\s+set\b)/gi,
+      (whole, word, qualifier, noun, tail) => {
+        const claimed = NUMBER_WORDS[String(word).toLowerCase()];
+        if (!Number.isFinite(claimed) || claimed === reps) return whole;
+        changes.push({ kind: 'per_set_word_count_claim', from: claimed, to: reps });
+        return `${reps}${qualifier}${countNoun(noun, reps)}${tail}`;
       });
   }
 
