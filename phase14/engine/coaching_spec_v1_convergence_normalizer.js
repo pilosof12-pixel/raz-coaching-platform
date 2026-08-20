@@ -1,5 +1,6 @@
 import { isHighConcurrencyHybrid } from './advanced_hybrid_concurrency.js';
 import { endurancePerformanceIntegrityFlags, eventProgressionBearing } from './phase15_elite_guardrails.js';
+import { projectedWeeklyRunningKm } from './v34_workload_accounting.js';
 
 const WEEKDAYS = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'];
 
@@ -517,7 +518,15 @@ function anchorAerobicVolume(program, intake, repairs) {
   if (!head.trim()) return { program, changed: false };
   const span = baseline.low === baseline.high ? `${baseline.low} km` : `${baseline.low}-${baseline.high} km`;
   const runs = baseline.runs ? `${baseline.runs} running exposures` : 'the established number of running exposures';
-  const line = `Weekly running volume anchor: your established, tolerated baseline is about ${span} per week across ${runs}, and this block keeps ${runs} while quality becomes more 3K-specific. Easy-run durations are set at or slightly below that baseline on purpose, so the new interval specificity is the only impact variable stepping up. While shins and next-day soreness stay normal, rebuild toward the top of your ${span} range by adding a few minutes to the easy runs first - never by adding a fourth running day or by making the easy runs faster. If shin symptoms return, cut easy-run duration first, hold the newest interval and ruck progression, and repeat the last symptom-free week before progressing again.`;
+  // State the volume this block actually prescribes, counted from every running
+  // row including warm-up, repetitions and cooldown. Claiming to sit at the
+  // baseline while projecting well under it is the contradiction this anchor was
+  // meant to prevent in the first place.
+  const projected = projectedWeeklyRunningKm(program, 1);
+  const projectedPhrase = Number.isFinite(projected) && projected > 0
+    ? ` Counting easy runs, warm-up, repetitions and cooldown, Week 1 projects roughly ${projected} km, which is deliberately below that baseline while the new interval specificity is the only impact variable stepping up.`
+    : ' Easy-run durations are deliberately conservative while the new interval specificity is the only impact variable stepping up.';
+  const line = `Weekly running volume anchor: your established, tolerated baseline is about ${span} per week across ${runs}, and this block keeps ${runs} while quality becomes more 3K-specific.${projectedPhrase} While shins and next-day soreness stay normal, rebuild toward the top of your ${span} range by adding a few minutes to the easy runs first - never by adding a fourth running day or by making the easy runs faster. If shin symptoms return, reduce the stressor that provoked them or the one most recently increased - the interval session if symptoms follow that session, the ruck if they follow loaded carrying, and easy-run volume only for diffuse accumulated soreness - then repeat the last symptom-free week before progressing again.`;
   const updated = `${head.trimEnd()}\n\n${line}\n\n${String(program).slice(head.length).replace(/^\s*/, '')}`;
   repairs.push({ type: 'tactical_weekly_running_volume_anchor', baseline_km: span, runs: baseline.runs });
   return { program: updated, changed: true };

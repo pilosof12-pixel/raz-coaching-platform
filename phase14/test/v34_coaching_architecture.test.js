@@ -58,7 +58,10 @@ test('[V34-3] an explicitly low-cost microdose may occupy the least fresh day', 
   const intake = { available_gym_days: ['Mon', 'Wed'], sport: 'MMA', sport_schedule: [{ day: 'Sun', intensity: 'hard' }] };
   assert.equal(preferredDayForExposure(intake, { lowCost: true }), 'mon');
   const brief = buildV34ArchitectureBrief(intake);
-  assert.match(brief, /low-cost technical microdoses .* may occupy the least fresh day/s);
+  // The brief no longer names a specific weekday as freshest (that assertion leaked
+  // into client-facing text as a false claim), but it must still route low-cost
+  // microdoses to the lower-scoring days.
+  assert.match(brief, /Explicitly low-cost technical microdoses belong on the lower-scoring days/);
 });
 
 test('[V34-3b] readiness is derived from the schedule, never from fixed weekdays', () => {
@@ -243,15 +246,23 @@ test('[V34-13] heavily concurrent athletes get an intra-session stop rule', () =
 
 // 14-15. Regression on the accepted v33 artifacts -----------------------------
 
-test('[V34-14] the accepted v33 artifacts stay parseable and raise only the known +50 kg defect', () => {
+test('[V34-14] the load-reference rule raises no false positives on the accepted artifacts', () => {
+  // This asserts the rule's real contract: a note may reference a load that is
+  // prescribed on its row or established by an intake benchmark. It deliberately
+  // does NOT hardcode a specific defect, because docs/qa/live-three-avatar/latest
+  // is overwritten by each live acceptance run -- the v33 +50 kg undefined-load
+  // defect is now genuinely fixed (the load is prescribed on the row). Detection
+  // of real contradictions in the current artifacts is covered by [R13].
   const AH = { current_numbers: 'Back Squat: 205 kg 1RM\nOne-Arm Pull-up: 2 strict reps each arm\nOverhead Press: 80 kg x 4\nWeighted Chin-up: +80 kg 1RM' };
   const TAC = { current_numbers: '3 km: 13:30\nWeighted Pull-up: +30 kg x 5\nStrict Pull-ups: 14 reps' };
-  assert.deepEqual(collectPrescriptionConsistencyFlags(readLive('youth_gymnastics'), {}), []);
-  assert.deepEqual(collectPrescriptionConsistencyFlags(readLive('tactical_3k'), TAC), [], 'benchmark back-references are legitimate');
-  const hybrid = collectPrescriptionConsistencyFlags(readLive('advanced_hybrid'), AH);
-  assert.equal(hybrid.length, 1);
-  assert.equal(hybrid[0].code, 'V34_NOTE_UNDEFINED_LOAD_REFERENCE');
-  assert.equal(hybrid[0].load, '+50kg');
+  for (const [avatar, intake] of [['advanced_hybrid', AH], ['youth_gymnastics', {}], ['tactical_3k', TAC]]) {
+    const undefinedLoads = collectPrescriptionConsistencyFlags(readLive(avatar), intake)
+      .filter((f) => f.code === 'V34_NOTE_UNDEFINED_LOAD_REFERENCE');
+    assert.deepEqual(undefinedLoads, [], `${avatar}: legitimate benchmark/row loads must not be flagged`);
+  }
+  // The rule still fires on a genuinely undefined load.
+  const bogus = 'START_WEEK1_TSV\n' + HEADER + '\nFri\tChin-up\tRPE-selected load\t3\t4\t2 min\t7\tOtherwise hold +50 kg.\t\nEND_WEEK1_TSV';
+  assert.equal(collectPrescriptionConsistencyFlags(bogus, {})[0].code, 'V34_NOTE_UNDEFINED_LOAD_REFERENCE');
 });
 
 test('[V34-15] accounting runs cleanly on all three accepted artifacts', () => {

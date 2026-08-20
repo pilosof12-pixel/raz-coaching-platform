@@ -131,11 +131,209 @@ export function collectPrescriptionConsistencyFlags(program, intake = {}) {
   return flags;
 }
 
+// ---------------------------------------------------------------------------
+// Progression-language, rep-word and warm-up sanity checks.
+//
+// The first pass compared a note against its OWN row. These compare a note's
+// claim against the WEEK-OVER-WEEK delta for the same day+exercise, against
+// spelled-out rep words, and against the day's own warm-up ramp. Every check is
+// arithmetic on structured fields; qualitative cues are never inspected.
+// ---------------------------------------------------------------------------
+
+const NUMBER_WORDS = { one: 1, two: 2, three: 3, four: 4, five: 5, six: 6, seven: 7, eight: 8, nine: 9, ten: 10, twelve: 12 };
+// "doubles" means 2 reps, "triples" 3, "singles" 1.
+const REP_WORDS = { single: 1, singles: 1, double: 2, doubles: 2, triple: 3, triples: 3 };
+
+function rowKey(cells, parsed) {
+  return `${String(cells[parsed.day] || '').trim().toLowerCase()}|${String(cells[parsed.exercise] || '').trim().toLowerCase()}`;
+}
+function kgOf(raw) {
+  const m = String(raw || '').match(/\+?\s*(\d+(?:\.\d+)?)\s*kg\b/i);
+  return m ? Number(m[1]) : null;
+}
+function kmOf(raw) {
+  const m = String(raw || '').match(/(\d+(?:\.\d+)?)\s*km\b/i);
+  return m ? Number(m[1]) : null;
+}
+
+// Claim verbs, each with the sign it asserts for the metric it names.
+const CLAIMS = [
+  { re: /\b(?:trim|reduce|drop|cut|lower)\b[^.;]{0,24}\b(sets?|set count|total work|volume|reps?|distance)\b/i, direction: 'down' },
+  { re: /\b(?:fewer|less)\s+(?:total\s+)?(sets?|reps?|work|volume|distance)\b/i, direction: 'down' },
+  { re: /\b(?:slightly less|less)\s+total\s+(?:work|volume)\b/i, direction: 'down' },
+  { re: /\bfewer\s+total\s+reps?\b/i, direction: 'down' },
+  { re: /\b(?:repeat|hold|keep|maintain|match)\b[^.;]{0,30}\b(?:this|the|same)\s+(?:load|weight|dose)\b/i, direction: 'same', metric: 'load' },
+  { re: /\brepeat\s+(?:this|the)\s+load\b/i, direction: 'same', metric: 'load' },
+];
+
+export function collectProgressionLanguageFlags(program, intake = {}) {
+  const flags = [];
+  const previous = new Map();
+
+  for (let week = 1; week <= 4; week++) {
+    const parsed = parseWeek(program, week);
+    if (!parsed || !Number.isInteger(parsed.notes)) continue;
+    const thisWeek = new Map();
+
+    parsed.rows.forEach((cells, row) => {
+      const exercise = String(cells[parsed.exercise] || '').trim();
+      if (!exercise || isWarmup(exercise)) return;
+      const key = rowKey(cells, parsed);
+      const sets = firstNum(cells[parsed.sets]);
+      const reps = repCount(cells[parsed.reps]);
+      const load = Number.isInteger(parsed.load) ? kgOf(cells[parsed.load]) : null;
+      const km = Number.isInteger(parsed.reps) ? kmOf(cells[parsed.reps]) : null;
+      const current = { sets, reps, load, km, volume: (Number.isFinite(sets) && Number.isFinite(reps)) ? sets * reps : null };
+      thisWeek.set(key, current);
+
+      const prior = previous.get(key);
+      if (!prior) return;
+      const note = String(cells[parsed.notes] || '');
+      if (!note.trim()) return;
+      const where = { week, row, exercise };
+
+      let claimed = false;
+      for (const claim of CLAIMS) {
+        if (claimed) break;
+        if (!claim.re.test(note)) continue;
+        if (claim.metric === 'load') {
+          if (Number.isFinite(load) && Number.isFinite(prior.load) && load !== prior.load) {
+            claimed = true;
+            flags.push({ code: 'V34_PROGRESSION_LANGUAGE_MISMATCH', ...where, claim: 'repeat/hold load', previous_load: prior.load, current_load: load,
+              message: `${exercise} (Week ${week}) says the load is repeated or held, but it moved from ${prior.load} to ${load}.` });
+          }
+          continue;
+        }
+        if (claim.direction === 'down') {
+          const volumeSame = Number.isFinite(current.volume) && Number.isFinite(prior.volume) && current.volume >= prior.volume;
+          const setsSame = Number.isFinite(sets) && Number.isFinite(prior.sets) && sets >= prior.sets;
+          const kmSame = Number.isFinite(km) && Number.isFinite(prior.km) && km >= prior.km;
+          const nothingFell = (volumeSame || setsSame || kmSame)
+            && !(Number.isFinite(current.volume) && Number.isFinite(prior.volume) && current.volume < prior.volume)
+            && !(Number.isFinite(km) && Number.isFinite(prior.km) && km < prior.km);
+          if (nothingFell) {
+            claimed = true;
+            flags.push({ code: 'V34_PROGRESSION_LANGUAGE_MISMATCH', ...where, claim: 'reduction',
+              previous: { sets: prior.sets, reps: prior.reps, km: prior.km }, current: { sets, reps, km },
+              message: `${exercise} (Week ${week}) claims reduced work, but the prescription did not fall (previous ${prior.sets}x${prior.reps}${prior.km ? ` / ${prior.km} km` : ''}, now ${sets}x${reps}${km ? ` / ${km} km` : ''}).` });
+          }
+        }
+      }
+    });
+
+    for (const [k, v] of thisWeek) previous.set(k, v);
+  }
+  return flags;
+}
+
+// Spelled-out attempt claims ("Three quality attempts per set") and rep words
+// ("clean symmetrical doubles") must match the numeric reps on the row.
+export function collectRepWordFlags(program) {
+  const flags = [];
+  for (let week = 1; week <= 4; week++) {
+    const parsed = parseWeek(program, week);
+    if (!parsed || !Number.isInteger(parsed.notes)) continue;
+    // How many work rows each movement has on each day: a movement split across a
+    // priority set plus back-off singles may legitimately name the other sets.
+    const rowsPerKey = new Map();
+    parsed.rows.forEach((cells) => {
+      const nm = String(cells[parsed.exercise] || '').trim();
+      if (!nm || isWarmup(nm)) return;
+      const k = rowKey(cells, parsed);
+      rowsPerKey.set(k, (rowsPerKey.get(k) || 0) + 1);
+    });
+    parsed.rows.forEach((cells, row) => {
+      const exercise = String(cells[parsed.exercise] || '').trim();
+      if (!exercise || isWarmup(exercise)) return;
+      const reps = repCount(cells[parsed.reps]);
+      if (!Number.isFinite(reps)) return;
+      const note = String(cells[parsed.notes] || '');
+      const where = { week, row, exercise };
+
+      for (const m of note.matchAll(/\b([a-z]+)\s+(?:quality\s+|clean\s+|good\s+)?(?:attempts?|reps?|entries)\s+per\s+set\b/gi)) {
+        const n = NUMBER_WORDS[String(m[1]).toLowerCase()];
+        if (Number.isFinite(n) && n !== reps) {
+          flags.push({ code: 'V34_NOTE_PER_SET_MISMATCH', ...where, note_claim: n, prescribed_reps: reps,
+            message: `${exercise} (Week ${week}) prescribes ${reps} per set but its note states ${m[1]} per set.` });
+        }
+      }
+      const companionRows = rowsPerKey.get(rowKey(cells, parsed)) || 1;
+      for (const m of (companionRows > 1 ? [] : note.matchAll(/\b(singles?|doubles?|triples?)\b/gi))) {
+        const n = REP_WORDS[String(m[1]).toLowerCase()];
+        if (Number.isFinite(n) && n !== reps) {
+          flags.push({ code: 'V34_NOTE_REP_WORD_MISMATCH', ...where, note_claim: m[1], prescribed_reps: reps,
+            message: `${exercise} (Week ${week}) prescribes ${reps} rep(s) per set but its note describes ${m[1]}.` });
+        }
+      }
+    });
+  }
+  return flags;
+}
+
+// A normal ramp finishes below the work set, and one movement's ramp must not be
+// duplicated inside another movement's warm-up note when it already has its own.
+export function collectWarmupSanityFlags(program) {
+  const flags = [];
+  for (let week = 1; week <= 4; week++) {
+    const parsed = parseWeek(program, week);
+    if (!parsed || !Number.isInteger(parsed.load) || !Number.isInteger(parsed.notes)) continue;
+
+    const workLoadByKey = new Map();
+    parsed.rows.forEach((cells) => {
+      const name = String(cells[parsed.exercise] || '').trim();
+      if (!name || isWarmup(name)) return;
+      const kg = kgOf(cells[parsed.load]);
+      const key = rowKey(cells, parsed);
+      if (Number.isFinite(kg)) workLoadByKey.set(key, Math.max(workLoadByKey.get(key) ?? -Infinity, kg));
+    });
+
+    const rampOwners = new Map();
+    parsed.rows.forEach((cells, row) => {
+      const name = String(cells[parsed.exercise] || '').trim();
+      if (!isWarmup(name)) return;
+      const day = String(cells[parsed.day] || '').trim().toLowerCase();
+      const note = String(cells[parsed.notes] || '');
+      for (const m of note.matchAll(/Ramp\s+([A-Za-z][A-Za-z\- ]*?):\s*([^;]*?)\bbefore\s+\+?(\d+(?:\.\d+)?)\s*kg\s+work sets\./gi)) {
+        const movement = m[1].trim();
+        const steps = [...m[2].matchAll(/\+?(\d+(?:\.\d+)?)\s*kg\s*x/gi)].map((x) => Number(x[1])).filter(Number.isFinite);
+        const target = Number(m[3]);
+        const key = `${day}|${movement.toLowerCase()}`;
+        const work = workLoadByKey.get(key);
+
+        const top = steps.length ? Math.max(...steps) : null;
+        if (Number.isFinite(top) && Number.isFinite(work) && top >= work) {
+          flags.push({ code: 'V34_WARMUP_HEAVIER_THAN_WORK', week, row, exercise: movement, top_ramp_kg: top, work_kg: work,
+            message: `${movement} (Week ${week}) ramps to ${top} kg before ${work} kg work sets. A ramp must finish below the work load unless a potentiation protocol is explicitly prescribed.` });
+        }
+        if (Number.isFinite(target) && Number.isFinite(work) && target !== work) {
+          flags.push({ code: 'V34_WARMUP_TARGET_MISMATCH', week, row, exercise: movement, ramp_target_kg: target, work_kg: work,
+            message: `${movement} (Week ${week}) ramps toward ${target} kg but the work row prescribes ${work} kg.` });
+        }
+        // Duplicate specific ramps for the same movement on the same day.
+        if (rampOwners.has(key)) {
+          flags.push({ code: 'V34_DUPLICATE_SPECIFIC_RAMP', week, row, exercise: movement,
+            message: `${movement} (Week ${week}) has its ramp prescribed in more than one warm-up row on the same day.` });
+        } else rampOwners.set(key, row);
+      }
+    });
+  }
+  return flags;
+}
+
+export function collectAllV34ConsistencyFlags(program, intake = {}) {
+  return [
+    ...collectPrescriptionConsistencyFlags(program, intake),
+    ...collectProgressionLanguageFlags(program, intake),
+    ...collectRepWordFlags(program),
+    ...collectWarmupSanityFlags(program),
+  ];
+}
+
 // Release-boundary gate. Objective contradictions between structured fields and
 // quantitative note claims are repairable: the correct response is regeneration
 // with feedback, not silently inventing a replacement prescription.
 export function validatePrescriptionConsistency(program, intake = {}, RetriableValidationError) {
-  const flags = collectPrescriptionConsistencyFlags(program, intake);
+  const flags = collectAllV34ConsistencyFlags(program, intake);
   if (!flags.length) return { ok: true, flags: [] };
   const first = flags[0];
   const detail = flags.map((f) => f.message).join(' ');

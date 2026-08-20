@@ -8,6 +8,9 @@
 // "Advanced Hybrid" means.
 
 const WEEKDAYS = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'];
+// Cost charged to a day whose predecessor is one of this athlete's own training
+// days when no explicit prior-day load is supplied.
+const DEFAULT_PRIOR_GYM_COST = 1.5;
 
 function arr(v) { return Array.isArray(v) ? v : v ? [v] : []; }
 function txt(v) {
@@ -76,11 +79,16 @@ export function gymDayReadiness(intake = {}, options = {}) {
   const injury = injurySensitivity(intake);
   const globalPenalty = recoveryPenalty(intake);
 
+  const scheduledGymDays = new Set(gymDays);
   const days = (gymDays.length ? gymDays : WEEKDAYS).map((day) => {
     const prev = priorDay(day);
     const sameDaySport = sport[day] || 0;
     const prevDaySport = prev ? (sport[prev] || 0) : 0;
-    const prevDayGym = prev ? Number(priorGymLoad[prev] || 0) : 0;
+    // A previous training day is never free. Charging only sport_schedule days
+    // treated the morning after the athlete's own gym session as pristine, which
+    // is how a primary neural exposure could be stacked behind two loaded days.
+    const explicitPriorGym = prev ? Number(priorGymLoad[prev] || 0) : 0;
+    const prevDayGym = explicitPriorGym || (prev && scheduledGymDays.has(prev) ? DEFAULT_PRIOR_GYM_COST : 0);
     // Same-day sport costs most, the day after a hard session still costs real
     // neural and connective-tissue freshness.
     let score = 10 - (sameDaySport * 2) - (prevDaySport * 1.5) - prevDayGym - globalPenalty;
@@ -109,13 +117,11 @@ export function buildReadinessBrief(intake = {}, options = {}) {
   const sport = sportStressByDay(intake);
   if (!Object.keys(sport).length) return '';
   const ranked = days.map((d) => `${d.day}(${d.score})`).join(' > ');
-  const best = days[0].day;
-  const worst = days[days.length - 1].day;
   return [
     '=== READINESS-WEIGHTED SCHEDULING ===',
-    `Deterministic gym-day readiness for this athlete, freshest first: ${ranked}. The score falls for same-day sport, for the day AFTER a hard sport session, and for poor recovery context.`,
-    `Place the highest-priority high-neural, high-skill or race-quality exposure on the freshest available day (currently ${best}). Do not place it the day after a hard sport session just because the calendar allows it.`,
-    `Explicitly low-cost technical microdoses (low RPE, low volume, stated as recovery-first) may occupy the least fresh day (currently ${worst}); that is the point of them, and they may sit adjacent to another exposure of the same pattern provided they stay genuinely low fatigue.`,
-    'These are scheduling preferences derived from this athlete\'s own sport schedule and recovery context, not fixed weekday rules. If a different day is better for a stated reason, say the reason in the program.',
+    `Relative gym-day readiness estimated from this athlete's stated schedule, higher is fresher: ${ranked}. The score falls for same-day sport, for the day after sport, for the day after another training day, and for poor recovery context.`,
+    'Use this ranking to decide WHERE the highest-priority high-neural, high-skill or race-quality exposure goes: prefer a higher-scoring day, and do not stack it immediately behind consecutive loaded days. Explicitly low-cost technical microdoses belong on the lower-scoring days.',
+    'This ranking is an estimate from the intake, not a measured freshness reading. Do NOT state in the client-facing program that any particular day IS the athlete\'s freshest or most recovered day, and do not justify placement by naming a weekday as fresh. Describe placement by its purpose instead - for example that the session is positioned away from the heaviest sport days, or that a day is deliberately kept low-cost.',
+    'If the athlete reports that a day is habitually worse than this ranking suggests, their reported experience wins.',
   ].join('\n');
 }

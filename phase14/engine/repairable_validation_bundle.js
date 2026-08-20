@@ -17,6 +17,7 @@ import { trimExcessSupportVolume } from './mrv_support_trim.js';
 import { enrichSpecificWarmups } from './specific_warmup_enrichment.js';
 import { normalizeFinalNoteCoherence } from './final_note_coherence.js'; // FINAL-NOTE-COHERENCE-WIRED
 import { validatePrescriptionConsistency } from './v34_prescription_consistency.js'; // V34-PRESCRIPTION-CONSISTENCY-WIRED
+import { validateCoachingStandards } from './v35_coaching_standards.js'; // V35-COACHING-STANDARDS-WIRED
 import { normalizeAdvancedHybridWeek4OapConsolidation } from './advanced_hybrid_oap_consolidation_normalizer.js';
 import { normalizeAdvancedHybridOHPComplement } from './advanced_hybrid_ohp_normalizer.js';
 import { normalizeYouthPrimarySkillOrder } from './youth_skill_order_normalizer.js';
@@ -335,6 +336,9 @@ export function collectRepairableValidationFailures(program, intake = {}, option
   // v34: runs AFTER every deterministic prescription repair, so it compares
   // notes against final structured fields.
   runRepairable(flags, () => validatePrescriptionConsistency(candidate, intake, RetriableValidationError));
+  // v35: the program's own claims and block shape must match the structured
+  // prescriptions and the athlete's stated goal.
+  runRepairable(flags, () => validateCoachingStandards(candidate, intake, RetriableValidationError));
   runRepairable(flags, () => validatePhase15FinalProgram(candidate, intake));
 
   return {
