@@ -1,0 +1,37 @@
+name: Verify v35 per-set correction
+
+on:
+  push:
+    branches:
+      - privacy-security-hardening
+    paths:
+      - 'phase14/engine/final_note_coherence.js'
+      - 'phase14/test/v35_per_set_note_repair.test.js'
+      - '.github/workflows/verify-v35-per-set-correction.yml'
+  workflow_dispatch:
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: phase14/package-lock.json
+      - name: Install dependencies
+        working-directory: phase14
+        run: npm ci
+      - name: Syntax check correction
+        working-directory: phase14
+        run: node --check engine/final_note_coherence.js
+      - name: Run per-set regression and v34-v35 focused gates
+        working-directory: phase14
+        run: |
+          node --test \
+            test/v35_per_set_note_repair.test.js \
+            test/v34_coaching_architecture.test.js \
+            test/v35_coaching_standards.test.js \
+            test/v35_review_regressions.test.js
