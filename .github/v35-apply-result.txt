@@ -1,0 +1,284 @@
+V35_APPLY_FAILED
+stage=full_regression
+workflow_sha=9fcefa55a5d2aeb68d1a4e61c36e4d906c74ed78
+--- last log ---
+  ...
+# Subtest: [V34-14] the load-reference rule raises no false positives on the accepted artifacts
+ok 376 - [V34-14] the load-reference rule raises no false positives on the accepted artifacts
+  ---
+  duration_ms: 2.998001
+  type: 'test'
+  ...
+# Subtest: [V34-15] accounting runs cleanly on all three accepted artifacts
+ok 377 - [V34-15] accounting runs cleanly on all three accepted artifacts
+  ---
+  duration_ms: 1.470998
+  type: 'test'
+  ...
+# Subtest: [V34-15b] the brief is empty for an intake with none of the triggering facts
+ok 378 - [V34-15b] the brief is empty for an intake with none of the triggering facts
+  ---
+  duration_ms: 0.140933
+  type: 'test'
+  ...
+# Subtest: [S1] a "long run builds" claim must be visible in the prescribed distances
+ok 379 - [S1] a "long run builds" claim must be visible in the prescribed distances
+  ---
+  duration_ms: 3.180156
+  type: 'test'
+  ...
+# Subtest: [S2] two competing symptom-response hierarchies are rejected
+ok 380 - [S2] two competing symptom-response hierarchies are rejected
+  ---
+  duration_ms: 0.635573
+  type: 'test'
+  ...
+# Subtest: [S3] accessory volume may not rise in the same week the primary quality advances
+ok 381 - [S3] accessory volume may not rise in the same week the primary quality advances
+  ---
+  duration_ms: 1.085494
+  type: 'test'
+  ...
+# Subtest: [S3b] accessory volume may rise in a week the primary does not advance
+ok 382 - [S3b] accessory volume may rise in a week the primary does not advance
+  ---
+  duration_ms: 0.232312
+  type: 'test'
+  ...
+# Subtest: [S4] a block may not be called race-specific when its quality never nears event demand
+ok 383 - [S4] a block may not be called race-specific when its quality never nears event demand
+  ---
+  duration_ms: 0.887934
+  type: 'test'
+  ...
+# Subtest: [S5] a stated baseline anchor must match the computed weekly volume
+ok 384 - [S5] a stated baseline anchor must match the computed weekly volume
+  ---
+  duration_ms: 2.245771
+  type: 'test'
+  ...
+# Subtest: [S6] the gate throws a retriable error and passes a compliant program
+ok 385 - [S6] the gate throws a retriable error and passes a compliant program
+  ---
+  duration_ms: 0.837699
+  type: 'test'
+  ...
+# Subtest: [S7] Youth raises no coaching-standard flags: the gates stay silent when nothing is wrong
+ok 386 - [S7] Youth raises no coaching-standard flags: the gates stay silent when nothing is wrong
+  ---
+  duration_ms: 1.334501
+  type: 'test'
+  ...
+# Subtest: [S8] the gates reproduce the reviewer findings on the current live artifacts
+ok 387 - [S8] the gates reproduce the reviewer findings on the current live artifacts
+  ---
+  duration_ms: 2.776725
+  type: 'test'
+  ...
+# Subtest: [R1] a day following the athlete's own training day is no longer treated as pristine
+ok 388 - [R1] a day following the athlete's own training day is no longer treated as pristine
+  ---
+  duration_ms: 1.369824
+  type: 'test'
+  ...
+# Subtest: [R2] the brief no longer hands the model a quotable "freshest day" claim
+ok 389 - [R2] the brief no longer hands the model a quotable "freshest day" claim
+  ---
+  duration_ms: 0.485475
+  type: 'test'
+  ...
+# Subtest: [R3] readiness still responds to the schedule rather than to fixed weekdays
+ok 390 - [R3] readiness still responds to the schedule rather than to fixed weekdays
+  ---
+  duration_ms: 0.245983
+  type: 'test'
+  ...
+# Subtest: [R4] a "repeat this load" note cannot survive a load increase
+ok 391 - [R4] a "repeat this load" note cannot survive a load increase
+  ---
+  duration_ms: 1.735529
+  type: 'test'
+  ...
+# Subtest: [R5] a claimed reduction cannot survive an unchanged prescription
+ok 392 - [R5] a claimed reduction cannot survive an unchanged prescription
+  ---
+  duration_ms: 1.147227
+  type: 'test'
+  ...
+# Subtest: [R6] "fewer total reps" is checked against the actual rep count
+ok 393 - [R6] "fewer total reps" is checked against the actual rep count
+  ---
+  duration_ms: 0.276699
+  type: 'test'
+  ...
+# Subtest: [R7] a spelled-out attempts-per-set claim must match the numeric reps
+ok 394 - [R7] a spelled-out attempts-per-set claim must match the numeric reps
+  ---
+  duration_ms: 0.725618
+  type: 'test'
+  ...
+# Subtest: [R8] "doubles" cannot describe a single-rep prescription
+ok 395 - [R8] "doubles" cannot describe a single-rep prescription
+  ---
+  duration_ms: 0.247945
+  type: 'test'
+  ...
+# Subtest: [R9] a movement split across a priority set plus back-offs may name its other sets
+ok 396 - [R9] a movement split across a priority set plus back-offs may name its other sets
+  ---
+  duration_ms: 0.243449
+  type: 'test'
+  ...
+# Subtest: [R10] a ramp may not finish at or above the work load
+ok 397 - [R10] a ramp may not finish at or above the work load
+  ---
+  duration_ms: 0.987005
+  type: 'test'
+  ...
+# Subtest: [R11] a correct ramp raises nothing
+ok 398 - [R11] a correct ramp raises nothing
+  ---
+  duration_ms: 0.77896
+  type: 'test'
+  ...
+# Subtest: [R12] the same movement may not have its specific ramp prescribed twice on one day
+ok 399 - [R12] the same movement may not have its specific ramp prescribed twice on one day
+  ---
+  duration_ms: 0.177469
+  type: 'test'
+  ...
+# Subtest: [R13] every contradiction the reviewer found in the v34 artifacts is now detected
+ok 400 - [R13] every contradiction the reviewer found in the v34 artifacts is now detected
+  ---
+  duration_ms: 5.694964
+  type: 'test'
+  ...
+# Subtest: [R14] the checkers stay quiet on prescriptions that genuinely agree
+ok 401 - [R14] the checkers stay quiet on prescriptions that genuinely agree
+  ---
+  duration_ms: 0.358613
+  type: 'test'
+  ...
+# Subtest: deterministic Youth consolidation retains Week 3 reps while lowering set cost
+ok 402 - deterministic Youth consolidation retains Week 3 reps while lowering set cost
+  ---
+  duration_ms: 11.789244
+  type: 'test'
+  ...
+# Subtest: deterministic Youth consolidation keeps the earned Week 3 band with lower volume
+ok 403 - deterministic Youth consolidation keeps the earned Week 3 band with lower volume
+  ---
+  duration_ms: 1.743941
+  type: 'test'
+  ...
+# Subtest: volume-only handstand reset is repaired with explicit Week 3 quality retention, not extra attempts
+ok 404 - volume-only handstand reset is repaired with explicit Week 3 quality retention, not extra attempts
+  ---
+  duration_ms: 1.588115
+  type: 'test'
+  ...
+# Subtest: ambiguous duplicate Week 3 rows are not guessed at and remain fail-closed
+ok 405 - ambiguous duplicate Week 3 rows are not guessed at and remain fail-closed
+  ---
+  duration_ms: 0.796777
+  type: 'test'
+  ...
+# Subtest: shared production bundle wires Youth Week 4 consolidation before semantic validation
+ok 406 - shared production bundle wires Youth Week 4 consolidation before semantic validation
+  ---
+  duration_ms: 0.307376
+  type: 'test'
+  ...
+# Subtest: Youth acquisition normalizer restores missing bar-specific direct work and wall-supported handstand capacity
+ok 407 - Youth acquisition normalizer restores missing bar-specific direct work and wall-supported handstand capacity
+  ---
+  duration_ms: 16.457694
+  type: 'test'
+  ...
+# Subtest: Youth acquisition normalizer is idempotent once the required floor exists
+ok 408 - Youth acquisition normalizer is idempotent once the required floor exists
+  ---
+  duration_ms: 7.392715
+  type: 'test'
+  ...
+# Subtest: Youth live convergence patch locks ring vocabulary and live repair contracts
+ok 409 - Youth live convergence patch locks ring vocabulary and live repair contracts
+  ---
+  duration_ms: 0.63343
+  type: 'test'
+  ...
+# Subtest: known 12-rep pull-up max accepts submaximal 3x8 and rejects repeated 3x10
+ok 410 - known 12-rep pull-up max accepts submaximal 3x8 and rejects repeated 3x10
+  ---
+  duration_ms: 5.126053
+  type: 'test'
+  ...
+# Subtest: Notes cannot turn a generic Pull-up into direct bar-muscle-up exposure
+ok 411 - Notes cannot turn a generic Pull-up into direct bar-muscle-up exposure
+  ---
+  duration_ms: 6.892778
+  type: 'test'
+  ...
+# Subtest: session-quality normalizer relabels contradictory transition row and clears direct coverage
+ok 412 - session-quality normalizer relabels contradictory transition row and clears direct coverage
+  ---
+  duration_ms: 3.018672
+  type: 'test'
+  ...
+# Subtest: missing bar transition is inserted in each active Youth acquisition session
+ok 413 - missing bar transition is inserted in each active Youth acquisition session
+  ---
+  duration_ms: 1.561856
+  type: 'test'
+  ...
+# Subtest: duplicate static handstand capacity is removed when an explicit wall hold already exists
+ok 414 - duplicate static handstand capacity is removed when an explicit wall hold already exists
+  ---
+  duration_ms: 1.047977
+  type: 'test'
+  ...
+# Subtest: duplicate mislabeled and canonical transition rows collapse to one direct skill row
+ok 415 - duplicate mislabeled and canonical transition rows collapse to one direct skill row
+  ---
+  duration_ms: 0.702433
+  type: 'test'
+  ...
+# Subtest: youth handstand and bar muscle-up drills are accepted canonical exercises
+ok 416 - youth handstand and bar muscle-up drills are accepted canonical exercises
+  ---
+  duration_ms: 1.568696
+  type: 'test'
+  ...
+# Subtest: dictionary still blocks genuinely unknown invented youth skill names
+ok 417 - dictionary still blocks genuinely unknown invented youth skill names
+  ---
+  duration_ms: 0.536813
+  type: 'test'
+  ...
+# Subtest: deterministic youth skill-order repair changes order only and clears freshness failure
+ok 418 - deterministic youth skill-order repair changes order only and clears freshness failure
+  ---
+  duration_ms: 13.04138
+  type: 'test'
+  ...
+# Subtest: Youth acquisition normalizer creates safe visible Weeks 1-3 progression and Week 4 consolidation
+ok 419 - Youth acquisition normalizer creates safe visible Weeks 1-3 progression and Week 4 consolidation
+  ---
+  duration_ms: 10.962542
+  type: 'test'
+  ...
+# Subtest: Youth visible progression normalization is idempotent
+ok 420 - Youth visible progression normalization is idempotent
+  ---
+  duration_ms: 0.523012
+  type: 'test'
+  ...
+1..420
+# tests 420
+# suites 0
+# pass 391
+# fail 29
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 1908.872661
