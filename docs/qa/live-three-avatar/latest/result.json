@@ -1,12 +1,12 @@
 {
-  "timestamp": "2026-08-19T20:42:30.731Z",
+  "timestamp": "2026-08-20T06:16:16.544Z",
   "base": "https://raz-coaching-platform.onrender.com",
-  "head_sha": "924dbfa49d285d97bdb09216dedb981d3cfcf606",
-  "runtime": "launch-acceptance-v34-hybrid-architecture-live1-20260820",
+  "head_sha": "c1b66e8390fa45fc91cf2fa03f3fba5d7bcc17cf",
+  "runtime": "launch-acceptance-v35-coaching-standards-live2-20260820",
   "results": [
     {
       "id": "advanced_hybrid",
-      "job_id": "59e76dc7ff847556519c2c53036fa073",
+      "job_id": "292f966ea279e530b11af7f1b3e79fb1",
       "ok": true,
       "status": "done",
       "stage": "finalizing",
@@ -14,12 +14,12 @@
       "detail": "saving program",
       "last_seen_status": "done",
       "error": null,
-      "program_chars": 17097,
-      "seconds": 87
+      "program_chars": 17838,
+      "seconds": 133
     },
     {
       "id": "youth_gymnastics",
-      "job_id": "22e64a42f944eaa4d06879b4d00aed0f",
+      "job_id": "47ca2c79ed6e4eff54af1fe473aa4ae2",
       "ok": true,
       "status": "done",
       "stage": "finalizing",
@@ -27,22 +27,22 @@
       "detail": "saving program",
       "last_seen_status": "done",
       "error": null,
-      "program_chars": 13890,
-      "seconds": 50
+      "program_chars": 14086,
+      "seconds": 92
     },
     {
       "id": "tactical_3k",
-      "job_id": "ed1eceeb350cea14394000d26cb6959f",
-      "ok": true,
-      "status": "done",
-      "stage": "finalizing",
-      "attempt": 0,
-      "detail": "saving program",
-      "last_seen_status": "done",
-      "error": null,
-      "program_chars": 12247,
-      "seconds": 94
+      "job_id": "ed1f2e11619f0fb1cc7124e80b6bfd1c",
+      "ok": false,
+      "status": "error",
+      "stage": "refining",
+      "attempt": 4,
+      "detail": "internal repair: V34_NOTE_PER_SET_MISMATCH",
+      "last_seen_status": "error",
+      "error": "Internal coaching QA could not repair the candidate program after multiple passes. No client-facing program was saved. Please retry the build. QA trace: A1:SPORT_DAY_COUPLING_VIOLATION+TACTICAL_SCHEDULE_ARCHITECTURE_VIOLATION+TACTICAL_GPP_COVERAGE_MISSING+V34_NOTE_PER_SET_MISMATCH+V35_SECONDARY_VOLUME_CREEP -> A2:V34_NOTE_PER_SET_MISMATCH+V35_SECONDARY_VOLUME_CREEP -> A3:V34_NOTE_PER_SET_MISMATCH -> A4:V34_NOTE_PER_SET_MISMATCH. [QA:INTERNAL_QA_REPAIR_EXHAUSTED]",
+      "program_chars": 0,
+      "seconds": 160
     }
   ],
-  "ok": true
+  "ok": false
 }
