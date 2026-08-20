@@ -1,332 +1,102 @@
 V35 PER-SET CORRECTION VERIFICATION
 Outcome: failure
-Checkout: 9ed941c86a2dcf966a7ddee6cea458c85c6fa649
+Checkout: 7f61ff4b1c08262d9f8ba4c20e6e4bae0ccb470b
 
 TAP version 13
-# Subtest: [V34-1] a 2-rep OAP athlete chasing 4 reps gets multi-rep specificity, not only singles
-ok 1 - [V34-1] a 2-rep OAP athlete chasing 4 reps gets multi-rep specificity, not only singles
-  ---
-  duration_ms: 2.838664
-  type: 'test'
-  ...
-# Subtest: [V34-1b] the brief states rep-outcome specificity only when the goal exceeds demonstrated capacity
-ok 2 - [V34-1b] the brief states rep-outcome specificity only when the goal exceeds demonstrated capacity
-  ---
-  duration_ms: 4.132144
-  type: 'test'
-  ...
-# Subtest: [V34-2] hard sport the previous day penalises that gym day for a primary neural exposure
-ok 3 - [V34-2] hard sport the previous day penalises that gym day for a primary neural exposure
-  ---
-  duration_ms: 0.456685
-  type: 'test'
-  ...
-# Subtest: [V34-3] an explicitly low-cost microdose may occupy the least fresh day
-ok 4 - [V34-3] an explicitly low-cost microdose may occupy the least fresh day
-  ---
-  duration_ms: 0.39547
-  type: 'test'
-  ...
-# Subtest: [V34-3b] readiness is derived from the schedule, never from fixed weekdays
-ok 5 - [V34-3b] readiness is derived from the schedule, never from fixed weekdays
-  ---
-  duration_ms: 0.421739
-  type: 'test'
-  ...
-# Subtest: [V34-3c] readiness placement actually reaches the planner and honours hysteresis
-ok 6 - [V34-3c] readiness placement actually reaches the planner and honours hysteresis
-  ---
-  duration_ms: 39.608204
-  type: 'test'
-  ...
-# Subtest: [V34-4] adequate wall capacity requires a reduced-support balance drill
-ok 7 - [V34-4] adequate wall capacity requires a reduced-support balance drill
-  ---
-  duration_ms: 1.107613
-  type: 'test'
-  ...
-# Subtest: [V34-5] a 4 x 2 row cannot claim 4 attempts per set
-ok 8 - [V34-5] a 4 x 2 row cannot claim 4 attempts per set
-  ---
-  duration_ms: 4.811125
-  type: 'test'
-  ...
-# Subtest: [V34-5b] a total-attempt claim must equal sets x reps
-ok 9 - [V34-5b] a total-attempt claim must equal sets x reps
-  ---
-  duration_ms: 1.686808
-  type: 'test'
-  ...
-# Subtest: [V34-6] an RPE-selected row may not reference a load that was never established
-ok 10 - [V34-6] an RPE-selected row may not reference a load that was never established
-  ---
-  duration_ms: 1.886611
-  type: 'test'
-  ...
-# Subtest: [V34-7] an unconditional "add one set" cannot survive an unchanged prescription
-ok 11 - [V34-7] an unconditional "add one set" cannot survive an unchanged prescription
-  ---
-  duration_ms: 0.773308
-  type: 'test'
-  ...
-# Subtest: [V34-7b] the release gate throws a retriable error rather than inventing a fix
-ok 12 - [V34-7b] the release gate throws a retriable error rather than inventing a fix
-  ---
-  duration_ms: 3.127084
-  type: 'test'
-  ...
-# Subtest: [V34-8] session duration counts rests and transitions, not just work
-ok 13 - [V34-8] session duration counts rests and transitions, not just work
-  ---
-  duration_ms: 1.678602
-  type: 'test'
-  ...
-# Subtest: [V34-9] weekly running accounting includes interval reps and warm-up/cooldown
-ok 14 - [V34-9] weekly running accounting includes interval reps and warm-up/cooldown
-  ---
-  duration_ms: 1.223911
-  type: 'test'
-  ...
-# Subtest: [V34-9b] a plan inside the tolerated baseline raises no volume signal
-ok 15 - [V34-9b] a plan inside the tolerated baseline raises no volume signal
-  ---
-  duration_ms: 0.270246
-  type: 'test'
-  ...
-# Subtest: [V34-10] symptom response targets the provocative or newest stressor, not always easy running
-ok 16 - [V34-10] symptom response targets the provocative or newest stressor, not always easy running
-  ---
-  duration_ms: 0.38485
-  type: 'test'
-  ...
-# Subtest: [V34-11] maintenance defaults to hold across build weeks
-ok 17 - [V34-11] maintenance defaults to hold across build weeks
-  ---
-  duration_ms: 0.226604
-  type: 'test'
-  ...
-# Subtest: [V34-12] excessive secondary pulling is flagged against an endurance primary
-ok 18 - [V34-12] excessive secondary pulling is flagged against an endurance primary
-  ---
-  duration_ms: 0.417982
-  type: 'test'
-  ...
-# Subtest: [V34-13] heavily concurrent athletes get an intra-session stop rule
-ok 19 - [V34-13] heavily concurrent athletes get an intra-session stop rule
-  ---
-  duration_ms: 0.428301
-  type: 'test'
-  ...
-# Subtest: [V34-14] the load-reference rule raises no false positives on the accepted artifacts
-not ok 20 - [V34-14] the load-reference rule raises no false positives on the accepted artifacts
-  ---
-  duration_ms: 3.932831
-  type: 'test'
-  location: '/home/runner/work/raz-coaching-platform/raz-coaching-platform/phase14/test/v34_coaching_architecture.test.js:249:1'
-  failureType: 'testCodeFailure'
-  error: "ENOENT: no such file or directory, open '/home/runner/work/raz-coaching-platform/raz-coaching-platform/docs/qa/live-three-avatar/latest/tactical_3k-program.txt'"
-  code: 'ENOENT'
-  stack: |-
-    Object.readFileSync (node:fs:440:20)
-    readLive (file:///home/runner/work/raz-coaching-platform/raz-coaching-platform/phase14/test/v34_coaching_architecture.test.js:13:28)
-    TestContext.<anonymous> (file:///home/runner/work/raz-coaching-platform/raz-coaching-platform/phase14/test/v34_coaching_architecture.test.js:259:64)
-    Test.runInAsyncScope (node:async_hooks:214:14)
-    Test.run (node:internal/test_runner/test:1047:25)
-    Test.processPendingSubtests (node:internal/test_runner/test:744:18)
-    Test.postRun (node:internal/test_runner/test:1173:19)
-    Test.run (node:internal/test_runner/test:1101:12)
-    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
-  ...
-# Subtest: [V34-15] accounting runs cleanly on all three accepted artifacts
-not ok 21 - [V34-15] accounting runs cleanly on all three accepted artifacts
-  ---
-  duration_ms: 2.717116
-  type: 'test'
-  location: '/home/runner/work/raz-coaching-platform/raz-coaching-platform/phase14/test/v34_coaching_architecture.test.js:268:1'
-  failureType: 'testCodeFailure'
-  error: "ENOENT: no such file or directory, open '/home/runner/work/raz-coaching-platform/raz-coaching-platform/docs/qa/live-three-avatar/latest/tactical_3k-program.txt'"
-  code: 'ENOENT'
-  stack: |-
-    Object.readFileSync (node:fs:440:20)
-    readLive (file:///home/runner/work/raz-coaching-platform/raz-coaching-platform/phase14/test/v34_coaching_architecture.test.js:13:28)
-    TestContext.<anonymous> (file:///home/runner/work/raz-coaching-platform/raz-coaching-platform/phase14/test/v34_coaching_architecture.test.js:270:21)
-    Test.runInAsyncScope (node:async_hooks:214:14)
-    Test.run (node:internal/test_runner/test:1047:25)
-    Test.processPendingSubtests (node:internal/test_runner/test:744:18)
-    Test.postRun (node:internal/test_runner/test:1173:19)
-    Test.run (node:internal/test_runner/test:1101:12)
-    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
-  ...
-# Subtest: [V34-15b] the brief is empty for an intake with none of the triggering facts
-ok 22 - [V34-15b] the brief is empty for an intake with none of the triggering facts
-  ---
-  duration_ms: 0.211667
-  type: 'test'
-  ...
-# Subtest: [S1] a "long run builds" claim must be visible in the prescribed distances
-ok 23 - [S1] a "long run builds" claim must be visible in the prescribed distances
-  ---
-  duration_ms: 5.908079
-  type: 'test'
-  ...
-# Subtest: [S2] two competing symptom-response hierarchies are rejected
-ok 24 - [S2] two competing symptom-response hierarchies are rejected
-  ---
-  duration_ms: 1.108865
-  type: 'test'
-  ...
-# Subtest: [S3] accessory volume may not rise in the same week the primary quality advances
-ok 25 - [S3] accessory volume may not rise in the same week the primary quality advances
-  ---
-  duration_ms: 1.98217
-  type: 'test'
-  ...
-# Subtest: [S3b] accessory volume may rise in a week the primary does not advance
-ok 26 - [S3b] accessory volume may rise in a week the primary does not advance
-  ---
-  duration_ms: 0.362679
-  type: 'test'
-  ...
-# Subtest: [S4] a block may not be called race-specific when its quality never nears event demand
-ok 27 - [S4] a block may not be called race-specific when its quality never nears event demand
-  ---
-  duration_ms: 1.483847
-  type: 'test'
-  ...
-# Subtest: [S5] a stated baseline anchor must match the computed weekly volume
-ok 28 - [S5] a stated baseline anchor must match the computed weekly volume
-  ---
-  duration_ms: 3.84702
-  type: 'test'
-  ...
-# Subtest: [S6] the gate throws a retriable error and passes a compliant program
-ok 29 - [S6] the gate throws a retriable error and passes a compliant program
-  ---
-  duration_ms: 2.494459
-  type: 'test'
-  ...
-# Subtest: [S7] Youth raises no coaching-standard flags: the gates stay silent when nothing is wrong
-ok 30 - [S7] Youth raises no coaching-standard flags: the gates stay silent when nothing is wrong
-  ---
-  duration_ms: 2.197483
-  type: 'test'
-  ...
-# Subtest: [S8] the gates reproduce the reviewer findings on the current live artifacts
-not ok 31 - [S8] the gates reproduce the reviewer findings on the current live artifacts
-  ---
-  duration_ms: 2.668545
-  type: 'test'
-  location: '/home/runner/work/raz-coaching-platform/raz-coaching-platform/phase14/test/v35_coaching_standards.test.js:152:1'
-  failureType: 'testCodeFailure'
-  error: 'Hybrid summary claims the long run builds while it is held'
-  code: 'ERR_ASSERTION'
-  name: 'AssertionError'
-  expected: true
-  actual: false
-  operator: '=='
-  stack: |-
-    TestContext.<anonymous> (file:///home/runner/work/raz-coaching-platform/raz-coaching-platform/phase14/test/v35_coaching_standards.test.js:155:10)
-    Test.runInAsyncScope (node:async_hooks:214:14)
-    Test.run (node:internal/test_runner/test:1047:25)
-    Test.processPendingSubtests (node:internal/test_runner/test:744:18)
-    Test.postRun (node:internal/test_runner/test:1173:19)
-    Test.run (node:internal/test_runner/test:1101:12)
-    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
-  ...
 # Subtest: [V35-PS1] numeric attempts-per-set mismatch is repaired from the final Reps field
-ok 32 - [V35-PS1] numeric attempts-per-set mismatch is repaired from the final Reps field
+ok 1 - [V35-PS1] numeric attempts-per-set mismatch is repaired from the final Reps field
   ---
-  duration_ms: 7.916238
+  duration_ms: 7.227259
   type: 'test'
   ...
 # Subtest: [V35-PS2] spelled-out attempts-per-set mismatch is repaired deterministically
-ok 33 - [V35-PS2] spelled-out attempts-per-set mismatch is repaired deterministically
+ok 2 - [V35-PS2] spelled-out attempts-per-set mismatch is repaired deterministically
   ---
-  duration_ms: 1.264507
+  duration_ms: 1.205146
   type: 'test'
   ...
 # Subtest: [V35-PS3] already-consistent per-set language is preserved and the repair is idempotent
-ok 34 - [V35-PS3] already-consistent per-set language is preserved and the repair is idempotent
+ok 3 - [V35-PS3] already-consistent per-set language is preserved and the repair is idempotent
   ---
-  duration_ms: 0.272169
+  duration_ms: 0.275125
   type: 'test'
   ...
 # Subtest: [R1] a day following the athlete's own training day is no longer treated as pristine
-ok 35 - [R1] a day following the athlete's own training day is no longer treated as pristine
+ok 4 - [R1] a day following the athlete's own training day is no longer treated as pristine
   ---
-  duration_ms: 2.362282
+  duration_ms: 1.778639
   type: 'test'
   ...
 # Subtest: [R2] the brief no longer hands the model a quotable "freshest day" claim
-ok 36 - [R2] the brief no longer hands the model a quotable "freshest day" claim
+ok 5 - [R2] the brief no longer hands the model a quotable "freshest day" claim
   ---
-  duration_ms: 0.794908
+  duration_ms: 0.604471
   type: 'test'
   ...
 # Subtest: [R3] readiness still responds to the schedule rather than to fixed weekdays
-ok 37 - [R3] readiness still responds to the schedule rather than to fixed weekdays
+ok 6 - [R3] readiness still responds to the schedule rather than to fixed weekdays
   ---
-  duration_ms: 0.384299
+  duration_ms: 0.318326
   type: 'test'
   ...
 # Subtest: [R4] a "repeat this load" note cannot survive a load increase
-ok 38 - [R4] a "repeat this load" note cannot survive a load increase
+ok 7 - [R4] a "repeat this load" note cannot survive a load increase
   ---
-  duration_ms: 3.238823
+  duration_ms: 2.368153
   type: 'test'
   ...
 # Subtest: [R5] a claimed reduction cannot survive an unchanged prescription
-ok 39 - [R5] a claimed reduction cannot survive an unchanged prescription
+ok 8 - [R5] a claimed reduction cannot survive an unchanged prescription
   ---
-  duration_ms: 2.587543
+  duration_ms: 1.755657
   type: 'test'
   ...
 # Subtest: [R6] "fewer total reps" is checked against the actual rep count
-ok 40 - [R6] "fewer total reps" is checked against the actual rep count
+ok 9 - [R6] "fewer total reps" is checked against the actual rep count
   ---
-  duration_ms: 0.331611
+  duration_ms: 0.32057
   type: 'test'
   ...
 # Subtest: [R7] a spelled-out attempts-per-set claim must match the numeric reps
-ok 41 - [R7] a spelled-out attempts-per-set claim must match the numeric reps
+ok 10 - [R7] a spelled-out attempts-per-set claim must match the numeric reps
   ---
-  duration_ms: 1.232616
+  duration_ms: 0.965517
   type: 'test'
   ...
 # Subtest: [R8] "doubles" cannot describe a single-rep prescription
-ok 42 - [R8] "doubles" cannot describe a single-rep prescription
+ok 11 - [R8] "doubles" cannot describe a single-rep prescription
   ---
-  duration_ms: 0.447458
+  duration_ms: 0.321512
   type: 'test'
   ...
 # Subtest: [R9] a movement split across a priority set plus back-offs may name its other sets
-ok 43 - [R9] a movement split across a priority set plus back-offs may name its other sets
+ok 12 - [R9] a movement split across a priority set plus back-offs may name its other sets
   ---
-  duration_ms: 0.568153
+  duration_ms: 0.45948
   type: 'test'
   ...
 # Subtest: [R10] a ramp may not finish at or above the work load
-ok 44 - [R10] a ramp may not finish at or above the work load
+ok 13 - [R10] a ramp may not finish at or above the work load
   ---
-  duration_ms: 1.430608
+  duration_ms: 1.22855
   type: 'test'
   ...
 # Subtest: [R11] a correct ramp raises nothing
-ok 45 - [R11] a correct ramp raises nothing
+ok 14 - [R11] a correct ramp raises nothing
   ---
-  duration_ms: 0.376114
+  duration_ms: 1.030599
   type: 'test'
   ...
 # Subtest: [R12] the same movement may not have its specific ramp prescribed twice on one day
-ok 46 - [R12] the same movement may not have its specific ramp prescribed twice on one day
+ok 15 - [R12] the same movement may not have its specific ramp prescribed twice on one day
   ---
-  duration_ms: 0.351968
+  duration_ms: 0.311032
   type: 'test'
   ...
 # Subtest: [R13] every contradiction the reviewer found in the v34 artifacts is now detected
-not ok 47 - [R13] every contradiction the reviewer found in the v34 artifacts is now detected
+not ok 16 - [R13] every contradiction the reviewer found in the v34 artifacts is now detected
   ---
-  duration_ms: 9.928174
+  duration_ms: 7.178468
   type: 'test'
   location: '/home/runner/work/raz-coaching-platform/raz-coaching-platform/phase14/test/v35_review_regressions.test.js:150:1'
   failureType: 'testCodeFailure'
@@ -344,17 +114,17 @@ not ok 47 - [R13] every contradiction the reviewer found in the v34 artifacts is
     async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
   ...
 # Subtest: [R14] the checkers stay quiet on prescriptions that genuinely agree
-ok 48 - [R14] the checkers stay quiet on prescriptions that genuinely agree
+ok 17 - [R14] the checkers stay quiet on prescriptions that genuinely agree
   ---
-  duration_ms: 0.565599
+  duration_ms: 0.35256
   type: 'test'
   ...
-1..48
-# tests 48
+1..17
+# tests 17
 # suites 0
-# pass 44
-# fail 4
+# pass 16
+# fail 1
 # cancelled 0
 # skipped 0
 # todo 0
-# duration_ms 196.694138
+# duration_ms 107.59713
