@@ -1,0 +1,63 @@
+name: Verify v35 per-set correction result
+
+on:
+  push:
+    branches:
+      - v35-per-set-verify
+    paths:
+      - '.github/workflows/verify-v35-per-set-result.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: v35-per-set-verify
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: phase14/package-lock.json
+      - name: Install dependencies
+        working-directory: phase14
+        run: npm ci
+      - name: Run focused verification
+        id: tests
+        continue-on-error: true
+        working-directory: phase14
+        shell: bash
+        run: |
+          set -o pipefail
+          {
+            node --check engine/final_note_coherence.js
+            node --test \
+              test/v35_per_set_note_repair.test.js \
+              test/v34_coaching_architecture.test.js \
+              test/v35_coaching_standards.test.js \
+              test/v35_review_regressions.test.js
+          } 2>&1 | tee /tmp/v35-per-set-tests.log
+      - name: Publish verification result
+        if: always()
+        shell: bash
+        run: |
+          {
+            echo "V35 PER-SET CORRECTION VERIFICATION"
+            echo "Outcome: ${{ steps.tests.outcome }}"
+            echo "Checkout: $GITHUB_SHA"
+            echo
+            cat /tmp/v35-per-set-tests.log 2>/dev/null || true
+          } > .github/v35-per-set-correction-result.txt
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add .github/v35-per-set-correction-result.txt
+          git commit -m "Record v35 per-set verification [skip ci]" || exit 0
+          git push origin HEAD:v35-per-set-verify
+      - name: Fail if tests failed
+        if: steps.tests.outcome != 'success'
+        run: exit 1
