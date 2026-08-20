@@ -3,7 +3,7 @@ name: Apply V35 coaching standards
 on:
   push:
     branches:
-      - v35-coaching-standards-apply
+      - privacy-security-hardening
     paths:
       - '.github/v35-patch/**'
       - '.github/workflows/apply-v35-coaching-standards.yml'
@@ -16,10 +16,10 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
-      - name: Checkout staging branch
+      - name: Checkout production branch
         uses: actions/checkout@v4
         with:
-          ref: v35-coaching-standards-apply
+          ref: privacy-security-hardening
           fetch-depth: 0
 
       - name: Reconstruct and verify uploaded V35 patch
@@ -120,7 +120,7 @@ jobs:
               phase14/test/v35_review_regressions.test.js
             git diff --cached --check
             git commit -m 'Apply v35 coaching standards'
-            git push --force-with-lease origin HEAD:v35-coaching-standards-apply
+            git push --force-with-lease origin HEAD:privacy-security-hardening
           } 2>&1 | tee /tmp/v35-last.log
 
       - name: Record failure diagnostics
@@ -143,4 +143,4 @@ jobs:
           } > .github/v35-apply-result.txt
           git add .github/v35-apply-result.txt
           git commit -m 'Record V35 apply failure [skip ci]'
-          git push origin HEAD:v35-coaching-standards-apply
+          git push origin HEAD:privacy-security-hardening
