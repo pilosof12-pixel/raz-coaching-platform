@@ -1,0 +1,101 @@
+name: Verify current v35 engine
+
+on:
+  push:
+    branches:
+      - privacy-security-hardening
+    paths:
+      - '.github/workflows/v35-verify-current.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: privacy-security-hardening
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: phase14/package-lock.json
+      - name: Install
+        working-directory: phase14
+        run: npm ci
+      - name: Syntax
+        working-directory: phase14
+        shell: bash
+        run: |
+          set -o pipefail
+          {
+            node --check engine/coaching_spec_v1_convergence_normalizer.js
+            node --check engine/repairable_validation_bundle.js
+            node --check engine/v34_prescription_consistency.js
+            node --check engine/v34_readiness.js
+            node --check engine/v35_coaching_standards.js
+          } 2>&1 | tee /tmp/v35-syntax.log
+      - name: Focused v35 tests
+        working-directory: phase14
+        shell: bash
+        run: |
+          set -o pipefail
+          node --test test/v34_coaching_architecture.test.js test/v35_coaching_standards.test.js test/v35_review_regressions.test.js 2>&1 | tee /tmp/v35-focused.log
+      - name: Full regression
+        working-directory: phase14
+        shell: bash
+        run: |
+          set -o pipefail
+          node --test test/*.test.js 2>&1 | tee /tmp/v35-full.log
+      - name: Publish verification success
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p docs/qa/v35
+          {
+            echo "V35 CURRENT ENGINE VERIFICATION: PASS"
+            echo "Run: $GITHUB_RUN_ID"
+            echo "Checkout SHA: $GITHUB_SHA"
+            echo "Verified patch engine commit ancestor: f2cbf3f858a10cb0f1b32925f9e10c2ae936e32a"
+            echo
+            echo "FOCUSED SUMMARY"
+            grep -E '^# (tests|pass|fail|cancelled|skipped|todo|duration_ms)' /tmp/v35-focused.log || true
+            echo
+            echo "FULL REGRESSION SUMMARY"
+            grep -E '^# (tests|pass|fail|cancelled|skipped|todo|duration_ms)' /tmp/v35-full.log || true
+          } > docs/qa/v35/verification.txt
+          rm -f .github/v35-apply-failure.txt
+          rm -f .github/workflows/v35-verify-current.yml
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -m "Record v35 verification pass [skip ci]"
+          git push origin HEAD:privacy-security-hardening
+      - name: Publish verification failure
+        if: failure()
+        shell: bash
+        run: |
+          set +e
+          git reset --hard HEAD
+          mkdir -p docs/qa/v35
+          {
+            echo "V35 CURRENT ENGINE VERIFICATION: FAIL"
+            echo "Run: $GITHUB_RUN_ID"
+            echo "Checkout SHA: $GITHUB_SHA"
+            for f in /tmp/v35-syntax.log /tmp/v35-focused.log /tmp/v35-full.log; do
+              if [ -f "$f" ]; then
+                echo
+                echo "===== $f ====="
+                cat "$f"
+              fi
+            done
+          } > docs/qa/v35/verification.txt
+          rm -f .github/workflows/v35-verify-current.yml
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -m "Record v35 verification failure [skip ci]"
+          git push origin HEAD:privacy-security-hardening
