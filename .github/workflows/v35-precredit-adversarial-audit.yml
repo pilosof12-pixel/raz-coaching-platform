@@ -1,0 +1,70 @@
+name: V35 pre-credit adversarial audit
+
+on:
+  push:
+    branches:
+      - v35-precredit-audit
+    paths:
+      - 'phase14/test/v35_precredit_adversarial_audit.test.js'
+      - '.github/workflows/v35-precredit-adversarial-audit.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: v35-precredit-audit
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: phase14/package-lock.json
+      - name: Install dependencies
+        working-directory: phase14
+        run: npm ci
+      - name: Run adversarial quality-floor audit
+        id: audit
+        continue-on-error: true
+        working-directory: phase14
+        shell: bash
+        run: |
+          set -o pipefail
+          node --test test/v35_precredit_adversarial_audit.test.js 2>&1 | tee /tmp/v35-precredit-audit.log
+      - name: Run known cross-week Tactical progression regression slice
+        id: tactical
+        continue-on-error: true
+        working-directory: phase14
+        shell: bash
+        run: |
+          set -o pipefail
+          node --test --test-name-pattern='G2-(1|2|3|4|5|6|7|8|9|14|15|16)' test/coaching_spec_v1_live_convergence.test.js 2>&1 | tee /tmp/v35-tactical-slice.log
+      - name: Publish audit evidence
+        if: always()
+        shell: bash
+        run: |
+          {
+            echo 'V35 PRECREDIT ADVERSARIAL QA AUDIT'
+            echo "Adversarial outcome: ${{ steps.audit.outcome }}"
+            echo "Tactical regression slice outcome: ${{ steps.tactical.outcome }}"
+            echo "Checkout: $GITHUB_SHA"
+            echo
+            echo '===== ADVERSARIAL QUALITY FLOOR ====='
+            cat /tmp/v35-precredit-audit.log 2>/dev/null || true
+            echo
+            echo '===== TACTICAL CROSS-WEEK SLICE ====='
+            cat /tmp/v35-tactical-slice.log 2>/dev/null || true
+          } > .github/v35-precredit-audit-result.txt
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add .github/v35-precredit-audit-result.txt
+          git commit -m 'Record v35 pre-credit QA audit [skip ci]' || exit 0
+          git push origin HEAD:v35-precredit-audit
+      - name: Fail if audit found a gap
+        if: steps.audit.outcome != 'success' || steps.tactical.outcome != 'success'
+        run: exit 1
