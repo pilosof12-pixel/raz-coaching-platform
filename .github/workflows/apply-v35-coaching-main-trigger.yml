@@ -1,0 +1,85 @@
+name: Apply v35 coaching standards from staging
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - '.github/workflows/apply-v35-coaching-main-trigger.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  apply-test-commit:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout staging branch
+        uses: actions/checkout@v4
+        with:
+          ref: v35-coaching-standards-apply
+          fetch-depth: 0
+
+      - name: Reconstruct and verify patch
+        shell: bash
+        run: |
+          set -euo pipefail
+          cat .github/v35-patch/g4*.b64 > /tmp/v35.patch.gz.b64
+          base64 -d /tmp/v35.patch.gz.b64 > /tmp/v35.patch.gz
+          gzip -dc /tmp/v35.patch.gz > /tmp/v35-coaching-standards.patch
+          SHA="$(sha256sum /tmp/v35-coaching-standards.patch | awk '{print $1}')"
+          echo "Patch SHA256: $SHA"
+          test "$SHA" = "1448baa8d0cc6488402b6370f388e01ecda7267282c6038daf20e56cba20970c"
+          git apply --check /tmp/v35-coaching-standards.patch
+
+      - name: Apply v35 patch
+        shell: bash
+        run: |
+          set -euo pipefail
+          git apply --whitespace=nowarn /tmp/v35-coaching-standards.patch
+          git diff --check
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: phase14/package-lock.json
+
+      - name: Install dependencies
+        working-directory: phase14
+        run: npm ci
+
+      - name: Syntax check v35 files
+        working-directory: phase14
+        run: |
+          node --check engine/coaching_spec_v1_convergence_normalizer.js
+          node --check engine/repairable_validation_bundle.js
+          node --check engine/v34_prescription_consistency.js
+          node --check engine/v34_readiness.js
+          node --check engine/v35_coaching_standards.js
+
+      - name: Run focused v35 acceptance tests
+        working-directory: phase14
+        run: |
+          node --test test/v34_coaching_architecture.test.js
+          node --test test/v35_coaching_standards.test.js
+          node --test test/v35_review_regressions.test.js
+
+      - name: Run full regression suite
+        working-directory: phase14
+        run: node --test test/*.test.js
+
+      - name: Commit clean v35 engine to staging
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm -rf .github/v35-patch
+          rm -f .github/workflows/apply-v35-coaching.yml
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git diff --cached --check
+          git commit -m "Apply v35 coaching standards refinement"
+          git push origin HEAD:v35-coaching-standards-apply
