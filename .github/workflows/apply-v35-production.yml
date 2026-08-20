@@ -1,0 +1,127 @@
+name: Apply v35 coaching standards production gate
+
+on:
+  push:
+    branches:
+      - privacy-security-hardening
+    paths:
+      - '.github/workflows/apply-v35-production.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  apply-test-commit:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout production branch
+        uses: actions/checkout@v4
+        with:
+          ref: privacy-security-hardening
+          fetch-depth: 0
+
+      - name: Configure git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+      - name: Reconstruct and verify v35 patch
+        shell: bash
+        run: |
+          set -euo pipefail
+          git fetch origin v35-coaching-standards-apply
+          : > /tmp/v35.patch.gz.b64
+          for n in 00 01 02 03 04 05; do
+            git show origin/v35-coaching-standards-apply:.github/v35-patch/g4${n}.b64 >> /tmp/v35.patch.gz.b64
+          done
+          base64 -d /tmp/v35.patch.gz.b64 > /tmp/v35.patch.gz
+          gzip -dc /tmp/v35.patch.gz > /tmp/v35-coaching-standards.patch
+          SHA="$(sha256sum /tmp/v35-coaching-standards.patch | awk '{print $1}')"
+          echo "Patch SHA256: $SHA" | tee /tmp/v35-apply.log
+          test "$SHA" = "1448baa8d0cc6488402b6370f388e01ecda7267282c6038daf20e56cba20970c"
+          git apply --check /tmp/v35-coaching-standards.patch 2>&1 | tee -a /tmp/v35-apply.log
+
+      - name: Apply patch
+        shell: bash
+        run: |
+          set -euo pipefail
+          git apply --whitespace=nowarn /tmp/v35-coaching-standards.patch
+          git diff --check
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: phase14/package-lock.json
+
+      - name: Install dependencies
+        working-directory: phase14
+        run: npm ci
+
+      - name: Syntax check v35 files
+        working-directory: phase14
+        shell: bash
+        run: |
+          set -o pipefail
+          {
+            node --check engine/coaching_spec_v1_convergence_normalizer.js
+            node --check engine/repairable_validation_bundle.js
+            node --check engine/v34_prescription_consistency.js
+            node --check engine/v34_readiness.js
+            node --check engine/v35_coaching_standards.js
+          } 2>&1 | tee /tmp/v35-syntax.log
+
+      - name: Run focused v35 acceptance tests
+        working-directory: phase14
+        shell: bash
+        run: |
+          set -o pipefail
+          node --test \
+            test/v34_coaching_architecture.test.js \
+            test/v35_coaching_standards.test.js \
+            test/v35_review_regressions.test.js \
+            2>&1 | tee /tmp/v35-focused.log
+
+      - name: Run full regression suite
+        working-directory: phase14
+        shell: bash
+        run: |
+          set -o pipefail
+          node --test test/*.test.js 2>&1 | tee /tmp/v35-full.log
+
+      - name: Commit clean v35 engine
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm -f .github/workflows/apply-v35-production.yml
+          rm -f .github/v35-apply-failure.txt
+          git add -A
+          git diff --cached --check
+          git commit -m "Apply v35 coaching standards refinement"
+          git push origin HEAD:privacy-security-hardening
+
+      - name: Record failure evidence
+        if: failure()
+        shell: bash
+        run: |
+          set +e
+          git reset --hard HEAD
+          rm -f .github/workflows/apply-v35-production.yml
+          {
+            echo "V35 production apply failed"
+            echo "Run: $GITHUB_RUN_ID"
+            echo "SHA: $GITHUB_SHA"
+            echo
+            for f in /tmp/v35-apply.log /tmp/v35-syntax.log /tmp/v35-focused.log /tmp/v35-full.log; do
+              if [ -f "$f" ]; then
+                echo "===== $f ====="
+                cat "$f"
+                echo
+              fi
+            done
+          } > .github/v35-apply-failure.txt
+          git add -A
+          git commit -m "Record v35 apply failure [skip ci]"
+          git push origin HEAD:privacy-security-hardening
