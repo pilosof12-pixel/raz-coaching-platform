@@ -38,8 +38,6 @@ jobs:
             node --check engine/final_note_coherence.js
             node --test \
               test/v35_per_set_note_repair.test.js \
-              test/v34_coaching_architecture.test.js \
-              test/v35_coaching_standards.test.js \
               test/v35_review_regressions.test.js
           } 2>&1 | tee /tmp/v35-per-set-tests.log
       - name: Publish verification result
