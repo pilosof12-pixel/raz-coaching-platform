@@ -6,6 +6,13 @@ on:
       - main
     paths:
       - '.github/workflows/apply-v35-coaching-main-trigger.yml'
+  pull_request:
+    branches:
+      - main
+    paths:
+      - '.github/v35-patch/**'
+      - '.github/workflows/apply-v35-coaching.yml'
+      - 'phase14/**'
   workflow_dispatch:
 
 permissions:
@@ -72,6 +79,7 @@ jobs:
         run: node --test test/*.test.js
 
       - name: Commit clean v35 engine to staging
+        if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository
         shell: bash
         run: |
           set -euo pipefail
