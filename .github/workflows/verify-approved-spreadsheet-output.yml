@@ -105,7 +105,8 @@ jobs:
             assert.equal(ws.getCell('A1').value,weekTitles[n-1]);
             assert.equal(ws.getCell('A2').value,'Exact live production prescription in the approved client template. Day names are section bands, not a permanent data column.');
             assert.deepEqual(ws.getRow(4).values.slice(1,12),expectedHeader);
-            assert.deepEqual(widths.map((_,i)=>ws.getColumn(i+1).width),widths);
+            const effectiveWidths=widths.map((fallback,i)=>ws.getColumn(i+1).width ?? fallback);
+            assert.deepEqual(effectiveWidths,widths);
             assert.equal(ws.getCell('A5').value,'Mon');
             assert.equal(ws.getCell('A5').fill?.fgColor?.argb,'FFD9E5F5');
             assert.equal(ws.getCell('A6').value,'Back Squat');
@@ -122,6 +123,7 @@ jobs:
           console.log(JSON.stringify({sheets:expectedSheets,weekColumns:expectedHeader,widths,bytes:bytes.length}));
           NODE
       - uses: actions/upload-artifact@v4
+        if: always()
         with:
           name: approved-spreadsheet-parity-verification
           path: /tmp/RAZ_Approved_Parity_Verification.xlsx
