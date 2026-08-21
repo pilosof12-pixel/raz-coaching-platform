@@ -11,6 +11,9 @@ on:
       - 'phase14/engine/coaching_spec_v1_quality.js'
       - 'phase14/test/v35_precredit_adversarial_audit.test.js'
       - '.github/workflows/run-v35-precredit-fixes.yml'
+  pull_request:
+    branches:
+      - privacy-security-hardening
   workflow_dispatch:
 
 jobs:
