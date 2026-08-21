@@ -1,47 +1,47 @@
 {
-  "timestamp": "2026-08-20T07:12:05.921Z",
+  "timestamp": "2026-08-21T12:51:00.456Z",
   "base": "https://raz-coaching-platform.onrender.com",
-  "head_sha": "422a6a6d43cb5315b54bd55eb74132bca131f33f",
-  "runtime": "launch-acceptance-v35-coaching-standards-live3-20260820",
+  "head_sha": "fd8d4b3ffc6dd5c96cf40c6d42d5c87424588ca2",
+  "runtime": "launch-acceptance-v35-coaching-standards-live4-20260821",
   "results": [
     {
       "id": "advanced_hybrid",
-      "job_id": "20070a9496efae2696a1baa19051f4b8",
+      "job_id": "add0b617aca67a455416d615d1e346dd",
       "ok": false,
       "status": "error",
       "stage": "generating",
       "attempt": 1,
       "detail": "initial generation",
       "last_seen_status": "error",
-      "error": "You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/.",
+      "error": "This operation was aborted [QA:20]",
       "program_chars": 0,
-      "seconds": 4
+      "seconds": 181
     },
     {
       "id": "youth_gymnastics",
-      "job_id": "0333afcd13e1b900e8a525e148ceef89",
+      "job_id": "5b37224cfc1fe3cdfd7bc94e60fee5c2",
       "ok": false,
       "status": "error",
       "stage": "generating",
       "attempt": 1,
       "detail": "initial generation",
       "last_seen_status": "error",
-      "error": "You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/.",
+      "error": "This operation was aborted [QA:20]",
       "program_chars": 0,
-      "seconds": 4
+      "seconds": 181
     },
     {
       "id": "tactical_3k",
-      "job_id": "5af7d9a579b2ab542e3a154ec133ee38",
+      "job_id": "024a1dcb6693a8799fc9ac17f10a2a01",
       "ok": false,
       "status": "error",
       "stage": "generating",
       "attempt": 1,
       "detail": "initial generation",
       "last_seen_status": "error",
-      "error": "You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/.",
+      "error": "This operation was aborted [QA:20]",
       "program_chars": 0,
-      "seconds": 4
+      "seconds": 181
     }
   ],
   "ok": false
