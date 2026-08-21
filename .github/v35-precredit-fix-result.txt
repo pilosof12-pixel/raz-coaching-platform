@@ -1,0 +1,287 @@
+V35 PRECREDIT FIX VERIFICATION
+Patch: success
+Install: success
+Syntax: success
+Adversarial: success
+Per-set: success
+Tactical: success
+Contradiction: success
+Checkout: 66dd1dd197b44fed70344c1264b62cabac6335b5
+
+===== patch =====
+
+===== install =====
+npm warn deprecated prebuild-install@7.1.3: No longer maintained. Please contact the author of the relevant native addon; alternatives are available.
+npm warn deprecated uuid@9.0.1: uuid@10 and below is no longer supported.  For ESM codebases, update to uuid@latest.  For CommonJS codebases, use uuid@11 (but be aware this version will likely be deprecated in 2028).
+
+added 145 packages, and audited 146 packages in 2s
+
+26 packages are looking for funding
+  run `npm fund` for details
+
+3 vulnerabilities (1 low, 2 moderate)
+
+To address all issues, run:
+  npm audit fix
+
+Run `npm audit` for details.
+
+===== syntax =====
+
+===== adversarial =====
+TAP version 13
+# Subtest: [AUDIT-1] quantitative ceiling language cannot exceed sets x reps
+ok 1 - [AUDIT-1] quantitative ceiling language cannot exceed sets x reps
+  ---
+  duration_ms: 6.566292
+  type: 'test'
+  ...
+# Subtest: [AUDIT-2] progression claims in load/target text must agree with week-over-week dose
+ok 2 - [AUDIT-2] progression claims in load/target text must agree with week-over-week dose
+  ---
+  duration_ms: 0.606383
+  type: 'test'
+  ...
+# Subtest: [AUDIT-3] high-concurrency primary heavy day is protected from two-day long-run/gym stack
+ok 3 - [AUDIT-3] high-concurrency primary heavy day is protected from two-day long-run/gym stack
+  ---
+  duration_ms: 9.083266
+  type: 'test'
+  ...
+# Subtest: [AUDIT-4] static 3K quality block is rejected even when narrative is honest
+ok 4 - [AUDIT-4] static 3K quality block is rejected even when narrative is honest
+  ---
+  duration_ms: 4.417206
+  type: 'test'
+  ...
+1..4
+# tests 4
+# suites 0
+# pass 4
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 100.704136
+
+===== perset =====
+TAP version 13
+# Subtest: [V35-PS1] numeric attempts-per-set mismatch is repaired from the final Reps field
+ok 1 - [V35-PS1] numeric attempts-per-set mismatch is repaired from the final Reps field
+  ---
+  duration_ms: 7.543178
+  type: 'test'
+  ...
+# Subtest: [V35-PS2] spelled-out attempts-per-set mismatch is repaired deterministically
+ok 2 - [V35-PS2] spelled-out attempts-per-set mismatch is repaired deterministically
+  ---
+  duration_ms: 1.231782
+  type: 'test'
+  ...
+# Subtest: [V35-PS3] already-consistent per-set language is preserved and the repair is idempotent
+ok 3 - [V35-PS3] already-consistent per-set language is preserved and the repair is idempotent
+  ---
+  duration_ms: 0.288209
+  type: 'test'
+  ...
+1..3
+# tests 3
+# suites 0
+# pass 3
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 67.135478
+
+===== tactical =====
+TAP version 13
+# Subtest: live Tactical special-operations-style context no longer bypasses T3K-02
+ok 1 - live Tactical special-operations-style context no longer bypasses T3K-02
+  ---
+  duration_ms: 10.951929
+  type: 'test'
+  ...
+# Subtest: [G2-1] an identical 600 m session repeated for four weeks is rejected as static
+ok 2 - [G2-1] an identical 600 m session repeated for four weeks is rejected as static
+  ---
+  duration_ms: 2.528395
+  type: 'test'
+  ...
+# Subtest: [G2-2] the same dose with escalating wording in the notes is still rejected
+ok 3 - [G2-2] the same dose with escalating wording in the notes is still rejected
+  ---
+  duration_ms: 1.244455
+  type: 'test'
+  ...
+# Subtest: [G2-3] a trivial rest-only tweak is not accepted as event progression
+ok 4 - [G2-3] a trivial rest-only tweak is not accepted as event progression
+  ---
+  duration_ms: 1.146663
+  type: 'test'
+  ...
+# Subtest: [G2-4] the live v30k build-extend-taper shape passes
+ok 5 - [G2-4] the live v30k build-extend-taper shape passes
+  ---
+  duration_ms: 0.97352
+  type: 'test'
+  ...
+# Subtest: [G2-5] one plateau week followed by real progression and a taper passes
+ok 6 - [G2-5] one plateau week followed by real progression and a taper passes
+  ---
+  duration_ms: 1.250858
+  type: 'test'
+  ...
+# Subtest: [G2-6] a Week 4 taper that reduces volume at maintained pace is not flagged as regression
+ok 7 - [G2-6] a Week 4 taper that reduces volume at maintained pace is not flagged as regression
+  ---
+  duration_ms: 0.643712
+  type: 'test'
+  ...
+# Subtest: [G2-7] progression carried by session density alone passes
+ok 8 - [G2-7] progression carried by session density alone passes
+  ---
+  duration_ms: 0.665143
+  type: 'test'
+  ...
+# Subtest: [G2-8] random oscillation with no defensible direction is rejected
+ok 9 - [G2-8] random oscillation with no defensible direction is rejected
+  ---
+  duration_ms: 1.060342
+  type: 'test'
+  ...
+# Subtest: [G2-9] an intermediate week collapsing below baseline is rejected as incoherent even when a later week develops
+ok 10 - [G2-9] an intermediate week collapsing below baseline is rejected as incoherent even when a later week develops
+  ---
+  duration_ms: 0.90437
+  type: 'test'
+  ...
+# Subtest: [G2-10] fewer than three weeks of key sessions is treated as insufficient evidence, not a violation
+ok 11 - [G2-10] fewer than three weeks of key sessions is treated as insufficient evidence, not a violation
+  ---
+  duration_ms: 0.565607
+  type: 'test'
+  ...
+# Subtest: [G2-11] the new cross-week rule never fires for a non-Tactical intake
+ok 12 - [G2-11] the new cross-week rule never fires for a non-Tactical intake
+  ---
+  duration_ms: 0.152515
+  type: 'test'
+  ...
+# Subtest: [G2-12] the deterministic generic-run repair produces a block that satisfies the new cross-week rule
+ok 13 - [G2-12] the deterministic generic-run repair produces a block that satisfies the new cross-week rule
+  ---
+  duration_ms: 11.200674
+  type: 'test'
+  ...
+# Subtest: [G2-13] Advanced Hybrid and Youth convergence outputs are unaffected by this pass
+ok 14 - [G2-13] Advanced Hybrid and Youth convergence outputs are unaffected by this pass
+  ---
+  duration_ms: 3.380818
+  type: 'test'
+  ...
+# Subtest: [G2-14] a Week 2 spike that reverts to the Week 1 baseline for the rest of the block is rejected
+ok 15 - [G2-14] a Week 2 spike that reverts to the Week 1 baseline for the rest of the block is rejected
+  ---
+  duration_ms: 0.658441
+  type: 'test'
+  ...
+# Subtest: [G2-15] a single large isolated spike is not sufficient on its own
+ok 16 - [G2-15] a single large isolated spike is not sufficient on its own
+  ---
+  duration_ms: 0.649694
+  type: 'test'
+  ...
+# Subtest: [G2-16] volume build carried into a distance extension and then tapered passes
+ok 17 - [G2-16] volume build carried into a distance extension and then tapered passes
+  ---
+  duration_ms: 0.622033
+  type: 'test'
+  ...
+# Subtest: [G2-17] a gain transformed into a different progression dimension before the taper passes
+ok 18 - [G2-17] a gain transformed into a different progression dimension before the taper passes
+  ---
+  duration_ms: 0.886297
+  type: 'test'
+  ...
+1..18
+# tests 18
+# suites 0
+# pass 18
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 140.137657
+
+===== contradiction =====
+TAP version 13
+# Subtest: [R4] a "repeat this load" note cannot survive a load increase
+ok 1 - [R4] a "repeat this load" note cannot survive a load increase
+  ---
+  duration_ms: 3.362665
+  type: 'test'
+  ...
+# Subtest: [R5] a claimed reduction cannot survive an unchanged prescription
+ok 2 - [R5] a claimed reduction cannot survive an unchanged prescription
+  ---
+  duration_ms: 1.716508
+  type: 'test'
+  ...
+# Subtest: [R6] "fewer total reps" is checked against the actual rep count
+ok 3 - [R6] "fewer total reps" is checked against the actual rep count
+  ---
+  duration_ms: 0.357419
+  type: 'test'
+  ...
+# Subtest: [R7] a spelled-out attempts-per-set claim must match the numeric reps
+ok 4 - [R7] a spelled-out attempts-per-set claim must match the numeric reps
+  ---
+  duration_ms: 0.908599
+  type: 'test'
+  ...
+# Subtest: [R8] "doubles" cannot describe a single-rep prescription
+ok 5 - [R8] "doubles" cannot describe a single-rep prescription
+  ---
+  duration_ms: 0.392764
+  type: 'test'
+  ...
+# Subtest: [R9] a movement split across a priority set plus back-offs may name its other sets
+ok 6 - [R9] a movement split across a priority set plus back-offs may name its other sets
+  ---
+  duration_ms: 0.200865
+  type: 'test'
+  ...
+# Subtest: [R10] a ramp may not finish at or above the work load
+ok 7 - [R10] a ramp may not finish at or above the work load
+  ---
+  duration_ms: 0.933875
+  type: 'test'
+  ...
+# Subtest: [R11] a correct ramp raises nothing
+ok 8 - [R11] a correct ramp raises nothing
+  ---
+  duration_ms: 0.273001
+  type: 'test'
+  ...
+# Subtest: [R12] the same movement may not have its specific ramp prescribed twice on one day
+ok 9 - [R12] the same movement may not have its specific ramp prescribed twice on one day
+  ---
+  duration_ms: 0.424985
+  type: 'test'
+  ...
+# Subtest: [R14] the checkers stay quiet on prescriptions that genuinely agree
+ok 10 - [R14] the checkers stay quiet on prescriptions that genuinely agree
+  ---
+  duration_ms: 2.543654
+  type: 'test'
+  ...
+1..10
+# tests 10
+# suites 0
+# pass 10
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 76.066217
