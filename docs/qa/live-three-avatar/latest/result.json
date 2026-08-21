@@ -1,47 +1,47 @@
 {
-  "timestamp": "2026-08-21T12:51:00.456Z",
+  "timestamp": "2026-08-21T13:03:38.044Z",
   "base": "https://raz-coaching-platform.onrender.com",
-  "head_sha": "fd8d4b3ffc6dd5c96cf40c6d42d5c87424588ca2",
-  "runtime": "launch-acceptance-v35-coaching-standards-live4-20260821",
+  "head_sha": "2ce38cb8499f3b3a5697f883bac27cc3e6ec23d0",
+  "runtime": "launch-acceptance-v35-coaching-standards-live5-20260821",
   "results": [
     {
       "id": "advanced_hybrid",
-      "job_id": "add0b617aca67a455416d615d1e346dd",
+      "job_id": "e06ad13062c81e42c91dc5174d39f63f",
       "ok": false,
       "status": "error",
       "stage": "generating",
-      "attempt": 1,
-      "detail": "initial generation",
+      "attempt": 3,
+      "detail": "regenerating after quality check",
       "last_seen_status": "error",
-      "error": "This operation was aborted [QA:20]",
+      "error": "OpenAI returned no output_text content. [QA:OPENAI_EMPTY_OUTPUT]",
       "program_chars": 0,
-      "seconds": 181
+      "seconds": 729
     },
     {
       "id": "youth_gymnastics",
-      "job_id": "5b37224cfc1fe3cdfd7bc94e60fee5c2",
+      "job_id": "ea95c1d6d6a70b0eabd3726d00fe255d",
       "ok": false,
       "status": "error",
-      "stage": "generating",
-      "attempt": 1,
-      "detail": "initial generation",
+      "stage": "refining",
+      "attempt": 4,
+      "detail": "internal repair: V34_PROGRESSION_LANGUAGE_MISMATCH",
       "last_seen_status": "error",
-      "error": "This operation was aborted [QA:20]",
+      "error": "Internal coaching QA could not repair the candidate program after multiple passes. No client-facing program was saved. Please retry the build. QA trace: A1:V34_PROGRESSION_LANGUAGE_MISMATCH -> A2:V34_PROGRESSION_LANGUAGE_MISMATCH -> A3:V34_PROGRESSION_LANGUAGE_MISMATCH -> A4:V34_PROGRESSION_LANGUAGE_MISMATCH. [QA:INTERNAL_QA_REPAIR_EXHAUSTED]",
       "program_chars": 0,
-      "seconds": 181
+      "seconds": 390
     },
     {
       "id": "tactical_3k",
-      "job_id": "024a1dcb6693a8799fc9ac17f10a2a01",
-      "ok": false,
-      "status": "error",
-      "stage": "generating",
-      "attempt": 1,
-      "detail": "initial generation",
-      "last_seen_status": "error",
-      "error": "This operation was aborted [QA:20]",
-      "program_chars": 0,
-      "seconds": 181
+      "job_id": "74eb1db5e7bd0ace63fff3c3f962f95b",
+      "ok": true,
+      "status": "done",
+      "stage": "finalizing",
+      "attempt": 0,
+      "detail": "saving program",
+      "last_seen_status": "done",
+      "error": null,
+      "program_chars": 11455,
+      "seconds": 191
     }
   ],
   "ok": false
