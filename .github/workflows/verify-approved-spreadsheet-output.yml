@@ -35,6 +35,7 @@ jobs:
           import ExcelJS from 'exceljs';
 
           let capturedBlob=null;
+          globalThis.ExcelJS=ExcelJS;
           globalThis.window={
             ExcelJS,
             ExerciseDemos:{
