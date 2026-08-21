@@ -224,7 +224,7 @@
     row++;
     mergeTitle(ws,row,4,'PROGRAM RULES',DAY_BAND,10,'FF0B1324'); row++;
     for(const rule of programRules(intake)){
-      ws.mergeCells(row,1,row,4); const c=ws.getRow(row).getCell(1); c.value='• '+rule; font(c,{size:10}); align(c); ws.getRow(row).height=32; row++;
+      ws.mergeCells(row,1,row,4); const c=ws.getRow(row).getCell(1); c.value='• '+rule; fill(c,BODY); font(c,{size:10}); align(c); ws.getRow(row).height=32; row++;
     }
   }
 
