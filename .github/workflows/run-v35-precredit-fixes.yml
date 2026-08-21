@@ -1,0 +1,60 @@
+name: Run v35 pre-credit quality-floor verification
+
+on:
+  push:
+    branches:
+      - privacy-security-hardening
+    paths:
+      - '.github/workflows/run-v35-precredit-fixes.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: v35-precredit-audit
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: phase14/package-lock.json
+      - name: Apply patch script
+        run: python phase14/scripts/apply_v35_precredit_fixes.py
+      - name: Install dependencies
+        working-directory: phase14
+        run: npm ci
+      - name: Syntax check
+        working-directory: phase14
+        run: |
+          node --check engine/final_note_coherence.js
+          node --check engine/v34_prescription_consistency.js
+          node --check engine/manual_acceptance_quality.js
+          node --check engine/coaching_spec_v1_quality.js
+      - name: Run adversarial gate
+        working-directory: phase14
+        run: node --test test/v35_precredit_adversarial_audit.test.js
+      - name: Run per-set regression
+        working-directory: phase14
+        run: node --test test/v35_per_set_note_repair.test.js
+      - name: Run Tactical cross-week regression slice
+        working-directory: phase14
+        run: node --test --test-name-pattern='G2-(1|2|3|4|5|6|7|8|9|14|15|16)|special-operations-style' test/coaching_spec_v1_live_convergence.test.js
+      - name: Run V35 contradiction slice
+        working-directory: phase14
+        run: node --test --test-name-pattern='R(4|5|6|7|8|9|10|11|12|14)' test/v35_review_regressions.test.js
+      - name: Commit verified source corrections
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add phase14/engine/final_note_coherence.js \
+                  phase14/engine/v34_prescription_consistency.js \
+                  phase14/engine/manual_acceptance_quality.js \
+                  phase14/engine/coaching_spec_v1_quality.js
+          git commit -m 'Apply verified v35 pre-credit quality-floor fixes [skip ci]' || exit 0
+          git push origin HEAD:v35-precredit-audit
