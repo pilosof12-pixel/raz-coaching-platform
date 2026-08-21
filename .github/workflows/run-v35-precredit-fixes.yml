@@ -28,36 +28,95 @@ jobs:
           cache: npm
           cache-dependency-path: phase14/package-lock.json
       - name: Apply patch script
-        run: python phase14/scripts/apply_v35_precredit_fixes.py
+        id: patch
+        continue-on-error: true
+        shell: bash
+        run: |
+          set -o pipefail
+          python phase14/scripts/apply_v35_precredit_fixes.py 2>&1 | tee /tmp/patch.log
       - name: Install dependencies
+        id: install
+        continue-on-error: true
         working-directory: phase14
-        run: npm ci
+        shell: bash
+        run: |
+          set -o pipefail
+          npm ci 2>&1 | tee /tmp/install.log
       - name: Syntax check
+        id: syntax
+        continue-on-error: true
         working-directory: phase14
+        shell: bash
         run: |
-          node --check engine/final_note_coherence.js
-          node --check engine/v34_prescription_consistency.js
-          node --check engine/manual_acceptance_quality.js
-          node --check engine/coaching_spec_v1_quality.js
+          set -o pipefail
+          {
+            node --check engine/final_note_coherence.js
+            node --check engine/v34_prescription_consistency.js
+            node --check engine/manual_acceptance_quality.js
+            node --check engine/coaching_spec_v1_quality.js
+          } 2>&1 | tee /tmp/syntax.log
       - name: Run adversarial gate
+        id: adversarial
+        continue-on-error: true
         working-directory: phase14
-        run: node --test test/v35_precredit_adversarial_audit.test.js
-      - name: Run per-set regression
-        working-directory: phase14
-        run: node --test test/v35_per_set_note_repair.test.js
-      - name: Run Tactical cross-week regression slice
-        working-directory: phase14
-        run: node --test --test-name-pattern='G2-(1|2|3|4|5|6|7|8|9|14|15|16)|special-operations-style' test/coaching_spec_v1_live_convergence.test.js
-      - name: Run V35 contradiction slice
-        working-directory: phase14
-        run: node --test --test-name-pattern='R(4|5|6|7|8|9|10|11|12|14)' test/v35_review_regressions.test.js
-      - name: Commit verified source corrections
+        shell: bash
         run: |
+          set -o pipefail
+          node --test test/v35_precredit_adversarial_audit.test.js 2>&1 | tee /tmp/adversarial.log
+      - name: Run per-set regression
+        id: perset
+        continue-on-error: true
+        working-directory: phase14
+        shell: bash
+        run: |
+          set -o pipefail
+          node --test test/v35_per_set_note_repair.test.js 2>&1 | tee /tmp/perset.log
+      - name: Run Tactical cross-week regression slice
+        id: tactical
+        continue-on-error: true
+        working-directory: phase14
+        shell: bash
+        run: |
+          set -o pipefail
+          node --test --test-name-pattern='G2-(1|2|3|4|5|6|7|8|9|14|15|16)|special-operations-style' test/coaching_spec_v1_live_convergence.test.js 2>&1 | tee /tmp/tactical.log
+      - name: Run V35 contradiction slice
+        id: contradiction
+        continue-on-error: true
+        working-directory: phase14
+        shell: bash
+        run: |
+          set -o pipefail
+          node --test --test-name-pattern='R(4|5|6|7|8|9|10|11|12|14)' test/v35_review_regressions.test.js 2>&1 | tee /tmp/contradiction.log
+      - name: Publish verification result
+        if: always()
+        shell: bash
+        run: |
+          {
+            echo 'V35 PRECREDIT FIX VERIFICATION'
+            echo "Patch: ${{ steps.patch.outcome }}"
+            echo "Install: ${{ steps.install.outcome }}"
+            echo "Syntax: ${{ steps.syntax.outcome }}"
+            echo "Adversarial: ${{ steps.adversarial.outcome }}"
+            echo "Per-set: ${{ steps.perset.outcome }}"
+            echo "Tactical: ${{ steps.tactical.outcome }}"
+            echo "Contradiction: ${{ steps.contradiction.outcome }}"
+            echo "Checkout: $GITHUB_SHA"
+            for f in patch install syntax adversarial perset tactical contradiction; do
+              echo
+              echo "===== $f ====="
+              cat "/tmp/$f.log" 2>/dev/null || true
+            done
+          } > .github/v35-precredit-fix-result.txt
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add phase14/engine/final_note_coherence.js \
-                  phase14/engine/v34_prescription_consistency.js \
-                  phase14/engine/manual_acceptance_quality.js \
-                  phase14/engine/coaching_spec_v1_quality.js
-          git commit -m 'Apply verified v35 pre-credit quality-floor fixes [skip ci]' || exit 0
+          git add .github/v35-precredit-fix-result.txt
+          if [ "${{ steps.patch.outcome }}" = "success" ] && [ "${{ steps.syntax.outcome }}" = "success" ] && [ "${{ steps.adversarial.outcome }}" = "success" ] && [ "${{ steps.perset.outcome }}" = "success" ] && [ "${{ steps.tactical.outcome }}" = "success" ] && [ "${{ steps.contradiction.outcome }}" = "success" ]; then
+            git add phase14/engine/final_note_coherence.js phase14/engine/v34_prescription_consistency.js phase14/engine/manual_acceptance_quality.js phase14/engine/coaching_spec_v1_quality.js
+            git commit -m 'Apply verified v35 pre-credit quality-floor fixes [skip ci]' || true
+          else
+            git commit -m 'Record v35 pre-credit fix diagnostics [skip ci]' || true
+          fi
           git push origin HEAD:v35-precredit-audit
+      - name: Fail if verification failed
+        if: steps.patch.outcome != 'success' || steps.syntax.outcome != 'success' || steps.adversarial.outcome != 'success' || steps.perset.outcome != 'success' || steps.tactical.outcome != 'success' || steps.contradiction.outcome != 'success'
+        run: exit 1
