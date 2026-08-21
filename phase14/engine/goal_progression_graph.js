@@ -312,7 +312,7 @@ function handstandComponentAnalysis(model, intake) {
         // ProgramModel's canonical exercise identity is display_name. Keep legacy
         // fallbacks for hand-built semantic fixtures, but never drop the visible
         // exercise name before checking wall/static and balance components.
-        const name = String(ex.display_name || ex.exercise || ex.name || '').toLowerCase();
+        const name = String(ex.display_name || ex.raw_display_name || ex.exercise || ex.name || '').toLowerCase();
         const semanticHandstand = ex.base_movement === 'handstand' || /hand\s*stand|handstand|kick[- ]?up/.test(name);
         if (!semanticHandstand) continue;
         const isStatic = (ex.execution_modifiers || []).includes('isometric') || /\bhold\b/.test(name);

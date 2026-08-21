@@ -1,4 +1,10 @@
 import { buildSpecialistRules } from './phase15_specialist_rules.js';
+import { buildProgressionGppBrief } from './coaching_progression_gpp.js';
+import { buildAcceptanceQualityBrief } from './coaching_acceptance_quality.js';
+import { buildConsolidationQualityBrief } from './coaching_consolidation_quality.js';
+import { buildTactical3KGppQualityBrief } from './tactical_3k_gpp_quality.js';
+import { buildAdvancedHybridConcurrencyBrief } from './advanced_hybrid_concurrency.js';
+import { buildCoachingSpecV1Brief } from './coaching_spec_v1_quality.js'; // COACHING-SPEC-V1-BRIEF
 import { gymDayReadiness } from './v34_readiness.js';
 import { buildV34ArchitectureBrief } from './v34_coaching_architecture.js';
 
@@ -118,6 +124,43 @@ export function buildDeterministicBrief(intake = {}) {
     if (chin1rm) optional.push(`Weighted Chin-up may be used once weekly as bilateral support for OAP but never replace unilateral specificity. With current +${chin1rm} kg external-load 1RM, an initial 4-6 rep support range around +${round25(chin1rm*.55)} to +${round25(chin1rm*.72)} kg is plausible, autoregulated by RPE and elbow/grip freshness.`);
   } else if (oapGoal) required.push('One or two unilateral-specific OAP exposures matched to demonstrated level.');
 
+  const namedSkillGoals = `${primary} ${secondary}`;
+  const barMuscleUpGoal = /bar muscle.?up/i.test(namedSkillGoals);
+  const freestandingHandstandGoal = /freestanding handstand|handstand balance/i.test(namedSkillGoals) && !/handstand push|\bhspu\b/i.test(namedSkillGoals);
+  const namedSkillEvidence = JSON.stringify({current_numbers:intake.current_numbers,clarification_answers:intake.clarification_answers,notes:intake.notes});
+  const advancedBarMuscleUpBase = /ring muscle.?up/i.test(namedSkillEvidence) || /(?:8|9|1[0-9]|2[0-9])\s*(?:strict\s*)?pull.?ups?/i.test(namedSkillEvidence);
+  const noReliableHandstandBalance = /no reliable unsupported|cannot.*unsupported|no.*freestanding.*hold|0\s*(?:s|sec).*freestanding/i.test(namedSkillEvidence);
+  const lowerAthleticGoal = /lower[- ]body athletic|athleticism|general strength/i.test(`${secondary} ${notes}`);
+  const pistolBaseline = /pistol squat/i.test(namedSkillEvidence);
+  const explicitAge = Number(intake.age || intake.age_years || 0);
+  const ageFromNotes = `${notes}`.match(/(?:athlete\s+is|age\s*[:=]?)\s*(\d{1,2})\b/i);
+  const parsedAge = explicitAge > 0 ? explicitAge : (ageFromNotes ? Number(ageFromNotes[1]) : 0);
+  const youthAthlete = parsedAge > 0 && parsedAge < 18;
+  if (barMuscleUpGoal) {
+    required.push('BAR MUSCLE-UP DIRECT-SKILL RULE: a named bar muscle-up goal requires direct bar-specific skill practice every week. Pull-ups, dips and ring muscle-ups are support work and do not replace target-skill exposure.');
+    required.push('BAR_MUSCLE_UP_DIRECT: if the athlete does not yet own a bar muscle-up, use Bar Muscle-up Transition Drill as a direct target-skill row, with assistance only when needed for clean mechanics. Do not omit the target pattern while training prerequisites.');
+    if (advancedBarMuscleUpBase) {
+      required.push('BAR MUSCLE-UP HIGH-PULL SUPPORT: this athlete already has a strong base (8+ strict pull-ups and/or a ring muscle-up). Include at least one weekly explosive/high vertical-pull exposure such as Strict Chest-to-Bar Pull-up or Explosive Hip-to-Bar Pull-up, using low reps and full recovery. Generic chin-ups or easy pull-ups are support volume only and must not replace the high-pull stimulus.');
+      required.push('BAR MUSCLE-UP PRACTICE QUALITY: direct transition/muscle-up practice should use clean singles or doubles with enough assistance for a close-to-bar, symmetrical turnover. Do not prescribe fatigue sets of 3-5 failed/slow muscle-up reps.');
+      forbidden.push('Generic Chin-up as the main bar-muscle-up progression when the athlete already demonstrates a ring muscle-up / strong pull-up base.');
+    }
+  }
+  if (freestandingHandstandGoal) {
+    required.push('FREESTANDING HANDSTAND DIRECT-SKILL RULE: a named freestanding handstand goal requires direct balance-specific practice every week. General pressing or wall strength work is support, not a replacement for balance practice.');
+    required.push('HANDSTAND_DIRECT: for an athlete without reliable unsupported balance, use Controlled Handstand Kick-up as the direct skill row and dose it as high-quality practice rather than fatigue work.');
+    if (noReliableHandstandBalance) required.push('HANDSTAND BALANCE PROGRESSION: use wall-facing/back-to-wall work only as alignment support. Progress toward independent balance with controlled kick-up attempts, toe-pulls or brief assisted balance. Count kick-ups as attempts, usually 1-2 per mini-set, rather than fatigue reps. Do not make longer wall holds the main progression metric.');
+  }
+
+  if (lowerAthleticGoal) {
+    if (pistolBaseline) required.push('LOWER-BODY ATHLETICISM: retain a meaningful Pistol Squat exposure at least weekly because the intake documents an established pistol baseline. With no external load available, progress control, reps, pauses or tempo rather than replacing it with high-rep filler.');
+    else required.push('LOWER-BODY ATHLETICISM: retain at least one meaningful unilateral lower-body strength exposure weekly using available equipment.');
+    required.push('ATHLETIC POWER: a small dose of Broad Jump or another appropriate low-volume jump may complement the unilateral strength work; full recovery and landing quality matter more than conditioning effect.');
+  }
+  if (youthAthlete) {
+    required.push('YOUTH QUALITY RULE: primary skills are practiced while fresh. Keep working sets submaximal, stop before technical breakdown and use repeatable successful reps/attempts rather than grinders or repeated failures.');
+    forbidden.push('High-fatigue conditioning filler that displaces the named skill/strength goals in a youth two-day program.');
+  }
+
   const strictOhpGoal = /overhead press|\bohp\b/i.test(secondary);
   if (strictOhpGoal) {
     required.push('STRICT OHP IS A PROGRESSION GOAL, not maintenance. Keep at least one direct strict Overhead Press exposure every week.');
@@ -160,6 +203,10 @@ export function buildDeterministicBrief(intake = {}) {
   const labels=[];
   if (squatDual) labels.push('BOX_SQUAT_REP','BOX_SQUAT_HEAVY'); else if (squatGoal) labels.push('SQUAT_SPECIFIC');
   if (oapGoal && oap!=null && oap>=2) labels.push('OAP_ASSISTED_ADVANCED','OAP_STRICT'); else if (oapGoal) labels.push('OAP_SPECIFIC');
+  if (barMuscleUpGoal) labels.push(...(days.length >= 2 ? ['BAR_MUSCLE_UP_DIRECT','BAR_MUSCLE_UP_DIRECT'] : ['BAR_MUSCLE_UP_DIRECT']));
+  if (barMuscleUpGoal && advancedBarMuscleUpBase) labels.push('BAR_MUSCLE_UP_HIGH_PULL');
+  if (freestandingHandstandGoal) labels.push(...(days.length >= 2 ? ['HANDSTAND_DIRECT','HANDSTAND_DIRECT'] : ['HANDSTAND_DIRECT']));
+  if (lowerAthleticGoal) labels.push('LOWER_ATHLETIC_STRENGTH');
   if (strictOhpGoal) labels.push('OHP_DIRECT','OHP_SECONDARY_VARIATION');
   if (zone2Goal) labels.push('AEROBIC_BASE_SOURCE_SELECTED'); // no universal frequency floor
   const sessions=distribute(days,labels);
@@ -190,6 +237,12 @@ export function buildDeterministicBrief(intake = {}) {
   if (strengthDaysRequested) for (const d of days) if (!sessions[d].some(x=>!/^ZONE2_/.test(x))) sessions[d].unshift('LOW_COST_STRENGTH_SUPPORT');
 
   const specialist = buildSpecialistRules(intake);
+  const progressionGpp = buildProgressionGppBrief(intake);
+  const acceptanceQuality = buildAcceptanceQualityBrief(intake);
+  const consolidationQuality = buildConsolidationQualityBrief(intake);
+  const tactical3KGppQuality = buildTactical3KGppQualityBrief(intake);
+  const advancedHybridConcurrency = buildAdvancedHybridConcurrencyBrief(intake);
+  const coachingSpecV1 = buildCoachingSpecV1Brief(intake);
   return [
     '=== DETERMINISTIC PROGRAM SKELETON, DO NOT DELETE REQUIRED EXPOSURES ===',
     `Gym days (${days.length}): ${days.join(', ')}.`,
@@ -199,6 +252,12 @@ export function buildDeterministicBrief(intake = {}) {
     forbidden.length ? 'Forbidden/tolerance-gated choices:' : '', ...forbidden.map(x=>`* ${x}`),
     buildV34ArchitectureBrief(intake, { gymDays: days }),
     specialist,
+    progressionGpp,
+    acceptanceQuality,
+    consolidationQuality,
+    tactical3KGppQuality,
+    advancedHybridConcurrency,
+    coachingSpecV1,
     'Session skeleton:', ...days.map(d=>`* ${d}: ${sessions[d].length?sessions[d].join(', '):'low-cost strength/support only'}; ${sport[d]?`same-day sport=${sport[d]}`:'no listed sport'}.`),
     'LOW_COST_STRENGTH_SUPPORT means real low-fatigue strength selected from athlete needs, never cardio-only filler.',
     'Exercise-name rule: use exact verified canonical names. Never output [REVIEW], support messages or placeholder exercise rows. Never invent exercise variations.',

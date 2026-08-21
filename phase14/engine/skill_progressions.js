@@ -386,7 +386,13 @@ export function parseSkillBenchmarks(intake = {}) {
     archer_pull_up: firstIntAfter(t, /archer\s*(?:pull[-\s]?up)?[^0-9]*(\d+)/),
     typewriter_pull_up: firstIntAfter(t, /typewriter[^0-9]*(\d+)/),
     band_assisted_oap: firstIntAfter(t, /band[-\s]?assisted\s*(?:one[-\s]?arm|oap)[^0-9]*(\d+)/),
-    one_arm_pull_up: firstIntAfter(t, /(\d+)\s*one[-\s]?arm\s*pull/) || firstIntAfter(t, /one[-\s]?arm\s*pull[-\s]?ups?[^0-9]{0,24}(\d+)/),
+    // ADVANCED-SKILL-DIRECT-OAP-BENCHMARK
+    // Accept both "2 one-arm pull-ups" and natural intake phrasing such as
+    // "One-Arm Pull-up: 2 strict reps each arm". Demonstrated full-skill
+    // performance must route from the achieved state, not back to prerequisites.
+    one_arm_pull_up:
+      firstIntAfter(t, /one[-\s]?arm\s*(?:pull|chin)(?:[-\s]?ups?)?[^0-9]{0,30}(\d+)/) ||
+      firstIntAfter(t, /(\d+)\s*(?:strict\s*)?one[-\s]?arm\s*(?:pull|chin)/),
   };
   out.one_arm_handstand = {
     freestanding_handstand_hold_s: g.freestanding_handstand_hold_s,
@@ -425,6 +431,11 @@ function hasRequiredEquipment(skill, intake) {
   const req = skill.required_equipment || [];
   if (!req.length) return true;
   const text = equipText(intake);
+  // ADVANCED-SKILL-COMMERCIAL-GYM-EQUIPMENT
+  // The main equipment validator defines commercial_gym as the full roster.
+  // Skill calibration must use the same contract rather than separately gating
+  // a demonstrated advanced athlete for a pull-up bar or rings.
+  if (/commercial[_\s-]?gym|full commercial gym/.test(text)) return true;
   return req.some((tok) => hasEquipmentToken(tok, text));
 }
 

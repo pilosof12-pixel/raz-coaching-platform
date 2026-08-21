@@ -65,13 +65,13 @@ const DICTIONARY_LIST = [
   "Tuck Human Flag Negative", "Tuck Human Flag Hold", "Tuck Human Flag",
   "One-Leg Human Flag Negative", "One-Leg Tuck Human Flag", "Straddle Human Flag Negative",
   "Straddle Human Flag", "Full Human Flag Negative", "Full Human Flag",
-  "Human Flag Hold",
+  "Human Flag Hold", "Iron Cross", "Maltese",
   // --- Muscle-up family ---
   "Strict Chest-to-Bar Pull-up", "Explosive Hip-to-Bar Pull-up", "Bar Muscle-up Transition Drill",
   "False-Grip Hold", "Banded Muscle-up", "Muscle-up Negative",
-  "Strict Muscle-up", "Muscle-up", "Bar Muscle-up", "Ring Muscle-up",
+  "Strict Muscle-up", "Muscle-up", "Bar Muscle-up", "Ring Muscle-up", "Bar Muscle-up Transition Drill",
   // --- Pistol / single-leg squat family ---
-  "Bodyweight Squat", "Air Squat", "Assisted Squat", "Assisted Pistol Squat",
+  "Bodyweight Squat", "Air Squat", "Assisted Squat", "Assisted Pistol Squat", "Belt Squat",
   "Box Squat to Parallel", "Pistol Squat", "Weighted Pistol Squat",
   "Eccentric Pistol Squat", "5-Second Eccentric Pistol Squat",
   "Single-Leg Box Jump", "Shrimp Squat", "Skater Squat",
@@ -127,7 +127,7 @@ const DICTIONARY_LIST = [
   "Inverted Row", "Ring Row", "Australian Pull-up", "Nordic Curl",
   "Nordic Hamstring Curl", "Plank", "Hollow Hold", "Hollow Body Rock",
   "Superman Hold", "Dead Bug", "Bird Dog", "Glute Bridge",
-  "Single-Leg Glute Bridge", "Box Jump", "Broad Jump", "Tuck Jump",
+  "Single-Leg Glute Bridge", "Ring Push-up", "Ring Hamstring Curl", "Box Jump", "Broad Jump", "Tuck Jump",
   "Burpee", "Mountain Climber", "Wall Sit", "Calf Raise",
   "Standing Calf Raise", "Seated Calf Raise", "Sit-up", "Crunch",
   "Russian Twist", "V-Up", "Flutter Kick", "Bear Crawl", "Ring Support Hold",
@@ -170,6 +170,13 @@ export const EXERCISE_DICTIONARY = new Set(DICTIONARY_LIST); // ENDURANCE-MODALI
 //    dictionary entry's normalized value (acronyms, reorderings, brand words).
 // ---------------------------------------------------------------------------
 const ALIAS_LIST = [
+  // Tactical loaded-locomotion terminology
+  ["Ruck", "Backpack Carry"],
+  ["Rucking", "Backpack Carry"],
+  ["Ruck March", "Backpack Carry"],
+  ["Loaded March", "Backpack Carry"],
+  ["Pack March", "Backpack Carry"],
+  ["Backpack March", "Backpack Carry"],
   // Warmup / mobility hyphenation and phrasing variants
   ["Scap Push-Up", "Scapular Push-up"],
   ["Scap Push-up", "Scapular Push-up"],
@@ -186,6 +193,8 @@ const ALIAS_LIST = [
   ["Neck Isometric Back", "Neck Isometric"],
   ["Neck Isometric Side", "Neck Isometric"],
   ["Wrist CARs", "Wrist Circles"],
+  ["Wall-Facing Handstand Hold", "Wall Handstand Hold"],
+  ["Wall Facing Handstand Hold", "Wall Handstand Hold"],
   ["Wall HSPU", "Back-to-Wall Handstand Push-Up"],
   ["Wall HSPU Partial", "Wall Handstand Push-up Partial"],
   ["Back to Wall HSPU", "Back-to-Wall Handstand Push-Up"],
@@ -362,7 +371,7 @@ const EQUIP_LIST = [
   ["Leg Curl", ["leg_curl"]], ["Lying Leg Curl", ["leg_curl"]],
   ["Seated Leg Curl", ["leg_curl"]], ["Machine Hamstring Curl", ["leg_curl"]],
   ["Chest Press Machine", ["machine"]], ["Pec Deck", ["machine"]],
-  ["Smith Machine Squat", ["smith_machine"]], ["GHD Raise", ["ghd"]],
+  ["Smith Machine Squat", ["smith_machine"]], ["Belt Squat", ["machine"]], ["GHD Raise", ["ghd"]],
   ["Glute-Ham Raise", ["ghd"]], ["Reverse Hyper", ["reverse_hyper"]],
   ["Seated Row Machine", ["machine"]], ["Assault Bike", ["assault_bike"]],
   ["Rower", ["rower"]], ["Treadmill", ["treadmill"]], ["Ski Erg", ["ski_erg"]],
@@ -382,7 +391,8 @@ const EQUIP_LIST = [
   ["Toes-to-Bar", ["pull_up_bar"]], ["Hanging Leg Raise", ["pull_up_bar"]],
   ["Dip", ["dip_bars"]], ["Parallel Bar Dip", ["dip_bars"]],
   ["Ring Dip", ["rings"]], ["Ring Row", ["rings"]], ["Ring Muscle-up", ["rings"]],
-  ["Ring Support Hold", ["rings"]],
+  ["Ring Support Hold", ["rings"]], ["Ring Push-up", ["rings"]], ["Ring Hamstring Curl", ["rings"]], ["Iron Cross", ["rings"]], ["Maltese", ["rings"]],
+  ["Bar Muscle-up Transition Drill", ["pull_up_bar"]],
   // band movements
   ["Band Row", ["bands"]], ["Band Pull-Apart", ["bands"]], ["Band Face Pull", ["bands"]],
   ["Banded Good Morning", ["bands"]], ["Band Chest Press", ["bands"]],
@@ -636,6 +646,119 @@ const MODIFIER_SET = new Set([
   "towel", "two-handed",
 ]);
 
+// COMPOSITIONAL-EXERCISE-VOCABULARY
+// Accept only controlled combinations of known movement families and known
+// assistance/loading/control modifiers. This prevents false [REVIEW] failures
+// without degrading the zero-hallucination gate into fuzzy matching.
+const COMPOSED_TRAILING_MODIFIERS = new Set([
+  "eccentric", "negative", "isometric", "iso", "hold", "partial", "tempo", "paused", "pause"
+]);
+const BELT_SQUAT_VARIANT_BASES = new Set([
+  "squat", "split squat", "bulgarian split squat", "reverse lunge", "forward lunge",
+  "lateral lunge", "walking lunge", "step up", "pistol squat"
+]);
+const ASSISTED_GYMNASTICS_BASES = new Set([
+  "iron cross", "maltese", "planche", "front lever", "handstand",
+  "bar muscle up transition drill", "bar muscle up", "ring muscle up"
+]);
+const CONTROL_PREFIX_BASES = new Set([
+  "back squat", "front squat", "bench press", "overhead press", "romanian deadlift",
+  "split squat", "bulgarian split squat", "pistol squat", "pull up", "chin up",
+  "dip", "ring dip", "push up", "ring row", "iron cross", "maltese",
+  "planche", "front lever", "handstand", "bar muscle up transition drill"
+]);
+const STRICT_PREFIX_BASE_REQUIREMENTS = new Map([
+  ["pull up", ["pull_up_bar"]],
+  ["chin up", ["pull_up_bar"]],
+  ["muscle up", ["pull_up_bar"]],
+  ["bar muscle up", ["pull_up_bar"]],
+  ["toes to bar", ["pull_up_bar"]],
+  ["hanging leg raise", ["pull_up_bar"]],
+  ["dip", ["dip_bars"]],
+  ["ring dip", ["rings"]],
+  ["ring row", ["rings"]],
+  ["ring muscle up", ["rings"]],
+  ["push up", []],
+]);
+
+function stripComposedTrailingModifiers(n) {
+  const removed = [];
+  let toks = String(n || "").split(" ").filter(Boolean);
+  while (toks.length > 1 && COMPOSED_TRAILING_MODIFIERS.has(toks[toks.length - 1])) {
+    removed.unshift(toks.pop());
+  }
+  return { base: toks.join(" "), modifiers: removed };
+}
+
+export function matchComposedExercise(core) {
+  let n = norm(core);
+  if (!n) return null;
+
+  // ENDURANCE-EXECUTION-COMPOSITION
+  // Pace/domain qualifiers belong in load, reps and Notes, not in Exercise identity.
+  const runLabels = new Set([
+    'easy run', 'long run', 'aerobic run', 'recovery run', 'steady run',
+    'tempo run', 'threshold run', 'interval run', 'run intervals',
+    'repeat run', 'run repeats', 'progression run'
+  ]);
+  if (runLabels.has(n)) {
+    return { kind: 'endurance_run_label', canonical: 'Run', requirements: [] };
+  }
+  const ruckLabels = new Set([
+    'ruck', 'rucking', 'ruck march', 'loaded ruck', 'loaded march',
+    'pack march', 'ruck walk', 'weighted ruck'
+  ]);
+  if (ruckLabels.has(n)) {
+    return { kind: 'ruck_label', canonical: 'Backpack Carry', requirements: ['backpack'] };
+  }
+
+  // "Strict" is normal coaching vocabulary for bounded bodyweight/gymnastics
+  // families. It does not create a new movement family, and it inherits the
+  // apparatus requirements of the underlying movement.
+  const strict = n.match(/^strict\s+(.+)$/);
+  if (strict) {
+    const inner = stripComposedTrailingModifiers(strict[1]).base;
+    if (STRICT_PREFIX_BASE_REQUIREMENTS.has(inner)) {
+      return { kind: "strict", requirements: STRICT_PREFIX_BASE_REQUIREMENTS.get(inner) };
+    }
+  }
+
+  // Leading control descriptors are common coach vocabulary (e.g. Tempo Pull-up).
+  // They are accepted only for a deliberately bounded family set.
+  const lead = n.match(/^(tempo|paused|pause|eccentric|negative|isometric|iso)\s+(.+)$/);
+  if (lead) {
+    const inner = stripComposedTrailingModifiers(lead[2]).base;
+    if (CONTROL_PREFIX_BASES.has(inner)) return { kind: "control", requirements: null };
+    // Allow a control modifier wrapping a valid belt-squat composition.
+    n = lead[2];
+  }
+
+  const stripped = stripComposedTrailingModifiers(n);
+  const bare = stripped.base;
+
+  // Belt-squat machine variants: Belt Split Squat, Belt Squat Reverse Lunge, etc.
+  let beltBase = null;
+  if (bare.startsWith("belt squat ")) beltBase = bare.slice("belt squat ".length).trim();
+  else if (bare.startsWith("belt ")) beltBase = bare.slice("belt ".length).trim();
+  if (beltBase && BELT_SQUAT_VARIANT_BASES.has(beltBase)) {
+    return { kind: "belt_squat", requirements: ["machine"] };
+  }
+
+  // Assistance can change the implementation of a skill without creating a new
+  // movement family. Only these assistance modes and skill bases are accepted.
+  const assisted = bare.match(/^(box|band|partner|foot|low bar) assisted\s+(.+)$/);
+  if (assisted && ASSISTED_GYMNASTICS_BASES.has(assisted[2])) {
+    const base = assisted[2];
+    const req = [];
+    if (/iron cross|maltese|ring muscle up/.test(base)) req.push("rings");
+    if (/bar muscle up/.test(base)) req.push("pull_up_bar");
+    if (assisted[1] === "band") req.push("bands");
+    return { kind: "assisted_gymnastics", requirements: req };
+  }
+
+  return null;
+}
+
 // v20 FIX A: tokens that appear inside parentheses purely as equipment
 // annotations (e.g. "Archer Pull-Up (bar)", "Pistol Squat (Weighted Vest)").
 // When a parenthetical's inner content is composed only of these, it must be
@@ -727,6 +850,11 @@ export function matchDictionary(core) {
     if (NORM_DICT.has(nn)) return { status: "hit" };
     if (NORM_ALIAS.has(nn)) return { status: "hit" }; // accept base, keep bridge descriptor
   }
+  const composed = matchComposedExercise(n);
+  if (composed?.canonical) {
+    return { status: "alias", canonical: composed.canonical, composed: true, requirements: composed.requirements || [] }; // ENDURANCE-CANONICAL-ALIAS-HOOK
+  }
+  if (composed) return { status: "hit", composed: true, requirements: composed.requirements || [] };
   return { status: "miss" };
 }
 
@@ -797,7 +925,7 @@ export class RetriableValidationError extends Error {
 export const RETRIABLE_CODES = new Set([
   "EXERCISE_HALLUCINATION", "EQUIPMENT_VIOLATION", "UNILATERAL_UNDERSTIMULATION",
   "INTRADAY_ORDER_VIOLATION", "SPORT_DAY_COUPLING_VIOLATION", "WEEKLY_MRV_EXCEEDED",
-  "SKILL_PREREQ_VIOLATION", "SKILL_UNDER_PROGRAMMED",
+  "SKILL_PREREQ_VIOLATION", "SKILL_UNDER_PROGRAMMED", "GOAL_COMPONENT_COVERAGE_MISSING",
 ]);
 
 // Retriable error carrying a prompt amendment for skill-calibration failures.
@@ -907,7 +1035,8 @@ export function validateEquipmentAgainstLocation(program, intake = {}) {
     let canonical = core;
     if (m.status === "alias") canonical = m.canonical;
     const req = EXERCISE_EQUIPMENT_REQUIREMENTS.get(canonical) ||
-      EXERCISE_EQUIPMENT_REQUIREMENTS.get(canonicalFromNorm(core));
+      EXERCISE_EQUIPMENT_REQUIREMENTS.get(canonicalFromNorm(core)) ||
+      (m.composed ? m.requirements : null);
     if (!req || req.length === 0) continue;
     const missing = req.filter((t) => !effective.has(t));
     if (missing.length > 0) {
@@ -960,11 +1089,15 @@ export function hardSubstituteEquipment(program, intake = {}) {
     const core = coreExerciseName(cell, isHebrew);
     const m = matchDictionary(core);
     const canonical = m.status === "alias" ? m.canonical : (canonicalFromNorm(core) || core);
-    const req = EXERCISE_EQUIPMENT_REQUIREMENTS.get(canonical);
+    const req = EXERCISE_EQUIPMENT_REQUIREMENTS.get(canonical) || (m.composed ? m.requirements : null);
     if (!req || req.length === 0) return null;
     if (req.every((t) => effective.has(t))) return null;
     const sub = EQUIPMENT_SUBSTITUTIONS.get(canonical);
-    const replacement = sub ? (isOutdoor ? sub.outdoor : sub.default) : (isOutdoor ? "Hill Sprints" : "Burpee EMOM");
+    // Never replace an unavailable strength/skill exercise with unrelated conditioning.
+    // If no movement-family substitution is explicitly approved, leave the row unchanged
+    // so the equipment validator/retry loop can request a coherent replacement.
+    if (!sub) return null;
+    const replacement = isOutdoor ? sub.outdoor : sub.default;
     cells[ctx.exIdx] = cell.replace(core, replacement);
     const notesIdx = ctx.header.indexOf("notes");
     if (notesIdx >= 0 && notesIdx < cells.length) {
@@ -1782,9 +1915,10 @@ export function validateAndCalibrateSkills(program, intake = {}) {
           family, goal, missing, maxPrescribed, allowedMax, reason: selection.reason,
         });
       }
-      // Gated but nothing over-prescribed: leave a non-fatal note if any row exists.
+      // SKILL-ANNOTATIONS-INTERNAL-ONLY
+      // Gated but nothing over-prescribed: keep the coaching signal as structured QA metadata only.
       if (maxPrescribed >= 0) {
-        const note = `[REVIEW] ${family} gated — ${selection.reason}`;
+        const note = `${family} gated — ${selection.reason}`;
         annotations.push({ family, type: "gated", note });
       }
       continue;
@@ -1813,7 +1947,7 @@ export function validateAndCalibrateSkills(program, intake = {}) {
     if (recommended) {
       const actual = countFamilyFrequency(out, family, maxPrescribed, isHebrew);
       if (actual > 0 && actual < recommended) {
-        const note = `[REVIEW] Frequency below skill-family recommendation (${actual}x/week vs recommended ${recommended}x/week)`;
+        const note = `Frequency below skill-family recommendation (${actual}x/week vs recommended ${recommended}x/week)`;
         annotations.push({ family, type: "frequency", actual, recommended, note });
       }
     }

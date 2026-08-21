@@ -21,6 +21,17 @@ import { validatePhase15FinalProgram } from "./engine/phase15_final_qa.js";
 import { buildDeterministicBrief } from "./engine/phase15_planner.js";
 import { buildPhase15SourceGrounding } from "./engine/phase15_source_router.js";
 import { EXERCISE_DICTIONARY } from "./engine/exercise_dictionary.js";
+import { repairUnbenchmarkedVariationLoads } from "./engine/phase15_elite_guardrails.js"; // UNBENCHMARKED-VARIATION-REPAIR-WIRED
+import { validateDirectGoalExposureSemantic, validateSportDayCouplingSemantic, validateWeeklyVolumeBudgetSemantic } from "./engine/semantic_program_qa.js"; // PROGRAM-MODEL-SEMANTIC-QA-WIRED
+import { validateProgressionArchitectureSemantic, validateTacticalGppCoverageSemantic, validateTacticalScheduleArchitectureSemantic, validateKnownMaxPullUpDoseSemantic } from "./engine/coaching_progression_gpp.js"; // PROGRESSION-GPP-SEMANTIC-QA-WIRED
+import { validateTactical3KIntervalProgressionSemantic, validateTacticalStrengthCompletenessSemantic } from "./engine/tactical_3k_gpp_quality.js"; // TACTICAL-3K-GPP-QUALITY-WIRED
+import { validateHardRunWarmupSemantic, validateYouthProgressionQualitySemantic } from "./engine/coaching_acceptance_quality.js"; // ACCEPTANCE-QUALITY-SEMANTIC-QA-WIRED
+import { validateYouthConsolidationRetentionSemantic } from "./engine/coaching_consolidation_quality.js"; // CONSOLIDATION-RETENTION-SEMANTIC-QA-WIRED
+import { validateClientOutputCleanliness } from "./engine/client_output_qa.js"; // CLIENT-OUTPUT-CLEANLINESS-WIRED
+import { validateRepairableProgramBundle } from "./engine/repairable_validation_bundle.js"; // AGGREGATE-REPAIR-VALIDATION-WIRED
+import { enrichSpecificWarmups } from "./engine/specific_warmup_enrichment.js"; // SPECIFIC-WARMUP-ENRICHMENT-WIRED
+import { normalizeYouthPrimarySkillOrder } from "./engine/youth_skill_order_normalizer.js"; // YOUTH-SKILL-ORDER-REPAIR-WIRED
+import { normalizeAdvancedHybridWeek4OapConsolidation } from "./engine/advanced_hybrid_oap_consolidation_normalizer.js"; // ADVANCED-HYBRID-OAP-CONSOLIDATION-REPAIR-WIRED
 import { registerAdminQaRoutes } from "./admin_qa_routes.js";
 // Engine v19: deterministic post-generation validators (dependency-free module,
 // also imported directly by test/v19_validators.test.js).
@@ -192,6 +203,8 @@ const OPENAI_COMPACT_DEVELOPER = [
   "Power/throw/jump primers come after preparation and before heavy strength. Keep sessions within the supplied hard time cap. Narrative must match the final TSV exactly.",
   "SILENT FINAL AUDIT BEFORE OUTPUT: use the reasoning budget to review all four weeks as one program. Confirm primary goals own the best readiness slots, the actual target quality is trained directly, maintenance stays stable unless deliberately developed, total workload includes all generated work, week-to-week progression language matches the structured dose, every numerical note agrees with Sets x Reps, and injury/recovery responses target the provocative or newest stressor. Repair any violation before answering. Do not print this audit.",
   "Return only a short client-ready intro, a short weeks 2-4 progression note, pain/substitution guidance relevant to this athlete, then the four TSV blocks."
+,
+  "ADVANCED OAP PROGRESSION AXIS LOCK: when an athlete already owns strict One-Arm Pull-up reps and is in a high-concurrency strength plus combat-sport plan, do not create progression merely by adding strict OAP sets. Keep strict OAP attempt-set count stable through build weeks unless the intake or authored source specifically identifies volume tolerance as the limiter. Prefer better execution quality, rep quality within a low set count, less assistance on the assisted exposure, or another verified performance variable that does not manufacture extra fatigue. Week 4 must hold or reduce strict OAP sets versus Week 3 while preserving the best earned skill standard. Never move volume from accessories into extra strict OAP sets just to satisfy a general progression or consolidation check.", // ADVANCED-HYBRID-OAP-PROGRESSION-AXIS-LOCK
 ].join("\n");
 
 function extractOpenAIIntake(userContent) {
@@ -241,6 +254,11 @@ function buildOpenAICompactUser(userContent) {
     "When a supplied marathon rule says one progression lever per transition, copy non-selected running-category prescriptions unchanged from the prior week; within quality work, change pace OR accumulated work, not both.",
     "When a marathon intake supplies current weekly running distance, Week 1 direct running distance must not exceed it. Treat supplied current volume as the starting anchor and begin progression in later weeks.",
     "Every physical TSV data row in every week must contain exactly nine tab-separated cells matching the required header; never insert an extra set/reps/rest/RPE field or an embedded tab inside a cell.",
+    "YOUTH KNOWN-CAPACITY PULL-UP RULE: when a youth intake supplies a strict pull-up maximum, repeated working sets must remain comfortably below that fresh max. For a 12-rep max, ordinary 3+ set submaximal work should normally live around 6-8 clean reps per set rather than repeated 10-12 rep sets. Progress quality, a small amount of volume, assistance, tempo or a verified skill-support variation without turning the benchmark max into the work-set target.",
+    "YOUTH PRIMARY-SKILL-FIRST RULE: when the youth primary goals are bar muscle-up and/or freestanding handstand, every session containing those skills must place the primary skill rows immediately after the warm-up and before ring dips, rows, pull-ups, pistol squats or other support strength. Skill quality is evaluated while fresh, not after fatigue-producing foundation work.",
+    "YOUTH QUALITY-PROGRESSION RULE: progress primary gymnastics skills by a measurable skill-quality variable rather than simply adding sets. For handstand use successful entry percentage, independent balance time, body-line standard or reduced wall dependence while keeping controlled kick-ups around 3-5 quality sets and no more than roughly 20 planned attempts. For bar muscle-up use transition height/quality, less band assistance, cleaner high-pull height or stricter transition execution. Weeks 1-3 must visibly progress at least one such quality variable for each primary skill.",
+    "YOUTH HANDSTAND COMPONENT RULE: for a youth seeking a first freestanding handstand who still relies on the wall, preserve BOTH Wall Handstand Hold for position/static capacity and Controlled Handstand Kick-up for fresh entry/independent-balance practice. Do not delete wall-supported capacity merely because kick-ups are present, and do not replace balance practice with longer wall holds.",
+    "YOUTH WEEK-4 RETENTION RULE: consolidation reduces fatigue, not earned capability. Reduce sets or attempts first while retaining the best clean Week-2/3 rep, assistance, balance, entry, ROM or execution standard. Explicitly reference retaining/matching the best Week-3 skill quality when volume is reduced.",
     "Week 4 is not automatically a deload. Consolidate or trim only when justified by the athlete constraints.",
   ].join("\n");
 }
@@ -309,7 +327,7 @@ async function runEngineRaw(userContent) {
       const sourceUserChars = String(userContent || "").length;
       const sentUserChars = compactUser.length;
       if (developerChars > 20000) throw new Error("OpenAI developer prompt unexpectedly large.");
-      if (/A NEW CLIENT has submitted/i.test(String(userContent || "")) && sentUserChars > 45000) throw new Error("OpenAI compact build prompt exceeded 45000 characters.");
+      if (/A NEW CLIENT has submitted/i.test(String(userContent || "")) && sentUserChars > 70000) throw new Error("OpenAI compact build prompt exceeded 70000 characters."); // OPENAI-COMPACT-PROMPT-BUDGET-70K
       console.log("OpenAI Phase15 prompt layout:", JSON.stringify({ developer_chars: developerChars, source_user_chars: sourceUserChars, sent_user_chars: sentUserChars, legacy_engine_chars_not_sent: ENGINE.length, execution_path: "deterministic-skeleton-v5.2.10-source-grounded" }));
       const r = await fetch("https://api.openai.com/v1/responses", {
         method: "POST",
@@ -352,7 +370,12 @@ async function runEngineRaw(userContent) {
         elapsed_ms: Date.now() - started
       };
       console.log("OpenAI generation usage:", JSON.stringify(lastAIUsage));
-      if (!text) throw new Error("OpenAI returned no output_text content.");
+      if (!text) {
+        const emptyOutputError = new Error("OpenAI returned no output_text content.");
+        emptyOutputError.code = "OPENAI_EMPTY_OUTPUT";
+        emptyOutputError.status = 503; // OPENAI-EMPTY-OUTPUT-TRANSIENT-RETRY
+        throw emptyOutputError;
+      }
       return normalizeOpenAIExerciseNames(text, intake);
     } catch (e) {
       const providerMessage = String(e?.message || e || '');
@@ -436,11 +459,33 @@ async function runEngineRaw(userContent) {
 // Wrapper: call the engine, validate the result, and retry a couple of times if
 // the model returned a degenerate/invalid program. Each attempt is independent,
 // so an intermittent collapse is recovered transparently.
+function isTransientAIProviderError(err) {
+  const status = Number(err?.status || err?.statusCode || err?.response?.status || 0);
+  if ([429, 500, 502, 503, 504].includes(status)) return true;
+  const code = String(err?.code || '').toUpperCase();
+  if (['ETIMEDOUT', 'ECONNRESET', 'ECONNREFUSED', 'EAI_AGAIN', 'UND_ERR_CONNECT_TIMEOUT', 'UND_ERR_HEADERS_TIMEOUT', 'UND_ERR_SOCKET'].includes(code)) return true;
+  const message = String(err?.message || err || '');
+  return /(?:\b429\b|\b500\b|\b502\b|\b503\b|\b504\b|high demand|overload|temporar(?:y|ily) unavailable|resource exhausted|rate limit|timed? out|timeout|connection reset|socket hang up)/i.test(message);
+}
+
+function transientAIRetryDelayMs(attempt) {
+  return Math.min(5000, 1000 * Math.max(1, Number(attempt) || 1));
+}
+
+// TRANSIENT-AI-PROVIDER-RETRY
 async function runEngine(userContent) {
-  const MAX_ATTEMPTS = 5;
+  const MAX_ATTEMPTS = 4; // OPENAI-MULTI-ATTEMPT-REPAIR-BUDGET
   let last = "";
   for (let attempt = 1; attempt <= MAX_ATTEMPTS; attempt++) {
-    last = await runEngineRaw(userContent);
+    try {
+      last = await runEngineRaw(userContent);
+    } catch (err) {
+      if (!isTransientAIProviderError(err) || attempt === MAX_ATTEMPTS) throw err;
+      const delayMs = transientAIRetryDelayMs(attempt);
+      console.warn(`runEngine: transient AI provider failure on attempt ${attempt}/${MAX_ATTEMPTS}; retrying in ${delayMs}ms: ${err?.message || err}`);
+      await new Promise((resolve) => setTimeout(resolve, delayMs));
+      continue;
+    }
     if (isValidProgram(last)) return last;
     console.warn(
       `runEngine: invalid/degenerate output on attempt ${attempt}/${MAX_ATTEMPTS} ` +
@@ -1631,7 +1676,12 @@ function phase15LastMileTsv(tsv, intake) {
     if (cells.length !== 9 || /^Day$/i.test(cells[0])) { out.push(line); continue; }
     if (availableDays.length === requestedDays && requestedDays > 0) {
       const rawDay = String(cells[0] || '').trim();
-      if (rawDay) {
+      // FIXED-DAY-LASTMILE-PRESERVE-REAL-WEEKDAYS: real weekday labels already carry calendar
+      // meaning. Do not remap a separate endurance/sport day merely because the
+      // intake also supplies fixed gym days. Only placeholder/session-style labels
+      // may be mapped onto available_gym_days.
+      const isRealWeekday = /^(?:mon(?:day)?|tue(?:sday)?|wed(?:nesday)?|thu(?:rsday)?|fri(?:day)?|sat(?:urday)?|sun(?:day)?)$/i.test(rawDay);
+      if (rawDay && !isRealWeekday) {
         if (!dayMap.has(rawDay)) dayMap.set(rawDay, availableDays[dayMap.size] || rawDay);
         cells[0] = dayMap.get(rawDay);
       }
@@ -1899,12 +1949,147 @@ app.get("/api/health", async (req, res) => {
 // amendments ACCUMULATE across attempts (append, never replace). After a given
 // error code has failed 3 times we downgrade to a deterministic hard-substitute
 // pass rather than failing the whole build.
+// INTERNAL_QUALITY_REPAIR_ARCHITECTURE
+function buildInternalQualityRepairPrompt(intake, candidateProgram, validatorFeedback) {
+  const skeleton = buildDeterministicBrief(intake);
+  const quality = phase15PromptRules(intake);
+  const sourceGrounding = buildPhase15SourceGrounding(ENGINE, intake, EXERCISE_DICTIONARY);
+  return [
+    'INTERNAL QUALITY REPAIR MODE. This candidate has NOT been approved for the client.',
+    'Repair ONLY the concrete validator defects below. Preserve every unaffected day, exercise, load, set, rep, rest period and coaching decision.',
+    'CUMULATIVE-CONSTRAINT RULE: validator feedback is cumulative. Every previously identified correction remains a hard constraint even when the newest failure is different. Never fix one defect by reintroducing an earlier defect.',
+    'Do not redesign the block merely to make it different. Do not add filler conditioning. Do not remove a named-goal exposure to solve an unrelated problem.',
+    'EXERCISE-NAME RULE: if a movement is legitimate but the exact display name is not accepted, use the closest canonical exercise name from the authoritative catalog and preserve the intended execution detail in Notes.',
+    'ROLE-PRESERVATION RULE: an exercise-name repair must preserve the original coaching role. Do not delete the only weekly push, trunk, unilateral, carry, direct-run or direct-ruck exposure merely to satisfy the vocabulary gate.',
+    'EQUIPMENT RULE: replace an unavailable movement only with a movement-family substitute that preserves the training intent. Never use Burpee EMOM, Hill Sprints or unrelated conditioning as a generic substitute for an unavailable strength or skill movement.',
+    'CLIENT CLEANLINESS RULE: never emit [REVIEW], contact-support text, QA labels, placeholders or an invented exercise.',
+    'Return the COMPLETE corrected client program with all four START_WEEKn_TSV / END_WEEKn_TSV blocks. Return no repair commentary outside the normal client-facing deliverable.',
+    '',
+    '=== CLIENT INTAKE ===',
+    JSON.stringify(intake, null, 2),
+    '',
+    skeleton,
+    '',
+    quality,
+    '',
+    sourceGrounding,
+    '',
+    '=== CUMULATIVE VALIDATOR CONTRACT TO REPAIR AND PRESERVE ===',
+    String(validatorFeedback || 'Unknown quality failure'),
+    '',
+    '=== CURRENT CANDIDATE PROGRAM ===',
+    String(candidateProgram || ''),
+  ].join('\n');
+}
+
+function buildRolePreservingRepairFeedback(err, intake) {
+  // AGGREGATE-ROLE-PRESERVING-FEEDBACK
+  const flags = err?.code === "PHASE15_QUALITY_VIOLATION" && Array.isArray(err?.flags) && err.flags.length
+    ? err.flags
+    : [err];
+  const feedbackParts = flags
+    .map((flag) => String(flag?.amendment || flag?.message || flag?.code || '').trim())
+    .filter(Boolean);
+  let feedback = feedbackParts.length
+    ? feedbackParts.join("\n\n--- ALSO REPAIR AND PRESERVE ALL PRIOR ITEMS ---\n\n")
+    : String(err?.amendment || err?.message || err?.code || 'Unknown quality failure');
+
+  const hybridWeek4 = flags.find((flag) => flag?.code === "ADVANCED_HYBRID_WEEK4_NOT_CONSOLIDATING");
+  if (hybridWeek4) {
+    const d = hybridWeek4.details || {};
+    const setTarget = Number.isFinite(Number(d.setTarget)) ? Number(d.setTarget) : Math.max(1, Math.floor(Number(d.w3Sets || 1) * 0.85));
+    const runTarget = Number.isFinite(Number(d.runTarget)) ? Number(d.runTarget) : null;
+    feedback += "\nADVANCED-HYBRID-NUMERIC-REPAIR-FEEDBACK: Repair Week 4 only. Keep Weeks 1-3 and the required exercise identities/calendar unchanged. Week 3 strength work sets=" + String(d.w3Sets ?? 'unknown') + ", Week 4 strength work sets=" + String(d.w4Sets ?? 'unknown') + ". Make Week 4 total strength work sets <= " + String(setTarget) + " and strictly below Week 3. Week 3 peak RPE=" + String(d.w3Rpe ?? 'unknown') + ", Week 4 peak RPE=" + String(d.w4Rpe ?? 'unknown') + "; Week 4 peak must not exceed Week 3. " + (d.w3Run != null ? ("Week 3 long run=" + String(d.w3Run) + " km and Week 4 long run=" + String(d.w4Run ?? 'unknown') + " km; make Week 4 long run strictly lower" + (runTarget != null ? (", approximately " + String(runTarget) + " km") : "") + ". ") : "") + "STRICT OAP VOLUME LOCK: preserve Week 4 direct strict One-Arm Pull-up set count at or below Week 3. Never move sets removed from accessories, bilateral pulling, pressing or lower-body work into extra strict OAP attempts. Reduce fatigue around the primary skill while retaining its best earned quality. Do not replace removed sets with extra reps, harder effort, new exercises, intervals, finishers or conditioning. This is a measurable workload reduction, not a prose rewrite. [ADVANCED-HYBRID-OAP-REPAIR-VOLUME-LOCK]"; // ADVANCED-HYBRID-NUMERIC-REPAIR-FEEDBACK
+  }
+
+  const hybridBenchmark = flags.find((flag) => flag?.code === "ADVANCED_HYBRID_BENCHMARK_LOADING");
+  if (hybridBenchmark) {
+    const benchmarkContext = String(intake?.current_numbers || (Array.isArray(intake?.performance_markers) ? intake.performance_markers.join(' | ') : intake?.performance_markers) || '').trim();
+    feedback += "\nADVANCED-HYBRID-BENCHMARK-REPAIR-FEEDBACK: The intake supplied these current performance anchors: " + benchmarkContext + ". For the named direct benchmarked lift in the failure, replace RPE-selected load with a sensible numeric kg prescription or an explicit percentage anchored to that demonstrated result. The target goal is not the current capacity. Use submaximal work that is credible from the current benchmark, preserve the required sets/reps/RPE relationship, and do not invent a new max. Keep already-valid weeks and exercises unchanged unless the validator explicitly requires otherwise."; // ADVANCED-HYBRID-BENCHMARK-REPAIR-FEEDBACK
+  }
+
+  const hybridSquat = flags.find((flag) => flag?.code === "ADVANCED_HYBRID_SQUAT_SPECIFICITY");
+  if (hybridSquat) {
+    const fixedDays = Array.isArray(intake?.available_gym_days) ? intake.available_gym_days.join(', ') : '';
+    feedback += "\nADVANCED-HYBRID-SQUAT-SPECIFICITY-REPAIR: Restore TWO direct Back Squat work rows in EVERY week, on two separate fixed gym days. Use the exact Exercise name Back Squat for both. One is a compact heavy exposure and one is a lower-cost volume/specificity exposure. Keep both through Week 4 even while reducing Week 4 sets. Do not count warm-up squats, split squats, leg press, machines, accessories or notes as either exposure. Fixed gym days are: " + fixedDays + ". Preserve all other already-valid primary goal exposures and trim accessories first."; // ADVANCED-HYBRID-SQUAT-SPECIFICITY-REPAIR
+  }
+
+  const eventProgression = flags.find((flag) => flag?.code === "EVENT_PROGRESSING_SESSION_MISSING");
+  if (eventProgression) {
+    const goals = [intake?.primary_goals, intake?.secondary_goals].flat().filter(Boolean).map(String).join(' | ');
+    const evidence = [intake?.current_numbers, intake?.performance_markers, intake?.clarification_answers, intake?.notes].map((v) => typeof v === 'string' ? v : JSON.stringify(v || '')).join(' ');
+    if (/\bmarathon\b/i.test(goals)) {
+      const kmMatches = [...evidence.matchAll(/\b(\d+(?:\.\d+)?)\s*km\b/ig)].map((m) => Number(m[1])).filter((n) => Number.isFinite(n) && n > 0);
+      const baselineKm = kmMatches.length ? Math.max(...kmMatches) : null;
+      feedback += "\nMARATHON-EVENT-ANCHOR-SURGICAL-REPAIR: Do not add another run day or hard conditioning. Preserve the existing direct run session and make it unmistakably the marathon progression anchor by identifying it in Notes as the Long run (or Long aerobic run) and prescribing a measurable distance or duration. Week 1 must stay at or below the supplied current running baseline" + (baselineKm != null ? (" of about " + baselineKm + " km") : "") + ". Across Weeks 1-3 progress only ONE variable for this same long-run pathway, normally a small distance/duration increase while easy effort stays unchanged; copy non-selected running categories unchanged. Week 4 must consolidate below Week 3 in this high-concurrency block. Do not add intervals, threshold work, extra run frequency, or a second progression category just to satisfy this validator. Preserve every already-valid strength, OAP, OHP, MMA and calendar decision."; // MARATHON-EVENT-ANCHOR-SURGICAL-REPAIR
+    } else if (/\b3\s*k(?:m)?\b|\b3\s*km\b/i.test(goals) && /\b(?:tactical|combat[- ]?ready|special[- ]?operations|operator)\b/i.test(evidence)) {
+      feedback += "\nTACTICAL-3K-EVENT-ANCHOR-SURGICAL-REPAIR: Do NOT add another run, conditioning row, or training day. The athlete already requires three direct running exposures and currently tolerates about 18-20 km/week. Convert ONE EXISTING Week-1 Run row into the event-progression anchor by giving that same row a source-supported 3K-specific interval/pace target in Weight, Reps or Notes (for example the already-contextualized repeat structure), while keeping the other existing Run rows as the easy/long aerobic support. Preserve three run days, the established weekly running exposure, the ruck, strength and pull-up structure, shin-impact spacing, and the five-calendar-day budget. If the event-specific run shares a day with strength, shorten/remove low-priority accessories rather than exceeding the supplied 60-minute session ceiling. Across later weeks progress the existing 3K-specific row by one useful variable at a time and consolidate Week 4; never solve this validator by appending a fourth run or extra HIIT."; // TACTICAL-3K-EVENT-ANCHOR-SURGICAL-REPAIR
+    }
+  }
+
+  const missingStrengthSessions = flags.find((flag) => flag?.code === "REQUESTED_STRENGTH_SESSIONS_UNACCOUNTED");
+  if (missingStrengthSessions) {
+    const requestedStrength = Number(intake?.days_per_week || 0);
+    const gymDays = Array.isArray(intake?.available_gym_days) ? intake.available_gym_days.filter(Boolean).map(String) : [];
+    const goals = [intake?.primary_goals, intake?.secondary_goals, intake?.maintenance_goals].flat().filter(Boolean).map(String).join(' | ');
+    const sport = String(intake?.sport || '') + ' ' + JSON.stringify(intake?.sport_schedule || []);
+    const highConcurrencyHybrid = /(?:squat|one[- ]?arm pull|\boap\b)/i.test(goals) && /\b(?:mma|bjj|jiu[- ]?jitsu|wrestl|boxing|combat)\b/i.test(sport);
+    if (highConcurrencyHybrid && requestedStrength > 0) {
+      const fixedDays = gymDays.length === requestedStrength ? gymDays.join(', ') : '';
+      feedback += "\nHYBRID-STRENGTH-FREQUENCY-SURGICAL-REPAIR: Preserve exactly " + requestedStrength + " meaningful strength/skill-strength sessions in every week. " + (fixedDays ? ("The intake supplies exactly " + requestedStrength + " available gym days (" + fixedDays + "), so EACH of those days must retain meaningful resistance/advanced-skill work; do not turn any of them into a run-only/cardio-only day. ") : "Do not delete an existing strength day while moving endurance work. ") + "A run, ruck or conditioning-only day never counts toward this strength-session total. If the long run needs relocation, put it on a compatible non-gym day rather than replacing one of the requested lifting sessions. Preserve the already-valid squat, OAP, OHP/vertical press and weighted-pull structure; restore the missing strength day with low-cost goal-relevant work if needed rather than adding random volume."; // HYBRID-STRENGTH-FREQUENCY-SURGICAL-REPAIR
+    }
+  }
+
+  const unknown = flags
+    .filter((flag) => flag?.code === "EXERCISE_HALLUCINATION")
+    .flatMap((flag) => Array.isArray(flag?.details?.unknown) ? flag.details.unknown : [])
+    .map((u) => String(u?.exercise || ''))
+    .filter(Boolean);
+  if (unknown.length) feedback += "\nREJECTED EXERCISE NAMES: " + [...new Set(unknown)].join(" | ") + ".";
+
+  const tacticalContext = JSON.stringify({
+    primary_goals: intake?.primary_goals,
+    secondary_goals: intake?.secondary_goals,
+    maintenance_goals: intake?.maintenance_goals,
+    notes: intake?.notes,
+    sport: intake?.sport,
+  });
+  if (unknown.length && /\b(?:tactical|military|special[- ]?operations|selection prep|combat[- ]?ready|operator)\b/i.test(tacticalContext)) {
+    feedback += "\nTACTICAL ROLE-PRESERVING CANONICAL MENU: for low-cost pushing use exact Exercise names Push-up, Dip or Overhead Press; for trunk use Pallof Press, Side Plank, Dead Bug or Hanging Leg Raise; for unilateral support use Reverse Lunge or Bulgarian Split Squat; for posterior-chain knee flexion use Leg Curl, Lying Leg Curl, Seated Leg Curl or Nordic Hamstring Curl; for carries use Farmer Carry or Suitcase Carry; for direct loaded marching use Backpack Carry; for running use Run. Rest or Off days are omitted from TSV rows entirely. Keep load, pace, interval, tempo and execution qualifiers in Weight/Reps/Notes rather than inventing a new Exercise name. Preserve at least the required small weekly push and trunk floor while repairing names.";
+  }
+  const repairContext = String(feedback || '');
+  const youthAge = Number(intake?.age || intake?.age_years || 0);
+  const youth = Number.isFinite(youthAge) && youthAge > 0 && youthAge < 18;
+  if (youth && /(?:PULL_UP_DOSE_EXCEEDS_KNOWN_CAPACITY|KNOWN-CAPACITY PULL-UP)/i.test(repairContext)) {
+    const evidence = [intake?.current_numbers, intake?.performance_markers, intake?.clarification_answers].map((v) => typeof v === 'string' ? v : JSON.stringify(v || '')).join(' ');
+    const m = evidence.match(/(?:strict\s+pull[- ]?ups?\s*:?\s*|about\s+)(\d{1,2})\s*(?:strict\s*)?pull[- ]?ups?|(?:strict\s+pull[- ]?ups?[^\d]{0,12})(\d{1,2})/i);
+    const knownMax = m ? Number(m[1] || m[2]) : null;
+    const safeUpper = Number.isFinite(knownMax) ? Math.max(3, Math.floor(knownMax * 0.70)) : null;
+    feedback += '\nYOUTH-PULL-UP-SURGICAL-REPAIR: Preserve the pull-up goal and bar-muscle-up support role, but reduce repeated bodyweight work-set reps rather than deleting the exercise. ' + (safeUpper ? ('The supplied strict maximum is about ' + knownMax + ' reps, so cap ordinary 3+ set submaximal work at about ' + safeUpper + ' clean reps per set in this candidate. ') : '') + 'Use a small progression in clean reps/sets or a verified high-pull/transition variable across Weeks 1-3. Never program repeated sets at or near the fresh max while calling them RPE 7-8.';
+  }
+  if (youth && /YOUTH_PRIMARY_SKILL_NOT_FRESH/i.test(repairContext)) {
+    feedback += '\nYOUTH-SKILL-FIRST-SURGICAL-REPAIR: Reorder rows rather than adding work. In every Session A/Session B that contains a primary bar-muscle-up or handstand skill, keep the warm-up first and then place ALL primary skill rows immediately after it, before Ring Dip, Ring Row, Pull-up, Pistol Squat or any other fatigue-producing support exercise. Do not merely change Notes; physically move the skill rows so the TSV order is warm-up -> primary skills -> foundation strength -> accessories. Preserve the existing exercises and total session dose unless another validator requires a dose change.';
+  }
+  if (youth && /YOUTH_PROGRESSION_QUALITY_MISSING/i.test(repairContext)) {
+    feedback += '\nYOUTH-QUALITY-PROGRESSION-SURGICAL-REPAIR: Preserve the existing two-session architecture and do not solve progression by adding more and more sets. Across Weeks 1-3 give each primary skill a visible measurable QUALITY progression. For Controlled Handstand Kick-up, keep about 3-5 quality sets and <=20 planned attempts/session while progressing successful-entry standard and/or independent balance target (for example cleaner 1s -> 2s -> 3s balance or a higher success criterion). For Wall Handstand Hold, progress body line/control or a modest hold target without replacing kick-up practice. For bar muscle-up preparation, progress high-pull height/quality, transition cleanliness or reduce band assistance while preserving strict technique. Week 4 must reduce fatigue while retaining the best Week-3 quality standard. Do not use set-count inflation as the main progression lever.';
+  }
+  if (youth && /GOAL_COMPONENT_COVERAGE_MISSING/i.test(repairContext)) {
+    feedback += '\nYOUTH-HANDSTAND-COMPONENT-SURGICAL-REPAIR: If the goal is first freestanding handstand and the athlete has wall holds but no reliable unsupported balance, preserve one meaningful Wall Handstand Hold exposure for static position capacity AND Controlled Handstand Kick-up for fresh entry/balance practice. Use those exact canonical Exercise names. Do not remove either component while repairing unrelated rows.';
+  }
+  if (youth && /YOUTH_CONSOLIDATION_RESET_TO_BASELINE/i.test(repairContext)) {
+    feedback += '\nYOUTH-WEEK4-SURGICAL-REPAIR: Do not copy Week 1 back into Week 4 after Weeks 2-3 progressed. Reduce fatigue by cutting sets/attempts first, while retaining at least an intermediate-to-Week-3 clean rep, assistance, balance, ROM or execution standard. For handstand/skill rows, explicitly say retain or match the best clean Week-3 entry/balance/quality while using fewer attempts. Preserve every unrelated Week-4 row.';
+  }
+  return feedback;
+}
 async function generateValidatedProgram(intake, onProgress = async () => {}) {
-  const MAX_ATTEMPTS = OPENAI_API_KEY ? 2 : 3;
+  const MAX_ATTEMPTS = 4; // INTERNAL-QA-REPAIR-BUDGET
   const basePrompt = buildPrompt(intake);
   const amendments = [];
   const failCounts = Object.create(null);
   let lastValid = null;
+  let repairCandidate = null;
+  let repairFeedback = "";
+  const qaTrace = [];
   const deadline = Date.now() + BUILD_JOB_TIMEOUT_MS;
 
   for (let attempt = 1; attempt <= MAX_ATTEMPTS; attempt++) {
@@ -1914,9 +2099,12 @@ async function generateValidatedProgram(intake, onProgress = async () => {}) {
       throw err;
     }
     await onProgress("generating", attempt, attempt === 1 ? "initial generation" : "regenerating after quality check");
-    const userContent = amendments.length
-      ? basePrompt + "\n\n" + amendments.join("\n\n")
-      : basePrompt;
+    const cumulativeRepairFeedback = amendments.length
+      ? amendments.join("\n\n--- PRESERVE PRIOR QA CONSTRAINT ---\n\n")
+      : repairFeedback;
+    const userContent = repairCandidate
+      ? buildInternalQualityRepairPrompt(intake, repairCandidate, cumulativeRepairFeedback)
+      : (amendments.length ? basePrompt + "\n\n=== ACCUMULATED QA CORRECTIONS ===\n" + amendments.join("\n\n") : basePrompt);
     const raw = await runEngineRaw(userContent);
     if (!isValidProgram(raw)) {
       console.warn(
@@ -1926,50 +2114,80 @@ async function generateValidatedProgram(intake, onProgress = async () => {}) {
       await onProgress("refining", attempt, "structural output check failed");
       continue;
     }
-    let program = fixInvalidExerciseNames(raw); // step 1
+    let program = normalizeYouthPrimarySkillOrder(enrichSpecificWarmups(repairUnbenchmarkedVariationLoads(fixInvalidExerciseNames(raw), intake)), intake).program; // step 1: DETERMINISTIC-UNBENCHMARKED-LOAD-REPAIR + SPECIFIC-WARMUP-ENRICHMENT + YOUTH-SKILL-ORDER-REPAIR
+    program = normalizeAdvancedHybridWeek4OapConsolidation(program, intake).program; // ADVANCED-HYBRID-OAP-CONSOLIDATION-REPAIR-WIRED
     try {
       await onProgress("validating", attempt, "exercise and coaching validators");
-      const dict = validateExercisesAgainstDictionary(program, intake); // step 2
-      program = dict.program;
-      if (!OPENAI_API_KEY) {
-        const skills = validateAndCalibrateSkills(program, intake); // legacy path only
-        program = skills.program;
-      }
-      validateEquipmentAgainstLocation(program, intake);        // step 4
-      enforceUnilateralIntensityFloor(program, intake);         // step 5
-      program = enforceIntradayConditioningOrder(program, intake); // step 6
-      validateSportDayCoupling(program, intake);                // step 7
-      validateWeeklyVolumeBudget(program, intake);              // step 8
-      program = reformatWarmupCells(program);                   // step 9
-      program = repairPhase15Program(program);                    // step 10: safe ordering only
-      validatePhase15FinalProgram(program, intake);              // step 11: variation-aware final QA
+      const aggregateValidation = validateRepairableProgramBundle(program, intake, {
+        skipSkillCalibration: Boolean(OPENAI_API_KEY), // OPENAI-DIRECT-SKILL-CALIBRATION-GUARD
+      }); // AGGREGATE-REPAIR-VALIDATION-RUNTIME
+      program = aggregateValidation.program;
+      validateClientOutputCleanliness(program); // CLIENT-OUTPUT-CLEANLINESS-INLOOP              // step 11: variation-aware final QA
       await onProgress("finalizing", attempt, "quality checks passed including Phase 15 v5");
       return program;
     } catch (err) {
-      if (err && err.code && RETRIABLE_CODES.has(err.code)) {
+      const repairable = Boolean(err && (
+        (err.code && RETRIABLE_CODES.has(err.code)) ||
+        err.code === "PHASE15_QUALITY_VIOLATION" ||
+        err.code === "PROGRESSION_ARCHITECTURE_MISSING" ||
+        err.code === "YOUTH_PROGRESSION_QUALITY_MISSING" ||
+        err.code === "YOUTH_CONSOLIDATION_RESET_TO_BASELINE" ||
+        err.code === "TACTICAL_SCHEDULE_ARCHITECTURE_VIOLATION" ||
+        err.code === "PULL_UP_DOSE_EXCEEDS_KNOWN_CAPACITY" ||
+        err.code === "TACTICAL_GPP_COVERAGE_MISSING" ||
+        err.code === "TACTICAL_STRENGTH_SESSION_TOO_THIN" ||
+        err.code === "TACTICAL_3K_INTERVAL_PROGRESSION_VIOLATION" ||
+        err.code === "HARD_RUN_WARMUP_MISSING"
+      ));
+      if (repairable) {
         lastValid = program;
-        failCounts[err.code] = (failCounts[err.code] || 0) + 1;
+        const repairCode = err.code || "INTERNAL_QUALITY_VIOLATION";
+        const specificCodes = Array.isArray(err.flags) && err.flags.length
+          ? err.flags.map((f) => f && f.code).filter(Boolean)
+          : [repairCode];
+        const repairLabel = specificCodes.length ? specificCodes.join("+") : repairCode;
+        const qaHallucinationSource = repairCode === "EXERCISE_HALLUCINATION"
+          ? err
+          : (Array.isArray(err?.flags) ? err.flags.find((flag) => flag?.code === "EXERCISE_HALLUCINATION") : null);
+        const qaUnknownNames = intake && intake.qa_diagnostics === true && Array.isArray(qaHallucinationSource?.details?.unknown)
+          ? qaHallucinationSource.details.unknown
+              .map((u) => String(u?.exercise || '').replace(/[\r\n\[\]|]+/g, ' ').trim().slice(0, 60))
+              .filter(Boolean)
+              .slice(0, 6)
+          : [];
+        const qaUnknownSuffix = qaUnknownNames.length ? '[' + qaUnknownNames.join('|') + ']' : '';
+        qaTrace.push(`A${attempt}:${repairLabel}${qaUnknownSuffix}`); // QA-DIAGNOSTIC-UNKNOWN-NAMES
+        failCounts[repairLabel] = (failCounts[repairLabel] || 0) + 1;
         console.warn(
-          `generateValidatedProgram: ${err.code} on attempt ${attempt}/${MAX_ATTEMPTS} ` +
-            `(count=${failCounts[err.code]})`
+          `generateValidatedProgram: grounded internal repair for ${repairLabel} on attempt ${attempt}/${MAX_ATTEMPTS} ` +
+            `(count=${failCounts[repairLabel]})`
         );
-        await onProgress("refining", attempt, err.code);
-        if (failCounts[err.code] >= 2 || attempt === MAX_ATTEMPTS) {
-          console.warn(`generateValidatedProgram: deterministic hard-substitute for ${err.code}`);
-          program = hardSubstitute(err.code, program, intake);
-          await onProgress("finalizing", attempt, `deterministic correction for ${err.code}`);
-          return reformatWarmupCells(program);
-        }
-        if (!amendments.includes(err.amendment)) amendments.push(err.amendment);
+        await onProgress("refining", attempt, `internal repair: ${repairLabel}`);
+        repairFeedback = buildRolePreservingRepairFeedback(err, intake);
+        if (repairFeedback && !amendments.includes(repairFeedback)) amendments.push(repairFeedback);
+        // Attempt 2 is the first surgical edit. If that still fails, attempt 3
+        // starts clean from the original grounded brief plus every accumulated
+        // validator correction. Attempt 4 can surgically repair that fresh result
+        // while still receiving every prior correction as a cumulative contract.
+        const structuralRepairCodes = new Set([
+          "TSV_PARSE_FAIL", "TSV_SCHEMA_VIOLATION", "TSV_WEEK_BLOCK_MISSING",
+          "TSV_ROW_COLUMN_COUNT_MISMATCH", "TSV_COLUMN_COUNT", "WEEK_MARKER_COUNT",
+          "WEEK_MARKER_ORDER", "MISSING_WEEK_BLOCK", "WEEK_BLOCK_MISSING", "HEADER_MISMATCH"
+        ]);
+        const requiresFreshCandidate = specificCodes.some((code) => structuralRepairCodes.has(String(code || "")));
+        repairCandidate = requiresFreshCandidate ? null : program; // STRUCTURAL-ONLY-FRESH-CANDIDATE
         continue;
       }
       throw err;
     }
   }
   if (lastValid) {
-    for (const code of Object.keys(failCounts)) lastValid = hardSubstitute(code, lastValid, intake);
-    await onProgress("finalizing", MAX_ATTEMPTS, "using last structurally valid program after deterministic corrections");
-    return reformatWarmupCells(lastValid);
+    const trace = qaTrace.join(" -> ");
+    const debugSuffix = intake && intake.qa_diagnostics === true && trace ? ` QA trace: ${trace}.` : "";
+    const err = new Error("Internal coaching QA could not repair the candidate program after multiple passes. No client-facing program was saved. Please retry the build." + debugSuffix);
+    err.code = "INTERNAL_QA_REPAIR_EXHAUSTED";
+    err.qa_trace = qaTrace.slice();
+    throw err;
   }
   throw new Error(
     "The program generator returned an unusable result after multiple attempts. Please try again."
@@ -2001,6 +2219,8 @@ async function runBuildJob(jobId, token, intake, isNewToken = false) {
   try {
     const generationStarted = Date.now();
     const program = privacyScrub(await generateValidatedProgram(intake, progress), intake);
+    validatePhase15FinalProgram(program, intake); // SAVE-BOUNDARY-FINAL-QA
+    validateClientOutputCleanliness(program); // SAVE-BOUNDARY-CLIENT-CLEANLINESS
     const generationAndQaMs = Date.now() - generationStarted;
     await progress("finalizing", 0, "saving program");
     const saveStarted = Date.now();

@@ -66,13 +66,29 @@ const MODALITY_DEFS = [
       /(\d+)\s*swims?\b/i,
     ],
   },
+  {
+    key:'rucking',
+    goal:/\b(?:ruck(?:ing)?|ruck march|loaded march|pack march|backpack march)\b/i,
+    exposure:/\b(?:ruck(?:ing)?|ruck march|loaded march|pack march|backpack march|backpack carry)\b/i,
+    sport:/\b(?:ruck(?:ing)?|ruck march|loaded march|pack march)\b/i,
+    current:[
+      /(?:rucks?|rucking|loaded marches?|pack marches?)\s*(\d+)\s*(?:sessions?|times?)?\s*(?:per|\/|each)\s*week/i,
+      /(\d+)\s*(?:rucks?|rucking sessions?|loaded marches?|pack marches?)\s*(?:per|\/|each)?\s*week/i,
+      /(\d+)\s*rucks?\b/i,
+    ],
+  },
 ];
 
 function explicitModalityGoals(intake={}) {
   const out=[];
   for (const goal of goalList(intake)) {
     if (goal.priority === 'maintenance') continue;
-    for (const def of MODALITY_DEFS) if (def.goal.test(goal.text)) out.push({...goal,def});
+    const ruckGoal = /\b(?:ruck(?:ing)?|ruck march|loaded march|pack march|backpack march)\b/i.test(goal.text);
+    for (const def of MODALITY_DEFS) {
+      // A distance such as '10 km ruck' is a loaded-locomotion goal, not a second running goal.
+      if (ruckGoal && def.key === 'running') continue;
+      if (def.goal.test(goal.text)) out.push({...goal,def});
+    }
   }
   const seen=new Set();
   return out.filter(x=>{const k=`${x.priority}:${x.def.key}:${x.text}`;if(seen.has(k))return false;seen.add(k);return true;});
@@ -253,10 +269,13 @@ export function endurancePerformanceIntegrityFlags(program, intake={}, parsed=nu
 
 function goalFamily(text='') {
   const s=norm(text);
+  const ruckDef=MODALITY_DEFS.find(x=>x.key==='rucking');
+  if(ruckDef?.goal.test(s)) return {key:'rucking',pattern:ruckDef.exposure};
   const defs=[
     ['one_arm_pullup',/(one.?arm pull.?up|\boap\b)/i,/(one.?arm (?:pull|chin).?up)/i],
     ['weighted_chin',/(weighted chin|chin.?up.*\+?\d|\+?\d+\s*kg.*chin)/i,/(weighted chin|chin.?up)/i],
     ['weighted_pullup',/(weighted pull|pull.?up.*\+?\d|\+?\d+\s*kg.*pull)/i,/(weighted pull|pull.?up)/i],
+    ['strict_pullup',/\b(?:strict\s*)?pull.?ups?\b/i,/\b(?:strict\s*)?(?:weighted\s*)?pull.?ups?\b/i],
     ['squat',/(back squat|box squat|front squat|\bsquat\b)/i,/(back squat|box squat|front squat|\bsquat\b)/i],
     ['deadlift',/(deadlift|rdl|romanian deadlift)/i,/(deadlift|rdl|romanian deadlift)/i],
     ['ohp',/(overhead press|\bohp\b)/i,/(overhead press|standing barbell overhead press|push press|dumbbell shoulder press|z press)/i],
@@ -265,7 +284,9 @@ function goalFamily(text='') {
     ['planche',/planche/i,/planche/i],
     ['front_lever',/front lever/i,/front lever/i],
     ['hspu',/(handstand push|\bhspu\b)/i,/(handstand push|\bhspu\b)/i],
+    ['bar_muscle_up',/bar muscle.?up/i,/(bar muscle.?up|bar muscle.?up transition drill)/i],
     ['muscle_up',/muscle.?up/i,/muscle.?up/i],
+    ['handstand',/(freestanding handstand|handstand balance)/i,/(controlled handstand kick.?up|freestanding handstand|handstand balance)/i],
     ['running',MODALITY_DEFS[0].goal,MODALITY_DEFS[0].exposure],
     ['rowing',MODALITY_DEFS[1].goal,MODALITY_DEFS[1].exposure],
     ['cycling',MODALITY_DEFS[2].goal,MODALITY_DEFS[2].exposure],
@@ -475,6 +496,8 @@ export function elitePromptRules(intake={}) {
     'INTEGRITY RULE: exact kilograms require a reliable benchmark for that exact loaded variation or another explicit deterministic anchor. Never transfer fixed kilograms from Back Squat to Box/Front/Pause Squat, or between any other merely related variations. Use RPE-selected load when the exact variation is unbenchmarked.',
     `INTEGRITY RULE: the client requested ${Number(intake.days_per_week||0)||'an unspecified number of'} strength sessions. Respect the deterministic planner's session structure; cardio/core work cannot silently replace a requested resistance-training day.`,
   ];
+  const tacticalContext=JSON.stringify({primary:intake.primary_goals,secondary:intake.secondary_goals,maintenance:intake.maintenance_goals,notes:intake.notes});
+  if(/combat[- ]?ready|special[- ]?operations|tactical|selection prep/i.test(tacticalContext)) rules.push('TACTICAL PRIORITY RULE: tactical/combat-ready language is context, not permission for punishment conditioning. Preserve the named 3K, ruck and calisthenics targets first. Do not add Burpee EMOM, arbitrary operator finishers, daily maximal tests or extra HIIT unless a named performance need, curated source and the recovery/time budget justify it.');
   for(const {priority,text,def} of explicitModalityGoals(intake)) {
     const current=currentTargetModalityExposure(intake,def.key);
     if(def.key==='running') {
@@ -488,6 +511,13 @@ export function elitePromptRules(intake={}) {
         rules.push('CONCURRENT ENDURANCE BUDGET: count the existing combat sessions inside the athlete\'s finite weekly recovery budget before adding conditioning. Preserve the stated direct running exposures first because running specificity matters for the named event. Do not automatically add generic Zone 2 bike/row sessions on top. Cross-training may supplement only when the curated endurance sources support a specific reason such as obtaining useful aerobic work with lower mechanical cost, replacing higher-cost running volume, or filling an identified missing quality; if you use it, state that purpose. Poor/variable recovery or high sport load strengthens the case for removing redundant volume before adding more.');
       }
     } // CONCURRENT-ENDURANCE-BUDGET-PROMPT
+    if(def.key==='rucking') {
+      rules.push('RUCK DIRECT SPECIFICITY: a named ruck/loaded-march goal needs at least one direct weekly ruck exposure. Farmer Carry, sled work and Sandbag Carry may support trunk, grip or work capacity but cannot replace loaded locomotion over meaningful distance/time.');
+      rules.push('RUCK PROGRESSION LOAD MANAGEMENT: progress the smallest useful mechanical variable from the current tolerated benchmark. Do not simultaneously make pack load heavier, distance longer and pace faster. Hold the other major variables stable while one progresses, and use foot/ankle/shin response plus next-day recovery as load-management gates.');
+      rules.push('RUCK LOADED-RUNNING RULE: do not default to heavy loaded running or run under load as a toughness shortcut. Use controlled ruck/loaded walking unless the intake explicitly requires loaded running and the curated source supports it.');
+      const impactContext=JSON.stringify({injuries:intake.injuries,pain:intake.pain,notes:intake.notes});
+      if(/shin[- ]?splint|shin pain|tibial/i.test(impactContext)) rules.push('RUN + RUCK IMPACT HISTORY: the athlete is currently asymptomatic at an established running/ruck workload but has a shin-load history. Preserve tolerated exposure and avoid simultaneous abrupt increases in running impact and ruck mechanical stress; change one main load lever, then reassess symptoms/recovery.');
+    }
     if(def.key==='running' && /\bmarathon\b/i.test(text)) {
       const volumeSource=String(intake.notes||'')+' '+String(intake.current_numbers||'');
       const vm=volumeSource.match(/\b(?:about|around|roughly|approximately|~)?\s*(\d+(?:\.\d+)?)\s*km\s*(?:\/|per)\s*week\b/i);

@@ -266,6 +266,8 @@ export function buildTactical3KGppQualityBrief(intake = {}) {
   if (!isTacticalHybridIntake(intake)) return '';
   const rules = [
     '=== TACTICAL 3K / GPP QUALITY ===',
+    '* EXERCISE-COLUMN IDENTITY: use exact Exercise name Run for easy, long, threshold and interval running rows, and exact Exercise name Backpack Carry for loaded ruck/march rows. Put pace, distance, 20 kg load, interval structure and easy/long/threshold labels in Weight, Reps/Duration or Notes instead of inventing a new Exercise name. This is the TACTICAL-ENDURANCE-EXERCISE-IDENTITY rule.',
+    '* CANONICAL SUPPORT NAMING: Rest, Off and Recovery Day are schedule states, not exercises, so omit non-training days from TSV rows entirely. For posterior-chain knee-flexion support use exact names Leg Curl, Lying Leg Curl, Seated Leg Curl or Nordic Hamstring Curl. Do not invent Ring Hamstring Curl or other equipment-prefixed variants. Keep this small support work subordinate to the 3K, ruck, pull-up and key-strength priorities. This is the TACTICAL-CANONICAL-SUPPORT-NAMING rule.',
     '* A tactical strength week should not be three token gym check-ins. When the stated session budget is 60+ minutes, each real strength day should normally contain the primary lift/skill plus at least one useful second movement or low-cost support piece. Keep support subordinate to the named run, ruck, pulling and key-strength priorities; never pad the session with random circuits or junk volume.',
   ];
   if (has3KGoal(intake)) {

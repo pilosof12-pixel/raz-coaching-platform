@@ -50,7 +50,7 @@ once(
 
 once(
   '  const MAX_ATTEMPTS = 3;',
-  '  const MAX_ATTEMPTS = OPENAI_API_KEY ? 2 : 3;',
+  '  const MAX_ATTEMPTS = OPENAI_API_KEY ? 1 : 3;',
   "attempt budget"
 );
 

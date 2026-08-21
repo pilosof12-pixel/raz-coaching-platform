@@ -19,6 +19,12 @@ import { normalizeFinalNoteCoherence } from './final_note_coherence.js'; // FINA
 import { validatePrescriptionConsistency } from './v34_prescription_consistency.js'; // V34-PRESCRIPTION-CONSISTENCY-WIRED
 import { validateCoachingStandards } from './v35_coaching_standards.js'; // V35-COACHING-STANDARDS-WIRED
 import { normalizeAdvancedHybridWeek4OapConsolidation } from './advanced_hybrid_oap_consolidation_normalizer.js';
+import {
+  normalizeAdvancedHybridSecondaryRunStability,
+  normalizeYouthSkillAcquisitionQuality,
+  normalizeTactical3KRaceSpecificity,
+} from './coaching_spec_v1_convergence_normalizer.js'; // COACH-SPEC-V1-MANUAL-CONVERGENCE
+import { normalizeAdvancedHybridAdjacentPulling } from './advanced_hybrid_pull_spacing_normalizer.js'; // COACH-SPEC-V1-AH04-NORMALIZER
 import { normalizeAdvancedHybridOHPComplement } from './advanced_hybrid_ohp_normalizer.js';
 import { normalizeYouthPrimarySkillOrder } from './youth_skill_order_normalizer.js';
 import { normalizeYouthAcquisitionGoalFloors } from './youth_goal_floor_normalizer.js';
@@ -48,10 +54,17 @@ import {
 } from './coaching_acceptance_quality.js';
 import { validateYouthConsolidationRetentionSemantic } from './coaching_consolidation_quality.js';
 import { validateGoalComponentCoverageSemantic } from './goal_progression_graph.js';
+import { validateAdvancedHybridQualitySemantic } from './advanced_hybrid_quality.js';
 import {
   validateYouthManualAcceptanceSemantic,
   validateAdvancedHybridManualAcceptanceSemantic,
 } from './manual_acceptance_quality.js';
+import {
+  validateAdvancedHybridCoachingSpecV1,
+  validateYouthCoachingSpecV1HardRules,
+  validateTactical3KCoachingSpecV1,
+} from './coaching_spec_v1_quality.js'; // COACHING-SPEC-V1-HARD-RULES
+import { validateTacticalManualAcceptanceSemantic } from './tactical_manual_acceptance.js'; // TACTICAL-MANUAL-ACCEPTANCE-WIRED
 
 const NON_EXERCISE_ROW_NAMES = new Set(['rest', 'rest day', 'off', 'off day', 'recovery day']);
 
@@ -196,6 +209,10 @@ function applyDeterministicCandidateRepairs(program, intake = {}) {
   candidate = advancedOapConsolidation.program;
   if (advancedOapConsolidation.repaired) repairs.push({ type: 'advanced_hybrid_week4_oap_consolidation', rows: advancedOapConsolidation.repairs });
 
+  const advancedPullSpacing = normalizeAdvancedHybridAdjacentPulling(candidate, intake);
+  candidate = advancedPullSpacing.program;
+  if (advancedPullSpacing.repaired) repairs.push({ type: 'advanced_hybrid_adjacent_pull_spacing', rows: advancedPullSpacing.repairs }); // COACH-SPEC-V1-AH04-CANDIDATE-REPAIR
+
   const advancedOhpComplement = normalizeAdvancedHybridOHPComplement(candidate, intake);
   candidate = advancedOhpComplement.program;
   if (advancedOhpComplement.repaired) repairs.push({ type: 'advanced_hybrid_ohp_complement', rows: advancedOhpComplement.repairs });
@@ -223,6 +240,18 @@ function applyDeterministicCandidateRepairs(program, intake = {}) {
   const youthConsolidation = normalizeYouthWeek4Consolidation(candidate, intake);
   candidate = youthConsolidation.program;
   if (youthConsolidation.repaired) repairs.push({ type: 'youth_week4_consolidation', rows: youthConsolidation.repairs });
+
+  const advancedSecondaryRun = normalizeAdvancedHybridSecondaryRunStability(candidate, intake);
+  candidate = advancedSecondaryRun.program;
+  if (advancedSecondaryRun.repaired) repairs.push({ type: 'advanced_hybrid_secondary_run_stability', rows: advancedSecondaryRun.repairs });
+
+  const youthAcquisitionQuality = normalizeYouthSkillAcquisitionQuality(candidate, intake);
+  candidate = youthAcquisitionQuality.program;
+  if (youthAcquisitionQuality.repaired) repairs.push({ type: 'youth_skill_acquisition_quality', rows: youthAcquisitionQuality.repairs });
+
+  const tacticalRaceSpecificity = normalizeTactical3KRaceSpecificity(candidate, intake);
+  candidate = tacticalRaceSpecificity.program;
+  if (tacticalRaceSpecificity.repaired) repairs.push({ type: 'tactical_3k_race_specificity', rows: tacticalRaceSpecificity.repairs }); // COACH-SPEC-V1-MANUAL-CANDIDATE-REPAIR
 
   return { program: candidate, repairs };
 }
@@ -273,12 +302,17 @@ export function collectRepairableValidationFailures(program, intake = {}, option
     () => validateSportDayCouplingSemantic(candidate, intake, model),
     () => validateDirectGoalExposureSemantic(candidate, intake, model),
     () => validateGoalComponentCoverageSemantic(candidate, intake, model),
+    () => validateAdvancedHybridQualitySemantic(candidate, intake, model),
     () => validateProgressionArchitectureSemantic(candidate, intake, model),
     () => validateYouthProgressionQualitySemantic(candidate, intake, model),
     () => validateYouthConsolidationRetentionSemantic(candidate, intake, model),
     () => validateYouthSessionQualitySemantic(candidate, intake, model),
     () => validateYouthManualAcceptanceSemantic(candidate, intake, model),
     () => validateAdvancedHybridManualAcceptanceSemantic(candidate, intake, model),
+    () => validateAdvancedHybridCoachingSpecV1(candidate, intake, model),
+    () => validateYouthCoachingSpecV1HardRules(candidate, intake, model),
+    () => validateTactical3KCoachingSpecV1(candidate, intake, model),
+    () => validateTacticalManualAcceptanceSemantic(candidate, intake, model), // TACTICAL-MANUAL-ACCEPTANCE-RUNTIME
     () => validateTacticalScheduleArchitectureSemantic(candidate, intake, model),
     () => validateKnownMaxPullUpDoseSemantic(candidate, intake, model),
     () => validateTacticalGppCoverageSemantic(candidate, intake, model),
@@ -308,6 +342,10 @@ export function collectRepairableValidationFailures(program, intake = {}, option
   candidate = finalAdvancedOap.program;
   if (finalAdvancedOap.repaired) deterministic_repairs.push({ type: 'final_advanced_hybrid_week4_oap_consolidation', rows: finalAdvancedOap.repairs });
 
+  const finalAdvancedPullSpacing = normalizeAdvancedHybridAdjacentPulling(candidate, intake);
+  candidate = finalAdvancedPullSpacing.program;
+  if (finalAdvancedPullSpacing.repaired) deterministic_repairs.push({ type: 'final_advanced_hybrid_adjacent_pull_spacing', rows: finalAdvancedPullSpacing.repairs }); // COACH-SPEC-V1-AH04-FINAL-REPAIR
+
   const finalAdvancedOhp = normalizeAdvancedHybridOHPComplement(candidate, intake);
   candidate = finalAdvancedOhp.program;
   if (finalAdvancedOhp.repaired) deterministic_repairs.push({ type: 'final_advanced_hybrid_ohp_complement', rows: finalAdvancedOhp.repairs });
@@ -320,6 +358,18 @@ export function collectRepairableValidationFailures(program, intake = {}, option
   candidate = finalYouthConsolidation.program;
   if (finalYouthConsolidation.repaired) deterministic_repairs.push({ type: 'final_youth_week4_consolidation', rows: finalYouthConsolidation.repairs });
 
+  const finalAdvancedSecondaryRun = normalizeAdvancedHybridSecondaryRunStability(candidate, intake);
+  candidate = finalAdvancedSecondaryRun.program;
+  if (finalAdvancedSecondaryRun.repaired) deterministic_repairs.push({ type: 'final_advanced_hybrid_secondary_run_stability', rows: finalAdvancedSecondaryRun.repairs });
+
+  const finalYouthAcquisitionQuality = normalizeYouthSkillAcquisitionQuality(candidate, intake);
+  candidate = finalYouthAcquisitionQuality.program;
+  if (finalYouthAcquisitionQuality.repaired) deterministic_repairs.push({ type: 'final_youth_skill_acquisition_quality', rows: finalYouthAcquisitionQuality.repairs });
+
+  const finalTacticalRaceSpecificity = normalizeTactical3KRaceSpecificity(candidate, intake);
+  candidate = finalTacticalRaceSpecificity.program;
+  if (finalTacticalRaceSpecificity.repaired) deterministic_repairs.push({ type: 'final_tactical_3k_race_specificity', rows: finalTacticalRaceSpecificity.repairs }); // COACH-SPEC-V1-MANUAL-FINAL-REPAIR
+
   // Last deterministic repair: every prescription above is now settled, so any
   // quantitative claim a note still makes about its own row can be checked
   // against the final structured fields.
@@ -329,6 +379,9 @@ export function collectRepairableValidationFailures(program, intake = {}, option
 
   const finalModel = parseProgramModel(candidate, intake);
   runRepairable(flags, () => validateAdvancedHybridManualAcceptanceSemantic(candidate, intake, finalModel));
+  runRepairable(flags, () => validateAdvancedHybridCoachingSpecV1(candidate, intake, finalModel));
+  runRepairable(flags, () => validateYouthCoachingSpecV1HardRules(candidate, intake, finalModel));
+  runRepairable(flags, () => validateTactical3KCoachingSpecV1(candidate, intake, finalModel));
   runRepairable(flags, () => validateTacticalScheduleArchitectureSemantic(candidate, intake, finalModel));
   runRepairable(flags, () => validateKnownMaxPullUpDoseSemantic(candidate, intake, finalModel));
   runRepairable(flags, () => validateYouthConsolidationRetentionSemantic(candidate, intake, finalModel));

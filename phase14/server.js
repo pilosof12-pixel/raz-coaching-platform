@@ -1414,7 +1414,12 @@ function phase15LastMileTsv(tsv, intake) {
     if (cells.length !== 9 || /^Day$/i.test(cells[0])) { out.push(line); continue; }
     if (availableDays.length === requestedDays && requestedDays > 0) {
       const rawDay = String(cells[0] || '').trim();
-      if (rawDay) {
+      // FIXED-DAY-LASTMILE-PRESERVE-REAL-WEEKDAYS: real weekday labels already carry calendar
+      // meaning. Do not remap a separate endurance/sport day merely because the
+      // intake also supplies fixed gym days. Only placeholder/session-style labels
+      // may be mapped onto available_gym_days.
+      const isRealWeekday = /^(?:mon(?:day)?|tue(?:sday)?|wed(?:nesday)?|thu(?:rsday)?|fri(?:day)?|sat(?:urday)?|sun(?:day)?)$/i.test(rawDay);
+      if (rawDay && !isRealWeekday) {
         if (!dayMap.has(rawDay)) dayMap.set(rawDay, availableDays[dayMap.size] || rawDay);
         cells[0] = dayMap.get(rawDay);
       }
