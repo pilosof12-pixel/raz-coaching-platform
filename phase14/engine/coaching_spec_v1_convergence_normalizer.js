@@ -197,7 +197,7 @@ function youthVisibleProgressionTargets(week) {
       1: 'Moderate band assistance for a smooth, repeatable bar turnover',
       2: 'Slightly lighter band assistance if every Week 1 turnover was clean',
       3: 'Lightest band assistance that still preserves a clean bar turnover',
-      4: 'Lightest band assistance that still preserves the clean Week 3 turnover; reduce volume, not the earned assistance standard',
+      4: 'Lightest band assistance that still preserves the clean Week 3 turnover; retain the earned assistance standard rather than chasing extra work',
     }[week],
   };
 }

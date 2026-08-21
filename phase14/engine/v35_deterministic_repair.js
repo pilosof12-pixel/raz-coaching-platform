@@ -82,14 +82,13 @@ function repairRowNote(note, { sets, reps, priorSets, priorReps, priorLoad, load
         const n = NUMBER_WORDS[String(word).toLowerCase()];
         return (!Number.isFinite(n) || n === reps) ? w : `${reps}${tail}`;
       });
-    // Rep words describing this row's own dose.
-    const wanted = REP_WORD_FOR[reps];
-    if (wanted) {
-      out = out.replace(/\b(singles?|doubles?|triples?)\b/gi, (w) => {
-        const n = { single: 1, singles: 1, double: 2, doubles: 2, triple: 3, triples: 3 }[String(w).toLowerCase()];
-        return (!Number.isFinite(n) || n === reps) ? w : wanted;
-      });
-    }
+    // Rep words describing this row's own dose. Above three reps there is no
+    // natural word, so name the number instead of leaving the contradiction.
+    const wanted = REP_WORD_FOR[reps] || `sets of ${reps}`;
+    out = out.replace(/\b(singles?|doubles?|triples?)\b/gi, (w) => {
+      const n = { single: 1, singles: 1, double: 2, doubles: 2, triple: 3, triples: 3 }[String(w).toLowerCase()];
+      return (!Number.isFinite(n) || n === reps) ? w : wanted;
+    });
   }
 
   // "N total attempts" must equal sets x reps.
@@ -304,6 +303,20 @@ export function repairDeterministicContradictions(program, intake = {}) {
         cells[parsed.notes] = note;
         repairs.push({ type: 'v35_note_restated', week, row, exercise: name });
         changed = true;
+      }
+
+      // The load/target cell also carries prose, and a deterministic normalizer can
+      // write a reduction claim there while leaving this row's dose untouched. That
+      // contradiction is engine-authored, so no amount of regeneration can clear it.
+      if (Number.isInteger(parsed.load)) {
+        const { note: descriptor, changed: loadChanged } = repairRowNote(cells[parsed.load], {
+          sets, reps, load: null, priorSets: p.sets, priorReps: p.reps, priorLoad: null,
+        });
+        if (loadChanged) {
+          cells[parsed.load] = descriptor;
+          repairs.push({ type: 'v35_load_descriptor_restated', week, row, exercise: name });
+          changed = true;
+        }
       }
     });
 
