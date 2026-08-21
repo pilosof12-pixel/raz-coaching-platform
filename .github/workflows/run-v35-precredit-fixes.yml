@@ -6,6 +6,9 @@ on:
       - privacy-security-hardening
     paths:
       - '.github/workflows/run-v35-precredit-fixes.yml'
+  pull_request:
+    branches:
+      - privacy-security-hardening
   workflow_dispatch:
 
 permissions:
