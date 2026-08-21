@@ -21,19 +21,26 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
-      - name: Apply Overview detail-body fill parity
+      - name: Apply approved Overview body-fill parity
         shell: bash
         run: |
           python - <<'PY'
           from pathlib import Path
           p=Path('phase14/public/spreadsheet-parity.js')
           s=p.read_text()
-          old="      font(b,{size:10}); align(b); ws.mergeCells(row,2,row,4); ws.getRow(row).height=34; row++;"
-          new="      ws.mergeCells(row,2,row,4); fill(b,BODY); font(b,{size:10}); align(b); ws.getRow(row).height=34; row++;"
-          if old in s:
-              s=s.replace(old,new,1)
-          elif new not in s:
-              raise SystemExit('Overview parity anchor not found')
+          old_detail="      font(b,{size:10}); align(b); ws.mergeCells(row,2,row,4); ws.getRow(row).height=34; row++;"
+          new_detail="      ws.mergeCells(row,2,row,4); fill(b,BODY); font(b,{size:10}); align(b); ws.getRow(row).height=34; row++;"
+          if old_detail in s:
+              s=s.replace(old_detail,new_detail,1)
+          elif new_detail not in s:
+              raise SystemExit('Overview detail parity anchor not found')
+
+          old_rules="      ws.mergeCells(row,1,row,4); const c=ws.getRow(row).getCell(1); c.value='• '+rule; font(c,{size:10}); align(c); ws.getRow(row).height=32; row++;"
+          new_rules="      ws.mergeCells(row,1,row,4); const c=ws.getRow(row).getCell(1); c.value='• '+rule; fill(c,BODY); font(c,{size:10}); align(c); ws.getRow(row).height=32; row++;"
+          if old_rules in s:
+              s=s.replace(old_rules,new_rules,1)
+          elif new_rules not in s:
+              raise SystemExit('Overview program-rules parity anchor not found')
           p.write_text(s)
           PY
       - name: Syntax check exporter
@@ -44,5 +51,5 @@ jobs:
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
           git add phase14/public/spreadsheet-parity.js
-          git commit -m 'Match approved Overview detail fill in spreadsheet exporter [skip ci]' || exit 0
+          git commit -m 'Finish approved Overview fill parity [skip ci]' || exit 0
           git push origin HEAD:privacy-security-hardening
