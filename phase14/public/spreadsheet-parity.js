@@ -219,7 +219,7 @@
     for(const [k,v] of profileRows(intake)){
       const a=ws.getRow(row).getCell(1), b=ws.getRow(row).getCell(2);
       a.value=k; b.value=v; fill(a,LABEL); font(a,{size:10,bold:true}); align(a);
-      font(b,{size:10}); align(b); ws.mergeCells(row,2,row,4); ws.getRow(row).height=34; row++;
+      ws.mergeCells(row,2,row,4); fill(b,BODY); font(b,{size:10}); align(b); ws.getRow(row).height=34; row++;
     }
     row++;
     mergeTitle(ws,row,4,'PROGRAM RULES',DAY_BAND,10,'FF0B1324'); row++;
