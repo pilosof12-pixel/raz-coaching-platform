@@ -158,7 +158,7 @@ export function validateAdvancedHybridCoachingSpecV1(program, intake = {}, suppl
   if (families.length >= 4) {
     fail(
       'COACH_SPEC_V1_AH_RECOVERY_HIERARCHY_OVERLOADED',
-      `Coaching Specification v1.0 AH-01: this high-concurrency athlete materially progresses ${families.join(', ')} across the same four-week block. Primary goals must own the recovery budget; secondary/maintenance qualities should be held, micro-dosed or progressed only when clearly low-cost. Repair the lowest-priority stressor first rather than progressing every stated quality at once.`,
+      `Coaching Specification v1.0 AH-01: this high-concurrency athlete materially progresses ${families.join(', ')} across the same four-week block. Primary goals are ${goals(intake, 'primary') || 'unspecified'}; secondary goals are ${goals(intake, 'secondary') || 'none'}. PRESCRIPTIVE REPAIR: preserve primary-goal progression. Freeze at least one currently progressing secondary family by copying its Week 1 ACTUAL TSV dose into Weeks 2-3 (no increase in load, sets or reps). When Overhead Press is secondary, hold the strict OHP and complementary press dose at Week 1 levels before changing a primary family. Do not solve this with relabeling, justification text or low-cost wording. Change the actual dose so fewer than four families meet the material-progression detector, while preserving all other valid constraints.`,
       { families, external_sport_sessions: externalSportSessions(intake) },
     );
   }
@@ -245,6 +245,19 @@ function youthAcquisition(intake = {}) {
     establishedWall: /wall[^.]{0,25}(?:15|20|25|30)\s*(?:s|sec)|handstand[^.]{0,25}(?:15|20|25|30)\s*(?:s|sec)/.test(e),
     fullBarPrereqs: /ring muscle[- ]?up/.test(e) && /(?:10|11|12|13|14|15)\s*(?:strict\s*)?pull[- ]?ups?/.test(e),
   };
+}
+
+// COACH-SPEC-V1-YOUTH-NEGATION-AWARE
+function hasYouthFailureBasedPrescription(value) {
+  const raw = String(value || '');
+  if (/\bamrap\b/i.test(raw)) return true;
+  const clauses = raw.split(/[.;\n]/);
+  for (const clause of clauses) {
+    if (!/(?:to|until)\s+failure|forced\s+reps?|grinders?|grinding/i.test(clause)) continue;
+    const negated = /\b(?:do\s+not|don't|never|avoid|no|without|stop(?:\s+well)?\s+before|stay\s+short\s+of|leave[^.;\n]{0,30}in\s+reserve)\b/i.test(clause);
+    if (!negated) return true;
+  }
+  return false;
 }
 
 export function validateYouthCoachingSpecV1HardRules(program, intake = {}, suppliedModel = null) {
@@ -348,7 +361,7 @@ function tacticalContext(intake = {}) {
   return lower(`${goals(intake)} ${text(intake.notes)} ${text(intake.sport)}`);
 }
 function isTactical3K(intake = {}) {
-  return /(?:tactical|military|special[-–— ]?operations|selection|operator)/.test(tacticalContext(intake)) && /\b3\s*k(?:m)?\b/.test(lower(goals(intake, 'primary')));
+  return /(?:tactical|military|special[-–— ]?operations|selection|operator|combat[- ]?ready|\bruck\b)/.test(tacticalContext(intake)) && /\b3\s*k(?:m)?\b/.test(lower(goals(intake, 'primary'))); // COACH-SPEC-V1-TACTICAL-LIVE-CONTEXT
 }
 function shinHistory(intake = {}) {
   return /shin splint|shin pain|medial tibial|tibial stress/.test(lower(`${text(intake.injuries)} ${text(intake.notes)} ${text(intake.pain)}`));
@@ -564,6 +577,7 @@ export function buildCoachingSpecV1Brief(intake = {}) {
   if (isHighConcurrencyHybrid(intake)) {
     lines.push(
       'ADVANCED HYBRID: make goal hierarchy visible in the actual dose. Do not progress every stated quality simultaneously. Primary goals own freshness; secondary goals use minimum effective meaningful work; maintenance stays approximately stable unless explicit recovery headroom justifies development.',
+      'When two primary families coexist with multiple secondary families under heavy sport load, proactively hold secondary pressing at its Week 1 actual dose through build weeks unless the primary recovery budget clearly permits more. Do not wait for a repair pass to remove four-family progression.',
       'If squat is primary with >=4 demanding sport sessions/week, use one true primary squat loading exposure and one genuinely lower-cost squat exposure. A top set plus 1-2 back-offs is often more recoverable than four equally heavy work sets. The secondary exposure should meaningfully reduce intensity, hard sets, reps and/or RPE.',
       'For OAP/maximal pulling plus grappling/climbing-style sport stress, avoid substantive unilateral pulling on consecutive days. Aim for roughly 48h between hard local pulling exposures; an adjacent session is acceptable only when it is genuinely technique/easy work around RPE <=6-6.5.',
       'Secondary pressing should stay subordinate: roughly 4-8 meaningful direct pressing work sets/week is a useful default in this context; >10 deserves strong justification. Push press is support, not permission to create another large pressing block.',
