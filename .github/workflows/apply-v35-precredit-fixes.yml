@@ -6,6 +6,9 @@ on:
       - v35-precredit-audit
     paths:
       - '.github/workflows/apply-v35-precredit-fixes.yml'
+  pull_request:
+    branches:
+      - privacy-security-hardening
   workflow_dispatch:
 
 permissions:
@@ -121,9 +124,6 @@ jobs:
             metric = 'distance';
             reductionMissing = Number.isFinite(km) && Number.isFinite(prior.km) && km >= prior.km;
           } else {
-            // "reps", "total reps", "work" and "volume" all describe total
-            // countable work, so compare Sets x Reps rather than an unrelated
-            // metric that happened to fall.
             metric = /rep/.test(metricText) ? 'total reps' : 'volume';
             reductionMissing = Number.isFinite(current.volume) && Number.isFinite(prior.volume) && current.volume >= prior.volume;
           }
@@ -151,8 +151,7 @@ jobs:
               s = s[:start] + seg + s[end:]
               write(p, s)
 
-          # 3) Protect a primary heavy hybrid day from a dense 72 h stack: long run
-          # two days before + meaningful intervening gym work + primary heavy squat.
+          # 3) Protect a primary heavy hybrid day from a dense 72 h stack.
           p = Path('phase14/engine/manual_acceptance_quality.js')
           s = p.read_text()
           if 'ADVANCED_HYBRID_DENSE_72H_PRIMARY_WINDOW' not in s:
@@ -161,9 +160,7 @@ jobs:
               insertion = r'''
   // Whole-week recovery architecture: in a high-concurrency block a long run two
   // days before the primary heavy squat is only acceptable when the intervening
-  // day is genuinely low-cost. This catches Sat long run -> Sun substantive gym
-  // -> Mon primary heavy squat without pretending that weekday labels themselves
-  // determine readiness.
+  // day is genuinely low-cost.
   if (squat1rm) {
     for (const week of model.weeks || []) {
       const dayMap = new Map((week.days || []).map((d) => [String(d.day || '').toLowerCase(), d]));
@@ -200,8 +197,7 @@ jobs:
               s = s[:ret] + insertion + s[ret:]
               write(p, s)
 
-          # 4) Restore Tactical applicability for the live "special-operations-style"
-          # wording so the existing T3K-08 cross-week state machine actually runs.
+          # 4) Restore Tactical applicability for "special-operations-style".
           p = Path('phase14/engine/coaching_spec_v1_quality.js')
           s = p.read_text()
           old = "return /(?:tactical|military|special operations|selection|operator)/.test(tacticalContext(intake)) && /\\b3\\s*k(?:m)?\\b/.test(lower(goals(intake, 'primary')));"
