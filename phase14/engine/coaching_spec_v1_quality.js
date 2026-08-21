@@ -348,7 +348,7 @@ function tacticalContext(intake = {}) {
   return lower(`${goals(intake)} ${text(intake.notes)} ${text(intake.sport)}`);
 }
 function isTactical3K(intake = {}) {
-  return /(?:tactical|military|special operations|selection|operator)/.test(tacticalContext(intake)) && /\b3\s*k(?:m)?\b/.test(lower(goals(intake, 'primary')));
+  return /(?:tactical|military|special[-–— ]?operations|selection|operator)/.test(tacticalContext(intake)) && /\b3\s*k(?:m)?\b/.test(lower(goals(intake, 'primary')));
 }
 function shinHistory(intake = {}) {
   return /shin splint|shin pain|medial tibial|tibial stress/.test(lower(`${text(intake.injuries)} ${text(intake.notes)} ${text(intake.pain)}`));

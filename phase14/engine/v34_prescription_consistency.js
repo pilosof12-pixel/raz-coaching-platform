@@ -168,7 +168,7 @@ const CLAIMS = [
 
 export function collectProgressionLanguageFlags(program, intake = {}) {
   const flags = [];
-  const previous = new Map();
+  let previous = new Map();
 
   for (let week = 1; week <= 4; week++) {
     const parsed = parseWeek(program, week);
@@ -189,13 +189,17 @@ export function collectProgressionLanguageFlags(program, intake = {}) {
       const prior = previous.get(key);
       if (!prior) return;
       const note = String(cells[parsed.notes] || '');
-      if (!note.trim()) return;
+      const loadText = Number.isInteger(parsed.load) ? String(cells[parsed.load] || '') : '';
+      const repsText = Number.isInteger(parsed.reps) ? String(cells[parsed.reps] || '') : '';
+      const claimText = [loadText, repsText, note].filter((x) => x.trim()).join(' | ');
+      if (!claimText.trim()) return;
       const where = { week, row, exercise };
 
       let claimed = false;
       for (const claim of CLAIMS) {
         if (claimed) break;
-        if (!claim.re.test(note)) continue;
+        const matchedClaim = claimText.match(claim.re);
+        if (!matchedClaim) continue;
         if (claim.metric === 'load') {
           if (Number.isFinite(load) && Number.isFinite(prior.load) && load !== prior.load) {
             claimed = true;
@@ -205,23 +209,32 @@ export function collectProgressionLanguageFlags(program, intake = {}) {
           continue;
         }
         if (claim.direction === 'down') {
-          const volumeSame = Number.isFinite(current.volume) && Number.isFinite(prior.volume) && current.volume >= prior.volume;
-          const setsSame = Number.isFinite(sets) && Number.isFinite(prior.sets) && sets >= prior.sets;
-          const kmSame = Number.isFinite(km) && Number.isFinite(prior.km) && km >= prior.km;
-          const nothingFell = (volumeSame || setsSame || kmSame)
-            && !(Number.isFinite(current.volume) && Number.isFinite(prior.volume) && current.volume < prior.volume)
-            && !(Number.isFinite(km) && Number.isFinite(prior.km) && km < prior.km);
-          if (nothingFell) {
+          const metricText = String(matchedClaim?.[1] || matchedClaim?.[0] || '').toLowerCase();
+          let reductionMissing = false;
+          let metric = 'work';
+          if (/set/.test(metricText)) {
+            metric = 'sets';
+            reductionMissing = Number.isFinite(sets) && Number.isFinite(prior.sets) && sets >= prior.sets;
+          } else if (/distance/.test(metricText)) {
+            metric = 'distance';
+            reductionMissing = Number.isFinite(km) && Number.isFinite(prior.km) && km >= prior.km;
+          } else {
+            metric = /rep/.test(metricText) ? 'total reps' : 'volume';
+            reductionMissing = Number.isFinite(current.volume) && Number.isFinite(prior.volume) && current.volume >= prior.volume;
+          }
+          if (reductionMissing) {
             claimed = true;
-            flags.push({ code: 'V34_PROGRESSION_LANGUAGE_MISMATCH', ...where, claim: 'reduction',
-              previous: { sets: prior.sets, reps: prior.reps, km: prior.km }, current: { sets, reps, km },
-              message: `${exercise} (Week ${week}) claims reduced work, but the prescription did not fall (previous ${prior.sets}x${prior.reps}${prior.km ? ` / ${prior.km} km` : ''}, now ${sets}x${reps}${km ? ` / ${km} km` : ''}).` });
+            flags.push({ code: 'V34_PROGRESSION_LANGUAGE_MISMATCH', ...where, claim: `reduction:${metric}`,
+              previous: { sets: prior.sets, reps: prior.reps, km: prior.km, volume: prior.volume }, current: { sets, reps, km, volume: current.volume },
+              message: `${exercise} (Week ${week}) claims reduced ${metric}, but that metric did not fall from the immediately previous week.` });
           }
         }
       }
     });
 
-    for (const [k, v] of thisWeek) previous.set(k, v);
+    // Compare only to the immediately previous week. A movement that disappears
+    // for a week must not be compared to stale history when it returns later.
+    previous = thisWeek;
   }
   return flags;
 }
