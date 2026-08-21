@@ -1,0 +1,48 @@
+name: Apply final Overview spreadsheet parity
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - '.github/workflows/apply-final-overview-parity.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  apply:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: privacy-security-hardening
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Apply Overview detail-body fill parity
+        shell: bash
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          p=Path('phase14/public/spreadsheet-parity.js')
+          s=p.read_text()
+          old="      font(b,{size:10}); align(b); ws.mergeCells(row,2,row,4); ws.getRow(row).height=34; row++;"
+          new="      ws.mergeCells(row,2,row,4); fill(b,BODY); font(b,{size:10}); align(b); ws.getRow(row).height=34; row++;"
+          if old in s:
+              s=s.replace(old,new,1)
+          elif new not in s:
+              raise SystemExit('Overview parity anchor not found')
+          p.write_text(s)
+          PY
+      - name: Syntax check exporter
+        working-directory: phase14
+        run: node --check public/spreadsheet-parity.js
+      - name: Commit production exporter parity fix
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add phase14/public/spreadsheet-parity.js
+          git commit -m 'Match approved Overview detail fill in spreadsheet exporter [skip ci]' || exit 0
+          git push origin HEAD:privacy-security-hardening
