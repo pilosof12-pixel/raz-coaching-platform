@@ -1,0 +1,58 @@
+name: Fix v35 coaching spec build idempotency
+
+on:
+  push:
+    branches:
+      - privacy-security-hardening
+    paths:
+      - '.github/workflows/fix-v35-coaching-spec-build.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  fix:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: phase14/package-lock.json
+      - name: Patch tactical classifier to final build-stable form
+        shell: bash
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          p = Path('phase14/engine/coaching_spec_v1_quality.js')
+          s = p.read_text()
+          old = "  return /(?:tactical|military|special[-–— ]?operations|selection|operator)/.test(tacticalContext(intake)) && /\\b3\\s*k(?:m)?\\b/.test(lower(goals(intake, 'primary')));"
+          new = "  return /(?:tactical|military|special[-–— ]?operations|selection|operator|combat[- ]?ready|\\bruck\\b)/.test(tacticalContext(intake)) && /\\b3\\s*k(?:m)?\\b/.test(lower(goals(intake, 'primary'))); // COACH-SPEC-V1-TACTICAL-LIVE-CONTEXT"
+          if old in s:
+              s = s.replace(old, new, 1)
+          elif 'COACH-SPEC-V1-TACTICAL-LIVE-CONTEXT' not in s:
+              raise SystemExit('tactical classifier anchor not found')
+          p.write_text(s)
+          PY
+      - name: Install dependencies
+        working-directory: phase14
+        run: npm ci
+      - name: Verify build patch idempotency
+        working-directory: phase14
+        run: node scripts/apply_coaching_spec_v1.mjs
+      - name: Run focused quality tests
+        working-directory: phase14
+        run: |
+          node --check engine/coaching_spec_v1_quality.js
+          node --test test/v35_precredit_adversarial_audit.test.js
+          node --test --test-name-pattern='G2-(1|2|3|4|5|6|7|8|9|14|15|16)|special-operations-style' test/coaching_spec_v1_live_convergence.test.js
+      - name: Commit source fix
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add phase14/engine/coaching_spec_v1_quality.js
+          git commit -m 'Make v35 Tactical classifier build-idempotent [skip ci]' || exit 0
+          git push origin HEAD:privacy-security-hardening
