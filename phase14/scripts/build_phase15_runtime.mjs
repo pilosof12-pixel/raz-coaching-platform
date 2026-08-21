@@ -20,7 +20,7 @@ once(
 
 once(
   'const GEMINI_MODEL = process.env.GEMINI_MODEL || "gemini-2.5-flash";\nconst AI_REQUEST_TIMEOUT_MS = Number(process.env.AI_REQUEST_TIMEOUT_MS || 110000);\nconst BUILD_JOB_TIMEOUT_MS = Number(process.env.BUILD_JOB_TIMEOUT_MS || 210000);',
-  'const GEMINI_MODEL = process.env.GEMINI_MODEL || "gemini-2.5-flash";\nconst OPENAI_API_KEY = process.env.OPENAI_API_KEY || "";\nconst OPENAI_MODEL = process.env.OPENAI_MODEL || "gpt-5.4";\nconst OPENAI_REASONING_EFFORT = process.env.OPENAI_REASONING_EFFORT || "high";\nconst OPENAI_MAX_OUTPUT_TOKENS = Number(process.env.OPENAI_MAX_OUTPUT_TOKENS || 24000);\nconst AI_REQUEST_TIMEOUT_MS = Number(process.env.AI_REQUEST_TIMEOUT_MS || (OPENAI_API_KEY ? 180000 : 110000));\nconst BUILD_JOB_TIMEOUT_MS = Number(process.env.BUILD_JOB_TIMEOUT_MS || (OPENAI_API_KEY ? 360000 : 210000));\nlet lastAIUsage = null;\nlet lastBuildTiming = null;',
+  'const GEMINI_MODEL = process.env.GEMINI_MODEL || "gemini-2.5-flash";\nconst OPENAI_API_KEY = process.env.OPENAI_API_KEY || "";\nconst OPENAI_MODEL = process.env.OPENAI_MODEL || "gpt-5.4";\nconst OPENAI_REASONING_EFFORT = process.env.OPENAI_REASONING_EFFORT || "high";\nconst OPENAI_MAX_OUTPUT_TOKENS = Number(process.env.OPENAI_MAX_OUTPUT_TOKENS || 24000);\nconst AI_REQUEST_TIMEOUT_MS = Number(process.env.AI_REQUEST_TIMEOUT_MS || (OPENAI_API_KEY ? 420000 : 110000));\nconst BUILD_JOB_TIMEOUT_MS = Number(process.env.BUILD_JOB_TIMEOUT_MS || (OPENAI_API_KEY ? 600000 : 210000));\nlet lastAIUsage = null;\nlet lastBuildTiming = null;',
   "provider config"
 );
 
