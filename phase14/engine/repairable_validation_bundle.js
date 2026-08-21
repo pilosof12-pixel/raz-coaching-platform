@@ -18,6 +18,7 @@ import { enrichSpecificWarmups } from './specific_warmup_enrichment.js';
 import { normalizeFinalNoteCoherence } from './final_note_coherence.js'; // FINAL-NOTE-COHERENCE-WIRED
 import { validatePrescriptionConsistency } from './v34_prescription_consistency.js'; // V34-PRESCRIPTION-CONSISTENCY-WIRED
 import { validateCoachingStandards } from './v35_coaching_standards.js'; // V35-COACHING-STANDARDS-WIRED
+import { repairDeterministicContradictions } from './v35_deterministic_repair.js'; // V35-DETERMINISTIC-REPAIR-WIRED
 import { normalizeAdvancedHybridWeek4OapConsolidation } from './advanced_hybrid_oap_consolidation_normalizer.js';
 import {
   normalizeAdvancedHybridSecondaryRunStability,
@@ -376,6 +377,15 @@ export function collectRepairableValidationFailures(program, intake = {}, option
   const finalNoteCoherence = normalizeFinalNoteCoherence(candidate, intake);
   candidate = finalNoteCoherence.program;
   if (finalNoteCoherence.repaired) deterministic_repairs.push({ type: 'final_note_coherence', rows: finalNoteCoherence.repairs });
+
+  // The structured prescription is authoritative and a note is derived text, so a
+  // note that contradicts its own row has exactly one correct resolution: restate
+  // the note. Doing that here means the gates below only reject genuinely
+  // structural problems, instead of asking the model to guess which of two
+  // disagreeing statements was meant -- which is what exhausted the repair loop.
+  const deterministicText = repairDeterministicContradictions(candidate, intake);
+  candidate = deterministicText.program;
+  if (deterministicText.repaired) deterministic_repairs.push({ type: 'v35_deterministic_contradiction_repair', rows: deterministicText.repairs });
 
   const finalModel = parseProgramModel(candidate, intake);
   runRepairable(flags, () => validateAdvancedHybridManualAcceptanceSemantic(candidate, intake, finalModel));
