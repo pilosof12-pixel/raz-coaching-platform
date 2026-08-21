@@ -34,7 +34,39 @@ jobs:
           cache: npm
           cache-dependency-path: phase14/package-lock.json
       - name: Apply one-shot pre-credit hardening
-        run: python phase14/scripts/apply_v35_generation_spreadsheet_hardening.py
+        shell: bash
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+
+          # Durable generation settings live in the runtime builder.
+          p=Path('phase14/scripts/build_phase15_runtime.mjs')
+          s=p.read_text()
+          pairs=[
+            ('const OPENAI_REASONING_EFFORT = process.env.OPENAI_REASONING_EFFORT || "low";', 'const OPENAI_REASONING_EFFORT = process.env.OPENAI_REASONING_EFFORT || "high";'),
+            ('const OPENAI_MAX_OUTPUT_TOKENS = Number(process.env.OPENAI_MAX_OUTPUT_TOKENS || 14000);', 'const OPENAI_MAX_OUTPUT_TOKENS = Number(process.env.OPENAI_MAX_OUTPUT_TOKENS || 24000);'),
+            ('const AI_REQUEST_TIMEOUT_MS = Number(process.env.AI_REQUEST_TIMEOUT_MS || (OPENAI_API_KEY ? 120000 : 110000));', 'const AI_REQUEST_TIMEOUT_MS = Number(process.env.AI_REQUEST_TIMEOUT_MS || (OPENAI_API_KEY ? 180000 : 110000));'),
+            ('const BUILD_JOB_TIMEOUT_MS = Number(process.env.BUILD_JOB_TIMEOUT_MS || (OPENAI_API_KEY ? 180000 : 210000));', 'const BUILD_JOB_TIMEOUT_MS = Number(process.env.BUILD_JOB_TIMEOUT_MS || (OPENAI_API_KEY ? 360000 : 210000));'),
+            ('const MAX_ATTEMPTS = OPENAI_API_KEY ? 1 : 3;', 'const MAX_ATTEMPTS = OPENAI_API_KEY ? 2 : 3;'),
+          ]
+          for old,new in pairs:
+            if old in s: s=s.replace(old,new,1)
+            elif new not in s: raise SystemExit(f'generation anchor missing: {old}')
+
+          final_line='  "Return only a short client-ready intro, a short weeks 2-4 progression note, pain/substitution guidance relevant to this athlete, then the four TSV blocks."\\n].join("\\\\n");'
+          audit_line='  "SILENT FINAL AUDIT BEFORE OUTPUT: use the reasoning budget to review all four weeks as one program. Confirm primary goals own the best readiness slots, the actual target quality is trained directly, maintenance stays stable unless deliberately developed, total workload includes all generated work, week-to-week progression language matches the structured dose, every numerical note agrees with Sets x Reps, and injury/recovery responses target the provocative or newest stressor. Repair any violation before answering. Do not print this audit.",\\n'
+          if 'SILENT FINAL AUDIT BEFORE OUTPUT' not in s:
+            if final_line not in s: raise SystemExit('final-audit insertion anchor missing')
+            s=s.replace(final_line,audit_line+final_line,1)
+          p.write_text(s)
+
+          # Execute only the spreadsheet + regression-test half of the staged script;
+          # its old generation-anchor section is intentionally bypassed.
+          staged=Path('phase14/scripts/apply_v35_generation_spreadsheet_hardening.py').read_text()
+          marker='# B) Approved spreadsheet parity.'
+          if marker not in staged: raise SystemExit('spreadsheet patch marker missing')
+          exec('from pathlib import Path\n'+marker+staged.split(marker,1)[1])
+          PY
       - name: Install dependencies
         working-directory: phase14
         run: npm ci
