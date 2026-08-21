@@ -145,6 +145,39 @@ function repairNote(note, { sets, reps, priorSets }) {
       });
   }
 
+
+  // (f) Alternate attempt-ceiling/range phrasings must also agree with the
+  // authoritative structured dose. These are objective arithmetic repairs, not
+  // subjective coaching rewrites.
+  if (Number.isFinite(sets) && Number.isFinite(reps)) {
+    const prescribed = sets * reps;
+    out = out.replace(/\b((?:quality\s+)?ceiling(?:\s+of|:)?\s+)(\d+)(\s+(?:total\s+)?(?:attempts?|entries|reps?)\b)/gi,
+      (whole, prefix, n, tail) => {
+        const claimed = Number(n);
+        if (!Number.isFinite(claimed) || claimed <= prescribed) return whole;
+        changes.push({ kind: 'alternate_attempt_ceiling_claim', from: claimed, to: prescribed });
+        return `${prefix}${prescribed}${tail}`;
+      });
+
+    out = out.replace(/\b(stay\s+around|aim\s+for|target)\s+(\d+)\s*[-–]\s*(\d+)(\s+(?:excellent\s+|quality\s+|clean\s+|high-quality\s+)?(?:attempts?|entries|reps?)\b)/gi,
+      (whole, verb, loRaw, hiRaw, tail) => {
+        const lo = Number(loRaw), hi = Number(hiRaw);
+        if (!Number.isFinite(lo) || !Number.isFinite(hi) || hi <= prescribed) return whole;
+        const clampedLo = Math.min(lo, prescribed);
+        changes.push({ kind: 'attempt_range_ceiling_claim', from: `${lo}-${hi}`, to: clampedLo === prescribed ? `${prescribed}` : `${clampedLo}-${prescribed}` });
+        return clampedLo === prescribed ? `${verb} ${prescribed}${tail}` : `${verb} ${clampedLo}-${prescribed}${tail}`;
+      });
+
+    const wordNumbers = { one:1, two:2, three:3, four:4, five:5, six:6, seven:7, eight:8, nine:9, ten:10, eleven:11, twelve:12, thirteen:13, fourteen:14, fifteen:15, sixteen:16, seventeen:17, eighteen:18, nineteen:19, twenty:20 };
+    out = out.replace(/\b(up to|at most|no more than|(?:quality\s+)?ceiling(?:\s+of|:)?)\s+(one|two|three|four|five|six|seven|eight|nine|ten|eleven|twelve|thirteen|fourteen|fifteen|sixteen|seventeen|eighteen|nineteen|twenty)(\s+(?:total\s+)?(?:high-quality\s+|quality\s+|clean\s+)?(?:attempts?|entries|reps?)\b)/gi,
+      (whole, verb, word, tail) => {
+        const claimed = wordNumbers[String(word).toLowerCase()];
+        if (!Number.isFinite(claimed) || claimed <= prescribed) return whole;
+        changes.push({ kind: 'word_attempt_ceiling_claim', from: claimed, to: prescribed });
+        return `${verb} ${prescribed}${tail}`;
+      });
+  }
+
   out = out.replace(/\s{2,}/g, ' ').replace(/\s+([.;,])/g, '$1').trim();
   // Removing a leading conditional clause can leave the sentence starting
   // lower-case ("otherwise keep ..."); restore sentence case so the client-facing

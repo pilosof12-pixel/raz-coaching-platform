@@ -218,5 +218,41 @@ export function validateAdvancedHybridManualAcceptanceSemantic(program, intake =
     }
   }
 
+
+  // Whole-week recovery architecture: in a high-concurrency block a long run two
+  // days before the primary heavy squat is only acceptable when the intervening
+  // day is genuinely low-cost.
+  if (squat1rm) {
+    for (const week of model.weeks || []) {
+      const dayMap = new Map((week.days || []).map((d) => [String(d.day || '').toLowerCase(), d]));
+      for (const [heavyDay, day] of dayMap) {
+        if (!WEEKDAY_ORDER.includes(heavyDay)) continue;
+        const heavySquat = (day.exercises || []).find((x) => /^back squat$/i.test(String(x.display_name || '')) && (kgLoad(x?.dose?.load) || 0) >= squat1rm * 0.80);
+        if (!heavySquat) continue;
+        const heavyIndex = WEEKDAY_ORDER.indexOf(heavyDay);
+        const longRunDay = WEEKDAY_ORDER[(heavyIndex + 5) % 7];
+        const middleDay = WEEKDAY_ORDER[(heavyIndex + 6) % 7];
+        const prior = dayMap.get(longRunDay);
+        const middle = dayMap.get(middleDay);
+        if (!prior || !middle) continue;
+        const longRun = (prior.exercises || []).find((x) => x.modality === 'running' && (kmDose(x) || 0) >= Math.max(12, (currentRunBaseline(intake).longest_km || 0) * 0.75));
+        if (!longRun) continue;
+        const meaningfulMiddle = (middle.exercises || []).some((x) => {
+          if (x.role === 'warm_up' || x.modality === 'warm_up' || x.modality === 'recovery') return false;
+          const rpe = effortUpper(x);
+          const setCount = Number(x?.dose?.sets || 0);
+          return (Number.isFinite(rpe) && rpe >= 7) || (Number.isFinite(setCount) && setCount >= 3);
+        });
+        if (meaningfulMiddle) {
+          fail(
+            'ADVANCED_HYBRID_DENSE_72H_PRIMARY_WINDOW',
+            `Week ${week.week}: a ${kmDose(longRun)} km long run on ${longRunDay} is followed by substantive ${middleDay} training and then the primary heavy Back Squat on ${heavyDay}. In this high-concurrency block, protect the primary squat/OAP readiness window: move the long run, or make the intervening session genuinely low-cost (roughly RPE <=6-6.5 and compact) rather than stacking three meaningful days into the same 72-hour window.`,
+            { week: week.week, long_run_day: longRunDay, middle_day: middleDay, heavy_day: heavyDay, run_km: kmDose(longRun), squat_load: kgLoad(heavySquat?.dose?.load), current_1rm: squat1rm },
+          );
+        }
+      }
+    }
+  }
+
   return { ok: true, skipped: false, model };
 }
