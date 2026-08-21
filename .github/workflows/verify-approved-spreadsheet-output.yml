@@ -1,0 +1,127 @@
+name: Verify approved spreadsheet output
+
+on:
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  verify-xlsx:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: privacy-security-hardening
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: phase14/package-lock.json
+      - name: Install app dependencies
+        working-directory: phase14
+        run: npm ci
+      - name: Install temporary ExcelJS verifier
+        working-directory: phase14
+        run: npm install --no-save --package-lock=false exceljs@4
+      - name: Generate real XLSX and compare approved workbook signature
+        working-directory: phase14
+        shell: bash
+        run: |
+          node --input-type=module <<'NODE'
+          import fs from 'node:fs';
+          import vm from 'node:vm';
+          import assert from 'node:assert/strict';
+          import ExcelJS from 'exceljs';
+
+          let capturedBlob=null;
+          globalThis.window={
+            ExcelJS,
+            ExerciseDemos:{
+              load: async()=>{},
+              resolveExerciseDemo:(name)=>({url:'https://example.com/demo/'+encodeURIComponent(name)})
+            }
+          };
+          globalThis.document={
+            createElement:()=>({href:'',download:'',click(){},remove(){}}),
+            body:{appendChild(){}}
+          };
+          if(!globalThis.URL) globalThis.URL=class URL {};
+          globalThis.URL.createObjectURL=(blob)=>{capturedBlob=blob;return 'blob:verification';};
+          globalThis.URL.revokeObjectURL=()=>{};
+
+          const exporter=fs.readFileSync('public/spreadsheet-parity.js','utf8');
+          vm.runInThisContext(exporter,{filename:'spreadsheet-parity.js'});
+          assert.equal(typeof window.buildStrengthSpreadsheet,'function');
+
+          const header=['Day','Exercise','Weight','Sets','Reps','Rest','Target RPE','Notes','Results'];
+          const rows=[
+            ['Mon','[WARMUP] Leg Swings','Bodyweight','1','8 / side','30 sec','4','Dynamic lower-body preparation',''],
+            ['Mon','Back Squat','120 kg','3','5','3 min','7','Controlled maintenance strength',''],
+            ['Tue','Run','2:35 per 600 m','4','600 m','2:30','8','Developmental 3K quality',''],
+            ['Thu','Backpack Carry','20 kg, 9:30/km','1','8 km','N/A','6','Controlled ruck','']
+          ];
+          const week=(n)=>[`START_WEEK${n}_TSV`,header.join('\t'),...rows.map(r=>r.join('\t')),`END_WEEK${n}_TSV`].join('\n');
+          const program=[1,2,3,4].map(week).join('\n\n');
+          const intake={
+            age:27,
+            days_per_week:3,
+            primary_goals:['Improve 3 km from 13:30 to sub-12:00'],
+            secondary_goals:['Improve 10 km ruck with 20 kg'],
+            maintenance_goals:['Maintain squat strength'],
+            current_numbers:'3 km: 13:30 | 10 km ruck with 20 kg: 95 min | Back Squat: 140 kg x 5',
+            equipment:'Full gym + 20 kg ruck',
+            notes:'Combat-ready special-operations-style fitness.'
+          };
+
+          await window.buildStrengthSpreadsheet(program,intake);
+          assert.ok(capturedBlob,'Exporter did not create an XLSX blob');
+          const bytes=Buffer.from(await capturedBlob.arrayBuffer());
+          fs.writeFileSync('/tmp/RAZ_Approved_Parity_Verification.xlsx',bytes);
+
+          const wb=new ExcelJS.Workbook();
+          await wb.xlsx.load(bytes);
+          const expectedSheets=['Overview','Warm-Up','Week 1','Week 2','Week 3','Week 4'];
+          assert.deepEqual(wb.worksheets.map(ws=>ws.name),expectedSheets);
+
+          const ov=wb.getWorksheet('Overview');
+          assert.equal(ov.getCell('A1').value,'RAZ — TACTICAL 3K / GPP PROGRAM');
+          assert.equal(ov.getCell('A2').value,'EXACT LIVE PRODUCTION ACCEPTANCE — 4-WEEK BLOCK');
+          assert.deepEqual([1,2,3,4].map(i=>ov.getColumn(i).width),[28,34,16,48]);
+
+          const wu=wb.getWorksheet('Warm-Up');
+          assert.deepEqual(wu.getRow(4).values.slice(1,7),['SESSION / DAY','EXERCISE','SETS','REPS / DURATION','REST','COACHING NOTE']);
+          assert.deepEqual([1,2,3,4,5,6].map(i=>wu.getColumn(i).width),[18,32,10,18,12,54]);
+          const warmLink=wu.getCell('B5').value;
+          assert.equal(warmLink?.text,'Leg Swings');
+          assert.ok(warmLink?.hyperlink);
+
+          const weekTitles=['WEEK 1 — FOUNDATION','WEEK 2 — BUILD','WEEK 3 — SPECIFICITY','WEEK 4 — CONSOLIDATE / EXPRESS'];
+          const expectedHeader=['Exercise','Load / Target','Sets','Reps / Duration','Rest','Effort','Coaching Note','Log','Video','Status','Done'];
+          const widths=[29,23,9,17,14,16,50,13,38,14,9];
+          for(let n=1;n<=4;n++){
+            const ws=wb.getWorksheet(`Week ${n}`);
+            assert.equal(ws.getCell('A1').value,weekTitles[n-1]);
+            assert.equal(ws.getCell('A2').value,'Exact live production prescription in the approved client template. Day names are section bands, not a permanent data column.');
+            assert.deepEqual(ws.getRow(4).values.slice(1,12),expectedHeader);
+            assert.deepEqual(widths.map((_,i)=>ws.getColumn(i+1).width),widths);
+            assert.equal(ws.getCell('A5').value,'Mon');
+            assert.equal(ws.getCell('A5').fill?.fgColor?.argb,'FFD9E5F5');
+            assert.equal(ws.getCell('A6').value,'Back Squat');
+            assert.equal(ws.getCell('A6').fill?.fgColor?.argb,'FFECFDF5');
+            const video=ws.getCell('I6').value;
+            assert.equal(video?.text,'Open demo');
+            assert.ok(video?.hyperlink);
+            assert.equal(ws.getCell('J6').dataValidation?.type,'list');
+            assert.match(String(ws.getCell('J6').dataValidation?.formulae?.[0]||''),/Not Started,In Progress,Complete/);
+            assert.equal(ws.getCell('K6').dataValidation?.type,'list');
+            assert.match(String(ws.getCell('K6').dataValidation?.formulae?.[0]||''),/✓/);
+          }
+          console.log('SPREADSHEET_PARITY_OK');
+          console.log(JSON.stringify({sheets:expectedSheets,weekColumns:expectedHeader,widths,bytes:bytes.length}));
+          NODE
+      - uses: actions/upload-artifact@v4
+        with:
+          name: approved-spreadsheet-parity-verification
+          path: /tmp/RAZ_Approved_Parity_Verification.xlsx
+          if-no-files-found: error
