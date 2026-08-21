@@ -10,6 +10,12 @@ on:
 permissions:
   contents: write
 
+# Overlapping triggers previously ran two acceptances at once, duplicating a
+# Youth generation and its credit spend. Queue a second run instead of racing it.
+concurrency:
+  group: live-three-avatar
+  cancel-in-progress: false
+
 jobs:
   acceptance:
     if: github.event_name == 'workflow_dispatch' || contains(github.event.head_commit.message, '[RUN-LIVE-ACCEPTANCE]')
