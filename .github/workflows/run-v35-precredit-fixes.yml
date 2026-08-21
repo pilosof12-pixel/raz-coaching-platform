@@ -16,76 +16,27 @@ on:
       - privacy-security-hardening
   workflow_dispatch:
 
-permissions:
-  contents: write
-
 jobs:
   verify:
-    if: ${{ github.actor != 'github-actions[bot]' }}
     runs-on: ubuntu-latest
-    timeout-minutes: 25
+    timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
-        with:
-          ref: privacy-security-hardening
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
           cache: npm
           cache-dependency-path: phase14/package-lock.json
-      - name: Apply one-shot pre-credit hardening
-        shell: bash
-        run: |
-          python - <<'PY'
-          from pathlib import Path
-
-          # Durable generation settings live in the runtime builder.
-          p=Path('phase14/scripts/build_phase15_runtime.mjs')
-          s=p.read_text()
-          pairs=[
-            ('const OPENAI_REASONING_EFFORT = process.env.OPENAI_REASONING_EFFORT || "low";', 'const OPENAI_REASONING_EFFORT = process.env.OPENAI_REASONING_EFFORT || "high";'),
-            ('const OPENAI_MAX_OUTPUT_TOKENS = Number(process.env.OPENAI_MAX_OUTPUT_TOKENS || 14000);', 'const OPENAI_MAX_OUTPUT_TOKENS = Number(process.env.OPENAI_MAX_OUTPUT_TOKENS || 24000);'),
-            ('const AI_REQUEST_TIMEOUT_MS = Number(process.env.AI_REQUEST_TIMEOUT_MS || (OPENAI_API_KEY ? 120000 : 110000));', 'const AI_REQUEST_TIMEOUT_MS = Number(process.env.AI_REQUEST_TIMEOUT_MS || (OPENAI_API_KEY ? 180000 : 110000));'),
-            ('const BUILD_JOB_TIMEOUT_MS = Number(process.env.BUILD_JOB_TIMEOUT_MS || (OPENAI_API_KEY ? 180000 : 210000));', 'const BUILD_JOB_TIMEOUT_MS = Number(process.env.BUILD_JOB_TIMEOUT_MS || (OPENAI_API_KEY ? 360000 : 210000));'),
-            ('const MAX_ATTEMPTS = OPENAI_API_KEY ? 1 : 3;', 'const MAX_ATTEMPTS = OPENAI_API_KEY ? 2 : 3;'),
-          ]
-          for old,new in pairs:
-            if old in s: s=s.replace(old,new,1)
-            elif new not in s: raise SystemExit(f'generation anchor missing: {old}')
-
-          final_line='  "Return only a short client-ready intro, a short weeks 2-4 progression note, pain/substitution guidance relevant to this athlete, then the four TSV blocks."\\n].join("\\\\n");'
-          audit_line='  "SILENT FINAL AUDIT BEFORE OUTPUT: use the reasoning budget to review all four weeks as one program. Confirm primary goals own the best readiness slots, the actual target quality is trained directly, maintenance stays stable unless deliberately developed, total workload includes all generated work, week-to-week progression language matches the structured dose, every numerical note agrees with Sets x Reps, and injury/recovery responses target the provocative or newest stressor. Repair any violation before answering. Do not print this audit.",\\n'
-          if 'SILENT FINAL AUDIT BEFORE OUTPUT' not in s:
-            if final_line not in s: raise SystemExit('final-audit insertion anchor missing')
-            s=s.replace(final_line,audit_line+final_line,1)
-          p.write_text(s)
-
-          # Execute only the spreadsheet + regression-test half of the staged script;
-          # its old generation-anchor section is intentionally bypassed.
-          staged=Path('phase14/scripts/apply_v35_generation_spreadsheet_hardening.py').read_text()
-          marker='# B) Approved spreadsheet parity.'
-          if marker not in staged: raise SystemExit('spreadsheet patch marker missing')
-          exec('from pathlib import Path\n'+marker+staged.split(marker,1)[1])
-          PY
       - name: Install dependencies
         working-directory: phase14
         run: npm ci
-      - name: Rebuild generated runtime
-        working-directory: phase14
-        run: node scripts/build_phase15_runtime.mjs
       - name: Syntax check
         working-directory: phase14
         run: |
-          node --check scripts/build_phase15_runtime.mjs
-          node --check server.phase15.js
-          node --check public/spreadsheet-parity.js
           node --check engine/final_note_coherence.js
           node --check engine/v34_prescription_consistency.js
           node --check engine/manual_acceptance_quality.js
           node --check engine/coaching_spec_v1_quality.js
-      - name: Run approved spreadsheet parity gate
-        working-directory: phase14
-        run: node --test test/spreadsheet_approved_parity.test.js
       - name: Run adversarial gate
         working-directory: phase14
         run: node --test test/v35_precredit_adversarial_audit.test.js
@@ -98,77 +49,3 @@ jobs:
       - name: Run V35 contradiction slice
         working-directory: phase14
         run: node --test --test-name-pattern='R(4|5|6|7|8|9|10|11|12|14)' test/v35_review_regressions.test.js
-      - name: Verify generated model-quality settings
-        working-directory: phase14
-        run: |
-          grep -F 'OPENAI_REASONING_EFFORT || "high"' server.phase15.js
-          grep -F 'OPENAI_MAX_OUTPUT_TOKENS || 24000' server.phase15.js
-          grep -F 'OPENAI_API_KEY ? 2 : 3' server.phase15.js
-          grep -F 'SILENT FINAL AUDIT BEFORE OUTPUT' server.phase15.js
-      - name: Commit verified hardening and clean temporary scaffolding
-        shell: bash
-        run: |
-          cat > .github/workflows/run-v35-precredit-fixes.yml <<'YAML'
-          name: Run v35 pre-credit quality-floor verification
-
-          on:
-            push:
-              branches:
-                - privacy-security-hardening
-              paths:
-                - 'phase14/engine/final_note_coherence.js'
-                - 'phase14/engine/v34_prescription_consistency.js'
-                - 'phase14/engine/manual_acceptance_quality.js'
-                - 'phase14/engine/coaching_spec_v1_quality.js'
-                - 'phase14/test/v35_precredit_adversarial_audit.test.js'
-                - '.github/workflows/run-v35-precredit-fixes.yml'
-            pull_request:
-              branches:
-                - privacy-security-hardening
-            workflow_dispatch:
-
-          jobs:
-            verify:
-              runs-on: ubuntu-latest
-              timeout-minutes: 20
-              steps:
-                - uses: actions/checkout@v4
-                - uses: actions/setup-node@v4
-                  with:
-                    node-version: '22'
-                    cache: npm
-                    cache-dependency-path: phase14/package-lock.json
-                - name: Install dependencies
-                  working-directory: phase14
-                  run: npm ci
-                - name: Syntax check
-                  working-directory: phase14
-                  run: |
-                    node --check engine/final_note_coherence.js
-                    node --check engine/v34_prescription_consistency.js
-                    node --check engine/manual_acceptance_quality.js
-                    node --check engine/coaching_spec_v1_quality.js
-                - name: Run adversarial gate
-                  working-directory: phase14
-                  run: node --test test/v35_precredit_adversarial_audit.test.js
-                - name: Run per-set regression
-                  working-directory: phase14
-                  run: node --test test/v35_per_set_note_repair.test.js
-                - name: Run Tactical cross-week regression slice
-                  working-directory: phase14
-                  run: node --test --test-name-pattern='G2-(1|2|3|4|5|6|7|8|9|14|15|16)|special-operations-style' test/coaching_spec_v1_live_convergence.test.js
-                - name: Run V35 contradiction slice
-                  working-directory: phase14
-                  run: node --test --test-name-pattern='R(4|5|6|7|8|9|10|11|12|14)' test/v35_review_regressions.test.js
-          YAML
-          rm -f phase14/scripts/apply_v35_generation_spreadsheet_hardening.py
-          rm -f .github/workflows/apply-v35-generation-spreadsheet-hardening.yml
-          rm -f .github/v35-generation-sheet-trigger.txt
-          rm -f .github/v35-generation-sheet-pr-trigger.txt
-          rm -f .github/v35-generation-sheet-pr-trigger-branch.txt
-          rm -f .github/v35-generation-sheet-trigger-final.txt
-          git config user.name 'github-actions[bot]'
-          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add -A
-          git commit -m 'Maximise generation quality and lock approved spreadsheet parity [skip ci]'
-          git push origin HEAD:privacy-security-hardening

@@ -59,10 +59,10 @@ const GEMINI_API_KEY = process.env.GEMINI_API_KEY || "";
 const GEMINI_MODEL = process.env.GEMINI_MODEL || "gemini-2.5-flash";
 const OPENAI_API_KEY = process.env.OPENAI_API_KEY || "";
 const OPENAI_MODEL = process.env.OPENAI_MODEL || "gpt-5.4";
-const OPENAI_REASONING_EFFORT = process.env.OPENAI_REASONING_EFFORT || "low";
-const OPENAI_MAX_OUTPUT_TOKENS = Number(process.env.OPENAI_MAX_OUTPUT_TOKENS || 14000);
-const AI_REQUEST_TIMEOUT_MS = Number(process.env.AI_REQUEST_TIMEOUT_MS || (OPENAI_API_KEY ? 120000 : 110000));
-const BUILD_JOB_TIMEOUT_MS = Number(process.env.BUILD_JOB_TIMEOUT_MS || (OPENAI_API_KEY ? 180000 : 210000));
+const OPENAI_REASONING_EFFORT = process.env.OPENAI_REASONING_EFFORT || "high";
+const OPENAI_MAX_OUTPUT_TOKENS = Number(process.env.OPENAI_MAX_OUTPUT_TOKENS || 24000);
+const AI_REQUEST_TIMEOUT_MS = Number(process.env.AI_REQUEST_TIMEOUT_MS || (OPENAI_API_KEY ? 180000 : 110000));
+const BUILD_JOB_TIMEOUT_MS = Number(process.env.BUILD_JOB_TIMEOUT_MS || (OPENAI_API_KEY ? 360000 : 210000));
 let lastAIUsage = null;
 let lastBuildTiming = null;
 
@@ -190,6 +190,7 @@ const OPENAI_COMPACT_DEVELOPER = [
   "Never emit a 0-set or 0-rep explanatory placeholder row. If equipment forbids an exercise, omit the forbidden row and prescribe the valid substitute directly.",
   "Do not emit [REVIEW], QA labels, internal scores, support messages, placeholders, or invented exercise names. [WARMUP] is the only permitted bracketed row prefix.",
   "Power/throw/jump primers come after preparation and before heavy strength. Keep sessions within the supplied hard time cap. Narrative must match the final TSV exactly.",
+  "SILENT FINAL AUDIT BEFORE OUTPUT: use the reasoning budget to review all four weeks as one program. Confirm primary goals own the best readiness slots, the actual target quality is trained directly, maintenance stays stable unless deliberately developed, total workload includes all generated work, week-to-week progression language matches the structured dose, every numerical note agrees with Sets x Reps, and injury/recovery responses target the provocative or newest stressor. Repair any violation before answering. Do not print this audit.",
   "Return only a short client-ready intro, a short weeks 2-4 progression note, pain/substitution guidance relevant to this athlete, then the four TSV blocks."
 ].join("\n");
 
@@ -1899,7 +1900,7 @@ app.get("/api/health", async (req, res) => {
 // error code has failed 3 times we downgrade to a deterministic hard-substitute
 // pass rather than failing the whole build.
 async function generateValidatedProgram(intake, onProgress = async () => {}) {
-  const MAX_ATTEMPTS = OPENAI_API_KEY ? 1 : 3;
+  const MAX_ATTEMPTS = OPENAI_API_KEY ? 2 : 3;
   const basePrompt = buildPrompt(intake);
   const amendments = [];
   const failCounts = Object.create(null);

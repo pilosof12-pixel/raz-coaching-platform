@@ -8,6 +8,7 @@
   const HEADER = 'FF263757';
   const BODY = 'FFECFDF5';
   const LABEL = 'FFF2F5F9';
+  const DAY_BAND = 'FFD9E5F5';
   const WHITE = 'FFFFFFFF';
   const TEXT = 'FF111827';
   const LINK = 'FF0563C1';
@@ -137,10 +138,11 @@
     if(direct?.url) return direct.url;
     return 'https://www.youtube.com/results?search_query=' + encodeURIComponent(clean(name) + ' exercise demo').replace(/%20/g,'+');
   }
-  function setHyperlink(cell, name) {
+  function setHyperlink(cell, name, visibleText='Open demo', linkStyle=true) {
     const url=fallbackDemo(name);
-    cell.value={text:url,hyperlink:url,tooltip:'Open exercise demonstration'};
-    font(cell,{size:10,color:LINK,underline:true}); align(cell);
+    cell.value={text:visibleText,hyperlink:url,tooltip:'Open exercise demonstration'};
+    if(linkStyle) font(cell,{size:10,color:LINK,underline:true}); else font(cell,{size:11,color:TEXT});
+    align(cell);
     return url;
   }
 
@@ -198,35 +200,31 @@
     return rules;
   }
 
+  function overviewTitle(intake={}) {
+    const g=`${joinGoals(intake.primary_goals)} ${joinGoals(intake.secondary_goals)}`;
+    if(/3\s*k(?:m)?|ruck|tactical|special[- ]?operations/i.test(`${g} ${text(intake.notes)}`)) return 'RAZ — TACTICAL 3K / GPP PROGRAM';
+    if(ageFromIntake(intake) && ageFromIntake(intake)<18) return 'RAZ — YOUTH PERFORMANCE PROGRAM';
+    if(/one[- ]?arm\s*(?:pull|chin)|marathon|back squat|overhead press/i.test(g)) return 'RAZ — ADVANCED HYBRID PERFORMANCE PROGRAM';
+    return 'RAZ — PERFORMANCE PROGRAM';
+  }
+
   function renderOverview(ws, intake, week1) {
     ws.views=[{showGridLines:false}];
-    ws.getColumn(1).width=28; ws.getColumn(2).width=62; ws.getColumn(3).width=18; ws.getColumn(4).width=48;
-    mergeTitle(ws,1,4, ageFromIntake(intake)&&ageFromIntake(intake)<18 ? 'RAZ — YOUTH PERFORMANCE PROGRAM' : 'RAZ — INDIVIDUALIZED PERFORMANCE PROGRAM', NAVY,16);
-    mergeTitle(ws,2,4,'4-WEEK INDIVIDUALIZED TRAINING BLOCK',NAVY_2,10,'FFDCE7F7');
+    [28,34,16,48].forEach((w,i)=>ws.getColumn(i+1).width=w);
+    mergeTitle(ws,1,4,overviewTitle(intake),NAVY,16);
+    mergeTitle(ws,2,4,'EXACT LIVE PRODUCTION ACCEPTANCE — 4-WEEK BLOCK',NAVY_2,10,'FFDCE7F7');
     let row=4;
-    const hdr=['ATHLETE PROFILE','DETAIL','',''];
-    hdr.forEach((v,i)=>{const c=ws.getRow(row).getCell(i+1);c.value=v;fill(c,HEADER);font(c,{bold:true,color:WHITE});align(c,{horizontal:'center'});});
+    ['ATHLETE / PROGRAM','DETAIL','',''].forEach((v,i)=>{const c=ws.getRow(row).getCell(i+1);c.value=v;fill(c,HEADER);font(c,{size:10,bold:true,color:WHITE});align(c,{horizontal:'center'});});
     row++;
     for(const [k,v] of profileRows(intake)){
-      const a=ws.getRow(row).getCell(1), b=ws.getRow(row).getCell(2); a.value=k;b.value=v;
-      fill(a,LABEL);font(a,{bold:true});align(a);font(b);align(b); ws.mergeCells(row,2,row,4); row++;
+      const a=ws.getRow(row).getCell(1), b=ws.getRow(row).getCell(2);
+      a.value=k; b.value=v; fill(a,LABEL); font(a,{size:10,bold:true}); align(a);
+      font(b,{size:10}); align(b); ws.mergeCells(row,2,row,4); ws.getRow(row).height=34; row++;
     }
     row++;
-    for(let c=1;c<=4;c++){const x=ws.getRow(row).getCell(c);fill(x,HEADER);font(x,{bold:true,color:WHITE});align(x,{horizontal:'center'});}
-    ['WEEKLY STRUCTURE','TYPE','PRIORITY','COACHING PURPOSE'].forEach((v,i)=>ws.getRow(row).getCell(i+1).value=v);
-    row++;
-    const ss=sessions(week1);
-    ss.forEach((s,i)=>{
-      ws.getRow(row).getCell(1).value=sessionLabel(intake,s,i);
-      ws.getRow(row).getCell(2).value=sessionType(s);
-      ws.getRow(row).getCell(3).value='MANDATORY';
-      ws.getRow(row).getCell(4).value=sessionPurpose(s,i);
-      for(let c=1;c<=4;c++){font(ws.getRow(row).getCell(c));align(ws.getRow(row).getCell(c));} row++;
-    });
-    row++;
-    mergeTitle(ws,row,4,'PROGRAM RULES',BAND,11); row++;
+    mergeTitle(ws,row,4,'PROGRAM RULES',DAY_BAND,10,'FF0B1324'); row++;
     for(const rule of programRules(intake)){
-      ws.mergeCells(row,1,row,4); const c=ws.getRow(row).getCell(1); c.value='• '+rule; font(c); align(c); ws.getRow(row).height=30; row++;
+      ws.mergeCells(row,1,row,4); const c=ws.getRow(row).getCell(1); c.value='• '+rule; font(c,{size:10}); align(c); ws.getRow(row).height=32; row++;
     }
   }
 
@@ -248,59 +246,71 @@
     return out.slice(0,5);
   }
 
+  function splitWarmupDose(raw) {
+    const x=clean(raw);
+    const m=x.match(/^(\d+)\s*[×x]\s*(.+)$/i);
+    if(m) return [m[1],m[2]];
+    return ['1',x||'N/A'];
+  }
+
   function renderWarmup(ws, intake, week1) {
     ws.views=[{showGridLines:false}];
-    [19,30,18,14,38,44,38].forEach((w,i)=>ws.getColumn(i+1).width=w);
-    mergeTitle(ws,1,7,'RAZ — WARM-UP + SKILL PREP',NAVY,16);
-    mergeTitle(ws,2,7,'Keep preparation short, specific and non-fatiguing. Primary skills are practiced while fresh.',NAVY_2,10,'FFDCE7F7');
-    let row=4; const ss=sessions(week1); const explicit=warmupRows(week1);
-    ss.forEach((s,i)=>{
-      mergeTitle(ws,row,7,`${sessionLabel(intake,s,i).toUpperCase()}  |  ${sessionType(s).toUpperCase()}`,BAND,11); row++;
-      ['Section','Movement / Target','Dose','Rest','Purpose','Video','Notes'].forEach((v,j)=>{const c=ws.getRow(row).getCell(j+1);c.value=v;fill(c,HEADER);font(c,{bold:true,color:WHITE});align(c,{horizontal:'center'});}); row++;
+    [18,32,10,18,12,54].forEach((w,i)=>ws.getColumn(i+1).width=w);
+    mergeTitle(ws,1,6,'RAZ — WARM-UP / PREPARATION',NAVY,16);
+    mergeTitle(ws,2,6,'Warm-ups are separated from the weekly prescription so the training sheets stay clean and use the approved 11-column template.',NAVY_2,10,'FFDCE7F7');
+    let row=4;
+    ['SESSION / DAY','EXERCISE','SETS','REPS / DURATION','REST','COACHING NOTE'].forEach((v,j)=>{const c=ws.getRow(row).getCell(j+1);c.value=v;fill(c,HEADER);font(c,{size:10,bold:true,color:WHITE});align(c,{horizontal:'center'});});
+    row++;
+    const ss=sessions(week1), explicit=warmupRows(week1);
+    ss.forEach((session,i)=>{
+      const label=sessionLabel(intake,session,i);
+      const same=explicit.filter(x=>!x.day || x.day===session.day);
       let items=[];
-      // If machine output supplied warm-up rows for this day, preserve them; otherwise derive a concise specific warm-up.
-      const same=explicit.filter(x=>!x.day || x.day===s.day);
-      if(same.length) items=same.map(x=>['PREP',x.exercise.replace(/^\s*\[(?:WARMUP|חימום)\]\s*/i,''),x.reps||x.sets||'',x.rest||'',x.notes||'Session-specific preparation','',x.notes||'']);
-      else items=derivedWarmup(s,intake);
-      for(const item of items){
-        const vals=[item[0],item[1],item[2],item[3],item[4],'',item[5]];
-        vals.forEach((v,j)=>{const c=ws.getRow(row).getCell(j+1);c.value=v;fill(c,BODY);font(c);align(c);});
-        setHyperlink(ws.getRow(row).getCell(6),item[1]); ws.getRow(row).height=32; row++;
+      if(same.length) {
+        items=same.map(x=>({exercise:x.exercise.replace(/^\s*\[(?:WARMUP|חימום)\]\s*/i,''),sets:x.sets||'1',reps:x.reps||'N/A',rest:x.rest||'N/A',note:x.notes||'Session-specific preparation'}));
+      } else {
+        items=derivedWarmup(session,intake).map(x=>{const [sets,reps]=splitWarmupDose(x[2]);return {exercise:x[1],sets,reps,rest:x[3]||'N/A',note:[x[4],x[5]].filter(Boolean).join(' ')};});
       }
-      row++;
+      items.forEach((item,itemIndex)=>{
+        const vals=[itemIndex===0?label:'',item.exercise,item.sets,item.reps,item.rest,item.note];
+        vals.forEach((v,j)=>{const c=ws.getRow(row).getCell(j+1);c.value=v;fill(c,BODY);font(c,{size:10});align(c);});
+        setHyperlink(ws.getRow(row).getCell(2),item.exercise,item.exercise,false);
+        ws.getRow(row).height=34; row++;
+      });
     });
   }
 
-  function weekIntent(n) {
-    return n===1?'FOUNDATION • Establish repeatable positions and clean goal-specific reps':
-      n===2?'BUILD • Add a small amount of quality work without chasing fatigue':
-      n===3?'SPECIFICITY • Progress the smallest useful variable while preserving execution':
-      'CONSOLIDATE • Keep quality high, reduce unnecessary fatigue and assess readiness';
+  function weekTitle(n) {
+    return n===1?'WEEK 1 — FOUNDATION':n===2?'WEEK 2 — BUILD':n===3?'WEEK 3 — SPECIFICITY':'WEEK 4 — CONSOLIDATE / EXPRESS';
   }
-  function rowStatus(r) { return /\boptional\b/i.test(`${r.exercise} ${r.notes}`)?'OPTIONAL':'MANDATORY'; }
+  function applyTrackingValidation(cell, kind) {
+    cell.dataValidation = kind==='status'
+      ? {type:'list',allowBlank:true,formulae:['"Not Started,In Progress,Complete"']}
+      : {type:'list',allowBlank:true,formulae:['",✓"']};
+  }
   function renderWeek(ws, intake, week) {
-    ws.views=[{showGridLines:false,state:'frozen',ySplit:8}];
+    ws.views=[{showGridLines:false,state:'frozen',ySplit:4}];
     [29,23,9,17,14,16,50,13,38,14,9].forEach((w,i)=>ws.getColumn(i+1).width=w);
-    mergeTitle(ws,1,11,ageFromIntake(intake)&&ageFromIntake(intake)<18?'RAZ — YOUTH PERFORMANCE':'RAZ — PERFORMANCE',NAVY,16);
-    mergeTitle(ws,2,11,`INDIVIDUALIZED TRAINING BLOCK • WEEK ${week.week}`,NAVY_2,10,'FFDCE7F7');
-    mergeTitle(ws,4,11,`WEEK INTENT • ${weekIntent(week.week)}`,BAND,11);
-    let row=6; const ss=sessions(week);
-    ss.forEach((s,i)=>{
-      mergeTitle(ws,row,11,`${sessionLabel(intake,s,i).toUpperCase()}  |  ${sessionType(s).toUpperCase()}  •  MANDATORY`,BAND,11); row++;
-      ws.mergeCells(row,1,row,11); const prep=ws.getRow(row).getCell(1); prep.value=`WARM-UP • Use ${sessionLabel(intake,s,i)} protocol in the Warm-Up tab`; font(prep,{italic:true,color:'FF475569'});align(prep);row++;
-      const headers=['Exercise','Load / Target','Sets','Reps / Duration','Rest','Effort','Coaching Note','Log','Video','Status','Done'];
-      headers.forEach((v,j)=>{const c=ws.getRow(row).getCell(j+1);c.value=v;fill(c,HEADER);font(c,{bold:true,color:WHITE});align(c,{horizontal:'center'});}); row++;
-      for(const r of s.rows){
-        const vals=[r.exercise,r.load,r.sets,r.reps,r.rest,r.effort,r.notes,'','',rowStatus(r),''];
-        vals.forEach((v,j)=>{const c=ws.getRow(row).getCell(j+1);c.value=v;fill(c,BODY);font(c);align(c,{horizontal:[2,3,4,5,6,9,10,11].includes(j+1)?'center':'left'});});
-        setHyperlink(ws.getRow(row).getCell(9),r.exercise); ws.getRow(row).height=34; row++;
+    mergeTitle(ws,1,11,weekTitle(week.week),NAVY,16);
+    mergeTitle(ws,2,11,'Exact live production prescription in the approved client template. Day names are section bands, not a permanent data column.',NAVY_2,10,'FFDCE7F7');
+    const headers=['Exercise','Load / Target','Sets','Reps / Duration','Rest','Effort','Coaching Note','Log','Video','Status','Done'];
+    let row=4;
+    headers.forEach((v,j)=>{const c=ws.getRow(row).getCell(j+1);c.value=v;fill(c,HEADER);font(c,{size:10,bold:true,color:WHITE});align(c,{horizontal:'center'});});
+    row++;
+    const ss=sessions(week);
+    ss.forEach((session,i)=>{
+      ws.mergeCells(row,1,row,11);
+      const band=ws.getRow(row).getCell(1); band.value=sessionLabel(intake,session,i); fill(band,DAY_BAND); font(band,{size:10,bold:true,color:'FF0B1324'}); align(band); ws.getRow(row).height=24; row++;
+      for(const r of session.rows){
+        const vals=[r.exercise,r.load,r.sets,r.reps,r.rest,r.effort,r.notes,'','','',''];
+        vals.forEach((v,j)=>{const c=ws.getRow(row).getCell(j+1);c.value=v;fill(c,BODY);font(c,{size:10});align(c,{horizontal:[2,3,4,5,6,9,10,11].includes(j+1)?'center':'left'});});
+        setHyperlink(ws.getRow(row).getCell(9),r.exercise,'Open demo',true);
+        applyTrackingValidation(ws.getRow(row).getCell(10),'status');
+        applyTrackingValidation(ws.getRow(row).getCell(11),'done');
+        ws.getRow(row).height=34; row++;
       }
-      row+=2;
+      row++;
     });
-    mergeTitle(ws,row,11,'COACH NOTES',BAND,11); row++;
-    for(const rule of programRules(intake).slice(0,4)){
-      ws.mergeCells(row,1,row,11); const c=ws.getRow(row).getCell(1); c.value='• '+rule; font(c);align(c);ws.getRow(row).height=28;row++;
-    }
   }
 
   async function buildParitySpreadsheet(program, intake={}) {
