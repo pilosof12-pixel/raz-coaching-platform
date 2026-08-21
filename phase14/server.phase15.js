@@ -32,6 +32,7 @@ import { validateRepairableProgramBundle } from "./engine/repairable_validation_
 import { enrichSpecificWarmups } from "./engine/specific_warmup_enrichment.js"; // SPECIFIC-WARMUP-ENRICHMENT-WIRED
 import { normalizeYouthPrimarySkillOrder } from "./engine/youth_skill_order_normalizer.js"; // YOUTH-SKILL-ORDER-REPAIR-WIRED
 import { normalizeAdvancedHybridWeek4OapConsolidation } from "./engine/advanced_hybrid_oap_consolidation_normalizer.js"; // ADVANCED-HYBRID-OAP-CONSOLIDATION-REPAIR-WIRED
+import { repairSafeObjectiveLanguage } from "./engine/quality_preserving_fast_repairs.js"; // QUALITY-PRESERVING-FAST-REPAIR-WIRED
 import { registerAdminQaRoutes } from "./admin_qa_routes.js";
 // Engine v19: deterministic post-generation validators (dependency-free module,
 // also imported directly by test/v19_validators.test.js).
@@ -71,9 +72,9 @@ const GEMINI_MODEL = process.env.GEMINI_MODEL || "gemini-2.5-flash";
 const OPENAI_API_KEY = process.env.OPENAI_API_KEY || "";
 const OPENAI_MODEL = process.env.OPENAI_MODEL || "gpt-5.4";
 const OPENAI_REASONING_EFFORT = process.env.OPENAI_REASONING_EFFORT || "high";
-const OPENAI_MAX_OUTPUT_TOKENS = Number(process.env.OPENAI_MAX_OUTPUT_TOKENS || 24000);
-const AI_REQUEST_TIMEOUT_MS = Number(process.env.AI_REQUEST_TIMEOUT_MS || (OPENAI_API_KEY ? 180000 : 110000));
-const BUILD_JOB_TIMEOUT_MS = Number(process.env.BUILD_JOB_TIMEOUT_MS || (OPENAI_API_KEY ? 360000 : 210000));
+const OPENAI_MAX_OUTPUT_TOKENS = Number(process.env.OPENAI_MAX_OUTPUT_TOKENS || 32000); // QUALITY-PRESERVING-HIGH-REASONING-HEADROOM
+const AI_REQUEST_TIMEOUT_MS = Number(process.env.AI_REQUEST_TIMEOUT_MS || (OPENAI_API_KEY ? 420000 : 110000));
+const BUILD_JOB_TIMEOUT_MS = Number(process.env.BUILD_JOB_TIMEOUT_MS || (OPENAI_API_KEY ? 600000 : 210000));
 let lastAIUsage = null;
 let lastBuildTiming = null;
 
@@ -2156,6 +2157,33 @@ async function generateValidatedProgram(intake, onProgress = async () => {}) {
               .slice(0, 6)
           : [];
         const qaUnknownSuffix = qaUnknownNames.length ? '[' + qaUnknownNames.join('|') + ']' : '';
+
+        // QUALITY-PRESERVING FAST PATH: a false week-over-week wording claim is
+        // objective and may be corrected without changing a single training variable.
+        // We only touch Notes. If the contradiction lives in Load/Reps, or if any
+        // other validator remains, the existing high-reasoning repair path is kept.
+        if (specificCodes.length && specificCodes.every((code) => code === "V34_PROGRESSION_LANGUAGE_MISMATCH")) {
+          const deterministic = repairSafeObjectiveLanguage(program, err.flags);
+          if (deterministic.changed) {
+            try {
+              const recheck = validateRepairableProgramBundle(deterministic.program, intake, {
+                skipSkillCalibration: Boolean(OPENAI_API_KEY),
+              });
+              const repairedProgram = recheck.program;
+              validateClientOutputCleanliness(repairedProgram);
+              qaTrace.push(`A${attempt}:${repairLabel}->DETERMINISTIC_NOTE_REPAIR`);
+              console.warn(`generateValidatedProgram: quality-preserving deterministic note repair passed for ${repairLabel}; avoided full regeneration`);
+              await onProgress("finalizing", attempt, "objective wording mismatch repaired without changing prescription");
+              return repairedProgram;
+            } catch (deterministicErr) {
+              // Keep the objectively improved candidate, then allow the normal
+              // source-grounded model repair to address whatever remains.
+              program = deterministic.program;
+              console.warn("deterministic wording repair did not fully clear QA; preserving repair and continuing normal high-reasoning path:", deterministicErr?.code || deterministicErr?.message);
+            }
+          }
+        }
+
         qaTrace.push(`A${attempt}:${repairLabel}${qaUnknownSuffix}`); // QA-DIAGNOSTIC-UNKNOWN-NAMES
         failCounts[repairLabel] = (failCounts[repairLabel] || 0) + 1;
         console.warn(

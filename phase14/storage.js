@@ -138,11 +138,11 @@ function makeSupabaseStorage() {
     },
     async createJob(id,token,kind,now) {
       const row={id,token,kind,status:"pending",stage:"queued",attempt:0,detail:null,program:null,error:null,created_at:now,updated_at:now}; mirrorJob(row);
-      persistEventually("job create",async()=>{ const s=await sb(); await runSupabase("createJob/upsert",()=>s.from("jobs").upsert(row,{onConflict:"id"}),{attempts:1}); });
+      persistEventually("job create",async()=>{ const s=await sb(); const durableRow={...row}; delete durableRow.attempt; await runSupabase("createJob/upsert",()=>s.from("jobs").upsert(durableRow,{onConflict:"id"}),{attempts:1}); }); // SUPABASE-LEGACY-JOB-SCHEMA-COMPAT
     },
     async updateJobProgress(id,stage,attempt=0,detail=null,now=Date.now()) {
       mirrorJob({id,stage,attempt,detail,updated_at:now});
-      persistEventually("job progress",async()=>{ const s=await sb(); await runSupabase("updateJobProgress/update",()=>s.from("jobs").update({stage,attempt,detail,updated_at:now}).eq("id",id),{attempts:1}); });
+      persistEventually("job progress",async()=>{ const s=await sb(); await runSupabase("updateJobProgress/update",()=>s.from("jobs").update({stage,detail,updated_at:now}).eq("id",id),{attempts:1}); }); // SUPABASE-LEGACY-JOB-SCHEMA-COMPAT
     },
     async finishJob(id,status,program,error,now) {
       mirrorJob({id,status,program:program||null,error:error||null,updated_at:now});
