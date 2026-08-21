@@ -1,38 +1,12 @@
 {
-  "timestamp": "2026-08-21T14:10:56.421Z",
+  "timestamp": "2026-08-21T15:18:09.463Z",
   "base": "https://raz-coaching-platform.onrender.com",
-  "head_sha": "7da37e4f405ff9fa048602098a5b95f735cd15bc",
-  "runtime": "launch-acceptance-v35-quality-optimized-live7-20260822",
+  "head_sha": "c1e17219c6f3b28ad396a595f7f1d3145074cc11",
+  "runtime": "launch-acceptance-v37-youth-loop-fix-live8-20260822",
   "results": [
     {
       "id": "advanced_hybrid",
-      "job_id": "7298f7745265257333885dfa9ebed4b3",
-      "ok": false,
-      "status": "error",
-      "stage": "refining",
-      "attempt": 4,
-      "detail": "internal repair: ADVANCED_HYBRID_MARATHON_SUBORDINATION",
-      "last_seen_status": "error",
-      "error": "Internal coaching QA could not repair the candidate program after multiple passes. No client-facing program was saved. Please retry the build. QA trace: A1:ADVANCED_HYBRID_WEEK4_NOT_CONSOLIDATING+ADVANCED_HYBRID_DENSE_72H_PRIMARY_WINDOW+V34_NOTE_UNDEFINED_LOAD_REFERENCE -> A2:ADVANCED_HYBRID_DENSE_72H_PRIMARY_WINDOW+EVENT_PROGRESSING_SESSION_MISSING -> A3:ADVANCED_HYBRID_MARATHON_SUBORDINATION+ADVANCED_HYBRID_DENSE_72H_PRIMARY_WINDOW -> A4:ADVANCED_HYBRID_MARATHON_SUBORDINATION. [QA:INTERNAL_QA_REPAIR_EXHAUSTED]",
-      "program_chars": 0,
-      "seconds": 486
-    },
-    {
-      "id": "youth_gymnastics",
-      "job_id": "1f178c6e767e8e2956e8cb9e44eeec90",
-      "ok": false,
-      "status": "error",
-      "stage": "refining",
-      "attempt": 4,
-      "detail": "internal repair: V34_PROGRESSION_LANGUAGE_MISMATCH",
-      "last_seen_status": "error",
-      "error": "Internal coaching QA could not repair the candidate program after multiple passes. No client-facing program was saved. Please retry the build. QA trace: A1:COACH_SPEC_V1_YG_FAILURE_BASED_DEFAULT+V34_PROGRESSION_LANGUAGE_MISMATCH -> A2:V34_PROGRESSION_LANGUAGE_MISMATCH -> A3:V34_PROGRESSION_LANGUAGE_MISMATCH -> A4:V34_PROGRESSION_LANGUAGE_MISMATCH. [QA:INTERNAL_QA_REPAIR_EXHAUSTED]",
-      "program_chars": 0,
-      "seconds": 332
-    },
-    {
-      "id": "tactical_3k",
-      "job_id": "630504bcc78b4ff8c339f07457c969f6",
+      "job_id": "de9cc21e25818565d20a01a60e889a9a",
       "ok": true,
       "status": "done",
       "stage": "finalizing",
@@ -40,9 +14,35 @@
       "detail": "saving program",
       "last_seen_status": "done",
       "error": null,
-      "program_chars": 11297,
-      "seconds": 337
+      "program_chars": 17466,
+      "seconds": 535
+    },
+    {
+      "id": "youth_gymnastics",
+      "job_id": "de4fc2995835f094a3641d607b36ca59",
+      "ok": true,
+      "status": "done",
+      "stage": "finalizing",
+      "attempt": 0,
+      "detail": "saving program",
+      "last_seen_status": "done",
+      "error": null,
+      "program_chars": 14769,
+      "seconds": 302
+    },
+    {
+      "id": "tactical_3k",
+      "job_id": "1c1b7e03ae10f980961e569f5a38bb6d",
+      "ok": true,
+      "status": "done",
+      "stage": "finalizing",
+      "attempt": 0,
+      "detail": "saving program",
+      "last_seen_status": "done",
+      "error": null,
+      "program_chars": 11300,
+      "seconds": 373
     }
   ],
-  "ok": false
+  "ok": true
 }
