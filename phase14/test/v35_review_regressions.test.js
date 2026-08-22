@@ -14,7 +14,15 @@ import {
 // Regressions for the v34 live review. Every fixture below is the shape the
 // reviewer actually found in docs/qa/live-three-avatar/latest.
 const LIVE = path.join(process.cwd(), '..', 'docs', 'qa', 'live-three-avatar', 'latest');
-const readLive = (n) => fs.readFileSync(path.join(LIVE, `${n}-program.txt`), 'utf8');
+// These read the coach-reviewed artifacts, pinned under test/fixtures. Reading
+// docs/qa/live-three-avatar/latest instead made the suite's baseline move with
+// every acceptance run -- a failed avatar deletes its artifact, and a fresh one
+// replaces the program the assertions were written against -- so real
+// regressions were indistinguishable from artifact churn. New live output is
+// audited separately; these stay fixed so they can detect a regression.
+const readLive = (n) => {
+  return fs.readFileSync(path.join(process.cwd(), 'test', 'fixtures', `${n}-program.txt`), 'utf8');
+};
 const HEADER = 'Day\tExercise\tWeight\tSets\tReps\tRest\tTarget RPE\tNotes\tResults';
 const block = (w, rows) => `START_WEEK${w}_TSV\n${HEADER}\n${rows.join('\n')}\nEND_WEEK${w}_TSV`;
 

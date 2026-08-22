@@ -1,6 +1,24 @@
 import { RetriableValidationError } from './exercise_dictionary.js';
 import { isHighConcurrencyHybrid, currentRunBaseline, marathonGoalTier } from './advanced_hybrid_concurrency.js';
 
+// Exposure matchers for the Advanced Hybrid rules. Each rule below asks whether
+// a KIND of work is present, so these accept every canonical name in the
+// exercise dictionary that delivers that kind, and nothing that does not.
+//
+// Strict one-arm pulling is unassisted full-range work; a weighted or chin
+// variant is still strict. Eccentric, isometric and partial work is explicitly
+// NOT strict -- the rule exists to stop an athlete who already performs strict
+// reps being regressed to prerequisite-only work -- but it does count as the
+// second assistance/volume exposure the rule also requires.
+const STRICT_OAP = /^(?:weighted\s+)?one[- ]arm\s+(?:pull|chin)-?up$/i;
+const ASSISTED_OAP = /^(?:band[- ])?assisted\s+one[- ]arm\s+(?:pull|chin)-?up(?:\s+eccentric)?$/i;
+const OAP_SUPPORT = /^one[- ]arm\s+(?:pull|chin)-?up\s+(?:eccentric|isometric|partial)$/i;
+
+// A strict overhead press goal is a barbell goal; a dumbbell press is a
+// different exposure and does not satisfy it.
+const STRICT_OHP = /^(?:standing\s+)?(?:barbell\s+)?overhead press$/i;
+
+
 function arr(v) { return Array.isArray(v) ? v : v ? [v] : []; }
 function lower(v) { return String(v || '').toLowerCase(); }
 
@@ -105,13 +123,19 @@ export function validateAdvancedHybridQualitySemantic(program, intake = {}) {
     }
 
     if (/one[- ]?arm\s*(?:pull|chin)|\boap\b/.test(primary)) {
-      const hasStrict = work.some((r) => /^one-arm pull-up$/i.test(r.exercise));
-      const hasAssisted = work.some((r) => /^assisted one-arm pull-up$/i.test(r.exercise));
+      // These rules are about exposure types, not spellings. Matching a single
+      // exact display name rejected programs that satisfied the coaching intent
+      // with another name the exercise dictionary itself sanctions -- a
+      // Weighted One-Arm Pull-up is strict work, a Band-Assisted One-Arm Pull-Up
+      // is an assistance exposure -- and cost four regeneration attempts because
+      // no rewording of the same program could ever satisfy the check.
+      const hasStrict = work.some((r) => STRICT_OAP.test(r.exercise));
+      const hasAssisted = work.some((r) => ASSISTED_OAP.test(r.exercise) || OAP_SUPPORT.test(r.exercise));
       if (!hasStrict || !hasAssisted) fail('ADVANCED_HYBRID_OAP_SPECIFICITY', `Week ${week} must protect both demonstrated strict One-Arm Pull-up skill-strength and a second assistance/volume exposure. Do not regress an athlete already performing strict OAPs to prerequisite-only work.`, { week, hasStrict, hasAssisted });
     }
 
     if (/overhead\s*press|\bohp\b/.test(allGoals)) {
-      const ohp = work.filter((r) => /^overhead press$/i.test(r.exercise));
+      const ohp = work.filter((r) => STRICT_OHP.test(r.exercise));
       const hasPushPress = work.some((r) => /^push press$/i.test(r.exercise));
       if (!ohp.length || !hasPushPress) fail('ADVANCED_HYBRID_OHP_ARCHITECTURE', `Week ${week} needs one direct strict Overhead Press exposure plus one low-cost complementary vertical press exposure such as Push Press when recovery allows.`, { week });
       if (benchmarked(intake, /overhead press/i) && ohp.some((r) => !hasNumericLoad(r))) {

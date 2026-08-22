@@ -15,7 +15,9 @@ import { ADVANCED_HYBRID_LAUNCH_INTAKE } from './fixtures/advanced_hybrid_launch
 // ---------------------------------------------------------------------------
 
 const LIVE = path.join(process.cwd(), '..', 'docs', 'qa', 'live-three-avatar', 'latest');
-const readLive = (name) => fs.readFileSync(path.join(LIVE, `${name}-program.txt`), 'utf8');
+const readLive = (name) => {
+  return fs.readFileSync(path.join(process.cwd(), 'test', 'fixtures', `${name}-program.txt`), 'utf8');
+};
 
 const HEADER = 'Day\tExercise\tWeight\tSets\tReps\tRest\tTarget RPE\tNotes\tResults';
 const block = (w, rows) => `START_WEEK${w}_TSV\n${HEADER}\n${rows.join('\n')}\nEND_WEEK${w}_TSV`;
