@@ -1,5 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import fs from 'node:fs';
+import path from 'node:path';
 
 import { trimExcessSupportVolume } from '../engine/mrv_support_trim.js';
 import { validateWeeklyVolumeBudgetSemantic } from '../engine/semantic_program_qa.js';
@@ -179,5 +181,63 @@ test('[N5] the restatement is idempotent', () => {
   const p = flatBlock('The long run builds gradually across the block.');
   const once = repairDeterministicContradictions(p, {});
   const twice = repairDeterministicContradictions(once.program, {});
+  assert.equal(twice.program, once.program);
+});
+
+// --- the gate that blocked run #67 -------------------------------------------
+
+import { validateAdvancedHybridQualitySemantic } from '../engine/advanced_hybrid_quality.js';
+
+// Advanced Hybrid spent all four attempts of live run #67 on
+// HEAVY_STRENGTH_RAMP_MISSING, failing from the first attempt. A ramp is derived
+// arithmetically from the work load by rampText -- the same function the
+// enrichment layer already uses -- so asking the model for it again was never
+// going to help.
+const HYBRID_INTAKE = {
+  age: 30, primary_goals: ['220kg back squat', '4 One arm pullups'],
+  secondary_goals: ['100kg overhead press', 'Marathon'], experience: 'advanced',
+  days_per_week: 4, available_gym_days: ['Mon', 'Tue', 'Fri', 'Sun'],
+  gym_availability_mode: 'limited', goal_priority_model: 'tiered_equal_primary',
+  training_location: 'commercial_gym', sport: 'MMA', sport_sessions_per_week: 5,
+  sport_schedule: [
+    { day: 'Tue', intensity: 'moderate' }, { day: 'Wed', intensity: 'hard' },
+    { day: 'Thu', intensity: 'moderate' }, { day: 'Fri', intensity: 'hard' },
+    { day: 'Sat', intensity: 'moderate' },
+  ],
+  current_numbers: 'Back Squat: 205 kg 1RM\nOne-Arm Pull-up: 2 strict reps each arm\nOverhead Press: 80 kg x 4',
+  injuries: 'None reported',
+};
+const hybridGolden = fs.readFileSync(path.join(process.cwd(), 'test', 'fixtures', 'advanced_hybrid-program.txt'), 'utf8');
+const hybridCode = (p) => {
+  try { validateAdvancedHybridQualitySemantic(p, HYBRID_INTAKE); return null; }
+  catch (e) { return e.code; }
+};
+
+test('[K1] a missing heavy ramp is generated from the work load, not regenerated', () => {
+  const stripped = hybridGolden.replace(/Ramp [^;\t]*?work sets\./g, 'General prep.');
+  assert.equal(hybridCode(stripped), 'HEAVY_STRENGTH_RAMP_MISSING');
+  const repaired = repairDeterministicContradictions(stripped, HYBRID_INTAKE);
+  assert.equal(hybridCode(repaired.program), null, 'one pass must clear the gate');
+  assert.ok(repaired.repairs.some((r) => r.type === 'v45_heavy_ramp_added'));
+});
+
+test('[K2] a program that already ramps correctly is left alone', () => {
+  const out = repairDeterministicContradictions(hybridGolden, HYBRID_INTAKE);
+  assert.equal(out.repairs.filter((r) => r.type === 'v45_heavy_ramp_added').length, 0);
+});
+
+test('[K3] one ramp per day, for the heaviest lift, not every loaded row', () => {
+  // Ramping every loaded row would turn the warm-up into its own session.
+  const stripped = hybridGolden.replace(/Ramp [^;\t]*?work sets\./g, 'General prep.');
+  const repaired = repairDeterministicContradictions(stripped, HYBRID_INTAKE);
+  const perWeekDay = repaired.repairs.filter((r) => r.type === 'v45_heavy_ramp_added');
+  const keys = new Set(perWeekDay.map((r) => `${r.week}|${r.day}`));
+  assert.equal(keys.size, perWeekDay.length, 'no day gets two ramps');
+});
+
+test('[K4] the ramp repair is idempotent', () => {
+  const stripped = hybridGolden.replace(/Ramp [^;\t]*?work sets\./g, 'General prep.');
+  const once = repairDeterministicContradictions(stripped, HYBRID_INTAKE);
+  const twice = repairDeterministicContradictions(once.program, HYBRID_INTAKE);
   assert.equal(twice.program, once.program);
 });

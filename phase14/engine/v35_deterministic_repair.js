@@ -423,6 +423,73 @@ function repairMaintenanceDrift(program, intake, repairs) {
   return candidate;
 }
 
+// --- 6. missing heavy-strength ramps ------------------------------------------
+
+// A heavy loaded lift needs a progressive ramp before its work sets, and the
+// gate that enforces this had no repair: Advanced Hybrid spent all four attempts
+// of live run #67 on HEAVY_STRENGTH_RAMP_MISSING, failing from the first
+// attempt. A ramp is not a coaching decision -- it is derived arithmetically
+// from the work load by rampText, the same function the enrichment layer already
+// uses -- so there was never a reason to ask the model for it again.
+
+// Load anchors the gate counts. Mirrored here so the repair adds exactly what
+// the check looks for rather than guessing at it.
+function rampAnchorCount(text) {
+  const kg = String(text || '').match(/(?:\b\d+(?:\.\d+)?\s*kg\b[^|;]{0,18}(?:x|×)\s*\d+)|(?:\b\d+(?:\.\d+)?\s*kg\b)/gi) || [];
+  const pct = String(text || '').match(/\b\d+(?:\.\d+)?\s*%\b/g) || [];
+  const bar = /(?:empty\s+bar|barbell\s*(?:x|×)\s*\d+|bar\s*(?:x|×)\s*\d+)/i.test(String(text || ''));
+  return { kg: kg.length, pct: pct.length, bar };
+}
+function hasRamp(text) {
+  const a = rampAnchorCount(text);
+  return a.kg >= 3 || a.pct >= 3 || (a.bar && a.kg >= 2);
+}
+
+function repairMissingHeavyRamps(program, intake, repairs) {
+  let candidate = program;
+  for (let week = 1; week <= 4; week++) {
+    const parsed = parseWeek(candidate, week);
+    if (!parsed || !Number.isInteger(parsed.notes) || !Number.isInteger(parsed.load)) continue;
+
+    const byDay = new Map();
+    parsed.rows.forEach((cells, index) => {
+      const day = String(cells[parsed.day] || '').trim();
+      if (!day) return;
+      if (!byDay.has(day)) byDay.set(day, { warmups: [], work: [] });
+      const entry = byDay.get(day);
+      const name = String(cells[parsed.exercise] || '').trim();
+      if (!name) return;
+      (isWarmup(name) ? entry.warmups : entry.work).push({ cells, index, name });
+    });
+
+    let changed = false;
+    for (const [day, entry] of byDay) {
+      if (!entry.warmups.length) continue;
+      const text = entry.warmups.map((w) => `${w.cells[parsed.load]} ${w.cells[parsed.reps]} ${w.cells[parsed.notes]}`).join(' | ');
+      if (hasRamp(text)) continue;
+
+      // One ramp, for the day's heaviest loaded lift. Ramping every loaded row
+      // would bloat the warm-up into its own training session.
+      const loaded = entry.work
+        .map((r) => ({ ...r, kg: kgOf(r.cells[parsed.load]) }))
+        .filter((r) => Number.isFinite(r.kg))
+        .sort((a, b) => b.kg - a.kg);
+      if (!loaded.length) continue;
+      const heaviest = loaded[0];
+      const ramp = rampText(heaviest.name, String(heaviest.cells[parsed.load] || ''));
+      if (!ramp) continue;
+
+      const target = entry.warmups[0].cells;
+      const note = String(target[parsed.notes] || '').trim();
+      target[parsed.notes] = note ? `${note}${/[.!?;]$/.test(note) ? '' : ';'} ${ramp}` : ramp;
+      repairs.push({ type: 'v45_heavy_ramp_added', week, day, exercise: heaviest.name });
+      changed = true;
+    }
+    if (changed) candidate = rebuild(candidate, parsed);
+  }
+  return candidate;
+}
+
 // --- entry point --------------------------------------------------------------
 
 export function repairDeterministicContradictions(program, intake = {}) {
@@ -433,6 +500,7 @@ export function repairDeterministicContradictions(program, intake = {}) {
   candidate = repairAccessoryCreep(candidate, intake, repairs);
   candidate = repairMaintenanceDrift(candidate, intake, repairs);
   candidate = repairSkillCeilings(candidate, intake, repairs);
+  candidate = repairMissingHeavyRamps(candidate, intake, repairs);
 
   const prior = new Map();
   for (let week = 1; week <= 4; week++) {
