@@ -20,6 +20,8 @@ import { validatePrescriptionConsistency } from './v34_prescription_consistency.
 import { validateCoachingStandards } from './v35_coaching_standards.js'; // V35-COACHING-STANDARDS-WIRED
 import { auditProgramStructure } from './v38_structural_audit.js'; // V38-STRUCTURAL-AUDIT-WIRED
 import { auditTacticalHardRules } from './v40_tactical_hard_rules.js'; // V40-TACTICAL-HARD-RULES-WIRED
+import { collectRecoveryBudgetFlags, RECOVERY_BUDGET_HARD_CODES } from './v42_recovery_budget.js'; // V42-RECOVERY-BUDGET-WIRED
+import { collectProgressionDisciplineFlags } from './v42_progression_discipline.js'; // V42-PROGRESSION-DISCIPLINE-WIRED
 import { repairDeterministicContradictions } from './v35_deterministic_repair.js'; // V35-DETERMINISTIC-REPAIR-WIRED
 import { normalizeAdvancedHybridWeek4OapConsolidation } from './advanced_hybrid_oap_consolidation_normalizer.js';
 import {
@@ -422,6 +424,22 @@ export function collectRepairableValidationFailures(program, intake = {}, option
       { flags: structural },
     );
   });
+  // v42: recovery budgeting and one-stressor-at-a-time progression. Only a
+  // label that contradicts its own prescription blocks release; placement
+  // against a sport week and multi-dimensional progression are coaching
+  // judgements, reported for review rather than rejected. Rejecting them would
+  // make the engine rigid about choices a coach is entitled to make.
+  runRepairable(flags, () => {
+    const budget = collectRecoveryBudgetFlags(candidate, intake)
+      .filter((f) => RECOVERY_BUDGET_HARD_CODES.has(f.code));
+    if (!budget.length) return;
+    throw new RetriableValidationError(
+      budget[0].code,
+      budget.map((f) => f.message).join(' '),
+      { flags: budget },
+    );
+  });
+
   runRepairable(flags, () => validatePhase15FinalProgram(candidate, intake));
 
   return {

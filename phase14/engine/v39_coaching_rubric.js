@@ -53,6 +53,14 @@ const RULE_REGISTRY = {
   V38_CONSECUTIVE_CONFLICTING_EXPOSURE: { classification: CLASSIFICATION.HARD, dimension: 'recovery_management' },
   V38_CARRY_PACE_ONLY_PROGRESSION: { classification: CLASSIFICATION.HARD, dimension: 'progression' },
   V38_MISSING_MOVEMENT_CATEGORY: { classification: CLASSIFICATION.SOFT, dimension: 'exercise_selection' },
+  // Recovery budgeting and progression discipline. A label that contradicts the
+  // prescription is an objective error the athlete is misled by, so it is hard.
+  // Where to place work against a sport week, and how many stress dimensions to
+  // move at once, are coaching judgements with defensible answers.
+  V42_LOW_COST_CLAIM_CONTRADICTED: { classification: CLASSIFICATION.HARD, dimension: 'recovery_management' },
+  V42_PRIMARY_WORK_ON_HARD_SPORT_DAY: { classification: CLASSIFICATION.CONTEXT, dimension: 'recovery_management' },
+  V42_CONDITIONING_STACKED_ON_SPORT_DAYS: { classification: CLASSIFICATION.SOFT, dimension: 'recovery_management' },
+  V42_MULTIPLE_STRESSORS_RAISED: { classification: CLASSIFICATION.SOFT, dimension: 'progression' },
 
   // --- prescription and narrative honesty ---------------------------------
   V34_NOTE_PER_SET_MISMATCH: { classification: CLASSIFICATION.HARD, dimension: 'progression' },
