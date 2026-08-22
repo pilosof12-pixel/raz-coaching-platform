@@ -396,7 +396,7 @@ function restSeconds(exercise) {
   return sec ? Number(sec[1]) : null;
 }
 // Aggregate the week's key event-specific running work into the coaching
-// dimensions T3K-08 reasons about. Multiple key rows in one week are summed for
+// dimensions T3K-10 reasons about. Multiple key rows in one week are summed for
 // volume, and represented by their longest repetition and fastest normalised
 // velocity, so a week is compared on what it actually demands.
 function eventSessionSnapshot(week) {
@@ -424,7 +424,7 @@ function eventSessionSnapshot(week) {
   if (!(volume > 0) || !Number.isFinite(distance)) return null;
   return { week: week.week, volume_m: volume, distance_m: distance, pace_s_per_km: paceSecPerKm, rest_s: rest };
 }
-// T3K-08: the frozen brief already requires that "race specificity must increase
+// T3K-10: the frozen brief already requires that "race specificity must increase
 // across the block". T3K-02 only rejects an all-400 m block and
 // EVENT_PROGRESSING_SESSION_MISSING only proves Week 1 has a key session, so a
 // legitimate-looking session repeated identically for four weeks passes both.
@@ -453,7 +453,7 @@ function tactical3KEventProgressionFailure(model) {
   if (!later.some((s) => gained(s).any)) {
     return {
       code: 'COACH_SPEC_V1_T3K_EVENT_PROGRESSION_STATIC',
-      amendment: 'Coaching Specification v1.0 T3K-08: the primary 3K event-specific session repeats the same measured dose across the block, so there is no week-over-week race-specific development. Progress at least one coaching-meaningful dimension of the key session across the build weeks - repetition distance, repetition count / total quality volume, per-repetition clock target, or session density (equivalent work on less recovery). Changing only the wording, labels or coaching notes is not progression. A build-then-taper shape is welcome: the final week may reduce volume while holding or sharpening intensity.',
+      amendment: 'Coaching Specification v1.0 T3K-10: the primary 3K event-specific session repeats the same measured dose across the block, so there is no week-over-week race-specific development. Progress at least one coaching-meaningful dimension of the key session across the build weeks - repetition distance, repetition count / total quality volume, per-repetition clock target, or session density (equivalent work on less recovery). Changing only the wording, labels or coaching notes is not progression. A build-then-taper shape is welcome: the final week may reduce volume while holding or sharpening intensity.',
       details: { event_weeks: eventWeeks },
     };
   }
@@ -471,7 +471,7 @@ function tactical3KEventProgressionFailure(model) {
   if (lastBuild && !gained(lastBuild).any && !gained(finalWeek).any) {
     return {
       code: 'COACH_SPEC_V1_T3K_EVENT_PROGRESSION_NOT_RETAINED',
-      amendment: `Coaching Specification v1.0 T3K-08: the primary 3K session gains earlier in the block but Week ${lastBuild.week} onward returns to the Week 1 baseline, so no event-specific development is retained into the end of the build. One isolated spike is not a progression narrative. Either carry the gained quality forward - hold it, extend repetition distance, add quality volume, sharpen the per-repetition clock, or tighten recovery - or make the final week a genuine taper that preserves or sharpens intensity while volume comes down.`,
+      amendment: `Coaching Specification v1.0 T3K-10: the primary 3K session gains earlier in the block but Week ${lastBuild.week} onward returns to the Week 1 baseline, so no event-specific development is retained into the end of the build. One isolated spike is not a progression narrative. Either carry the gained quality forward - hold it, extend repetition distance, add quality volume, sharpen the per-repetition clock, or tighten recovery - or make the final week a genuine taper that preserves or sharpens intensity while volume comes down.`,
       details: { baseline: base, last_build_week: lastBuild, final_week: finalWeek },
     };
   }
@@ -486,7 +486,7 @@ function tactical3KEventProgressionFailure(model) {
   if (regressed) {
     return {
       code: 'COACH_SPEC_V1_T3K_EVENT_PROGRESSION_INCOHERENT',
-      amendment: `Coaching Specification v1.0 T3K-08: Week ${regressed.week} reduces the primary 3K quality session below the Week 1 baseline without gaining repetition distance, per-repetition velocity or session density, so the block oscillates instead of developing. Give the build weeks a defensible direction - hold or advance the key session, and reserve genuine volume reduction for a final taper/realisation week that preserves or sharpens intensity.`,
+      amendment: `Coaching Specification v1.0 T3K-10: Week ${regressed.week} reduces the primary 3K quality session below the Week 1 baseline without gaining repetition distance, per-repetition velocity or session density, so the block oscillates instead of developing. Give the build weeks a defensible direction - hold or advance the key session, and reserve genuine volume reduction for a final taper/realisation week that preserves or sharpens intensity.`,
       details: { week: regressed.week, baseline: base, regressed },
     };
   }

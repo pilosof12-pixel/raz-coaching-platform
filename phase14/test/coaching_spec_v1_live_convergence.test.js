@@ -279,7 +279,7 @@ test('Advanced Hybrid convergence holds secondary long-run distance at the toler
 
 // ---------------------------------------------------------------------------
 // Architectural hardening pass: Gap 1 (Week 1 generic-running-only deterministic
-// repair) and Gap 2 (T3K-08 real cross-week event progression enforcement).
+// repair) and Gap 2 (T3K-10 real cross-week event progression enforcement).
 // ---------------------------------------------------------------------------
 
 // Two generic aerobic runs per week: repurposing the smaller one still leaves a
@@ -366,7 +366,7 @@ test('[G1-6] a non-Tactical intake gets no Tactical repair at all', () => {
   assert.equal(repaired.program, program);
 });
 
-// --- Gap 2: T3K-08 cross-week event progression -----------------------------
+// --- Gap 2: T3K-10 cross-week event progression -----------------------------
 
 function keyRow(sets, distance, clock, rest, note) {
   return `Tue\tRun\t${distance} m @ ${clock}\t${sets}\t${distance} m\t${rest}\t8\t${note}\t`;
@@ -521,7 +521,7 @@ test('[G2-13] Advanced Hybrid and Youth convergence outputs are unaffected by th
 
 // ---------------------------------------------------------------------------
 // Review round 2: (1) Stage 1b must be strictly all-or-nothing across all four
-// planned weeks; (2) T3K-08 must reject a transient spike that collapses back to
+// planned weeks; (2) T3K-10 must reject a transient spike that collapses back to
 // the Week 1 baseline before the final week.
 // ---------------------------------------------------------------------------
 
