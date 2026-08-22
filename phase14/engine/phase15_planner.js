@@ -8,6 +8,7 @@ import { buildCoachingSpecV1Brief } from './coaching_spec_v1_quality.js'; // COA
 import { gymDayReadiness } from './v34_readiness.js';
 import { buildV34ArchitectureBrief } from './v34_coaching_architecture.js';
 import { buildSkeletonBrief } from './v38_session_skeleton.js';
+import { buildTacticalHardRuleBrief } from './v40_tactical_hard_rules.js';
 
 function txt(v) {
   if (Array.isArray(v)) return v.map(x => typeof x === 'string' ? x : JSON.stringify(x)).join(' | ');
@@ -252,6 +253,7 @@ export function buildDeterministicBrief(intake = {}) {
     optional.length ? 'Preferred/support choices:' : '', ...optional.map(x=>`* ${x}`),
     forbidden.length ? 'Forbidden/tolerance-gated choices:' : '', ...forbidden.map(x=>`* ${x}`),
     buildSkeletonBrief(intake),
+    buildTacticalHardRuleBrief(intake),
     buildV34ArchitectureBrief(intake, { gymDays: days }),
     specialist,
     progressionGpp,

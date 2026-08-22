@@ -19,6 +19,7 @@ import { normalizeFinalNoteCoherence } from './final_note_coherence.js'; // FINA
 import { validatePrescriptionConsistency } from './v34_prescription_consistency.js'; // V34-PRESCRIPTION-CONSISTENCY-WIRED
 import { validateCoachingStandards } from './v35_coaching_standards.js'; // V35-COACHING-STANDARDS-WIRED
 import { auditProgramStructure } from './v38_structural_audit.js'; // V38-STRUCTURAL-AUDIT-WIRED
+import { auditTacticalHardRules } from './v40_tactical_hard_rules.js'; // V40-TACTICAL-HARD-RULES-WIRED
 import { repairDeterministicContradictions } from './v35_deterministic_repair.js'; // V35-DETERMINISTIC-REPAIR-WIRED
 import { normalizeAdvancedHybridWeek4OapConsolidation } from './advanced_hybrid_oap_consolidation_normalizer.js';
 import {
@@ -410,7 +411,10 @@ export function collectRepairableValidationFailures(program, intake = {}, option
   // rewriting a session's content would be inventing coaching. Weekly movement
   // coverage is advisory and reported, not a release block.
   runRepairable(flags, () => {
-    const structural = auditProgramStructure(candidate, intake).filter((f) => f.severity === 'hard');
+    const structural = [
+      ...auditProgramStructure(candidate, intake),
+      ...auditTacticalHardRules(candidate, intake),
+    ].filter((f) => f.severity === 'hard');
     if (!structural.length) return;
     throw new RetriableValidationError(
       structural[0].code,
