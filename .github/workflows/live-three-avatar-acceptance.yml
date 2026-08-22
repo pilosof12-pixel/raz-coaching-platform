@@ -6,6 +6,11 @@ on:
       - '.github/workflows/live-three-avatar-acceptance.yml'
       - 'phase14/public/runtime-version.txt'
   workflow_dispatch:
+    inputs:
+      avatars:
+        description: 'Which avatars to run: all, hybrid, youth, tactical, or a comma list'
+        required: false
+        default: 'all'
 
 permissions:
   contents: write
@@ -53,6 +58,8 @@ jobs:
         env:
           BASE_URL: https://raz-coaching-platform.onrender.com
           ADMIN_PROVISION_KEY: ${{ secrets.ADMIN_PROVISION_KEY }}
+          AVATAR_SELECTION: ${{ github.event.inputs.avatars || 'all' }}
+          COMMIT_MESSAGE: ${{ github.event.head_commit.message }}
         run: |
           mkdir -p docs/qa/live-three-avatar
           rm -f docs/qa/live-three-avatar/result.json docs/qa/live-three-avatar/advanced_hybrid-program.txt docs/qa/live-three-avatar/youth_gymnastics-program.txt docs/qa/live-three-avatar/tactical_3k-program.txt
@@ -127,7 +134,21 @@ jobs:
             return rec;
           }
           const result={timestamp:now(),base,head_sha:process.env.GITHUB_SHA||null,runtime:fs.readFileSync('phase14/public/runtime-version.txt','utf8').trim(),results:[]};
-          for(const a of [hybrid,youth,tactical]){const rec=await runAvatar(a);result.results.push(rec);console.log(JSON.stringify(rec));}
+          // Every avatar in a run is a paid generation, and a fix that touches one
+          // avatar does not need the other two re-proved. Select with the
+          // workflow_dispatch input or an [AVATARS:youth,tactical] tag in the
+          // commit message; default stays all three.
+          const tagged = (String(process.env.COMMIT_MESSAGE||'').match(/\[AVATARS:([^\]]+)\]/i)||[])[1];
+          const selectionRaw = (tagged || process.env.AVATAR_SELECTION || 'all').toLowerCase().trim();
+          const wanted = selectionRaw === 'all' || !selectionRaw
+            ? ['advanced_hybrid','youth_gymnastics','tactical_3k']
+            : selectionRaw.split(',').map(x=>x.trim()).filter(Boolean).map(x=>
+                x.startsWith('hyb')?'advanced_hybrid':x.startsWith('you')?'youth_gymnastics':x.startsWith('tac')?'tactical_3k':x);
+          const selected=[hybrid,youth,tactical].filter(a=>wanted.includes(a.id));
+          if(!selected.length) throw new Error('No avatars selected: '+selectionRaw);
+          console.log('Running avatars:', selected.map(a=>a.id).join(', '));
+          result.selection=selected.map(a=>a.id);
+          for(const a of selected){const rec=await runAvatar(a);result.results.push(rec);console.log(JSON.stringify(rec));}
           result.ok=result.results.every(x=>x.ok);
           fs.writeFileSync('docs/qa/live-three-avatar/result.json',JSON.stringify(result,null,2));
           if(!result.ok)process.exitCode=1;
