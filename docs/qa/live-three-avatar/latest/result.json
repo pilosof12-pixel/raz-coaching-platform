@@ -1,38 +1,38 @@
 {
-  "timestamp": "2026-08-22T15:40:43.347Z",
+  "timestamp": "2026-08-22T16:02:32.367Z",
   "base": "https://raz-coaching-platform.onrender.com",
-  "head_sha": "b9a960af7dd602deac8bd57066a727ecfe04e879",
-  "runtime": "launch-acceptance-v46-heavy-ramp-live15-20260822",
+  "head_sha": "be6cd700ca455b03e002af8d8b7eb92fde87146e",
+  "runtime": "launch-acceptance-v47-oap-feedback-live16-20260822",
   "results": [
     {
       "id": "advanced_hybrid",
-      "job_id": "040cca6bc3cbde239a4013170e8b386b",
+      "job_id": "d71d1bc0714a85a5ed5b1f640e87c548",
       "ok": false,
       "status": "error",
       "stage": "refining",
       "attempt": 4,
-      "detail": "internal repair: ADVANCED_HYBRID_OAP_SPECIFICITY",
+      "detail": "internal repair: V38_CONSECUTIVE_CONFLICTING_EXPOSURE",
       "last_seen_status": "error",
-      "error": "Internal coaching QA could not repair the candidate program after multiple passes. No client-facing program was saved. Please retry the build. QA trace: A1:HEAVY_STRENGTH_RAMP_MISSING+V34_NOTE_UNDEFINED_LOAD_REFERENCE+EVENT_PROGRESSING_SESSION_MISSING -> A2:ADVANCED_HYBRID_OAP_SPECIFICITY -> A3:ADVANCED_HYBRID_OAP_SPECIFICITY -> A4:ADVANCED_HYBRID_OAP_SPECIFICITY. [QA:INTERNAL_QA_REPAIR_EXHAUSTED]",
+      "error": "Internal coaching QA could not repair the candidate program after multiple passes. No client-facing program was saved. Please retry the build. QA trace: A1:ADVANCED_HYBRID_WEEK4_NOT_CONSOLIDATING+ADVANCED_HYBRID_DENSE_72H_PRIMARY_WINDOW+V34_NOTE_UNDEFINED_LOAD_REFERENCE+V38_CONSECUTIVE_CONFLICTING_EXPOSURE+EVENT_PROGRESSING_SESSION_MISSING -> A2:V38_CONSECUTIVE_CONFLICTING_EXPOSURE -> A3:V38_CONSECUTIVE_CONFLICTING_EXPOSURE -> A4:V38_CONSECUTIVE_CONFLICTING_EXPOSURE. [QA:INTERNAL_QA_REPAIR_EXHAUSTED]",
       "program_chars": 0,
-      "seconds": 506
+      "seconds": 595
     },
     {
       "id": "youth_gymnastics",
-      "job_id": "862d8d014fad867620b57c42a028400b",
-      "ok": true,
-      "status": "done",
-      "stage": "finalizing",
-      "attempt": 0,
-      "detail": "saving program",
-      "last_seen_status": "done",
-      "error": null,
-      "program_chars": 19205,
-      "seconds": 200
+      "job_id": "c29b6240fef43c228993b17fb24eb1d2",
+      "ok": false,
+      "status": "error",
+      "stage": "refining",
+      "attempt": 4,
+      "detail": "internal repair: YOUTH_PRIMARY_SKILL_NOT_FRESH",
+      "last_seen_status": "error",
+      "error": "Internal coaching QA could not repair the candidate program after multiple passes. No client-facing program was saved. Please retry the build. QA trace: A1:YOUTH_PRIMARY_SKILL_NOT_FRESH -> A2:YOUTH_PRIMARY_SKILL_NOT_FRESH -> A3:YOUTH_PRIMARY_SKILL_NOT_FRESH -> A4:YOUTH_PRIMARY_SKILL_NOT_FRESH. [QA:INTERNAL_QA_REPAIR_EXHAUSTED]",
+      "program_chars": 0,
+      "seconds": 437
     },
     {
       "id": "tactical_3k",
-      "job_id": "cf9d9f14d5a1d3bbe3d95f057a6462e5",
+      "job_id": "a79739ee74bd9e2b9c5ffe499b715e60",
       "ok": true,
       "status": "done",
       "stage": "finalizing",
@@ -40,8 +40,8 @@
       "detail": "saving program",
       "last_seen_status": "done",
       "error": null,
-      "program_chars": 14604,
-      "seconds": 383
+      "program_chars": 15075,
+      "seconds": 264
     }
   ],
   "ok": false
