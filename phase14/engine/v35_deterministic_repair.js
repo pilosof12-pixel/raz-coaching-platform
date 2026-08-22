@@ -16,7 +16,7 @@ import { rampText } from './specific_warmup_enrichment.js';
 import { PROGRESSION_CLAIMS, reductionMetric, reductionMissing } from './v34_prescription_consistency.js';
 import { collectSkillCeilingFlags, collectMaintenanceDriftFlags } from './v43_coaching_governance.js';
 import { longRunBuildClaim } from './v35_coaching_standards.js';
-import { classifyExercise } from './v38_movement_taxonomy.js';
+import { classifyExercise, dayGap } from './v38_movement_taxonomy.js';
 
 function arr(v) { return Array.isArray(v) ? v : v ? [v] : []; }
 function txt(v) {
@@ -566,9 +566,22 @@ function repairMissingOapAssistance(program, intake, repairs) {
       if (!day || !isEligible(day)) continue;
       dayLoad.set(day, (dayLoad.get(day) || 0) + 1);
     }
-    // The lightest eligible day: a microdose belongs where it costs least, and
-    // never doubled up on the day carrying the hard exposure.
-    const target = [...dayLoad.entries()].sort((a, b) => a[1] - b[1]).map(([day]) => day)[0];
+    // Prefer a day that is not next to the strict exposure, then the lightest.
+    // The two rules governing this pull against each other -- one requires a
+    // second unilateral exposure every week, the other forbids conflicting
+    // exposures on consecutive days -- and run #70 showed the model resolving
+    // that tension by putting the assistance work next to the strict work and
+    // failing V38_CONSECUTIVE_CONFLICTING_EXPOSURE four times. Choosing the day
+    // deliberately satisfies both.
+    const adjacentToStrict = (day) => {
+      const gap = dayGap(strictDay, day);
+      const back = dayGap(day, strictDay);
+      return gap === 1 || back === 1;
+    };
+    const ranked = [...dayLoad.entries()]
+      .sort((a, b) => (adjacentToStrict(a[0]) ? 1 : 0) - (adjacentToStrict(b[0]) ? 1 : 0) || a[1] - b[1])
+      .map(([day]) => day);
+    const target = ranked[0];
     if (!target) continue;
 
     const cells = new Array(parsed.header.length).fill('');

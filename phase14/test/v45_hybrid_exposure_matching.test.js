@@ -114,6 +114,25 @@ test('[H8] the exposure lands on one of the athlete\'s own gym days', { skip: !g
   }
 });
 
+test('[H12] placement avoids the day next to the strict exposure', { skip: !golden }, () => {
+  // Two rules pull against each other here: one requires a second unilateral
+  // exposure every week, the other forbids conflicting exposures on consecutive
+  // days. Run #70 showed the model resolving that by placing the assistance
+  // work next to the strict work and failing V38_CONSECUTIVE_CONFLICTING_EXPOSURE
+  // four times. Choosing the day deliberately satisfies both.
+  const repaired = repairDeterministicContradictions(strippedGolden, HYBRID);
+  const gap = (a, b) => {
+    const week = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'];
+    const i = week.indexOf(a.slice(0, 3).toLowerCase());
+    const j = week.indexOf(b.slice(0, 3).toLowerCase());
+    return Math.min((j - i + 7) % 7, (i - j + 7) % 7);
+  };
+  for (const r of repaired.repairs.filter((x) => x.type === 'v47_oap_assistance_added')) {
+    assert.ok(gap(r.strictDay, r.day) > 1, `${r.day} is adjacent to the strict day ${r.strictDay}`);
+  }
+  assert.deepEqual(auditProgramStructure(repaired.program, HYBRID).filter((f) => f.severity === 'hard'), []);
+});
+
 test('[H9] the repair introduces no structural failure', { skip: !golden }, () => {
   const before = auditProgramStructure(strippedGolden, HYBRID).filter((f) => f.severity === 'hard').length;
   const after = auditProgramStructure(repairDeterministicContradictions(strippedGolden, HYBRID).program, HYBRID)
