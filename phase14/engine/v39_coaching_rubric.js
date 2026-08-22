@@ -61,6 +61,14 @@ const RULE_REGISTRY = {
   V42_PRIMARY_WORK_ON_HARD_SPORT_DAY: { classification: CLASSIFICATION.CONTEXT, dimension: 'recovery_management' },
   V42_CONDITIONING_STACKED_ON_SPORT_DAYS: { classification: CLASSIFICATION.SOFT, dimension: 'recovery_management' },
   V42_MULTIPLE_STRESSORS_RAISED: { classification: CLASSIFICATION.SOFT, dimension: 'progression' },
+  // Governance. A skill quota with no stop condition and a maintenance lift
+  // drifting upward are objective errors with deterministic repairs. Duration
+  // estimates and coaching emphasis are reported, not enforced.
+  V43_SKILL_QUOTA_WITHOUT_CEILING: { classification: CLASSIFICATION.HARD, dimension: 'safety' },
+  V43_MAINTENANCE_AUTO_PROGRESSED: { classification: CLASSIFICATION.HARD, dimension: 'progression' },
+  V43_SESSION_EXCEEDS_TIME_BUDGET: { classification: CLASSIFICATION.SOFT, dimension: 'recovery_management' },
+  V43_NO_AUTOREGULATION_PATH: { classification: CLASSIFICATION.SOFT, dimension: 'safety' },
+  V43_INJURY_RESPONSE_NOT_CAUSAL: { classification: CLASSIFICATION.SOFT, dimension: 'safety' },
 
   // --- prescription and narrative honesty ---------------------------------
   V34_NOTE_PER_SET_MISMATCH: { classification: CLASSIFICATION.HARD, dimension: 'progression' },

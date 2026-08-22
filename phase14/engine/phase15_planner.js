@@ -11,6 +11,7 @@ import { buildSkeletonBrief } from './v38_session_skeleton.js';
 import { buildTacticalHardRuleBrief } from './v40_tactical_hard_rules.js';
 import { buildRecoveryBudgetBrief } from './v42_recovery_budget.js';
 import { buildProgressionDisciplineBrief } from './v42_progression_discipline.js';
+import { buildGovernanceBrief } from './v43_coaching_governance.js';
 
 function txt(v) {
   if (Array.isArray(v)) return v.map(x => typeof x === 'string' ? x : JSON.stringify(x)).join(' | ');
@@ -259,6 +260,7 @@ export function buildDeterministicBrief(intake = {}) {
     buildV34ArchitectureBrief(intake, { gymDays: days }),
     buildRecoveryBudgetBrief(intake),
     buildProgressionDisciplineBrief(intake),
+    buildGovernanceBrief(intake),
     specialist,
     progressionGpp,
     acceptanceQuality,

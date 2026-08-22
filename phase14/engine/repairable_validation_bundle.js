@@ -22,6 +22,7 @@ import { auditProgramStructure } from './v38_structural_audit.js'; // V38-STRUCT
 import { auditTacticalHardRules } from './v40_tactical_hard_rules.js'; // V40-TACTICAL-HARD-RULES-WIRED
 import { collectRecoveryBudgetFlags, RECOVERY_BUDGET_HARD_CODES } from './v42_recovery_budget.js'; // V42-RECOVERY-BUDGET-WIRED
 import { collectProgressionDisciplineFlags } from './v42_progression_discipline.js'; // V42-PROGRESSION-DISCIPLINE-WIRED
+import { collectGovernanceFlags, GOVERNANCE_HARD_CODES } from './v43_coaching_governance.js'; // V43-GOVERNANCE-WIRED
 import { repairDeterministicContradictions } from './v35_deterministic_repair.js'; // V35-DETERMINISTIC-REPAIR-WIRED
 import { normalizeAdvancedHybridWeek4OapConsolidation } from './advanced_hybrid_oap_consolidation_normalizer.js';
 import {
@@ -437,6 +438,20 @@ export function collectRepairableValidationFailures(program, intake = {}, option
       budget[0].code,
       budget.map((f) => f.message).join(' '),
       { flags: budget },
+    );
+  });
+
+  // v43: governance. Both hard codes have deterministic repairs that ran
+  // earlier in this bundle, so reaching here means the repair could not resolve
+  // them and regeneration is the right answer.
+  runRepairable(flags, () => {
+    const governance = collectGovernanceFlags(candidate, intake)
+      .filter((f) => GOVERNANCE_HARD_CODES.has(f.code));
+    if (!governance.length) return;
+    throw new RetriableValidationError(
+      governance[0].code,
+      governance.map((f) => f.message).join(' '),
+      { flags: governance },
     );
   });
 

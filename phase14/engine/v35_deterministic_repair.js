@@ -14,6 +14,7 @@
 
 import { rampText } from './specific_warmup_enrichment.js';
 import { PROGRESSION_CLAIMS, reductionMetric, reductionMissing } from './v34_prescription_consistency.js';
+import { collectSkillCeilingFlags, collectMaintenanceDriftFlags } from './v43_coaching_governance.js';
 
 function arr(v) { return Array.isArray(v) ? v : v ? [v] : []; }
 function txt(v) {
@@ -336,6 +337,71 @@ function repairAccessoryCreep(program, intake, repairs) {
   return candidate;
 }
 
+// --- 5. governance repairs ----------------------------------------------------
+
+// A skill row with no stop condition and a maintenance lift drifting upward are
+// both hard violations, and a hard rule with no repair is how a generation loop
+// burns all four attempts on one code. Neither repair invents coaching: one
+// appends the stop condition the rest of the program already states, the other
+// restores the dose the athlete's own maintenance goal asks for.
+
+const SKILL_STOP_SENTENCE = 'Prescribed attempts are a ceiling, not a quota: stop the set early if quality, symmetry or balance breaks down.';
+
+function repairSkillCeilings(program, intake, repairs) {
+  let candidate = program;
+  for (let week = 1; week <= 4; week++) {
+    const parsed = parseWeek(candidate, week);
+    if (!parsed || !Number.isInteger(parsed.notes)) continue;
+    let changed = false;
+    for (const flag of collectSkillCeilingFlags(candidate, intake)) {
+      if (flag.week !== week) continue;
+      for (const cells of parsed.rows) {
+        if (String(cells[parsed.exercise] || '').trim() !== flag.exercise) continue;
+        if (String(cells[parsed.day] || '').trim() !== flag.day) continue;
+        const note = String(cells[parsed.notes] || '').trim();
+        if (note.includes(SKILL_STOP_SENTENCE)) continue;
+        cells[parsed.notes] = note ? `${note.replace(/\s*$/, '')}${/[.!?]$/.test(note) ? '' : '.'} ${SKILL_STOP_SENTENCE}` : SKILL_STOP_SENTENCE;
+        repairs.push({ type: 'v43_skill_ceiling_stated', week, exercise: flag.exercise });
+        changed = true;
+      }
+    }
+    if (changed) candidate = rebuild(candidate, parsed);
+  }
+  return candidate;
+}
+
+function repairMaintenanceDrift(program, intake, repairs) {
+  let candidate = program;
+  for (let week = 2; week <= 4; week++) {
+    const flags = collectMaintenanceDriftFlags(candidate, intake).filter((f) => f.week === week);
+    if (!flags.length) continue;
+    const now = parseWeek(candidate, week);
+    const prev = parseWeek(candidate, week - 1);
+    if (!now || !prev) continue;
+    const priorByKey = new Map();
+    for (const cells of prev.rows) {
+      priorByKey.set(rowKey(cells, prev), {
+        sets: cells[prev.sets],
+        load: prev.load == null ? null : cells[prev.load],
+      });
+    }
+    let changed = false;
+    for (const cells of now.rows) {
+      const name = String(cells[now.exercise] || '').trim();
+      if (!flags.some((f) => f.exercise === name)) continue;
+      const prior = priorByKey.get(rowKey(cells, now));
+      if (!prior) continue;
+      // Hold the maintenance dose at the week that already worked.
+      if (Number.isInteger(now.load) && prior.load != null) cells[now.load] = prior.load;
+      cells[now.sets] = prior.sets;
+      repairs.push({ type: 'v43_maintenance_dose_held', week, exercise: name });
+      changed = true;
+    }
+    if (changed) candidate = rebuild(candidate, now);
+  }
+  return candidate;
+}
+
 // --- entry point --------------------------------------------------------------
 
 export function repairDeterministicContradictions(program, intake = {}) {
@@ -344,6 +410,8 @@ export function repairDeterministicContradictions(program, intake = {}) {
 
   // Accessory holds first: they change set counts that later note repairs cite.
   candidate = repairAccessoryCreep(candidate, intake, repairs);
+  candidate = repairMaintenanceDrift(candidate, intake, repairs);
+  candidate = repairSkillCeilings(candidate, intake, repairs);
 
   const prior = new Map();
   for (let week = 1; week <= 4; week++) {
