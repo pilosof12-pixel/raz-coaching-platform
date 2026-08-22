@@ -1,47 +1,47 @@
 {
-  "timestamp": "2026-08-22T16:02:32.367Z",
+  "timestamp": "2026-08-22T16:27:53.678Z",
   "base": "https://raz-coaching-platform.onrender.com",
-  "head_sha": "be6cd700ca455b03e002af8d8b7eb92fde87146e",
-  "runtime": "launch-acceptance-v47-oap-feedback-live16-20260822",
+  "head_sha": "4fe399333529c09ae462a582595f8f0b1a49d43a",
+  "runtime": "launch-acceptance-v48-oap-placement-live17-20260822",
   "results": [
     {
       "id": "advanced_hybrid",
-      "job_id": "d71d1bc0714a85a5ed5b1f640e87c548",
+      "job_id": "cc6a23037e1f3c0cc22046fce8735eb1",
       "ok": false,
       "status": "error",
-      "stage": "refining",
-      "attempt": 4,
-      "detail": "internal repair: V38_CONSECUTIVE_CONFLICTING_EXPOSURE",
+      "stage": "generating",
+      "attempt": 1,
+      "detail": "initial generation",
       "last_seen_status": "error",
-      "error": "Internal coaching QA could not repair the candidate program after multiple passes. No client-facing program was saved. Please retry the build. QA trace: A1:ADVANCED_HYBRID_WEEK4_NOT_CONSOLIDATING+ADVANCED_HYBRID_DENSE_72H_PRIMARY_WINDOW+V34_NOTE_UNDEFINED_LOAD_REFERENCE+V38_CONSECUTIVE_CONFLICTING_EXPOSURE+EVENT_PROGRESSING_SESSION_MISSING -> A2:V38_CONSECUTIVE_CONFLICTING_EXPOSURE -> A3:V38_CONSECUTIVE_CONFLICTING_EXPOSURE -> A4:V38_CONSECUTIVE_CONFLICTING_EXPOSURE. [QA:INTERNAL_QA_REPAIR_EXHAUSTED]",
+      "error": "You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/.",
       "program_chars": 0,
-      "seconds": 595
+      "seconds": 4
     },
     {
       "id": "youth_gymnastics",
-      "job_id": "c29b6240fef43c228993b17fb24eb1d2",
+      "job_id": "0b266d50e8e601984d69090c71911f05",
       "ok": false,
       "status": "error",
-      "stage": "refining",
-      "attempt": 4,
-      "detail": "internal repair: YOUTH_PRIMARY_SKILL_NOT_FRESH",
+      "stage": "generating",
+      "attempt": 1,
+      "detail": "initial generation",
       "last_seen_status": "error",
-      "error": "Internal coaching QA could not repair the candidate program after multiple passes. No client-facing program was saved. Please retry the build. QA trace: A1:YOUTH_PRIMARY_SKILL_NOT_FRESH -> A2:YOUTH_PRIMARY_SKILL_NOT_FRESH -> A3:YOUTH_PRIMARY_SKILL_NOT_FRESH -> A4:YOUTH_PRIMARY_SKILL_NOT_FRESH. [QA:INTERNAL_QA_REPAIR_EXHAUSTED]",
+      "error": "You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/.",
       "program_chars": 0,
-      "seconds": 437
+      "seconds": 4
     },
     {
       "id": "tactical_3k",
-      "job_id": "a79739ee74bd9e2b9c5ffe499b715e60",
-      "ok": true,
-      "status": "done",
-      "stage": "finalizing",
-      "attempt": 0,
-      "detail": "saving program",
-      "last_seen_status": "done",
-      "error": null,
-      "program_chars": 15075,
-      "seconds": 264
+      "job_id": "152615441ab97b6457ae71b857643484",
+      "ok": false,
+      "status": "error",
+      "stage": "generating",
+      "attempt": 1,
+      "detail": "initial generation",
+      "last_seen_status": "error",
+      "error": "You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/.",
+      "program_chars": 0,
+      "seconds": 4
     }
   ],
   "ok": false
