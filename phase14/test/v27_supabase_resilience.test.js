@@ -45,9 +45,25 @@ test('foreground client persistence and reads still reject non-transient Supabas
 
 test('best-effort background writes update local mirrors before remote persistence', () => {
   assert.match(storage, /historyFallback\.push\(row\).*persistEventually\(\"history\"/s);
-  assert.match(storage, /mirrorJob\(row\).*persistEventually\(\"job create\"/s);
   assert.match(storage, /mirrorJob\(\{id,stage,attempt,detail,updated_at:now\}\).*persistEventually\(\"job progress\"/s);
   assert.match(storage, /mirrorJob\(\{id,status,program:program\|\|null,error:error\|\|null,updated_at:now\}\).*persistEventually\(\"job finish\"/s);
+});
+
+test('job creation mirrors locally first but persists durably before it returns', () => {
+  // Progress and finish updates stay best-effort: the local mirror already
+  // answers every poll, and a lagging remote write costs nothing. Creation is
+  // different. jobFallback is process-local, so a create that never reached
+  // durable storage leaves the job unresolvable the moment the process is
+  // replaced -- the caller polls a bare 404 and the build appears to have
+  // vanished, which is how two live avatars were lost. The mirror is still
+  // written first; the durable write is now awaited rather than dispatched.
+  const create = storage.slice(storage.indexOf('async createJob(id,token,kind,now)'));
+  const body = create.slice(0, create.indexOf('async staleJobs'));
+  assert.ok(body.indexOf('mirrorJob(row)') < body.indexOf('runSupabase("createJob/upsert"'));
+  assert.doesNotMatch(body, /persistEventually/);
+  assert.match(body, /await runSupabase\(\"createJob\/upsert\"/);
+  // A failed durable write must not fail the build; it degrades to memory-only.
+  assert.match(body, /catch\(err\) \{ console\.warn\(\"job not persisted durably/);
 });
 
 test('health check reports degraded transport without declaring app dead', () => {

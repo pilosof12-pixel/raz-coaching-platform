@@ -43,7 +43,7 @@ let storage = fs.readFileSync(storagePath, 'utf8');
 storage = replaceOnce(
   storage,
   '      persistEventually("job create",async()=>{ const s=await sb(); await runSupabase("createJob/upsert",()=>s.from("jobs").upsert(row,{onConflict:"id"}),{attempts:1}); });',
-  '      persistEventually("job create",async()=>{ const s=await sb(); const durableRow={...row}; delete durableRow.attempt; await runSupabase("createJob/upsert",()=>s.from("jobs").upsert(durableRow,{onConflict:"id"}),{attempts:1}); }); // SUPABASE-LEGACY-JOB-SCHEMA-COMPAT',
+  '      try { const s=await sb(); const durableRow={...row}; delete durableRow.attempt; await runSupabase("createJob/upsert",()=>s.from("jobs").upsert(durableRow,{onConflict:"id"}),{attempts:2}); } // SUPABASE-LEGACY-JOB-SCHEMA-COMPAT\n      catch(err) { console.warn("job not persisted durably; memory-only for this process:",errorText(err)); }',
   'Supabase createJob compatibility'
 );
 storage = replaceOnce(

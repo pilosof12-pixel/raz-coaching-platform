@@ -138,7 +138,23 @@ function makeSupabaseStorage() {
     },
     async createJob(id,token,kind,now) {
       const row={id,token,kind,status:"pending",stage:"queued",attempt:0,detail:null,program:null,error:null,created_at:now,updated_at:now}; mirrorJob(row);
-      persistEventually("job create",async()=>{ const s=await sb(); const durableRow={...row}; delete durableRow.attempt; await runSupabase("createJob/upsert",()=>s.from("jobs").upsert(durableRow,{onConflict:"id"}),{attempts:1}); }); // SUPABASE-LEGACY-JOB-SCHEMA-COMPAT
+      // Awaited, not fire-and-forget. jobFallback is process-local, so a job that
+      // never reached durable storage becomes an unexplained 404 the moment the
+      // process restarts -- which is exactly how two live avatars were lost.
+      try { const s=await sb(); const durableRow={...row}; delete durableRow.attempt; await runSupabase("createJob/upsert",()=>s.from("jobs").upsert(durableRow,{onConflict:"id"}),{attempts:2}); } // SUPABASE-LEGACY-JOB-SCHEMA-COMPAT
+      catch(err) { console.warn("job not persisted durably; memory-only for this process:",errorText(err)); }
+    },
+    // Pending jobs whose owning process is gone. Keyed on updated_at so a live
+    // job that is merely slow between progress stages is never touched.
+    async staleJobs(cutoff) {
+      const stale=[];
+      for (const [id,row] of jobFallback.entries()) if (row?.status==="pending" && Number(row.updated_at||0) < cutoff) stale.push({id,token:row.token||null});
+      try {
+        const s=await sb();
+        const result=await runSupabase("staleJobs/select",()=>s.from("jobs").select("id,token").eq("status","pending").lt("updated_at",cutoff),{attempts:1});
+        for (const row of result.data||[]) if (!stale.some(x=>x.id===row.id)) stale.push({id:row.id,token:row.token||null});
+      } catch(err) { if (!isTransientSupabaseError(err)) throw err; }
+      return stale;
     },
     async updateJobProgress(id,stage,attempt=0,detail=null,now=Date.now()) {
       mirrorJob({id,stage,attempt,detail,updated_at:now});
@@ -189,6 +205,7 @@ async function makeSqliteStorage() {
     async updateJobProgress(id,stage,attempt=0,detail=null,now=Date.now()){db.prepare("UPDATE jobs SET stage=?,attempt=?,detail=?,updated_at=? WHERE id=?").run(stage,attempt,detail,now,id);},
     async finishJob(id,status,program,error,now){db.prepare("UPDATE jobs SET status=?,program=?,error=?,updated_at=? WHERE id=?").run(status,program||null,error||null,now,id);},
     async getJob(id){return db.prepare("SELECT * FROM jobs WHERE id=?").get(id)||null;},
+    async staleJobs(cutoff){return db.prepare("SELECT id,token FROM jobs WHERE status='pending' AND updated_at < ?").all(Number(cutoff));},
     async listRecentClients(limit=50){return db.prepare("SELECT token,intake,program,created_at,updated_at FROM clients ORDER BY updated_at DESC LIMIT ?").all(Math.max(1,Math.min(200,Number(limit)||50)));},
     async healthCheck(){db.prepare("SELECT 1").get();return {ok:true,backend:"sqlite",job_polling:"local"};}
   };

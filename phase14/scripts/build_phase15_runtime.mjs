@@ -88,8 +88,8 @@ once(
 );
 
 once(
-  '    runBuildJob(jobId, token, intake);',
-  '    runBuildJob(jobId, token, intake, !req.body?.token);',
+  '    runBuildJob(jobId, token, intake).catch((err) => failJobSafely(jobId, err, "build"));',
+  '    runBuildJob(jobId, token, intake, !req.body?.token).catch((err) => failJobSafely(jobId, err, "build"));',
   "new client fast path call"
 );
 

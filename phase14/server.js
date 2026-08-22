@@ -1735,6 +1735,37 @@ async function generateValidatedProgram(intake, onProgress = async () => {}) {
   );
 }
 
+// A background job that rejects must be recorded against its own job id and go
+// no further. Without this the rejection is unhandled, Node terminates the
+// process, and every other in-flight build dies with it -- the caller sees its
+// job simply stop existing.
+async function failJobSafely(jobId, err, label) {
+  console.error(`${label} job rejected:`, err && (err.stack || err.message || err));
+  try {
+    await store.finishJob(jobId, "error", null, err?.message || "Engine error.", Date.now());
+  } catch (storeErr) {
+    console.error(`could not record ${label} job failure:`, storeErr && storeErr.message);
+  }
+}
+
+// A pending job whose process is gone would otherwise poll as a bare 404
+// forever, which reads as "the job disappeared" rather than "the service
+// restarted". Reap on updated_at, well past any real gap between progress
+// stages, so a slow but living job is never touched.
+const STALE_JOB_MS = Number(process.env.STALE_JOB_MS || 15 * 60 * 1000);
+async function reapInterruptedJobs() {
+  if (typeof store.staleJobs !== "function") return;
+  const stale = await store.staleJobs(Date.now() - STALE_JOB_MS);
+  for (const job of stale) {
+    console.warn("reaping interrupted job:", job.id);
+    try {
+      await store.finishJob(job.id, "error", null,
+        "The build was interrupted before it finished, most likely by a service restart. No program was saved. Please start the build again.",
+        Date.now());
+    } catch (e) { console.warn("could not reap job:", e && e.message); }
+  }
+}
+
 async function runBuildJob(jobId, token, intake) {
   const progress = async (stage, attempt = 0, detail = null) => {
     try { await store.updateJobProgress(jobId, stage, attempt, detail, Date.now()); }
@@ -1771,7 +1802,11 @@ async function runBuildJob(jobId, token, intake) {
     ].map((code) => String(code || '')).filter((code) => /^[A-Z0-9_]+$/.test(code)))].slice(0, 8) : [];
     const baseError = e?.message || e?.code || "Engine error.";
     const jobError = qaCodes.length ? `${baseError} [QA:${qaCodes.join("+")}]` : baseError;
-    await store.finishJob(jobId, "error", null, jobError, Date.now());
+    // A storage failure here must not escape: an unhandled rejection from a
+    // background job takes down the whole process, and with it every unrelated
+    // build in flight.
+    try { await store.finishJob(jobId, "error", null, jobError, Date.now()); }
+    catch (storeErr) { console.error("could not record job failure:", storeErr && storeErr.message); }
   }
 }
 
@@ -1812,7 +1847,7 @@ app.post("/api/build", async (req, res) => {
     const jobId = crypto.randomBytes(16).toString("hex");
     await store.createJob(jobId, token, "build", Date.now());
     // fire-and-forget; do not await
-    runBuildJob(jobId, token, intake);
+    runBuildJob(jobId, token, intake).catch((err) => failJobSafely(jobId, err, "build"));
     res.status(202).json({ job_id: jobId, token, status: "pending" });
   } catch (e) {
     console.error("build error:", e);
@@ -1886,7 +1921,7 @@ app.post("/api/set-language", async (req, res) => {
 
     const jobId = crypto.randomBytes(16).toString("hex");
     await store.createJob(jobId, token, "adjust", Date.now());
-    runSetLanguageJob(jobId, token, language);
+    runSetLanguageJob(jobId, token, language).catch((err) => failJobSafely(jobId, err, "set-language"));
     res.status(202).json({ job_id: jobId, token, status: "pending", language });
   } catch (e) {
     console.error("set-language error:", e);
@@ -1913,7 +1948,7 @@ app.post("/api/adjust", async (req, res) => {
 
     const jobId = crypto.randomBytes(16).toString("hex");
     await store.createJob(jobId, token, "adjust", Date.now());
-    runAdjustJob(jobId, token, changeRequest);
+    runAdjustJob(jobId, token, changeRequest).catch((err) => failJobSafely(jobId, err, "adjust"));
     res.status(202).json({ job_id: jobId, token, status: "pending" });
   } catch (e) {
     console.error("adjust error:", e);
@@ -1974,6 +2009,26 @@ const httpServer = app.listen(PORT, () => {
     console.warn("GEMINI_API_KEY is not configured; /api/health will report not ready.");
   }
 });
+
+// Losing the process loses every in-flight build and all their job state, so a
+// stray fault in one background task must not be allowed to kill the others.
+// Node's default is to terminate on an unhandled rejection, which for this
+// service means three concurrent builds vanish because one of them failed to
+// write a row. Both handlers therefore log and keep serving; any job actually
+// left behind is picked up by the reaper and reported to its caller.
+process.on("unhandledRejection", (reason) => {
+  console.error("unhandled rejection (process kept alive):", reason && (reason.stack || reason.message || reason));
+});
+process.on("uncaughtException", (err) => {
+  console.error("uncaught exception (process kept alive):", err && (err.stack || err.message || err));
+});
+
+reapInterruptedJobs().catch((e) => console.warn("job reaper failed:", e && e.message));
+const jobReaper = setInterval(
+  () => reapInterruptedJobs().catch((e) => console.warn("job reaper failed:", e && e.message)),
+  5 * 60 * 1000,
+);
+jobReaper.unref?.();
 
 function shutdown(signal) {
   console.log(`${signal} received; closing HTTP server...`);

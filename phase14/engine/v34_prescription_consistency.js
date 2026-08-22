@@ -157,14 +157,41 @@ function kmOf(raw) {
 }
 
 // Claim verbs, each with the sign it asserts for the metric it names.
-const CLAIMS = [
-  { re: /\b(?:trim|reduce|drop|cut|lower)\b[^.;]{0,24}\b(sets?|set count|total work|volume|reps?|distance)\b/i, direction: 'down' },
+//
+// Exported because the deterministic repair layer must restate exactly the
+// claims this table detects. When the two layers kept separate phrase lists the
+// repair covered one wording out of eleven, so every other phrasing was flagged,
+// never rewritten, and burned all four regeneration attempts.
+export const PROGRESSION_CLAIMS = [
+  // Longest alternative first: "set count" must not capture as "set", leaving
+  // "count" stranded for the repair layer to trip over.
+  { re: /\b(?:trim|reduce|drop|cut|lower)\b[^.;]{0,24}\b(set count|sets?|total work|volume|total reps?|reps?|distance)\b/i, direction: 'down' },
   { re: /\b(?:fewer|less)\s+(?:total\s+)?(sets?|reps?|work|volume|distance)\b/i, direction: 'down' },
   { re: /\b(?:slightly less|less)\s+total\s+(?:work|volume)\b/i, direction: 'down' },
   { re: /\bfewer\s+total\s+reps?\b/i, direction: 'down' },
   { re: /\b(?:repeat|hold|keep|maintain|match)\b[^.;]{0,30}\b(?:this|the|same)\s+(?:load|weight|dose)\b/i, direction: 'same', metric: 'load' },
   { re: /\brepeat\s+(?:this|the)\s+load\b/i, direction: 'same', metric: 'load' },
 ];
+const CLAIMS = PROGRESSION_CLAIMS;
+
+// The metric a reduction claim names, read from the noun the claim matched.
+// Both the detector and the repair must key on this same metric: keying the
+// repair on total volume instead let "trim the set count" survive a week where
+// only reps fell, which no amount of regeneration could clear.
+export function reductionMetric(matchedText) {
+  const t = String(matchedText || '').toLowerCase();
+  if (/set/.test(t)) return 'sets';
+  if (/distance/.test(t)) return 'distance';
+  return /rep/.test(t) ? 'total reps' : 'volume';
+}
+
+// True when a claimed reduction in `metric` did not actually happen. Unknown
+// values are never treated as a violation.
+export function reductionMissing(metric, current = {}, prior = {}) {
+  const pick = (o) => (metric === 'sets' ? o.sets : metric === 'distance' ? o.km : o.volume);
+  const now = pick(current), before = pick(prior);
+  return Number.isFinite(now) && Number.isFinite(before) && now >= before;
+}
 
 export function collectProgressionLanguageFlags(program, intake = {}) {
   const flags = [];
@@ -209,20 +236,8 @@ export function collectProgressionLanguageFlags(program, intake = {}) {
           continue;
         }
         if (claim.direction === 'down') {
-          const metricText = String(matchedClaim?.[1] || matchedClaim?.[0] || '').toLowerCase();
-          let reductionMissing = false;
-          let metric = 'work';
-          if (/set/.test(metricText)) {
-            metric = 'sets';
-            reductionMissing = Number.isFinite(sets) && Number.isFinite(prior.sets) && sets >= prior.sets;
-          } else if (/distance/.test(metricText)) {
-            metric = 'distance';
-            reductionMissing = Number.isFinite(km) && Number.isFinite(prior.km) && km >= prior.km;
-          } else {
-            metric = /rep/.test(metricText) ? 'total reps' : 'volume';
-            reductionMissing = Number.isFinite(current.volume) && Number.isFinite(prior.volume) && current.volume >= prior.volume;
-          }
-          if (reductionMissing) {
+          const metric = reductionMetric(matchedClaim?.[1] || matchedClaim?.[0]);
+          if (reductionMissing(metric, current, prior)) {
             claimed = true;
             flags.push({ code: 'V34_PROGRESSION_LANGUAGE_MISMATCH', ...where, claim: `reduction:${metric}`,
               previous: { sets: prior.sets, reps: prior.reps, km: prior.km, volume: prior.volume }, current: { sets, reps, km, volume: current.volume },

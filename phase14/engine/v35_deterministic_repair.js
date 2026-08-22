@@ -13,6 +13,7 @@
 // problems are deliberately left for the gates to reject.
 
 import { rampText } from './specific_warmup_enrichment.js';
+import { PROGRESSION_CLAIMS, reductionMetric, reductionMissing } from './v34_prescription_consistency.js';
 
 function arr(v) { return Array.isArray(v) ? v : v ? [v] : []; }
 function txt(v) {
@@ -31,6 +32,10 @@ function firstNum(raw) {
 function isWarmup(name) { return /^\s*\[WARMUP\]/i.test(String(name || '')); }
 function kgOf(raw) {
   const m = String(raw || '').match(/\+?\s*(\d+(?:\.\d+)?)\s*kg\b/i);
+  return m ? Number(m[1]) : null;
+}
+function kmOf(raw) {
+  const m = String(raw || '').match(/(\d+(?:\.\d+)?)\s*km\b/i);
   return m ? Number(m[1]) : null;
 }
 
@@ -66,9 +71,85 @@ const NUMBER_WORDS = { one: 1, two: 2, three: 3, four: 4, five: 5, six: 6, seven
 const REP_WORD_FOR = { 1: 'singles', 2: 'doubles', 3: 'triples' };
 const CONDITIONAL = /\b(?:if|only if|when|provided|optional|earned|may|can)\b/i;
 
+// A false claim is restated in terms of the metric the claim itself names, using
+// the detector's own claim table. Driving both layers from one table is what
+// guarantees convergence: a phrasing the detector can flag is a phrasing this
+// function can rewrite, so the repair loop cannot be handed a contradiction it
+// has no move against.
+const HOLD_PHRASE = {
+  sets: 'hold the set count',
+  distance: 'hold the distance',
+  'total reps': 'hold the total reps',
+  volume: 'hold the total work',
+};
+
+// Restatement rewrites the claim itself plus any text left stranded by it, and
+// nothing else. Replacing the whole clause was too blunt -- it discarded genuine
+// conditions ("repeat this load only if Week 3 stayed inside the cap") -- while
+// replacing only the verb phrase left qualifiers dangling ("hold the set count
+// than Week 3"). So the span grows left over a bare connector and right over a
+// tail that carries no instruction, and stops there.
+const CLAUSE_END = /[.;!?]/;
+const CONNECTOR_LEAD = /(?:^|[.;!?]\s*|,\s*)(?:(?:otherwise|instead|so|then|and|but)\s+)?(?:slightly|marginally|somewhat|modestly|a little|a bit)?\s*$/i;
+// A tail that still tells the athlete to do something is kept verbatim.
+const TAIL_INSTRUCTION = /\b(?:if|when|unless|provided|only|once|while|so that|because|but|keep|stay|stop|hold|add|use|aim|focus|make|leave|start|drop|rest|expect)\b/i;
+
+function strandedSpan(text, from, to) {
+  let start = from;
+  const lead = text.slice(0, from).match(CONNECTOR_LEAD);
+  if (lead) start = from - lead[0].replace(/^[.;!?,]\s*/, '').length;
+
+  let end = text.length;
+  for (let i = to; i < text.length; i++) {
+    if (CLAUSE_END.test(text[i])) { end = i; break; }
+  }
+  const tail = text.slice(to, end);
+  return { start, end: TAIL_INSTRUCTION.test(tail) ? to : end };
+}
+
+function replaceClaim(text, from, to, phrase) {
+  const span = strandedSpan(text, from, to);
+  const before = text.slice(0, span.start).replace(/\s+$/, '');
+  const startsSentence = !before || /[.!?]$/.test(before);
+  const body = startsSentence
+    ? phrase.charAt(0).toUpperCase() + phrase.slice(1)
+    : phrase.charAt(0).toLowerCase() + phrase.slice(1);
+  return text.slice(0, span.start) + body + text.slice(span.end);
+}
+
+// Rewrite every false claim the detector would raise on this text. Both layers
+// read PROGRESSION_CLAIMS, so a phrasing the detector can flag is by
+// construction a phrasing this function can restate -- which is what makes the
+// repair loop converge instead of exhausting its attempts.
+function restateFalseClaims(text, current, prior) {
+  let out = String(text || '');
+  for (const claim of PROGRESSION_CLAIMS) {
+    // Each rewrite shifts later offsets, so rescan from the top after a change.
+    for (let guard = 0; guard < 8; guard++) {
+      const m = out.match(new RegExp(claim.re.source, 'i'));
+      if (!m) break;
+      let phrase = null;
+      if (claim.metric === 'load') {
+        const { load } = current;
+        if (Number.isFinite(load) && Number.isFinite(prior.load) && load !== prior.load) {
+          phrase = `${load > prior.load ? 'Take' : 'Drop to'} ${load} kg`;
+        }
+      } else if (claim.direction === 'down') {
+        const metric = reductionMetric(m[1] || m[0]);
+        if (reductionMissing(metric, current, prior)) phrase = HOLD_PHRASE[metric];
+      }
+      if (!phrase) break;
+      const next = replaceClaim(out, m.index, m.index + m[0].length, phrase);
+      if (next === out) break;
+      out = next;
+    }
+  }
+  return out.replace(/\s{2,}/g, ' ').replace(/\s+([.,;!?])/g, '$1').trim();
+}
+
 // --- 1. note claims restated from the row's own fields -----------------------
 
-function repairRowNote(note, { sets, reps, priorSets, priorReps, priorLoad, load }) {
+function repairRowNote(note, { sets, reps, km, load, volume, priorSets, priorReps, priorKm, priorVolume, priorLoad }) {
   let out = String(note || '');
   if (!out.trim()) return { note: out, changed: false };
   const before = out;
@@ -106,23 +187,9 @@ function repairRowNote(note, { sets, reps, priorSets, priorReps, priorLoad, load
       (w, verb, n, tail) => (Number(n) === sets ? w : `${verb} ${sets}${tail}`));
   }
 
-  // A claimed reduction that did not happen becomes a hold statement.
-  if (Number.isFinite(sets) && Number.isFinite(priorSets) && Number.isFinite(reps) && Number.isFinite(priorReps)) {
-    const fell = (sets * reps) < (priorSets * priorReps);
-    if (!fell) {
-      out = out.replace(/\b(?:slightly\s+)?(?:less|fewer)\s+total\s+(?:work|volume|reps?)\b/gi, 'the same total work');
-      out = out.replace(/\bfewer\s+total\s+reps?\b/gi, 'the same total reps');
-      out = out.replace(/\b(?:slightly\s+)?(?:trim|reduce|drop|cut|lower)\s+(?:the\s+)?set\s+count\b/gi, 'hold the set count');
-      out = out.replace(/\b(?:reduce|drop|trim|cut|remove)\s+(?:one|a|1)\s+set\b/gi, 'hold the set count');
-    }
-  }
-
-  // A "repeat/hold this load" claim against a load that actually moved.
-  if (Number.isFinite(load) && Number.isFinite(priorLoad) && load !== priorLoad) {
-    const dir = load > priorLoad ? 'Take' : 'Drop to';
-    out = out.replace(/\b(repeat|hold|keep|maintain|match)\s+(?:this|the|same)\s+(load|weight|dose)\b/gi,
-      `${dir} ${load} kg`);
-  }
+  // A claimed reduction that did not happen becomes a hold statement, and a
+  // "repeat this load" claim against a load that moved names the new load.
+  out = restateFalseClaims(out, { sets, reps, km, load, volume }, { sets: priorSets, reps: priorReps, km: priorKm, volume: priorVolume, load: priorLoad });
 
   // An unconditional instruction to add work becomes explicitly optional.
   if (/\badd (?:one|an?|another|1)\s+(?:more\s+)?(?:set|rep|single)\b/i.test(out) && !CONDITIONAL.test(out)) {
@@ -292,12 +359,15 @@ export function repairDeterministicContradictions(program, intake = {}) {
       const sets = firstNum(cells[parsed.sets]);
       const reps = repCount(cells[parsed.reps]);
       const load = Number.isInteger(parsed.load) ? kgOf(cells[parsed.load]) : null;
-      thisWeek.set(key, { sets, reps, load });
+      const km = kmOf(cells[parsed.reps]);
+      const volume = (Number.isFinite(sets) && Number.isFinite(reps)) ? sets * reps : null;
+      thisWeek.set(key, { sets, reps, load, km, volume });
       if (isWarmup(name) || !Number.isInteger(parsed.notes)) return;
 
       const p = prior.get(key) || {};
       const { note, changed: noteChanged } = repairRowNote(cells[parsed.notes], {
-        sets, reps, load, priorSets: p.sets, priorReps: p.reps, priorLoad: p.load,
+        sets, reps, load, km, volume,
+        priorSets: p.sets, priorReps: p.reps, priorLoad: p.load, priorKm: p.km, priorVolume: p.volume,
       });
       if (noteChanged) {
         cells[parsed.notes] = note;
@@ -310,7 +380,8 @@ export function repairDeterministicContradictions(program, intake = {}) {
       // contradiction is engine-authored, so no amount of regeneration can clear it.
       if (Number.isInteger(parsed.load)) {
         const { note: descriptor, changed: loadChanged } = repairRowNote(cells[parsed.load], {
-          sets, reps, load: null, priorSets: p.sets, priorReps: p.reps, priorLoad: null,
+          sets, reps, km, volume, load: null,
+          priorSets: p.sets, priorReps: p.reps, priorKm: p.km, priorVolume: p.volume, priorLoad: null,
         });
         if (loadChanged) {
           cells[parsed.load] = descriptor;
