@@ -16,6 +16,7 @@ import { rampText } from './specific_warmup_enrichment.js';
 import { PROGRESSION_CLAIMS, reductionMetric, reductionMissing } from './v34_prescription_consistency.js';
 import { collectSkillCeilingFlags, collectMaintenanceDriftFlags } from './v43_coaching_governance.js';
 import { longRunBuildClaim } from './v35_coaching_standards.js';
+import { classifyExercise } from './v38_movement_taxonomy.js';
 
 function arr(v) { return Array.isArray(v) ? v : v ? [v] : []; }
 function txt(v) {
@@ -490,6 +491,109 @@ function repairMissingHeavyRamps(program, intake, repairs) {
   return candidate;
 }
 
+// --- 7. a missing One-Arm Pull-up assistance exposure -------------------------
+
+// Advanced Hybrid lost runs #66 and #69 to ADVANCED_HYBRID_OAP_SPECIFICITY, four
+// attempts each. The rule requires two unilateral pulling exposures per week,
+// strict and assisted, and the model kept shipping only the strict one. Both
+// earlier fixes were guesses at what it had written; the dictionary turned out
+// to contain no name the matchers missed, so the exposure was simply absent.
+//
+// Nothing about the missing row is a coaching decision the engine has not
+// already made. The planner brief specifies this exposure and its dose --
+// "Assisted One-Arm Pull-up doubles or triples with the minimum assistance
+// needed for clean symmetrical reps" -- and the coach-reviewed program places it
+// as a deliberately low-cost adjacent-day microdose. So the engine writes it
+// rather than asking a fifth time.
+
+const ASSISTED_OAP_ROW = {
+  exercise: 'Assisted One-Arm Pull-up',
+  load: 'Minimum assistance for clean reps',
+  sets: '2',
+  reps: '1 per arm',
+  rest: '120-150 sec',
+  rpe: '6-6.5',
+  notes: 'Technique-only exposure. Lead the weaker arm and use the least assistance that keeps full range, no twist and equal tempo each side. Recovery-first pulling microdose: keep it at RPE 6-6.5 or easier and stop well before local fatigue.',
+};
+
+const STRICT_OAP_NAME = /^(?:weighted\s+)?one[- ]arm\s+(?:pull|chin)-?up$/i;
+const ANY_OAP_NAME = /one[- ]arm\s+(?:pull|chin)-?up/i;
+
+function wantsOapExposures(intake = {}) {
+  const primary = arr(intake.primary_goals).map(String).join(' ').toLowerCase();
+  return /one[- ]?arm\s*(?:pull|chin)|\boap\b/.test(primary);
+}
+
+function repairMissingOapAssistance(program, intake, repairs) {
+  if (!wantsOapExposures(intake)) return program;
+  let candidate = program;
+
+  for (let week = 1; week <= 4; week++) {
+    const parsed = parseWeek(candidate, week);
+    if (!parsed || !Number.isInteger(parsed.notes)) continue;
+
+    const work = parsed.rows.filter((c) => {
+      const n = String(c[parsed.exercise] || '').trim();
+      return n && !isWarmup(n);
+    });
+    const strictRow = work.find((c) => STRICT_OAP_NAME.test(String(c[parsed.exercise] || '').trim()));
+    const hasAssisted = work.some((c) => {
+      const n = String(c[parsed.exercise] || '').trim();
+      return ANY_OAP_NAME.test(n) && !STRICT_OAP_NAME.test(n);
+    });
+    // Only add the second exposure. A week with no strict work at all is a
+    // different failure, and inserting a strict one-arm pull-up would be
+    // inventing training rather than completing it.
+    if (!strictRow || hasAssisted) continue;
+
+    const strictDay = String(strictRow[parsed.day] || '').trim();
+    // Only the athlete's own fixed strength days are eligible. The first version
+    // of this repair picked the lightest day overall and landed the row on a
+    // running day, inventing a strength session the athlete never agreed to and
+    // trading one hard failure for ADVANCED_HYBRID_CALENDAR_DRIFT.
+    const fixedDays = arr(intake.available_gym_days).map((d) => String(d).trim().toLowerCase()).filter(Boolean);
+    const isEligible = (day) => {
+      if (day === strictDay) return false;
+      if (fixedDays.length) return fixedDays.includes(day.toLowerCase());
+      // No stated gym days: any day already carrying non-conditioning work.
+      return work.some((c) => String(c[parsed.day] || '').trim() === day
+        && !['endurance', 'loaded_carry'].includes(classifyExercise(String(c[parsed.exercise] || '')).category));
+    };
+
+    const dayLoad = new Map();
+    for (const c of work) {
+      const day = String(c[parsed.day] || '').trim();
+      if (!day || !isEligible(day)) continue;
+      dayLoad.set(day, (dayLoad.get(day) || 0) + 1);
+    }
+    // The lightest eligible day: a microdose belongs where it costs least, and
+    // never doubled up on the day carrying the hard exposure.
+    const target = [...dayLoad.entries()].sort((a, b) => a[1] - b[1]).map(([day]) => day)[0];
+    if (!target) continue;
+
+    const cells = new Array(parsed.header.length).fill('');
+    cells[parsed.day] = target;
+    cells[parsed.exercise] = ASSISTED_OAP_ROW.exercise;
+    if (Number.isInteger(parsed.load)) cells[parsed.load] = ASSISTED_OAP_ROW.load;
+    cells[parsed.sets] = ASSISTED_OAP_ROW.sets;
+    cells[parsed.reps] = ASSISTED_OAP_ROW.reps;
+    if (Number.isInteger(parsed.rest)) cells[parsed.rest] = ASSISTED_OAP_ROW.rest;
+    const rpeIndex = parsed.header.findIndex((h) => /rpe|rir/i.test(String(h || '')));
+    if (rpeIndex >= 0) cells[rpeIndex] = ASSISTED_OAP_ROW.rpe;
+    cells[parsed.notes] = ASSISTED_OAP_ROW.notes;
+
+    // Place it after the target day's existing rows so session order is kept.
+    let insertAt = parsed.rows.length;
+    for (let i = parsed.rows.length - 1; i >= 0; i--) {
+      if (String(parsed.rows[i][parsed.day] || '').trim() === target) { insertAt = i + 1; break; }
+    }
+    parsed.rows.splice(insertAt, 0, cells);
+    repairs.push({ type: 'v47_oap_assistance_added', week, day: target, strictDay });
+    candidate = rebuild(candidate, parsed);
+  }
+  return candidate;
+}
+
 // --- entry point --------------------------------------------------------------
 
 export function repairDeterministicContradictions(program, intake = {}) {
@@ -501,6 +605,7 @@ export function repairDeterministicContradictions(program, intake = {}) {
   candidate = repairMaintenanceDrift(candidate, intake, repairs);
   candidate = repairSkillCeilings(candidate, intake, repairs);
   candidate = repairMissingHeavyRamps(candidate, intake, repairs);
+  candidate = repairMissingOapAssistance(candidate, intake, repairs);
 
   const prior = new Map();
   for (let week = 1; week <= 4; week++) {

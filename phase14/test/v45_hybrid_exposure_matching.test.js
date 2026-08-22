@@ -82,3 +82,57 @@ test('[H5] the rule still rejects what it exists to reject', { skip: !golden }, 
 test('[H6] bilateral pulling never substitutes for a unilateral exposure', { skip: !golden }, () => {
   assert.equal(codeFor(golden.replace(/\tOne-Arm Pull-up\t/g, '\tPull-up\t')), 'ADVANCED_HYBRID_OAP_SPECIFICITY');
 });
+
+// --- the repair that ends the loop -------------------------------------------
+
+import { repairDeterministicContradictions } from '../engine/v35_deterministic_repair.js';
+import { auditProgramStructure } from '../engine/v38_structural_audit.js';
+
+// Runs #66 and #69 each spent four attempts on ADVANCED_HYBRID_OAP_SPECIFICITY.
+// Widening the matchers was correct but was not the cause: the dictionary holds
+// no unilateral pulling name the matchers miss, so the exposure was simply
+// absent. The planner brief already specifies this exposure and its dose, so the
+// engine writes it rather than asking the model a fifth time.
+
+const strippedGolden = golden && golden.split('\n').filter((l) => !/\tAssisted One-Arm Pull-up\t/.test(l)).join('\n');
+
+test('[H7] a missing assistance exposure is written, not regenerated', { skip: !golden }, () => {
+  assert.equal(codeFor(strippedGolden), 'ADVANCED_HYBRID_OAP_SPECIFICITY');
+  const repaired = repairDeterministicContradictions(strippedGolden, HYBRID);
+  assert.equal(codeFor(repaired.program), null, 'one pass must clear the gate');
+  assert.equal(repaired.repairs.filter((r) => r.type === 'v47_oap_assistance_added').length, 4, 'every week needs the exposure');
+});
+
+test('[H8] the exposure lands on one of the athlete\'s own gym days', { skip: !golden }, () => {
+  // The first version picked the lightest day overall and landed on the running
+  // day, inventing a strength session and trading one hard failure for
+  // ADVANCED_HYBRID_CALENDAR_DRIFT.
+  const repaired = repairDeterministicContradictions(strippedGolden, HYBRID);
+  for (const r of repaired.repairs.filter((x) => x.type === 'v47_oap_assistance_added')) {
+    assert.ok(HYBRID.available_gym_days.includes(r.day), `${r.day} is not a stated gym day`);
+    assert.notEqual(r.day, r.strictDay, 'the microdose never doubles up on the strict day');
+  }
+});
+
+test('[H9] the repair introduces no structural failure', { skip: !golden }, () => {
+  const before = auditProgramStructure(strippedGolden, HYBRID).filter((f) => f.severity === 'hard').length;
+  const after = auditProgramStructure(repairDeterministicContradictions(strippedGolden, HYBRID).program, HYBRID)
+    .filter((f) => f.severity === 'hard').length;
+  assert.ok(after <= before);
+});
+
+test('[H10] a program that already has both exposures is untouched, and the repair is idempotent', { skip: !golden }, () => {
+  const clean = repairDeterministicContradictions(golden, HYBRID);
+  assert.equal(clean.repairs.filter((r) => r.type === 'v47_oap_assistance_added').length, 0);
+  const once = repairDeterministicContradictions(strippedGolden, HYBRID);
+  assert.equal(repairDeterministicContradictions(once.program, HYBRID).program, once.program);
+});
+
+test('[H11] a week with no strict work at all is left for regeneration', { skip: !golden }, () => {
+  // Inserting a strict one-arm pull-up would be inventing training rather than
+  // completing it, so that failure stays the model's to fix.
+  const noStrict = golden.replace(/\tOne-Arm Pull-up\t/g, '\tOne-Arm Pull-up Eccentric\t');
+  const repaired = repairDeterministicContradictions(noStrict, HYBRID);
+  assert.equal(repaired.repairs.filter((r) => r.type === 'v47_oap_assistance_added').length, 0);
+  assert.equal(codeFor(repaired.program), 'ADVANCED_HYBRID_OAP_SPECIFICITY');
+});
