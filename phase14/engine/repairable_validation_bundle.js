@@ -23,6 +23,7 @@ import { auditTacticalHardRules } from './v40_tactical_hard_rules.js'; // V40-TA
 import { collectRecoveryBudgetFlags, RECOVERY_BUDGET_HARD_CODES } from './v42_recovery_budget.js'; // V42-RECOVERY-BUDGET-WIRED
 import { collectProgressionDisciplineFlags } from './v42_progression_discipline.js'; // V42-PROGRESSION-DISCIPLINE-WIRED
 import { collectGovernanceFlags, GOVERNANCE_HARD_CODES } from './v43_coaching_governance.js'; // V43-GOVERNANCE-WIRED
+import { collectLanguageAccuracyFlags, LANGUAGE_HARD_CODES, repairCountClaims } from './v46_language_accuracy.js'; // V46-LANGUAGE-ACCURACY-WIRED
 import { repairDeterministicContradictions } from './v35_deterministic_repair.js'; // V35-DETERMINISTIC-REPAIR-WIRED
 import { normalizeAdvancedHybridWeek4OapConsolidation } from './advanced_hybrid_oap_consolidation_normalizer.js';
 import {
@@ -452,6 +453,22 @@ export function collectRepairableValidationFailures(program, intake = {}, option
       governance[0].code,
       governance.map((f) => f.message).join(' '),
       { flags: governance },
+    );
+  });
+
+  // v46: the prose must count the program correctly. Repaired in place first --
+  // restating a number is mechanical and cannot be a coaching decision -- so
+  // reaching the gate means the claim could not be reconciled at all.
+  const counted = repairCountClaims(candidate, intake);
+  if (counted.repaired) candidate = counted.program;
+  runRepairable(flags, () => {
+    const language = collectLanguageAccuracyFlags(candidate, intake)
+      .filter((f) => LANGUAGE_HARD_CODES.has(f.code));
+    if (!language.length) return;
+    throw new RetriableValidationError(
+      language[0].code,
+      language.map((f) => f.message).join(' '),
+      { flags: language },
     );
   });
 

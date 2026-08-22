@@ -69,6 +69,10 @@ const RULE_REGISTRY = {
   V43_SESSION_EXCEEDS_TIME_BUDGET: { classification: CLASSIFICATION.SOFT, dimension: 'recovery_management' },
   V43_NO_AUTOREGULATION_PATH: { classification: CLASSIFICATION.SOFT, dimension: 'safety' },
   V43_INJURY_RESPONSE_NOT_CAUSAL: { classification: CLASSIFICATION.SOFT, dimension: 'safety' },
+  // Language accuracy. A miscounted sentence is an objective error with a
+  // mechanical correction; a proofreading defect is reported, not enforced.
+  V46_COUNT_CLAIM_MISMATCH: { classification: CLASSIFICATION.HARD, dimension: 'specificity' },
+  V46_TEXT_DEFECT: { classification: CLASSIFICATION.SOFT, dimension: 'specificity' },
 
   // --- prescription and narrative honesty ---------------------------------
   V34_NOTE_PER_SET_MISMATCH: { classification: CLASSIFICATION.HARD, dimension: 'progression' },
