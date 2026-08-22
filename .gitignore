@@ -6,12 +6,11 @@ node_modules/
 .env.local
 *.key
 
-# SQLite database + write-ahead logs (created at runtime)
-data/data.db
-data/data.db-shm
-data/data.db-wal
-data/*.db
-data/*.db-*
+# SQLite database + write-ahead logs (created at runtime).
+# Patterns are unanchored: the app runs from phase14/, so a root-anchored
+# data/*.db never matched the files it was written to ignore.
+**/data/*.db
+**/data/*.db-*
 
 # Logs
 *.log
