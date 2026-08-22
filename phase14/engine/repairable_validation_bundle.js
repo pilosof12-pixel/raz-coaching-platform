@@ -18,6 +18,7 @@ import { enrichSpecificWarmups } from './specific_warmup_enrichment.js';
 import { normalizeFinalNoteCoherence } from './final_note_coherence.js'; // FINAL-NOTE-COHERENCE-WIRED
 import { validatePrescriptionConsistency } from './v34_prescription_consistency.js'; // V34-PRESCRIPTION-CONSISTENCY-WIRED
 import { validateCoachingStandards } from './v35_coaching_standards.js'; // V35-COACHING-STANDARDS-WIRED
+import { auditProgramStructure } from './v38_structural_audit.js'; // V38-STRUCTURAL-AUDIT-WIRED
 import { repairDeterministicContradictions } from './v35_deterministic_repair.js'; // V35-DETERMINISTIC-REPAIR-WIRED
 import { normalizeAdvancedHybridWeek4OapConsolidation } from './advanced_hybrid_oap_consolidation_normalizer.js';
 import {
@@ -402,6 +403,21 @@ export function collectRepairableValidationFailures(program, intake = {}, option
   // v35: the program's own claims and block shape must match the structured
   // prescriptions and the athlete's stated goal.
   runRepairable(flags, () => validateCoachingStandards(candidate, intake, RetriableValidationError));
+
+  // v38: structural coaching architecture. Session completeness, foundational
+  // strength under skill work, circular-week recovery and loaded-carry
+  // progression. Architecture failures are regenerated rather than patched:
+  // rewriting a session's content would be inventing coaching. Weekly movement
+  // coverage is advisory and reported, not a release block.
+  runRepairable(flags, () => {
+    const structural = auditProgramStructure(candidate, intake).filter((f) => f.severity === 'hard');
+    if (!structural.length) return;
+    throw new RetriableValidationError(
+      structural[0].code,
+      structural.map((f) => f.message).join(' '),
+      { flags: structural },
+    );
+  });
   runRepairable(flags, () => validatePhase15FinalProgram(candidate, intake));
 
   return {

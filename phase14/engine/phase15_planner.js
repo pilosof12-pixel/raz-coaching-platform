@@ -7,6 +7,7 @@ import { buildAdvancedHybridConcurrencyBrief } from './advanced_hybrid_concurren
 import { buildCoachingSpecV1Brief } from './coaching_spec_v1_quality.js'; // COACHING-SPEC-V1-BRIEF
 import { gymDayReadiness } from './v34_readiness.js';
 import { buildV34ArchitectureBrief } from './v34_coaching_architecture.js';
+import { buildSkeletonBrief } from './v38_session_skeleton.js';
 
 function txt(v) {
   if (Array.isArray(v)) return v.map(x => typeof x === 'string' ? x : JSON.stringify(x)).join(' | ');
@@ -250,6 +251,7 @@ export function buildDeterministicBrief(intake = {}) {
     'Required coaching constraints:', ...required.map(x=>`* ${x}`),
     optional.length ? 'Preferred/support choices:' : '', ...optional.map(x=>`* ${x}`),
     forbidden.length ? 'Forbidden/tolerance-gated choices:' : '', ...forbidden.map(x=>`* ${x}`),
+    buildSkeletonBrief(intake),
     buildV34ArchitectureBrief(intake, { gymDays: days }),
     specialist,
     progressionGpp,
