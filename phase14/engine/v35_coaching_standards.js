@@ -137,20 +137,32 @@ function primaryModalityPattern(intake = {}) {
 }
 
 // Total quality metres of the primary running session, per week.
+// A primary quality does not always progress in metres. A squat goal advances by
+// load, a pull-up goal by reps; measuring only distance made this rule silent for
+// every strength primary, which is exactly the concurrent athlete the coach
+// singled out as needing it most.
 function primaryQualityLoad(program, pattern) {
   const out = [];
   for (let week = 1; week <= 4; week++) {
     const parsed = parseWeek(program, week);
     if (!parsed) continue;
     let metres = 0;
+    let topKg = 0;
+    let volume = 0;
     for (const cells of parsed.rows) {
       const name = String(cells[parsed.exercise] || '');
       if (isWarmup(name) || !pattern.test(name)) continue;
       const sets = firstNum(cells[parsed.sets]) || 0;
       const m = (String(cells[parsed.reps] || '').match(/\b(\d{2,4})\s*m\b/i) || [])[1];
       if (m != null && sets >= 2) metres += Number(m) * sets;
+      const kg = Number.isInteger(parsed.load)
+        ? (String(cells[parsed.load] || '').match(/\+?\s*(\d+(?:\.\d+)?)\s*kg\b/i) || [])[1]
+        : null;
+      if (kg != null) topKg = Math.max(topKg, Number(kg));
+      const reps = firstNum(cells[parsed.reps]);
+      if (Number.isFinite(sets) && Number.isFinite(reps) && m == null) volume += sets * reps;
     }
-    out.push({ week, metres });
+    out.push({ week, metres, topKg, volume });
   }
   return out;
 }
@@ -185,7 +197,7 @@ export function collectSecondaryVolumeCreepFlags(program, intake = {}) {
     const q = quality.find((x) => x.week === now.week);
     const qPrev = quality.find((x) => x.week === prev.week);
     // Only a week in which the primary quality actually advanced.
-    const primaryRose = q && qPrev && q.metres > qPrev.metres;
+    const primaryRose = q && qPrev && (q.metres > qPrev.metres || q.topKg > qPrev.topKg || q.volume > qPrev.volume);
     const longerReps = (() => {
       const repMax = (w) => {
         const parsed = parseWeek(program, w);

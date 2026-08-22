@@ -182,3 +182,43 @@ test('[R14] the checkers stay quiet on prescriptions that genuinely agree', () =
   ].join('\n\n');
   assert.deepEqual(collectAllV34ConsistencyFlags(clean, {}), []);
 });
+
+// --- item 5 for athletes whose primary is not a distance -----------------------
+
+import { collectSecondaryVolumeCreepFlags } from '../engine/v35_coaching_standards.js';
+
+// An offline audit of the coach's fifteen items found this rule silent for every
+// strength primary. It measured the primary quality in metres only, so a squat
+// goal advancing by load never registered as an advance and accessory creep
+// alongside it was never caught -- in the concurrent athlete the coach singled
+// out as needing this rule most.
+const SQUAT_PRIMARY = { primary_goals: ['220kg back squat'] };
+const week = (w, rows) => `START_WEEK${w}_TSV\n${'Day\tExercise\tWeight\tSets\tReps\tRest\tTarget RPE\tNotes\tResults'}\n${rows.join('\n')}\nEND_WEEK${w}_TSV`;
+const twoWeek = (rowsA, rowsB) => ['Overview.', week(1, rowsA), week(2, rowsB)].join('\n\n');
+
+test('[R15] accessory volume may not creep while a load-based primary advances', () => {
+  const creep = twoWeek(
+    ['Mon\tBack Squat\t100 kg\t3\t3\t3 min\t8\tTop.\t', 'Mon\tCable Row\tRPE-selected load\t2\t10\t90 sec\t7\tSupport.\t'],
+    ['Mon\tBack Squat\t110 kg\t3\t3\t3 min\t8\tTop.\t', 'Mon\tCable Row\tRPE-selected load\t4\t10\t90 sec\t7\tSupport.\t'],
+  );
+  assert.deepEqual(collectSecondaryVolumeCreepFlags(creep, SQUAT_PRIMARY).map((f) => f.code), ['V35_SECONDARY_VOLUME_CREEP']);
+});
+
+test('[R16] holding the accessory while the primary advances raises nothing', () => {
+  const held = twoWeek(
+    ['Mon\tBack Squat\t100 kg\t3\t3\t3 min\t8\tTop.\t', 'Mon\tCable Row\tRPE-selected load\t2\t10\t90 sec\t7\tSupport.\t'],
+    ['Mon\tBack Squat\t110 kg\t3\t3\t3 min\t8\tTop.\t', 'Mon\tCable Row\tRPE-selected load\t2\t10\t90 sec\t7\tSupport.\t'],
+  );
+  assert.deepEqual(collectSecondaryVolumeCreepFlags(held, SQUAT_PRIMARY), []);
+});
+
+test('[R17] the widened measure raises nothing on the coach-reviewed programs', () => {
+  const cases = [
+    ['tactical_3k', { primary_goals: ['Improve 3 km from 13:30 to sub-12:00'] }],
+    ['advanced_hybrid', { primary_goals: ['220kg back squat', '4 One arm pullups'] }],
+    ['youth_gymnastics', { primary_goals: ['Achieve first bar muscle-up'] }],
+  ];
+  for (const [id, intake] of cases) {
+    assert.deepEqual(collectSecondaryVolumeCreepFlags(readLive(id), intake), [], `${id} must stay clean`);
+  }
+});
