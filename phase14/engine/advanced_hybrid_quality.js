@@ -131,7 +131,18 @@ export function validateAdvancedHybridQualitySemantic(program, intake = {}) {
       // no rewording of the same program could ever satisfy the check.
       const hasStrict = work.some((r) => STRICT_OAP.test(r.exercise));
       const hasAssisted = work.some((r) => ASSISTED_OAP.test(r.exercise) || OAP_SUPPORT.test(r.exercise));
-      if (!hasStrict || !hasAssisted) fail('ADVANCED_HYBRID_OAP_SPECIFICITY', `Week ${week} must protect both demonstrated strict One-Arm Pull-up skill-strength and a second assistance/volume exposure. Do not regress an athlete already performing strict OAPs to prerequisite-only work.`, { week, hasStrict, hasAssisted });
+      if (!hasStrict || !hasAssisted) {
+        // Name what the week actually contains. This rule cost three live runs,
+        // and twice the fix was a guess at what the model had written because
+        // the failure said only that something was missing. A build that fails
+        // should say what it saw.
+        const pulling = work
+          .filter((r) => /pull-?up|chin-?up|row|lat|hang/i.test(r.exercise))
+          .map((r) => `${r.day || '?'}:${r.exercise}`);
+        fail('ADVANCED_HYBRID_OAP_SPECIFICITY',
+          `Week ${week} must protect both demonstrated strict One-Arm Pull-up skill-strength and a second assistance/volume exposure. Do not regress an athlete already performing strict OAPs to prerequisite-only work. Missing: ${[!hasStrict && 'strict unilateral exposure', !hasAssisted && 'assistance/volume exposure'].filter(Boolean).join(' and ')}. Pulling work found this week: ${pulling.length ? pulling.join(', ') : 'none'}.`,
+          { week, hasStrict, hasAssisted, pulling });
+      }
     }
 
     if (/overhead\s*press|\bohp\b/.test(allGoals)) {
