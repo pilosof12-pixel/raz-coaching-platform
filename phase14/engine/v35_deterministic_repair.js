@@ -15,6 +15,7 @@
 import { rampText } from './specific_warmup_enrichment.js';
 import { PROGRESSION_CLAIMS, reductionMetric, reductionMissing } from './v34_prescription_consistency.js';
 import { collectSkillCeilingFlags, collectMaintenanceDriftFlags } from './v43_coaching_governance.js';
+import { longRunBuildClaim } from './v35_coaching_standards.js';
 
 function arr(v) { return Array.isArray(v) ? v : v ? [v] : []; }
 function txt(v) {
@@ -262,8 +263,28 @@ function repairNarrative(program, intake) {
     if (best != null) km.push(best);
   }
   if (km.length > 1 && !km.some((v, i) => i > 0 && v > km[i - 1])) {
-    out = out.replace(/\b(the long run)\b([^.]{0,60}?)\b(builds?|building|progresses|increases?)\b/gi,
-      '$1$2is held at the tolerated dose');
+    // Restate whatever the detector would flag, using its own claim table. A
+    // private phrase list here covered one wording out of six, so every other
+    // way of saying the same false thing was flagged and never rewritten.
+    //
+    // The whole sentence is replaced, not the matched span. Splicing a
+    // correction into the middle left the claim's adverbs and time references
+    // stranded ("held at the tolerated dose gradually across the block"), and
+    // where two patterns overlapped it produced nonsense.
+    for (let guard = 0; guard < 4; guard++) {
+      const claim = longRunBuildClaim(out);
+      if (!claim) break;
+      const at = claim.match.index;
+      const sentences = [...out.matchAll(/[^.!?]*[.!?]?/g)].filter((m) => m[0].length);
+      const owner = sentences.find((m) => at >= m.index && at < m.index + m[0].length);
+      if (!owner) break;
+      const trailing = /[.!?]$/.test(owner[0]) ? owner[0].slice(-1) : '';
+      const lead = owner[0].match(/^\s*/)[0];
+      const replacement = `${lead}The long run is held at the tolerated dose${trailing}`;
+      const next = out.slice(0, owner.index) + replacement + out.slice(owner.index + owner[0].length);
+      if (next === out) break;
+      out = next;
+    }
   }
 
   // Only one symptom-response hierarchy may stand. Keep the source-linked one.

@@ -1680,7 +1680,21 @@ async function generateValidatedProgram(intake, onProgress = async () => {}) {
     const userContent = amendments.length
       ? basePrompt + "\n\n" + amendments.join("\n\n")
       : basePrompt;
-    const raw = await runEngineRaw(userContent);
+    // An empty model response is transient, not a verdict on the program: with
+    // high reasoning effort the model can spend its whole output budget thinking
+    // and emit nothing. It used to be retriable only through the Gemini
+    // fallback, and with OpenAI as the sole provider that branch is unreachable,
+    // so a single empty response failed the entire build on attempt 1. Spend an
+    // attempt on it instead.
+    let raw;
+    try {
+      raw = await runEngineRaw(userContent);
+    } catch (e) {
+      if (e?.code !== "OPENAI_EMPTY_OUTPUT" || attempt >= MAX_ATTEMPTS) throw e;
+      console.warn(`generateValidatedProgram: empty model output on attempt ${attempt}/${MAX_ATTEMPTS}; retrying`);
+      await onProgress("refining", attempt, "model returned no content; retrying");
+      continue;
+    }
     if (!isValidProgram(raw)) {
       console.warn(
         `generateValidatedProgram: invalid/degenerate output attempt ${attempt}/${MAX_ATTEMPTS} ` +

@@ -71,6 +71,22 @@ function weeklyMaxKm(program, namePattern) {
   return out;
 }
 
+// The wordings that assert a long run is getting longer. Exported so the repair
+// layer restates exactly what this detector flags: when the two kept separate
+// phrase lists, five of six phrasings were flagged forever and never rewritten.
+export const LONG_RUN_BUILD_CLAIMS = [
+  { re: /\b(?:the\s+)?long run\b[^.]{0,80}?\b(?:builds?|building|progress(?:es|ively)?|increases?|steps? up)\b/i, form: 'subject' },
+  { re: /\b(?:builds?|building|progress(?:es|ively)?|increases?|steps? up)\b[^.]{0,40}?\b(?:the\s+)?long run\b/i, form: 'verb' },
+];
+
+export function longRunBuildClaim(head) {
+  for (const claim of LONG_RUN_BUILD_CLAIMS) {
+    const m = String(head || '').match(claim.re);
+    if (m) return { match: m, form: claim.form };
+  }
+  return null;
+}
+
 export function collectNarrativeClaimFlags(program, intake = {}) {
   const flags = [];
   const head = narrative(program);
@@ -79,8 +95,7 @@ export function collectNarrativeClaimFlags(program, intake = {}) {
   // A claim that the long run BUILDS must be visible in the structured distances.
   const longRun = weeklyMaxKm(program, /\brun(?:ning)?\b/i);
   if (longRun.length >= 2) {
-    const claimsBuild = /\blong run\b[^.]{0,80}\b(builds?|building|progress(?:es|ively)?|increases?|step(?:s)? up)\b/i.test(head)
-      || /\b(builds?|progress(?:es)?|increases?)\b[^.]{0,40}\blong run\b/i.test(head);
+    const claimsBuild = Boolean(longRunBuildClaim(head));
     const rises = longRun.some((x, i) => i > 0 && x.km > longRun[i - 1].km);
     if (claimsBuild && !rises) {
       flags.push({
