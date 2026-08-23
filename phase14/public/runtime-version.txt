@@ -1,1 +1,1 @@
-launch-acceptance-v48-oap-placement-live17-20260822
+launch-acceptance-v50-hybrid-only-live18-20260822
