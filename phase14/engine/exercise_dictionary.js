@@ -27,6 +27,7 @@ import {
   selectRungForSkill,
   renderSkillWorkForRung,
 } from "./skill_progressions.js";
+import { bodyweightKg } from "./intake_bodyweight.js";
 
 // ---------------------------------------------------------------------------
 // 1. CANONICAL EXERCISE DICTIONARY
@@ -579,7 +580,7 @@ export function ELITE_UNILATERAL_TRIGGER(intake = {}) {
     return true;
   }
   // Generic: any unilateral movement at >= 50% bodyweight external load x 5+ reps.
-  const bw = Number(intake.bodyweight || intake.body_weight || intake.weight_kg || 0);
+  const bw = bodyweightKg(intake) || 0;
   if (bw > 0 && bench && (bench.reps || 0) >= 5 && bench.extLoad >= 0.5 * bw) return true;
   return false;
 }

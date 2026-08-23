@@ -1,3 +1,5 @@
+import { bodyweightKg } from './engine/intake_bodyweight.js';
+
 function text(v) {
   if (Array.isArray(v)) return v.map(text).join(' | ');
   if (v && typeof v === 'object') return JSON.stringify(v);
@@ -190,7 +192,7 @@ export function addOptionalQuestions(out, intake = {}) {
   // and at 95 kg, and every relative-strength judgement is blind without it.
   const bodyweightGiven = /\b(?:bodyweight|body weight|bw)\b[^\n]{0,20}\d+\s*(?:kg|lb)/i.test(
     text([intake?.current_numbers, intake?.notes, intake?.clarification_answers]),
-  ) || Number(intake?.bodyweight_kg) > 0;
+  ) || bodyweightKg(intake) != null;
   const relativeStrengthGoal = /\b(?:one[- ]arm|muscle[- ]?up|handstand|planche|lever|pull[- ]?up|chin[- ]?up|dip|calisthenic|bodyweight)\b/i.test(goals);
   if (relativeStrengthGoal && !bodyweightGiven) {
     addQuestion(out, intake, {
