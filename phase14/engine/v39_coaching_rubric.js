@@ -82,6 +82,10 @@ const RULE_REGISTRY = {
   // removing a training day is restructuring -- so it is reported, not enforced.
   V46_SCHEDULE_EXCEEDS_STATED_FREQUENCY: { classification: CLASSIFICATION.SOFT, dimension: 'recovery_management' },
   V46_OPTIONAL_QUALIFIER_ON_PRIMARY: { classification: CLASSIFICATION.SOFT, dimension: 'progression' },
+  // Whether a dose stimulates a given athlete is a judgement, so these are
+  // raised for review rather than rejected.
+  V53_UNDERLOADED_ACCESSORY: { classification: CLASSIFICATION.SOFT, dimension: 'loading' },
+  V53_THIN_SESSION: { classification: CLASSIFICATION.SOFT, dimension: 'exercise_selection' },
   // Language accuracy. A miscounted sentence is an objective error with a
   // mechanical correction; a proofreading defect is reported, not enforced.
   V46_COUNT_CLAIM_MISMATCH: { classification: CLASSIFICATION.HARD, dimension: 'specificity' },

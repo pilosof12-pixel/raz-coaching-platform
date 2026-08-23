@@ -39,7 +39,15 @@ const GOAL_PATTERNS = [
 
 function patternsFor(goals) {
   const text = txt(goals);
-  return GOAL_PATTERNS.filter((g) => g.re.test(text)).map((g) => g.movement);
+  let matched = GOAL_PATTERNS.filter((g) => g.re.test(text));
+  // "4 one arm pullups" matches the generic pull-up pattern as well as the
+  // one-arm one, which made every chin-up count as primary work and excused
+  // sessions that contained no goal work at all. The specific goal wins.
+  if (matched.some((g) => g.movement.source.includes('one[- ]arm'))) {
+    matched = matched.filter((g) => !/^\/?\(\?:\)?pull-\?up\|chin-\?up/.test(g.movement.source)
+      && g.movement.source !== 'pull-?up|chin-?up');
+  }
+  return matched.map((g) => g.movement);
 }
 
 // A movement's tier: primary beats secondary beats everything else. A movement
