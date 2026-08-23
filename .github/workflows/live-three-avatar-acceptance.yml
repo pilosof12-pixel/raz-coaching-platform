@@ -109,13 +109,20 @@ jobs:
                   if(job?.status==='done'||job?.status==='error') break;
                 } else if(poll.r.status===404){
                   consecutive404++;
-                  if(consecutive404>=5) break;
+                  // A restarting service returns 404 for as long as it takes to
+                  // come back. Giving up after five polls meant abandoning a job
+                  // after ten seconds, well inside a normal restart window, and
+                  // three of eight runs were written off that way. Job creation
+                  // is durable now, so a job that outlives the process is found
+                  // again once it recovers -- but only if the poll is still
+                  // asking. Wait out a restart before calling it gone.
+                  if(consecutive404>=90) break;
                 }
               }catch(e){
                 console.warn(JSON.stringify({id:a.id,poll_error:String(e?.message||e)}));
               }
             }
-            const disappeared=consecutive404>=5;
+            const disappeared=consecutive404>=90;
             const timedOut=!disappeared&&job?.status!=='done'&&job?.status!=='error';
             const rec={
               id:a.id,
@@ -126,7 +133,7 @@ jobs:
               attempt:job?.attempt??lastSeen?.attempt??null,
               detail:job?.detail||lastSeen?.detail||null,
               last_seen_status:lastSeen?.status||null,
-              error:job?.error||(disappeared?'Job state disappeared after successful earlier polling.':null),
+              error:job?.error||(disappeared?`Job state absent for ${consecutive404*2}s after successful earlier polling; service likely restarted mid-build.`:null),
               program_chars:typeof job?.program==='string'?job.program.length:0,
               seconds:Math.round((Date.now()-started)/1000)
             };
