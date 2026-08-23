@@ -18,6 +18,7 @@ import { collectSkillCeilingFlags, collectMaintenanceDriftFlags } from './v43_co
 import { longRunBuildClaim } from './v35_coaching_standards.js';
 import { repairCountClaims } from './v46_language_accuracy.js';
 import { repairSessionHierarchy, repairKeySessionCrowding } from './v52_session_hierarchy.js';
+import { repairPrePrimaryLoad } from './v56_primary_day_protection.js';
 import { classifyExercise, dayGap, stressSignature, dayKey as dayKeyOf } from './v38_movement_taxonomy.js';
 import { auditCircularScheduling } from './v38_structural_audit.js';
 
@@ -861,6 +862,11 @@ export function repairDeterministicContradictions(program, intake = {}) {
     candidate = hierarchy.program;
     repairs.push(...hierarchy.repairs);
   }
+
+  // Secondary work in the 24 hours before the primary day is held to a
+  // technical dose. Capping an effort ceiling changes no exercise, no load and
+  // no set count, so this never needs regeneration.
+  candidate = repairPrePrimaryLoad(candidate, intake);
 
   // The lower-cost exposure of a primary movement is relocated off the day
   // before its heavy exposure. Moving a row between the athlete's own training
