@@ -40,6 +40,13 @@ function addQuestion(out, intake, q) {
   out.push({ answer_type:'text', required:true, ...q });
 }
 
+// Whether anything actually blocks the build. An optional question is worth
+// asking while the athlete is already answering something, and is never worth
+// stopping a build over.
+export function requiredClarifications(questions) {
+  return (questions || []).filter(q => q.required !== false);
+}
+
 export function detectIntakeClarifications(intake = {}) {
   const out = [];
   const goals = goalText(intake);
@@ -153,7 +160,23 @@ export function detectIntakeClarifications(intake = {}) {
   return out;
 }
 
+// Adherence is the one thing an athlete knows and the engine cannot infer: a
+// coach's point after seeing an accessory prescribed that the athlete had
+// already shown he would not perform. It is asked only when the intake is being
+// clarified anyway, so it never adds a round trip of its own, and it never
+// blocks a build.
+export function addAdherenceQuestion(out, intake = {}) {
+  if (!out.length) return out;
+  addQuestion(out, intake, {
+    id: 'adherence_exclusions',
+    required: false,
+    prompt: 'Are there any exercises you know you will not do, or have consistently skipped before?',
+    help: 'Optional. Name them and say why if you like - too boring, no access, previous niggle, or simply never done. Anything listed here will not be programmed as an accessory.',
+  });
+  return out;
+}
+
 export function intakeClarificationResult(intake = {}) {
-  const questions = detectIntakeClarifications(intake);
-  return { ready: questions.length === 0, questions };
+  const questions = addAdherenceQuestion(detectIntakeClarifications(intake), intake);
+  return { ready: requiredClarifications(questions).length === 0, questions };
 }

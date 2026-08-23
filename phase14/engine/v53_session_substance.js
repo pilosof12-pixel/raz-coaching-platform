@@ -255,11 +255,71 @@ export function collectAccessoryLevelFlags(program, intake = {}) {
   return flags;
 }
 
+// --- what the athlete has told you they will not do ---------------------------
+
+// A coach's last point: do not keep prescribing an accessory the athlete has
+// already demonstrated he will not perform. The engine cannot infer that, so it
+// is now asked as an optional intake question, and honoured here. An exercise
+// nobody does is worse than no exercise: it occupies a slot and quietly makes
+// the plan wrong.
+
+// Movement words worth matching on. Matching whole free-text answers directly
+// would catch every incidental word the athlete happened to type.
+function excludedMovements(intake = {}) {
+  const answers = intake?.clarification_answers || {};
+  const raw = `${txt(answers.adherence_exclusions)} ${txt(intake.exercise_exclusions)} ${txt(intake.will_not_do)}`;
+  if (!raw.trim()) return [];
+  // Split on separators an athlete would naturally use, then keep phrases that
+  // look like movement names rather than explanations.
+  return raw.split(/[,;\n]|\band\b|\bor\b/i)
+    .map((x) => x
+      // Strip the sentence the athlete wrapped the movement in, leading verbs
+      // included: keeping them produced "will not do do machine hamstring curls".
+      .replace(/\b(?:i|do not|don't|won't|will not|cannot|can't|never|rarely|hate|skip|skipped|dislike|refuse to|avoid|any|all|the|these|those)\b/gi, ' ')
+      .replace(/^\s*(?:do|doing|does|did|perform|performing|use|using)\b/i, ' ')
+      .replace(/[^\w\s-]/g, ' ')
+      .replace(/\s{2,}/g, ' ')
+      .trim())
+    // Singular and plural both need to match an exercise name.
+    .map((x) => x.replace(/\b(\w{4,}?)s\b/g, '$1'))
+    .filter((x) => x.length >= 4 && x.split(/\s+/).length <= 4);
+}
+
+export function collectAdherenceFlags(program, intake = {}) {
+  const excluded = excludedMovements(intake);
+  if (!excluded.length) return [];
+  const flags = [];
+
+  for (let week = 1; week <= 4; week++) {
+    const parsed = parseWeek(program, week);
+    if (!parsed) continue;
+    for (const cells of parsed.rows) {
+      const name = String(cells[parsed.exercise] || '').trim();
+      if (!name || isWarmup(name)) continue;
+      const hit = excluded.find((x) => {
+        const needle = x.toLowerCase();
+        return name.toLowerCase().includes(needle) || needle.includes(name.toLowerCase());
+      });
+      if (!hit) continue;
+      flags.push({
+        code: 'V53_PRESCRIBES_DECLINED_MOVEMENT',
+        week,
+        day: String(cells[parsed.day] || '').trim(),
+        exercise: name,
+        declined: hit,
+        message: `${name} (Week ${week}) is something this athlete has said they will not do ("${hit}"). Programming it wastes the slot: choose a movement that trains the same quality and that they will actually perform.`,
+      });
+    }
+  }
+  return flags;
+}
+
 export function collectSessionSubstanceFlags(program, intake = {}) {
   return [
     ...collectUnderloadedAccessoryFlags(program, intake),
     ...collectAccessoryLevelFlags(program, intake),
     ...collectThinSessionFlags(program, intake),
+    ...collectAdherenceFlags(program, intake),
   ];
 }
 
@@ -273,6 +333,10 @@ export function buildSessionSubstanceBrief(intake = {}) {
   const floor = press ? PRESS_RUNG_FLOOR.find((f) => press >= f.pressKg) : null;
   if (floor) {
     lines.push(`ACCESSORY LEVEL: this athlete strict presses ${press} kg. Bodyweight pressing for them starts at ${floor.suggest}; a plain or decline push-up asks nothing. Match the variant to what they can already do, or load it.`);
+  }
+  const declined = excludedMovements(intake);
+  if (declined.length) {
+    lines.push(`ADHERENCE: this athlete has said they will not do ${declined.join(', ')}. Do not program any of it. Pick movements that train the same quality and that they will actually perform.`);
   }
   lines.push('SESSION SUBSTANCE: every session the athlete travels for needs at least three pieces of substantive work - loaded or repeated, at a real effort. Trunk and tissue work supports a session; it does not constitute one. If a day cannot carry primary work, give it meaningful accessory work rather than filler.');
   return lines.join('\n');

@@ -195,3 +195,55 @@ test('[Z17] two light sets of bodyweight chin-ups do not', () => {
   ])].join('\n\n');
   assert.equal(collectThinSessionFlags(light, HYBRID).length, 1);
 });
+
+// --- what the athlete has told you they will not do ---------------------------
+
+import { collectAdherenceFlags } from '../engine/v53_session_substance.js';
+import { intakeClarificationResult, requiredClarifications } from '../../phase14/intake_clarification.js';
+
+// A coach's last point: do not keep prescribing an accessory the athlete has
+// already demonstrated he will not perform. The engine cannot infer it, so it is
+// asked as an optional intake question and honoured here.
+
+test('[Z18] a movement the athlete declined is not programmed', () => {
+  const declined = { ...HYBRID, clarification_answers: { adherence_exclusions: 'I never do machine hamstring curls, and I skip neck isometrics' } };
+  const p = ['Overview.', block(1, [
+    'Fri\tMachine Hamstring Curl\tRPE-selected load\t2\t10\t90 sec\t7\tSupport.\t',
+    'Fri\tNeck Isometric\tRPE-selected load\t1\t20 sec\t45 sec\t6\tNeck.\t',
+    'Fri\tCable Row\tRPE-selected load\t3\t10\t90 sec\t7\tSupport.\t',
+  ])].join('\n\n');
+  const flags = collectAdherenceFlags(p, declined);
+  assert.deepEqual([...new Set(flags.map((f) => f.exercise))].sort(), ['Machine Hamstring Curl', 'Neck Isometric']);
+  assert.equal(flags[0].code, 'V53_PRESCRIBES_DECLINED_MOVEMENT');
+});
+
+test('[Z19] the movement is extracted from the sentence the athlete wrapped it in', () => {
+  // Leaving the verb in produced "will not do do machine hamstring curls" in the
+  // brief, and a phrase that matched nothing.
+  const declined = { ...HYBRID, clarification_answers: { adherence_exclusions: 'I never do machine hamstring curls' } };
+  const p = ['Overview.', block(1, ['Fri\tMachine Hamstring Curl\tRPE-selected load\t2\t10\t90 sec\t7\tS.\t'])].join('\n\n');
+  assert.equal(collectAdherenceFlags(p, declined)[0].declined, 'machine hamstring curl');
+});
+
+test('[Z20] an athlete who declined nothing is never second-guessed', () => {
+  const p = ['Overview.', block(1, ['Fri\tMachine Hamstring Curl\tRPE-selected load\t2\t10\t90 sec\t7\tS.\t'])].join('\n\n');
+  assert.deepEqual(collectAdherenceFlags(p, HYBRID), []);
+});
+
+test('[Z21] the question is optional: it never blocks a build', () => {
+  // A complete intake is asked nothing at all, so adherence costs no round trip.
+  const complete = intakeClarificationResult({
+    primary_goals: ['220kg back squat'], current_numbers: 'Back Squat: 205 kg 1RM',
+    days_per_week: 4, experience: 'advanced',
+  });
+  assert.equal(complete.questions.length, 0);
+  assert.equal(complete.ready, true);
+
+  // An intake already being clarified is offered it alongside what is required.
+  const partial = intakeClarificationResult({ primary_goals: ['Improve 3 km from 13:30 to sub-12:00'] });
+  const optional = partial.questions.find((q) => q.id === 'adherence_exclusions');
+  assert.ok(optional, 'offered while the athlete is already answering');
+  assert.equal(optional.required, false);
+  assert.ok(requiredClarifications(partial.questions).every((q) => q.id !== 'adherence_exclusions'),
+    'and never counted among the answers that gate the build');
+});

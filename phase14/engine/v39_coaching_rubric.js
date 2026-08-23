@@ -87,6 +87,7 @@ const RULE_REGISTRY = {
   V53_UNDERLOADED_ACCESSORY: { classification: CLASSIFICATION.SOFT, dimension: 'loading' },
   V53_THIN_SESSION: { classification: CLASSIFICATION.SOFT, dimension: 'exercise_selection' },
   V53_ACCESSORY_BELOW_DEMONSTRATED_LEVEL: { classification: CLASSIFICATION.SOFT, dimension: 'exercise_selection' },
+  V53_PRESCRIBES_DECLINED_MOVEMENT: { classification: CLASSIFICATION.SOFT, dimension: 'exercise_selection' },
   // Language accuracy. A miscounted sentence is an objective error with a
   // mechanical correction; a proofreading defect is reported, not enforced.
   V46_COUNT_CLAIM_MISMATCH: { classification: CLASSIFICATION.HARD, dimension: 'specificity' },
