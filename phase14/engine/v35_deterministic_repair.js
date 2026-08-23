@@ -16,6 +16,7 @@ import { rampText } from './specific_warmup_enrichment.js';
 import { PROGRESSION_CLAIMS, reductionMetric, reductionMissing } from './v34_prescription_consistency.js';
 import { collectSkillCeilingFlags, collectMaintenanceDriftFlags } from './v43_coaching_governance.js';
 import { longRunBuildClaim } from './v35_coaching_standards.js';
+import { repairCountClaims } from './v46_language_accuracy.js';
 import { classifyExercise, dayGap } from './v38_movement_taxonomy.js';
 
 function arr(v) { return Array.isArray(v) ? v : v ? [v] : []; }
@@ -806,6 +807,14 @@ export function repairDeterministicContradictions(program, intake = {}) {
 
     for (const [k, v] of thisWeek) prior.set(k, v);
     if (changed) candidate = rebuild(candidate, parsed);
+  }
+
+  // A sentence that miscounts the program it introduces is an objective error
+  // with a mechanical correction, and was being left to regeneration.
+  const counts = repairCountClaims(candidate, intake);
+  if (counts.repaired) {
+    candidate = counts.program;
+    repairs.push(...counts.repairs);
   }
 
   const narrative = repairNarrative(candidate, intake);
