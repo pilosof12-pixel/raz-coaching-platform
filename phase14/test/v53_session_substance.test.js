@@ -136,3 +136,62 @@ test('[Z11] the brief states the athlete\'s own number', () => {
   assert.match(buildSessionSubstanceBrief(HYBRID), /three pieces of substantive work/);
   assert.doesNotMatch(buildSessionSubstanceBrief(YOUTH), /STIMULUS FLOOR/);
 });
+
+// --- matching the accessory to the athlete ------------------------------------
+
+import { collectAccessoryLevelFlags, demonstratedPressKg } from '../engine/v53_session_substance.js';
+
+// A coach's framing: once you know an athlete's limits and abilities, matching
+// the accessory to the demand is straightforward. Someone pressing 90 kg
+// overhead should be doing wall handstand push-ups, or pike push-ups at least.
+// The engine had no notion that a bodyweight movement has rungs.
+
+test('[Z12] a bodyweight press below the athlete\'s level names the variant that fits', () => {
+  const p = ['Overview.', block(1, [
+    'Tue\tDecline Push-up\tBodyweight\t3\t12\t60 sec\t7\tUpper-body support.\t',
+  ])].join('\n\n');
+  const flags = collectAccessoryLevelFlags(p, HYBRID);
+  assert.equal(flags.length, 1);
+  assert.equal(flags[0].code, 'V53_ACCESSORY_BELOW_DEMONSTRATED_LEVEL');
+  assert.equal(flags[0].press_kg, 80);
+  assert.match(flags[0].message, /Wall Handstand Push-up/);
+});
+
+test('[Z13] a variant at or above the athlete\'s level passes', () => {
+  for (const name of ['Wall Handstand Push-up', 'Handstand Push-up']) {
+    const p = ['Overview.', block(1, [`Tue\t${name}\tBodyweight\t3\t5\t90 sec\t8\tPressing.\t`])].join('\n\n');
+    assert.deepEqual(collectAccessoryLevelFlags(p, HYBRID), [], name);
+  }
+});
+
+test('[Z14] loading the movement lifts any rung to a real demand', () => {
+  const p = ['Overview.', block(1, ['Tue\tDecline Push-up\t+20 kg vest\t3\t12\t60 sec\t7\tLoaded.\t'])].join('\n\n');
+  assert.deepEqual(collectAccessoryLevelFlags(p, HYBRID), []);
+});
+
+test('[Z15] an athlete who has not demonstrated a press is not judged', () => {
+  assert.equal(demonstratedPressKg(HYBRID), 80);
+  assert.equal(demonstratedPressKg({}), null);
+  const p = ['Overview.', block(1, ['Tue\tPush-up\tBodyweight\t3\t12\t60 sec\t7\tSupport.\t'])].join('\n\n');
+  assert.deepEqual(collectAccessoryLevelFlags(p, YOUTH), []);
+});
+
+test('[Z16] a weighted chin-up at a real dose carries a session', () => {
+  // A coach's correction: 4x4 weighted is legitimate primary work for a pulling
+  // goal, even though the goal names the one-arm version.
+  const weighted = ['Overview.', block(1, [
+    'Fri\tWeighted Chin-up\tRPE-selected load\t4\t4\t3 min\t8\tLoaded bilateral pulling.\t',
+    'Fri\tMachine Hamstring Curl\tRPE-selected load\t2\t10\t90 sec\t7\tSupport.\t',
+    'Fri\tNeck Isometric\tRPE-selected load\t1\t20 sec\t45 sec\t6\tNeck.\t',
+  ])].join('\n\n');
+  assert.deepEqual(collectThinSessionFlags(weighted, HYBRID), []);
+});
+
+test('[Z17] two light sets of bodyweight chin-ups do not', () => {
+  const light = ['Overview.', block(1, [
+    'Fri\tChin-up\tRPE-selected load\t2\t4\t2 min\t7.5\tSupport.\t',
+    'Fri\tMachine Hamstring Curl\tRPE-selected load\t2\t10\t90 sec\t7\tSupport.\t',
+    'Fri\tNeck Isometric\tRPE-selected load\t1\t20 sec\t45 sec\t6\tNeck.\t',
+  ])].join('\n\n');
+  assert.equal(collectThinSessionFlags(light, HYBRID).length, 1);
+});

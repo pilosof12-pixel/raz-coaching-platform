@@ -129,6 +129,26 @@ function isSubstantive(cells, parsed) {
 
 const MIN_SUBSTANTIVE_ROWS = 3;
 
+// Patterns that support a stated goal closely enough to carry a session, when
+// they are actually loaded and given a real dose.
+const GOAL_ADJACENT = [
+  { goal: /one[- ]?arm\s*(?:pull|chin)|\boap\b|pull[- ]?up|chin[- ]?up/i, movement: /pull-?up|chin-?up/i },
+  { goal: /squat/i, movement: /squat|leg press/i },
+  { goal: /overhead press|\bohp\b/i, movement: /overhead press|push press|shoulder press/i },
+  { goal: /deadlift/i, movement: /deadlift|romanian/i },
+];
+function servesGoalWhenLoaded(name, cells, parsed, intake) {
+  const goals = `${txt(intake.primary_goals)} ${txt(intake.secondary_goals)}`;
+  const match = GOAL_ADJACENT.find((g) => g.goal.test(goals) && g.movement.test(name));
+  if (!match) return false;
+  const sets = firstNum(cells[parsed.sets]) || 0;
+  if (sets < 3) return false;
+  const loadText = parsed.load == null ? '' : String(cells[parsed.load] || '');
+  const rpe = maxRpe(cells[6]);
+  // Either explicitly loaded, or loaded to an effort that means business.
+  return hasExternalLoad(loadText) || /rpe|rir/i.test(loadText) && Number.isFinite(rpe) && rpe >= 7;
+}
+
 export function collectThinSessionFlags(program, intake = {}) {
   const flags = [];
   for (let week = 1; week <= 4; week++) {
@@ -143,6 +163,10 @@ export function collectThinSessionFlags(program, intake = {}) {
       const entry = byDay.get(day);
       entry.rows.push(name);
       if (goalTierFor(name, intake) !== 'support') entry.servesGoal = true;
+      // A coach's correction: a weighted chin-up at 4x4 is legitimate primary
+      // work for a pulling goal, even though the goal names the one-arm version.
+      // Loaded, repeated, goal-adjacent work has a claim the bare name does not.
+      else if (servesGoalWhenLoaded(name, cells, parsed, intake)) entry.servesGoal = true;
       if (isSubstantive(cells, parsed)) entry.substantive += 1;
     }
 
@@ -169,8 +193,74 @@ export function collectThinSessionFlags(program, intake = {}) {
   return flags;
 }
 
+// --- the accessory has to match the athlete, not just carry load -------------
+
+// A coach's framing: once you know an athlete's limits and abilities, matching
+// the accessory to the demand is straightforward. Someone pressing 90 kg
+// overhead should be doing wall handstand push-ups, or pike push-ups at least --
+// a plain push-up asks them for nothing. The engine had no notion that a
+// bodyweight movement has rungs.
+const PUSH_LADDER = [
+  { rung: 1, re: /^(?:incline|knee)\s+push-?up$/i, name: 'Incline Push-up' },
+  { rung: 2, re: /^push-?up$/i, name: 'Push-up' },
+  { rung: 3, re: /^(?:decline|feet[- ]elevated)\s+push-?up$/i, name: 'Decline Push-up' },
+  { rung: 4, re: /^pike\s+push-?up$/i, name: 'Pike Push-up' },
+  { rung: 5, re: /^wall\s+handstand\s+push-?up$/i, name: 'Wall Handstand Push-up' },
+  { rung: 6, re: /^handstand\s+push-?up$/i, name: 'Handstand Push-up' },
+];
+// The rung a demonstrated strict press earns. Deliberately coarse: the point is
+// to stop a strong presser being given a movement that asks nothing, not to
+// prescribe an exact progression.
+const PRESS_RUNG_FLOOR = [
+  { pressKg: 80, rung: 5, suggest: 'Wall Handstand Push-up' },
+  { pressKg: 60, rung: 4, suggest: 'Pike Push-up' },
+];
+
+export function demonstratedPressKg(intake = {}) {
+  const src = `${txt(intake.current_numbers)} ${txt(intake.performance_markers)}`;
+  const m = [...src.matchAll(/(?:overhead press|strict press|\bohp\b|push press)[^\d]{0,30}(\d+(?:\.\d+)?)\s*kg\b/gi)]
+    .map((x) => Number(x[1])).filter(Number.isFinite);
+  return m.length ? Math.max(...m) : null;
+}
+
+export function collectAccessoryLevelFlags(program, intake = {}) {
+  const press = demonstratedPressKg(intake);
+  if (!press) return [];
+  const floor = PRESS_RUNG_FLOOR.find((f) => press >= f.pressKg);
+  if (!floor) return [];
+
+  const flags = [];
+  for (let week = 1; week <= 4; week++) {
+    const parsed = parseWeek(program, week);
+    if (!parsed) continue;
+    for (const cells of parsed.rows) {
+      const name = String(cells[parsed.exercise] || '').trim();
+      if (!name || isWarmup(name)) continue;
+      const rung = PUSH_LADDER.find((r) => r.re.test(name));
+      if (!rung || rung.rung >= floor.rung) continue;
+      // Adding external load lifts any rung to a real demand.
+      if (hasExternalLoad(parsed.load == null ? '' : String(cells[parsed.load] || ''))) continue;
+
+      flags.push({
+        code: 'V53_ACCESSORY_BELOW_DEMONSTRATED_LEVEL',
+        week,
+        day: String(cells[parsed.day] || '').trim(),
+        exercise: name,
+        press_kg: press,
+        suggested: floor.suggest,
+        message: `${name} (Week ${week}) asks nothing of an athlete who strict presses ${press} kg. At that level the bodyweight pressing options are ${floor.suggest} or harder; use one of those, or load the movement.`,
+      });
+    }
+  }
+  return flags;
+}
+
 export function collectSessionSubstanceFlags(program, intake = {}) {
-  return [...collectUnderloadedAccessoryFlags(program, intake), ...collectThinSessionFlags(program, intake)];
+  return [
+    ...collectUnderloadedAccessoryFlags(program, intake),
+    ...collectAccessoryLevelFlags(program, intake),
+    ...collectThinSessionFlags(program, intake),
+  ];
 }
 
 export function buildSessionSubstanceBrief(intake = {}) {
@@ -178,6 +268,11 @@ export function buildSessionSubstanceBrief(intake = {}) {
   const lines = [];
   if (demonstrated && demonstrated >= 60 && canAddExternalLoad(intake)) {
     lines.push(`STIMULUS FLOOR: this athlete has demonstrated ${demonstrated} kg. A single set of an unloaded pressing or pulling accessory does nothing for them. Load the accessory, give it a dose that counts, or use the slot for something that earns its place.`);
+  }
+  const press = demonstratedPressKg(intake);
+  const floor = press ? PRESS_RUNG_FLOOR.find((f) => press >= f.pressKg) : null;
+  if (floor) {
+    lines.push(`ACCESSORY LEVEL: this athlete strict presses ${press} kg. Bodyweight pressing for them starts at ${floor.suggest}; a plain or decline push-up asks nothing. Match the variant to what they can already do, or load it.`);
   }
   lines.push('SESSION SUBSTANCE: every session the athlete travels for needs at least three pieces of substantive work - loaded or repeated, at a real effort. Trunk and tissue work supports a session; it does not constitute one. If a day cannot carry primary work, give it meaningful accessory work rather than filler.');
   return lines.join('\n');

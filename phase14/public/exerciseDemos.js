@@ -55,6 +55,23 @@
     return String(name || "").toLowerCase().replace(/\([^)]*\)/g, "").replace(/[^a-z0-9]+/g, "_").replace(/_+/g, "_").replace(/^_|_$/g, "");
   }
 
+  // The policy has always documented a fallback for entries with no curated
+  // video -- "runtime builds a YouTube search" -- and it was never implemented,
+  // so resolve returned nothing and the workbook shipped an exercise with no
+  // link at all. Of fifteen exercises in one reviewed program, four resolved.
+  // A search link is honest: it always works, and it never claims to be a
+  // specific video that nobody chose.
+  function searchDemo(name, canonical) {
+    const label = String(canonical || name || "").trim();
+    if (!label) return null;
+    return {
+      url: "https://www.youtube.com/results?search_query=" + encodeURIComponent(label + " exercise demo"),
+      source: "search",
+      channel: null,
+      canonical: label
+    };
+  }
+
   function resolveExerciseDemo(name) {
     if (!name || !demos?.entries) return null;
     const lookupName = canonicalLookupName(name), key = normalizeExerciseName(lookupName);
@@ -63,10 +80,16 @@
     for (const v of Object.values(demos.entries)) {
       if (v.aliases?.includes(key) && v.demo_url) return { url: v.demo_url, source: "curated", channel: v.channel, canonical: v.canonical };
     }
-    return null;
+    // Known movement, no curated video yet.
+    if (direct) return searchDemo(name, direct.canonical);
+    for (const v of Object.values(demos.entries)) {
+      if (v.aliases?.includes(key)) return searchDemo(name, v.canonical);
+    }
+    // Unknown movement: the athlete still gets somewhere useful to look.
+    return searchDemo(name, lookupName);
   }
 
   function getPrivacyDisclosure() { return (demos?.policy?.privacy_disclosure) || "Exercise demos open in YouTube."; }
-  function hasCuratedDemo(name) { return !!resolveExerciseDemo(name); }
+  function hasCuratedDemo(name) { const d = resolveExerciseDemo(name); return !!d && d.source === "curated"; }
   window.ExerciseDemos = { load, normalizeExerciseName, resolveExerciseDemo, hasCuratedDemo, getPrivacyDisclosure };
 })();
