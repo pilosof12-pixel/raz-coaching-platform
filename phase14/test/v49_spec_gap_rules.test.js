@@ -50,9 +50,16 @@ test('[S3] starting from demonstrated capacity raises nothing', () => {
   assert.deepEqual(collectIntervalPaceOriginFlags(atCapacity, TACTICAL), []);
 });
 
-test('[S4] an athlete with no stated repeat capacity is not second-guessed', () => {
+test('[S4] a stated race time is itself a demonstrated capacity', () => {
+  // Asking an athlete for repeats they may never have run would interrogate an
+  // intake that already answered the question, so the rule falls back to the
+  // current race time when no repeat performance is given.
   const p = program([block(1, ['Wed\tRun\tN/A\t6\t400 m\t2 min\t8\tRepeats at 1:36 each.\t'])]);
-  assert.deepEqual(collectIntervalPaceOriginFlags(p, { primary_goals: ['Improve 3 km from 13:30 to sub-12:00'] }), []);
+  const raceOnly = { primary_goals: ['Improve 3 km from 13:30 to sub-12:00'] };
+  assert.equal(demonstratedIntervalPace(raceOnly).source, 'race_time');
+  assert.equal(collectIntervalPaceOriginFlags(p, raceOnly).length, 1, 'goal pace in week 1 is still caught');
+  // An athlete with neither repeats nor a race time is not judged.
+  assert.equal(demonstratedIntervalPace({ primary_goals: ['Get fitter'] }), null);
 });
 
 // --- YG-06 -------------------------------------------------------------------

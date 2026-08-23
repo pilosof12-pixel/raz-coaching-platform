@@ -199,7 +199,7 @@ test('[Z17] two light sets of bodyweight chin-ups do not', () => {
 // --- what the athlete has told you they will not do ---------------------------
 
 import { collectAdherenceFlags } from '../engine/v53_session_substance.js';
-import { intakeClarificationResult, requiredClarifications } from '../../phase14/intake_clarification.js';
+import { intakeClarificationResult, requiredClarifications } from '../intake_clarification.js';
 
 // A coach's last point: do not keep prescribing an accessory the athlete has
 // already demonstrated he will not perform. The engine cannot infer it, so it is
@@ -240,7 +240,7 @@ test('[Z21] the question is optional: it never blocks a build', () => {
   assert.equal(complete.ready, true);
 
   // An intake already being clarified is offered it alongside what is required.
-  const partial = intakeClarificationResult({ primary_goals: ['Improve 3 km from 13:30 to sub-12:00'] });
+  const partial = intakeClarificationResult({ primary_goals: ['4 One arm pullups'], secondary_goals: ['Improve 5 km from 25:00 to 22:30'] });
   const optional = partial.questions.find((q) => q.id === 'adherence_exclusions');
   assert.ok(optional, 'offered while the athlete is already answering');
   assert.equal(optional.required, false);

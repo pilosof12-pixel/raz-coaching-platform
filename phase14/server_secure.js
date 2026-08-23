@@ -7,7 +7,7 @@ import { makeEntitlementStore } from "./entitlements.js";
 import { makeAnalyticsStore, isAllowedAnalyticsEvent } from "./analytics.js";
 import { makePrivacyStore } from "./privacy_store.js";
 import { validateLaunchIntake } from "./intake_validation.js";
-import { detectIntakeClarifications, addAdherenceQuestion, requiredClarifications } from "./intake_clarification.js";
+import { detectIntakeClarifications, addOptionalQuestions, requiredClarifications } from "./intake_clarification.js";
 
 const TOKEN_RE=/^[a-f0-9]{32}$/i, JOB_RE=/^[a-f0-9]{32}$/i, PASS_RE=/^[a-f0-9]{32}$/i;
 const NODE_ENV=process.env.NODE_ENV||"development";
@@ -87,7 +87,7 @@ function securityMiddleware(req,res,next){
     // ZERO-COST PING-PONG GATE: deterministic/local only. It MUST stay before
     // consumeHourly() and guardProgramPass(), so clarification neither consumes a
     // generation slot nor activates/uses Program Pass access and no AI call starts.
-    const clarifications=addAdherenceQuestion(detectIntakeClarifications(intake),intake);
+    const clarifications=addOptionalQuestions(detectIntakeClarifications(intake),intake);
     if(requiredClarifications(clarifications).length)return res.status(422).json({error:"A few details are needed before I can build this accurately.",clarification_required:true,clarifications});
     if(!consumeHourly(req,"build",GENERATION_BUILDS_PER_HOUR))return res.status(429).json({error:"Too many program generation requests from this connection. Please try again later."});
   }

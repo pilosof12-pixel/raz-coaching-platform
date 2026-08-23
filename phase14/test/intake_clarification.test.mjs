@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
-import { detectIntakeClarifications, intakeClarificationResult } from '../intake_clarification.js';
+import { detectIntakeClarifications, intakeClarificationResult, requiredClarifications } from '../intake_clarification.js';
 
 function ids(intake) { return detectIntakeClarifications(intake).map(q => q.id); }
 
@@ -112,7 +112,9 @@ test('fully specified annoying avatar does not create unnecessary ping-pong', ()
 
 test('server build clarification gate stays before generation rate limit and Program Pass guard', () => {
   const src = fs.readFileSync(new URL('../server_secure.js', import.meta.url), 'utf8');
-  const gate = src.indexOf('const clarifications=detectIntakeClarifications(intake)');
+  // The gate now offers optional questions alongside the blocking ones; what
+  // this test protects is its position, not its exact wording.
+  const gate = src.indexOf('detectIntakeClarifications(intake)');
   const rate = src.indexOf('consumeHourly(req,"build"');
   const guard = src.indexOf('return guardProgramPass(req,res,next)');
   assert.ok(gate >= 0 && rate > gate && guard > rate);
@@ -123,4 +125,63 @@ test('clarification UI is a local fetch retry layer with no AI endpoint', () => 
   assert.match(src, /response\.status === 422/);
   assert.match(src, /clarification_answers/);
   assert.doesNotMatch(src, /openai|gemini|generateContent|\/api\/adjust/i);
+});
+
+// A coach's framing: the clarification exchange already works, so it should
+// cover everything the engine needs before generating -- not just goal
+// benchmarks. Each question below exists because a rule is switched off
+// entirely without its answer, not merely weakened.
+
+test('optional gaps are offered only while the athlete is already answering', () => {
+  // Neither of these blocks a build, and neither is worth a round trip of its
+  // own. A session length of "coach decides" is a real answer, not a gap, and
+  // re-asking would second-guess a choice the athlete made in the form.
+  const asked = (i) => intakeClarificationResult(i).questions.map((q) => q.id);
+
+  const complete = { primary_goals: ['220kg back squat'], current_numbers: 'Back Squat: 205 kg 1RM' };
+  assert.deepEqual(asked(complete), [], 'nothing is asked when nothing blocks');
+
+  // Already in the exchange for a required reason: the optional gaps come too.
+  const inExchange = { primary_goals: ['4 One arm pullups'], secondary_goals: ['Improve 5 km from 25:00 to 22:30'] };
+  const ids2 = asked(inExchange);
+  assert.ok(ids2.includes('session_time_budget'), 'no stated session ceiling');
+  assert.ok(ids2.includes('bodyweight'), 'calisthenics goal with no bodyweight');
+});
+
+test('a stated session ceiling or bodyweight is never asked for again', () => {
+  const asked = (i) => intakeClarificationResult(i).questions.map((q) => q.id);
+  const base = { primary_goals: ['4 One arm pullups'], secondary_goals: ['Improve 5 km from 25:00 to 22:30'] };
+  assert.ok(!asked({ ...base, session_length: '45-70 min' }).includes('session_time_budget'));
+  assert.ok(!asked({ ...base, session_duration_minutes: 60 }).includes('session_time_budget'));
+  assert.ok(!asked({ ...base, current_numbers: 'Bodyweight 82 kg' }).includes('bodyweight'));
+  // A purely barbell athlete is never asked for bodyweight.
+  assert.ok(!asked({ primary_goals: ['220kg back squat'], secondary_goals: ['Improve 5 km from 25:00 to 22:30'] }).includes('bodyweight'));
+});
+
+test('an athlete who stated a race time is not asked for repeats as well', () => {
+  // The rule that needs a repeat pace now falls back to the current race time,
+  // which is a demonstrated capacity in its own right. Asking for repeats the
+  // athlete may never have run would interrogate an intake that already
+  // answered the question.
+  const stated = { primary_goals: ['Improve 5 km from 25:00 to 22:30'], session_duration_minutes: 60, current_numbers: '5K 25:00', notes: 'Runs 2 per week, about 10 km/week.' };
+  assert.ok(!ids(stated).includes('interval_repeat_capacity'));
+});
+
+test('an intake that answers everything is asked nothing and builds', () => {
+  const complete = intakeClarificationResult({
+    primary_goals: ['Improve 3 km from 13:30 to sub-12:00'],
+    session_duration_minutes: 60,
+    current_numbers: '3 km: 13:30',
+    notes: 'Runs 3 sessions per week, about 18-20 km/week. Recent 400 m repeats are around 1:42-1:45.',
+  });
+  assert.deepEqual(complete.questions, []);
+  assert.equal(complete.ready, true);
+});
+
+test('optional questions are offered but never gate the build', () => {
+  const partial = intakeClarificationResult({ primary_goals: ['4 One arm pullups'], secondary_goals: ['Improve 5 km from 25:00 to 22:30'] });
+  const optional = partial.questions.filter((q) => q.required === false);
+  assert.ok(optional.length, 'optional questions ride along with the required one');
+  assert.ok(requiredClarifications(partial.questions).every((q) => q.required !== false),
+    'and are never counted among the answers that gate the build');
 });

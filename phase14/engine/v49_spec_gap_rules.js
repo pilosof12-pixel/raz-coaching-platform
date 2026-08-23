@@ -83,7 +83,16 @@ export function demonstratedIntervalPace(intake = {}) {
   const src = `${txt(intake.notes)} ${txt(intake.current_numbers)} ${txt(intake.clarification_answers)} ${txt(intake.performance_markers)}`;
   // e.g. "400 m repeats are around 1:42-1:45"
   const m = src.match(/\b(\d{3,4})\s*m\b[^.]{0,60}?(\d{1,2}):(\d{2})(?:\s*[-–]\s*(\d{1,2}):(\d{2}))?/i);
-  if (!m) return null;
+  if (!m) {
+    // No repeat performance stated, but the athlete's current race time is a
+    // demonstrated capacity too. Asking them for repeats they may never have run
+    // would be interrogating an intake that already answered the question.
+    const race = raceProfile(intake);
+    if (race && Number.isFinite(race.currentPace) && race.currentPace > race.goalPace) {
+      return { metres: race.km * 1000, seconds: race.currentSec, pace: race.currentPace, source: 'race_time' };
+    }
+    return null;
+  }
   const metres = Number(m[1]);
   if (!(metres > 0)) return null;
   const times = [Number(m[2]) * 60 + Number(m[3])];

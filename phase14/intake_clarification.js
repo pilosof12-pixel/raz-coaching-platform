@@ -160,13 +160,47 @@ export function detectIntakeClarifications(intake = {}) {
   return out;
 }
 
-// Adherence is the one thing an athlete knows and the engine cannot infer: a
-// coach's point after seeing an accessory prescribed that the athlete had
-// already shown he would not perform. It is asked only when the intake is being
-// clarified anyway, so it never adds a round trip of its own, and it never
-// blocks a build.
-export function addAdherenceQuestion(out, intake = {}) {
+// Questions worth asking while the athlete is already answering something, and
+// never worth stopping a build over. detectIntakeClarifications above returns
+// only what blocks; these are added alongside it, are marked optional, and are
+// ignored by the gate. Each exists because a rule is switched off entirely
+// without its answer -- not merely weakened -- but none of them is worth a round
+// trip of its own, and a session length of "coach decides" is a real answer
+// rather than a gap.
+export function addOptionalQuestions(out, intake = {}) {
   if (!out.length) return out;
+  const goals = goalText(intake);
+
+  // Without a session ceiling the engine cannot judge whether a session fits the
+  // athlete's evening at all: the duration check is switched off entirely rather
+  // than merely relaxed, and a coach reviewing a live program raised session
+  // length as a problem the engine had reported nothing about.
+  const statedBudget = text([intake?.session_length, intake?.session_duration_minutes, intake?.time_per_session]);
+  if (!/\d/.test(statedBudget)) {
+    addQuestion(out, intake, {
+      id:'session_time_budget',
+      required:false,
+      prompt:'How long can a normal training session run, door to door?',
+      help:'A range is fine, for example "about 60 minutes" or "45-70 minutes". This is treated as a ceiling, not a target to fill.',
+    });
+  }
+
+  // Bodyweight decides what a calisthenics benchmark means. "+80 kg weighted
+  // chin-up" and "one-arm pull-up" describe very different athletes at 65 kg
+  // and at 95 kg, and every relative-strength judgement is blind without it.
+  const bodyweightGiven = /\b(?:bodyweight|body weight|bw)\b[^\n]{0,20}\d+\s*(?:kg|lb)/i.test(
+    text([intake?.current_numbers, intake?.notes, intake?.clarification_answers]),
+  ) || Number(intake?.bodyweight_kg) > 0;
+  const relativeStrengthGoal = /\b(?:one[- ]arm|muscle[- ]?up|handstand|planche|lever|pull[- ]?up|chin[- ]?up|dip|calisthenic|bodyweight)\b/i.test(goals);
+  if (relativeStrengthGoal && !bodyweightGiven) {
+    addQuestion(out, intake, {
+      id:'bodyweight',
+      required:false,
+      prompt:'What is your current bodyweight?',
+      help:'Bodyweight is what turns a calisthenics number into a level: the same weighted pull-up means something different at 65 kg and at 95 kg.',
+    });
+  }
+
   addQuestion(out, intake, {
     id: 'adherence_exclusions',
     required: false,
@@ -177,6 +211,6 @@ export function addAdherenceQuestion(out, intake = {}) {
 }
 
 export function intakeClarificationResult(intake = {}) {
-  const questions = addAdherenceQuestion(detectIntakeClarifications(intake), intake);
+  const questions = addOptionalQuestions(detectIntakeClarifications(intake), intake);
   return { ready: requiredClarifications(questions).length === 0, questions };
 }
