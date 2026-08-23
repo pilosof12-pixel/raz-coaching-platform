@@ -139,11 +139,42 @@
     return 'https://www.youtube.com/results?search_query=' + encodeURIComponent(clean(name) + ' exercise demo').replace(/%20/g,'+');
   }
   function setHyperlink(cell, name, visibleText='Open demo', linkStyle=true) {
+    // A protocol row carries its drills in the coaching note and has no
+    // exercise of its own to link. Writing the hyperlink object anyway put a
+    // literal {"text":"","hyperlink":...} into the cell, because ExcelJS only
+    // recognises the hyperlink shape when there is text to show.
+    const target=String(name||'').trim();
+    if(!target){ cell.value=''; align(cell); return null; }
     const url=fallbackDemo(name);
-    cell.value={text:visibleText,hyperlink:url,tooltip:'Open exercise demonstration'};
+    cell.value={text:String(visibleText||'').trim()||target,hyperlink:url,tooltip:'Open exercise demonstration'};
     if(linkStyle) font(cell,{size:10,color:LINK,underline:true}); else font(cell,{size:11,color:TEXT});
     align(cell);
     return url;
+  }
+
+  // A generated warm-up row often carries no exercise of its own and lists its
+  // drills as one semicolon-separated protocol in the coaching note. The
+  // reference layout gives every drill its own cell, so split that protocol
+  // into one row per drill instead of leaving a blank exercise column.
+  function splitProtocolNote(note) {
+    const parts=String(note||'').split(';').map(x=>x.trim()).filter(Boolean);
+    if(parts.length<2) return null;
+    const drills=[]; const rules=[];
+    for(const part of parts){
+      // "Ramp Back Squat: 47.5 kg x 5, 72.5 kg x 3" -- a named ramp protocol.
+      let m=part.match(/^(.+?):\s*(.+)$/);
+      if(m){ drills.push({exercise:m[1].trim(),reps:m[2].trim()}); continue; }
+      // "Squat-and-reach x 6", "Scapular pull-up 2 x 5-6", "Wall slide x 8".
+      m=part.match(/^(.+?)\s+((?:\d+\s*)?x\s*[\d].*)$/i);
+      if(m){ drills.push({exercise:m[1].trim(),reps:m[2].trim()}); continue; }
+      // A segment carrying no dose and reading as a sentence is a coaching
+      // rule, not a drill. "Keep the warm-up specific and short" is not an
+      // exercise and must not occupy an exercise row.
+      if(part.split(/\s+/).length>4){ rules.push(part); continue; }
+      drills.push({exercise:part,reps:''});
+    }
+    if(!drills.length) return null;
+    return {drills,rules};
   }
 
   function profileRows(intake={}) {
@@ -267,7 +298,17 @@
       const same=explicit.filter(x=>!x.day || x.day===session.day);
       let items=[];
       if(same.length) {
-        items=same.map(x=>({exercise:x.exercise.replace(/^\s*\[(?:WARMUP|חימום)\]\s*/i,''),sets:x.sets||'1',reps:x.reps||'N/A',rest:x.rest||'N/A',note:x.notes||'Session-specific preparation'}));
+        items=[];
+        for(const x of same){
+          const name=x.exercise.replace(/^\s*\[(?:WARMUP|חימום)\]\s*/i,'').trim();
+          const split=name?null:splitProtocolNote(x.notes);
+          if(split){
+            const rule=split.rules.join(' ')||'Session-specific preparation';
+            split.drills.forEach((d,i)=>items.push({exercise:d.exercise,sets:'1',reps:d.reps||'N/A',rest:x.rest||'N/A',note:i===0?rule:'Session-specific preparation'}));
+          } else {
+            items.push({exercise:name,sets:x.sets||'1',reps:x.reps||'N/A',rest:x.rest||'N/A',note:x.notes||'Session-specific preparation'});
+          }
+        }
       } else {
         items=derivedWarmup(session,intake).map(x=>{const [sets,reps]=splitWarmupDose(x[2]);return {exercise:x[1],sets,reps,rest:x[3]||'N/A',note:[x[4],x[5]].filter(Boolean).join(' ')};});
       }
@@ -304,6 +345,10 @@
       for(const r of session.rows){
         const vals=[r.exercise,r.load,r.sets,r.reps,r.rest,r.effort,r.notes,'','','',''];
         vals.forEach((v,j)=>{const c=ws.getRow(row).getCell(j+1);c.value=v;fill(c,BODY);font(c,{size:10});align(c,{horizontal:[2,3,4,5,6,9,10,11].includes(j+1)?'center':'left'});});
+        // The exercise name carries its own demo link, so a coach clicks the
+        // thing they are reading rather than hunting for a separate column.
+        // The Warm-Up sheet already reads this way; the week tables did not.
+        setHyperlink(ws.getRow(row).getCell(1),r.exercise,r.exercise,false);
         setHyperlink(ws.getRow(row).getCell(9),r.exercise,'Open demo',true);
         applyTrackingValidation(ws.getRow(row).getCell(10),'status');
         applyTrackingValidation(ws.getRow(row).getCell(11),'done');
