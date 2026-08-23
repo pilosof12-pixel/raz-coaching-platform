@@ -69,6 +69,11 @@ const RULE_REGISTRY = {
   V43_SESSION_EXCEEDS_TIME_BUDGET: { classification: CLASSIFICATION.SOFT, dimension: 'recovery_management' },
   V43_NO_AUTOREGULATION_PATH: { classification: CLASSIFICATION.SOFT, dimension: 'safety' },
   V43_INJURY_RESPONSE_NOT_CAUSAL: { classification: CLASSIFICATION.SOFT, dimension: 'safety' },
+  // The two frozen v1.0 rules that had no implementation until an offline audit
+  // mapped every spec rule to the codes the engine actually emits. Both are
+  // review signals in the specification, not hard failures.
+  COACH_SPEC_V1_YG_POWER_VOLUME_BEFORE_OUTPUT: { classification: CLASSIFICATION.SOFT, dimension: 'progression' },
+  COACH_SPEC_V1_T3K_PACE_FROM_GOAL_NOT_CAPACITY: { classification: CLASSIFICATION.SOFT, dimension: 'specificity' },
   // Language accuracy. A miscounted sentence is an objective error with a
   // mechanical correction; a proofreading defect is reported, not enforced.
   V46_COUNT_CLAIM_MISMATCH: { classification: CLASSIFICATION.HARD, dimension: 'specificity' },
