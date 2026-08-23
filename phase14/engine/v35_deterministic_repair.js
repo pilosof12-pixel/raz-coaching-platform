@@ -607,6 +607,65 @@ function repairMissingOapAssistance(program, intake, repairs) {
   return candidate;
 }
 
+// --- 8. notes that cite a load the program never establishes ------------------
+
+// V34_NOTE_UNDEFINED_LOAD_REFERENCE appeared at the FIRST attempt in both of the
+// Hybrid runs that later failed, and had no repair, so it cost a full
+// regeneration -- around three minutes and a paid call -- before the model had
+// even been told anything else. It self-clears on regeneration, which is why it
+// never showed up as the blocking code, but it was quietly buying an attempt
+// every run.
+//
+// The correction is deliberately conservative. A note citing a load the program
+// never establishes is unverifiable, so the sentence carrying it goes. If that
+// sentence is the note's only content, nothing is removed: an empty note is
+// worse than an unverifiable one, and rewriting it would mean inventing a
+// coaching cue rather than deleting an unsupported claim.
+
+function loadTokensIn(text) {
+  return String(text || '').match(/\+?\s*\d+(?:\.\d+)?\s*kg\b/gi) || [];
+}
+function normaliseToken(t) { return String(t).replace(/\s+/g, '').toLowerCase(); }
+
+function repairUndefinedLoadReferences(program, intake, repairs) {
+  let candidate = program;
+
+  // Every load the program itself prescribes, anywhere, plus the athlete's own
+  // stated numbers: those are established and may be referenced.
+  const established = new Set();
+  for (let week = 1; week <= 4; week++) {
+    const parsed = parseWeek(candidate, week);
+    if (!parsed || !Number.isInteger(parsed.load)) continue;
+    for (const cells of parsed.rows) for (const t of loadTokensIn(cells[parsed.load])) established.add(normaliseToken(t));
+  }
+  for (const t of loadTokensIn(txt(intake.current_numbers) + ' ' + txt(intake.performance_markers))) established.add(normaliseToken(t));
+
+  for (let week = 1; week <= 4; week++) {
+    const parsed = parseWeek(candidate, week);
+    if (!parsed || !Number.isInteger(parsed.notes)) continue;
+    let changed = false;
+    for (const cells of parsed.rows) {
+      const name = String(cells[parsed.exercise] || '').trim();
+      if (!name || isWarmup(name)) continue;
+      const note = String(cells[parsed.notes] || '');
+      if (!note.trim()) continue;
+      const rowLoads = new Set(Number.isInteger(parsed.load) ? loadTokensIn(cells[parsed.load]).map(normaliseToken) : []);
+
+      const sentences = note.split(/(?<=[.!?])\s+/).filter((x) => x.trim());
+      if (sentences.length < 2) continue; // the only sentence stays; see above
+      const kept = sentences.filter((sentence) => !loadTokensIn(sentence)
+        .some((t) => !rowLoads.has(normaliseToken(t)) && !established.has(normaliseToken(t))));
+      if (kept.length === sentences.length || !kept.length) continue;
+
+      cells[parsed.notes] = kept.join(' ').replace(/\s{2,}/g, ' ').trim();
+      repairs.push({ type: 'v49_unverifiable_load_reference_dropped', week, exercise: name });
+      changed = true;
+    }
+    if (changed) candidate = rebuild(candidate, parsed);
+  }
+  return candidate;
+}
+
 // --- entry point --------------------------------------------------------------
 
 export function repairDeterministicContradictions(program, intake = {}) {
@@ -619,6 +678,7 @@ export function repairDeterministicContradictions(program, intake = {}) {
   candidate = repairSkillCeilings(candidate, intake, repairs);
   candidate = repairMissingHeavyRamps(candidate, intake, repairs);
   candidate = repairMissingOapAssistance(candidate, intake, repairs);
+  candidate = repairUndefinedLoadReferences(candidate, intake, repairs);
 
   const prior = new Map();
   for (let week = 1; week <= 4; week++) {

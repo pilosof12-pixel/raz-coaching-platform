@@ -241,3 +241,59 @@ test('[K4] the ramp repair is idempotent', () => {
   const twice = repairDeterministicContradictions(once.program, HYBRID_INTAKE);
   assert.equal(twice.program, once.program);
 });
+
+// --- the code that was quietly buying an attempt every run --------------------
+
+import { collectAllV34ConsistencyFlags } from '../engine/v34_prescription_consistency.js';
+
+// V34_NOTE_UNDEFINED_LOAD_REFERENCE appeared at the FIRST attempt in both Hybrid
+// runs that later failed, with no repair, so it cost a full regeneration before
+// the model had been told anything else. It self-clears on regeneration, which
+// is why it never showed as the blocking code -- and why it went unnoticed.
+const wpRow = (note) => `Mon\tWeighted Pull-up\t+22.5 kg\t3\t4\t3 min\t7\t${note}\t`;
+const oneWeek = (row) => ['Overview.', `START_WEEK1_TSV\n${H}\n${row}\nEND_WEEK1_TSV`].join('\n\n');
+const v34Codes = (p, i = {}) => collectAllV34ConsistencyFlags(p, i).map((f) => f.code);
+
+test('[U1] a sentence citing a load the program never establishes is dropped', () => {
+  const p = oneWeek(wpRow('Submaximal support; keep the elbows tracking. Build toward your +30 kg standard from the last block.'));
+  assert.deepEqual(v34Codes(p), ['V34_NOTE_UNDEFINED_LOAD_REFERENCE']);
+  const repaired = repairDeterministicContradictions(p, {});
+  assert.deepEqual(v34Codes(repaired.program), []);
+  assert.match(repaired.program, /Submaximal support; keep the elbows tracking\./);
+  assert.doesNotMatch(repaired.program, /\+30 kg standard/);
+});
+
+test('[U2] a note whose only sentence carries the reference is left for regeneration', () => {
+  // An empty note is worse than an unverifiable one, and rewriting it would mean
+  // inventing a coaching cue rather than deleting an unsupported claim.
+  const p = oneWeek(wpRow('Build toward your +30 kg standard from the last block.'));
+  const repaired = repairDeterministicContradictions(p, {});
+  assert.deepEqual(v34Codes(repaired.program), ['V34_NOTE_UNDEFINED_LOAD_REFERENCE']);
+  assert.match(repaired.program, /\+30 kg standard/);
+});
+
+test('[U3] a load prescribed on the row, or stated by the athlete, is verifiable', () => {
+  const onRow = oneWeek(wpRow('Submaximal support. Hold +22.5 kg across all sets.'));
+  assert.deepEqual(v34Codes(onRow), []);
+  assert.equal(repairDeterministicContradictions(onRow, {}).repairs
+    .filter((r) => r.type === 'v49_unverifiable_load_reference_dropped').length, 0);
+
+  const fromIntake = oneWeek(wpRow('Submaximal support. This sits under your +80 kg chin-up best.'));
+  const intake = { current_numbers: 'Weighted Chin-up: +80 kg 1RM' };
+  assert.equal(repairDeterministicContradictions(fromIntake, intake).repairs
+    .filter((r) => r.type === 'v49_unverifiable_load_reference_dropped').length, 0);
+});
+
+test('[U4] no coach-reviewed program loses a sentence', () => {
+  const cases = [
+    ['advanced_hybrid', { current_numbers: 'Back Squat: 205 kg 1RM\nOverhead Press: 80 kg x 4\nWeighted Chin-up: +80 kg 1RM' }],
+    ['youth_gymnastics', {}],
+    ['tactical_3k', {}],
+  ];
+  for (const [id, intake] of cases) {
+    const p = fs.readFileSync(path.join(process.cwd(), 'test', 'fixtures', `${id}-program.txt`), 'utf8');
+    const dropped = repairDeterministicContradictions(p, intake).repairs
+      .filter((r) => r.type === 'v49_unverifiable_load_reference_dropped');
+    assert.deepEqual(dropped, [], `${id} must be untouched`);
+  }
+});
