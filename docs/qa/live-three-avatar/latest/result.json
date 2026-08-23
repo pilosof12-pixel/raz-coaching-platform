@@ -1,25 +1,25 @@
 {
-  "timestamp": "2026-08-23T12:29:54.212Z",
+  "timestamp": "2026-08-23T12:48:28.560Z",
   "base": "https://raz-coaching-platform.onrender.com",
-  "head_sha": "e352e64fc44978e4e15214663b0165ff848b068d",
-  "runtime": "launch-acceptance-v50-hybrid-only-live18-20260822",
+  "head_sha": "5c27bf3f1b5ed756b8b6c994a737e7877b80fec1",
+  "runtime": "launch-acceptance-v51-pull-spacing-live19-20260823",
   "results": [
     {
       "id": "advanced_hybrid",
-      "job_id": "5b2a95ce98b496f95c5576c709fdf30e",
-      "ok": false,
-      "status": "error",
-      "stage": "refining",
-      "attempt": 4,
-      "detail": "internal repair: V38_CONSECUTIVE_CONFLICTING_EXPOSURE",
-      "last_seen_status": "error",
-      "error": "Internal coaching QA could not repair the candidate program after multiple passes. No client-facing program was saved. Please retry the build. QA trace: A1:HEAVY_STRENGTH_RAMP_MISSING+ADVANCED_HYBRID_DENSE_72H_PRIMARY_WINDOW+V34_NOTE_UNDEFINED_LOAD_REFERENCE+V38_CONSECUTIVE_CONFLICTING_EXPOSURE+EVENT_PROGRESSING_SESSION_MISSING -> A2:ADVANCED_HYBRID_WEEK4_NOT_CONSOLIDATING+V38_CONSECUTIVE_CONFLICTING_EXPOSURE -> A3:V38_CONSECUTIVE_CONFLICTING_EXPOSURE -> A4:V38_CONSECUTIVE_CONFLICTING_EXPOSURE. [QA:INTERNAL_QA_REPAIR_EXHAUSTED]",
-      "program_chars": 0,
-      "seconds": 590
+      "job_id": "cafce4493f3d19a01148d8de14cccb66",
+      "ok": true,
+      "status": "done",
+      "stage": "finalizing",
+      "attempt": 0,
+      "detail": "saving program",
+      "last_seen_status": "done",
+      "error": null,
+      "program_chars": 19551,
+      "seconds": 384
     }
   ],
   "selection": [
     "advanced_hybrid"
   ],
-  "ok": false
+  "ok": true
 }
