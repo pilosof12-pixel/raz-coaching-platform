@@ -17,7 +17,8 @@ import { PROGRESSION_CLAIMS, reductionMetric, reductionMissing } from './v34_pre
 import { collectSkillCeilingFlags, collectMaintenanceDriftFlags } from './v43_coaching_governance.js';
 import { longRunBuildClaim } from './v35_coaching_standards.js';
 import { repairCountClaims } from './v46_language_accuracy.js';
-import { classifyExercise, dayGap } from './v38_movement_taxonomy.js';
+import { classifyExercise, dayGap, stressSignature, dayKey as dayKeyOf } from './v38_movement_taxonomy.js';
+import { auditCircularScheduling } from './v38_structural_audit.js';
 
 function arr(v) { return Array.isArray(v) ? v : v ? [v] : []; }
 function txt(v) {
@@ -743,6 +744,74 @@ function repairRunBaselineExceeded(program, intake, repairs) {
   return changed ? rebuild(program, parsed) : program;
 }
 
+// --- 10. pulling volume stacked on consecutive days ---------------------------
+
+// Live run #74 lost Hybrid to V38_CONSECUTIVE_CONFLICTING_EXPOSURE on all four
+// attempts. This athlete trains Mon, Tue, Fri and Sun, so on a circular week
+// three of the four possible pairs are adjacent, and the rule accumulates: one
+// heavy vertical pull scores 3, but two light ones also reach 3. A single
+// accessory pull row too many on the day after the strict One-Arm Pull-up trips
+// it. The coach-reviewed program is clean but sits one row from the edge, which
+// is why the model keeps landing the wrong side of it.
+//
+// The repair is the cut order once more: the day carrying the primary exposure
+// is protected, and the lowest-priority accessory pulling on the other side of
+// the pair goes until the pair is under the threshold. The required One-Arm
+// Pull-up exposures are never candidates -- removing one to satisfy this rule
+// would simply fail the other.
+
+const REQUIRED_OAP = /one[- ]arm\s+(?:pull|chin)-?up/i;
+
+function repairConsecutivePullStacking(program, intake, repairs) {
+  let candidate = program;
+
+  for (let guard = 0; guard < 8; guard++) {
+    const clashes = auditCircularScheduling(candidate, intake)
+      .filter((f) => f.tissue === 'vertical pulling');
+    if (!clashes.length) break;
+    const clash = clashes[0];
+
+    const parsed = parseWeek(candidate, clash.week);
+    if (!parsed) break;
+
+    // Protect whichever side carries the heavier primary pulling exposure.
+    const pullOn = (day) => parsed.rows.filter((c) => {
+      const name = String(c[parsed.exercise] || '').trim();
+      return name && !isWarmup(name)
+        && dayKeyOf(c[parsed.day]) === day
+        && ['vertical_pull', 'horizontal_pull'].includes(classifyExercise(name).category);
+    });
+    const primaryWeight = (day) => pullOn(day).filter((c) => REQUIRED_OAP.test(String(c[parsed.exercise] || ''))).length;
+    const secondary = primaryWeight(clash.from) >= primaryWeight(clash.to) ? clash.to : clash.from;
+
+    const dayRows = parsed.rows.filter((c) => dayKeyOf(c[parsed.day]) === secondary
+      && String(c[parsed.exercise] || '').trim() && !isWarmup(String(c[parsed.exercise] || '')));
+    const candidates = pullOn(secondary)
+      .filter((c) => !REQUIRED_OAP.test(String(c[parsed.exercise] || '')))
+      .sort((a, b) => {
+        const w = (c) => stressSignature(String(c[parsed.exercise] || '')).upperPull;
+        return w(b) - w(a);
+      });
+    // Never strip a session below a complete one to satisfy a scheduling rule.
+    if (!candidates.length || dayRows.length <= 3) break;
+
+    const drop = candidates[0];
+    const index = parsed.rows.indexOf(drop);
+    if (index < 0) break;
+    parsed.rows.splice(index, 1);
+    const next = rebuild(candidate, parsed);
+    if (next === candidate) break;
+    candidate = next;
+    repairs.push({
+      type: 'v50_consecutive_pull_thinned',
+      week: clash.week,
+      day: secondary,
+      exercise: String(drop[parsed.exercise] || '').trim(),
+    });
+  }
+  return candidate;
+}
+
 // --- entry point --------------------------------------------------------------
 
 export function repairDeterministicContradictions(program, intake = {}) {
@@ -758,6 +827,7 @@ export function repairDeterministicContradictions(program, intake = {}) {
   candidate = repairUndefinedLoadReferences(candidate, intake, repairs);
   candidate = repairExtraHardConditioning(candidate, intake, repairs);
   candidate = repairRunBaselineExceeded(candidate, intake, repairs);
+  candidate = repairConsecutivePullStacking(candidate, intake, repairs);
 
   const prior = new Map();
   for (let week = 1; week <= 4; week++) {

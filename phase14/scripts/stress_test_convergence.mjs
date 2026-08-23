@@ -129,6 +129,12 @@ const PERTURBATIONS = [
     apply: (p) => p.replace(/\tRun\tN\/A\t1\t\d+(\.\d+)? km\t/, '\tRun\tN/A\t1\t34 km\t'),
   },
   {
+    id: 'pull-stacked-on-adjacent-day', seen: 'run #74 Hybrid, four attempts',
+    applies: ['advanced_hybrid'],
+    apply: (p) => p.replace(/(Tue\tCable Row\t[^\n]*\n)/,
+      '$1Tue\tLat Pulldown\tRPE-selected load\t3\t10\t90 sec\t7\tUpper-back volume.\t\n'),
+  },
+  {
     id: 'maintenance-lift-drifts-up', seen: 'coach review, item 13',
     applies: ['tactical_3k'],
     apply: (p) => p.replace(/(START_WEEK2_TSV[\s\S]*?)(\t)(\d+)( kg\t)/, (m, a, t, kg, u) => `${a}${t}${Number(kg) + 25}${u}`),

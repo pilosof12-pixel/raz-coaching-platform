@@ -203,3 +203,49 @@ test('[H16] an athlete with no stated running volume is not second-guessed', { s
   const noBaseline = repairDeterministicContradictions(over, { ...HYBRID, notes: '' });
   assert.equal(noBaseline.repairs.filter((r) => r.type === 'v49_run_held_at_baseline').length, 0);
 });
+
+// --- pulling stacked on consecutive days --------------------------------------
+
+import { auditCircularScheduling, auditProgramStructure as auditStructure } from '../engine/v38_structural_audit.js';
+
+// Live run #74 lost Hybrid to V38_CONSECUTIVE_CONFLICTING_EXPOSURE on all four
+// attempts. This athlete trains Mon, Tue, Fri and Sun, so on a circular week
+// three of the four possible pairs are adjacent, and the rule accumulates: one
+// heavy vertical pull scores 3, but two light ones also reach 3. The
+// coach-reviewed program is clean and sits exactly one accessory row from the
+// edge, which is why the model kept landing on the wrong side of it.
+const addPullAccessory = (p) => p.replace(/(Tue\tCable Row\t[^\n]*\n)/,
+  '$1Tue\tLat Pulldown\tRPE-selected load\t3\t10\t90 sec\t7\tUpper-back volume.\t\n');
+
+test('[H17] one accessory too many on the adjacent day is thinned, not regenerated', { skip: !golden }, () => {
+  const clashing = addPullAccessory(golden);
+  assert.equal(auditCircularScheduling(clashing, HYBRID).length, 1);
+  const repaired = repairDeterministicContradictions(clashing, HYBRID);
+  assert.equal(auditCircularScheduling(repaired.program, HYBRID).length, 0);
+  const thinned = repaired.repairs.filter((r) => r.type === 'v50_consecutive_pull_thinned');
+  assert.ok(thinned.length);
+  assert.equal(thinned[0].exercise, 'Lat Pulldown');
+});
+
+test('[H18] the required One-Arm Pull-up exposures are never the ones removed', { skip: !golden }, () => {
+  // Removing one to satisfy this rule would simply fail the other.
+  const repaired = repairDeterministicContradictions(addPullAccessory(golden), HYBRID);
+  assert.equal(codeFor(repaired.program), null, 'the Advanced Hybrid rules must still pass');
+  assert.match(repaired.program, /\tOne-Arm Pull-up\t/);
+  assert.match(repaired.program, /\tAssisted One-Arm Pull-up\t/);
+});
+
+test('[H19] the repair leaves the program structurally better, never worse', { skip: !golden }, () => {
+  const clashing = addPullAccessory(golden);
+  const before = auditStructure(clashing, HYBRID).filter((f) => f.severity === 'hard').length;
+  const after = auditStructure(repairDeterministicContradictions(clashing, HYBRID).program, HYBRID)
+    .filter((f) => f.severity === 'hard').length;
+  assert.ok(after < before, `expected the clash to clear: ${before} -> ${after}`);
+});
+
+test('[H20] a program with no clash is untouched, and the repair is idempotent', { skip: !golden }, () => {
+  assert.equal(repairDeterministicContradictions(golden, HYBRID).repairs
+    .filter((r) => r.type === 'v50_consecutive_pull_thinned').length, 0);
+  const once = repairDeterministicContradictions(addPullAccessory(golden), HYBRID);
+  assert.equal(repairDeterministicContradictions(once.program, HYBRID).program, once.program);
+});
