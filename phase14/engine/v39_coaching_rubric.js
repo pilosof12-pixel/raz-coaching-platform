@@ -74,6 +74,9 @@ const RULE_REGISTRY = {
   // review signals in the specification, not hard failures.
   COACH_SPEC_V1_YG_POWER_VOLUME_BEFORE_OUTPUT: { classification: CLASSIFICATION.SOFT, dimension: 'progression' },
   COACH_SPEC_V1_T3K_PACE_FROM_GOAL_NOT_CAPACITY: { classification: CLASSIFICATION.SOFT, dimension: 'specificity' },
+  // Secondary work interrupting the primary exposures of a session. Hard,
+  // because reordering changes no prescription and the repair is exact.
+  V52_SECONDARY_BETWEEN_PRIMARIES: { classification: CLASSIFICATION.HARD, dimension: 'progression' },
   // Language accuracy. A miscounted sentence is an objective error with a
   // mechanical correction; a proofreading defect is reported, not enforced.
   V46_COUNT_CLAIM_MISMATCH: { classification: CLASSIFICATION.HARD, dimension: 'specificity' },

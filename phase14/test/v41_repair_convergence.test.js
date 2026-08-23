@@ -47,6 +47,12 @@ const PHRASINGS = [
   { note: 'Hold roughly the same load as Week 3.', prev: [3, 3], next: [3, 3], prevLoad: '20 kg', load: '25 kg' },
   { note: 'Keep this week at the same dose you used before.', prev: [3, 3], next: [3, 3], prevLoad: '20 kg', load: '25 kg' },
   { note: 'Repeat this load.', prev: [3, 3], next: [3, 3], prevLoad: '20 kg', load: '17.5 kg' },
+  // Instructions to add work that the prescription never adds. A coach found
+  // exactly this on a live program: "add only 1 km" against a long run that
+  // stayed at 18 km for three consecutive weeks.
+  { note: 'Add only 1 km and keep the pace equally easy.', prev: [1, 0], next: [1, 0], prevReps: '18 km', reps: '18 km' },
+  { note: 'Only extend to 20 km if last week recovered cleanly.', prev: [1, 0], next: [1, 0], prevReps: '18 km', reps: '18 km' },
+  { note: 'Increase the distance a little this week.', prev: [1, 0], next: [1, 0], prevReps: '18 km', reps: '18 km' },
 ];
 
 test('[C1] every phrasing the detector flags is cleared by a single repair pass', () => {

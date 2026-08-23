@@ -169,6 +169,13 @@ export const PROGRESSION_CLAIMS = [
   { re: /\b(?:fewer|less)\s+(?:total\s+)?(sets?|reps?|work|volume|distance)\b/i, direction: 'down' },
   { re: /\b(?:slightly less|less)\s+total\s+(?:work|volume)\b/i, direction: 'down' },
   { re: /\bfewer\s+total\s+reps?\b/i, direction: 'down' },
+  // Claims that work goes UP. The table only ever described reductions and
+  // holds, so a note instructing "add only 1 km" against a distance that never
+  // moved was unchecked -- a coach found exactly that on a live program while
+  // the engine reported no finding.
+  { re: /\badd\s+(?:only\s+)?(?:another\s+)?\d+(?:\.\d+)?\s*km\b/i, direction: 'up', metric: 'distance' },
+  { re: /\b(?:extend|build|progress|take|move)\s+(?:it\s+)?(?:up\s+)?to\s+\d+(?:\.\d+)?\s*km\b/i, direction: 'up', metric: 'distance' },
+  { re: /\b(?:increase|add to|lengthen|extend)\b[^.;]{0,24}\b(distance|mileage|long run)\b/i, direction: 'up', metric: 'distance' },
   { re: /\b(?:repeat|hold|keep|maintain|match)\b[^.;]{0,30}\b(?:this|the|same)\s+(?:load|weight|dose)\b/i, direction: 'same', metric: 'load' },
   { re: /\brepeat\s+(?:this|the)\s+load\b/i, direction: 'same', metric: 'load' },
 ];
@@ -187,6 +194,13 @@ export function reductionMetric(matchedText) {
 
 // True when a claimed reduction in `metric` did not actually happen. Unknown
 // values are never treated as a violation.
+// True when a claimed increase in `metric` did not actually happen.
+export function increaseMissing(metric, current = {}, prior = {}) {
+  const pick = (o) => (metric === 'sets' ? o.sets : metric === 'distance' ? o.km : o.volume);
+  const now = pick(current), before = pick(prior);
+  return Number.isFinite(now) && Number.isFinite(before) && now <= before;
+}
+
 export function reductionMissing(metric, current = {}, prior = {}) {
   const pick = (o) => (metric === 'sets' ? o.sets : metric === 'distance' ? o.km : o.volume);
   const now = pick(current), before = pick(prior);
@@ -232,6 +246,16 @@ export function collectProgressionLanguageFlags(program, intake = {}) {
             claimed = true;
             flags.push({ code: 'V34_PROGRESSION_LANGUAGE_MISMATCH', ...where, claim: 'repeat/hold load', previous_load: prior.load, current_load: load,
               message: `${exercise} (Week ${week}) says the load is repeated or held, but it moved from ${prior.load} to ${load}.` });
+          }
+          continue;
+        }
+        if (claim.direction === 'up') {
+          const metric = claim.metric || reductionMetric(matchedClaim?.[1] || matchedClaim?.[0]);
+          if (increaseMissing(metric, current, prior)) {
+            claimed = true;
+            flags.push({ code: 'V34_PROGRESSION_LANGUAGE_MISMATCH', ...where, claim: `increase:${metric}`,
+              previous: { sets: prior.sets, reps: prior.reps, km: prior.km, volume: prior.volume }, current: { sets, reps, km, volume: current.volume },
+              message: `${exercise} (Week ${week}) instructs an increase in ${metric}, but that metric did not rise from the immediately previous week.` });
           }
           continue;
         }

@@ -13,10 +13,11 @@
 // problems are deliberately left for the gates to reject.
 
 import { rampText } from './specific_warmup_enrichment.js';
-import { PROGRESSION_CLAIMS, reductionMetric, reductionMissing } from './v34_prescription_consistency.js';
+import { PROGRESSION_CLAIMS, reductionMetric, reductionMissing, increaseMissing } from './v34_prescription_consistency.js';
 import { collectSkillCeilingFlags, collectMaintenanceDriftFlags } from './v43_coaching_governance.js';
 import { longRunBuildClaim } from './v35_coaching_standards.js';
 import { repairCountClaims } from './v46_language_accuracy.js';
+import { repairSessionHierarchy } from './v52_session_hierarchy.js';
 import { classifyExercise, dayGap, stressSignature, dayKey as dayKeyOf } from './v38_movement_taxonomy.js';
 import { auditCircularScheduling } from './v38_structural_audit.js';
 
@@ -87,6 +88,10 @@ const HOLD_PHRASE = {
   'total reps': 'hold the total reps',
   volume: 'hold the total work',
 };
+// An instruction to add work that the prescription does not carry is the same
+// error as a claimed reduction that never happened, and is restated the same
+// way. A coach found "add only 1 km" against a distance that stayed at 18 km
+// for three weeks running.
 
 // Restatement rewrites the claim itself plus any text left stranded by it, and
 // nothing else. Replacing the whole clause was too blunt -- it discarded genuine
@@ -110,6 +115,16 @@ function strandedSpan(text, from, to) {
   }
   const tail = text.slice(to, end);
   return { start, end: TAIL_INSTRUCTION.test(tail) ? to : end };
+}
+
+function replaceSentence(text, from, to, phrase) {
+  const sentences = [...String(text).matchAll(/[^.!?]*[.!?]?/g)].filter((m) => m[0].length);
+  const owner = sentences.find((m) => from >= m.index && from < m.index + m[0].length);
+  if (!owner) return replaceClaim(text, from, to, phrase);
+  const lead = owner[0].match(/^\s*/)[0];
+  const trailing = /[.!?]$/.test(owner[0]) ? owner[0].slice(-1) : '';
+  const body = phrase.charAt(0).toUpperCase() + phrase.slice(1);
+  return text.slice(0, owner.index) + lead + body + trailing + text.slice(owner.index + owner[0].length);
 }
 
 function replaceClaim(text, from, to, phrase) {
@@ -142,9 +157,19 @@ function restateFalseClaims(text, current, prior) {
       } else if (claim.direction === 'down') {
         const metric = reductionMetric(m[1] || m[0]);
         if (reductionMissing(metric, current, prior)) phrase = HOLD_PHRASE[metric];
+      } else if (claim.direction === 'up') {
+        const metric = claim.metric || reductionMetric(m[1] || m[0]);
+        if (increaseMissing(metric, current, prior)) phrase = HOLD_PHRASE[metric];
       }
       if (!phrase) break;
-      const next = replaceClaim(out, m.index, m.index + m[0].length, phrase);
+      // An instruction to add work usually carries its own condition -- "only
+      // extend to 20 km if Week 2 recovered cleanly" -- and the condition
+      // belongs to the increase. Splicing over just the claim left "only hold
+      // the distance if Week 2 recovered cleanly", which asks nothing coherent,
+      // so the whole sentence goes and its neighbours stay.
+      const next = claim.direction === 'up'
+        ? replaceSentence(out, m.index, m.index + m[0].length, phrase)
+        : replaceClaim(out, m.index, m.index + m[0].length, phrase);
       if (next === out) break;
       out = next;
     }
@@ -828,6 +853,14 @@ export function repairDeterministicContradictions(program, intake = {}) {
   candidate = repairExtraHardConditioning(candidate, intake, repairs);
   candidate = repairRunBaselineExceeded(candidate, intake, repairs);
   candidate = repairConsecutivePullStacking(candidate, intake, repairs);
+
+  // Reordering changes no prescription, so a secondary lift interrupting the
+  // primaries is moved rather than regenerated.
+  const hierarchy = repairSessionHierarchy(candidate, intake);
+  if (hierarchy.repaired) {
+    candidate = hierarchy.program;
+    repairs.push(...hierarchy.repairs);
+  }
 
   const prior = new Map();
   for (let week = 1; week <= 4; week++) {

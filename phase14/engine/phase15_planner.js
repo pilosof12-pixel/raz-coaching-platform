@@ -13,6 +13,7 @@ import { buildRecoveryBudgetBrief } from './v42_recovery_budget.js';
 import { buildProgressionDisciplineBrief } from './v42_progression_discipline.js';
 import { buildGovernanceBrief } from './v43_coaching_governance.js';
 import { buildSpecGapBrief } from './v49_spec_gap_rules.js';
+import { buildSessionHierarchyBrief } from './v52_session_hierarchy.js';
 import { buildLanguageAccuracyBrief } from './v46_language_accuracy.js';
 
 function txt(v) {
@@ -264,6 +265,7 @@ export function buildDeterministicBrief(intake = {}) {
     buildProgressionDisciplineBrief(intake),
     buildGovernanceBrief(intake),
     buildSpecGapBrief(intake),
+    buildSessionHierarchyBrief(intake),
     buildLanguageAccuracyBrief(intake),
     specialist,
     progressionGpp,
