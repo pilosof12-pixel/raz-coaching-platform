@@ -155,3 +155,51 @@ test('[H11] a week with no strict work at all is left for regeneration', { skip:
   assert.equal(repaired.repairs.filter((r) => r.type === 'v47_oap_assistance_added').length, 0);
   assert.equal(codeFor(repaired.program), 'ADVANCED_HYBRID_OAP_SPECIFICITY');
 });
+
+// --- the two rules that state their own remedy --------------------------------
+
+// One says to remove optional intervals, sprints, finishers and metcons; the
+// other says Week 1 running must not exceed what the athlete has demonstrated.
+// Both are the coach's cut order applied to the lowest-priority stressor, and
+// both were left to regeneration -- which had to rewrite an entire program to
+// delete a finisher.
+
+const HYBRID_RUN = { ...HYBRID, notes: 'Running: 1 session a week, about 20 km total.' };
+
+test('[H12] an optional conditioning finisher is deleted, not regenerated', { skip: !golden }, () => {
+  const withFinisher = golden.replace('END_WEEK1_TSV', 'Sun\tSprint Intervals\tBodyweight\t6\t100 m\t2 min\t9\tFinisher.\t\nEND_WEEK1_TSV');
+  assert.equal(codeFor(withFinisher), 'ADVANCED_HYBRID_EXTRA_HARD_CONDITIONING');
+  const repaired = repairDeterministicContradictions(withFinisher, HYBRID_RUN);
+  assert.equal(codeFor(repaired.program), null);
+  assert.ok(repaired.repairs.some((r) => r.type === 'v49_optional_conditioning_removed'));
+  assert.doesNotMatch(repaired.program, /Sprint Intervals/);
+});
+
+test('[H13] a movement is judged by its own name, never by its coaching note', { skip: !golden }, () => {
+  // Prose may legitimately say "without intervals"; deleting a row for its note
+  // would remove real training over a turn of phrase.
+  const prose = golden.replace(/\tSubmaximal support\./, '\tSteady aerobic work without intervals or sprints.');
+  const repaired = repairDeterministicContradictions(prose, HYBRID_RUN);
+  assert.equal(repaired.repairs.filter((r) => r.type === 'v49_optional_conditioning_removed').length, 0);
+});
+
+test('[H14] Week 1 running is held at the demonstrated baseline', { skip: !golden }, () => {
+  const over = golden.replace(/\tRun\tN\/A\t1\t16 km\t/, '\tRun\tN/A\t1\t26 km\t');
+  const repaired = repairDeterministicContradictions(over, HYBRID_RUN);
+  const held = repaired.repairs.find((r) => r.type === 'v49_run_held_at_baseline');
+  assert.ok(held, 'building from above a demonstrated baseline is the jump an injury history warns about');
+  assert.equal(held.from_km, 26);
+  assert.equal(held.to_km, 20);
+  assert.match(repaired.program, /\tRun\tN\/A\t1\t20 km\t/);
+});
+
+test('[H15] neither repair touches a program already inside its limits', { skip: !golden }, () => {
+  const out = repairDeterministicContradictions(golden, HYBRID_RUN);
+  assert.deepEqual(out.repairs.filter((r) => r.type.startsWith('v49_optional') || r.type.startsWith('v49_run')), []);
+});
+
+test('[H16] an athlete with no stated running volume is not second-guessed', { skip: !golden }, () => {
+  const over = golden.replace(/\tRun\tN\/A\t1\t16 km\t/, '\tRun\tN/A\t1\t26 km\t');
+  const noBaseline = repairDeterministicContradictions(over, { ...HYBRID, notes: '' });
+  assert.equal(noBaseline.repairs.filter((r) => r.type === 'v49_run_held_at_baseline').length, 0);
+});

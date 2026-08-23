@@ -666,6 +666,82 @@ function repairUndefinedLoadReferences(program, intake, repairs) {
   return candidate;
 }
 
+// --- 9. lower-priority stress the rules say to cut -----------------------------
+
+// Two Advanced Hybrid rules state their own remedy. One says to remove optional
+// intervals, sprints, finishers and metcons; the other says Week 1 running must
+// not exceed the volume the athlete has demonstrated. Both are the coach's cut
+// order applied to the lowest-priority stressor, and both were left to
+// regeneration, which had to rewrite an entire program to delete a finisher.
+//
+// Deletion and reduction are the safest repair class: nothing is invented, and
+// what is removed is by definition optional or above what the athlete has shown
+// they tolerate.
+
+const OPTIONAL_CONDITIONING = /interval|sprint|burpee|emom|metcon|finisher/i;
+
+function hybridWithSecondaryEndurance(intake = {}) {
+  const sport = arr(intake.sport_schedule).length;
+  return sport >= 4 || /mma|bjj|grappl|boxing|muay/i.test(txt(intake.sport));
+}
+
+function repairExtraHardConditioning(program, intake, repairs) {
+  if (!hybridWithSecondaryEndurance(intake)) return program;
+  let candidate = program;
+  for (let week = 1; week <= 4; week++) {
+    const parsed = parseWeek(candidate, week);
+    if (!parsed) continue;
+    const keep = [];
+    let removed = 0;
+    for (const cells of parsed.rows) {
+      const name = String(cells[parsed.exercise] || '').trim();
+      // Only the movement's own identity counts. Coaching prose may legitimately
+      // say "without intervals", and deleting a row for its note would be wrong.
+      if (name && !isWarmup(name) && OPTIONAL_CONDITIONING.test(name)) {
+        repairs.push({ type: 'v49_optional_conditioning_removed', week, exercise: name });
+        removed += 1;
+        continue;
+      }
+      keep.push(cells);
+    }
+    if (!removed) continue;
+    parsed.rows.length = 0;
+    parsed.rows.push(...keep);
+    candidate = rebuild(candidate, parsed);
+  }
+  return candidate;
+}
+
+// The demonstrated weekly running volume, from the athlete's own words.
+function statedWeeklyRunKm(intake = {}) {
+  const src = `${txt(intake.notes)} ${txt(intake.current_numbers)} ${txt(intake.clarification_answers)}`;
+  const range = src.match(/(\d{1,3})\s*(?:-|–|to)\s*(\d{1,3})\s*km\b/i);
+  if (range) return Math.max(Number(range[1]), Number(range[2]));
+  const single = src.match(/(?:about|around|roughly|~)?\s*(\d{1,3})\s*km\s*(?:total|per week|\/week|a week|weekly)/i);
+  return single ? Number(single[1]) : null;
+}
+
+function repairRunBaselineExceeded(program, intake, repairs) {
+  const baseline = statedWeeklyRunKm(intake);
+  if (!baseline) return program;
+  const parsed = parseWeek(program, 1);
+  if (!parsed) return program;
+
+  let changed = false;
+  for (const cells of parsed.rows) {
+    const name = String(cells[parsed.exercise] || '').trim();
+    if (!name || isWarmup(name) || !/\brun(?:ning)?\b/i.test(name) || /ruck|march/i.test(name)) continue;
+    const km = kmOf(cells[parsed.reps]);
+    if (!Number.isFinite(km) || km <= baseline) continue;
+    // Hold Week 1 at what the athlete has actually been running. Building from
+    // above a demonstrated baseline is the jump their history warns about.
+    cells[parsed.reps] = String(cells[parsed.reps]).replace(/(\d+(?:\.\d+)?)(\s*km\b)/i, `${baseline}$2`);
+    repairs.push({ type: 'v49_run_held_at_baseline', exercise: name, from_km: km, to_km: baseline });
+    changed = true;
+  }
+  return changed ? rebuild(program, parsed) : program;
+}
+
 // --- entry point --------------------------------------------------------------
 
 export function repairDeterministicContradictions(program, intake = {}) {
@@ -679,6 +755,8 @@ export function repairDeterministicContradictions(program, intake = {}) {
   candidate = repairMissingHeavyRamps(candidate, intake, repairs);
   candidate = repairMissingOapAssistance(candidate, intake, repairs);
   candidate = repairUndefinedLoadReferences(candidate, intake, repairs);
+  candidate = repairExtraHardConditioning(candidate, intake, repairs);
+  candidate = repairRunBaselineExceeded(candidate, intake, repairs);
 
   const prior = new Map();
   for (let week = 1; week <= 4; week++) {
