@@ -17,7 +17,7 @@ import { PROGRESSION_CLAIMS, reductionMetric, reductionMissing, increaseMissing 
 import { collectSkillCeilingFlags, collectMaintenanceDriftFlags } from './v43_coaching_governance.js';
 import { longRunBuildClaim } from './v35_coaching_standards.js';
 import { repairCountClaims } from './v46_language_accuracy.js';
-import { repairSessionHierarchy } from './v52_session_hierarchy.js';
+import { repairSessionHierarchy, repairKeySessionCrowding } from './v52_session_hierarchy.js';
 import { classifyExercise, dayGap, stressSignature, dayKey as dayKeyOf } from './v38_movement_taxonomy.js';
 import { auditCircularScheduling } from './v38_structural_audit.js';
 
@@ -860,6 +860,15 @@ export function repairDeterministicContradictions(program, intake = {}) {
   if (hierarchy.repaired) {
     candidate = hierarchy.program;
     repairs.push(...hierarchy.repairs);
+  }
+
+  // The lower-cost exposure of a primary movement is relocated off the day
+  // before its heavy exposure. Moving a row between the athlete's own training
+  // days changes no prescription.
+  const crowding = repairKeySessionCrowding(candidate, intake);
+  if (crowding.repaired) {
+    candidate = crowding.program;
+    repairs.push(...crowding.repairs);
   }
 
   const prior = new Map();

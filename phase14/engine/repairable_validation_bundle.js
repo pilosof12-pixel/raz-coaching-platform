@@ -23,7 +23,7 @@ import { auditTacticalHardRules } from './v40_tactical_hard_rules.js'; // V40-TA
 import { collectRecoveryBudgetFlags, RECOVERY_BUDGET_HARD_CODES } from './v42_recovery_budget.js'; // V42-RECOVERY-BUDGET-WIRED
 import { collectProgressionDisciplineFlags } from './v42_progression_discipline.js'; // V42-PROGRESSION-DISCIPLINE-WIRED
 import { collectGovernanceFlags, GOVERNANCE_HARD_CODES } from './v43_coaching_governance.js'; // V43-GOVERNANCE-WIRED
-import { collectSessionHierarchyFlags } from './v52_session_hierarchy.js'; // V52-SESSION-HIERARCHY-WIRED
+import { collectSessionHierarchyFlags, collectKeySessionCrowdingFlags } from './v52_session_hierarchy.js'; // V52-SESSION-HIERARCHY-WIRED
 import { collectLanguageAccuracyFlags, LANGUAGE_HARD_CODES, repairCountClaims } from './v46_language_accuracy.js'; // V46-LANGUAGE-ACCURACY-WIRED
 import { repairDeterministicContradictions } from './v35_deterministic_repair.js'; // V35-DETERMINISTIC-REPAIR-WIRED
 import { normalizeAdvancedHybridWeek4OapConsolidation } from './advanced_hybrid_oap_consolidation_normalizer.js';
@@ -477,7 +477,7 @@ export function collectRepairableValidationFailures(program, intake = {}, option
   // The repair above reorders it, so reaching here means the reorder could not
   // resolve it and regeneration is the right answer.
   runRepairable(flags, () => {
-    const hierarchy = collectSessionHierarchyFlags(candidate, intake);
+    const hierarchy = [...collectSessionHierarchyFlags(candidate, intake), ...collectKeySessionCrowdingFlags(candidate, intake)];
     if (!hierarchy.length) return;
     throw new RetriableValidationError(hierarchy[0].code,
       hierarchy.map((f) => f.message).join(' '), { flags: hierarchy });

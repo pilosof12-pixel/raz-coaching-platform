@@ -77,6 +77,11 @@ const RULE_REGISTRY = {
   // Secondary work interrupting the primary exposures of a session. Hard,
   // because reordering changes no prescription and the repair is exact.
   V52_SECONDARY_BETWEEN_PRIMARIES: { classification: CLASSIFICATION.HARD, dimension: 'progression' },
+  V52_KEY_SESSION_CROWDED: { classification: CLASSIFICATION.HARD, dimension: 'recovery_management' },
+  // Scheduling more days than the athlete agreed to has no safe automatic fix --
+  // removing a training day is restructuring -- so it is reported, not enforced.
+  V46_SCHEDULE_EXCEEDS_STATED_FREQUENCY: { classification: CLASSIFICATION.SOFT, dimension: 'recovery_management' },
+  V46_OPTIONAL_QUALIFIER_ON_PRIMARY: { classification: CLASSIFICATION.SOFT, dimension: 'progression' },
   // Language accuracy. A miscounted sentence is an objective error with a
   // mechanical correction; a proofreading defect is reported, not enforced.
   V46_COUNT_CLAIM_MISMATCH: { classification: CLASSIFICATION.HARD, dimension: 'specificity' },

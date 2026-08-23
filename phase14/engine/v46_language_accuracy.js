@@ -13,10 +13,17 @@
 
 import { parseWeek } from './v34_workload_accounting.js';
 import { classifyExercise, CATEGORY } from './v38_movement_taxonomy.js';
+import { goalTierFor } from './v52_session_hierarchy.js';
 
 const NUMBER_WORDS = {
   one: 1, two: 2, three: 3, four: 4, five: 5, six: 6, seven: 7, eight: 8, nine: 9, ten: 10,
 };
+
+function txt(v) {
+  if (Array.isArray(v)) return v.map(String).join(' ');
+  if (v && typeof v === 'object') return JSON.stringify(v);
+  return String(v || '');
+}
 
 function numberFrom(token) {
   const word = NUMBER_WORDS[String(token || '').toLowerCase()];
@@ -113,8 +120,85 @@ export function collectTextDefectFlags(program) {
   return flags;
 }
 
+// --- what the athlete asked for vs what the program schedules ----------------
+
+// A coach reading a live program counted five training days against an intake
+// asking for four. Nothing objected: the count rule above compares prose against
+// structure, and no sentence had made a claim. The athlete's own stated
+// frequency is a claim too, and a louder one.
+export function collectScheduleFrequencyFlags(program, intake = {}) {
+  const stated = Number(intake?.days_per_week || intake?.training_days_per_week || 0);
+  if (!Number.isFinite(stated) || stated <= 0) return [];
+  const counts = structureCounts(program, 1);
+  if (!counts) return [];
+  if (counts.calendarDays <= stated) return [];
+
+  // An athlete who has said they can spread work across more days has already
+  // answered this. Tactical states exactly that, and flagging it would be
+  // contradicting the intake rather than checking it.
+  const sanctioned = /\b(?:can train|able to train|comfortable|happy to)\b[^.]{0,60}\b(?:across|over|on)\s+(?:up to\s+)?(\w+)\s+(?:calendar\s+)?days\b/i
+    .exec(`${txt(intake.notes)} ${txt(intake.clarification_answers)}`);
+  if (sanctioned) {
+    const word = String(sanctioned[1]).toLowerCase();
+    const allowed = NUMBER_WORDS[word] ?? Number(word);
+    if (Number.isFinite(allowed) && counts.calendarDays <= allowed) return [];
+  }
+
+  return [{
+    code: 'V46_SCHEDULE_EXCEEDS_STATED_FREQUENCY',
+    stated,
+    actual: counts.calendarDays,
+    days: counts.dayLabels,
+    message: `The athlete asked for ${stated} training days a week and Week 1 schedules ${counts.calendarDays} (${counts.dayLabels.join(', ')}). Fit the plan into the frequency they agreed to, or say plainly on which day the extra work sits and why it is not a session.`,
+  }];
+}
+
+// --- an optional qualifier must name what is optional ------------------------
+
+// The same review read "earned, optional" on the primary One-Arm Pull-up row as
+// marking the primary work optional. It did not -- the qualifier attaches to one
+// extra single, and the prescribed sets are not in question -- but a client
+// skimming their own program can make exactly that mistake, and on a primary
+// exposure the cost of being misread is high.
+// "Earned" is not in this list. A note saying "keep the earned standard" means
+// achieved, not discretionary, and flagging it called good coaching language a
+// defect. Only words that actually make work skippable belong here.
+const OPTIONAL_QUALIFIER = /\b(?:optional|if you feel like it|only if you want|skip (?:it )?if you prefer|entirely up to you)\b/i;
+const NAMES_AN_ADDITION = /\b(?:add|extra|additional|one more|another|bonus|top-?up)\b/i;
+
+export function collectOptionalQualifierFlags(program, intake = {}, isPrimary = () => false) {
+  const flags = [];
+  for (let week = 1; week <= 4; week++) {
+    const parsed = parseWeek(program, week);
+    if (!parsed || !Number.isInteger(parsed.notes)) continue;
+    for (const cells of parsed.rows) {
+      const name = String(cells[parsed.exercise] || '').trim();
+      if (!name || isWarmup(name) || !isPrimary(name)) continue;
+      const note = String(cells[parsed.notes] || '');
+      const m = note.match(OPTIONAL_QUALIFIER);
+      if (!m) continue;
+      // The qualifier must sit close to the addition it describes.
+      const window = note.slice(Math.max(0, m.index - 90), m.index + 40);
+      if (NAMES_AN_ADDITION.test(window)) continue;
+      flags.push({
+        code: 'V46_OPTIONAL_QUALIFIER_ON_PRIMARY',
+        week,
+        exercise: name,
+        qualifier: m[0],
+        message: `${name} (Week ${week}) is primary-goal work and its note says "${m[0]}" without naming what is optional. State the addition the qualifier applies to, so the prescribed work cannot be read as discretionary.`,
+      });
+    }
+  }
+  return flags;
+}
+
 export function collectLanguageAccuracyFlags(program, intake = {}) {
-  return [...collectCountClaimFlags(program, intake), ...collectTextDefectFlags(program)];
+  return [
+    ...collectCountClaimFlags(program, intake),
+    ...collectTextDefectFlags(program),
+    ...collectScheduleFrequencyFlags(program, intake),
+    ...collectOptionalQualifierFlags(program, intake, (name) => goalTierFor(name, intake) === 'primary'),
+  ];
 }
 
 // A miscounted sentence is an objective error with a mechanical correction, so
@@ -155,5 +239,7 @@ export function buildLanguageAccuracyBrief(intake = {}) {
     'LANGUAGE ACCURACY: every number the summary states must match the program below it.',
     'If you say the athlete has three strength sessions, prescribe three. If you say five calendar days, use five. Count before you write the sentence.',
     'The summary is client-facing prose: no placeholder text, no raw markdown, no repeated words, no stray double spaces.',
+    'Schedule the plan into the training frequency the athlete asked for. If a day carries something you do not consider a session, say so on that day rather than leaving them to count.',
+    'On primary-goal work, never leave "optional" or "earned" standing without naming what is optional. The prescribed sets are not discretionary; only a stated addition is.',
   ].join('\n');
 }

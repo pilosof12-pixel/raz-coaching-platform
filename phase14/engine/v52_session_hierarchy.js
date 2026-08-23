@@ -138,11 +138,156 @@ export function repairSessionHierarchy(program, intake = {}) {
   return { program: candidate, repaired: repairs.length > 0, repairs };
 }
 
+// --- a key session must not be crowded by the day before it ------------------
+
+// A coach found the engine placing the lower-cost squat exposure on Sunday, the
+// day before Monday's primary One-Arm Pull-up and 172.5 kg squat, and said
+// plainly that recovery-aware scheduling was not overriding the template. He was
+// right: the existing adjacency rule only objects when BOTH days breach axial
+// and lower-body load, and a light Sunday squat breaches neither on its own.
+//
+// The question is not whether each day is heavy. It is whether the same primary
+// pattern is loaded on the day before the session that pattern's block is built
+// around. Two squat exposures are required for a primary squat goal; they just
+// must not be back to back.
+
+const WEEK_ORDER = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'];
+const dayIndex = (d) => WEEK_ORDER.indexOf(String(d || '').trim().slice(0, 3).toLowerCase());
+function circularGap(from, to) {
+  const a = dayIndex(from), b = dayIndex(to);
+  if (a < 0 || b < 0) return null;
+  return (b - a + 7) % 7;
+}
+// How far apart two days are, whichever way round the week you count.
+function separation(a, b) {
+  const f = circularGap(a, b);
+  return f == null ? null : Math.min(f, 7 - f);
+}
+function loadKg(text) {
+  const m = String(text || '').match(/(\d+(?:\.\d+)?)\s*kg\b/i);
+  return m ? Number(m[1]) : null;
+}
+
+// Every day on which a primary movement pattern is loaded, heaviest first.
+function primaryExposures(parsed, intake) {
+  const out = [];
+  parsed.rows.forEach((cells, index) => {
+    const name = String(cells[parsed.exercise] || '').trim();
+    const day = String(cells[parsed.day] || '').trim();
+    if (!name || !day || isWarmup(name)) return;
+    if (goalTierFor(name, intake) !== 'primary') return;
+    out.push({ index, day, name, kg: parsed.load == null ? null : loadKg(cells[parsed.load]) });
+  });
+  return out;
+}
+
+export function collectKeySessionCrowdingFlags(program, intake = {}) {
+  if (!arr(intake.primary_goals).length) return [];
+  const flags = [];
+
+  for (let week = 1; week <= 4; week++) {
+    const parsed = parseWeek(program, week);
+    if (!parsed) continue;
+    const exposures = primaryExposures(parsed, intake);
+    // Group by movement, so a squat is compared with a squat.
+    const byMovement = new Map();
+    for (const e of exposures) {
+      const key = e.name.toLowerCase();
+      if (!byMovement.has(key)) byMovement.set(key, []);
+      byMovement.get(key).push(e);
+    }
+
+    for (const [, group] of byMovement) {
+      if (group.length < 2) continue;
+      const loaded = group.filter((e) => Number.isFinite(e.kg));
+      if (loaded.length < 2) continue;
+      const sorted = [...loaded].sort((a, b) => b.kg - a.kg);
+      const heavy = sorted[0];
+      for (const other of sorted.slice(1)) {
+        if (other.day === heavy.day) continue;
+        if (separation(other.day, heavy.day) !== 1) continue;
+        flags.push({
+          code: 'V52_KEY_SESSION_CROWDED',
+          week,
+          movement: heavy.name,
+          heavy_day: heavy.day,
+          crowding_day: other.day,
+          heavy_kg: heavy.kg,
+          crowding_kg: other.kg,
+          message: `Week ${week} loads ${other.name} at ${other.kg} kg on ${other.day}, the day immediately before the ${heavy.kg} kg exposure on ${heavy.day}. The key session for a primary goal should get the best available readiness; put the lower-cost exposure where it does not spend the day before.`,
+        });
+      }
+    }
+  }
+  return flags;
+}
+
+// Moving a row between existing training days changes no prescription, so this
+// is repaired. The lower-cost exposure goes to whichever training day sits
+// furthest from the heavy one, counting either way round the week.
+export function repairKeySessionCrowding(program, intake = {}) {
+  const repairs = [];
+  let candidate = String(program || '');
+
+  for (let week = 1; week <= 4; week++) {
+    for (let guard = 0; guard < 4; guard++) {
+      const flags = collectKeySessionCrowdingFlags(candidate, intake).filter((f) => f.week === week);
+      if (!flags.length) break;
+      const flag = flags[0];
+      const parsed = parseWeek(candidate, week);
+      if (!parsed) break;
+
+      // Only the athlete's own strength days are eligible. Choosing from every
+      // day present in the week put a barbell squat on the running day, which
+      // invents a strength session rather than relocating one.
+      const stated = arr(intake.available_gym_days).map((d) => String(d).trim().toLowerCase()).filter(Boolean);
+      const present = [...new Set(parsed.rows
+        .map((c) => String(c[parsed.day] || '').trim())
+        .filter((d) => d && dayIndex(d) >= 0))];
+      const days = stated.length
+        ? present.filter((d) => stated.includes(d.toLowerCase()))
+        : present;
+      const target = days
+        .filter((d) => d !== flag.heavy_day && d !== flag.crowding_day)
+        .map((d) => ({ d, sep: separation(d, flag.heavy_day) ?? 0 }))
+        .sort((a, b) => b.sep - a.sep)[0];
+      if (!target || target.sep <= 1) break;
+
+      const row = parsed.rows.find((c) => String(c[parsed.day] || '').trim() === flag.crowding_day
+        && String(c[parsed.exercise] || '').trim().toLowerCase() === flag.movement.toLowerCase());
+      if (!row) break;
+      row[parsed.day] = target.d;
+      // Primary work leads the session it lands in. Appending it left a barbell
+      // squat sitting after the neck isometrics.
+      const at = parsed.rows.indexOf(row);
+      parsed.rows.splice(at, 1);
+      let insertAt = parsed.rows.length;
+      let seenTargetDay = false;
+      for (let i = 0; i < parsed.rows.length; i += 1) {
+        const sameDay = String(parsed.rows[i][parsed.day] || '').trim() === target.d;
+        if (sameDay) seenTargetDay = true;
+        if (sameDay && isWarmup(String(parsed.rows[i][parsed.exercise] || ''))) continue;
+        if (sameDay) { insertAt = i; break; }
+        if (seenTargetDay) { insertAt = i; break; }
+      }
+      parsed.rows.splice(insertAt, 0, row);
+
+      const inner = [parsed.header.join('\t'), ...parsed.rows.map((c) => c.join('\t'))].join('\n');
+      const next = candidate.replace(parsed.re, parsed.match[1] + inner + parsed.match[3]);
+      if (next === candidate) break;
+      candidate = next;
+      repairs.push({ type: 'v52_key_session_uncrowded', week, movement: flag.movement, from: flag.crowding_day, to: target.d });
+    }
+  }
+  return { program: candidate, repaired: repairs.length > 0, repairs };
+}
+
 export function buildSessionHierarchyBrief(intake = {}) {
   if (!arr(intake.primary_goals).length || !arr(intake.secondary_goals).length) return '';
   return [
     'WITHIN-SESSION HIERARCHY: when a session carries more than one primary-goal exposure, keep them together.',
     `Primary: ${arr(intake.primary_goals).join('; ')}. Secondary: ${arr(intake.secondary_goals).join('; ')}.`,
     'Secondary work goes after the primary qualities it is subordinate to, never between them. A secondary lift sitting between two primary exposures spends freshness that belongs to the primaries.',
+    'KEY SESSION READINESS: the day before a primary session is part of that session. Where a primary movement has two exposures, do not put the lower-cost one on the day immediately before the heavy one; separate them so the key session gets the best available readiness.',
   ].join('\n');
 }
