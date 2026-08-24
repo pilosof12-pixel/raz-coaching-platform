@@ -1,1 +1,1 @@
-launch-acceptance-v59-timeouts-live23-20260824
+launch-acceptance-v60-abort-retry-live24-20260824
