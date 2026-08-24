@@ -1,25 +1,39 @@
 {
-  "timestamp": "2026-08-23T19:04:43.998Z",
+  "timestamp": "2026-08-24T12:15:56.709Z",
   "base": "https://raz-coaching-platform.onrender.com",
-  "head_sha": "5b4f5d26e2306042c9bd4736e6a234960e731f58",
-  "runtime": "launch-acceptance-v55-transport-retry-live21-20260823",
+  "head_sha": "49391ad34e2fc3169f8c25d006c49347938a39f6",
+  "runtime": "launch-acceptance-v58-recovery-governance-live22-20260823",
   "results": [
     {
       "id": "advanced_hybrid",
-      "job_id": "362a8e5bc4691bb236a01e9c119b6694",
-      "ok": true,
-      "status": "done",
-      "stage": "finalizing",
-      "attempt": 0,
-      "detail": "saving program",
-      "last_seen_status": "done",
-      "error": null,
-      "program_chars": 19038,
-      "seconds": 422
+      "job_id": "37bac8ac4dba74b3a409a27ed42f59aa",
+      "ok": false,
+      "status": "error",
+      "stage": "generating",
+      "attempt": 1,
+      "detail": "initial generation",
+      "last_seen_status": "error",
+      "error": "This operation was aborted [QA:20]",
+      "program_chars": 0,
+      "seconds": 423
+    },
+    {
+      "id": "tactical_3k",
+      "job_id": "6e79509bd57ff97442f8600ee3eff7dd",
+      "ok": false,
+      "status": "error",
+      "stage": "refining",
+      "attempt": 4,
+      "detail": "internal repair: V35_BLOCK_SPECIFICITY_OVERSTATED",
+      "last_seen_status": "error",
+      "error": "Internal coaching QA could not repair the candidate program after multiple passes. No client-facing program was saved. Please retry the build. QA trace: A1:TACTICAL_GPP_COVERAGE_MISSING+V35_BLOCK_SPECIFICITY_OVERSTATED -> A2:V35_BLOCK_SPECIFICITY_OVERSTATED -> A3:V35_BLOCK_SPECIFICITY_OVERSTATED -> A4:V35_BLOCK_SPECIFICITY_OVERSTATED. [QA:INTERNAL_QA_REPAIR_EXHAUSTED]",
+      "program_chars": 0,
+      "seconds": 482
     }
   ],
   "selection": [
-    "advanced_hybrid"
+    "advanced_hybrid",
+    "tactical_3k"
   ],
-  "ok": true
+  "ok": false
 }
