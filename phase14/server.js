@@ -1690,9 +1690,20 @@ async function generateValidatedProgram(intake, onProgress = async () => {}) {
     try {
       raw = await runEngineRaw(userContent);
     } catch (e) {
-      if (e?.code !== "OPENAI_EMPTY_OUTPUT" || attempt >= MAX_ATTEMPTS) throw e;
-      console.warn(`generateValidatedProgram: empty model output on attempt ${attempt}/${MAX_ATTEMPTS}; retrying`);
-      await onProgress("refining", attempt, "model returned no content; retrying");
+      // A generation that ran past the request ceiling is not a verdict on the
+      // program either. Observed generation times run from 211s to past 420s,
+      // so the ceiling sits inside the normal distribution rather than beyond
+      // it -- and an abort was ending the build outright, leaving the whole
+      // remaining build budget unspent. Run #79 lost both avatars that way,
+      // each at 422s, with nineteen minutes of budget untouched.
+      const aborted = e?.name === "AbortError" || /operation was aborted/i.test(String(e?.message || ""));
+      const retriable = e?.code === "OPENAI_EMPTY_OUTPUT" || aborted;
+      // The deadline check at the top of the loop still owns the real limit, so
+      // a retry can only happen when there is genuinely budget left for one.
+      if (!retriable || attempt >= MAX_ATTEMPTS) throw e;
+      const reason = aborted ? "generation exceeded the request ceiling" : "empty model output";
+      console.warn(`generateValidatedProgram: ${reason} on attempt ${attempt}/${MAX_ATTEMPTS}; retrying`);
+      await onProgress("refining", attempt, aborted ? "generation timed out; retrying" : "model returned no content; retrying");
       continue;
     }
     if (!isValidProgram(raw)) {
