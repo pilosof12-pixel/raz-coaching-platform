@@ -77,6 +77,48 @@ test('429 and 5xx are retried; the final response is returned', async () => {
 });
 
 // Retrying these would burn minutes and money for an identical failure.
+// Live run #82 stopped on "You have no credits remaining", which OpenAI
+// returns as a 429. A rate-limit 429 is worth retrying; an out-of-money 429 is
+// as permanent as a 400 and only spends the build deadline.
+test('an out-of-credits 429 is not retried', async () => {
+  let calls = 0;
+  const body = { error: { code: 'insufficient_quota', message: 'You have no credits remaining. Add credits to continue using the API.' } };
+  const { openAIFetchWithTransportRetry } = await loadHelper(async () => {
+    calls += 1;
+    return { ok: false, status: 429, clone: () => ({ json: async () => body }) };
+  });
+  const r = await openAIFetchWithTransportRetry('u', { body: '{}' }, undefined);
+  assert.equal(r.status, 429);
+  assert.equal(calls, 1, 'a billing failure must not be re-sent');
+});
+
+test('an ordinary rate-limit 429 is still retried', async () => {
+  let calls = 0;
+  const { openAIFetchWithTransportRetry } = await loadHelper(async () => {
+    calls += 1;
+    if (calls === 1) {
+      return { ok: false, status: 429, clone: () => ({ json: async () => ({ error: { code: 'rate_limit_exceeded', message: 'Too many requests' } }) }) };
+    }
+    return { ok: true, status: 200 };
+  });
+  const r = await openAIFetchWithTransportRetry('u', { body: '{}' }, undefined);
+  assert.equal(r.status, 200);
+  assert.equal(calls, 2);
+});
+
+// A 429 whose body cannot be read must stay retriable rather than being
+// mistaken for a billing stop.
+test('an unreadable 429 body is treated as transient', async () => {
+  let calls = 0;
+  const { openAIFetchWithTransportRetry } = await loadHelper(async () => {
+    calls += 1;
+    if (calls === 1) return { ok: false, status: 429, clone: () => ({ json: async () => { throw new Error('not json'); } }) };
+    return { ok: true, status: 200 };
+  });
+  assert.equal((await openAIFetchWithTransportRetry('u', { body: '{}' }, undefined)).status, 200);
+  assert.equal(calls, 2);
+});
+
 test('a bad request is not retried', async () => {
   let calls = 0;
   const { openAIFetchWithTransportRetry } = await loadHelper(async () => {
