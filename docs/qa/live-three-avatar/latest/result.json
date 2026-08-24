@@ -1,39 +1,39 @@
 {
-  "timestamp": "2026-08-24T12:51:14.984Z",
+  "timestamp": "2026-08-24T13:22:02.781Z",
   "base": "https://raz-coaching-platform.onrender.com",
-  "head_sha": "c12fc350826b2bc6dc1c31b6ddb00b8e820e3963",
-  "runtime": "launch-acceptance-v59-timeouts-live23-20260824",
+  "head_sha": "b94789ee426c9bcdaea84311fb9991f999fa0215",
+  "runtime": "launch-acceptance-v60-abort-retry-live24-20260824",
   "results": [
     {
       "id": "advanced_hybrid",
-      "job_id": "371d5101909d15c0b7b1d125d490f57d",
-      "ok": false,
-      "status": "error",
-      "stage": "generating",
-      "attempt": 1,
-      "detail": "initial generation",
-      "last_seen_status": "error",
-      "error": "This operation was aborted [QA:20]",
-      "program_chars": 0,
-      "seconds": 422
+      "job_id": "b00e5cce3fe9d9eeefcf8338f788eed6",
+      "ok": true,
+      "status": "done",
+      "stage": "finalizing",
+      "attempt": 0,
+      "detail": "saving program",
+      "last_seen_status": "done",
+      "error": null,
+      "program_chars": 18672,
+      "seconds": 670
     },
     {
       "id": "tactical_3k",
-      "job_id": "a9caee9f979da458723f4fd5fd7fa255",
-      "ok": false,
-      "status": "error",
-      "stage": "generating",
-      "attempt": 1,
-      "detail": "initial generation",
-      "last_seen_status": "error",
-      "error": "This operation was aborted [QA:20]",
-      "program_chars": 0,
-      "seconds": 422
+      "job_id": "2b01b7f6f2130ff043ee242da79eb3a3",
+      "ok": true,
+      "status": "done",
+      "stage": "finalizing",
+      "attempt": 0,
+      "detail": "saving program",
+      "last_seen_status": "done",
+      "error": null,
+      "program_chars": 16216,
+      "seconds": 845
     }
   ],
   "selection": [
     "advanced_hybrid",
     "tactical_3k"
   ],
-  "ok": false
+  "ok": true
 }
