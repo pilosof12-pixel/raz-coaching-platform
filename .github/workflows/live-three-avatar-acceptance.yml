@@ -25,7 +25,7 @@ jobs:
   acceptance:
     if: github.event_name == 'workflow_dispatch' || contains(github.event.head_commit.message, '[RUN-LIVE-ACCEPTANCE]')
     runs-on: ubuntu-latest
-    timeout-minutes: 45
+    timeout-minutes: 60
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -93,7 +93,10 @@ jobs:
             let consecutive404=0;
             let lastSignature='';
             const started=Date.now();
-            for(let i=0;i<360;i++){
+            // 660 polls x 2s = 22 min, deliberately past the 20-minute server
+            // build deadline. At 360 the harness abandoned a job at 12 minutes
+            // while the service was still working on it.
+            for(let i=0;i<660;i++){
               await sleep(2000);
               try{
                 const poll=await req('/api/job/'+encodeURIComponent(b.j.job_id));
