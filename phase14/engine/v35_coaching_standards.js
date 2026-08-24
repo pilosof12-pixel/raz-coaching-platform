@@ -273,8 +273,24 @@ export function collectBlockSpecificityFlags(program, intake = {}) {
   // A block whose fastest quality is still materially slower than goal demand is
   // a developmental block, and must not be described as event-specific.
   const materiallySlower = fastest > goalPace * 1.03;
-  const claimsSpecific = /\brace[- ]specific|event[- ]specific\b/i.test(narrative(program))
-    || new RegExp(`sub-?\\s*${Math.floor(goalSec / 60)}`, 'i').test(narrative(program));
+  const narr = narrative(program);
+  // Naming the goal is not the same as claiming to have reached it. This rule
+  // used to treat any mention of the target time as a specificity claim, which
+  // made it reject the very remedy its own message prescribes: a narrative
+  // reading "a developmental block toward sub-12:00" was flagged exactly like
+  // one reading "a race-specific block". A live Tactical build spent all four
+  // attempts on that, following the instruction each time and failing each
+  // time, because the only passing move was to never mention the goal at all
+  // -- which the feedback never said and no coaching summary would do.
+  //
+  // What the rule is actually for is overstatement, so that is what it tests.
+  const framedDevelopmental = /\b(?:developmental|transition(?:al)?|preparatory|base|build(?:ing)?)\b[^.]{0,60}\bblock\b/i.test(narr)
+    || /\bblock\b[^.]{0,60}\b(?:developmental|transition(?:al)?|preparatory)\b/i.test(narr)
+    || /\btowards?\b/i.test(narr);
+  const deniesSpecific = /\bnot\s+(?:yet\s+)?(?:a\s+)?(?:race|event)[- ]specific\b/i.test(narr);
+  const assertsSpecific = /\brace[- ]specific|event[- ]specific\b/i.test(narr) && !deniesSpecific;
+  const namesGoalTime = new RegExp(`sub-?\\s*${Math.floor(goalSec / 60)}`, 'i').test(narr);
+  const claimsSpecific = assertsSpecific || (namesGoalTime && !framedDevelopmental);
   if (materiallySlower && claimsSpecific) {
     return [{
       code: 'V35_BLOCK_SPECIFICITY_OVERSTATED',

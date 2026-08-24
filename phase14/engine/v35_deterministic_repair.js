@@ -21,6 +21,7 @@ import { repairSessionHierarchy, repairKeySessionCrowding } from './v52_session_
 import { repairPrePrimaryLoad } from './v56_primary_day_protection.js';
 import { repairEnduranceVolume } from './v57_endurance_volume_governor.js';
 import { repairSemanticProse } from './v58_semantic_cleanup.js';
+import { repairBlockSpecificityClaim } from './v59_block_specificity_repair.js';
 import { classifyExercise, dayGap, stressSignature, dayKey as dayKeyOf } from './v38_movement_taxonomy.js';
 import { auditCircularScheduling } from './v38_structural_audit.js';
 
@@ -951,6 +952,14 @@ export function repairDeterministicContradictions(program, intake = {}) {
   // Last, once the logic is frozen and every repair above has written into
   // the notes: make the sentences say what the rows already say. This changes
   // no number, load or exercise.
+  // Name the block honestly. This is prose, not prescription, and without it
+  // the rule had no deterministic answer and cost four attempts.
+  const named = repairBlockSpecificityClaim(candidate, intake);
+  if (named !== candidate) {
+    candidate = named;
+    repairs.push({ type: 'v59_block_specificity_named' });
+  }
+
   const cleaned = repairSemanticProse(candidate, intake);
   if (cleaned !== candidate) {
     candidate = cleaned;

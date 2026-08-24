@@ -145,5 +145,6 @@ export function buildEnduranceVolumeBrief(intake = {}) {
     '* SECONDARY VOLUME GOVERNOR: the primary goal is an endurance event, so recovery belongs to it first.',
     '  Rank work as primary event work > maintenance strength > necessary tissue work > hypertrophy and accessories.',
     '  Lower-body accessories on or beside a key run or ruck day take the minimum useful dose: keep the tissue exposure, not the effort. Do not add hypertrophy volume merely because a day has room for it.',
+    '  This protects the event work; it never dilutes it. The interval and tempo sessions that drive the goal keep their prescribed quality and pace. Reduce accessories, never the primary event quality.',
   ].join('\n');
 }
