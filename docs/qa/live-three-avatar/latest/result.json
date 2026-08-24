@@ -1,39 +1,39 @@
 {
-  "timestamp": "2026-08-24T13:22:02.781Z",
+  "timestamp": "2026-08-24T14:50:05.424Z",
   "base": "https://raz-coaching-platform.onrender.com",
-  "head_sha": "b94789ee426c9bcdaea84311fb9991f999fa0215",
-  "runtime": "launch-acceptance-v60-abort-retry-live24-20260824",
+  "head_sha": "458323cb37773cd777ab2a7bd4b0c212f8cc06d1",
+  "runtime": "launch-acceptance-v62-phase-exposures-live25-20260824",
   "results": [
     {
       "id": "advanced_hybrid",
-      "job_id": "b00e5cce3fe9d9eeefcf8338f788eed6",
-      "ok": true,
-      "status": "done",
-      "stage": "finalizing",
-      "attempt": 0,
-      "detail": "saving program",
-      "last_seen_status": "done",
-      "error": null,
-      "program_chars": 18672,
-      "seconds": 670
+      "job_id": "e840340a610a1b720aab738b589e002d",
+      "ok": false,
+      "status": "error",
+      "stage": "generating",
+      "attempt": 1,
+      "detail": "initial generation",
+      "last_seen_status": "error",
+      "error": "You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/.",
+      "program_chars": 0,
+      "seconds": 13
     },
     {
       "id": "tactical_3k",
-      "job_id": "2b01b7f6f2130ff043ee242da79eb3a3",
-      "ok": true,
-      "status": "done",
-      "stage": "finalizing",
-      "attempt": 0,
-      "detail": "saving program",
-      "last_seen_status": "done",
-      "error": null,
-      "program_chars": 16216,
-      "seconds": 845
+      "job_id": "ec856fe33453f218054607a6d395e6d2",
+      "ok": false,
+      "status": "error",
+      "stage": "generating",
+      "attempt": 1,
+      "detail": "initial generation",
+      "last_seen_status": "error",
+      "error": "You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/.",
+      "program_chars": 0,
+      "seconds": 11
     }
   ],
   "selection": [
     "advanced_hybrid",
     "tactical_3k"
   ],
-  "ok": true
+  "ok": false
 }
