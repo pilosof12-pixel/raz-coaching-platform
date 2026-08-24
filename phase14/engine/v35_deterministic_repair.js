@@ -22,6 +22,7 @@ import { repairPrePrimaryLoad } from './v56_primary_day_protection.js';
 import { repairEnduranceVolume } from './v57_endurance_volume_governor.js';
 import { repairSemanticProse } from './v58_semantic_cleanup.js';
 import { repairBlockSpecificityClaim } from './v59_block_specificity_repair.js';
+import { repairFrequencyClaim } from './v61_weekly_exposures.js';
 import { classifyExercise, dayGap, stressSignature, dayKey as dayKeyOf } from './v38_movement_taxonomy.js';
 import { auditCircularScheduling } from './v38_structural_audit.js';
 
@@ -954,6 +955,14 @@ export function repairDeterministicContradictions(program, intake = {}) {
   // no number, load or exercise.
   // Name the block honestly. This is prose, not prescription, and without it
   // the rule had no deterministic answer and cost four attempts.
+  // A stated weekly frequency that does not match the prescription is a
+  // contradiction the client can see on one sheet. Counting is deterministic.
+  const counted = repairFrequencyClaim(candidate, intake);
+  if (counted !== candidate) {
+    candidate = counted;
+    repairs.push({ type: 'v61_frequency_claim_counted' });
+  }
+
   const named = repairBlockSpecificityClaim(candidate, intake);
   if (named !== candidate) {
     candidate = named;

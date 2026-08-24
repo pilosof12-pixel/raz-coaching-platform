@@ -177,7 +177,7 @@
     return {drills,rules};
   }
 
-  function profileRows(intake={}) {
+  function profileRows(intake={}, frequencyText='') {
     const rows=[]; const age=ageFromIntake(intake); const benchmarks=benchmarkText(intake);
     if(age) rows.push(['Age',String(age)]);
     if(intake.bodyweight || intake.weight_kg) rows.push(['Bodyweight',clean(intake.bodyweight || intake.weight_kg)]);
@@ -189,7 +189,10 @@
       rows.push(['Handstand baseline',clean(intake.clarification_answers.benchmark_handstand)]);
     if(/pistol/i.test(text(intake.current_numbers))) rows.push(['Lower-body benchmark',clean(intake.current_numbers)]);
     else if(benchmarks && !rows.some(r=>/baseline|benchmark/i.test(r[0]))) rows.push(['Current benchmarks',benchmarks]);
-    rows.push(['Training frequency',`${Number(intake.days_per_week||0)||''} structured sessions/week`.trim()]);
+    // Prefer the counted week. The requested figure is kept only when there is
+    // no program to count, so the sheet never contradicts the table beside it.
+    const requested = `${Number(intake.days_per_week||0)||''} structured sessions/week`.trim();
+    rows.push(['Training frequency', frequencyText || requested]);
     rows.push(['Equipment',equipmentText(intake)]);
     if(clean(intake.sport)) rows.push(['Concurrent sport',clean(intake.sport)]);
     rows.push(['Pain / injury',painText(intake)]);
@@ -239,6 +242,48 @@
     return 'RAZ — PERFORMANCE PROGRAM';
   }
 
+  // What the week actually contains, counted from the prescription.
+  //
+  // This row used to read intake.days_per_week, so the Overview quoted what
+  // the athlete asked for while the table beside it showed what was
+  // prescribed: "4 structured sessions/week" against a Mon/Tue/Thu/Fri/Sun
+  // schedule. A client reading one sheet saw a contradiction and was right to.
+  //
+  // The engine counts the same thing in v61_weekly_exposures.js. Browser code
+  // cannot import it, so a test asserts the two agree on the live programs
+  // rather than trusting that they do.
+  const ENDURANCE_RE = /\b(?:run|running|jog|ruck|carry|row(?:ing)?|bike|cycl|swim|sled|treadmill|interval)\b/i;
+
+  function weeklyExposures(week) {
+    const byDay = new Map();
+    for (const r of normalizedRows(week)) {
+      const name = String(r.exercise || '');
+      if (/^\s*\[(?:WARMUP|חימום)\]/i.test(name)) continue;
+      const day = String(r.day || '').trim();
+      if (!day) continue;
+      if (!byDay.has(day)) byDay.set(day, { strength: 0, endurance: 0 });
+      const b = byDay.get(day);
+      if (ENDURANCE_RE.test(name)) b.endurance += 1; else b.strength += 1;
+    }
+    const days = [...byDay.keys()];
+    return {
+      total: days.length,
+      strength: days.filter((d) => byDay.get(d).strength > 0).length,
+      enduranceOnly: days.filter((d) => byDay.get(d).endurance > 0 && byDay.get(d).strength === 0).length,
+    };
+  }
+
+  function describeExposures(ex, intake) {
+    if (!ex || !ex.total) return '';
+    const parts = [];
+    if (ex.strength) parts.push(ex.strength + ' strength/GPP');
+    if (ex.enduranceOnly) parts.push(ex.enduranceOnly + ' endurance');
+    const detail = parts.length ? ' (' + parts.join(' + ') + ')' : '';
+    const sportDays = Array.isArray(intake && intake.sport_schedule) ? intake.sport_schedule.length : 0;
+    const sport = sportDays ? ', plus ' + sportDays + ' sport session' + (sportDays === 1 ? '' : 's') : '';
+    return ex.total + ' training day' + (ex.total === 1 ? '' : 's') + '/week' + detail + sport;
+  }
+
   function renderOverview(ws, intake, week1) {
     ws.views=[{showGridLines:false}];
     [28,34,16,48].forEach((w,i)=>ws.getColumn(i+1).width=w);
@@ -247,7 +292,7 @@
     let row=4;
     ['ATHLETE / PROGRAM','DETAIL','',''].forEach((v,i)=>{const c=ws.getRow(row).getCell(i+1);c.value=v;fill(c,HEADER);font(c,{size:10,bold:true,color:WHITE});align(c,{horizontal:'center'});});
     row++;
-    for(const [k,v] of profileRows(intake)){
+    for(const [k,v] of profileRows(intake, describeExposures(weeklyExposures(week1), intake))){
       const a=ws.getRow(row).getCell(1), b=ws.getRow(row).getCell(2);
       a.value=k; b.value=v; fill(a,LABEL); font(a,{size:10,bold:true}); align(a);
       ws.mergeCells(row,2,row,4); fill(b,BODY); font(b,{size:10}); align(b); ws.getRow(row).height=34; row++;

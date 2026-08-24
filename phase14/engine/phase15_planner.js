@@ -16,6 +16,7 @@ import { buildSpecGapBrief } from './v49_spec_gap_rules.js';
 import { buildSessionHierarchyBrief } from './v52_session_hierarchy.js';
 import { buildPrimaryDayProtectionBrief } from './v56_primary_day_protection.js';
 import { buildEnduranceVolumeBrief } from './v57_endurance_volume_governor.js';
+import { buildBlockPhaseBrief } from './v62_block_phase.js';
 import { buildSessionSubstanceBrief } from './v53_session_substance.js';
 import { buildLanguageAccuracyBrief } from './v46_language_accuracy.js';
 
@@ -271,6 +272,7 @@ export function buildDeterministicBrief(intake = {}) {
     buildSessionHierarchyBrief(intake),
     buildPrimaryDayProtectionBrief(intake),
     buildEnduranceVolumeBrief(intake),
+    buildBlockPhaseBrief(intake),
     buildSessionSubstanceBrief(intake),
     buildLanguageAccuracyBrief(intake),
     specialist,

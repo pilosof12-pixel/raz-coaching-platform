@@ -118,9 +118,15 @@ test('the brief tells the model to reason from the schedule, not the calendar', 
 });
 
 // The finding the coach actually raised, against the program he reviewed.
-test('the live run #77 Hybrid program is caught in every week and converges', () => {
-  const url = new URL('../../docs/qa/live-three-avatar/latest/advanced_hybrid-program.txt', import.meta.url);
-  if (!fs.existsSync(url)) return; // evidence is rewritten by acceptance runs
+//
+// Pinned rather than read from docs/qa/.../latest: acceptance runs overwrite
+// that file, and once the engine started preventing this defect the live
+// program stopped exhibiting it -- so the test was asserting the presence of a
+// bug in a program that no longer had one. The regression it guards is the
+// detector going quiet, which needs a program that genuinely offends.
+test('the reviewed run #77 Hybrid program is caught in every week and converges', () => {
+  const url = new URL('./fixtures/run77_advanced_hybrid_defective.txt', import.meta.url);
+  if (!fs.existsSync(url)) return;
   const program = fs.readFileSync(url, 'utf8');
   const intake = { ...HYBRID, goal_priority_model: 'tiered_equal_primary' };
   const flags = collectPrePrimaryLoadFlags(program, intake);
