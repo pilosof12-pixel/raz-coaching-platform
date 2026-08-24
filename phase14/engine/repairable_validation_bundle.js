@@ -25,6 +25,8 @@ import { collectProgressionDisciplineFlags } from './v42_progression_discipline.
 import { collectGovernanceFlags, GOVERNANCE_HARD_CODES } from './v43_coaching_governance.js'; // V43-GOVERNANCE-WIRED
 import { collectSessionHierarchyFlags, collectKeySessionCrowdingFlags } from './v52_session_hierarchy.js'; // V52-SESSION-HIERARCHY-WIRED
 import { collectPrePrimaryLoadFlags } from './v56_primary_day_protection.js'; // V56-PRIMARY-DAY-PROTECTION-WIRED
+import { collectEnduranceVolumeFlags } from './v57_endurance_volume_governor.js'; // V57-ENDURANCE-VOLUME-WIRED
+import { collectSemanticFlags } from './v58_semantic_cleanup.js'; // V58-SEMANTIC-CLEANUP-WIRED
 import { collectLanguageAccuracyFlags, LANGUAGE_HARD_CODES, repairCountClaims } from './v46_language_accuracy.js'; // V46-LANGUAGE-ACCURACY-WIRED
 import { repairDeterministicContradictions } from './v35_deterministic_repair.js'; // V35-DETERMINISTIC-REPAIR-WIRED
 import { normalizeAdvancedHybridWeek4OapConsolidation } from './advanced_hybrid_oap_consolidation_normalizer.js';
@@ -491,6 +493,22 @@ export function collectRepairableValidationFailures(program, intake = {}, option
     if (!prePrimary.length) return;
     throw new RetriableValidationError(prePrimary[0].code,
       prePrimary.map((f) => f.detail).join(' '), { flags: prePrimary });
+  });
+
+  runRepairable(flags, () => {
+    const governed = collectEnduranceVolumeFlags(candidate, intake);
+    if (!governed.length) return;
+    throw new RetriableValidationError(governed[0].code,
+      governed.map((f) => f.detail).join(' '), { flags: governed });
+  });
+
+  // Malformed prose is always repairable in place, so reaching here means the
+  // cleanup could not resolve it and the sentence needs regenerating.
+  runRepairable(flags, () => {
+    const prose = collectSemanticFlags(candidate, intake);
+    if (!prose.length) return;
+    throw new RetriableValidationError(prose[0].code,
+      prose.map((f) => f.detail).join(' '), { flags: prose });
   });
 
   runRepairable(flags, () => validatePhase15FinalProgram(candidate, intake));

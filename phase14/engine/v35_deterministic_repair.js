@@ -19,6 +19,8 @@ import { longRunBuildClaim } from './v35_coaching_standards.js';
 import { repairCountClaims } from './v46_language_accuracy.js';
 import { repairSessionHierarchy, repairKeySessionCrowding } from './v52_session_hierarchy.js';
 import { repairPrePrimaryLoad } from './v56_primary_day_protection.js';
+import { repairEnduranceVolume } from './v57_endurance_volume_governor.js';
+import { repairSemanticProse } from './v58_semantic_cleanup.js';
 import { classifyExercise, dayGap, stressSignature, dayKey as dayKeyOf } from './v38_movement_taxonomy.js';
 import { auditCircularScheduling } from './v38_structural_audit.js';
 
@@ -868,6 +870,11 @@ export function repairDeterministicContradictions(program, intake = {}) {
   // no set count, so this never needs regeneration.
   candidate = repairPrePrimaryLoad(candidate, intake);
 
+  // With an endurance primary goal, lower-body accessories beside key run and
+  // ruck work are held to the minimum useful dose. Maintenance strength is
+  // untouched: a conservative squat is how an endurance athlete stays strong.
+  candidate = repairEnduranceVolume(candidate, intake);
+
   // The lower-cost exposure of a primary movement is relocated off the day
   // before its heavy exposure. Moving a row between the athlete's own training
   // days changes no prescription.
@@ -939,6 +946,15 @@ export function repairDeterministicContradictions(program, intake = {}) {
   if (narrative.changed) {
     candidate = narrative.program;
     repairs.push({ type: 'v35_narrative_restated' });
+  }
+
+  // Last, once the logic is frozen and every repair above has written into
+  // the notes: make the sentences say what the rows already say. This changes
+  // no number, load or exercise.
+  const cleaned = repairSemanticProse(candidate, intake);
+  if (cleaned !== candidate) {
+    candidate = cleaned;
+    repairs.push({ type: 'v58_semantic_cleanup' });
   }
 
   return { program: candidate, repaired: repairs.length > 0, repairs };
