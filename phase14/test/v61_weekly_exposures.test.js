@@ -48,9 +48,19 @@ test('a strength day that finishes with a jog is still one day', () => {
   assert.equal(ex.enduranceOnly, 1, 'Monday is not an endurance-only day');
 });
 
+// The review asked for these apart: three runs and a ruck is four conditioning
+// exposures, and reporting "2 endurance days" hid that entirely.
+test('runs and rucks are counted as separate exposures', () => {
+  const withRuck = WEEK.replace('END_WEEK1_TSV', 'Sat\tBackpack Carry\t20 kg\t1\t8 km\tN/A\t6\tRuck.\t\nEND_WEEK1_TSV');
+  const ex = weeklyExposures(withRuck, 1, HYBRID);
+  assert.equal(ex.runningExposures, 1);
+  assert.equal(ex.ruckExposures, 1);
+  assert.equal(ex.conditioningExposures, 2);
+});
+
 test('the description names what the figure counts', () => {
   const text = describeExposures(weeklyExposures(WEEK, 1, HYBRID));
-  assert.equal(text, '5 training days/week (4 strength/GPP + 1 endurance), plus 5 sport sessions');
+  assert.equal(text, '5 training days/week (4 strength, 1 running), plus 5 sport sessions');
 });
 
 // The live defect: the Overview quoted intake.days_per_week while the table
@@ -80,7 +90,7 @@ test('the repair states the counted week and converges', () => {
   const bad = build('This block runs 4 structured sessions/week.');
   const fixed = repairFrequencyClaim(bad, HYBRID);
   assert.equal(collectFrequencyClaimFlags(fixed, HYBRID).length, 0);
-  assert.match(fixed, /5 training days\/week \(4 strength\/GPP \+ 1 endurance\)/);
+  assert.match(fixed, /5 training days\/week \(4 strength, 1 running\)/);
   assert.equal(repairFrequencyClaim(fixed, HYBRID), fixed, 'idempotent');
 });
 
@@ -108,6 +118,9 @@ test('the spreadsheet exporter counts the same week as the engine', () => {
   assert.equal(ctx.result.total, engine.total, 'total days must agree');
   assert.equal(ctx.result.strength, engine.strength, 'strength days must agree');
   assert.equal(ctx.result.enduranceOnly, engine.enduranceOnly, 'endurance-only days must agree');
+  assert.equal(ctx.result.runningExposures, engine.runningExposures, 'running exposures must agree');
+  assert.equal(ctx.result.ruckExposures, engine.ruckExposures, 'ruck exposures must agree');
+  assert.equal(ctx.result.conditioningExposures, engine.conditioningExposures, 'conditioning exposures must agree');
 });
 
 // Against the programs a coach actually reviewed.

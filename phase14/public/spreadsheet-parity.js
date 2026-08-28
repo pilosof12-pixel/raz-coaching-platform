@@ -253,9 +253,14 @@
   // cannot import it, so a test asserts the two agree on the live programs
   // rather than trusting that they do.
   const ENDURANCE_RE = /\b(?:run|running|jog|ruck|carry|row(?:ing)?|bike|cycl|swim|sled|treadmill|interval)\b/i;
+  // A run and a ruck both condition and are not interchangeable: one is the
+  // event, the other competes with it for the same tissue.
+  const RUCK_RE = /\bruck|backpack carry|weighted carry|loaded carry|sandbag carry\b/i;
 
   function weeklyExposures(week) {
     const byDay = new Map();
+    let running = 0;
+    let ruck = 0;
     for (const r of normalizedRows(week)) {
       const name = String(r.exercise || '');
       if (/^\s*\[(?:WARMUP|חימום)\]/i.test(name)) continue;
@@ -263,22 +268,29 @@
       if (!day) continue;
       if (!byDay.has(day)) byDay.set(day, { strength: 0, endurance: 0 });
       const b = byDay.get(day);
-      if (ENDURANCE_RE.test(name)) b.endurance += 1; else b.strength += 1;
+      if (ENDURANCE_RE.test(name)) {
+        b.endurance += 1;
+        if (RUCK_RE.test(name)) ruck += 1; else running += 1;
+      } else b.strength += 1;
     }
     const days = [...byDay.keys()];
     return {
       total: days.length,
       strength: days.filter((d) => byDay.get(d).strength > 0).length,
       enduranceOnly: days.filter((d) => byDay.get(d).endurance > 0 && byDay.get(d).strength === 0).length,
+      runningExposures: running,
+      ruckExposures: ruck,
+      conditioningExposures: running + ruck,
     };
   }
 
   function describeExposures(ex, intake) {
     if (!ex || !ex.total) return '';
     const parts = [];
-    if (ex.strength) parts.push(ex.strength + ' strength/GPP');
-    if (ex.enduranceOnly) parts.push(ex.enduranceOnly + ' endurance');
-    const detail = parts.length ? ' (' + parts.join(' + ') + ')' : '';
+    if (ex.strength) parts.push(ex.strength + ' strength');
+    if (ex.runningExposures) parts.push(ex.runningExposures + ' running');
+    if (ex.ruckExposures) parts.push(ex.ruckExposures + ' ruck');
+    const detail = parts.length ? ' (' + parts.join(', ') + ')' : '';
     const sportDays = Array.isArray(intake && intake.sport_schedule) ? intake.sport_schedule.length : 0;
     const sport = sportDays ? ', plus ' + sportDays + ' sport session' + (sportDays === 1 ? '' : 's') : '';
     return ex.total + ' training day' + (ex.total === 1 ? '' : 's') + '/week' + detail + sport;
@@ -366,18 +378,32 @@
     });
   }
 
-  function weekTitle(n) {
-    return n===1?'WEEK 1 — FOUNDATION':n===2?'WEEK 2 — BUILD':n===3?'WEEK 3 — SPECIFICITY':'WEEK 4 — CONSOLIDATE / EXPRESS';
+  // Week 3 used to be labelled SPECIFICITY unconditionally. For a block whose
+  // quality work is still materially slower than race demand that is simply
+  // untrue, and it contradicted the program's own opening sentence, which
+  // called the block developmental. The label now reads the narrative rather
+  // than asserting a phase: the engine already makes that sentence honest, so
+  // it is the single source of truth and nothing here has to re-derive it.
+  const DEVELOPMENTAL_NARRATIVE = /\b(?:developmental|pre[- ]specific|transition(?:al)?|base(?:[- ]building)?)\b/i;
+
+  function weekTitle(n, program) {
+    if (n === 1) return 'WEEK 1 — FOUNDATION';
+    if (n === 2) return 'WEEK 2 — BUILD';
+    if (n === 4) return 'WEEK 4 — CONSOLIDATE / EXPRESS';
+    const narrative = String(program || '').split(/START_WEEK1_TSV/i)[0];
+    return DEVELOPMENTAL_NARRATIVE.test(narrative)
+      ? 'WEEK 3 — PEAK LOAD'
+      : 'WEEK 3 — SPECIFICITY';
   }
   function applyTrackingValidation(cell, kind) {
     cell.dataValidation = kind==='status'
       ? {type:'list',allowBlank:true,formulae:['"Not Started,In Progress,Complete"']}
       : {type:'list',allowBlank:true,formulae:['",✓"']};
   }
-  function renderWeek(ws, intake, week) {
+  function renderWeek(ws, intake, week, program) {
     ws.views=[{showGridLines:false,state:'frozen',ySplit:4}];
     [29,23,9,17,14,16,50,13,38,14,9].forEach((w,i)=>ws.getColumn(i+1).width=w);
-    mergeTitle(ws,1,11,weekTitle(week.week),NAVY,16);
+    mergeTitle(ws,1,11,weekTitle(week.week, program),NAVY,16);
     mergeTitle(ws,2,11,'Exact live production prescription in the approved client template. Day names are section bands, not a permanent data column.',NAVY_2,10,'FFDCE7F7');
     const headers=['Exercise','Load / Target','Sets','Reps / Duration','Rest','Effort','Coaching Note','Log','Video','Status','Done'];
     let row=4;
@@ -411,7 +437,7 @@
     const wb=new ExcelJS.Workbook(); wb.creator='RAZ Performance Coaching Engine'; wb.created=new Date();
     renderOverview(wb.addWorksheet('Overview'),intake,weeks[0]);
     renderWarmup(wb.addWorksheet('Warm-Up'),intake,weeks[0]);
-    weeks.forEach(w=>renderWeek(wb.addWorksheet(`Week ${w.week}`),intake,w));
+    weeks.forEach(w=>renderWeek(wb.addWorksheet(`Week ${w.week}`),intake,w,program));
     const buffer=await wb.xlsx.writeBuffer();
     const blob=new Blob([buffer],{type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'});
     const url=URL.createObjectURL(blob); const a=document.createElement('a');

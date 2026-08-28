@@ -1,0 +1,88 @@
+This is a developmental 3K block spread across five training days so the three strength sessions are no longer stacked back-to-back. Monday carries squat plus weighted pull-up and easy running, Wednesday holds deadlift plus press plus strict pull-ups, Thursday keeps direct 20 kg ruck practice in, Friday is the low-cost support day with easy running, and Saturday is still the key 3K session.
+
+Weeks 2-3 lengthen the interval reps at roughly your current repeat pace, then Week 4 trims interval volume and lets you express slightly faster 500s. Ruck pace nudges up through Week 3, then Week 4 holds that pace and extends distance slightly. Weighted pull-ups stay stable; strict pull-up volume climbs to 4x8, then consolidates at 3x8.
+
+If shin soreness shows up during or within 24 hours of the interval day, first hold or cut the newest interval change and repeat the last clean week before touching easy runs. If soreness shows up after the ruck, back off the newest ruck variable first, pace in Weeks 2-3, distance in Week 4, before changing the runs. For elbows or shoulders, use the low end of the loading range and drop the last Pull-up or Push-up set before changing the whole day.
+
+Weekly running volume anchor: your established, tolerated baseline is about 18-20 km per week across 3 running exposures, and this block keeps 3 running exposures while quality becomes more 3K-specific. Counting easy runs, warm-up, repetitions and cooldown, Week 1 projects roughly 14 km, which is deliberately below that baseline while the new interval specificity is the only impact variable stepping up. While shins and next-day soreness stay normal, rebuild toward the top of your 18-20 km range by adding a few minutes to the easy runs first, never by adding a fourth running day or by making the easy runs faster. If shin symptoms return, reduce the stressor that provoked them or the one most recently increased, the interval session if symptoms follow that session, the ruck if they follow loaded carrying, and easy-run volume only for diffuse accumulated soreness, then repeat the last symptom-free week before progressing again.
+
+START_WEEK1_TSV
+Day	Exercise	Weight	Sets	Reps	Rest	Target RPE	Notes	Results
+Mon	Back Squat	110-115 kg	2	3	3:00	6.5-7	Low-fatigue maintenance; if bar speed drops or this climbs past 7, hold load or cut 1 set.	
+Mon	Weighted Pull-up	+22.5 kg	3	4	2:30-3:00	7-8	Submaximal weighted support anchored below the demonstrated +30 kg x 5 benchmark; full hang, strict reps, no grind.	
+Mon	Push-up	RPE-selected plate or vest	2	8	1:30	7	Low-cost horizontal press; load it enough to matter, but keep reps smooth and clean.	
+Mon	Calf Raise	RPE-selected load	2	12-15	1:00	7	Controlled pause at top and bottom; tissue-capacity work for run and ruck tolerance.	
+Mon	Run	Easy conversational pace, about 5:35-6:05/km	1	7 km	N/A	5	Separate later the same day is fine; flat route if shins or calves feel loaded.	
+Wed	Deadlift	145-150 kg	2	3	3:00	6.5-7	Maintenance only; if back or grip feels cooked, stay at the low end or cut 1 set.	
+Wed	Overhead Press	52.5-55 kg	3	5	2:00-2:30	7-7.5	Strict reps; if bar path or speed slips, hold load rather than forcing the top end.	
+Wed	Pull-up	Bodyweight	4	6	2:00	7.5	Leave about 2 reps in reserve on early sets; if any set turns grindy, hold this target next week.	
+Wed	Side Plank	Bodyweight	2	30-40 sec/side	0:45	7	Hips stacked and ribs down; stop the set when position goes soft.	
+Thu	Backpack Carry	20 kg pack, 9:35-9:45/km	1	8 km	N/A	6	Brisk walk only, no shuffle; early developmental step toward the faster 10 km goal. If shin or foot soreness appears, slow down and repeat this week.	
+Fri	Reverse Lunge	RPE-selected dumbbells	2	6/leg	1:30-2:00	7	Recovery-contingent support day; keep 2 reps in reserve and do not chase soreness before Saturday quality.	
+Fri	Chest-Supported Row	RPE-selected load	3	8-10	1:30	7.5	Smooth chest contact and brief squeeze; add load only after all reps are clean.	
+Fri	Push-up	RPE-selected plate or vest	1	10	1:30	7	Keep this submaximal; one quality set is enough here, and skip it if shoulders feel beat up.	
+Fri	Calf Raise	RPE-selected load	2	12-15	1:00	7	Second small tissue-capacity dose; remove this first if time is tight.	
+Fri	Run	Easy conversational pace, about 5:40-6:10/km	1	5 km	N/A	5	Keep it truly easy to protect Saturday quality.	
+Sat	[WARMUP]	N/A	1	10 min	N/A	3	Easy jog 6-8 min; dynamic running drills; 3 relaxed strides before the hard running work; keep the warm-up specific and non-fatiguing.	
+Sat	Run	1:44-1:46 per 400 m	5	400 m	2:00 walk/jog	8	2 km easy + drills + 4 relaxed strides before, 1.5 km easy after. Developmental 3K support; if pace slips by more than about 2 sec per 400 equivalent or shin pain appears, stop at the last clean rep and repeat this week.	
+END_WEEK1_TSV
+START_WEEK2_TSV
+Day	Exercise	Weight	Sets	Reps	Rest	Target RPE	Notes	Results
+Mon	Back Squat	110-115 kg	2	3	3:00	6.5-7	Low-fatigue maintenance; if bar speed drops or this climbs past 7, hold load or Hold the set count and consolidate through rep quality and a slightly lower effort,	
+Mon	Weighted Pull-up	+22.5 kg	3	4	2:30-3:00	7-8	Submaximal weighted support anchored below the demonstrated +30 kg x 5 benchmark; full hang, strict reps, no grind.	
+Mon	Push-up	RPE-selected plate or vest	2	8	1:30	7	Low-cost horizontal press; load it enough to matter, but keep reps smooth and clean.	
+Mon	Calf Raise	RPE-selected load	2	12-15	1:00	7	Controlled pause at top and bottom; tissue-capacity work for run and ruck tolerance.	
+Mon	Run	Easy conversational pace, about 5:35-6:05/km	1	7 km	N/A	5	Separate later the same day is fine; flat route if shins or calves feel loaded.	
+Wed	Deadlift	145-150 kg	2	3	3:00	6.5-7	Maintenance only; if back or grip feels cooked, stay at the low end or Hold the set count and consolidate through rep quality and a slightly lower effort,	
+Wed	Overhead Press	52.5-55 kg	3	5	2:00-2:30	7-7.5	Strict reps; if bar path or speed slips, hold load rather than forcing the top end.	
+Wed	Pull-up	Bodyweight	4	7	2:00	8	Add 7 reps per set only if Week 1 stayed clean; if rep speed falls off badly, stop at 6s and repeat.	
+Wed	Side Plank	Bodyweight	2	30-40 sec/side	0:45	7	Hips stacked and ribs down; stop the set when position goes soft.	
+Thu	Backpack Carry	20 kg pack, 9:25-9:35/km	1	8 km	N/A	6	Pace moves slightly while load and distance stay fixed. If shin or foot soreness appears, return to Week 1 pace next time.	
+Fri	Reverse Lunge	RPE-selected dumbbells	2	6/leg	1:30-2:00	7	Recovery-contingent support day; keep 2 reps in reserve and do not chase soreness before Saturday quality.	
+Fri	Chest-Supported Row	RPE-selected load	3	8-10	1:30	7.5	Smooth chest contact and brief squeeze; add load only after all reps are clean.	
+Fri	Push-up	RPE-selected plate or vest	1	10	1:30	7	Keep this submaximal; one quality set is enough here, and skip it if shoulders feel beat up.	
+Fri	Calf Raise	RPE-selected load	2	12-15	1:00	7	Second small tissue-capacity dose; remove this first if time is tight.	
+Fri	Run	Easy conversational pace, about 5:40-6:10/km	1	5 km	N/A	5	Keep it truly easy to protect Saturday quality.	
+Sat	[WARMUP]	N/A	1	10 min	N/A	3	Easy jog 6-8 min; dynamic running drills; 3 relaxed strides before the hard running work; keep the warm-up specific and non-fatiguing.	
+Sat	Run	2:10-2:12 per 500 m	4	500 m	2:15 walk/jog	8	2 km easy + drills + 4 relaxed strides before, 1.5 km easy after. Longer reps at similar current-calibrated pace; if you cannot hold the split cleanly, stop at 3 reps and repeat Week 1.	
+END_WEEK2_TSV
+START_WEEK3_TSV
+Day	Exercise	Weight	Sets	Reps	Rest	Target RPE	Notes	Results
+Mon	Back Squat	110-115 kg	2	3	3:00	6.5-7	Low-fatigue maintenance; if bar speed drops or this climbs past 7, hold load or Hold the set count and consolidate through rep quality and a slightly lower effort,	
+Mon	Weighted Pull-up	+22.5 kg	3	4	2:30-3:00	7-8	Submaximal weighted support anchored below the demonstrated +30 kg x 5 benchmark; full hang, strict reps, no grind.	
+Mon	Push-up	RPE-selected plate or vest	2	8	1:30	7	Low-cost horizontal press; load it enough to matter, but keep reps smooth and clean.	
+Mon	Calf Raise	RPE-selected load	2	12-15	1:00	7	Controlled pause at top and bottom; tissue-capacity work for run and ruck tolerance.	
+Mon	Run	Easy conversational pace, about 5:35-6:05/km	1	7 km	N/A	5	Separate later the same day is fine; flat route if shins or calves feel loaded.	
+Wed	Deadlift	145-150 kg	2	3	3:00	6.5-7	Maintenance only; if back or grip feels cooked, stay at the low end or Hold the set count and consolidate through rep quality and a slightly lower effort,	
+Wed	Overhead Press	52.5-55 kg	3	5	2:00-2:30	7-7.5	Strict reps; if bar path or speed slips, hold load rather than forcing the top end.	
+Wed	Pull-up	Bodyweight	4	8	2:00	8-8.5	Only take the extra rep if Week 2 stayed clean. If the fourth set becomes a grind, stop at 3 quality sets and retry next week.	
+Wed	Side Plank	Bodyweight	2	30-40 sec/side	0:45	7	Hips stacked and ribs down; stop the set when position goes soft.	
+Thu	Backpack Carry	20 kg pack, 9:15-9:25/km	1	8 km	N/A	6-6.5	Another small pace nudge with load and distance fixed. If shin or foot soreness shows up, go back to Week 2 pace.	
+Fri	Reverse Lunge	RPE-selected dumbbells	2	6/leg	1:30-2:00	7	Recovery-contingent support day; keep 2 reps in reserve and do not chase soreness before Saturday quality.	
+Fri	Chest-Supported Row	RPE-selected load	3	8-10	1:30	7.5	Smooth chest contact and brief squeeze; add load only after all reps are clean.	
+Fri	Push-up	RPE-selected plate or vest	1	10	1:30	7	Keep this submaximal; one quality set is enough here, and skip it if shoulders feel beat up.	
+Fri	Calf Raise	RPE-selected load	2	12-15	1:00	7	Second small tissue-capacity dose; remove this first if time is tight.	
+Fri	Run	Easy conversational pace, about 5:40-6:10/km	1	5 km	N/A	5	Keep it truly easy to protect Saturday quality.	
+Sat	[WARMUP]	N/A	1	10 min	N/A	3	Easy jog 6-8 min; dynamic running drills; 3 relaxed strides before the hard running work; keep the warm-up specific and non-fatiguing.	
+Sat	Run	2:36-2:38 per 600 m	4	600 m	2:30 walk/jog	8.5	2 km easy + drills + 4 relaxed strides before, 1.5 km easy after. Longer sustained reps are the main progression; if rep 4 is not as controlled as rep 3, stop there and repeat Week 2 next time.	
+END_WEEK3_TSV
+START_WEEK4_TSV
+Day	Exercise	Weight	Sets	Reps	Rest	Target RPE	Notes	Results
+Mon	Back Squat	110-115 kg	2	3	3:00	6.5-7	Low-fatigue maintenance; if bar speed drops or this climbs past 7, hold load or Hold the set count and consolidate through rep quality and a slightly lower effort,	
+Mon	Weighted Pull-up	+22.5 kg	3	4	2:30-3:00	7-8	Submaximal weighted support anchored below the demonstrated +30 kg x 5 benchmark; full hang, strict reps, no grind.	
+Mon	Push-up	RPE-selected plate or vest	2	8	1:30	7	Low-cost horizontal press; load it enough to matter, but keep reps smooth and clean.	
+Mon	Calf Raise	RPE-selected load	2	12-15	1:00	7	Controlled pause at top and bottom; tissue-capacity work for run and ruck tolerance.	
+Mon	Run	Easy conversational pace, about 5:35-6:05/km	1	7 km	N/A	5	Separate later the same day is fine; flat route if shins or calves feel loaded.	
+Wed	Deadlift	145-150 kg	2	3	3:00	6.5-7	Maintenance only; if back or grip feels cooked, stay at the low end or Hold the set count and consolidate through rep quality and a slightly lower effort,	
+Wed	Overhead Press	52.5-55 kg	3	5	2:00-2:30	7-7.5	Strict reps; if bar path or speed slips, hold load rather than forcing the top end.	
+Wed	Pull-up	Bodyweight	3	8	2:00	8	Keep the best Week 3 rep standard, but drop 1 set to freshen up for the faster Saturday work.	
+Wed	Side Plank	Bodyweight	2	30-40 sec/side	0:45	7	Hips stacked and ribs down; stop the set when position goes soft.	
+Thu	Backpack Carry	20 kg pack, 9:15-9:25/km	1	8.5 km	N/A	6	Hold the best Week 3 pace and extend distance slightly as the block's first duration nudge. Brisk walk only; if shin or foot soreness shows up, go back to 8 km at this pace.	
+Fri	Reverse Lunge	RPE-selected dumbbells	2	6/leg	1:30-2:00	7	Recovery-contingent support day; keep 2 reps in reserve and do not chase soreness before Saturday quality.	
+Fri	Chest-Supported Row	RPE-selected load	3	8-10	1:30	7.5	Smooth chest contact and brief squeeze; add load only after all reps are clean.	
+Fri	Push-up	RPE-selected plate or vest	1	10	1:30	7	Keep this submaximal; one quality set is enough here, and skip it if shoulders feel beat up.	
+Fri	Calf Raise	RPE-selected load	2	12-15	1:00	7	Second small tissue-capacity dose; remove this first if time is tight.	
+Fri	Run	Easy conversational pace, about 5:40-6:10/km	1	5 km	N/A	5	Keep it truly easy to protect Saturday quality.	
+Sat	[WARMUP]	N/A	1	10 min	N/A	3	Easy jog 6-8 min; dynamic running drills; 3 relaxed strides before the hard running work; keep the warm-up specific and non-fatiguing.	
+Sat	Run	2:05-2:07 per 500 m	4	500 m	2:30-3:00 walk/jog	8-8.5	2 km easy + drills + 4 relaxed strides before, 1.5 km easy after. Controlled speed expression: pace rises while quality volume comes down from Week 3. If this is not cleaner than Week 3, stay at Week 3 pace.	
+END_WEEK4_TSV

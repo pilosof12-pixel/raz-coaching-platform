@@ -97,7 +97,14 @@ export function detectIntakeClarifications(intake = {}) {
   }
 
   // Running event progression changes materially with present running exposure.
-  if (/\b(?:3\s*k(?:m)?|5\s*k(?:m)?|10\s*k(?:m)?|half[- ]?marathon|marathon|running (?:time|pace|performance))\b/i.test(goals)) {
+  // A running goal is not the only reason this matters. An athlete with a
+  // history of running-related overuse needs the same answer before anyone
+  // prescribes Week-1 running volume, because the safe starting dose is
+  // defined by what they are currently tolerating and by nothing else.
+  const overuseHistory = /\bshin split|shin splint|stress (?:fracture|reaction)|plantar|achilles|\bitb\b|it band|runner'?s knee|periostitis|tendinopathy/i
+    .test(text([intake?.injuries, intake?.pain, intake?.notes]));
+  const runningGoal = /\b(?:3\s*k(?:m)?|5\s*k(?:m)?|10\s*k(?:m)?|half[- ]?marathon|marathon|running (?:time|pace|performance))\b/i.test(goals);
+  if (runningGoal || (overuseHistory && /\brun|jog|ruck\b/i.test(`${goals} ${text([intake?.notes])}`))) {
     // current_numbers and performance_markers are where an athlete actually
     // writes "2 runs per week, about 14 km total" -- the running-benchmark box
     // is the obvious place to put it. Reading only notes and clarifications
