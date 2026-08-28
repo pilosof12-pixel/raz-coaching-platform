@@ -98,7 +98,14 @@ export function detectIntakeClarifications(intake = {}) {
 
   // Running event progression changes materially with present running exposure.
   if (/\b(?:3\s*k(?:m)?|5\s*k(?:m)?|10\s*k(?:m)?|half[- ]?marathon|marathon|running (?:time|pace|performance))\b/i.test(goals)) {
-    const exposureText = text([intake?.notes, intake?.sport, intake?.sport_schedule, intake?.clarification_answers]).toLowerCase();
+    // current_numbers and performance_markers are where an athlete actually
+    // writes "2 runs per week, about 14 km total" -- the running-benchmark box
+    // is the obvious place to put it. Reading only notes and clarifications
+    // meant asking again for something already on the form.
+    const exposureText = text([
+      intake?.notes, intake?.sport, intake?.sport_schedule, intake?.clarification_answers,
+      intake?.current_numbers, intake?.performance_markers,
+    ]).toLowerCase();
     if (!/(?:\b\d+(?:\.\d+)?\s*km\b|\b\d+\s*(?:runs?|running sessions?)\b|weekly mileage|weekly kilometres|weekly kilometers|km\/week|runs?\/week)/i.test(exposureText)) {
       addQuestion(out, intake, {
         id:'running_current_exposure',
