@@ -195,4 +195,20 @@ jobs:
             exit 0
           fi
           git commit -m "Record latest synthetic live acceptance evidence [skip ci]"
-          git push origin "HEAD:${GITHUB_REF_NAME}"
+          # The branch can move while a run generates -- a push during run #85
+          # rejected this and the evidence for a twelve-minute run was lost, so
+          # the only record of why it failed was the uploaded artifact. Rebase
+          # onto whatever landed and try again; the evidence is the point of the
+          # run and must not depend on nobody else touching the branch.
+          for attempt in 1 2 3; do
+            if git push origin "HEAD:${GITHUB_REF_NAME}"; then
+              echo "QA evidence published"
+              exit 0
+            fi
+            echo "push rejected (attempt ${attempt}); rebasing onto the branch"
+            git fetch origin "${GITHUB_REF_NAME}"
+            git rebase "origin/${GITHUB_REF_NAME}" || { git rebase --abort; true; }
+            sleep $((attempt * 3))
+          done
+          echo "::error::QA evidence could not be published after three attempts"
+          exit 1
