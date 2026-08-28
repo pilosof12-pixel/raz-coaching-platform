@@ -556,6 +556,72 @@ function wantsOapExposures(intake = {}) {
   return /one[- ]?arm\s*(?:pull|chin)|\boap\b/.test(primary);
 }
 
+
+// The strict exposure may only be written back for an athlete who has shown it.
+function canRestoreStrictOap(intake = {}) {
+  const shown = `${arr(intake.current_numbers).join(' ')} ${arr(intake.performance_markers).join(' ')}`;
+  const demonstrated = /one[- ]arm\s+(?:pull|chin)-?up[^.\n]{0,40}\d/i.test(shown);
+  if (!demonstrated) return false;
+  // An athlete with active pain that pulling reproduces is the one case where
+  // the missing row may be a coaching decision rather than an omission.
+  const pain = intake?.pain;
+  if (pain && pain.active) {
+    const text = `${pain.description || ''} ${pain.tolerated_movements || ''} ${intake.injuries || ''}`;
+    if (/pull|chin|hang|elbow|shoulder|lat/i.test(text)) return false;
+  }
+  return true;
+}
+
+const STRICT_OAP_ROW = {
+  exercise: 'One-Arm Pull-up',
+  load: 'Bodyweight',
+  sets: '3',
+  reps: '1-2 per arm',
+  rest: '150-240 sec',
+  rpe: '8',
+  notes: 'Strict skill-strength exposure, weaker arm first. Every rep starts from a dead hang with no kip or swing; stop the set while one clean rep is still in reserve.',
+};
+
+// Placed on the freshest fixed strength day the week already uses, so the
+// restored row never invents a training day the athlete did not agree to.
+function insertStrictOapRow(program, parsed, work, intake) {
+  const fixedDays = arr(intake.available_gym_days).map((d) => String(d).trim()).filter(Boolean);
+  const present = [...new Set(work.map((c) => String(c[parsed.day] || '').trim()).filter(Boolean))];
+  const eligible = fixedDays.length
+    ? present.filter((d) => fixedDays.some((f) => f.toLowerCase() === d.toLowerCase()))
+    : present;
+  if (!eligible.length) return null;
+
+  // The day carrying the most non-conditioning work is the athlete's main
+  // strength day, which is where strict skill-strength belongs.
+  const score = new Map();
+  for (const c of work) {
+    const day = String(c[parsed.day] || '').trim();
+    if (!eligible.includes(day)) continue;
+    const conditioning = ['endurance', 'loaded_carry'].includes(classifyExercise(String(c[parsed.exercise] || '')).category);
+    if (!conditioning) score.set(day, (score.get(day) || 0) + 1);
+  }
+  const target = [...score.entries()].sort((a, b) => b[1] - a[1])[0]?.[0] || eligible[0];
+
+  const row = parsed.header.map(() => '');
+  row[parsed.day] = target;
+  row[parsed.exercise] = STRICT_OAP_ROW.exercise;
+  if (Number.isInteger(parsed.load)) row[parsed.load] = STRICT_OAP_ROW.load;
+  row[parsed.sets] = STRICT_OAP_ROW.sets;
+  row[parsed.reps] = STRICT_OAP_ROW.reps;
+  if (Number.isInteger(parsed.rest)) row[parsed.rest] = STRICT_OAP_ROW.rest;
+  const rpeCol = parsed.header.findIndex((h) => /rpe|effort/i.test(String(h || '')));
+  if (rpeCol >= 0) row[rpeCol] = STRICT_OAP_ROW.rpe;
+  if (Number.isInteger(parsed.notes)) row[parsed.notes] = STRICT_OAP_ROW.notes;
+
+  // First row of that day, because strict skill-strength takes the freshest slot.
+  const rows = parsed.rows.map((c) => c.slice());
+  const at = rows.findIndex((c) => String(c[parsed.day] || '').trim() === target);
+  rows.splice(at < 0 ? rows.length : at, 0, row);
+  const rebuilt = [parsed.header.join('\t'), ...rows.map((c) => c.join('\t'))].join('\n');
+  return String(program).replace(parsed.re, `$1${rebuilt}$3`);
+}
+
 function repairMissingOapAssistance(program, intake, repairs) {
   if (!wantsOapExposures(intake)) return program;
   let candidate = program;
@@ -573,9 +639,25 @@ function repairMissingOapAssistance(program, intake, repairs) {
       const n = String(c[parsed.exercise] || '').trim();
       return ANY_OAP_NAME.test(n) && !STRICT_OAP_NAME.test(n);
     });
-    // Only add the second exposure. A week with no strict work at all is a
-    // different failure, and inserting a strict one-arm pull-up would be
-    // inventing training rather than completing it.
+    // A week missing the strict exposure used to be left alone, on the view
+    // that writing one would be inventing training. Run #84 spent three
+    // attempts proving that view expensive: the gate refuses, no repair
+    // answers it, and the build dies.
+    //
+    // It is not invention when the athlete has already done it. The gate's own
+    // message is "do not regress an athlete already performing strict OAPs",
+    // the benchmark is in the intake, and strict work is the literal primary
+    // goal. So the exposure is restored on the same terms the assisted one is
+    // -- but only when the athlete has demonstrated it and nothing in the
+    // intake argues against pulling.
+    if (!strictRow && canRestoreStrictOap(intake)) {
+      const restored = insertStrictOapRow(candidate, parsed, work, intake);
+      if (restored) {
+        candidate = restored;
+        repairs.push({ type: 'v35_strict_oap_restored', week });
+        continue;
+      }
+    }
     if (!strictRow || hasAssisted) continue;
 
     const strictDay = String(strictRow[parsed.day] || '').trim();

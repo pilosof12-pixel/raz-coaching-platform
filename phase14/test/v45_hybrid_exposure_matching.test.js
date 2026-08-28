@@ -147,13 +147,31 @@ test('[H10] a program that already has both exposures is untouched, and the repa
   assert.equal(repairDeterministicContradictions(once.program, HYBRID).program, once.program);
 });
 
-test('[H11] a week with no strict work at all is left for regeneration', { skip: !golden }, () => {
-  // Inserting a strict one-arm pull-up would be inventing training rather than
-  // completing it, so that failure stays the model's to fix.
+// This used to assert the opposite: that a week with no strict work was left
+// for regeneration, because inserting a strict one-arm pull-up would be
+// inventing training. Run #84 priced that view -- attempts 2, 3 and 4 all
+// refused on ADVANCED_HYBRID_OAP_SPECIFICITY and no program was saved.
+//
+// It is not invention when the athlete has already done it. The gate's own
+// message is "do not regress an athlete already performing strict OAPs to
+// prerequisite-only work", the benchmark is in the intake, and strict work is
+// the literal primary goal. Replacing it with eccentrics is exactly the
+// regression the rule names.
+//
+// The protective half of the original test is kept below: an athlete who has
+// never shown the movement is still not given one.
+test('[H11] strict work regressed to eccentrics is restored, not regenerated', { skip: !golden }, () => {
   const noStrict = golden.replace(/\tOne-Arm Pull-up\t/g, '\tOne-Arm Pull-up Eccentric\t');
   const repaired = repairDeterministicContradictions(noStrict, HYBRID);
-  assert.equal(repaired.repairs.filter((r) => r.type === 'v47_oap_assistance_added').length, 0);
-  assert.equal(codeFor(repaired.program), 'ADVANCED_HYBRID_OAP_SPECIFICITY');
+  assert.ok(repaired.repairs.some((r) => r.type === 'v35_strict_oap_restored'));
+  assert.notEqual(codeFor(repaired.program), 'ADVANCED_HYBRID_OAP_SPECIFICITY');
+});
+
+test('[H11b] an athlete who has never shown a strict rep is still left for regeneration', { skip: !golden }, () => {
+  const noStrict = golden.replace(/\tOne-Arm Pull-up\t/g, '\tOne-Arm Pull-up Eccentric\t');
+  const unproven = { ...HYBRID, current_numbers: 'Back Squat: 205 kg 1RM', performance_markers: [] };
+  const repaired = repairDeterministicContradictions(noStrict, unproven);
+  assert.equal(repaired.repairs.some((r) => r.type === 'v35_strict_oap_restored'), false);
 });
 
 // --- the two rules that state their own remedy --------------------------------
