@@ -114,6 +114,44 @@ const PERTURBATIONS = [
                    .replace(/stop earlier if[^\t.]*\./gi, ''),
   },
   {
+    id: 'strict-exposure-removed', seen: 'run #84 Hybrid, three attempts',
+    applies: ['advanced_hybrid'],
+    apply: (p) => p.split('\n').filter((l) => !/^\w+\tOne-Arm Pull-up\t/.test(l)).join('\n'),
+  },
+  {
+    id: 'secondary-volume-creep', seen: 'run #87 Hybrid, four attempts',
+    applies: ['advanced_hybrid'],
+    apply: (p) => {
+      const lines = p.split('\n');
+      const end = lines.findIndex((l) => /END_WEEK1_TSV/.test(l));
+      return lines.map((l, i) => {
+        if (i <= end) return l;
+        const c = l.split('\t');
+        if (c.length > 6 && /^(Cable Row|Chest-Supported Row|Face Pull)$/i.test((c[1] || '').trim())) {
+          const n = Number(String(c[3]).match(/\d+/)?.[0]);
+          if (Number.isFinite(n)) c[3] = String(n + 3);
+        }
+        return c.join('\t');
+      }).join('\n');
+    },
+  },
+  {
+    id: 'week4-not-consolidating', seen: 'run #87 Hybrid, attempt 3',
+    apply: (p) => {
+      const m = p.match(/(START_WEEK4_TSV\s*\n)([\s\S]*?)(\nEND_WEEK4_TSV)/i);
+      if (!m) return p;
+      const rows = m[2].split('\n').map((l) => {
+        const c = l.split('\t');
+        if (c.length > 6) {
+          const n = Number(String(c[3]).match(/\d+/)?.[0]);
+          if (Number.isFinite(n)) c[3] = String(n + 2);
+        }
+        return c.join('\t');
+      }).join('\n');
+      return p.replace(m[0], `${m[1]}${rows}${m[3]}`);
+    },
+  },
+  {
     id: 'assisted-exposure-removed', seen: 'runs #66 and #69 Hybrid, four attempts each',
     applies: ['advanced_hybrid'],
     apply: (p) => p.split('\n').filter((l) => !/\tAssisted One-Arm Pull-up\t/.test(l)).join('\n'),

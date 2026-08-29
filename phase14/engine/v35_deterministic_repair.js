@@ -24,6 +24,7 @@ import { repairSemanticProse } from './v58_semantic_cleanup.js';
 import { repairBlockSpecificityClaim } from './v59_block_specificity_repair.js';
 import { repairFrequencyClaim } from './v61_weekly_exposures.js';
 import { repairSecondaryVolumeCreep } from './v66_secondary_volume_hold.js';
+import { repairWeek4Consolidation } from './v67_week4_consolidation.js';
 import { classifyExercise, dayGap, stressSignature, dayKey as dayKeyOf } from './v38_movement_taxonomy.js';
 import { auditCircularScheduling } from './v38_structural_audit.js';
 
@@ -593,16 +594,30 @@ function insertStrictOapRow(program, parsed, work, intake) {
     : present;
   if (!eligible.length) return null;
 
+  // A day the program itself calls low-cost cannot take a strict primary
+  // exposure: the restored row would contradict the day's own description, and
+  // the offline stress run caught exactly that -- the repair cleared the OAP
+  // gate and raised V42_LOW_COST_CLAIM_CONTRADICTED in its place.
+  const LOW_COST_DAY = /\b(?:low[- ]cost|recovery|deload|technical only|easy)\b/i;
+  const lowCostDays = new Set();
+  for (const c of work) {
+    const day = String(c[parsed.day] || '').trim();
+    const text = `${Number.isInteger(parsed.notes) ? c[parsed.notes] || '' : ''} ${Number.isInteger(parsed.load) ? c[parsed.load] || '' : ''}`;
+    if (day && LOW_COST_DAY.test(String(text))) lowCostDays.add(day);
+  }
+
   // The day carrying the most non-conditioning work is the athlete's main
   // strength day, which is where strict skill-strength belongs.
   const score = new Map();
   for (const c of work) {
     const day = String(c[parsed.day] || '').trim();
-    if (!eligible.includes(day)) continue;
+    if (!eligible.includes(day) || lowCostDays.has(day)) continue;
     const conditioning = ['endurance', 'loaded_carry'].includes(classifyExercise(String(c[parsed.exercise] || '')).category);
     if (!conditioning) score.set(day, (score.get(day) || 0) + 1);
   }
-  const target = [...score.entries()].sort((a, b) => b[1] - a[1])[0]?.[0] || eligible[0];
+  const target = [...score.entries()].sort((a, b) => b[1] - a[1])[0]?.[0]
+    || eligible.find((d) => !lowCostDays.has(d));
+  if (!target) return null; // every eligible day is declared low-cost; leave it to regeneration
 
   const row = parsed.header.map(() => '');
   row[parsed.day] = target;
@@ -1047,6 +1062,17 @@ export function repairDeterministicContradictions(program, intake = {}) {
   if (held !== candidate) {
     candidate = held;
     repairs.push({ type: 'v66_secondary_volume_held' });
+  }
+
+  // Week 4 consolidates -- and this has to run after the volume hold above,
+  // not before it. Consolidation is measured against Week 3, so holding
+  // secondary volume first changes the very number Week 4 must come in under.
+  // Ordered the other way, the hold silently undid the consolidation and the
+  // finding came back.
+  const consolidated = repairWeek4Consolidation(candidate, intake);
+  if (consolidated !== candidate) {
+    candidate = consolidated;
+    repairs.push({ type: 'v67_week4_consolidated' });
   }
 
   const counted = repairFrequencyClaim(candidate, intake);
