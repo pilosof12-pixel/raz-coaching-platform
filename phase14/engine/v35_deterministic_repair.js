@@ -23,6 +23,7 @@ import { repairEnduranceVolume } from './v57_endurance_volume_governor.js';
 import { repairSemanticProse } from './v58_semantic_cleanup.js';
 import { repairBlockSpecificityClaim } from './v59_block_specificity_repair.js';
 import { repairFrequencyClaim } from './v61_weekly_exposures.js';
+import { repairSecondaryVolumeCreep } from './v66_secondary_volume_hold.js';
 import { classifyExercise, dayGap, stressSignature, dayKey as dayKeyOf } from './v38_movement_taxonomy.js';
 import { auditCircularScheduling } from './v38_structural_audit.js';
 
@@ -1039,6 +1040,15 @@ export function repairDeterministicContradictions(program, intake = {}) {
   // the rule had no deterministic answer and cost four attempts.
   // A stated weekly frequency that does not match the prescription is a
   // contradiction the client can see on one sheet. Counting is deterministic.
+  // Secondary volume holds when the primary quality advances. Reducing a set
+  // count changes no exercise and no load, so this converges here rather than
+  // dragging a build to exhaustion the way it did in run #87.
+  const held = repairSecondaryVolumeCreep(candidate, intake);
+  if (held !== candidate) {
+    candidate = held;
+    repairs.push({ type: 'v66_secondary_volume_held' });
+  }
+
   const counted = repairFrequencyClaim(candidate, intake);
   if (counted !== candidate) {
     candidate = counted;
