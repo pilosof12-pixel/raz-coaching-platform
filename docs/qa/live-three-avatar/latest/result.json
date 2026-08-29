@@ -1,39 +1,25 @@
 {
-  "timestamp": "2026-08-28T14:11:40.282Z",
+  "timestamp": "2026-08-29T13:44:31.529Z",
   "base": "https://raz-coaching-platform.onrender.com",
-  "head_sha": "c90fe5ed8507ed69faf07006ba83e14a05187be1",
-  "runtime": "launch-acceptance-v64-credits-live27-20260828",
+  "head_sha": "c57844d122a4170ed6c3329ec45c7e3f986d06f0",
+  "runtime": "launch-acceptance-v65-strict-oap-live29-20260829",
   "results": [
     {
       "id": "advanced_hybrid",
-      "job_id": "7fce4e43365b34f00ec8f2e081ac12e6",
+      "job_id": "6ec01c63dc8aa230675ea73cc43fc7a7",
       "ok": false,
       "status": "error",
       "stage": "refining",
       "attempt": 4,
-      "detail": "internal repair: ADVANCED_HYBRID_OAP_SPECIFICITY",
+      "detail": "internal repair: WEEKLY_MRV_EXCEEDED+V35_SECONDARY_VOLUME_CREEP",
       "last_seen_status": "error",
-      "error": "Internal coaching QA could not repair the candidate program after multiple passes. No client-facing program was saved. Please retry the build. QA trace: A1:EXERCISE_HALLUCINATION+COACH_SPEC_V1_AH_ADJACENT_HIGH_STRESS_PULLING+V34_NOTE_UNDEFINED_LOAD_REFERENCE+TSV_WEEK_BLOCK_MISSING+TSV_WEEK_BLOCK_MISSING[Chest] -> A2:ADVANCED_HYBRID_OAP_SPECIFICITY+EVENT_PROGRESSING_SESSION_MISSING -> A3:ADVANCED_HYBRID_OAP_SPECIFICITY -> A4:ADVANCED_HYBRID_OAP_SPECIFICITY. [QA:INTERNAL_QA_REPAIR_EXHAUSTED]",
+      "error": "Internal coaching QA could not repair the candidate program after multiple passes. No client-facing program was saved. Please retry the build. QA trace: A1:ADVANCED_HYBRID_BENCHMARK_LOADING+ADVANCED_HYBRID_DENSE_72H_PRIMARY_WINDOW+WEEKLY_MRV_EXCEEDED+V35_SECONDARY_VOLUME_CREEP+EVENT_PROGRESSING_SESSION_MISSING -> A2:ADVANCED_HYBRID_BENCHMARK_LOADING+WEEKLY_MRV_EXCEEDED+V35_SECONDARY_VOLUME_CREEP -> A3:ADVANCED_HYBRID_WEEK4_NOT_CONSOLIDATING+WEEKLY_MRV_EXCEEDED+V35_SECONDARY_VOLUME_CREEP -> A4:WEEKLY_MRV_EXCEEDED+V35_SECONDARY_VOLUME_CREEP. Last failure detail: PHASE15_QUALITY_VIOLATION [QA:INTERNAL_QA_REPAIR_EXHAUSTED]",
       "program_chars": 0,
-      "seconds": 685
-    },
-    {
-      "id": "tactical_3k",
-      "job_id": "8cf3687529ac0b23735b3cdcbe6d1b0b",
-      "ok": true,
-      "status": "done",
-      "stage": "finalizing",
-      "attempt": 0,
-      "detail": "saving program",
-      "last_seen_status": "done",
-      "error": null,
-      "program_chars": 13104,
-      "seconds": 306
+      "seconds": 530
     }
   ],
   "selection": [
-    "advanced_hybrid",
-    "tactical_3k"
+    "advanced_hybrid"
   ],
   "ok": false
 }
