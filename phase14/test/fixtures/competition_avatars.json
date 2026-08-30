@@ -33,7 +33,7 @@
     "language": "en",
     "experience": "Advanced (3+ years)",
     "bodyweight": "77 kg",
-    "primary_goals": ["Arrive at the fight in 3 weeks fresh and physically sharp"],
+    "primary_goals": ["Arrive at the fight in 4 weeks fresh and physically sharp"],
     "secondary_goals": ["Hold my strength through camp without adding fatigue"],
     "maintenance_goals": ["Maintain the strength and power I already have"],
     "goal_priority_model": "tiered",
@@ -68,7 +68,7 @@
       "tolerated_movements": "Trap bar deadlift, split squats, sled pushes, hip thrusts and all upper body are comfortable. Heavy back squat is not."
     },
     "mobility": { "active": false, "limitation": "" },
-    "notes": "Fight is in 3 weeks, so this block runs into fight week. Sport is the priority and strength work exists only to keep what he has without stealing recovery. Two gym sessions of 40 minutes, Tuesday and Friday, both after MMA. Weight cut begins in the final week. Do not add conditioning: he already trains seven times a week.",
+    "notes": "Fight is in 4 weeks, so Week 4 of this block IS fight week: taper and sharpen, do not build. Sport is the priority and strength work exists only to keep what he has without stealing recovery. Two gym sessions of 40 minutes, Tuesday and Friday, both after MMA. Weight cut begins in the final week, which is fight week. Do not add conditioning: he already trains seven times a week.",
     "qa_diagnostics": true
   }
 }
