@@ -40,11 +40,36 @@ test('a date already past is not treated as a plan', () => {
 
 // Four weeks out with a four-week block means Week 4 IS the event week. That is
 // the case the engine previously labelled Consolidate / Express like any other.
-test('a block that runs into the event ends in competition week', () => {
+// The first version of this model put the fighter in realization for weeks 1
+// and 2, which the cluster explicitly rules out: "a combat athlete does not
+// need a strength-sport realization phase -- near-maximal gym performance is
+// not the competition demand". A fighter moves through camp instead, and with
+// seven sport sessions a week the gym is already minimal in week 1.
+test('a block that runs into a fight is camp throughout, then taper, then fight week', () => {
   const fighter = COMP.mma_fight_camp;
   const states = [1, 2, 3, 4].map((w) => stateForWeek(fighter, w));
-  assert.deepEqual(states, [STATE.REALIZATION, STATE.REALIZATION, STATE.TAPER, STATE.COMPETITION_WEEK]);
+  assert.deepEqual(states, [STATE.LATE_CAMP, STATE.LATE_CAMP, STATE.TAPER, STATE.COMPETITION_WEEK]);
+  assert.equal(states.includes(STATE.REALIZATION), false, 'combat athletes have no realization phase');
   assert.equal(competitionProfile(fighter).blockEndsAtEvent, true);
+});
+
+// Competition week is a calendar fact. Load cannot create a second one.
+test('sport load compresses camp phases but never relabels the fight week', () => {
+  const fighter = COMP.mma_fight_camp;
+  const weeks = competitionProfile(fighter).weeks;
+  assert.equal(weeks.filter((w) => w.state === STATE.COMPETITION_WEEK).length, 1);
+});
+
+// "As hard and specific sport practice rises, the gym contribution should fall."
+test('a saturated camp reaches the minimal dose sooner than a light one', () => {
+  const base = { ...COMP.mma_fight_camp, primary_goals: ['Arrive at the fight fresh'], notes: 'Fight is in 8 weeks.' };
+  const at = (n) => stateForWeek({
+    ...base,
+    sport_sessions_per_week: n,
+    sport_schedule: Array.from({ length: n }, (_, k) => ({ day: `D${k}` })),
+  }, 1);
+  assert.equal(at(7), STATE.LATE_CAMP, 'seven sessions a week leaves no room for gym development');
+  assert.equal(at(2), STATE.MIDDLE_CAMP, 'a light camp still has room to maintain rather than minimise');
 });
 
 // Eight weeks out is weeks 1-4 of the runway: still building, not peaking.
@@ -82,6 +107,9 @@ test('the brief carries only the states this block reaches', () => {
   const brief = buildCompetitionBrief(COMP.mma_fight_camp);
   assert.match(brief, /competition week/i);
   assert.match(brief, /Count the mat, ring and cage/);
+  assert.match(brief, /minimal effective dose/i);
+  assert.match(brief, /doubles and triples/i);
+  assert.match(brief, /does not need a strength-sport realization phase/i);
   assert.equal(/still a building block/.test(brief), false, 'specificity guidance is not reached by this block');
 
   const lifter = buildCompetitionBrief(COMP.weightlifter_peak);

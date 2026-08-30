@@ -30,6 +30,16 @@ const STATE_BRIEF = {
     'This is still a building block. Do not taper, do not reduce volume for the event, and do not treat this as peak week -- the competition is far enough away that fitness is still the objective.',
     'Specificity means closer to the event, not merely harder. Nonessential gym complexity earns less space as the event approaches.',
   ],
+  [STATE.MIDDLE_CAMP]: [
+    'Emphasis: the sport is taking more, so the gym takes less. Strength shifts from developing to maintaining -- fewer hard sets, less novelty, and supplemental work only where it still solves a real deficit.',
+    'Ask of every gym exposure whether it is still solving a problem the sport is not already creating. If it is not, remove it rather than shrinking it.',
+  ],
+  [STATE.LATE_CAMP]: [
+    'Emphasis: minimal effective dose. Strength work exists to preserve force and speed, not to build anything, and the sport is already supplying the hard work.',
+    'Keep total gym volume very low. Favour power and speed-biased exposures: familiar compound movements for crisp doubles and triples with full rest, stopping while bar speed is still high. Intensity may stay meaningful; volume must not.',
+    'Remove high-repetition hypertrophy work, grinders, near-failure sets, novel exercises and large eccentric doses. These offer little late-camp return and cost soreness the athlete cannot afford.',
+    'A combat athlete does not need a strength-sport realization phase. Near-maximal gym performance is not the competition demand, so do not build toward a gym test.',
+  ],
   [STATE.REALIZATION]: [
     'Emphasis: can the athlete express the required qualities under event-like constraints? High-quality specific exposures and controlled simulations, with general volume coming down.',
     'What should start disappearing: failure training, excessive accessories, redundant conditioning, and anything novel.',
@@ -58,6 +68,8 @@ const COMBAT_BRIEF = [
   'Generic conditioning must not duplicate hard sparring. An athlete already sparring hard several times a week does not need conditioning added to prove fitness.',
   'Store technical intensity and contact intensity separately. Preserving intensity must not mean preserving damage: technical drilling, pad work and controlled positional rounds keep timing at a fraction of the cost of unrestricted hard sparring.',
   'Strength work in camp maintains what exists. Favour power-biased, low-volume, familiar compound exposures with full rest; avoid muscle damage, near-failure work and heavy eccentric loading.',
+  'As hard sport practice rises the gym contribution falls. Do not hold off-season strength volume flat and add fight-camp sparring on top of it.',
+  'A strength session that is reasonable in isolation becomes excessive when it loads the same tissues shortly before or after hard sport practice. Count the sport sessions first, then decide what the gym can afford.',
 ];
 
 const STRENGTH_MEET_BRIEF = [

@@ -21,6 +21,12 @@ export const STATE = {
   NORMAL: 'normal_training',
   SPECIFICITY: 'prepeak_specificity',
   REALIZATION: 'realization',
+  // Combat camp runs its own phases. The cluster is explicit that "a combat
+  // athlete does not need a strength-sport realization phase -- near-maximal
+  // gym performance is not the competition demand", so a fighter never reaches
+  // REALIZATION; they move through camp toward the taper instead.
+  MIDDLE_CAMP: 'middle_camp',
+  LATE_CAMP: 'late_camp',
   TAPER: 'taper',
   COMPETITION_WEEK: 'competition_week',
   POST: 'postcompetition',
@@ -32,10 +38,30 @@ export const PRIORITY = { A: 'A', B: 'B', C: 'C' };
 // A C-priority event or technical mock "may need only a small reduction", so it
 // never reaches a full taper state.
 const PRIORITY_REACH = {
-  A: [STATE.COMPETITION_WEEK, STATE.TAPER, STATE.REALIZATION, STATE.SPECIFICITY],
-  B: [STATE.COMPETITION_WEEK, STATE.TAPER, STATE.REALIZATION],
+  A: [STATE.COMPETITION_WEEK, STATE.TAPER, STATE.LATE_CAMP, STATE.MIDDLE_CAMP, STATE.REALIZATION, STATE.SPECIFICITY],
+  B: [STATE.COMPETITION_WEEK, STATE.TAPER, STATE.LATE_CAMP, STATE.REALIZATION],
   C: [STATE.COMPETITION_WEEK],
 };
+
+// How much the sport itself is already taking. The cluster's combat camp rule:
+// "as hard and specific sport practice rises, the gym and generic conditioning
+// contribution should usually fall. The coach should not keep off-season
+// strength volume flat while adding fight-camp sparring on top."
+export function sportSessionsPerWeek(intake = {}) {
+  const declared = Number(intake?.sport_sessions_per_week);
+  if (Number.isFinite(declared) && declared > 0) return declared;
+  const scheduled = Array.isArray(intake?.sport_schedule) ? intake.sport_schedule.length : 0;
+  return scheduled;
+}
+
+// A saturated camp is further along than the calendar says. Seven sessions a
+// week leaves no room for gym development regardless of weeks remaining.
+function campSaturation(intake = {}) {
+  const n = sportSessionsPerWeek(intake);
+  if (n >= 6) return 2;
+  if (n >= 4) return 1;
+  return 0;
+}
 
 const EVENT_WORDS = /\b(?:fight|bout|match|competition|competes?|meet\b|tournament|qualifier|championship|contest|race day|weigh[- ]?in|mock meet)\b/i;
 
@@ -112,10 +138,24 @@ export function stateForWeek(intake = {}, week = 1, now = Date.now()) {
   // seven days; the taper literature centres on 8-14 days; specificity and
   // realization precede it. These are defaults, not laws -- the cluster is
   // explicit that "these are functional phases, not mandatory calendar blocks".
+  const combat = eventType(intake) === 'combat';
+
   let state;
+  // Competition week and the taper are calendar facts: they are the weeks that
+  // contain and precede the event, and no amount of training load makes a
+  // second competition week exist.
   if (remaining <= 1) state = STATE.COMPETITION_WEEK;
   else if (remaining <= 2) state = STATE.TAPER;
-  else if (remaining <= 4) state = STATE.REALIZATION;
+  else if (combat) {
+    // Everything before that is camp, and how deep into camp the athlete is
+    // depends on what the sport is already taking, not only on the calendar.
+    // Seven sessions a week leaves no room for gym development whatever the
+    // date says, so saturation moves the athlete toward the minimal dose.
+    const effective = remaining - campSaturation(intake);
+    if (effective <= 6) state = STATE.LATE_CAMP;
+    else if (effective <= 10) state = STATE.MIDDLE_CAMP;
+    else state = STATE.NORMAL;
+  } else if (remaining <= 4) state = STATE.REALIZATION;
   else if (remaining <= 8) state = STATE.SPECIFICITY;
   else state = STATE.NORMAL;
 
@@ -123,7 +163,7 @@ export function stateForWeek(intake = {}, week = 1, now = Date.now()) {
   // gets competition week and nothing else, because the cluster says not to
   // destroy a training block for a minor event.
   if (state !== STATE.NORMAL && !reachable.has(state)) {
-    const order = [STATE.SPECIFICITY, STATE.REALIZATION, STATE.TAPER, STATE.COMPETITION_WEEK];
+    const order = [STATE.SPECIFICITY, STATE.MIDDLE_CAMP, STATE.REALIZATION, STATE.LATE_CAMP, STATE.TAPER, STATE.COMPETITION_WEEK];
     const softer = order.slice(0, order.indexOf(state)).reverse().find((s) => reachable.has(s));
     state = softer || STATE.NORMAL;
   }
@@ -135,7 +175,9 @@ export function freshnessPriority(state) {
   switch (state) {
     case STATE.COMPETITION_WEEK: return 'maximal';
     case STATE.TAPER: return 'high';
+    case STATE.LATE_CAMP: return 'high';
     case STATE.REALIZATION: return 'medium';
+    case STATE.MIDDLE_CAMP: return 'medium';
     default: return 'low';
   }
 }
