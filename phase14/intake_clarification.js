@@ -96,6 +96,20 @@ export function detectIntakeClarifications(intake = {}) {
     }
   }
 
+  // A weight class changes what the last two weeks can carry, and the engine
+  // cannot see a cut it was never told about.
+  const combatEvent = /\b(?:fight|bout|mma|boxing|muay thai|kickbox|bjj|grappl|wrestl)\b/i
+    .test(text([intake?.sport, intake?.primary_goals, intake?.notes]));
+  const weightKnown = Boolean(intake?.weight_class_status || intake?.weight_vs_class)
+    || /\b(?:no weight class|open weight|not cutting|walk around at)\b/i.test(text([intake?.notes]));
+  if (combatEvent && !weightKnown) {
+    addQuestion(out, intake, {
+      id: 'weight_class_plan',
+      prompt: 'Are you making weight for this, and if so what is your weight now against the class limit?',
+      help: 'Also say when the weigh-in is relative to the fight. A cut spends the same recovery training does, so the last two weeks are built differently when one is underway.',
+    });
+  }
+
   // An event with no date cannot be planned backwards from, and the whole
   // competition-preparation shape depends on knowing how far away it is. A
   // fight "soon" and a fight in eight weeks are different programs.

@@ -483,6 +483,8 @@
       event_priority: $("event_priority") ? $("event_priority").value : "",
       event_type: $("event_type") ? $("event_type").value : "",
       weight_class_status: $("weight_class_status") ? $("weight_class_status").value : "",
+      weigh_in_date: $("weigh_in_date") ? $("weigh_in_date").value : "",
+      weight_vs_class: $("weight_vs_class") ? $("weight_vs_class").value : "",
       gym_availability_mode: $("gym_availability_mode").value,
       available_gym_days: availableGymDays,
       same_day_gap_hours: sameDayGap,

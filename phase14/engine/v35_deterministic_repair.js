@@ -29,6 +29,7 @@ import { repairCompetitionBlock } from './v70_competition_rules.js';
 import { repairIntensification } from './v71_intensification.js';
 import { repairCombatPower } from './v72_combat_power.js';
 import { repairCampEconomy } from './v74_camp_economy.js';
+import { repairWeightCutLoad } from './v75_weight_cut.js';
 import { classifyExercise, dayGap, stressSignature, dayKey as dayKeyOf } from './v38_movement_taxonomy.js';
 import { auditCircularScheduling } from './v38_structural_audit.js';
 
@@ -1091,6 +1092,14 @@ export function repairDeterministicContradictions(program, intake = {}) {
   if (lean !== candidate) {
     candidate = lean;
     repairs.push({ type: 'v74_camp_economy_trimmed' });
+  }
+
+  // A cut spends the same recovery the training does, so the effort ceiling
+  // comes down with it.
+  const cut = repairWeightCutLoad(candidate, intake);
+  if (cut !== candidate) {
+    candidate = cut;
+    repairs.push({ type: 'v75_weight_cut_held' });
   }
 
   const intensified = repairIntensification(candidate, intake);

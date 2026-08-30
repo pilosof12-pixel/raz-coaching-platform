@@ -20,6 +20,8 @@ import { buildBlockPhaseBrief } from './v62_block_phase.js';
 import { buildSecondaryVolumeBrief } from './v66_secondary_volume_hold.js';
 import { buildCompetitionBrief } from './v69_competition_brief.js';
 import { buildCombatPowerBrief } from './v72_combat_power.js';
+import { buildWeightCutBrief } from './v75_weight_cut.js';
+import { buildConditioningBrief } from './v76_conditioning_gap.js';
 import { buildSessionSubstanceBrief } from './v53_session_substance.js';
 import { buildLanguageAccuracyBrief } from './v46_language_accuracy.js';
 
@@ -279,6 +281,8 @@ export function buildDeterministicBrief(intake = {}) {
     buildSecondaryVolumeBrief(intake),
     buildCompetitionBrief(intake),
     buildCombatPowerBrief(intake),
+    buildWeightCutBrief(intake),
+    buildConditioningBrief(intake),
     buildSessionSubstanceBrief(intake),
     buildLanguageAccuracyBrief(intake),
     specialist,

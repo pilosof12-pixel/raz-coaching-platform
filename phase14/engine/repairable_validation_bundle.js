@@ -33,6 +33,8 @@ import { collectIntensificationFlags } from './v71_intensification.js'; // V71-I
 import { collectCombatPowerFlags } from './v72_combat_power.js'; // V72-COMBAT-POWER-WIRED
 import { collectEconomyFlags, collectNoveltyFlags } from './v74_camp_economy.js'; // V74-CAMP-ECONOMY-WIRED
 import { collectAuditFlags } from './v73_taper_audit.js'; // V73-TAPER-AUDIT-WIRED
+import { collectWeightCutFlags } from './v75_weight_cut.js'; // V75-WEIGHT-CUT-WIRED
+import { collectConditioningFlags } from './v76_conditioning_gap.js'; // V76-CONDITIONING-GAP-WIRED
 import { collectLanguageAccuracyFlags, LANGUAGE_HARD_CODES, repairCountClaims } from './v46_language_accuracy.js'; // V46-LANGUAGE-ACCURACY-WIRED
 import { repairDeterministicContradictions } from './v35_deterministic_repair.js'; // V35-DETERMINISTIC-REPAIR-WIRED
 import { normalizeAdvancedHybridWeek4OapConsolidation } from './advanced_hybrid_oap_consolidation_normalizer.js';
@@ -546,7 +548,9 @@ export function collectRepairableValidationFailures(program, intake = {}, option
   });
 
   runRepairable(flags, () => {
-    const lean = [...collectEconomyFlags(candidate, intake), ...collectNoveltyFlags(candidate, intake), ...collectAuditFlags(candidate, intake)];
+    const lean = [...collectEconomyFlags(candidate, intake), ...collectNoveltyFlags(candidate, intake),
+      ...collectAuditFlags(candidate, intake), ...collectWeightCutFlags(candidate, intake),
+      ...collectConditioningFlags(candidate, intake)];
     if (!lean.length) return;
     throw new RetriableValidationError(lean[0].code,
       lean.map((f) => f.detail).join(' '), { flags: lean });
