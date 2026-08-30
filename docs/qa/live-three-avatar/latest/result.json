@@ -1,12 +1,12 @@
 {
-  "timestamp": "2026-08-30T09:22:01.910Z",
+  "timestamp": "2026-08-30T17:08:38.046Z",
   "base": "https://raz-coaching-platform.onrender.com",
-  "head_sha": "a68fb8e78aa3df60bf2012e580df8954bb7b20a6",
-  "runtime": "launch-acceptance-v67-repair-coverage-live30-20260830",
+  "head_sha": "4629f7878548df3645dca3b430373a8ec247e567",
+  "runtime": "launch-acceptance-v70-competition-prep-live31-20260830",
   "results": [
     {
-      "id": "advanced_hybrid",
-      "job_id": "595c1333937570b3b24185b5ec37c40d",
+      "id": "weightlifter_peak",
+      "job_id": "fcddeb27685bfef13004a82812ca3cff",
       "ok": true,
       "status": "done",
       "stage": "finalizing",
@@ -14,12 +14,26 @@
       "detail": "saving program",
       "last_seen_status": "done",
       "error": null,
-      "program_chars": 20418,
-      "seconds": 309
+      "program_chars": 19648,
+      "seconds": 247
+    },
+    {
+      "id": "mma_fight_camp",
+      "job_id": "c42531e8285bcf8acf61a9bb291b289e",
+      "ok": true,
+      "status": "done",
+      "stage": "finalizing",
+      "attempt": 0,
+      "detail": "saving program",
+      "last_seen_status": "done",
+      "error": null,
+      "program_chars": 7657,
+      "seconds": 171
     }
   ],
   "selection": [
-    "advanced_hybrid"
+    "weightlifter_peak",
+    "mma_fight_camp"
   ],
   "ok": true
 }

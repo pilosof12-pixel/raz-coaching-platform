@@ -1,0 +1,114 @@
+Here’s your corrected 4-week build: the main barbell work still leads each session, front squat keeps one main dose plus one light second touch, and back squat plus pulling stay at maintenance while squat-pattern volume is trimmed enough to keep the technical work sharp.
+
+Weeks 2-3 only add load when the prior week stayed within the listed RPE and positions were clean. Week 4 keeps the best week-3 primary standard, then nudges Monday front squat only if rack comfort and bar speed are both still good.
+
+For the left wrist, do your usual prep before every front-rack or overhead day. If discomfort rises above mild, keep the same load or reduce 5-10%, and cut the last set on the provoking pattern instead of forcing the planned increase.
+
+START_WEEK1_TSV
+Day	Exercise	Weight	Sets	Reps	Rest	Target RPE	Notes	Results
+Mon	[WARMUP] Overhead Squat	empty bar to work-up	1	5	N/A	N/A	2-4 quick ramp sets for hips, shoulders and receiving position; include your usual wrist prep before work sets.; Squat-and-reach x 6; Bodyweight squat x 8; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Ramp Front Squat: 55 kg x 5, 80 kg x 3, 105 kg x 1-2 before 135 kg work sets.; Keep the warm-up specific and non-fatiguing.	
+Mon	Overhead Squat	RPE-selected load	5	2	180s	6.5	Receiving-position doubles; only build while every rep stays vertical and fast. If wrist bites, balance drifts, or RPE exceeds target, hold load and cut 1 set.	
+Mon	Front Squat	135 kg	4	2	210s	7.5	Clean recovery support; smooth out of the hole. If rack discomfort rises or RPE jumps, hold 135 kg and skip the final set.	
+Mon	Chest-Supported Row	RPE-selected load	3	8	120s	8	Hard squeeze without low-back fatigue; keep 1-2 reps in reserve.	
+Mon	Side Plank	Bodyweight	3	40s/side	45s	N/A	Brace hard and stay stacked; this is trunk stiffness, not a max effort.	
+Tue	[WARMUP] Band Pull-Apart Warm-up	light band	2	15	30s	N/A	2 quick rounds to open shoulders and upper back; then take 2-3 barbell ramp sets for the press.; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Band shoulder pass-through x 10; Wall slide x 8; Keep the warm-up specific and non-fatiguing.	
+Tue	Overhead Press	RPE-selected load	4	4	180s	6.5	Vertical press strength; stop before grind. If lockout slows or wrist feels off, keep the same load and cap at 3 sets.	
+Tue	Pull-up	RPE-selected load	3	5	150s	7	Use bodyweight or small added load to keep all 5s crisp; this is pulling maintenance, not a PR slot.	
+Tue	Pallof Press	RPE-selected load	3	10/side	45s	7	Controlled anti-rotation work; no leaning or twisting to finish reps.	
+Wed	[WARMUP] Overhead Squat	empty bar to work-up	1	5	N/A	N/A	3 quick ramp sets and footwork rehearsals; then 2-3 front-squat ramp sets to the light top set after the single; keep this day easy on the joints.; Squat-and-reach x 6; Bodyweight squat x 8; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Keep the warm-up specific and non-fatiguing.; Ramp Front Squat: 50 kg x 5, 75 kg x 3, 97.5 kg x 1-2 before 125 kg work sets.	
+Wed	Overhead Squat	RPE-selected load	1	1	150s	6	Crisp single between heavier days; fast feet and a stable receive. If timing is off, stay lighter rather than chase load.	
+Wed	Front Squat	125 kg	1	2	180s	6.5	Second front-squat touch for position and timing; keep it easy so Friday stays fresh. If rack position is irritated, reduce 5-10%.	
+Wed	Barbell Hip Thrust	RPE-selected load	3	6	150s	7.5	Posterior-chain support with full lockout; keep it submaximal so later-week lifting stays sharp.	
+Wed	Cable Row	RPE-selected load	3	10	120s	8	Full reach and hard finish; keep the torso quiet.	
+Wed	Dead Bug	Bodyweight	3	8/side	45s	N/A	Exhale fully on each rep and keep the low back quiet against the floor.	
+Thu	[WARMUP] Band Pull-Apart Warm-up	light band	2	15	30s	N/A	2 quick rounds to open shoulders and upper back; then take 2-3 barbell ramp sets for the press.; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Band shoulder pass-through x 10; Wall slide x 8; Keep the warm-up specific and non-fatiguing.	
+Thu	Overhead Press	RPE-selected load	5	2	180s	7	Heavier vertical press exposure; still crisp, not grindy. If bar path drifts or RPE overshoots, hold the load and stop at 4 good sets.	
+Thu	Chest-Supported Row	RPE-selected load	3	8	120s	8	Hard squeeze without low-back fatigue; keep 1-2 reps in reserve.	
+Thu	Side Plank	Bodyweight	3	45s/side	45s	N/A	Stay long through the top hip and keep breathing under tension.	
+Fri	[WARMUP] Overhead Squat	empty bar to work-up	1	5	N/A	N/A	3 quick ramp sets to your first single; shoulders warm, feet quick, wrists calm.; Squat-and-reach x 6; Bodyweight squat x 8; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Ramp Back Squat: 60 kg x 5, 90 kg x 3, 117.5 kg x 1-2 before 150 kg work sets.; Keep the warm-up specific and non-fatiguing.	
+Fri	Overhead Squat	RPE-selected load	5	1	180s	7	Heaviest receiving-position singles of the week; still crisp, not grindy. If the catch wobbles or the wrist complains, hold load and stop at 4 good singles.	
+Fri	Back Squat	150 kg	2	3	210s	6.5	Maintenance only; repeat the same load all block unless primary work is clearly improving and this feels easier than target.	
+Fri	Machine Hamstring Curl	RPE-selected load	3	10	90s	8	Hamstring tissue work; control the lowering and stop 1 rep before form slips.	
+Fri	Dead Bug	Bodyweight	3	8/side	45s	N/A	Own the exhale and keep ribcage down on every rep.	
+END_WEEK1_TSV
+START_WEEK2_TSV
+Day	Exercise	Weight	Sets	Reps	Rest	Target RPE	Notes	Results
+Mon	[WARMUP] Overhead Squat	empty bar to work-up	1	5	N/A	N/A	2-4 quick ramp sets for hips, shoulders and receiving position; include your usual wrist prep before work sets.; Squat-and-reach x 6; Bodyweight squat x 8; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Ramp Front Squat: 55 kg x 5, 80 kg x 3, 105 kg x 1-2 before 135 kg work sets.; Keep the warm-up specific and non-fatiguing.	
+Mon	Overhead Squat	RPE-selected load	5	2	180s	7	Add a small load only if W1 stayed at or under 6.5 with clean catches; otherwise repeat W1. If wrist bites, balance drifts, or RPE exceeds target, hold load and Hold the set count and consolidate through rep quality and a slightly lower effort,	
+Mon	Front Squat	135 kg	4	2	210s	7.5	Hold the same Monday front-squat dose while the primary work advances. If rack discomfort rises or RPE jumps, keep 135 kg and skip the final set.	
+Mon	Chest-Supported Row	RPE-selected load	3	8	120s	8	Hard squeeze without low-back fatigue; keep 1-2 reps in reserve.	
+Mon	Side Plank	Bodyweight	3	40s/side	45s	N/A	Brace hard and stay stacked; this is trunk stiffness, not a max effort.	
+Tue	[WARMUP] Band Pull-Apart Warm-up	light band	2	15	30s	N/A	2 quick rounds to open shoulders and upper back; then take 2-3 barbell ramp sets for the press.; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Band shoulder pass-through x 10; Wall slide x 8; Keep the warm-up specific and non-fatiguing.	
+Tue	Overhead Press	RPE-selected load	4	4	180s	7	Add a small load only if W1 stayed at or under 6.5 with a clean lockout; otherwise repeat. If it turns grindy, keep the load and cap at 3 sets.	
+Tue	Pull-up	RPE-selected load	3	5	150s	7	Use bodyweight or small added load to keep all 5s crisp; this is pulling maintenance, not a PR slot.	
+Tue	Pallof Press	RPE-selected load	3	10/side	45s	7	Controlled anti-rotation work; no leaning or twisting to finish reps.	
+Wed	[WARMUP] Overhead Squat	empty bar to work-up	1	5	N/A	N/A	3 quick ramp sets and footwork rehearsals; then 2-3 front-squat ramp sets to the light top set after the single; keep this day easy on the joints.; Squat-and-reach x 6; Bodyweight squat x 8; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Keep the warm-up specific and non-fatiguing.; Ramp Front Squat: 50 kg x 5, 75 kg x 3, 97.5 kg x 1-2 before 125 kg work sets.	
+Wed	Overhead Squat	RPE-selected load	1	1	150s	6.5	Add a small load only if W1 single was sharp and centered; otherwise repeat. If timing is off, stay lighter rather than chase load.	
+Wed	Front Squat	125 kg	1	2	180s	6.5	Second front-squat touch for position and timing; keep it easy so Friday stays fresh. If rack position is irritated, reduce 5-10%.	
+Wed	Barbell Hip Thrust	RPE-selected load	3	6	150s	7.5	Posterior-chain support with full lockout; keep it submaximal so later-week lifting stays sharp.	
+Wed	Cable Row	RPE-selected load	3	10	120s	8	Full reach and hard finish; keep the torso quiet.	
+Wed	Dead Bug	Bodyweight	3	8/side	45s	N/A	Exhale fully on each rep and keep the low back quiet against the floor.	
+Thu	[WARMUP] Band Pull-Apart Warm-up	light band	2	15	30s	N/A	2 quick rounds to open shoulders and upper back; then take 2-3 barbell ramp sets for the press.; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Band shoulder pass-through x 10; Wall slide x 8; Keep the warm-up specific and non-fatiguing.	
+Thu	Overhead Press	RPE-selected load	5	2	180s	7.5	Add a small load only if W1 doubles stayed crisp at 7; otherwise repeat W1. If bar path drifts or RPE overshoots, hold the load and stop at 4 good sets.	
+Thu	Chest-Supported Row	RPE-selected load	3	8	120s	8	Hard squeeze without low-back fatigue; keep 1-2 reps in reserve.	
+Thu	Side Plank	Bodyweight	3	45s/side	45s	N/A	Stay long through the top hip and keep breathing under tension.	
+Fri	[WARMUP] Overhead Squat	empty bar to work-up	1	5	N/A	N/A	3 quick ramp sets to your first single; shoulders warm, feet quick, wrists calm.; Squat-and-reach x 6; Bodyweight squat x 8; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Ramp Back Squat: 60 kg x 5, 90 kg x 3, 117.5 kg x 1-2 before 150 kg work sets.; Keep the warm-up specific and non-fatiguing.	
+Fri	Overhead Squat	RPE-selected load	5	1	180s	7.5	Add a small load only if W1 singles were stable and snappy; otherwise repeat. If the catch wobbles or the wrist complains, hold load and stop at 4 good singles.	
+Fri	Back Squat	150 kg	2	3	210s	6.5	Maintenance only; repeat the same load all block unless primary work is clearly improving and this feels easier than target.	
+Fri	Machine Hamstring Curl	RPE-selected load	3	10	90s	8	Hamstring tissue work; control the lowering and stop 1 rep before form slips.	
+Fri	Dead Bug	Bodyweight	3	8/side	45s	N/A	Own the exhale and keep ribcage down on every rep.	
+END_WEEK2_TSV
+START_WEEK3_TSV
+Day	Exercise	Weight	Sets	Reps	Rest	Target RPE	Notes	Results
+Mon	[WARMUP] Overhead Squat	empty bar to work-up	1	5	N/A	N/A	2-4 quick ramp sets for hips, shoulders and receiving position; include your usual wrist prep before work sets.; Squat-and-reach x 6; Bodyweight squat x 8; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Ramp Front Squat: 55 kg x 5, 80 kg x 3, 105 kg x 1-2 before 135 kg work sets.; Keep the warm-up specific and non-fatiguing.	
+Mon	Overhead Squat	RPE-selected load	5	2	180s	7.5	Add a small load only if W2 stayed at or under 7 with clean catches; otherwise repeat W2. If wrist bites, balance drifts, or RPE exceeds target, hold load and Hold the set count and consolidate through rep quality and a slightly lower effort,	
+Mon	Front Squat	135 kg	4	2	210s	7.5	Hold the same Monday front-squat dose while the primary work advances. If rack discomfort rises or RPE jumps, keep 135 kg and skip the final set.	
+Mon	Chest-Supported Row	RPE-selected load	3	8	120s	8	Hard squeeze without low-back fatigue; keep 1-2 reps in reserve.	
+Mon	Side Plank	Bodyweight	3	40s/side	45s	N/A	Brace hard and stay stacked; this is trunk stiffness, not a max effort.	
+Tue	[WARMUP] Band Pull-Apart Warm-up	light band	2	15	30s	N/A	2 quick rounds to open shoulders and upper back; then take 2-3 barbell ramp sets for the press.; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Band shoulder pass-through x 10; Wall slide x 8; Keep the warm-up specific and non-fatiguing.	
+Tue	Overhead Press	RPE-selected load	4	4	180s	7.5	Add a small load only if W2 stayed at or under 7 with a clean lockout; otherwise repeat. If it turns grindy, keep the load and cap at 3 sets.	
+Tue	Pull-up	RPE-selected load	3	5	150s	7	Use bodyweight or small added load to keep all 5s crisp; this is pulling maintenance, not a PR slot.	
+Tue	Pallof Press	RPE-selected load	3	10/side	45s	7	Controlled anti-rotation work; no leaning or twisting to finish reps.	
+Wed	[WARMUP] Overhead Squat	empty bar to work-up	1	5	N/A	N/A	3 quick ramp sets and footwork rehearsals; then 2-3 front-squat ramp sets to the light top set after the single; keep this day easy on the joints.; Squat-and-reach x 6; Bodyweight squat x 8; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Keep the warm-up specific and non-fatiguing.; Ramp Front Squat: 50 kg x 5, 75 kg x 3, 97.5 kg x 1-2 before 125 kg work sets.	
+Wed	Overhead Squat	RPE-selected load	1	1	150s	7	Add a small load only if W2 single was sharp and centered; otherwise repeat. If timing is off, stay lighter rather than chase load.	
+Wed	Front Squat	125 kg	1	2	180s	6.5	Second front-squat touch for position and timing; keep it easy so Friday stays fresh. If rack position is irritated, reduce 5-10%.	
+Wed	Barbell Hip Thrust	RPE-selected load	3	6	150s	7.5	Posterior-chain support with full lockout; keep it submaximal so later-week lifting stays sharp.	
+Wed	Cable Row	RPE-selected load	3	10	120s	8	Full reach and hard finish; keep the torso quiet.	
+Wed	Dead Bug	Bodyweight	3	8/side	45s	N/A	Exhale fully on each rep and keep the low back quiet against the floor.	
+Thu	[WARMUP] Band Pull-Apart Warm-up	light band	2	15	30s	N/A	2 quick rounds to open shoulders and upper back; then take 2-3 barbell ramp sets for the press.; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Band shoulder pass-through x 10; Wall slide x 8; Keep the warm-up specific and non-fatiguing.	
+Thu	Overhead Press	RPE-selected load	5	2	180s	8	Add a small load only if W2 doubles stayed crisp at 7.5; otherwise repeat W2. If bar path drifts or RPE overshoots, hold the load and stop at 4 good sets.	
+Thu	Chest-Supported Row	RPE-selected load	3	8	120s	8	Hard squeeze without low-back fatigue; keep 1-2 reps in reserve.	
+Thu	Side Plank	Bodyweight	3	45s/side	45s	N/A	Stay long through the top hip and keep breathing under tension.	
+Fri	[WARMUP] Overhead Squat	empty bar to work-up	1	5	N/A	N/A	3 quick ramp sets to your first single; shoulders warm, feet quick, wrists calm.; Squat-and-reach x 6; Bodyweight squat x 8; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Ramp Back Squat: 60 kg x 5, 90 kg x 3, 117.5 kg x 1-2 before 150 kg work sets.; Keep the warm-up specific and non-fatiguing.	
+Fri	Overhead Squat	RPE-selected load	5	1	180s	8	Add a small load only if W2 singles were stable and snappy; otherwise repeat. If the catch wobbles or the wrist complains, hold load and stop at 4 good singles.	
+Fri	Back Squat	150 kg	2	3	210s	6.5	Maintenance only; repeat the same load all block unless primary work is clearly improving and this feels easier than target.	
+Fri	Machine Hamstring Curl	RPE-selected load	3	10	90s	8	Hamstring tissue work; control the lowering and stop 1 rep before form slips.	
+Fri	Dead Bug	Bodyweight	3	8/side	45s	N/A	Own the exhale and keep ribcage down on every rep.	
+END_WEEK3_TSV
+START_WEEK4_TSV
+Day	Exercise	Weight	Sets	Reps	Rest	Target RPE	Notes	Results
+Mon	[WARMUP] Overhead Squat	empty bar to work-up	1	5	N/A	N/A	2-4 quick ramp sets for hips, shoulders and receiving position; include your usual wrist prep before work sets.; Squat-and-reach x 6; Bodyweight squat x 8; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Ramp Front Squat: 55 kg x 5, 82.5 kg x 3, 107.5 kg x 1-2 before 137.5 kg work sets.; Keep the warm-up specific and non-fatiguing.	
+Mon	Overhead Squat	RPE-selected load	5	2	180s	7.5	Match the best W3 load and shape; no forced jump this week. If wrist bites, balance drifts, or quality slips, repeat the last clean load and Hold the set count and consolidate through rep quality and a slightly lower effort, if needed.	
+Mon	Front Squat	137.5 kg	4	2	210s	8	Only take 137.5 kg if W3 stayed fast and the rack is calm; otherwise repeat 135 kg. If rack discomfort rises or RPE jumps, skip the final set.	
+Mon	Chest-Supported Row	RPE-selected load	3	8	120s	8	Hard squeeze without low-back fatigue; keep 1-2 reps in reserve.	
+Mon	Side Plank	Bodyweight	3	40s/side	45s	N/A	Brace hard and stay stacked; this is trunk stiffness, not a max effort.	
+Tue	[WARMUP] Band Pull-Apart Warm-up	light band	2	15	30s	N/A	2 quick rounds to open shoulders and upper back; then take 2-3 barbell ramp sets for the press.; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Band shoulder pass-through x 10; Wall slide x 8; Keep the warm-up specific and non-fatiguing.	
+Tue	Overhead Press	RPE-selected load	4	4	180s	7.5	Match the best clean W3 load; no need to force another jump. If it turns grindy, keep the load and cap at 3 sets.	
+Tue	Pull-up	RPE-selected load	3	5	150s	7	Use bodyweight or small added load to keep all 5s crisp; this is pulling maintenance, not a PR slot.	
+Tue	Pallof Press	RPE-selected load	3	10/side	45s	7	Controlled anti-rotation work; no leaning or twisting to finish reps.	
+Wed	[WARMUP] Overhead Squat	empty bar to work-up	1	5	N/A	N/A	3 quick ramp sets and footwork rehearsals; then 2-3 front-squat ramp sets to the light top set after the single; keep this day easy on the joints.; Squat-and-reach x 6; Bodyweight squat x 8; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Keep the warm-up specific and non-fatiguing.; Ramp Front Squat: 50 kg x 5, 75 kg x 3, 97.5 kg x 1-2 before 125 kg work sets.	
+Wed	Overhead Squat	RPE-selected load	1	1	150s	7	Match the best clean W3 single quality; if timing is off, stay lighter rather than chase load.	
+Wed	Front Squat	125 kg	1	2	180s	6.5	Second front-squat touch for position and timing; keep it easy so Friday stays fresh. If rack position is irritated, reduce 5-10%.	
+Wed	Barbell Hip Thrust	RPE-selected load	3	6	150s	7.5	Posterior-chain support with full lockout; keep it submaximal so later-week lifting stays sharp.	
+Wed	Cable Row	RPE-selected load	3	10	120s	8	Full reach and hard finish; keep the torso quiet.	
+Wed	Dead Bug	Bodyweight	3	8/side	45s	N/A	Exhale fully on each rep and keep the low back quiet against the floor.	
+Thu	[WARMUP] Band Pull-Apart Warm-up	light band	2	15	30s	N/A	2 quick rounds to open shoulders and upper back; then take 2-3 barbell ramp sets for the press.; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Band shoulder pass-through x 10; Wall slide x 8; Keep the warm-up specific and non-fatiguing.	
+Thu	Overhead Press	RPE-selected load	5	2	180s	8	Match the best crisp W3 doubles; no forced jump. If bar path drifts or RPE overshoots, hold the load and stop at 4 good sets.	
+Thu	Chest-Supported Row	RPE-selected load	3	8	120s	8	Hard squeeze without low-back fatigue; keep 1-2 reps in reserve.	
+Thu	Side Plank	Bodyweight	3	45s/side	45s	N/A	Stay long through the top hip and keep breathing under tension.	
+Fri	[WARMUP] Overhead Squat	empty bar to work-up	1	5	N/A	N/A	3 quick ramp sets to your first single; shoulders warm, feet quick, wrists calm.; Squat-and-reach x 6; Bodyweight squat x 8; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Ramp Back Squat: 60 kg x 5, 90 kg x 3, 117.5 kg x 1-2 before 150 kg work sets.; Keep the warm-up specific and non-fatiguing.	
+Fri	Overhead Squat	RPE-selected load	5	1	180s	8	Match the best W3 single standard and keep it crisp. If the catch wobbles or the wrist complains, hold load and stop at 4 good singles.	
+Fri	Back Squat	150 kg	2	3	210s	6.5	Maintenance only; repeat the same load all block unless primary work is clearly improving and this feels easier than target.	
+Fri	Machine Hamstring Curl	RPE-selected load	3	10	90s	8	Hamstring tissue work; control the lowering and stop 1 rep before form slips.	
+Fri	Dead Bug	Bodyweight	3	8/side	45s	N/A	Own the exhale and keep ribcage down on every rep.	
+END_WEEK4_TSV
