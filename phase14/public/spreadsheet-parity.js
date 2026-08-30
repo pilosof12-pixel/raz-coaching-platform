@@ -252,7 +252,11 @@
   // The engine counts the same thing in v61_weekly_exposures.js. Browser code
   // cannot import it, so a test asserts the two agree on the live programs
   // rather than trusting that they do.
-  const ENDURANCE_RE = /\b(?:run|running|jog|ruck|carry|row(?:ing)?|bike|cycl|swim|sled|treadmill|interval)\b/i;
+  // "row" used to be in here as a synonym for the ergometer, and it counted
+  // Cable Row and Chest-Supported Row as cardio: a Hybrid week with one run
+  // reported four running exposures. Rowing as conditioning has to name itself
+  // -- rowing, or an erg -- because a bare "Row" is a pulling exercise.
+  const ENDURANCE_RE = /\b(?:run|running|jog|ruck|backpack carry|loaded carry|weighted carry|rowing|erg|bike|cycl|swim|sled|treadmill)\b/i;
   // A run and a ruck both condition and are not interchangeable: one is the
   // event, the other competes with it for the same tissue.
   const RUCK_RE = /\bruck|backpack carry|weighted carry|loaded carry|sandbag carry\b/i;

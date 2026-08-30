@@ -25,6 +25,8 @@ const WEEK = [
   'Tue\tAssisted One-Arm Pull-up\tband\t2\t1\t120 s\t6\tTechnical.\t',
   'Thu\tRun\teasy\t1\t18 km\tN/A\t5\tLong run.\t',
   'Fri\tChin-up\tBW\t2\t4\t120 s\t7\tSupport.\t',
+  'Fri\tCable Row\tRPE-selected\t2\t8\t90 s\t7\tPulling support.\t',
+  'Sun\tChest-Supported Row\tRPE-selected\t2\t8\t90 s\t7\tPulling support.\t',
   'Sun\tOverhead Press\t70 kg\t2\t4\t150 s\t7.5\tSecondary.\t',
   'END_WEEK1_TSV',
 ].join('\n');
@@ -56,6 +58,14 @@ test('runs and rucks are counted as separate exposures', () => {
   assert.equal(ex.runningExposures, 1);
   assert.equal(ex.ruckExposures, 1);
   assert.equal(ex.conditioningExposures, 2);
+});
+
+// A bare "Row" is a pulling exercise. Counting it as the ergometer reported a
+// Hybrid week with one run as four running exposures.
+test('pulling rows are not counted as conditioning', () => {
+  const ex = weeklyExposures(WEEK, 1, HYBRID);
+  assert.equal(ex.runningExposures, 1, 'only the actual run counts');
+  assert.equal(ex.conditioningExposures, 1);
 });
 
 test('the description names what the figure counts', () => {
