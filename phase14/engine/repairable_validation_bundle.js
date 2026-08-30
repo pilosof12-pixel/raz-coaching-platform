@@ -30,6 +30,9 @@ import { collectSemanticFlags } from './v58_semantic_cleanup.js'; // V58-SEMANTI
 import { collectFrequencyClaimFlags } from './v61_weekly_exposures.js'; // V61-FREQUENCY-EXPOSURES-WIRED
 import { collectCompetitionFlags } from './v70_competition_rules.js'; // V70-COMPETITION-WIRED
 import { collectIntensificationFlags } from './v71_intensification.js'; // V71-INTENSIFICATION-WIRED
+import { collectCombatPowerFlags } from './v72_combat_power.js'; // V72-COMBAT-POWER-WIRED
+import { collectEconomyFlags, collectNoveltyFlags } from './v74_camp_economy.js'; // V74-CAMP-ECONOMY-WIRED
+import { collectAuditFlags } from './v73_taper_audit.js'; // V73-TAPER-AUDIT-WIRED
 import { collectLanguageAccuracyFlags, LANGUAGE_HARD_CODES, repairCountClaims } from './v46_language_accuracy.js'; // V46-LANGUAGE-ACCURACY-WIRED
 import { repairDeterministicContradictions } from './v35_deterministic_repair.js'; // V35-DETERMINISTIC-REPAIR-WIRED
 import { normalizeAdvancedHybridWeek4OapConsolidation } from './advanced_hybrid_oap_consolidation_normalizer.js';
@@ -533,6 +536,20 @@ export function collectRepairableValidationFailures(program, intake = {}, option
     if (!intens.length) return;
     throw new RetriableValidationError(intens[0].code,
       intens.map((f) => f.detail).join(' '), { flags: intens });
+  });
+
+  runRepairable(flags, () => {
+    const power = collectCombatPowerFlags(candidate, intake);
+    if (!power.length) return;
+    throw new RetriableValidationError(power[0].code,
+      power.map((f) => f.detail).join(' '), { flags: power });
+  });
+
+  runRepairable(flags, () => {
+    const lean = [...collectEconomyFlags(candidate, intake), ...collectNoveltyFlags(candidate, intake), ...collectAuditFlags(candidate, intake)];
+    if (!lean.length) return;
+    throw new RetriableValidationError(lean[0].code,
+      lean.map((f) => f.detail).join(' '), { flags: lean });
   });
 
   runRepairable(flags, () => validatePhase15FinalProgram(candidate, intake));

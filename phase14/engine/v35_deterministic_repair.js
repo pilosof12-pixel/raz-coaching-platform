@@ -27,6 +27,8 @@ import { repairSecondaryVolumeCreep } from './v66_secondary_volume_hold.js';
 import { repairWeek4Consolidation } from './v67_week4_consolidation.js';
 import { repairCompetitionBlock } from './v70_competition_rules.js';
 import { repairIntensification } from './v71_intensification.js';
+import { repairCombatPower } from './v72_combat_power.js';
+import { repairCampEconomy } from './v74_camp_economy.js';
 import { classifyExercise, dayGap, stressSignature, dayKey as dayKeyOf } from './v38_movement_taxonomy.js';
 import { auditCircularScheduling } from './v38_structural_audit.js';
 
@@ -1076,6 +1078,21 @@ export function repairDeterministicContradictions(program, intake = {}) {
   // two want different things from the same rows.
   // An intensification block trades volume for intensity and gives the
   // competition lifts a larger share as the meet approaches.
+  // A fighter's block must contain speed work, not just the word explosive.
+  const powered = repairCombatPower(candidate, intake);
+  if (powered !== candidate) {
+    candidate = powered;
+    repairs.push({ type: 'v72_combat_power_added' });
+  }
+
+  // After the speed exposure exists, not before: trimming first would cut the
+  // session down and then add a row back into it.
+  const lean = repairCampEconomy(candidate, intake);
+  if (lean !== candidate) {
+    candidate = lean;
+    repairs.push({ type: 'v74_camp_economy_trimmed' });
+  }
+
   const intensified = repairIntensification(candidate, intake);
   if (intensified !== candidate) {
     candidate = intensified;

@@ -65,7 +65,10 @@ const PATTERNS = [
   // Pulls and blockwork support the classic lifts without being them.
   [/\b(?:clean|snatch)\s*pull\b|\bpull from (?:blocks|the floor)\b/i, CATEGORY.HIP_DOMINANT, ROLE.SECONDARY],
 
-  [/box jump|broad jump|jump squat|med ?ball|medicine ball|throw|slam|sprint|explosive/i, CATEGORY.POWER, ROLE.SECONDARY],
+  // Loaded jump variants are power exposures too. "Trap Bar Jump" classified as
+  // unknown/accessory, so a repair that prescribed one to satisfy a power rule
+  // did not satisfy it -- the fix wrote a row its own rule could not see.
+  [/box jump|broad jump|jump squat|trap ?bar jump|dumbbell jump|barbell jump|vertical jump|countermovement jump|med ?ball|medicine ball|throw|slam|sprint|explosive/i, CATEGORY.POWER, ROLE.SECONDARY],
 
   // Vertical pulling.
   [/one[- ]?arm (?:pull|chin)[- ]?up/i, CATEGORY.VERTICAL_PULL, ROLE.PRIMARY],
