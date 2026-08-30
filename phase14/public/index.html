@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <title>RAZ Performance — Training Built Around Your Real Week</title>
   <style>
     :root{
@@ -127,6 +127,7 @@
     .intake-shell{padding:0;overflow:hidden}.intake-topline{display:flex;justify-content:space-between;gap:16px;align-items:flex-start;padding:22px 22px 14px}.eyebrow{text-transform:uppercase;letter-spacing:.12em;font-size:10px;font-weight:800;color:var(--teal);margin-bottom:4px}.step-count{font-size:12px;font-weight:800;color:var(--muted);background:var(--panel2);border:1px solid var(--line);padding:6px 9px;border-radius:999px;white-space:nowrap}.progress-track{height:4px;background:var(--panel2)}.progress-fill{height:100%;width:20%;background:var(--teal);transition:width .25s ease}.wizard-step{display:none;padding:18px 22px 8px;animation:stepIn .18s ease}.wizard-step.active{display:block}@keyframes stepIn{from{opacity:.35;transform:translateY(5px)}to{opacity:1;transform:none}}.wizard-actions{display:flex;justify-content:space-between;gap:10px;padding:18px 22px 22px;border-top:1px solid var(--line);margin-top:14px}.wizard-actions .btn:last-child{margin-left:auto}.goal-stack{display:grid;gap:12px;margin-top:14px}.priority-block{border:1px solid var(--line);background:var(--panel2);border-radius:14px;padding:14px}.priority-block.main-priority{border-color:rgba(24,211,197,.55);box-shadow:inset 0 0 0 1px rgba(24,211,197,.08)}.priority-block label{margin-top:6px}.priority-badge{display:inline-block;font-size:10px;letter-spacing:.08em;font-weight:900;color:#04211f;background:var(--teal);padding:4px 7px;border-radius:6px}.muted-badge{background:#27302f;color:#bed0cd}.sport-key{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0 12px}.sport-key span{font-size:11.5px;color:var(--muted);border:1px solid var(--line);background:var(--panel2);border-radius:9px;padding:7px 9px}.sport-key b{color:#eef5f4}.intake-summary{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:18px}.summary-item{border:1px solid var(--line);background:var(--panel2);border-radius:10px;padding:10px}.summary-item small{display:block;color:var(--muted);font-size:10.5px;text-transform:uppercase;letter-spacing:.06em;margin-bottom:3px}.summary-item strong{display:block;color:#fff;font-size:13px}.build-expectation{display:flex;flex-direction:column;gap:4px;margin-top:14px;background:rgba(24,211,197,.07);border:1px solid rgba(24,211,197,.22);border-radius:12px;padding:13px}.build-expectation strong{color:var(--teal);font-size:12px}.build-expectation span{font-size:12.5px;color:#d7e7e4}.generation-stage{color:var(--muted)}.mini-link{margin-top:8px;padding:0;border:0;background:none;color:var(--teal);font:inherit;font-size:12px;font-weight:800;cursor:pointer}.choice-row{display:flex;gap:8px;margin-top:8px}.choice-btn{border:1px solid var(--line);background:var(--panel2);color:var(--muted);border-radius:10px;padding:9px 14px;font-weight:800;cursor:pointer}.choice-btn.active{background:rgba(24,211,197,.14);border-color:var(--teal);color:var(--teal)}.conditional-panel{margin-top:12px;padding:13px;border:1px solid var(--line);border-radius:12px;background:rgba(255,255,255,.02)}.performance-rows{display:grid;gap:8px;margin-top:8px}.performance-row{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr) auto;gap:8px}.performance-row button{border:1px solid var(--line);background:var(--panel2);color:var(--muted);border-radius:9px;padding:0 10px;cursor:pointer}@media(max-width:560px){.performance-row{grid-template-columns:1fr 1fr}.performance-row button{grid-column:2;justify-self:end;padding:7px 10px}}
     @media(max-width:560px){.wrap{padding:20px 14px 60px}.hero{margin:20px 2px 16px}.hero h2{font-size:25px}.card{border-radius:15px}.intake-topline,.wizard-step,.wizard-actions{padding-left:16px;padding-right:16px}.intake-summary{grid-template-columns:1fr}.sport-day{align-items:flex-start}.sport-day .daybtn{flex-basis:58px}.sport-day .intensity{flex:1}.sport-day .ibtn{padding:7px 9px}.trust-row span{font-size:11px}}
   </style>
+  <link rel="stylesheet" href="launch-mobile.css">
 </head>
 <body>
   <div class="wrap">
@@ -263,6 +264,47 @@
             <select id="session_length"><option value="">Any</option><option>30 min</option><option>45 min</option><option>60 min</option><option>75–90 min</option></select>
           </div>
         </div>
+        <div class="grid2">
+          <div>
+            <label>Competing on a date?</label>
+            <input type="date" id="competition_date" />
+            <div class="hint" style="margin:6px 0 0">A fight, meet, tournament or race. The block is built backwards from this &mdash; leave it blank if you are not competing.</div>
+          </div>
+          <div>
+            <label>How much does this event matter?</label>
+            <select id="event_priority">
+              <option value="">Not competing</option>
+              <option value="A">A &mdash; the event I am building everything around</option>
+              <option value="B">B &mdash; want to perform well, not at the cost of the block</option>
+              <option value="C">C &mdash; training day or tune-up</option>
+            </select>
+            <div class="hint" style="margin:6px 0 0">This decides how much training is given up for freshness.</div>
+          </div>
+        </div>
+        <div id="competition-details" class="hidden conditional-panel">
+          <div class="grid2">
+            <div>
+              <label>What kind of event?</label>
+              <select id="event_type">
+                <option value="">Select&hellip;</option>
+                <option value="combat">Fight or grappling match</option>
+                <option value="strength_meet">Weightlifting or powerlifting meet</option>
+                <option value="endurance_race">Race</option>
+                <option value="high_fidelity_mock">Mock meet / full test day</option>
+                <option value="technical_mock">Technical practice day</option>
+                <option value="other">Something else</option>
+              </select>
+            </div>
+            <div>
+              <label>Making weight?</label>
+              <select id="weight_class_status">
+                <option value="">No weight class</option>
+                <option value="routine">Routine cut, comfortable</option>
+                <option value="difficult">Difficult cut</option>
+              </select>
+            </div>
+          </div>
+        </div>
         <label>Which days can you realistically lift?</label>
         <div class="choice-row" id="gym-availability-choice"><button type="button" class="choice-btn active" data-value="flexible">Any days are flexible</button><button type="button" class="choice-btn" data-value="limited">I have specific days</button></div>
         <input type="hidden" id="gym_availability_mode" value="flexible" />
@@ -364,6 +406,12 @@
   <script src="exceljs.lib.js"></script>
   <script src="exerciseDemos.js"></script>
   <script src="spreadsheet.js"></script>
+  <script src="spreadsheet-parity.js"></script>
   <script src="app.js"></script>
+  <script src="intake-polish.js"></script>
+  <script src="generation-progress.js"></script>
+  <script src="program-pass-gate.js"></script>
+  <script src="clarification-controls.js"></script>
+  <script src="launch-controls.js"></script>
 </body>
 </html>

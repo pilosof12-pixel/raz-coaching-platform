@@ -25,6 +25,7 @@ import { repairBlockSpecificityClaim } from './v59_block_specificity_repair.js';
 import { repairFrequencyClaim } from './v61_weekly_exposures.js';
 import { repairSecondaryVolumeCreep } from './v66_secondary_volume_hold.js';
 import { repairWeek4Consolidation } from './v67_week4_consolidation.js';
+import { repairCompetitionBlock } from './v70_competition_rules.js';
 import { classifyExercise, dayGap, stressSignature, dayKey as dayKeyOf } from './v38_movement_taxonomy.js';
 import { auditCircularScheduling } from './v38_structural_audit.js';
 
@@ -1069,6 +1070,15 @@ export function repairDeterministicContradictions(program, intake = {}) {
   // secondary volume first changes the very number Week 4 must come in under.
   // Ordered the other way, the hold silently undid the consolidation and the
   // finding came back.
+  // Competition shape before consolidation: for an athlete with an event, the
+  // final week is a competition week rather than a consolidation week, and the
+  // two want different things from the same rows.
+  const peaked = repairCompetitionBlock(candidate, intake);
+  if (peaked !== candidate) {
+    candidate = peaked;
+    repairs.push({ type: 'v70_competition_shape' });
+  }
+
   const consolidated = repairWeek4Consolidation(candidate, intake);
   if (consolidated !== candidate) {
     candidate = consolidated;

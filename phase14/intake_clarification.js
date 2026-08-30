@@ -96,6 +96,22 @@ export function detectIntakeClarifications(intake = {}) {
     }
   }
 
+  // An event with no date cannot be planned backwards from, and the whole
+  // competition-preparation shape depends on knowing how far away it is. A
+  // fight "soon" and a fight in eight weeks are different programs.
+  const eventMentioned = /\b(?:fight|bout|match|competition|competing|meet\b|tournament|qualifier|championship|weigh[- ]?in)\b/i
+    .test(text([intake?.primary_goals, intake?.secondary_goals, intake?.notes]));
+  const dateKnown = Boolean(intake?.competition_date || intake?.event_date)
+    || /\bin\s+\d+\s*(?:days?|weeks?|months?)\b|\b\d+\s*(?:days?|weeks?)\s+(?:out|away)\b/i
+      .test(text([intake?.primary_goals, intake?.secondary_goals, intake?.notes, intake?.clarification_answers]));
+  if (eventMentioned && !dateKnown) {
+    addQuestion(out, intake, {
+      id: 'competition_date',
+      prompt: 'When is the event, and how much does it matter to you?',
+      help: 'A date, or how many weeks away it is, plus whether this is the event you are building everything around or a tune-up. The block is built backwards from the date, so a guess is worse than a range.',
+    });
+  }
+
   // Running event progression changes materially with present running exposure.
   // A running goal is not the only reason this matters. An athlete with a
   // history of running-related overuse needs the same answer before anyone

@@ -213,6 +213,22 @@
     });
   }
   revealExtraGoal("add-primary-goal", "goal-primary-2-wrap");
+
+  // Event type and weight class only matter once there is an event, so they
+  // stay out of the way until a date or a priority says there is one.
+  (function competitionDetails() {
+    const panel = $("competition-details");
+    const date = $("competition_date");
+    const priority = $("event_priority");
+    if (!panel || !date || !priority) return;
+    const sync = () => {
+      const competing = Boolean(date.value) || Boolean(priority.value);
+      panel.classList.toggle("hidden", !competing);
+    };
+    date.addEventListener("change", sync);
+    priority.addEventListener("change", sync);
+    sync();
+  })();
   revealExtraGoal("add-secondary-goal", "goal-secondary-2-wrap");
 
   function bindChoice(groupId, hiddenId, panelId) {
@@ -463,6 +479,10 @@
       goal_priority_model: "tiered_equal_primary",
       experience: $("experience").value,
       days_per_week: $("days").value,
+      competition_date: $("competition_date") ? $("competition_date").value : "",
+      event_priority: $("event_priority") ? $("event_priority").value : "",
+      event_type: $("event_type") ? $("event_type").value : "",
+      weight_class_status: $("weight_class_status") ? $("weight_class_status").value : "",
       gym_availability_mode: $("gym_availability_mode").value,
       available_gym_days: availableGymDays,
       same_day_gap_hours: sameDayGap,

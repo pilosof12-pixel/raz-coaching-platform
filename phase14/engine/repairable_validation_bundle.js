@@ -28,6 +28,7 @@ import { collectPrePrimaryLoadFlags } from './v56_primary_day_protection.js'; //
 import { collectEnduranceVolumeFlags } from './v57_endurance_volume_governor.js'; // V57-ENDURANCE-VOLUME-WIRED
 import { collectSemanticFlags } from './v58_semantic_cleanup.js'; // V58-SEMANTIC-CLEANUP-WIRED
 import { collectFrequencyClaimFlags } from './v61_weekly_exposures.js'; // V61-FREQUENCY-EXPOSURES-WIRED
+import { collectCompetitionFlags } from './v70_competition_rules.js'; // V70-COMPETITION-WIRED
 import { collectLanguageAccuracyFlags, LANGUAGE_HARD_CODES, repairCountClaims } from './v46_language_accuracy.js'; // V46-LANGUAGE-ACCURACY-WIRED
 import { repairDeterministicContradictions } from './v35_deterministic_repair.js'; // V35-DETERMINISTIC-REPAIR-WIRED
 import { normalizeAdvancedHybridWeek4OapConsolidation } from './advanced_hybrid_oap_consolidation_normalizer.js';
@@ -517,6 +518,13 @@ export function collectRepairableValidationFailures(program, intake = {}, option
     if (!freq.length) return;
     throw new RetriableValidationError(freq[0].code,
       freq.map((f) => f.detail).join(' '), { flags: freq });
+  });
+
+  runRepairable(flags, () => {
+    const comp = collectCompetitionFlags(candidate, intake);
+    if (!comp.length) return;
+    throw new RetriableValidationError(comp[0].code,
+      comp.map((f) => f.detail).join(' '), { flags: comp });
   });
 
   runRepairable(flags, () => validatePhase15FinalProgram(candidate, intake));
