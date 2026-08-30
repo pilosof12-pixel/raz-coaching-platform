@@ -30,6 +30,7 @@ import { repairIntensification } from './v71_intensification.js';
 import { repairCombatPower } from './v72_combat_power.js';
 import { repairCampEconomy } from './v74_camp_economy.js';
 import { repairWeightCutLoad } from './v75_weight_cut.js';
+import { repairFightWeekClock } from './v77_fight_week_clock.js';
 import { classifyExercise, dayGap, stressSignature, dayKey as dayKeyOf } from './v38_movement_taxonomy.js';
 import { auditCircularScheduling } from './v38_structural_audit.js';
 
@@ -1100,6 +1101,14 @@ export function repairDeterministicContradictions(program, intake = {}) {
   if (cut !== candidate) {
     candidate = cut;
     repairs.push({ type: 'v75_weight_cut_held' });
+  }
+
+  // Last of the competition repairs: the clock is written after every other
+  // rule has finished editing the notes it prefixes.
+  const onClock = repairFightWeekClock(candidate, intake);
+  if (onClock !== candidate) {
+    candidate = onClock;
+    repairs.push({ type: 'v77_fight_week_clock' });
   }
 
   const intensified = repairIntensification(candidate, intake);

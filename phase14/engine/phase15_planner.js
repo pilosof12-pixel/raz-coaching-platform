@@ -22,6 +22,7 @@ import { buildCompetitionBrief } from './v69_competition_brief.js';
 import { buildCombatPowerBrief } from './v72_combat_power.js';
 import { buildWeightCutBrief } from './v75_weight_cut.js';
 import { buildConditioningBrief } from './v76_conditioning_gap.js';
+import { buildFightWeekClockBrief } from './v77_fight_week_clock.js';
 import { buildSessionSubstanceBrief } from './v53_session_substance.js';
 import { buildLanguageAccuracyBrief } from './v46_language_accuracy.js';
 
@@ -283,6 +284,7 @@ export function buildDeterministicBrief(intake = {}) {
     buildCombatPowerBrief(intake),
     buildWeightCutBrief(intake),
     buildConditioningBrief(intake),
+    buildFightWeekClockBrief(intake),
     buildSessionSubstanceBrief(intake),
     buildLanguageAccuracyBrief(intake),
     specialist,
