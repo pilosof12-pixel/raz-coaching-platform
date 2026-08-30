@@ -82,6 +82,23 @@ const WEIGHT_CLASS_BRIEF = [
   'A weight-class plan is underway. Prioritise safe weight management and technical freshness over maintaining normal gym volume, and do not answer weight-cut fatigue with more training.',
 ];
 
+
+// "This is Weeks -8 to -5. An intensification block, not the final taper."
+// A block that does not say where it sits invites the athlete to read it as the
+// peak whatever it contains.
+function runwayStatement(profile) {
+  const start = Math.round(profile.weeksOut);
+  const end = Math.max(0, start - 3);
+  const window = end === 0 ? `Weeks -${start} to the event` : `Weeks -${start} to -${end}`;
+  if (profile.blockEndsAtEvent) {
+    return `This block is ${window}: it runs into the event, so the final week is competition week rather than a normal training week.`;
+  }
+  if (start > 5) {
+    return `This block is ${window}: an intensification block, not the final taper. The taper is a separate block generated closer to the event.`;
+  }
+  return `This block is ${window}: the run-in to the event.`;
+}
+
 function bullet(lines) { return lines.map((l) => `  ${l}`).join('\n'); }
 
 export function buildCompetitionBrief(intake = {}, now = Date.now()) {
@@ -100,6 +117,8 @@ export function buildCompetitionBrief(intake = {}, now = Date.now()) {
   const lines = [
     `* COMPETITION PREPARATION: the athlete has a ${profile.eventType.replace(/_/g, ' ')} event, priority ${profile.priority}, about ${profile.weeksOut} weeks away.`,
     `  Week states across this block -- ${perWeek}.`,
+    `  ${runwayStatement(profile)}`,
+    '  Say in the opening paragraph where this block sits in the run-up and what kind of block it therefore is. An athlete reading week 1 should know whether they are building or peaking.',
     '  Build the block from the event backwards. Do not write a normal block and then forbid things in the last week.',
     bullet(guidance),
     bullet(COST_RULES),

@@ -390,10 +390,35 @@
   // it is the single source of truth and nothing here has to re-derive it.
   const DEVELOPMENTAL_NARRATIVE = /\b(?:developmental|pre[- ]specific|transition(?:al)?|base(?:[- ]building)?)\b/i;
 
+  // A phase name is a claim about the prescription. Week 4 called
+  // CONSOLIDATE / EXPRESS while carrying the same volume as Week 1 is a label
+  // contradicting the table under it, which is what a coach reads first.
+  function weekSets(program, n) {
+    const m = String(program || '').match(new RegExp('START_WEEK' + n + '_TSV\\s*\\n([\\s\\S]*?)\\nEND_WEEK' + n + '_TSV', 'i'));
+    if (!m) return null;
+    let total = 0;
+    const lines = m[1].split('\n').slice(1);
+    for (const line of lines) {
+      const c = line.split('\t');
+      if (c.length < 5) continue;
+      if (/^\s*\[(?:WARMUP|חימום)\]/i.test(c[1] || '')) continue;
+      const n2 = Number(String(c[3]).match(/\d+/) ? String(c[3]).match(/\d+/)[0] : 0);
+      total += n2 || 0;
+    }
+    return total;
+  }
+
   function weekTitle(n, program) {
     if (n === 1) return 'WEEK 1 — FOUNDATION';
     if (n === 2) return 'WEEK 2 — BUILD';
-    if (n === 4) return 'WEEK 4 — CONSOLIDATE / EXPRESS';
+    if (n === 4) {
+      const w3 = weekSets(program, 3);
+      const w4 = weekSets(program, 4);
+      // Only claim consolidation when the week actually consolidates.
+      return (w3 != null && w4 != null && w4 >= w3)
+        ? 'WEEK 4 — PEAK LOAD'
+        : 'WEEK 4 — CONSOLIDATE / EXPRESS';
+    }
     const narrative = String(program || '').split(/START_WEEK1_TSV/i)[0];
     return DEVELOPMENTAL_NARRATIVE.test(narrative)
       ? 'WEEK 3 — PEAK LOAD'

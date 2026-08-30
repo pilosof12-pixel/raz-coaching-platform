@@ -26,6 +26,7 @@ import { repairFrequencyClaim } from './v61_weekly_exposures.js';
 import { repairSecondaryVolumeCreep } from './v66_secondary_volume_hold.js';
 import { repairWeek4Consolidation } from './v67_week4_consolidation.js';
 import { repairCompetitionBlock } from './v70_competition_rules.js';
+import { repairIntensification } from './v71_intensification.js';
 import { classifyExercise, dayGap, stressSignature, dayKey as dayKeyOf } from './v38_movement_taxonomy.js';
 import { auditCircularScheduling } from './v38_structural_audit.js';
 
@@ -1073,6 +1074,14 @@ export function repairDeterministicContradictions(program, intake = {}) {
   // Competition shape before consolidation: for an athlete with an event, the
   // final week is a competition week rather than a consolidation week, and the
   // two want different things from the same rows.
+  // An intensification block trades volume for intensity and gives the
+  // competition lifts a larger share as the meet approaches.
+  const intensified = repairIntensification(candidate, intake);
+  if (intensified !== candidate) {
+    candidate = intensified;
+    repairs.push({ type: 'v71_intensification_shaped' });
+  }
+
   const peaked = repairCompetitionBlock(candidate, intake);
   if (peaked !== candidate) {
     candidate = peaked;
