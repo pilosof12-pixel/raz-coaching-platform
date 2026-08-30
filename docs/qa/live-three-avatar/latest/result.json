@@ -1,25 +1,25 @@
 {
-  "timestamp": "2026-08-30T18:53:09.242Z",
+  "timestamp": "2026-08-30T20:22:10.727Z",
   "base": "https://raz-coaching-platform.onrender.com",
-  "head_sha": "6e5f3c7bec92da11a4456f02768f9261c55ad359",
-  "runtime": "launch-acceptance-v71-camp-model-live32-20260830",
+  "head_sha": "e931963ed598664e12d0450990c3920a730274dc",
+  "runtime": "launch-acceptance-v77-competition-prep-live33-20260830",
   "results": [
     {
       "id": "weightlifter_peak",
-      "job_id": "208454129b7494168b2c661c0424f47c",
-      "ok": true,
-      "status": "done",
-      "stage": "finalizing",
-      "attempt": 0,
-      "detail": "saving program",
-      "last_seen_status": "done",
-      "error": null,
-      "program_chars": 18000,
-      "seconds": 356
+      "job_id": "6c3dcda563e06ee66c6522f33ba5a559",
+      "ok": false,
+      "status": "error",
+      "stage": "refining",
+      "attempt": 4,
+      "detail": "internal repair: V34_PROGRESSION_LANGUAGE_MISMATCH",
+      "last_seen_status": "error",
+      "error": "Internal coaching QA could not repair the candidate program after multiple passes. No client-facing program was saved. Please retry the build. QA trace: A1:EXERCISE_HALLUCINATION+V34_PROGRESSION_LANGUAGE_MISMATCH+V38_CONSECUTIVE_CONFLICTING_EXPOSURE[Snatch Pull|Snatch Pull|Snatch Pull|Snatch Pull] -> A2:V34_PROGRESSION_LANGUAGE_MISMATCH -> A3:V34_PROGRESSION_LANGUAGE_MISMATCH -> A4:V34_PROGRESSION_LANGUAGE_MISMATCH. Last failure detail: PHASE15_QUALITY_VIOLATION [QA:INTERNAL_QA_REPAIR_EXHAUSTED]",
+      "program_chars": 0,
+      "seconds": 429
     },
     {
       "id": "mma_fight_camp",
-      "job_id": "6362173c75a43dd39cc250e611b6119e",
+      "job_id": "512c9045e7987e784ef2a9600c83c9df",
       "ok": true,
       "status": "done",
       "stage": "finalizing",
@@ -27,13 +27,13 @@
       "detail": "saving program",
       "last_seen_status": "done",
       "error": null,
-      "program_chars": 9084,
-      "seconds": 146
+      "program_chars": 9230,
+      "seconds": 239
     }
   ],
   "selection": [
     "weightlifter_peak",
     "mma_fight_camp"
   ],
-  "ok": true
+  "ok": false
 }

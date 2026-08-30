@@ -1,72 +1,64 @@
-Two short full-body lifts to keep force and speed online without stealing from camp. Tuesday carries the slightly stronger maintenance signal; Friday stays deliberately cheaper and recovery-contingent so you leave the gym feeling better, not flatter.
+This is a late-camp taper block: two short full-body gym touches each week to keep force and speed without stealing from MMA. Week 4 is fight week, so the only gym work is brief primer work placed on Day -5 and Day -2 to keep you sharp and fresh.
 
-Weeks 2-4: only the Tuesday weighted Pull-up nudges up in Week 2 if Week 1 stayed crisp. Week 3 trims volume while keeping familiar speed and loading. Week 4 is a competition-week primer: same patterns, tiny dose, no grinders.
+Weeks 2-3 keep the same familiar movements and mostly the same load feel while trimming sets first. Week 4 is primer work only: fast singles or short sets, full rest, and stop while everything still feels snappy.
 
-Knee guidance: no heavy bilateral squatting in this block. If knee ache climbs above your normal camp baseline, keep Prowler Push short and sharp, hold Barbell Hip Thrust load steady or cut one set, and do not chase extra warm-up or back-off volume. If anything lower-body feels slower instead of sharper, stop there.
+No heavy bilateral squatting in this block. If the right-knee ache climbs above your normal mild baseline or next-day stiffness lingers, shorten the Prowler Push, keep Barbell Hip Thrust to one set, and strip the final accessory first; weight-cut details are medical and outside this program.
 
 START_WEEK1_TSV
 Day	Exercise	Weight	Sets	Reps	Rest	Target RPE	Notes	Results
-Tue	[WARMUP] Bike	Easy spin	1	3 min	N/A	N/A	Easy reset only; then take 1-2 quick ramp sets into the first loaded lifts.; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Band shoulder pass-through x 10; Scapular push-up x 8; Keep the warm-up specific and non-fatiguing.	
-Tue	Pull-up	RPE-selected load	3	2	150 sec	7.5	Up to 3 sets; stop after 2 if RPE would exceed 8, elbows or shoulders feel off, or rep speed clearly fades.	
-Tue	Barbell Hip Thrust	RPE-selected load	2	4	120 sec	7	Explosive up and controlled down; hold load or cut 1 set if you feel slow after MMA.	
-Tue	Chest-Supported Row	RPE-selected load	2	5	75 sec	7	Keep it crisp and braced; support work only, no grinding.	
-Tue	Push-up	RPE-selected load	2	5	75 sec	7	Use external load only if reps stay fast and clean; stop 2-3 reps before any grind.	
-Tue	Side Plank	Bodyweight	2	30 sec/side	30 sec	6	Trunk stiffness only; stop short of shaking.	
-Tue	Prowler Push	RPE-selected load	4	15 m	120 sec	N/A	Fast crisp drives with full resets; this is a power primer, not conditioning; stop if speed drops.	
-Fri	[WARMUP] Bike	Easy spin	1	3 min	N/A	N/A	Very short reset before a low-cost full-body session; then take 1-2 quick ramp sets into the first loaded lifts.; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Band shoulder pass-through x 10; Scapular push-up x 8; Keep the warm-up specific and non-fatiguing.	
-Fri	Pull-up	RPE-selected load	2	2	150 sec	6.5	Recovery-contingent touch; stop after 1 set if elbows, shoulders, or bar speed are not clean.	
-Fri	Barbell Hip Thrust	RPE-selected load	2	3	120 sec	6.5	Familiar low-fatigue lower-body work only; no grind and no soreness chase.	
-Fri	Cable Row	RPE-selected load	2	5	75 sec	6.5	Stay crisp; this is support work, not a fatigue set.	
-Fri	Push-up	RPE-selected load	2	4	75 sec	6.5	Use a load that stays fast; leave reps in reserve.	
-Fri	Neck Isometric	Manual resistance	2	15 sec each direction	30 sec	6	First row to remove if Friday MMA already took too much out of you.	
-Fri	Prowler Push	RPE-selected load	3	10 m	90 sec	N/A	Low-cost speed primer; lighter than Tuesday; full reset each push and stop before speed drops.	
+Tue	[WARMUP] Band Pull-Apart Warm-up	Light band	1	15	30 sec	3	After MMA, keep prep under 5 min; then take 2 quick ramp sets for Pull-up and Barbell Hip Thrust.; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Band shoulder pass-through x 10; Wall slide x 8; Keep the warm-up specific and non-fatiguing.	
+Tue	Trap Bar Jump	Light, speed-first load	3	3	2 min	7	Light and fast: this is a speed exposure, not a lift. Land softly, reset every rep, and keep the load low enough that the bar moves quickly. Session trimmed for camp: what remains is here because it keeps strength, speed or tissue readiness, not because it is easy.	
+Tue	Pull-up	RPE-selected load	2	2	150 sec	6.5	Crisp doubles only; stop after 1 set if elbows or speed feel off. No grind reps.	
+Tue	Barbell Hip Thrust	RPE-selected load	2	3	150 sec	6.5	Strength touch only; smooth lockout, no slow eccentric. Cut to 1 set if leg drive feels flat after MMA.	
+Tue	Pallof Press	RPE-selected load	2	8/side	60 sec	6	Trunk stiffness, not fatigue; clean brace on every rep.	
+Tue	Prowler Push	RPE-selected load	4	10 m	90 sec	N/A	Acceleration primer; full reset each rep and stop early if push speed drops. Keep this fast, not tiring.	
+Fri	[WARMUP] Band Pull-Apart Warm-up	Light band	1	15	30 sec	3	Low-cost recovery-contingent session; if MMA ran long, keep the first four work rows and drop the last accessory first.; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Band shoulder pass-through x 10; Wall slide x 8; Keep the warm-up specific and non-fatiguing.	
+Fri	Barbell Hip Thrust	RPE-selected load	2	3	150 sec	6	Low-cost posterior-chain maintenance; 1 set is enough if Friday sport already took a lot out of you.	
+Fri	Chest-Supported Row	RPE-selected load	2	4	90 sec	6	Horizontal pull maintenance; strict chest contact and no heaving.	
+Fri	Dumbbell Shoulder Press	RPE-selected load	2	3	120 sec	6	Same feel as Tue or slightly lighter; smooth reps only.	
+Fri	Side Plank	Bodyweight	2	20 sec/side	45 sec	5	Optional if time or recovery is tight; remove this first.	
+Fri	Prowler Push	RPE-selected load	3	10 m	90 sec	N/A	Low-cost speed touch; lighter than Tue if needed. Stop before the legs burn.	
 END_WEEK1_TSV
 START_WEEK2_TSV
 Day	Exercise	Weight	Sets	Reps	Rest	Target RPE	Notes	Results
-Tue	[WARMUP] Bike	Easy spin	1	3 min	N/A	N/A	Easy reset only; then take 1-2 quick ramp sets into the first loaded lifts.; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Band shoulder pass-through x 10; Scapular push-up x 8; Keep the warm-up specific and non-fatiguing.	
-Tue	Pull-up	RPE-selected load	3	2	150 sec	8	If Week 1 exceeded the RPE cap or speed faded, repeat the last clean Week 1 load instead; stop after 2 sets if rep quality drops.	
-Tue	Barbell Hip Thrust	RPE-selected load	2	4	120 sec	7	Same dose as Week 1; explosive up and controlled down; Hold the set count and consolidate through rep quality and a slightly lower effort, if you feel slow after MMA.	
-Tue	Chest-Supported Row	RPE-selected load	2	5	75 sec	7	Keep it crisp and braced; support work only, no grinding.	
-Tue	Push-up	RPE-selected load	2	5	75 sec	7	Use external load only if reps stay fast and clean; stop 2-3 reps before any grind.	
-Tue	Side Plank	Bodyweight	2	30 sec/side	30 sec	6	Trunk stiffness only; stop short of shaking.	
-Tue	Prowler Push	RPE-selected load	4	15 m	120 sec	N/A	Fast crisp drives with full resets; this is a power primer, not conditioning; stop if speed drops.	
-Fri	[WARMUP] Bike	Easy spin	1	3 min	N/A	N/A	Very short reset before a low-cost full-body session; then take 1-2 quick ramp sets into the first loaded lifts.; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Band shoulder pass-through x 10; Scapular push-up x 8; Keep the warm-up specific and non-fatiguing.	
-Fri	Pull-up	RPE-selected load	2	2	150 sec	6.5	Recovery-contingent touch; stop after 1 set if elbows, shoulders, or bar speed are not clean.	
-Fri	Barbell Hip Thrust	RPE-selected load	2	3	120 sec	6.5	Familiar low-fatigue lower-body work only; no grind and no soreness chase.	
-Fri	Cable Row	RPE-selected load	2	5	75 sec	6.5	Stay crisp; this is support work, not a fatigue set.	
-Fri	Push-up	RPE-selected load	2	4	75 sec	6.5	Use a load that stays fast; leave reps in reserve.	
-Fri	Neck Isometric	Manual resistance	2	15 sec each direction	30 sec	6	First row to remove if Friday MMA already took too much out of you.	
-Fri	Prowler Push	RPE-selected load	3	10 m	90 sec	N/A	Low-cost speed primer; lighter than Tuesday; full reset each push and stop before speed drops.	
+Tue	[WARMUP] Band Pull-Apart Warm-up	Light band	1	15	30 sec	3	If Week 1 felt heavy, repeat Week 1 exactly; no load chasing in camp.; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Band shoulder pass-through x 10; Wall slide x 8; Keep the warm-up specific and non-fatiguing.	
+Tue	Trap Bar Jump	Light, speed-first load	3	3	2 min	7	Light and fast: this is a speed exposure, not a lift. Land softly, reset every rep, and keep the load low enough that the bar moves quickly. Session trimmed for camp: what remains is here because it keeps strength, speed or tissue readiness, not because it is easy.	
+Tue	Pull-up	RPE-selected load	2	2	150 sec	6.5	Repeat only if Week 1 stayed crisp; otherwise hold the same load feel and hold the set count if needed.	
+Tue	Barbell Hip Thrust	RPE-selected load	2	3	150 sec	6.5	Same familiar strength touch; no grind and no extra set even if it feels easy.	
+Tue	Pallof Press	RPE-selected load	2	8/side	60 sec	6	Brace quality only; do not turn this into fatigue work.	
+Tue	Prowler Push	RPE-selected load	3	10 m	90 sec	N/A	Match Week 1 sled feel with cleaner speed; full reset each rep and stop if speed drops.	
+Fri	[WARMUP] Band Pull-Apart Warm-up	Light band	1	15	30 sec	3	Low-cost recovery-contingent session again; keep it short and leave feeling better than you arrived.; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Band shoulder pass-through x 10; Wall slide x 8; Keep the warm-up specific and non-fatiguing.	
+Fri	Barbell Hip Thrust	RPE-selected load	2	3	150 sec	6	Same dose as Week 1 unless Friday sport was unusually hard, then stop at 1 set.	
+Fri	Chest-Supported Row	RPE-selected load	2	4	90 sec	6	Strict row; keep the upper back switched on without chasing fatigue.	
+Fri	Dumbbell Shoulder Press	RPE-selected load	2	3	120 sec	6	Same or slightly lighter than Tue; smooth, crisp reps only.	
+Fri	Side Plank	Bodyweight	2	20 sec/side	45 sec	5	Optional if time or recovery is tight; remove this first.	
+Fri	Prowler Push	RPE-selected load	3	10 m	90 sec	N/A	Speed touch, not conditioning; lighter than Tue if needed and stop before any slowdown.	
 END_WEEK2_TSV
 START_WEEK3_TSV
 Day	Exercise	Weight	Sets	Reps	Rest	Target RPE	Notes	Results
-Tue	[WARMUP] Bike	Easy spin	1	3 min	N/A	N/A	Taper week reset only; then take 1-2 quick ramp sets into the first loaded lifts.; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Band shoulder pass-through x 10; Scapular push-up x 8; Keep the warm-up specific and non-fatiguing.	
-Tue	Pull-up	RPE-selected load	2	2	150 sec	7.5	Use the best clean Week 2 load; if Week 2 overshot, repeat the last clean load instead; stop if rep speed fades.	
-Tue	Barbell Hip Thrust	RPE-selected load	2	3	120 sec	6.5	Same pattern, less volume; keep it crisp and leave fresh.	
-Tue	Chest-Supported Row	RPE-selected load	1	5	75 sec	6.5	One clean support set only; no grind.	
-Tue	Push-up	RPE-selected load	1	5	75 sec	6.5	One fast support set only; stop well before fatigue.	
-Tue	Side Plank	Bodyweight	1	25 sec/side	30 sec	6	Short trunk reminder only.	
-Tue	Prowler Push	RPE-selected load	3	10 m	120 sec	N/A	Fast clean pushes only; full reset and stop before any speed drop.	
-Fri	[WARMUP] Bike	Easy spin	1	3 min	N/A	N/A	Short taper reset before the low-cost session.; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Band shoulder pass-through x 10; Scapular push-up x 8; Keep the warm-up specific and non-fatiguing.	
-Fri	Pull-up	RPE-selected load	1	2	150 sec	6.5	doubles crisp touch only; if elbows or shoulders feel beat up, skip this row and move on.	
-Fri	Barbell Hip Thrust	RPE-selected load	1	3	120 sec	6	One clean lower-body reminder; no grind.	
-Fri	Cable Row	RPE-selected load	1	5	75 sec	6	Easy support set only.	
-Fri	Push-up	RPE-selected load	1	4	75 sec	6	Easy support set only; leave plenty in reserve.	
-Fri	Neck Isometric	Manual resistance	1	15 sec each direction	30 sec	5-6	First row to remove if combat work already covered it.	
-Fri	Prowler Push	RPE-selected load	2	10 m	90 sec	N/A	Very low-cost speed touch; full reset and stop while you still feel sharp.	
+Tue	[WARMUP] Band Pull-Apart Warm-up	Light band	1	15	30 sec	3	Taper week; keep prep brief and keep every work set looking fast.; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Band shoulder pass-through x 10; Wall slide x 8; Keep the warm-up specific and non-fatiguing.	
+Tue	Trap Bar Jump	Light, speed-first load	3	3	2 min	7	Light and fast: this is a speed exposure, not a lift. Land softly, reset every rep, and keep the load low enough that the bar moves quickly. Session trimmed for camp: what remains is here because it keeps strength, speed or tissue readiness, not because it is easy.	
+Tue	Pull-up	RPE-selected load	1	2	150 sec	6	Same load feel, half the total work; if the double is not crisp, stop after the first clean rep.	
+Tue	Barbell Hip Thrust	RPE-selected load	1	3	150 sec	6	Taper trim; one clean set only, no back-off work.	
+Tue	Pallof Press	RPE-selected load	1	8/side	60 sec	5.5	Quick trunk brace touch; no fatigue.	
+Tue	Prowler Push	RPE-selected load	2	10 m	90 sec	N/A	Taper trim; same light sled feel, full reset, and stop the moment push speed drops.	
+Fri	[WARMUP] Band Pull-Apart Warm-up	Light band	1	15	30 sec	3	Very low-cost session; leave early rather than force extra work.; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Band shoulder pass-through x 10; Wall slide x 8; Keep the warm-up specific and non-fatiguing.	
+Fri	Barbell Hip Thrust	RPE-selected load	1	3	150 sec	5.5	One smooth set for posterior-chain feel; stop if the cut or sparring fatigue is obvious.	
+Fri	Chest-Supported Row	RPE-selected load	1	4	90 sec	5.5	One clean horizontal-pull set; strict and easy.	
+Fri	Side Plank	Bodyweight	1	20 sec/side	45 sec	5	Optional if recovery is tight; remove this first.	
+Fri	Prowler Push	RPE-selected load	2	10 m	90 sec	N/A	Short speed touch only; lighter than Tue if legs feel flat.	
 END_WEEK3_TSV
 START_WEEK4_TSV
 Day	Exercise	Weight	Sets	Reps	Rest	Target RPE	Notes	Results
-Tue	[WARMUP] Bike	Easy spin	1	2-3 min	N/A	N/A	Competition-week primer; just enough to feel loose, then take 1 quick ramp set into the first loaded lifts.; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Band shoulder pass-through x 10; Scapular push-up x 8; Keep the warm-up specific and non-fatiguing.	
-Tue	Pull-up	RPE-selected load	2	2	150 sec	7	Keep both reps snappy; if weight-cut fatigue is already high, do 1 set only with a lighter crisp RPE-selected load.	
-Tue	Barbell Hip Thrust	RPE-selected load	1	3	120 sec	6	One clean lower-body signal only; no extra sets.	
-Tue	Chest-Supported Row	RPE-selected load	1	5	75 sec	6	One crisp support set only.	
-Tue	Push-up	RPE-selected load	1	4	75 sec	6	One fast support set only; stop well before fatigue.	
-Tue	Side Plank	Bodyweight	1	20 sec/side	30 sec	5-6	Brief trunk stiffness reminder only.	
-Tue	Prowler Push	RPE-selected load	2	10 m	90 sec	N/A	Competition-week power touch; full reset and stop while you feel sharper than when you started.	
-Fri	[WARMUP] Bike	Easy spin	1	2 min	N/A	N/A	Competition-prep microdose only; leave the gym feeling better than when you walked in.; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Band shoulder pass-through x 10; Scapular push-up x 8; Keep the warm-up specific and non-fatiguing.	
-Fri	Pull-up	RPE-selected load	1	2	150 sec	6	doubles crisp set only; skip if elbows, shoulders, or the cut say no.	
-Fri	Push-up	RPE-selected load	1	3	75 sec	6	One sharp support set only; no fatigue.	
-Fri	Neck Isometric	Manual resistance	1	10 sec each direction	30 sec	5	Skip this row if you feel even slightly flat.	
-Fri	Prowler Push	RPE-selected load	2	10 m	90 sec	N/A	Very light and snappy; full reset; stop immediately if legs feel heavy.	
+Tue	[WARMUP] Band Pull-Apart Warm-up	Light band	1	15	30 sec	3	Day -5 competition-prep microdose; full rest and leave with more snap than you came in with.; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Band shoulder pass-through x 10; Wall slide x 8; Keep the warm-up specific and non-fatiguing.	
+Tue	Trap Bar Jump	Light, speed-first load	2	3	2 min	7	Day -5: Light and fast: this is a speed exposure, not a lift. Land softly, reset every rep, and keep the load low enough that the bar moves quickly. Session trimmed for camp: what remains is here because it keeps strength, speed or tissue readiness, not because it is easy. Volume reduced into the event: fatigue comes down while the intensity that keeps you sharp stays.	
+Tue	Pull-up	RPE-selected load	1	1	150 sec	5.5	Day -5: Fight-week touch only; one perfect single. If it is not crisp, stop at the last clean warm-up rep.	
+Tue	Barbell Hip Thrust	RPE-selected load	1	2	150 sec	5.5	Day -5: One clean set for lower-body feel; no extra work even if it feels easy.	
+Tue	Pallof Press	RPE-selected load	1	6/side	60 sec	5	Day -5: Just enough trunk stiffness without fatigue.	
+Tue	Prowler Push	RPE-selected load	2	10 m	90 sec	N/A	Day -5: Primer only; same light sled feel, crisp starts, and stop before any fatigue shows up.	
+Fri	[WARMUP] Band Pull-Apart Warm-up	Light band	1	12	30 sec	3	Day -2 very low-cost primer before weigh-in; nothing here should create soreness, thirst, or fatigue.; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Band shoulder pass-through x 10; Wall slide x 8; Keep the warm-up specific and non-fatiguing.	
+Fri	Chest-Supported Row	RPE-selected load	1	4	90 sec	5.5	Day -2: One clean set to keep the upper back awake; strict and easy.	
+Fri	Dumbbell Shoulder Press	RPE-selected load	1	3	120 sec	5.5	Day -2: One crisp press set; stop while it still feels easy.	
+Fri	Side Plank	Bodyweight	1	15 sec/side	45 sec	4.5	Day -2: Optional; skip this first if the cut has you flat.	
+Fri	Prowler Push	RPE-selected load	2	10 m	90 sec	N/A	Day -2: Two sharp starts, then out; keep it snappy and light.	
 END_WEEK4_TSV
