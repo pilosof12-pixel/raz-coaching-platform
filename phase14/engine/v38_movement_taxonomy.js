@@ -49,6 +49,22 @@ const PATTERNS = [
   [/planche|front lever|back lever|human flag/i, CATEGORY.SKILL, ROLE.SKILL_PRACTICE],
 
   // Power.
+  // The competition lifts of weightlifting. Without these the classic lifts
+  // classified as unknown/accessory, so the session skeleton -- which builds
+  // around a primary movement -- could never place them, and an Olympic
+  // weightlifter eight weeks from a qualifier was given a program of squats
+  // and presses containing no snatch and no clean and jerk at all.
+  //
+  // Snatch-grip pulling is tested first: a snatch-grip deadlift is a hinge, not
+  // a classic lift.
+  [/\bsnatch[- ]?grip\b/i, CATEGORY.HIP_DOMINANT, ROLE.SECONDARY],
+  [/\b(?:power |hang |muscle |squat |dumbbell |kettlebell |single[- ]arm )?snatch\b/i, CATEGORY.POWER, ROLE.PRIMARY],
+  [/\bclean\s*(?:and|&)\s*jerk\b/i, CATEGORY.POWER, ROLE.PRIMARY],
+  [/\b(?:power |hang |squat )?clean\b(?!\s*pull)/i, CATEGORY.POWER, ROLE.PRIMARY],
+  [/\b(?:push|split|power|jerk)\s*jerk\b|\bjerk\b(?!\s*(?:block|box))/i, CATEGORY.POWER, ROLE.PRIMARY],
+  // Pulls and blockwork support the classic lifts without being them.
+  [/\b(?:clean|snatch)\s*pull\b|\bpull from (?:blocks|the floor)\b/i, CATEGORY.HIP_DOMINANT, ROLE.SECONDARY],
+
   [/box jump|broad jump|jump squat|med ?ball|medicine ball|throw|slam|sprint|explosive/i, CATEGORY.POWER, ROLE.SECONDARY],
 
   // Vertical pulling.
