@@ -1,25 +1,12 @@
 {
-  "timestamp": "2026-08-31T13:08:28.655Z",
+  "timestamp": "2026-08-31T13:28:50.624Z",
   "base": "https://raz-coaching-platform.onrender.com",
-  "head_sha": "2006646d668e908cb9a8d93e8e07068f534531df",
-  "runtime": "launch-acceptance-v77b-brief-alignment-live34-20260831",
+  "head_sha": "594fe6e636af62f5bddfb7618dda1ad56aebbb55",
+  "runtime": "launch-acceptance-v78-sport-taper-v79-ballistic-v34-band-live35-20260831",
   "results": [
     {
       "id": "weightlifter_peak",
-      "job_id": "f2df2f35f0339f6d86fbb138547608f5",
-      "ok": false,
-      "status": "error",
-      "stage": "refining",
-      "attempt": 4,
-      "detail": "internal repair: V34_PROGRESSION_LANGUAGE_MISMATCH",
-      "last_seen_status": "error",
-      "error": "Internal coaching QA could not repair the candidate program after multiple passes. No client-facing program was saved. Please retry the build. QA trace: A1:EXERCISE_HALLUCINATION+V34_PROGRESSION_LANGUAGE_MISMATCH[Snatch Pull|Snatch Pull|Snatch Pull|Snatch Pull] -> A2:EXERCISE_HALLUCINATION+SPORT_DAY_COUPLING_VIOLATION+V34_PROGRESSION_LANGUAGE_MISMATCH[Exercise] -> A3:V34_PROGRESSION_LANGUAGE_MISMATCH -> A4:V34_PROGRESSION_LANGUAGE_MISMATCH. Last failure detail: Prescription/note consistency: Snatch (Week 2) claims reduced volume, but that metric did not fall from the immediately previous week. Snatch (Week 3) claims reduced volume, but that metric did not fall from the immediately previous week. Front Squat (Week 1) ramps toward 125 kg but the work row prescribes 124 kg. Front Squat (Week 1) ramps toward 135 kg but the work row prescribes 134 kg. Front Squat (Week 2) ramps toward 125 kg but the work row prescribes 126 kg. Front Squat (Week 2) ramps toward 135 kg but the work row prescribes 136 kg. Front Squat (Week 3) ramps toward 127.5 kg but the wo [QA:INTERNAL_QA_REPAIR_EXHAUSTED]",
-      "program_chars": 0,
-      "seconds": 376
-    },
-    {
-      "id": "mma_fight_camp",
-      "job_id": "d46df831752893f793ffcb59296655ad",
+      "job_id": "05ffa50eaf5c61e5667d190b604538b2",
       "ok": true,
       "status": "done",
       "stage": "finalizing",
@@ -27,8 +14,21 @@
       "detail": "saving program",
       "last_seen_status": "done",
       "error": null,
-      "program_chars": 8539,
-      "seconds": 177
+      "program_chars": 20755,
+      "seconds": 791
+    },
+    {
+      "id": "mma_fight_camp",
+      "job_id": "53b35c9b9c60f880f10fbfba73f6d569",
+      "ok": false,
+      "status": "error",
+      "stage": "refining",
+      "attempt": 4,
+      "detail": "internal repair: V74_NOVEL_EXERCISE_NEAR_EVENT",
+      "last_seen_status": "error",
+      "error": "Internal coaching QA could not repair the candidate program after multiple passes. No client-facing program was saved. Please retry the build. QA trace: A1:SPORT_DAY_COUPLING_VIOLATION+V74_NOVEL_EXERCISE_NEAR_EVENT -> A2:V74_NOVEL_EXERCISE_NEAR_EVENT -> A3:SPORT_DAY_COUPLING_VIOLATION+V74_NOVEL_EXERCISE_NEAR_EVENT -> A4:V74_NOVEL_EXERCISE_NEAR_EVENT. Last failure detail: Week 3 introduces Explosive Push-up for the first time in a taper week. A movement the athlete has not done in this block has unpredictable soreness, and there is no time left to find out. [QA:INTERNAL_QA_REPAIR_EXHAUSTED]",
+      "program_chars": 0,
+      "seconds": 405
     }
   ],
   "selection": [
