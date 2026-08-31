@@ -1,25 +1,25 @@
 {
-  "timestamp": "2026-08-30T20:22:10.727Z",
+  "timestamp": "2026-08-31T13:08:28.655Z",
   "base": "https://raz-coaching-platform.onrender.com",
-  "head_sha": "e931963ed598664e12d0450990c3920a730274dc",
-  "runtime": "launch-acceptance-v77-competition-prep-live33-20260830",
+  "head_sha": "2006646d668e908cb9a8d93e8e07068f534531df",
+  "runtime": "launch-acceptance-v77b-brief-alignment-live34-20260831",
   "results": [
     {
       "id": "weightlifter_peak",
-      "job_id": "6c3dcda563e06ee66c6522f33ba5a559",
+      "job_id": "f2df2f35f0339f6d86fbb138547608f5",
       "ok": false,
       "status": "error",
       "stage": "refining",
       "attempt": 4,
       "detail": "internal repair: V34_PROGRESSION_LANGUAGE_MISMATCH",
       "last_seen_status": "error",
-      "error": "Internal coaching QA could not repair the candidate program after multiple passes. No client-facing program was saved. Please retry the build. QA trace: A1:EXERCISE_HALLUCINATION+V34_PROGRESSION_LANGUAGE_MISMATCH+V38_CONSECUTIVE_CONFLICTING_EXPOSURE[Snatch Pull|Snatch Pull|Snatch Pull|Snatch Pull] -> A2:V34_PROGRESSION_LANGUAGE_MISMATCH -> A3:V34_PROGRESSION_LANGUAGE_MISMATCH -> A4:V34_PROGRESSION_LANGUAGE_MISMATCH. Last failure detail: PHASE15_QUALITY_VIOLATION [QA:INTERNAL_QA_REPAIR_EXHAUSTED]",
+      "error": "Internal coaching QA could not repair the candidate program after multiple passes. No client-facing program was saved. Please retry the build. QA trace: A1:EXERCISE_HALLUCINATION+V34_PROGRESSION_LANGUAGE_MISMATCH[Snatch Pull|Snatch Pull|Snatch Pull|Snatch Pull] -> A2:EXERCISE_HALLUCINATION+SPORT_DAY_COUPLING_VIOLATION+V34_PROGRESSION_LANGUAGE_MISMATCH[Exercise] -> A3:V34_PROGRESSION_LANGUAGE_MISMATCH -> A4:V34_PROGRESSION_LANGUAGE_MISMATCH. Last failure detail: Prescription/note consistency: Snatch (Week 2) claims reduced volume, but that metric did not fall from the immediately previous week. Snatch (Week 3) claims reduced volume, but that metric did not fall from the immediately previous week. Front Squat (Week 1) ramps toward 125 kg but the work row prescribes 124 kg. Front Squat (Week 1) ramps toward 135 kg but the work row prescribes 134 kg. Front Squat (Week 2) ramps toward 125 kg but the work row prescribes 126 kg. Front Squat (Week 2) ramps toward 135 kg but the work row prescribes 136 kg. Front Squat (Week 3) ramps toward 127.5 kg but the wo [QA:INTERNAL_QA_REPAIR_EXHAUSTED]",
       "program_chars": 0,
-      "seconds": 429
+      "seconds": 376
     },
     {
       "id": "mma_fight_camp",
-      "job_id": "512c9045e7987e784ef2a9600c83c9df",
+      "job_id": "d46df831752893f793ffcb59296655ad",
       "ok": true,
       "status": "done",
       "stage": "finalizing",
@@ -27,8 +27,8 @@
       "detail": "saving program",
       "last_seen_status": "done",
       "error": null,
-      "program_chars": 9230,
-      "seconds": 239
+      "program_chars": 8539,
+      "seconds": 177
     }
   ],
   "selection": [
