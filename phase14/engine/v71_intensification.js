@@ -173,6 +173,7 @@ export function repairIntensification(program, intake = {}, now = Date.now()) {
     const rows = parsed.rows.map((c) => c.slice());
     const setsOf = (i) => firstInt(rows[i][parsed.sets]) || 0;
     let total = wk.sets;
+    const trimmed = [];
 
     for (const pattern of SUPPORT_CUT_ORDER) {
       if (total <= target) break;
@@ -181,16 +182,33 @@ export function repairIntensification(program, intake = {}, now = Date.now()) {
         .map((r) => r.index)
         .sort((a, b) => setsOf(b) - setsOf(a));
       for (const i of candidates) {
+        const before = setsOf(i);
         while (total > target && setsOf(i) > 1) {
           rows[i][parsed.sets] = String(setsOf(i) - 1);
           total -= 1;
         }
+        // A row whose set count just changed must not keep a note describing
+        // the old one. Every other repair in this chain restates what it
+        // edits; leaving a stale claim here would hand the athlete a sentence
+        // its own row contradicts.
+        if (setsOf(i) !== before) trimmed.push({ index: i, before, after: setsOf(i) });
         if (total <= target) break;
       }
     }
     if (total === wk.sets) continue;
 
+    // Restate the rows that changed, before the block-level note.
     if (Number.isInteger(parsed.notes)) {
+      for (const t of trimmed) {
+        const cells = rows[t.index];
+        const note = String(cells[parsed.notes] || '').trim();
+        // Drop a hold-claim the new set count no longer supports, then say what
+        // happened instead of leaving the row silently contradicted.
+        const cleaned = note.replace(
+          /\b(?:hold|keep|maintain|repeat|same)\b[^.;]{0,40}\b(?:set count|sets)\b[^.;]*[.;]?/gi, '').trim();
+        const reason = `Support volume trimmed to ${t.after} set${t.after === 1 ? '' : 's'} this week as the classic lifts take a larger share.`;
+        cells[parsed.notes] = (cleaned ? `${cleaned} ${reason}` : reason).replace(/\s+/g, ' ').trim();
+      }
       const lead = wk.rows.find((r) => r.classic);
       if (lead) {
         const cells = rows[lead.index];

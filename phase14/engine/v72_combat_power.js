@@ -134,7 +134,8 @@ export function buildCombatPowerBrief(intake = {}, now = Date.now()) {
   if (!governsCombatPower(intake, now)) return '';
   return [
     '* POWER IS A PRESCRIPTION, NOT AN ADJECTIVE: striking and takedowns are rate-of-force-development qualities, so a camp that only maintains slow strength maintains the wrong thing.',
-    '  Every gym week carries at least one genuine speed exposure: a medicine-ball throw, a low-volume jump, an Olympic derivative, or a sled acceleration. Writing "explosive" in the note of a hip thrust does not count.',
+    '  Every gym week carries at least one ballistic exposure: a medicine-ball throw, a low-volume jump, an explosive push-up, or an Olympic derivative. Writing "explosive" in the note of a hip thrust does not count.',
+    '  Short alactic sled or prowler work is valuable and belongs in a camp, but it is concentric-only and does not substitute for the ballistic exposure above. Have both, and do not let the sled stand in for the jump.',
     '  Choose speed work by its eccentric cost. Throws, jumps that are stepped down from, Olympic derivatives and sled work are almost free. Depth jumps, drop jumps and bounding are not, and have no place in the last two weeks.',
     '  Keep it low volume with full rest, and stop the set the moment bar or body speed drops. Quality is the whole point of the exposure.',
   ].join('\n');
