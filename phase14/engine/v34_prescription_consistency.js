@@ -151,6 +151,19 @@ function kgOf(raw) {
   const m = String(raw || '').match(/\+?\s*(\d+(?:\.\d+)?)\s*kg\b/i);
   return m ? Number(m[1]) : null;
 }
+// A work row's load is frequently a prescribed range ("122-126 kg"), which is
+// ordinary coaching: the coach names a band and the athlete picks inside it.
+// kgOf keeps only the number glued to the unit -- the top of the band -- so a
+// ramp aimed at any other point in the range read as a contradiction. Return
+// the whole band so callers can ask whether a load agrees with it.
+function kgBandOf(raw) {
+  const text = String(raw || '');
+  if (!/\bkg\b/i.test(text)) return null;
+  const nums = [...text.matchAll(/(\d+(?:\.\d+)?)/g)].map((m) => Number(m[1])).filter(Number.isFinite);
+  if (!nums.length) return null;
+  return { low: Math.min(...nums), high: Math.max(...nums) };
+}
+
 function kmOf(raw) {
   const m = String(raw || '').match(/(\d+(?:\.\d+)?)\s*km\b/i);
   return m ? Number(m[1]) : null;
@@ -331,12 +344,20 @@ export function collectWarmupSanityFlags(program) {
     if (!parsed || !Number.isInteger(parsed.load) || !Number.isInteger(parsed.notes)) continue;
 
     const workLoadByKey = new Map();
+    const workBandByKey = new Map();
     parsed.rows.forEach((cells) => {
       const name = String(cells[parsed.exercise] || '').trim();
       if (!name || isWarmup(name)) return;
       const kg = kgOf(cells[parsed.load]);
       const key = rowKey(cells, parsed);
       if (Number.isFinite(kg)) workLoadByKey.set(key, Math.max(workLoadByKey.get(key) ?? -Infinity, kg));
+      const band = kgBandOf(cells[parsed.load]);
+      if (band) {
+        const seen = workBandByKey.get(key);
+        workBandByKey.set(key, seen
+          ? { low: Math.min(seen.low, band.low), high: Math.max(seen.high, band.high) }
+          : band);
+      }
     });
 
     const rampOwners = new Map();
@@ -357,9 +378,14 @@ export function collectWarmupSanityFlags(program) {
           flags.push({ code: 'V34_WARMUP_HEAVIER_THAN_WORK', week, row, exercise: movement, top_ramp_kg: top, work_kg: work,
             message: `${movement} (Week ${week}) ramps to ${top} kg before ${work} kg work sets. A ramp must finish below the work load unless a potentiation protocol is explicitly prescribed.` });
         }
-        if (Number.isFinite(target) && Number.isFinite(work) && target !== work) {
-          flags.push({ code: 'V34_WARMUP_TARGET_MISMATCH', week, row, exercise: movement, ramp_target_kg: target, work_kg: work,
-            message: `${movement} (Week ${week}) ramps toward ${target} kg but the work row prescribes ${work} kg.` });
+        // Agreement, not identity: a ramp aimed anywhere inside the prescribed
+        // band agrees with the work sets. Only a target outside the band is a
+        // real contradiction between the note and the prescription.
+        const band = workBandByKey.get(key);
+        if (Number.isFinite(target) && band && (target < band.low || target > band.high)) {
+          const shown = band.low === band.high ? `${band.high} kg` : `${band.low}-${band.high} kg`;
+          flags.push({ code: 'V34_WARMUP_TARGET_MISMATCH', week, row, exercise: movement, ramp_target_kg: target, work_kg: band.high, work_low_kg: band.low,
+            message: `${movement} (Week ${week}) ramps toward ${target} kg but the work row prescribes ${shown}.` });
         }
         // Duplicate specific ramps for the same movement on the same day.
         if (rampOwners.has(key)) {
@@ -397,4 +423,65 @@ export function validatePrescriptionConsistency(program, intake = {}, RetriableV
     );
   }
   return { ok: false, flags };
+}
+
+// V34_WARMUP_TARGET_MISMATCH was classified HARD with no repair anywhere in the
+// chain, so a program carrying one could only be regenerated -- four attempts,
+// then the build died and the client was charged for nothing. A ramp whose
+// stated target sits outside the prescribed band is repairable without
+// guessing: the ramp exists to bring the athlete to the work weight, so aim it
+// at the band the work rows actually prescribe.
+export function repairWarmupRampTarget(program, intake = {}) {
+  let out = String(program || '');
+
+  for (let week = 1; week <= 4; week += 1) {
+    const parsed = parseWeek(out, week);
+    if (!parsed || !Number.isInteger(parsed.load) || !Number.isInteger(parsed.notes)) continue;
+
+    const bands = new Map();
+    parsed.rows.forEach((cells) => {
+      const name = String(cells[parsed.exercise] || '').trim();
+      if (!name || isWarmup(name)) return;
+      const band = kgBandOf(cells[parsed.load]);
+      if (!band) return;
+      const key = rowKey(cells, parsed);
+      const seen = bands.get(key);
+      bands.set(key, seen
+        ? { low: Math.min(seen.low, band.low), high: Math.max(seen.high, band.high) }
+        : band);
+    });
+
+    const rows = parsed.rows.map((c) => c.slice());
+    let changed = false;
+
+    rows.forEach((cells) => {
+      if (!isWarmup(String(cells[parsed.exercise] || ''))) return;
+      const day = String(cells[parsed.day] || '').trim().toLowerCase();
+      const note = String(cells[parsed.notes] || '');
+
+      const next = note.replace(
+        /(Ramp\s+([A-Za-z][A-Za-z\- ]*?):\s*[^;]*?\bbefore\s+\+?)(\d+(?:\.\d+)?)(\s*kg\s+work sets\.)/gi,
+        (whole, head, movement, target, tail) => {
+          const band = bands.get(`${day}|${movement.trim().toLowerCase()}`);
+          const value = Number(target);
+          if (!band || !Number.isFinite(value)) return whole;
+          if (value >= band.low && value <= band.high) return whole;
+          return `${head}${band.high}${tail}`;
+        },
+      );
+
+      if (next !== note) { cells[parsed.notes] = next; changed = true; }
+    });
+
+    if (!changed) continue;
+    // parseWeek does not hand back the block regex, so rebuild it here rather
+    // than reaching for a parsed.re that does not exist -- replacing on
+    // undefined coerces to the string "undefined", matches nothing, and drops
+    // the repair on the floor without an error.
+    const blockRe = new RegExp(`(START_WEEK${week}_TSV\\s*\\n)([\\s\\S]*?)(\\nEND_WEEK${week}_TSV)`, 'i');
+    const rebuilt = [parsed.header.join('\t'), ...rows.map((c) => c.join('\t'))].join('\n');
+    if (!blockRe.test(out)) continue;
+    out = out.replace(blockRe, (whole, head, body, tail) => `${head}${rebuilt}${tail}`);
+  }
+  return out;
 }

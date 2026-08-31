@@ -31,6 +31,7 @@ import { repairCombatPower } from './v72_combat_power.js';
 import { repairCampEconomy } from './v74_camp_economy.js';
 import { repairWeightCutLoad } from './v75_weight_cut.js';
 import { repairFightWeekClock } from './v77_fight_week_clock.js';
+import { repairWarmupRampTarget } from './v34_prescription_consistency.js';
 import { repairBallisticShare } from './v79_ballistic_share.js';
 import { appendCompetitionBlocks } from './v73_taper_audit.js';
 import { appendCampSchedule } from './v78_sport_taper.js';
@@ -1108,6 +1109,12 @@ export function repairDeterministicContradictions(program, intake = {}) {
 
   // Last of the competition repairs: the clock is written after every other
   // rule has finished editing the notes it prefixes.
+  const ramped = repairWarmupRampTarget(candidate, intake);
+  if (ramped !== candidate) {
+    candidate = ramped;
+    repairs.push({ type: 'v34_warmup_ramp_target' });
+  }
+
   // Swap generic accessories for ballistic work before the clock is written,
   // so the countdown prefixes the notes the swap leaves behind.
   const ballistic = repairBallisticShare(candidate, intake);
