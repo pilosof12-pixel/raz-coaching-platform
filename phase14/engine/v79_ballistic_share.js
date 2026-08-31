@@ -41,10 +41,44 @@ const BALLISTIC_OPTIONS = [
 function isWarmup(n) { return /^\s*\[WARMUP\]/i.test(String(n || '')); }
 function txt(v) { return (Array.isArray(v) ? v : [v]).map((x) => String(x || '')).join(' '); }
 
-function chooseBallistic(intake, exclude = new Set()) {
-  const kit = `${txt(intake.equipment)} ${txt(intake.training_location)}`;
-  return BALLISTIC_OPTIONS.find((o) => (!o.needs || o.needs.test(kit)) && !exclude.has(o.name))
-    || BALLISTIC_OPTIONS.find((o) => !o.needs && !exclude.has(o.name));
+// Every ballistic movement the athlete has already performed earlier in this
+// block, with the dose it was given, so a swap can promote one instead of
+// inventing one.
+function familiarBallistic(program, week) {
+  const seen = new Map();
+  for (let w = 1; w < week; w += 1) {
+    const parsed = parseWeek(program, w);
+    if (!parsed) continue;
+    parsed.rows.forEach((cells) => {
+      const name = String(cells[parsed.exercise] || '').trim();
+      if (!name || isWarmup(name) || !isPowerExposure(name)) return;
+      if (seen.has(name)) return;
+      const at = (i) => (Number.isInteger(i) ? String(cells[i] || '') : '');
+      const rpeCol = parsed.header.findIndex((h) => /rpe|effort/i.test(String(h || '')));
+      seen.set(name, {
+        name,
+        sets: at(parsed.sets) || '3',
+        reps: at(parsed.reps) || '3',
+        rest: at(parsed.rest) || '90 sec',
+        rpe: (rpeCol >= 0 ? String(cells[rpeCol] || '') : '') || '7',
+        note: 'Same exposure as earlier in the block, kept short and sharp. Speed is the point; stop the moment it drops.',
+      });
+    });
+  }
+  return seen;
+}
+
+// A swap this close to the event must promote something the athlete already
+// knows. Introducing a movement in the taper hands them unpredictable soreness
+// with no time left to discover it -- which the camp economy rule flags, and
+// rightly: a live build died on exactly that contradiction between these two
+// rules. "Familiar" was in this file's own description of the work and nowhere
+// in the code that chose it.
+function chooseBallistic(intake, exclude = new Set(), familiar = new Map()) {
+  for (const [name, spec] of familiar) {
+    if (!exclude.has(name)) return spec;
+  }
+  return null;
 }
 
 function sessions(program, week) {
@@ -76,11 +110,28 @@ export function collectBallisticShareFlags(program, intake = {}, now = Date.now(
     if (!GOVERNED.has(stateForWeek(intake, week, now))) continue;
     const data = sessions(program, week);
     if (!data) continue;
+    // With nothing familiar to promote, the only way to satisfy this rule would
+    // be to introduce a novel movement in the taper, which is worse than the
+    // generic row it replaces. The rule then has nothing coherent to ask for.
+    const familiar = familiarBallistic(program, week);
+    if (!familiar.size) continue;
     for (const [day, rows] of data.days) {
       if (rows.length < 3) continue;
       if (shareOf(rows) >= 0.5) continue;
       const generic = rows.filter((r) => SWAPPABLE.test(r.name) && !isPowerExposure(r.name)).map((r) => r.name);
       if (!generic.length) continue;
+
+      // Only ask for what the familiar work on hand can actually deliver. A
+      // session with one familiar movement and four generic rows cannot reach
+      // the share however many passes it is given, and a rule that keeps asking
+      // anyway spends the attempt budget and kills the build. Deleting rows to
+      // force the number would risk taking the last strength-maintenance work
+      // with it, so the brief carries this case instead.
+      const present = new Set(rows.filter((r) => isPowerExposure(r.name)).map((r) => r.name));
+      const spare = [...familiar.keys()].filter((n) => !present.has(n)).length;
+      const swappable = Math.min(spare, generic.length);
+      const best = (rows.filter((r) => isPowerExposure(r.name) || SLED.test(r.name) || NECK_GRIP.test(r.name)).length + swappable) / rows.length;
+      if (best < 0.5) continue;
       flags.push({
         code: 'V79_TOO_GENERIC_NEAR_EVENT',
         week, day,
@@ -101,6 +152,8 @@ export function repairBallisticShare(program, intake = {}, now = Date.now()) {
     const data = sessions(out, week);
     if (!data) continue;
     const { parsed } = data;
+    const familiar = familiarBallistic(out, week);
+    if (!familiar.size) continue;
     const rows = parsed.rows.map((c) => c.slice());
     let changed = false;
 
@@ -116,7 +169,7 @@ export function repairBallisticShare(program, intake = {}, now = Date.now()) {
       while (shareOf(view()) < 0.5) {
         const current = view();
         const present = new Set(current.filter((r) => isPowerExposure(r.name)).map((r) => r.name));
-        const option = chooseBallistic(intake, present);
+        const option = chooseBallistic(intake, present, familiar);
         if (!option) break;
 
         // Swap the most generic row rather than adding to the session.
@@ -151,7 +204,8 @@ export function buildBallisticShareBrief(intake = {}, now = Date.now()) {
   if (!profile || !profile.blockEndsAtEvent) return '';
   return [
     '* AS DAY 0 APPROACHES, CHANGE WHAT THE SESSION IS MADE OF, NOT ONLY HOW MUCH OF IT THERE IS.',
-    '  Replace generic accessories -- rows, presses, curls, planks -- with familiar low-volume ballistic work: rotational and scoop medicine-ball throws, explosive push-ups, low jumps, short sled accelerations. Swap them out rather than trimming their sets.',
+    `  Replace generic accessories -- rows, presses, curls, planks -- with familiar low-volume ballistic work: ${BALLISTIC_OPTIONS.map((o) => o.name.toLowerCase()).join(', ')}, or short sled accelerations. Swap them out rather than trimming their sets.`,
+    '  ESTABLISH THEM IN WEEK 1. Whatever ballistic work appears in the taper or fight week must already have appeared earlier in the block. A movement introduced near the event brings soreness nobody can predict and there is no time left to discover it, so a novel exercise late is worse than the generic row it would replace.',
     '  Keep only the minimum strength maintenance the athlete needs. Every remaining generic exercise must justify itself against a ballistic or sport-specific alternative.',
     '  The last session before the fight is a brief neural primer, not a gym session: two to four familiar explosive drills, ten to twenty minutes, or nothing at all if the cut or readiness says so.',
     '  None of this is a licence to add plyometrics. Everything here is familiar, technically clean, very low volume, and must leave no soreness.',
