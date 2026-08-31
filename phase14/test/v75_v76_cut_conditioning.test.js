@@ -11,10 +11,14 @@ import {
 } from '../engine/v76_conditioning_gap.js';
 import { intakeClarificationResult } from '../intake_clarification.js';
 
+// Pinned rather than read from docs/qa/.../latest: acceptance runs overwrite
+// that directory, and once the engine started preventing these defects the
+// live programs stopped exhibiting them -- so the tests were asserting the
+// presence of bugs in programs that no longer had any.
 const COMP = JSON.parse(fs.readFileSync(new URL('./fixtures/competition_avatars.json', import.meta.url), 'utf8'));
 const CORE = JSON.parse(fs.readFileSync(new URL('./fixtures/acceptance_intakes.json', import.meta.url), 'utf8'));
 const FIGHTER = COMP.mma_fight_camp;
-const CAMP = fs.readFileSync(new URL('../../docs/qa/live-three-avatar/latest/mma_fight_camp-program.txt', import.meta.url), 'utf8');
+const CAMP = fs.readFileSync(new URL('./fixtures/run92_mma_fight_camp_pre_rules.txt', import.meta.url), 'utf8');
 
 test('neither rule touches an athlete with no event', () => {
   const g = fs.readFileSync(new URL('./fixtures/run81_advanced_hybrid.txt', import.meta.url), 'utf8');

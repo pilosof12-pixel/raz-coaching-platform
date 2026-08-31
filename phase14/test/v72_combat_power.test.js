@@ -8,11 +8,15 @@ import {
 import { classifyExercise } from '../engine/v38_movement_taxonomy.js';
 import { parseWeek } from '../engine/v34_workload_accounting.js';
 
+// Pinned rather than read from docs/qa/.../latest: acceptance runs overwrite
+// that directory, and once the engine started preventing these defects the
+// live programs stopped exhibiting them -- so the tests were asserting the
+// presence of bugs in programs that no longer had any.
 const COMP = JSON.parse(fs.readFileSync(new URL('./fixtures/competition_avatars.json', import.meta.url), 'utf8'));
 const CORE = JSON.parse(fs.readFileSync(new URL('./fixtures/acceptance_intakes.json', import.meta.url), 'utf8'));
 const FIGHTER = COMP.mma_fight_camp;
 const CAMP = fs.readFileSync(
-  new URL('../../docs/qa/live-three-avatar/latest/mma_fight_camp-program.txt', import.meta.url), 'utf8',
+  new URL('./fixtures/run92_mma_fight_camp_pre_rules.txt', import.meta.url), 'utf8',
 );
 
 test('only a combat block in camp is governed', () => {

@@ -8,13 +8,17 @@ import {
 import { buildCompetitionBrief } from '../engine/v69_competition_brief.js';
 import { parseWeek } from '../engine/v34_workload_accounting.js';
 
+// Pinned rather than read from docs/qa/.../latest: acceptance runs overwrite
+// that directory, and once the engine started preventing these defects the
+// live programs stopped exhibiting them -- so the tests were asserting the
+// presence of bugs in programs that no longer had any.
 const COMP = JSON.parse(fs.readFileSync(new URL('./fixtures/competition_avatars.json', import.meta.url), 'utf8'));
 const CORE = JSON.parse(fs.readFileSync(new URL('./fixtures/acceptance_intakes.json', import.meta.url), 'utf8'));
 const LIFTER = COMP.weightlifter_peak;
 
 // The reviewed block: 73 sets every week, 39% classic every week, +1 kg a week.
 const BLOCK = fs.readFileSync(
-  new URL('../../docs/qa/live-three-avatar/latest/weightlifter_peak-program.txt', import.meta.url), 'utf8',
+  new URL('./fixtures/run92_weightlifter_flat.txt', import.meta.url), 'utf8',
 );
 
 function weekStats(program, w) {

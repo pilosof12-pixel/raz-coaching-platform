@@ -6,12 +6,16 @@ import { renderTaperAudit, auditWeek, collectAuditFlags } from '../engine/v73_ta
 import { collectEconomyFlags, repairCampEconomy, collectNoveltyFlags, surplusInSession } from '../engine/v74_camp_economy.js';
 import { repairCombatPower } from '../engine/v72_combat_power.js';
 
+// Pinned rather than read from docs/qa/.../latest: acceptance runs overwrite
+// that directory, and once the engine started preventing these defects the
+// live programs stopped exhibiting them -- so the tests were asserting the
+// presence of bugs in programs that no longer had any.
 const COMP = JSON.parse(fs.readFileSync(new URL('./fixtures/competition_avatars.json', import.meta.url), 'utf8'));
 const CORE = JSON.parse(fs.readFileSync(new URL('./fixtures/acceptance_intakes.json', import.meta.url), 'utf8'));
 const LIFTER = COMP.weightlifter_peak;
 const FIGHTER = COMP.mma_fight_camp;
-const LIFT_BLOCK = fs.readFileSync(new URL('../../docs/qa/live-three-avatar/latest/weightlifter_peak-program.txt', import.meta.url), 'utf8');
-const CAMP = fs.readFileSync(new URL('../../docs/qa/live-three-avatar/latest/mma_fight_camp-program.txt', import.meta.url), 'utf8');
+const LIFT_BLOCK = fs.readFileSync(new URL('./fixtures/run92_weightlifter_flat.txt', import.meta.url), 'utf8');
+const CAMP = fs.readFileSync(new URL('./fixtures/run92_mma_fight_camp_pre_rules.txt', import.meta.url), 'utf8');
 
 test('an athlete with no event gets no audit and no camp rules', () => {
   const g = fs.readFileSync(new URL('./fixtures/run81_advanced_hybrid.txt', import.meta.url), 'utf8');
