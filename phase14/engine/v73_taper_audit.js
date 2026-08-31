@@ -168,3 +168,18 @@ export function collectAuditFlags(program, intake = {}, now = Date.now()) {
   }
   return flags;
 }
+
+// The audit and the camp schedule are deliverables, not diagnostics. Built and
+// never wired, they existed only as functions nobody called -- the delivered
+// program carried no audit at all. Appended at the end of the program so the
+// week tables are untouched and the blocks survive every parser that reads
+// them.
+export function appendCompetitionBlocks(program, intake = {}, now = Date.now()) {
+  const source = String(program || '');
+  const audit = renderTaperAudit(source, intake, now);
+  if (!audit) return source;
+
+  let out = source;
+  if (!out.includes('TAPER AUDIT')) out = `${out.replace(/\s*$/, '')}\n\n${audit}\n`;
+  return out;
+}

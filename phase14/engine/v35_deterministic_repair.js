@@ -31,6 +31,9 @@ import { repairCombatPower } from './v72_combat_power.js';
 import { repairCampEconomy } from './v74_camp_economy.js';
 import { repairWeightCutLoad } from './v75_weight_cut.js';
 import { repairFightWeekClock } from './v77_fight_week_clock.js';
+import { repairBallisticShare } from './v79_ballistic_share.js';
+import { appendCompetitionBlocks } from './v73_taper_audit.js';
+import { appendCampSchedule } from './v78_sport_taper.js';
 import { classifyExercise, dayGap, stressSignature, dayKey as dayKeyOf } from './v38_movement_taxonomy.js';
 import { auditCircularScheduling } from './v38_structural_audit.js';
 
@@ -1105,10 +1108,26 @@ export function repairDeterministicContradictions(program, intake = {}) {
 
   // Last of the competition repairs: the clock is written after every other
   // rule has finished editing the notes it prefixes.
+  // Swap generic accessories for ballistic work before the clock is written,
+  // so the countdown prefixes the notes the swap leaves behind.
+  const ballistic = repairBallisticShare(candidate, intake);
+  if (ballistic !== candidate) {
+    candidate = ballistic;
+    repairs.push({ type: 'v79_ballistic_swapped' });
+  }
+
   const onClock = repairFightWeekClock(candidate, intake);
   if (onClock !== candidate) {
     candidate = onClock;
     repairs.push({ type: 'v77_fight_week_clock' });
+  }
+
+  // Deliverables, appended once everything else has settled: the audit reports
+  // the block that actually shipped, not an intermediate one.
+  const documented = appendCampSchedule(appendCompetitionBlocks(candidate, intake), intake);
+  if (documented !== candidate) {
+    candidate = documented;
+    repairs.push({ type: 'v73_v78_blocks_appended' });
   }
 
   const intensified = repairIntensification(candidate, intake);
