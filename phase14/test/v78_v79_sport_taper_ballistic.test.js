@@ -118,11 +118,25 @@ test('the ballistic repair replaces accessories rather than adding work', () => 
   assert.equal(rows(repaired), rows(seeded), 'the repair added rows instead of swapping them');
 });
 
-test('the rule stands down when there is nothing familiar to promote', () => {
-  // Otherwise the only way to satisfy it is to introduce a movement in the
-  // taper, which is worse than the generic row it replaces.
-  assert.equal(collectBallisticShareFlags(CAMP, FIGHTER).length, 0);
-  assert.equal(repairBallisticShare(CAMP, FIGHTER), CAMP);
+test('a camp with no earlier ballistic work still gets some, by introduction', () => {
+  // Correctly dosed ballistic work leaves very little soreness and builds
+  // almost no mass, so introducing an explosive push-up or a low jump late in a
+  // camp sharpens the athlete rather than costing recovery. This is the live
+  // case from run #96, where refusing to introduce anything left the fighter
+  // with no ballistic work at all.
+  const before = collectBallisticShareFlags(CAMP, FIGHTER);
+  assert.ok(before.length > 0);
+  const repaired = repairBallisticShare(CAMP, FIGHTER);
+  assert.equal(collectBallisticShareFlags(repaired, FIGHTER).length, 0);
+  assert.equal(collectNoveltyFlags(repaired, FIGHTER).length, 0, 'the introduced work must not read as novelty');
+});
+
+test('a movement the athlete already knows is preferred over a new one', () => {
+  const seeded = seedFamiliar(['Medicine Ball Rotational Throw']);
+  const repaired = repairBallisticShare(seeded, FIGHTER);
+  const added = repaired.split('\n').filter((l) => !seeded.includes(l.trim()) && l.split('\t').length >= 4);
+  assert.ok(added.some((l) => l.split('\t')[1] === 'Medicine Ball Rotational Throw'),
+    'the familiar movement was not promoted first');
 });
 
 test('the rule asks only for what the familiar work on hand can deliver', () => {
@@ -147,16 +161,16 @@ test('the swap never introduces a movement the camp economy rule forbids', () =>
   }
 });
 
-test('the swapped-in work is ballistic and already known to the athlete', () => {
-  const seeded = seedFamiliar(['Medicine Ball Rotational Throw', 'Box Jump']);
-  const repaired = repairBallisticShare(seeded, FIGHTER);
+test('the swapped-in work is always ballistic, and always at a primer dose', () => {
+  const repaired = repairBallisticShare(seedFamiliar(['Medicine Ball Rotational Throw']), FIGHTER);
+  const seeded = seedFamiliar(['Medicine Ball Rotational Throw']);
   const added = repaired.split('\n').filter((l) => !seeded.includes(l.trim()) && l.split('\t').length >= 4);
   assert.ok(added.length > 0);
   for (const row of added) {
-    const name = row.split('\t')[1];
-    assert.ok(
-      ['Medicine Ball Rotational Throw', 'Box Jump'].includes(name),
-      `swapped in something the athlete has not done: ${name}`,
-    );
+    const cells = row.split('\t');
+    assert.match(cells[1], /throw|jump|explosive|push-up/i, `not a ballistic swap: ${cells[1]}`);
+    // The dose is what makes late ballistic work safe, so it must stay a primer.
+    assert.ok(Number(cells[3]) <= 4, `too many sets for a primer: ${row}`);
+    assert.ok(Number(String(cells[4]).match(/\d+/)?.[0]) <= 5, `too many reps for a primer: ${row}`);
   }
 });

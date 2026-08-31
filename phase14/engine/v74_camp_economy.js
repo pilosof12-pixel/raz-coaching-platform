@@ -87,7 +87,8 @@ function sessionsOf(program, week) {
     const day = String(cells[parsed.day] || '').trim();
     if (!name || !day || isWarmup(name)) return;
     if (!days.has(day)) days.set(day, []);
-    days.get(day).push({ index, name });
+    const num = (i) => (Number.isInteger(i) ? Number(String(cells[i] || '').match(/\d+(?:\.\d+)?/)?.[0]) : NaN);
+    days.get(day).push({ index, name, sets: num(parsed.sets), reps: num(parsed.reps) });
   });
   return { parsed, days };
 }
@@ -176,6 +177,32 @@ export function repairCampEconomy(program, intake = {}, now = Date.now()) {
 
 // Novelty is expensive near competition: a movement the athlete has not done
 // in this block is one whose soreness nobody can predict.
+//
+// Plyometrics are the exception, and the exception is the coach's, not an
+// inference of mine. Correctly dosed ballistic work -- a few crisp sets of a
+// few reps -- sharpens without accumulating fatigue: it leaves very little
+// soreness, builds almost no muscle, and keeps the athlete fast and powerful.
+// The rule's whole rationale is unpredictable soreness, and at this dose there
+// is very little to predict, so introducing an explosive push-up or a low jump
+// late in a camp is legitimate rather than reckless.
+//
+// The exemption is conditional on the dosage, because that is what makes the
+// claim true. High-volume or high-rep jumping is a different exercise
+// physiologically -- that is where the landing volume starts costing real
+// tissue damage -- so it stays novel work near an event and is still flagged.
+const PLYO_MAX_SETS = 4;
+const PLYO_MAX_REPS = 5;
+const PLYO_MAX_CONTACTS = 20;
+
+export function isWellDosedPlyometric(row = {}) {
+  if (!isPowerExposure(row.name)) return false;
+  const { sets, reps } = row;
+  // An unreadable dose is not a demonstrated-safe one.
+  if (!Number.isFinite(sets) || !Number.isFinite(reps)) return false;
+  if (sets > PLYO_MAX_SETS || reps > PLYO_MAX_REPS) return false;
+  return sets * reps <= PLYO_MAX_CONTACTS;
+}
+
 export function collectNoveltyFlags(program, intake = {}, now = Date.now()) {
   if (!competitionProfile(intake, now)) return [];
   const seen = new Set();
@@ -188,7 +215,7 @@ export function collectNoveltyFlags(program, intake = {}, now = Date.now()) {
     for (const [, rows] of data.days) {
       for (const r of rows) {
         const key = r.name.toLowerCase();
-        if (late && !seen.has(key)) {
+        if (late && !seen.has(key) && !isWellDosedPlyometric(r)) {
           flags.push({
             code: 'V74_NOVEL_EXERCISE_NEAR_EVENT',
             week, exercise: r.name,

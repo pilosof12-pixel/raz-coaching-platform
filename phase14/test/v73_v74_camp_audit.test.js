@@ -105,3 +105,57 @@ test('a movement introduced in the taper is refused', () => {
 test('a movement carried through the block is not novel', () => {
   assert.equal(collectNoveltyFlags(CAMP, FIGHTER).length, 0);
 });
+
+// --- plyometrics near the event -------------------------------------------
+// The novelty rule exists because a movement the athlete has not done has
+// unpredictable soreness. Correctly dosed ballistic work is the coach's stated
+// exception: a few crisp sets of a few reps leave very little soreness and
+// build almost no mass, so they sharpen without costing recovery. The exemption
+// is conditional on that dose, because that is what makes the claim true.
+import { isWellDosedPlyometric } from '../engine/v74_camp_economy.js';
+
+const FIGHTER_LATE = { ...COMP.mma_fight_camp, competition_date: '2026-09-27', weigh_in_date: '2026-09-26' };
+
+// Introduce a movement for the first time in Week 3, a taper week.
+function introduceInTaper(name, sets, reps) {
+  let week = 0;
+  return CAMP.split('\n').map((line) => {
+    const m = line.match(/^START_WEEK(\d)_TSV/);
+    if (m) week = Number(m[1]);
+    if (week === 3 && /^Tue\t/.test(line) && !/WARMUP/.test(line)) {
+      const cells = line.split('\t');
+      const row = cells.slice();
+      row[1] = name; row[3] = String(sets); row[4] = String(reps);
+      return `${row.join('\t')}\n${line}`;
+    }
+    return line;
+  }).join('\n');
+}
+const novelFlags = (p, name) => collectNoveltyFlags(p, FIGHTER_LATE).filter((f) => f.exercise === name);
+
+test('a primer dose of ballistic work may be introduced near the event', () => {
+  for (const [name, sets, reps] of [['Box Jump', 3, 3], ['Explosive Push-up', 3, 3], ['Medicine Ball Scoop Throw', 4, 5]]) {
+    assert.equal(novelFlags(introduceInTaper(name, sets, reps), name).length, 0,
+      `${name} ${sets}x${reps} should be allowed this close to the fight`);
+  }
+});
+
+test('a high-volume dose of the same movement is not', () => {
+  // Volume is what turns jumping into landing exposure and real tissue damage,
+  // so at that dose it is novel work near an event like any other.
+  for (const [name, sets, reps] of [['Box Jump', 5, 10], ['Depth Jump', 6, 8], ['Box Jump', 4, 6]]) {
+    assert.equal(novelFlags(introduceInTaper(name, sets, reps), name).length, 1,
+      `${name} ${sets}x${reps} is too much landing volume to introduce here`);
+  }
+});
+
+test('novel non-ballistic work is still refused near the event', () => {
+  for (const [name, sets, reps] of [['Bulgarian Split Squat', 4, 8], ['Good Morning', 3, 10]]) {
+    assert.equal(novelFlags(introduceInTaper(name, sets, reps), name).length, 1, `${name} should still be flagged`);
+  }
+});
+
+test('an unreadable dose is not treated as a demonstrated-safe one', () => {
+  assert.equal(isWellDosedPlyometric({ name: 'Box Jump', sets: NaN, reps: NaN }), false);
+  assert.equal(isWellDosedPlyometric({ name: 'Chest-Supported Row', sets: 3, reps: 3 }), false);
+});

@@ -75,10 +75,20 @@ function familiarBallistic(program, week) {
 // rules. "Familiar" was in this file's own description of the work and nowhere
 // in the code that chose it.
 function chooseBallistic(intake, exclude = new Set(), familiar = new Map()) {
+  // Prefer what the athlete has already done: same movement, same dose, nothing
+  // to discover. But introducing one is legitimate too. Correctly dosed
+  // ballistic work leaves very little soreness and builds almost no mass, so a
+  // few crisp sets of an explosive push-up or a low jump sharpen the athlete
+  // without costing recovery -- which is why the camp economy rule exempts it
+  // from the novelty it otherwise refuses this close to the event. Every option
+  // below is prescribed at that dose.
   for (const [name, spec] of familiar) {
     if (!exclude.has(name)) return spec;
   }
-  return null;
+  const kit = `${txt(intake.equipment)} ${txt(intake.training_location)}`;
+  return BALLISTIC_OPTIONS.find((o) => (!o.needs || o.needs.test(kit)) && !exclude.has(o.name))
+    || BALLISTIC_OPTIONS.find((o) => !o.needs && !exclude.has(o.name))
+    || null;
 }
 
 function sessions(program, week) {
@@ -110,11 +120,7 @@ export function collectBallisticShareFlags(program, intake = {}, now = Date.now(
     if (!GOVERNED.has(stateForWeek(intake, week, now))) continue;
     const data = sessions(program, week);
     if (!data) continue;
-    // With nothing familiar to promote, the only way to satisfy this rule would
-    // be to introduce a novel movement in the taper, which is worse than the
-    // generic row it replaces. The rule then has nothing coherent to ask for.
     const familiar = familiarBallistic(program, week);
-    if (!familiar.size) continue;
     for (const [day, rows] of data.days) {
       if (rows.length < 3) continue;
       if (shareOf(rows) >= 0.5) continue;
@@ -128,7 +134,8 @@ export function collectBallisticShareFlags(program, intake = {}, now = Date.now(
       // force the number would risk taking the last strength-maintenance work
       // with it, so the brief carries this case instead.
       const present = new Set(rows.filter((r) => isPowerExposure(r.name)).map((r) => r.name));
-      const spare = [...familiar.keys()].filter((n) => !present.has(n)).length;
+      const introducible = BALLISTIC_OPTIONS.filter((o) => !present.has(o.name) && !familiar.has(o.name)).length;
+      const spare = [...familiar.keys()].filter((n) => !present.has(n)).length + introducible;
       const swappable = Math.min(spare, generic.length);
       const best = (rows.filter((r) => isPowerExposure(r.name) || SLED.test(r.name) || NECK_GRIP.test(r.name)).length + swappable) / rows.length;
       if (best < 0.5) continue;
@@ -153,7 +160,6 @@ export function repairBallisticShare(program, intake = {}, now = Date.now()) {
     if (!data) continue;
     const { parsed } = data;
     const familiar = familiarBallistic(out, week);
-    if (!familiar.size) continue;
     const rows = parsed.rows.map((c) => c.slice());
     let changed = false;
 
@@ -205,9 +211,10 @@ export function buildBallisticShareBrief(intake = {}, now = Date.now()) {
   return [
     '* AS DAY 0 APPROACHES, CHANGE WHAT THE SESSION IS MADE OF, NOT ONLY HOW MUCH OF IT THERE IS.',
     `  Replace generic accessories -- rows, presses, curls, planks -- with familiar low-volume ballistic work: ${BALLISTIC_OPTIONS.map((o) => o.name.toLowerCase()).join(', ')}, or short sled accelerations. Swap them out rather than trimming their sets.`,
-    '  ESTABLISH THEM IN WEEK 1. Whatever ballistic work appears in the taper or fight week must already have appeared earlier in the block. A movement introduced near the event brings soreness nobody can predict and there is no time left to discover it, so a novel exercise late is worse than the generic row it would replace.',
+    '  PREFER WHAT THE ATHLETE ALREADY DOES, but do not refuse to introduce ballistic work late in the camp. Correctly dosed plyometrics leave very little soreness and build almost no muscle: they keep an athlete sharp, fast and powerful without accumulating fatigue, which is exactly what is wanted near the event.',
+    '  THE DOSE IS WHAT MAKES THAT TRUE. A few crisp sets of a few reps -- roughly three sets of three, never beyond four sets of five, and well under twenty ground contacts -- with full recovery between them and the set stopped the moment speed drops. High-volume or high-rep jumping is a different exercise physiologically: the landing volume costs real tissue damage, and that does not belong in a taper.',
     '  Keep only the minimum strength maintenance the athlete needs. Every remaining generic exercise must justify itself against a ballistic or sport-specific alternative.',
     '  The last session before the fight is a brief neural primer, not a gym session: two to four familiar explosive drills, ten to twenty minutes, or nothing at all if the cut or readiness says so.',
-    '  None of this is a licence to add plyometrics. Everything here is familiar, technically clean, very low volume, and must leave no soreness.',
+    '  None of this is a licence to pile on volume. Everything here is technically clean, very low volume, and must leave no soreness -- the exposure is the point, the fatigue is not.',
   ].join('\n');
 }
