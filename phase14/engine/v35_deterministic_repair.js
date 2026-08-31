@@ -1038,6 +1038,38 @@ export function repairDeterministicContradictions(program, intake = {}) {
           changed = true;
         }
       }
+
+      // The reps cell carries prose too, and the detector reads it alongside
+      // the note and the load cell when it looks for a progression claim. Only
+      // two of those three were ever repaired, so a reduction claim written
+      // here was detected on every pass and answered on none: a HARD code with
+      // no reachable repair, which spends all four attempts and then fails the
+      // build. The rep count itself is the row's dose, so a rewrite that would
+      // disturb it is refused rather than trusted.
+      if (Number.isInteger(parsed.reps)) {
+        const { note: repsText, changed: repsChanged } = repairRowNote(cells[parsed.reps], {
+          sets, reps: null, km, volume, load: null,
+          priorSets: p.sets, priorReps: p.reps, priorKm: p.km, priorVolume: p.volume, priorLoad: null,
+        });
+        // A reps cell holds the dose, not coaching prose. Restating the claim
+        // in place would leave "2 hold the total work." in a Reps column, which
+        // reads as a defect on the spreadsheet the coach reviews, so the
+        // corrected claim is lifted out of the cell and the dose left clean.
+        const holds = Object.values(HOLD_PHRASE).map((h) => h.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('|');
+        const cleaned = repsText
+          .replace(new RegExp(`\\s*\\b(?:${holds})\\b\\s*\\.?`, 'gi'), ' ')
+          .replace(/\s{2,}/g, ' ')
+          .replace(/\s+([.,;])/g, '$1')
+          .replace(/[\s.,;]+$/, '')
+          .trim();
+        const finalReps = cleaned || repsText;
+
+        if (repsChanged && repCount(finalReps) === reps && kmOf(finalReps) === km) {
+          cells[parsed.reps] = finalReps;
+          repairs.push({ type: 'v35_reps_descriptor_restated', week, row, exercise: name });
+          changed = true;
+        }
+      }
     });
 
     for (const [k, v] of thisWeek) prior.set(k, v);
