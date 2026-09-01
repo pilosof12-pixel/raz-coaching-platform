@@ -25,6 +25,7 @@ import { buildConditioningBrief } from './v76_conditioning_gap.js';
 import { buildFightWeekClockBrief } from './v77_fight_week_clock.js';
 import { buildSportTaperBrief } from './v78_sport_taper.js';
 import { buildBallisticShareBrief } from './v79_ballistic_share.js';
+import { buildClusterBrief } from './v81_cluster_notation.js';
 import { buildSessionSubstanceBrief } from './v53_session_substance.js';
 import { buildLanguageAccuracyBrief } from './v46_language_accuracy.js';
 
@@ -289,6 +290,7 @@ export function buildDeterministicBrief(intake = {}) {
     buildFightWeekClockBrief(intake),
     buildSportTaperBrief(intake),
     buildBallisticShareBrief(intake),
+    buildClusterBrief(intake),
     buildSessionSubstanceBrief(intake),
     buildLanguageAccuracyBrief(intake),
     specialist,

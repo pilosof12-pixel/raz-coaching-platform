@@ -1,0 +1,135 @@
+This is Weeks 1-4 of your 8-week meet runway: a prepeak intensification build, not the taper. The classic lifts now own the best slots on Monday and Thursday, front squat stays meaningful on Monday, and back squat plus pulling stay on a minimum reliable maintenance dose that does not steal from snatch or clean and jerk quality.
+
+Weeks 2-4: only take the small Monday and Thursday jumps if the prior week stayed inside the RPE caps with clean bar speed, stable receiving positions, and a quiet rack. Support work trims slightly across the block on purpose so the snatch and clean and jerk make up a bigger share of the week as the qualifier gets closer.
+
+Wrist guidance: keep the rack prep honest. If left-wrist rack discomfort rises above mild, hold the last clean clean and jerk or front squat load, cut one work set from that lift, and keep the rest of the day crisp. If the cut leaves you flat, repeat the last clean week rather than adding load.
+
+START_WEEK1_TSV
+Day	Exercise	Weight	Sets	Reps	Rest	Target RPE	Notes	Results
+Mon	[WARMUP] Front Rack Carry	Empty bar to light load	3	20 m	45 sec	3	Rack and wrist prep, then normal barbell ramp-up into the classic lifts.; Squat-and-reach x 6; Bodyweight squat x 8; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Band shoulder pass-through x 10; Wall slide x 8; Keep the warm-up specific and non-fatiguing.	
+Mon	Snatch	RPE-selected load	5	2	2.5-3 min	6.5-7	Direct competition lift. Crisp doubles from the floor; if bar path or catch quality loosens, hold the load and cut the last set.	
+Mon	Clean and Jerk	RPE-selected load	5	3	2.5-3 min	7	Direct competition lift. Treat each 3-rep set as 3 crisp triples with 15-20 sec reset; if rack discomfort or lockout speed worsens, hold load and finish the day at the same load or 5% lighter.	
+Mon	Front Squat	125-130 kg	4	2	3 min	7	Elbows high and rack quiet; if rack pain exceeds mild or RPE overshoots, stay at the last clean load and skip set 4.	
+Mon	Chest-Supported Row	RPE-selected load	3	6	2 min	8	Hard upper-back support with no body English.	
+Mon	Side Plank	Bodyweight	3	40 sec/side	45 sec	7	Stack ribs over pelvis and stay long.	
+Tue	[WARMUP] Band Pull-Apart Warm-up	Light band	2	15	30 sec	N/A	Scap and shoulder prep, then normal barbell ramp-up.; Squat-and-reach x 6; Bodyweight squat x 8; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Band shoulder pass-through x 10; Wall slide x 8; Keep the warm-up specific and non-fatiguing.	
+Tue	Overhead Press	RPE-selected load	4	4	2 min	6.5-7	Jerk-support pressing only, not a competition-lift day. Keep it one full gear easier than Monday and Thursday; if wrist discomfort or bar path gets noisy, hold load and stop one set early.	
+Tue	Pendlay Row	RPE-selected load	3	5	2 min	7.5	Start each rep dead still on the floor.	
+Tue	Cable Row	RPE-selected load	3	8	90 sec	7.5	Upper-back volume without axial fatigue.	
+Tue	Dead Bug	Bodyweight	3	8/side	45 sec	6	Keep low back quiet and exhale hard each rep.	
+Wed	[WARMUP] Band Pull-Apart Warm-up	Light band	2	15	30 sec	N/A	Recovery-contingent support day; keep everything smooth and low-cost so Thursday readiness improves, not worsens.; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Keep the warm-up specific and non-fatiguing.	
+Wed	Cable Row	RPE-selected load	3	8	90 sec	7.5	Upper-back blood flow without axial fatigue.	
+Wed	Dead Bug	Bodyweight	3	8/side	45 sec	6	Move slowly and keep the trunk quiet.	
+Wed	Pallof Press	RPE-selected load	3	10/side	45 sec	6	First row to remove if time or recovery is tight.	
+Wed	Front Rack Carry	RPE-selected load	4	20 m	60 sec	5	Smooth rack position and easy breathing; if the left wrist complains, shorten the carry and keep it light.	
+Thu	[WARMUP] Front Rack Carry	Empty bar to light load	3	20 m	45 sec	3	Rack and wrist prep, then normal barbell ramp-up into the classic lifts.; Squat-and-reach x 6; Bodyweight squat x 8; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Band shoulder pass-through x 10; Wall slide x 8; Keep the warm-up specific and non-fatiguing.	
+Thu	Snatch	RPE-selected load	6	1	2-2.5 min	7-7.5	Direct competition lift. Single-rep crispness; climb only while every catch looks identical. If not, repeat the last clean load.	
+Thu	Clean and Jerk	RPE-selected load	5	2	3 min	7.5	Direct competition lift. Treat each 2-rep set as 2 crisp doubles with 20-30 sec reset. Heavy but fast; if the first rep of a set turns grindy, hold load and skip set 5.	
+Thu	Back Squat	150-155 kg	2	3	3 min	6.5-7	Maintenance only. Hold this exact dose across the block; if the classic lifts run flat or RPE overshoots, take the low end and do not add load.	
+Thu	Barbell Hip Thrust	RPE-selected load	3	6	2 min	7	Posterior-chain support with full lockout and quiet ribs.	
+Thu	Side Plank	Bodyweight	3	40 sec/side	45 sec	7	Stay stacked and do not rotate open.	
+Fri	[WARMUP] Deep Squat Hold	Bodyweight	2	30 sec	30 sec	N/A	Low-cost upper and trunk support day; hips and ankles open, then normal barbell ramp-up.; Squat-and-reach x 6; Bodyweight squat x 8; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Keep the warm-up specific and non-fatiguing.; Band shoulder pass-through x 10; Wall slide x 8	
+Fri	Overhead Press	RPE-selected load	4	4	2 min	6.5-7	Low-cost support pressing to keep lockout practice without stealing from Monday readiness; if wrist comfort drops, hold load and stop one set early.	
+Fri	Pendlay Row	RPE-selected load	3	5	2 min	7.5	Same maintenance pulling dose as Tuesday.	
+Fri	Cable Row	RPE-selected load	3	8	90 sec	7	Easy upper-back volume; stay smooth and leave plenty in reserve.	
+Fri	Dead Bug	Bodyweight	3	8/side	45 sec	6	Low-cost trunk work; keep ribs down and do not turn this into fatigue.	
+END_WEEK1_TSV
+
+START_WEEK2_TSV
+Day	Exercise	Weight	Sets	Reps	Rest	Target RPE	Notes	Results
+Mon	[WARMUP] Front Rack Carry	Empty bar to light load	3	20 m	45 sec	3	Rack and wrist prep, then normal barbell ramp-up into the classic lifts.; Squat-and-reach x 6; Bodyweight squat x 8; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Band shoulder pass-through x 10; Wall slide x 8; Keep the warm-up specific and non-fatiguing.	
+Mon	Snatch	RPE-selected load	5	2	2.5-3 min	7-7.5	Direct competition lift. One small jump above last week only if all sets stayed inside the cap; otherwise repeat last week. Support volume comes down this week so the classic lifts take a larger share as the meet approaches.	
+Mon	Clean and Jerk	RPE-selected load	5	3	2.5-3 min	7.5	Direct competition lift. Treat each 3-rep set as 3 crisp triples with 15-20 sec reset; take one small jump only if rack and lockout speed stayed clean, otherwise repeat last week.	
+Mon	Front Squat	130-135 kg	4	2	3 min	7.5	Use the top of the range only if last week stayed clean; if rack pain exceeds mild, take 135 kg.	
+Mon	Chest-Supported Row	RPE-selected load	3	6	2 min	8	Hard upper-back support with no body English.	
+Mon	Side Plank	Bodyweight	1	40 sec/side	45 sec	7	Stack ribs over pelvis and stay long. Support volume trimmed to 1 set this week as the classic lifts take a larger share.	
+Tue	[WARMUP] Band Pull-Apart Warm-up	Light band	2	15	30 sec	N/A	Scap and shoulder prep, then normal barbell ramp-up.; Squat-and-reach x 6; Bodyweight squat x 8; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Band shoulder pass-through x 10; Wall slide x 8; Keep the warm-up specific and non-fatiguing.	
+Tue	Overhead Press	RPE-selected load	4	4	2 min	6.5-7	Jerk-support pressing only, not a competition-lift day. Keep it one full gear easier than Monday and Thursday; if wrist discomfort or bar path gets noisy, hold load and stop one set early.	
+Tue	Pendlay Row	RPE-selected load	3	5	2 min	7.5	Start each rep dead still on the floor.	
+Tue	Cable Row	RPE-selected load	3	8	90 sec	7.5	Upper-back volume without axial fatigue.	
+Tue	Dead Bug	Bodyweight	2	8/side	45 sec	6	Keep low back quiet and exhale hard each rep. Support volume trimmed to 2 sets this week as the classic lifts take a larger share.	
+Wed	[WARMUP] Band Pull-Apart Warm-up	Light band	2	15	30 sec	N/A	Recovery-contingent support day; keep everything smooth and low-cost so Thursday readiness improves, not worsens.; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Keep the warm-up specific and non-fatiguing.	
+Wed	Cable Row	RPE-selected load	3	8	90 sec	7.5	Upper-back blood flow without axial fatigue.	
+Wed	Dead Bug	Bodyweight	3	8/side	45 sec	6	Move slowly and keep the trunk quiet.	
+Wed	Front Rack Carry	RPE-selected load	4	20 m	60 sec	5	Smooth rack position and easy breathing; if the left wrist complains, shorten the carry and keep it light.	
+Thu	[WARMUP] Front Rack Carry	Empty bar to light load	3	20 m	45 sec	3	Rack and wrist prep, then normal barbell ramp-up into the classic lifts.; Squat-and-reach x 6; Bodyweight squat x 8; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Band shoulder pass-through x 10; Wall slide x 8; Keep the warm-up specific and non-fatiguing.	
+Thu	Snatch	RPE-selected load	6	1	2-2.5 min	7.5-8	Direct competition lift. One small jump above last week only if every catch matched; otherwise repeat last week.	
+Thu	Clean and Jerk	RPE-selected load	5	2	3 min	8	Direct competition lift. Treat each 2-rep set as 2 crisp doubles with 20-30 sec reset; take one small jump only if the doubles stayed fast, otherwise repeat last week.	
+Thu	Back Squat	150-155 kg	2	3	3 min	6.5-7	Maintenance only. Hold this exact dose across the block; if the classic lifts run flat or RPE overshoots, take the low end and do not add load.	
+Thu	Barbell Hip Thrust	RPE-selected load	3	6	2 min	7	Posterior-chain support with full lockout and quiet ribs.	
+Thu	Side Plank	Bodyweight	3	40 sec/side	45 sec	7	Stay stacked and do not rotate open.	
+Fri	[WARMUP] Deep Squat Hold	Bodyweight	2	30 sec	30 sec	N/A	Low-cost upper and trunk support day; hips and ankles open, then normal barbell ramp-up.; Squat-and-reach x 6; Bodyweight squat x 8; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Keep the warm-up specific and non-fatiguing.; Band shoulder pass-through x 10; Wall slide x 8	
+Fri	Overhead Press	RPE-selected load	4	4	2 min	6.5-7	Low-cost support pressing to keep lockout practice without stealing from Monday readiness; if wrist comfort drops, hold load and stop one set early.	
+Fri	Pendlay Row	RPE-selected load	3	5	2 min	7.5	Same maintenance pulling dose as Tuesday.	
+Fri	Cable Row	RPE-selected load	3	8	90 sec	7	Easy upper-back volume; stay smooth and leave plenty in reserve.	
+Fri	Dead Bug	Bodyweight	3	8/side	45 sec	6	Low-cost trunk work; keep ribs down and do not turn this into fatigue.	
+END_WEEK2_TSV
+
+START_WEEK3_TSV
+Day	Exercise	Weight	Sets	Reps	Rest	Target RPE	Notes	Results
+Mon	[WARMUP] Front Rack Carry	Empty bar to light load	3	20 m	45 sec	3	Rack and wrist prep, then normal barbell ramp-up into the classic lifts.; Squat-and-reach x 6; Bodyweight squat x 8; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Band shoulder pass-through x 10; Wall slide x 8; Keep the warm-up specific and non-fatiguing.	
+Mon	Snatch	RPE-selected load	5	2	2.5-3 min	7.5-8	Direct competition lift. One small jump above last week only if all sets stayed inside the cap; otherwise repeat last week. Support volume comes down this week so the classic lifts take a larger share as the meet approaches.	
+Mon	Clean and Jerk	RPE-selected load	5	3	2.5-3 min	8	Direct competition lift. Treat each 3-rep set as 3 crisp triples with 15-20 sec reset; take one small jump only if rack and lockout speed stayed clean, otherwise repeat last week.	
+Mon	Front Squat	135-137.5 kg	4	2	3 min	8	Use the top of the range only if last week stayed clean; if rack pain exceeds mild, take 137.5 kg.	
+Mon	Chest-Supported Row	RPE-selected load	3	6	2 min	8	Hard upper-back support with no body English.	
+Mon	Side Plank	Bodyweight	1	40 sec/side	45 sec	7	Stack ribs over pelvis and stay long. Support volume trimmed to 1 set this week as the classic lifts take a larger share.	
+Tue	[WARMUP] Band Pull-Apart Warm-up	Light band	2	15	30 sec	N/A	Scap and shoulder prep, then normal barbell ramp-up.; Squat-and-reach x 6; Bodyweight squat x 8; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Band shoulder pass-through x 10; Wall slide x 8; Keep the warm-up specific and non-fatiguing.	
+Tue	Overhead Press	RPE-selected load	4	4	2 min	6.5-7	Jerk-support pressing only, not a competition-lift day. Keep it one full gear easier than Monday and Thursday; if wrist discomfort or bar path gets noisy, hold load and stop one set early.	
+Tue	Pendlay Row	RPE-selected load	3	5	2 min	7.5	Start each rep dead still on the floor.	
+Tue	Cable Row	RPE-selected load	3	8	90 sec	7.5	Upper-back volume without axial fatigue.	
+Tue	Dead Bug	Bodyweight	1	8/side	45 sec	6	Keep low back quiet and exhale hard each rep. Support volume trimmed to 1 set this week as the classic lifts take a larger share.	
+Wed	[WARMUP] Band Pull-Apart Warm-up	Light band	2	15	30 sec	N/A	Recovery-contingent support day; keep everything smooth and low-cost so Thursday readiness improves, not worsens.; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Keep the warm-up specific and non-fatiguing.	
+Wed	Cable Row	RPE-selected load	3	8	90 sec	7.5	Upper-back blood flow without axial fatigue.	
+Wed	Dead Bug	Bodyweight	1	8/side	45 sec	6	Move slowly and keep the trunk quiet. Support volume trimmed to 1 set this week as the classic lifts take a larger share.	
+Wed	Front Rack Carry	RPE-selected load	4	20 m	60 sec	5	Smooth rack position and easy breathing; if the left wrist complains, shorten the carry and keep it light.	
+Thu	[WARMUP] Front Rack Carry	Empty bar to light load	3	20 m	45 sec	3	Rack and wrist prep, then normal barbell ramp-up into the classic lifts.; Squat-and-reach x 6; Bodyweight squat x 8; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Band shoulder pass-through x 10; Wall slide x 8; Keep the warm-up specific and non-fatiguing.	
+Thu	Snatch	RPE-selected load	6	1	2-2.5 min	8	Direct competition lift. One small jump above last week only if every catch matched; otherwise repeat last week.	
+Thu	Clean and Jerk	RPE-selected load	5	2	3 min	8-8.5	Direct competition lift. Treat each 2-rep set as 2 crisp doubles with 20-30 sec reset; take one small jump only if the doubles stayed fast, otherwise repeat last week.	
+Thu	Back Squat	150-155 kg	2	3	3 min	6.5-7	Maintenance only. Hold this exact dose across the block; if the classic lifts run flat or RPE overshoots, take the low end and do not add load.	
+Thu	Barbell Hip Thrust	RPE-selected load	3	6	2 min	7	Posterior-chain support with full lockout and quiet ribs.	
+Thu	Side Plank	Bodyweight	3	40 sec/side	45 sec	7	Stay stacked and do not rotate open.	
+Fri	[WARMUP] Deep Squat Hold	Bodyweight	2	30 sec	30 sec	N/A	Low-cost upper and trunk support day; hips and ankles open, then normal barbell ramp-up.; Squat-and-reach x 6; Bodyweight squat x 8; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Keep the warm-up specific and non-fatiguing.; Band shoulder pass-through x 10; Wall slide x 8	
+Fri	Overhead Press	RPE-selected load	4	4	2 min	6.5-7	Low-cost support pressing to keep lockout practice without stealing from Monday readiness; if wrist comfort drops, hold load and stop one set early.	
+Fri	Pendlay Row	RPE-selected load	3	5	2 min	7.5	Same maintenance pulling dose as Tuesday.	
+Fri	Dead Bug	Bodyweight	3	8/side	45 sec	6	Low-cost trunk work; keep ribs down and do not turn this into fatigue.	
+END_WEEK3_TSV
+
+START_WEEK4_TSV
+Day	Exercise	Weight	Sets	Reps	Rest	Target RPE	Notes	Results
+Mon	[WARMUP] Front Rack Carry	Empty bar to light load	3	20 m	45 sec	3	Rack and wrist prep, then normal barbell ramp-up into the classic lifts.; Squat-and-reach x 6; Bodyweight squat x 8; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Band shoulder pass-through x 10; Wall slide x 8; Keep the warm-up specific and non-fatiguing.	
+Mon	Snatch	RPE-selected load	5	2	2.5-3 min	7.5-8	Direct competition lift. Beat last week by the smallest clean jump only if bar speed matches; otherwise repeat last week exactly. Support volume comes down this week so the classic lifts take a larger share as the meet approaches.	
+Mon	Clean and Jerk	RPE-selected load	5	3	2.5-3 min	8	Direct competition lift. Treat each 3-rep set as 3 crisp triples with 15-20 sec reset; beat last week by the smallest clean jump only if rack and lockout stay crisp, otherwise repeat last week exactly.	
+Mon	Front Squat	137.5-140 kg	4	2	3 min	8	Use the top of the range only if last week stayed clean; if rack pain exceeds mild, take 140 kg.	
+Mon	Side Plank	Bodyweight	1	40 sec/side	45 sec	7	Stack ribs over pelvis and stay long. Support volume trimmed to 1 set this week as the classic lifts take a larger share.	
+Tue	[WARMUP] Band Pull-Apart Warm-up	Light band	2	15	30 sec	N/A	Scap and shoulder prep, then normal barbell ramp-up.; Squat-and-reach x 6; Bodyweight squat x 8; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Band shoulder pass-through x 10; Wall slide x 8; Keep the warm-up specific and non-fatiguing.	
+Tue	Overhead Press	RPE-selected load	4	4	2 min	6.5-7	Jerk-support pressing only, not a competition-lift day. Keep it one full gear easier than Monday and Thursday; if wrist discomfort or bar path gets noisy, hold load and stop one set early.	
+Tue	Pendlay Row	RPE-selected load	3	5	2 min	7.5	Start each rep dead still on the floor.	
+Tue	Dead Bug	Bodyweight	1	8/side	45 sec	6	Keep low back quiet and exhale hard each rep. Support volume trimmed to 1 set this week as the classic lifts take a larger share.	
+Wed	[WARMUP] Band Pull-Apart Warm-up	Light band	2	15	30 sec	N/A	Recovery-contingent support day; keep everything smooth and low-cost so Thursday readiness improves, not worsens.; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Keep the warm-up specific and non-fatiguing.	
+Wed	Cable Row	RPE-selected load	3	8	90 sec	7.5	Upper-back blood flow without axial fatigue.	
+Wed	Dead Bug	Bodyweight	1	8/side	45 sec	6	Move slowly and keep the trunk quiet. Support volume trimmed to 1 set this week as the classic lifts take a larger share.	
+Wed	Front Rack Carry	RPE-selected load	4	20 m	60 sec	5	Smooth rack position and easy breathing; if the left wrist complains, shorten the carry and keep it light.	
+Thu	[WARMUP] Front Rack Carry	Empty bar to light load	3	20 m	45 sec	3	Rack and wrist prep, then normal barbell ramp-up into the classic lifts.; Squat-and-reach x 6; Bodyweight squat x 8; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Band shoulder pass-through x 10; Wall slide x 8; Keep the warm-up specific and non-fatiguing.	
+Thu	Snatch	RPE-selected load	6	1	2-2.5 min	8	Direct competition lift. Beat last week by the smallest clean jump only if every catch still matches; otherwise repeat last week exactly.	
+Thu	Clean and Jerk	RPE-selected load	5	2	3 min	8-8.5	Direct competition lift. Treat each 2-rep set as 2 crisp doubles with 20-30 sec reset; beat last week by the smallest clean jump only if the doubles stay fast, otherwise repeat last week exactly.	
+Thu	Back Squat	150-155 kg	2	3	3 min	6.5-7	Maintenance only. Hold this exact dose across the block; if the classic lifts run flat or RPE overshoots, take the low end and do not add load.	
+Thu	Barbell Hip Thrust	RPE-selected load	3	6	2 min	7	Posterior-chain support with full lockout and quiet ribs.	
+Thu	Side Plank	Bodyweight	2	40 sec/side	45 sec	7	Stay stacked and do not rotate open. Support volume trimmed to 2 sets this week as the classic lifts take a larger share.	
+Fri	[WARMUP] Deep Squat Hold	Bodyweight	2	30 sec	30 sec	N/A	Low-cost upper and trunk support day; hips and ankles open, then normal barbell ramp-up.; Squat-and-reach x 6; Bodyweight squat x 8; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Keep the warm-up specific and non-fatiguing.; Band shoulder pass-through x 10; Wall slide x 8	
+Fri	Overhead Press	RPE-selected load	4	4	2 min	6.5-7	Low-cost support pressing to keep lockout practice without stealing from Monday readiness; if wrist comfort drops, hold load and stop one set early.	
+Fri	Pendlay Row	RPE-selected load	3	5	2 min	7.5	Same maintenance pulling dose as Tuesday.	
+Fri	Dead Bug	Bodyweight	3	8/side	45 sec	6	Low-cost trunk work; keep ribs down and do not turn this into fatigue.	
+END_WEEK4_TSV
+
+TAPER AUDIT
+Event: strength meet, priority A, about 7.9 weeks out.
+This block does not reach the event: it is a build block, and the taper comes later.
+
+
+    phase                sets  exercises  competition lift  power sets  peak RPE  peak % max
+W1  prepeak specificity  78    13         27%               21          8         -
+W2  prepeak specificity  75    12         28%               21          8         -
+W3  prepeak specificity  72    12         29%               21          8.5       -
+W4  prepeak specificity  66    11         32%               21          8.5       -
+
+Across the block: volume -12 sets, exercises -2, competition-lift share +5 points, peak effort +0.5 RPE, accessory volume -12 sets.

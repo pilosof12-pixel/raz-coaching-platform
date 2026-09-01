@@ -9,6 +9,8 @@
 // It runs after deterministic prescription repairs so it compares against final
 // structured fields. Qualitative cues are never inspected.
 
+import { clusterStructure } from './v81_cluster_notation.js';
+
 function firstNum(raw) {
   const m = String(raw || '').match(/\d+(?:\.\d+)?/);
   return m ? Number(m[0]) : null;
@@ -323,11 +325,18 @@ export function collectRepWordFlags(program) {
         }
       }
       const companionRows = rowsPerKey.get(rowKey(cells, parsed)) || 1;
+      // In a cluster the rep word names the piece, not the set: 3 (1+1+1) is
+      // three singles, and calling them triples is the error the notation
+      // exists to prevent. Compare against the unit the structure declares.
+      const cluster = clusterStructure(cells[parsed.reps]);
+      const unit = cluster ? cluster[0] : reps;
       for (const m of (companionRows > 1 ? [] : note.matchAll(/\b(singles?|doubles?|triples?)\b/gi))) {
         const n = REP_WORDS[String(m[1]).toLowerCase()];
-        if (Number.isFinite(n) && n !== reps) {
+        if (Number.isFinite(n) && n !== unit) {
           flags.push({ code: 'V34_NOTE_REP_WORD_MISMATCH', ...where, note_claim: m[1], prescribed_reps: reps,
-            message: `${exercise} (Week ${week}) prescribes ${reps} rep(s) per set but its note describes ${m[1]}.` });
+            message: cluster
+              ? `${exercise} (Week ${week}) is prescribed as a cluster of ${cluster.join('+')} but its note describes ${m[1]}.`
+              : `${exercise} (Week ${week}) prescribes ${reps} rep(s) per set but its note describes ${m[1]}.` });
         }
       }
     });

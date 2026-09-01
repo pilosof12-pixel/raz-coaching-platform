@@ -6,7 +6,7 @@ import { collectProgressionLanguageFlags } from '../engine/v34_prescription_cons
 import { repairDeterministicContradictions } from '../engine/v35_deterministic_repair.js';
 
 const COMP = JSON.parse(fs.readFileSync(new URL('./fixtures/competition_avatars.json', import.meta.url), 'utf8'));
-const LIFTER = { ...COMP.weightlifter_qualifier, competition_date: '2026-10-26' };
+const LIFTER = { ...COMP.weightlifter_peak, competition_date: '2026-10-26' };
 const FLAT = fs.readFileSync(new URL('./fixtures/run92_weightlifter_flat.txt', import.meta.url), 'utf8');
 
 // Monday's Snatch is a flat 5 x 2 in every week of this fixture, so any claim

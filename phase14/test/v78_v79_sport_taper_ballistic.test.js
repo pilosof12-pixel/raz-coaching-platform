@@ -55,7 +55,7 @@ test('an athlete with no event is untouched by either module', () => {
 test('a lifter has no sport schedule to taper', () => {
   // The weightlifter competes, but the competition lift IS the gym work --
   // there is no separate sport to withdraw, so v78 must stay silent.
-  const lifter = { ...COMP.weightlifter_qualifier, competition_date: '2026-10-26' };
+  const lifter = { ...COMP.weightlifter_peak, competition_date: '2026-10-26' };
   assert.equal(governsSportTaper(lifter), false);
   assert.equal(collectSportTaperFlags(CAMP, lifter).length, 0);
   assert.equal(buildSportTaperBrief(lifter), '');

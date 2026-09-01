@@ -408,7 +408,33 @@
     return total;
   }
 
+  // A block aimed at a meet eight weeks out is an intensification build, and its
+  // last week is not an expression week. "Express" claims the athlete is
+  // realising fitness for competition; naming a 59-set five-day week that reads
+  // as more advanced than the prescription actually is. Realization words are
+  // reserved for a block that genuinely reaches the event -- which the engine
+  // already states in its opening sentence, so this reads that rather than
+  // guessing. Checked before the taper pattern because the sentence that
+  // establishes an intensification block is usually "not the taper".
+  const INTENSIFICATION_NARRATIVE = /\b(?:intensification|pre[- ]?peak|prepeak|build block|not the (?:taper|peak))\b/i;
+  const REALIZATION_NARRATIVE = /\b(?:taper|realizations?|realisations?|peaking|competition week|fight week|meet week)\b/i;
+
+  function blockPhase(program) {
+    const narrative = String(program || '').split(/START_WEEK1_TSV/i)[0];
+    if (INTENSIFICATION_NARRATIVE.test(narrative)) return 'intensification';
+    if (REALIZATION_NARRATIVE.test(narrative)) return 'realization';
+    return 'general';
+  }
+
   function weekTitle(n, program) {
+    const phase = blockPhase(program);
+    if (phase === 'intensification') {
+      // Volume coming down here is specificity, not consolidation or expression.
+      if (n === 1) return 'WEEK 1 — ACCUMULATION';
+      if (n === 2) return 'WEEK 2 — INTENSIFICATION';
+      if (n === 3) return 'WEEK 3 — INTENSIFICATION';
+      return 'WEEK 4 — SPECIFIC CONSOLIDATION';
+    }
     if (n === 1) return 'WEEK 1 — FOUNDATION';
     if (n === 2) return 'WEEK 2 — BUILD';
     if (n === 4) {

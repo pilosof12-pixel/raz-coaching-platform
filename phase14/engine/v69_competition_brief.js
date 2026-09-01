@@ -29,6 +29,8 @@ const STATE_BRIEF = {
     'Emphasis: make the qualities already built transfer to the event. More event-relevant lifts, paces, skill sequences and tactical scenarios; less low-value variety and redundant general work.',
     'This is still a building block. Do not taper, do not reduce volume for the event, and do not treat this as peak week -- the competition is far enough away that fitness is still the objective.',
     'Specificity means closer to the event, not merely harder. Nonessential gym complexity earns less space as the event approaches.',
+    'EVERY ACCESSORY MUST ANSWER A KNOWN NEED. Being cheap is not a reason to keep an exercise: low fatigue cost only means it is not expensive, not that it is earning its place. Name the deficit each accessory addresses, and if you cannot name one, drop the exercise rather than shrinking it. Secondary pressing and squat support are the usual offenders -- they should not still be carrying Week 1 volume in Weeks 3 and 4 unless the athlete has told us that lift is a limiter.',
+    'PRESCRIBE THE COMPETITION LIFTS IN LOADS THE ATHLETE CAN ACT ON: a weight in kg, or a percentage of their current best. "RPE-selected load" alone leaves the athlete to invent the number on the day and makes the block impossible to audit against their maxes. Effort caps belong alongside the load, not instead of it.',
   ],
   [STATE.MIDDLE_CAMP]: [
     'Emphasis: the sport is taking more, so the gym takes less. Strength shifts from developing to maintaining -- fewer hard sets, less novelty, and supplemental work only where it still solves a real deficit.',

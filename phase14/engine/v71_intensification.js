@@ -19,6 +19,34 @@ import { STATE, stateForWeek, competitionProfile } from './v68_competition_state
 
 const CLASSIC = /\b(?:snatch|clean and jerk|clean & jerk|power clean|power snatch|hang (?:snatch|clean)|jerk|clean)\b/i;
 // Trimmed before the competition lifts, in this order.
+// Secondary pressing and squat support were structurally immune to the trim:
+// neither appears below, and the block-level volume target is always met by
+// cutting curls, planks and rows first, so the cut never reached them. The
+// delivered block held overhead press at 8 sets and squat support at 6 in every
+// week while total volume fell 78 -> 59, which is the "too much cheap support
+// work" the review named. Low fatigue cost is not a justification: as the meet
+// approaches an accessory has to answer a known need.
+const SECONDARY_PRESS = /\b(?:overhead press|strict press|military press|push press|behind[- ](?:the[- ])?neck press|shoulder press|seated press)\b/i;
+const SQUAT_SUPPORT = /\b(?:back squat|paused squat|tempo squat|box squat)\b/i;
+
+// Jerk lockout named as an actual limiter, in what the athlete told us. Cue
+// text inside the program ("if lockout speed worsens...") is the model's own
+// writing and must not license its own volume.
+export function jerkLockoutIsLimiter(intake = {}) {
+  const said = `${txt(intake.notes)} ${txt(intake.current_numbers)} ${txt(intake.performance_markers)} ${txt(intake.primary_goals)} ${txt(intake.secondary_goals)} ${txt(intake.injuries)}`;
+  return /\b(?:jerk|lockout|overhead)\b[^.]{0,60}\b(?:limiter|limiting|weakness|weak point|misses|missing|fails|failing|sticking point)\b/i.test(said)
+    || /\b(?:limiter|limiting factor|weak point|weakness)\b[^.]{0,60}\b(?:jerk|lockout|overhead)\b/i.test(said);
+}
+
+// What secondary pressing and squat support may still carry, as a share of what
+// they carried in Week 1. Specificity rises by these coming down, not by the
+// classic lifts going up.
+const LATE_SUPPORT_CEILING = { 3: { press: 0.75, squat: 1 }, 4: { press: 0.5, squat: 0.84 } };
+
+function patternSets(wk, re) {
+  return wk.rows.filter((r) => !r.classic && re.test(r.name)).reduce((n, r) => n + r.sets, 0);
+}
+
 const SUPPORT_CUT_ORDER = [
   /\b(?:hamstring curl|leg curl|leg extension|calf raise)\b/i,
   /\b(?:plank|dead bug|pallof|trunk|ab wheel|side plank)\b/i,
@@ -84,6 +112,29 @@ export function collectIntensificationFlags(program, intake = {}, now = Date.now
   const weeks = [1, 2, 3, 4].map((w) => weekFacts(program, w));
   if (weeks.some((w) => !w)) return [];
   const flags = [];
+
+  // Secondary pressing and squat support must give ground as the block gets
+  // more specific, rather than riding through untouched.
+  const lockout = jerkLockoutIsLimiter(intake);
+  for (const week of [3, 4]) {
+    const ceiling = LATE_SUPPORT_CEILING[week];
+    const pressNow = patternSets(weeks[week - 1], SECONDARY_PRESS);
+    const pressFirst = patternSets(weeks[0], SECONDARY_PRESS);
+    if (!lockout && pressFirst > 0 && pressNow > Math.round(pressFirst * ceiling.press)) {
+      flags.push({
+        code: 'V71_SECONDARY_PRESS_NOT_REDUCED', week,
+        detail: `Week ${week} still carries ${pressNow} sets of secondary pressing against ${pressFirst} in Week 1. As the meet approaches the classic lifts take a larger share of the work, and overhead pressing that is not answering a stated jerk-lockout limiter is the first thing that should give way. Reduce it to about ${Math.round(pressFirst * ceiling.press)} sets.`,
+      });
+    }
+    const squatNow = patternSets(weeks[week - 1], SQUAT_SUPPORT);
+    const squatPrev = patternSets(weeks[week - 2], SQUAT_SUPPORT);
+    if (week === 4 && squatPrev > 1 && squatNow >= squatPrev) {
+      flags.push({
+        code: 'V71_SQUAT_SUPPORT_FLAT_IN_FINAL_WEEK', week,
+        detail: `Squat support holds at ${squatNow} sets into Week ${week}. Strength maintenance does not have to stay flat to be maintained; a small reduction in the last week of the block buys freshness for the competition lifts at no real cost.`,
+      });
+    }
+  }
 
   // Volume must come down as the block progresses. Holding it flat while the
   // bar creeps up is not intensification, it is repetition.
@@ -220,7 +271,77 @@ export function repairIntensification(program, intake = {}, now = Date.now()) {
     const rebuilt = [parsed.header.join('\t'), ...rows.map((c) => c.join('\t'))].join('\n');
     out = out.replace(parsed.re, `$1${rebuilt}$3`);
   }
+  // This module's own repair must answer this module's own flags: leaving the
+  // late-support trim to a separate call meant the collector still reported a
+  // finding after repairIntensification had run.
+  out = repairLateSupportVolume(out, intake, now);
+
   return out;
 }
 
 export { isIntensification };
+
+// Bring secondary pressing and squat support down to what a specific block can
+// justify. Trimming sets rather than deleting rows keeps the exposure -- the
+// athlete still presses, and still squats -- while the classic lifts take a
+// larger share of the week by the support work receding around them.
+export function repairLateSupportVolume(program, intake = {}, now = Date.now()) {
+  if (!isIntensification(intake, now)) return String(program || '');
+  let out = String(program || '');
+  const first = weekFacts(out, 1);
+  if (!first) return out;
+
+  const lockout = jerkLockoutIsLimiter(intake);
+  const pressFirst = patternSets(first, SECONDARY_PRESS);
+
+  for (const week of [3, 4]) {
+    const wk = weekFacts(out, week);
+    if (!wk) continue;
+    const ceiling = LATE_SUPPORT_CEILING[week];
+
+    const targets = [];
+    if (!lockout && pressFirst > 0) {
+      targets.push({ re: SECONDARY_PRESS, target: Math.max(1, Math.round(pressFirst * ceiling.press)), label: 'secondary pressing' });
+    }
+    if (week === 4) {
+      const prev = weekFacts(out, 3);
+      const squatPrev = prev ? patternSets(prev, SQUAT_SUPPORT) : 0;
+      if (squatPrev > 1) targets.push({ re: SQUAT_SUPPORT, target: Math.max(1, squatPrev - 1), label: 'squat support' });
+    }
+    if (!targets.length) continue;
+
+    const parsed = wk.parsed;
+    const rows = parsed.rows.map((c) => c.slice());
+    const setsOf = (i) => firstInt(rows[i][parsed.sets]) || 0;
+    let changed = false;
+
+    for (const { re, target, label } of targets) {
+      const candidates = wk.rows.filter((r) => !r.classic && re.test(r.name)).map((r) => r.index);
+      let total = candidates.reduce((n, i) => n + setsOf(i), 0);
+      if (total <= target) continue;
+
+      // Take from the heaviest row first, and never take the last set: the
+      // point is less of it, not none of it.
+      while (total > target) {
+        const from = candidates.slice().sort((a, b) => setsOf(b) - setsOf(a))[0];
+        if (!Number.isInteger(from) || setsOf(from) <= 1) break;
+        rows[from][parsed.sets] = String(setsOf(from) - 1);
+        total -= 1;
+        changed = true;
+      }
+
+      if (!changed) continue;
+      const lead = rows[candidates[0]];
+      if (Number.isInteger(parsed.notes)) {
+        const reason = `Volume here steps down as the meet nears; the ${label} is maintenance now, not a target.`;
+        const existing = String(lead[parsed.notes] || '');
+        if (!existing.includes('maintenance now')) lead[parsed.notes] = existing ? `${existing} ${reason}` : reason;
+      }
+    }
+
+    if (!changed) continue;
+    const rebuilt = [parsed.header.join('\t'), ...rows.map((c) => c.join('\t'))].join('\n');
+    out = out.replace(parsed.re, `$1${rebuilt}$3`);
+  }
+  return out;
+}
