@@ -178,18 +178,26 @@ export function repairCampEconomy(program, intake = {}, now = Date.now()) {
 // Novelty is expensive near competition: a movement the athlete has not done
 // in this block is one whose soreness nobody can predict.
 //
-// Plyometrics are the exception, and the exception is the coach's, not an
-// inference of mine. Correctly dosed ballistic work -- a few crisp sets of a
-// few reps -- sharpens without accumulating fatigue: it leaves very little
-// soreness, builds almost no muscle, and keeps the athlete fast and powerful.
-// The rule's whole rationale is unpredictable soreness, and at this dose there
-// is very little to predict, so introducing an explosive push-up or a low jump
-// late in a camp is legitimate rather than reckless.
+// Ballistic work is exempt, and for a plainer reason than the dose. This
+// generator writes a four-week block, and that block is a window onto the
+// athlete's training rather than the whole of it. A throw or a jump appearing
+// in Week 3 for the first time in these four weeks is not evidence the athlete
+// has never done one -- and for a fighter, medicine-ball throws, rotational
+// throws, slams and jumps are staples they have very likely been doing for
+// years. Flagging them on first appearance infers a history the intake never
+// gave us, and the cost of being wrong is a camp carrying no explosive work at
+// all, which is worse than the risk the rule was guarding against.
 //
-// The exemption is conditional on the dosage, because that is what makes the
-// claim true. High-volume or high-rep jumping is a different exercise
-// physiologically -- that is where the landing volume starts costing real
-// tissue damage -- so it stays novel work near an event and is still flagged.
+// The dose still matters, but that is a question about volume near an event
+// rather than about novelty, and it belongs to the rules that govern volume.
+// The primer dose is taught in the brief and written by the ballistic repair.
+//
+// A movement the athlete genuinely may never have met -- an unfamiliar
+// bilateral lift, a new hinge variation -- is still refused here.
+
+// A primer dose of ballistic work: what the brief asks for and what the
+// ballistic-share repair writes. Kept here as the single definition of
+// "primer" so the brief, the repair and any volume rule agree on the number.
 const PLYO_MAX_SETS = 4;
 const PLYO_MAX_REPS = 5;
 const PLYO_MAX_CONTACTS = 20;
@@ -215,7 +223,7 @@ export function collectNoveltyFlags(program, intake = {}, now = Date.now()) {
     for (const [, rows] of data.days) {
       for (const r of rows) {
         const key = r.name.toLowerCase();
-        if (late && !seen.has(key) && !isWellDosedPlyometric(r)) {
+        if (late && !seen.has(key) && !isPowerExposure(r.name)) {
           flags.push({
             code: 'V74_NOVEL_EXERCISE_NEAR_EVENT',
             week, exercise: r.name,

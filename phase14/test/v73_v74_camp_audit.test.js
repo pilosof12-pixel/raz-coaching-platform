@@ -133,19 +133,27 @@ function introduceInTaper(name, sets, reps) {
 }
 const novelFlags = (p, name) => collectNoveltyFlags(p, FIGHTER_LATE).filter((f) => f.exercise === name);
 
-test('a primer dose of ballistic work may be introduced near the event', () => {
-  for (const [name, sets, reps] of [['Box Jump', 3, 3], ['Explosive Push-up', 3, 3], ['Medicine Ball Scoop Throw', 4, 5]]) {
+test('ballistic work is never flagged as novel near the event', () => {
+  // The block is a four-week window onto the athlete's training, not the whole
+  // of it. A throw or a jump appearing here for the first time is not evidence
+  // the athlete has never done one, and for a fighter these are staples. The
+  // dose is a question about volume, not about novelty, so it does not gate
+  // this rule.
+  for (const [name, sets, reps] of [
+    ['Box Jump', 3, 3], ['Explosive Push-up', 3, 3], ['Medicine Ball Slam', 3, 5],
+    ['Medicine Ball Rotational Throw', 4, 5], ['Broad Jump', 5, 8],
+  ]) {
     assert.equal(novelFlags(introduceInTaper(name, sets, reps), name).length, 0,
-      `${name} ${sets}x${reps} should be allowed this close to the fight`);
+      `${name} ${sets}x${reps} should not be called novel`);
   }
 });
 
-test('a high-volume dose of the same movement is not', () => {
-  // Volume is what turns jumping into landing exposure and real tissue damage,
-  // so at that dose it is novel work near an event like any other.
-  for (const [name, sets, reps] of [['Box Jump', 5, 10], ['Depth Jump', 6, 8], ['Box Jump', 4, 6]]) {
+test('true shock-method plyometrics are still treated as novel', () => {
+  // Depth jumps and bounding carry real eccentric cost, which is why they are
+  // excluded from the ballistic exemption in the first place.
+  for (const [name, sets, reps] of [['Depth Jump', 3, 3], ['Bounding', 3, 5], ['Hurdle Hop', 3, 3]]) {
     assert.equal(novelFlags(introduceInTaper(name, sets, reps), name).length, 1,
-      `${name} ${sets}x${reps} is too much landing volume to introduce here`);
+      `${name} should not ride in on the ballistic exemption`);
   }
 });
 
@@ -155,7 +163,11 @@ test('novel non-ballistic work is still refused near the event', () => {
   }
 });
 
-test('an unreadable dose is not treated as a demonstrated-safe one', () => {
+test('the primer dose stays defined for the brief and the repair to share', () => {
+  // No longer the novelty gate, but still the single definition of "primer"
+  // that the brief teaches and the ballistic repair writes.
+  assert.equal(isWellDosedPlyometric({ name: 'Box Jump', sets: 3, reps: 3 }), true);
+  assert.equal(isWellDosedPlyometric({ name: 'Box Jump', sets: 5, reps: 10 }), false);
   assert.equal(isWellDosedPlyometric({ name: 'Box Jump', sets: NaN, reps: NaN }), false);
   assert.equal(isWellDosedPlyometric({ name: 'Chest-Supported Row', sets: 3, reps: 3 }), false);
 });

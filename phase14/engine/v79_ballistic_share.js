@@ -34,8 +34,12 @@ const BALLISTIC_OPTIONS = [
     note: 'Whole-body extension at speed. Three hard throws, full reset, nothing chased.' },
   { name: 'Explosive Push-up', needs: null, sets: '3', reps: '3', rest: '90 sec', rpe: '7',
     note: 'Upper-body ballistic work at almost no cost. Leave the floor, land soft, stop while every rep is sharp.' },
+  { name: 'Medicine Ball Slam', needs: /med(?:icine)? ?ball/i, sets: '3', reps: '3', rest: '90 sec', rpe: '7',
+    note: 'Overhead-to-floor at full speed, and nothing chased once the speed drops. Cheap, familiar, and it keeps the whole chain firing.' },
   { name: 'Box Jump', needs: null, sets: '3', reps: '3', rest: '2 min', rpe: '6-7',
     note: 'Step down between reps: the jump is the exposure, the landing is not. Low volume, full recovery.' },
+  { name: 'Broad Jump', needs: null, sets: '3', reps: '3', rest: '2 min', rpe: '6-7',
+    note: 'Horizontal power for level changes and takedown entries. Three hard jumps, walk back between each.' },
 ];
 
 function isWarmup(n) { return /^\s*\[WARMUP\]/i.test(String(n || '')); }
