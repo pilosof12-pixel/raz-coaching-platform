@@ -137,6 +137,11 @@ export function renderTaperAudit(program, intake = {}, now = Date.now()) {
       ? 'This block runs into the event: the final week is competition week.'
       : 'This block does not reach the event: it is a build block, and the taper comes later.',
     audit.sportSessions ? `Sport sessions counted as load: ${audit.sportSessions} per week.` : '',
+    // Stated once, in machine-readable form, so the spreadsheet can name each
+    // week for what it is instead of re-deriving a phase from the prose. A
+    // phase name is a claim about the prescription, and two places deriving it
+    // separately is how a fight week ends up labelled "Consolidate / Express".
+    `WEEK PHASES: ${profile.weeks.map((w, i) => `${i + 1}=${w.state}`).join(' ')} EVENT=${profile.eventType}`,
     '',
     line(head),
     ...rows.map(line),

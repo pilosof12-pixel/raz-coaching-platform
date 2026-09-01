@@ -426,7 +426,35 @@
     return 'general';
   }
 
+  // The engine states each week's phase once, in the audit block. Reading it
+  // beats re-deriving one here: a phase name is a claim about the prescription,
+  // and two places deriving it separately is how a fight week ends up labelled
+  // "Consolidate / Express".
+  const STATE_LABEL = {
+    normal: 'BUILD',
+    prepeak_specificity: 'INTENSIFICATION',
+    realization: 'REALIZATION',
+    middle_camp: 'CAMP BUILD',
+    late_camp: 'CAMP',
+    taper: 'TAPER',
+    competition_week: 'COMPETITION WEEK',
+    post: 'RECOVERY',
+  };
+
+  function statedPhase(program, n) {
+    const m = String(program || '').match(/WEEK PHASES:\s*([^\n]+)/i);
+    if (!m) return null;
+    const state = (m[1].match(new RegExp(`\\b${n}=([a-z_]+)`, 'i')) || [])[1];
+    if (!state) return null;
+    let label = STATE_LABEL[state.toLowerCase()];
+    if (!label) return null;
+    if (label === 'COMPETITION WEEK' && /EVENT=combat/i.test(m[1])) label = 'FIGHT WEEK';
+    return `WEEK ${n} — ${label}`;
+  }
+
   function weekTitle(n, program) {
+    const stated = statedPhase(program, n);
+    if (stated) return stated;
     const phase = blockPhase(program);
     if (phase === 'intensification') {
       // Volume coming down here is specificity, not consolidation or expression.

@@ -44,3 +44,31 @@ test('non-competition programs keep the labels they had', () => {
   assert.equal(weekTitle(3, TACTICAL), 'WEEK 3 — PEAK LOAD');
   assert.equal(weekTitle(3, 'A race-specific block for the event.\nSTART_WEEK1_TSV'), 'WEEK 3 — SPECIFICITY');
 });
+
+// --- phases the engine states outright -------------------------------------
+// The audit block names each week's phase once. The sheet reads that rather
+// than re-deriving one, so a fight week cannot end up labelled as expression.
+const FIGHT_CAMP = 'A four-week camp into the fight.\nWEEK PHASES: 1=late_camp 2=late_camp 3=taper 4=competition_week EVENT=combat\nSTART_WEEK1_TSV';
+const MEET_TAPER = 'The meet block.\nWEEK PHASES: 1=realization 2=realization 3=taper 4=competition_week EVENT=strength_meet\nSTART_WEEK1_TSV';
+
+test('a fight camp names its weeks for the camp and the fight', () => {
+  assert.equal(weekTitle(1, FIGHT_CAMP), 'WEEK 1 — CAMP');
+  assert.equal(weekTitle(3, FIGHT_CAMP), 'WEEK 3 — TAPER');
+  assert.equal(weekTitle(4, FIGHT_CAMP), 'WEEK 4 — FIGHT WEEK');
+  assert.doesNotMatch(weekTitle(4, FIGHT_CAMP), /EXPRESS|CONSOLIDATE/);
+});
+
+test('a meet block calls its last week competition week, not a fight', () => {
+  assert.equal(weekTitle(4, MEET_TAPER), 'WEEK 4 — COMPETITION WEEK');
+  assert.equal(weekTitle(3, MEET_TAPER), 'WEEK 3 — TAPER');
+});
+
+test('a stated phase wins over the narrative guess', () => {
+  const both = `This is an intensification block, not the taper.\n${MEET_TAPER}`;
+  assert.equal(weekTitle(4, both), 'WEEK 4 — COMPETITION WEEK');
+});
+
+test('programs with no stated phases fall back to the old labels', () => {
+  assert.equal(weekTitle(1, HYBRID), 'WEEK 1 — FOUNDATION');
+  assert.equal(weekTitle(3, TACTICAL), 'WEEK 3 — PEAK LOAD');
+});
