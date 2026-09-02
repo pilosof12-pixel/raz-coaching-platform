@@ -1,0 +1,92 @@
+This is your final 4-week run-in: Weeks 1-2 are late-camp maintenance, Week 3 tapers, and Week 4 is fight week. The gym work is minimum-effective-dose only to keep strength and sharpness without stealing from MMA or the cut. Hard sparring should already be tapering down: about 2 hard contacts in Week 1, 1 early hard contact in Week 3, and none in fight week; the last truly hard contact should be early in Week 3.
+
+Week 2 only nudges the Tuesday Pull-up load if Week 1 stays crisp; otherwise repeat Week 1 exactly. Week 3 drops sets across the board while keeping fast reps and full rest. Week 4 keeps the usual Tue/Fri slots, with the notes marked Day -6 and Day -3 so both sessions stay brief primer touches.
+
+Keep the right knee at or below your normal 3/10 response. If Reverse Lunge or Barbell Hip Thrust pushes pain or next-day stiffness above baseline, shorten range or stop one set early; if Friday knee feels off, replace Reverse Lunge with 2 more fast Prowler Push runs. Do not bring heavy Back Squat back in during this block. Weight-cut details are medical and outside this plan.
+
+CAMP SCHEDULE
+Sport sessions are load. The gym is built around them, and the contact comes down as the fight approaches.
+
+ | Mon | Tue | Wed | Thu | Fri | Sat | Sun | hard contact
+W1 | MMA hard | MMA moderate + gym | MMA hard | MMA moderate | MMA technical + gym | MMA moderate | MMA light | 2 of 3
+W2 | MMA hard | MMA moderate + gym | MMA hard | MMA moderate | MMA technical + gym | MMA moderate | MMA light | 2 of 3
+W3 | MMA hard | MMA moderate + gym | MMA technical | MMA moderate | MMA technical + gym | MMA moderate | MMA light | 1 of 3
+W4 | MMA technical | MMA moderate + gym | MMA technical | MMA moderate | MMA technical + gym | MMA moderate | MMA light | 0 of 3
+
+Hard contact falls 2 to 0 across the block. The last hard session sits far enough from Day 0 that soreness, cognitive fatigue and sleep disruption have resolved.
+
+START_WEEK1_TSV
+Day	Exercise	Weight	Sets	Reps	Rest	Target RPE	Notes	Results
+Tue	[WARMUP] Band Pull-Apart Warm-up	Bodyweight	1	15	30 sec	3	Then 2-3 quick ramp sets for Pull-up and Barbell Hip Thrust.; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Band shoulder pass-through x 10; Scapular push-up x 8; Keep the warm-up specific and non-fatiguing.	
+Tue	[WARMUP] Bodyweight Squat	Bodyweight	1	8	30 sec	3	Easy range only; use this as a knee check, not fatigue.	
+Tue	Trap Bar Jump	Light, speed-first load	3	3	2 min	7	Light and fast: this is a speed exposure, not a lift. Land softly, reset every rep, and keep the load low enough that the bar moves quickly. Session trimmed for camp: what remains is here because it keeps strength, speed or tissue readiness, not because it is easy.	
+Tue	Pull-up	RPE-selected load	2	2	150 sec	7	Crisp doubles only; stop after 1 set if RPE goes above 7.5, elbow or shoulder irritation appears, or rep speed slows.	
+Tue	Barbell Hip Thrust	RPE-selected load	2	3	150 sec	7	Fast lockout intent; stop after 1 set if knee or back symptoms rise or speed drops.	
+Tue	Dumbbell Bench Press	RPE-selected load	2	4	90 sec	7	Leave about 3 reps in reserve; keep shoulders fresh, no grinders.	
+Tue	Side Plank	Bodyweight	2	25 sec/side	30 sec	6	Trunk stiffness for grappling; if time gets tight keep 2 set per side.	
+Fri	[WARMUP] Band Pull-Apart Warm-up	Bodyweight	1	15	30 sec	3	Then 1-2 easy ramp sets for Reverse Lunge and Seated Cable Row.; Squat-and-reach x 6; Bodyweight squat x 8; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Band shoulder pass-through x 10; Scapular push-up x 8; Keep the warm-up specific and non-fatiguing.	
+Fri	[WARMUP] Bodyweight Squat	Bodyweight	1	8	30 sec	3	Easy range only; skip any depth that irritates the knee.	
+Fri	Push-up	Bodyweight	2	3	60 sec	5	Explosive reps for sharpness; stop if speed fades.	
+Fri	Reverse Lunge	RPE-selected load	2	4/side	90 sec	6.5	Comfortable knee-dominant maintenance; keep torso tall and do not grind.	
+Fri	Seated Cable Row	RPE-selected load	2	5	75 sec	7	Crisp horizontal pulling; leave about 3 reps in reserve.	
+Fri	Neck Isometric	Bodyweight	2	15 sec/direction	30 sec	6	Low-cost neck capacity; first item to remove if MMA runs long or fatigue is high.	
+Fri	Prowler Push	RPE-selected load	4	15 m	60 sec	N/A	Low-cost Friday session; fast short drives only, full reset, stop before leg burn or speed loss.	
+END_WEEK1_TSV
+START_WEEK2_TSV
+Day	Exercise	Weight	Sets	Reps	Rest	Target RPE	Notes	Results
+Tue	[WARMUP] Band Pull-Apart Warm-up	Bodyweight	1	15	30 sec	3	Then 2-3 quick ramp sets for Pull-up and Barbell Hip Thrust.; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Band shoulder pass-through x 10; Scapular push-up x 8; Keep the warm-up specific and non-fatiguing.	
+Tue	[WARMUP] Bodyweight Squat	Bodyweight	1	8	30 sec	3	Easy range only; use this as a knee check, not fatigue.	
+Tue	Trap Bar Jump	Light, speed-first load	3	3	2 min	7	Light and fast: this is a speed exposure, not a lift. Land softly, reset every rep, and keep the load low enough that the bar moves quickly. Session trimmed for camp: what remains is here because it keeps strength, speed or tissue readiness, not because it is easy.	
+Tue	Pull-up	RPE-selected load	2	2	150 sec	7.5	If Week 1 was crisp, nudge the load slightly; otherwise repeat Week 1 load. Stop after 1 set if RPE goes above 8 or rep speed slows.	
+Tue	Barbell Hip Thrust	RPE-selected load	2	3	150 sec	7	Fast lockout intent; same dose as Week 1, no extra work here.	
+Tue	Dumbbell Bench Press	RPE-selected load	2	4	90 sec	7	Leave about 3 reps in reserve; keep shoulders fresh, no grinders.	
+Tue	Side Plank	Bodyweight	2	25 sec/side	30 sec	6	Trunk stiffness for grappling; if time gets tight keep 2 set per side.	
+Fri	[WARMUP] Band Pull-Apart Warm-up	Bodyweight	1	15	30 sec	3	Then 1-2 easy ramp sets for Reverse Lunge and Seated Cable Row.; Squat-and-reach x 6; Bodyweight squat x 8; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Band shoulder pass-through x 10; Scapular push-up x 8; Keep the warm-up specific and non-fatiguing.	
+Fri	[WARMUP] Bodyweight Squat	Bodyweight	1	8	30 sec	3	Easy range only; skip any depth that irritates the knee.	
+Fri	Push-up	Bodyweight	2	3	60 sec	5	Explosive reps for sharpness; stop if speed fades.	
+Fri	Reverse Lunge	RPE-selected load	2	4/side	90 sec	6.5	Comfortable knee-dominant maintenance; keep torso tall and do not grind.	
+Fri	Seated Cable Row	RPE-selected load	2	5	75 sec	7	Crisp horizontal pulling; leave about 3 reps in reserve.	
+Fri	Neck Isometric	Bodyweight	2	15 sec/direction	30 sec	6	Low-cost neck capacity; first item to remove if MMA runs long or fatigue is high.	
+Fri	Prowler Push	RPE-selected load	4	15 m	60 sec	N/A	Low-cost Friday session; fast short drives only, full reset, stop before leg burn or speed loss.	
+END_WEEK2_TSV
+START_WEEK3_TSV
+Day	Exercise	Weight	Sets	Reps	Rest	Target RPE	Notes	Results
+Tue	[WARMUP] Band Pull-Apart Warm-up	Bodyweight	1	15	30 sec	3	Then 2 quick ramp sets for Pull-up and Barbell Hip Thrust.; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Band shoulder pass-through x 10; Scapular push-up x 8; Keep the warm-up specific and non-fatiguing.	
+Tue	[WARMUP] Bodyweight Squat	Bodyweight	1	8	30 sec	3	Easy range only; use this as a knee check, not fatigue.	
+Tue	Trap Bar Jump	Light, speed-first load	3	3	2 min	7	Light and fast: this is a speed exposure, not a lift. Land softly, reset every rep, and keep the load low enough that the bar moves quickly. Session trimmed for camp: what remains is here because it keeps strength, speed or tissue readiness, not because it is easy.	
+Tue	Pull-up	RPE-selected load	1	2	150 sec	7	Match Week 2 only if the set feels snappy; otherwise repeat the last successful load. One crisp set only.	
+Tue	Barbell Hip Thrust	RPE-selected load	1	2	150 sec	6.5	One fast set only; keep the same familiar groove and leave plenty in reserve.	
+Tue	Explosive Push-up	Light, speed-first load	3	3	90 sec	7	Upper-body ballistic work at almost no cost. Leave the floor, land soft, stop while every rep is sharp. Replaces Side Plank: closer to the fight this buys more than another accessory set.	
+Fri	[WARMUP] Band Pull-Apart Warm-up	Bodyweight	1	15	30 sec	3	Then 1 easy ramp set for Reverse Lunge and Seated Cable Row.; Squat-and-reach x 6; Bodyweight squat x 8; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Band shoulder pass-through x 10; Scapular push-up x 8; Keep the warm-up specific and non-fatiguing.	
+Fri	[WARMUP] Bodyweight Squat	Bodyweight	1	8	30 sec	3	Easy range only; skip any depth that irritates the knee.	
+Fri	Reverse Lunge	RPE-selected load	1	4/side	90 sec	6	Cut this immediately if the knee feels worse than baseline or Friday MMA was draining.	
+Fri	Trap Bar Jump	Light, speed-first load	3	3	2 min	7	Same exposure as earlier in the block, kept short and sharp. Speed is the point; stop the moment it drops. Replaces Seated Cable Row: closer to the fight this buys more than another accessory set.	
+Fri	Side Plank	Bodyweight	1	20 sec/side	30 sec	5	First thing to remove if Friday MMA runs long.	
+Fri	Prowler Push	RPE-selected load	3	15 m	75 sec	N/A	Low-cost taper session; fast short drives only, and stop before breathing or leg burn turns this into conditioning.	
+END_WEEK3_TSV
+START_WEEK4_TSV
+Day	Exercise	Weight	Sets	Reps	Rest	Target RPE	Notes	Results
+Tue	[WARMUP] Band Pull-Apart Warm-up	Bodyweight	1	12	30 sec	2	Day -6: Last meaningful gym touch of fight week; then do 1-2 easy ramps for Pull-up and Barbell Hip Thrust.; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Band shoulder pass-through x 10; Scapular push-up x 8; Keep the warm-up specific and non-fatiguing.	
+Tue	[WARMUP] Bodyweight Squat	Bodyweight	1	5	30 sec	2	Day -6: Easy range only; no forcing depth.	
+Tue	Trap Bar Jump	Light, speed-first load	3	3	2 min	7	Day -6: Light and fast: this is a speed exposure, not a lift. Land softly, reset every rep, and keep the load low enough that the bar moves quickly. Session trimmed for camp: what remains is here because it keeps strength, speed or tissue readiness, not because it is easy.	
+Tue	Pull-up	RPE-selected load	1	2	150 sec	6.5	Day -6: doubles crisp set only; if warm-ups feel heavy, keep this at the easier end of your normal range or skip the set.	
+Tue	Barbell Hip Thrust	RPE-selected load	1	2	150 sec	6.5	Day -6: doubles fast set only; leave the gym fresher than you came in.	
+Fri	[WARMUP] Band Pull-Apart Warm-up	Bodyweight	1	12	30 sec	2	Day -3: Brief primer warm-up only.; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Band shoulder pass-through x 10; Scapular push-up x 8; Keep the warm-up specific and non-fatiguing.	
+Fri	[WARMUP] Bodyweight Squat	Bodyweight	1	5	30 sec	2	Day -3: Easy range only; no fatigue.	
+Fri	Push-up	Bodyweight	1	3	60 sec	5	Day -3: Explosive reps only; stop well before any slowdown.	
+Fri	Trap Bar Jump	Light, speed-first load	3	3	2 min	7	Day -3: Same exposure as earlier in the block, kept short and sharp. Speed is the point; stop the moment it drops. Replaces Side Plank: closer to the fight this buys more than another accessory set.	
+Fri	Prowler Push	RPE-selected load	2	10 m	75 sec	N/A	Day -3: Competition-week primer; fast but easy. Skip the whole session if the cut or travel makes you feel flatter, not better.	
+END_WEEK4_TSV
+
+TAPER AUDIT
+Event: combat, priority A, about 3.9 weeks out.
+This block runs into the event: the final week is competition week.
+Sport sessions counted as load: 7 per week.
+
+    phase             sets  exercises  competition lift  power sets  peak RPE  peak % max
+W1  late camp         23    10         -                 3           7         -
+W2  late camp         23    10         -                 3           7.5       -
+W3  taper             16    7          -                 9           7         -
+W4  competition week  11    5          -                 6           7         -
+
+Across the block: volume -12 sets, exercises -5, competition-lift share unchanged, peak effort unchanged, accessory volume -8 sets.

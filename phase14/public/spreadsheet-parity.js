@@ -512,6 +512,46 @@
     });
   }
 
+  // The engine renders the camp week -- sport and gym together, with hard
+  // contact declining -- into the program text, and the workbook never carried
+  // it. The coach reads the workbook, so from their side the fighter's weekly
+  // calendar simply did not exist and the sparring taper was invisible.
+  function parseCampSchedule(program) {
+    const text = String(program || '');
+    const start = text.indexOf('CAMP SCHEDULE');
+    if (start < 0) return null;
+    const end = text.search(/START_WEEK1_TSV/i);
+    const block = (end > start ? text.slice(start, end) : text.slice(start)).trim();
+    const lines = block.split('\n').map((l) => l.trim()).filter(Boolean);
+    if (lines.length < 3) return null;
+    const head = lines.find((l) => /\bMon\b/.test(l) && l.includes('|'));
+    const weekRows = lines.filter((l) => /^W\d\b/.test(l));
+    if (!head || !weekRows.length) return null;
+    return {
+      intro: lines.slice(1).find((l) => !/^W\d\b/.test(l) && !l.includes('|')) || '',
+      closing: lines.slice().reverse().find((l) => /hard contact/i.test(l) && !/^W\d\b/.test(l)) || '',
+      head: head.split('|').map((c) => c.trim()).filter(Boolean),
+      rows: weekRows.map((l) => l.split('|').map((c) => c.trim())),
+    };
+  }
+
+  function renderCampSchedule(ws, intake, camp) {
+    ws.views=[{showGridLines:false}];
+    [10,20,20,20,20,20,20,20,16].forEach((w,i)=>ws.getColumn(i+1).width=w);
+    mergeTitle(ws,1,9,'CAMP SCHEDULE — SPORT AND GYM',NAVY,16);
+    mergeTitle(ws,2,9,'Sport sessions are load. The gym is built around them.',NAVY_2,10,'FFDCE7F7');
+    let row=4;
+    if(camp.intro){ ws.mergeCells(row,1,row,9); const c=ws.getRow(row).getCell(1); c.value=camp.intro; font(c,{size:10}); align(c,{wrapText:true}); ws.getRow(row).height=30; row+=2; }
+    const head=['Week',...camp.head];
+    head.forEach((v,i)=>{const c=ws.getRow(row).getCell(i+1);c.value=v;fill(c,HEADER);font(c,{size:10,bold:true,color:WHITE});align(c,{horizontal:'center'});});
+    row++;
+    for(const cells of camp.rows){
+      cells.forEach((v,i)=>{const c=ws.getRow(row).getCell(i+1);c.value=v;fill(c,i===0?LABEL:BODY);font(c,{size:10,bold:i===0});align(c,{horizontal:i===0?'center':'left',wrapText:true});});
+      ws.getRow(row).height=26; row++;
+    }
+    if(camp.closing){ row++; ws.mergeCells(row,1,row,9); const c=ws.getRow(row).getCell(1); c.value=camp.closing; font(c,{size:10,italic:true}); align(c,{wrapText:true}); ws.getRow(row).height=32; }
+  }
+
   async function buildParitySpreadsheet(program, intake={}) {
     if(!window.ExcelJS) throw new Error('Spreadsheet engine did not load. Check your connection and try again.');
     if(window.ExerciseDemos?.load){ try{await window.ExerciseDemos.load();}catch(e){console.warn('Exercise demo library unavailable; using search-link fallback.',e);} }
@@ -520,6 +560,8 @@
     const wb=new ExcelJS.Workbook(); wb.creator='RAZ Performance Coaching Engine'; wb.created=new Date();
     renderOverview(wb.addWorksheet('Overview'),intake,weeks[0]);
     renderWarmup(wb.addWorksheet('Warm-Up'),intake,weeks[0]);
+    const camp=parseCampSchedule(program);
+    if(camp) renderCampSchedule(wb.addWorksheet('Camp Schedule'),intake,camp);
     weeks.forEach(w=>renderWeek(wb.addWorksheet(`Week ${w.week}`),intake,w,program));
     const buffer=await wb.xlsx.writeBuffer();
     const blob=new Blob([buffer],{type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'});

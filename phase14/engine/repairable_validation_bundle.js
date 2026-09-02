@@ -39,6 +39,7 @@ import { collectFightWeekClockFlags } from './v77_fight_week_clock.js'; // V77-F
 import { collectSportTaperFlags } from './v78_sport_taper.js'; // V78-SPORT-TAPER-WIRED
 import { collectBallisticShareFlags } from './v79_ballistic_share.js'; // V79-BALLISTIC-SHARE-WIRED
 import { collectClusterFlags } from './v81_cluster_notation.js'; // V81-CLUSTER-NOTATION-WIRED
+import { collectCampSharpeningFlags } from './v82_camp_sharpening.js'; // V82-CAMP-SHARPENING-WIRED
 import { collectLanguageAccuracyFlags, LANGUAGE_HARD_CODES, repairCountClaims } from './v46_language_accuracy.js'; // V46-LANGUAGE-ACCURACY-WIRED
 import { repairDeterministicContradictions } from './v35_deterministic_repair.js'; // V35-DETERMINISTIC-REPAIR-WIRED
 import { normalizeAdvancedHybridWeek4OapConsolidation } from './advanced_hybrid_oap_consolidation_normalizer.js';
@@ -556,7 +557,8 @@ export function collectRepairableValidationFailures(program, intake = {}, option
       ...collectAuditFlags(candidate, intake), ...collectWeightCutFlags(candidate, intake),
       ...collectConditioningFlags(candidate, intake), ...collectFightWeekClockFlags(candidate, intake),
       ...collectSportTaperFlags(candidate, intake), ...collectBallisticShareFlags(candidate, intake),
-      ...collectClusterFlags(candidate, intake)];
+      ...collectClusterFlags(candidate, intake),
+      ...collectCampSharpeningFlags(candidate, intake)];
     if (!lean.length) return;
     throw new RetriableValidationError(lean[0].code,
       lean.map((f) => f.detail).join(' '), { flags: lean });

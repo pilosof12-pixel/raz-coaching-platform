@@ -97,8 +97,12 @@ export function renderCampSchedule(intake = {}, now = Date.now()) {
     return [`W${p.week}`, ...cells, `${p.hardTarget} of ${p.hardBaseline}`];
   });
 
-  const widths = head.map((h, i) => Math.max(h.length, ...rows.map((r) => String(r[i]).length)) + 2);
-  const line = (cells) => cells.map((c, i) => String(c).padEnd(widths[i])).join('').trimEnd();
+  // Pipes, not padding. This block sits ahead of the week tables so the
+  // sport-taper rule can see it, and a normalizer in that region collapses runs
+  // of whitespace -- which turned a column-aligned table into one run-on line in
+  // the delivered program and left the spreadsheet nothing it could parse. A
+  // delimiter survives; alignment does not.
+  const line = (cells) => cells.map((c) => String(c).trim()).join(' | ');
   lines.push(line(head), ...rows.map(line));
   lines.push('', `Hard contact falls ${plan[0].hardTarget} to ${plan[plan.length - 1].hardTarget} across the block. The last hard session sits far enough from Day 0 that soreness, cognitive fatigue and sleep disruption have resolved.`);
   return lines.join('\n');
