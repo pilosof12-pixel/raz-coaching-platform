@@ -1,39 +1,59 @@
 {
-  "timestamp": "2026-08-31T15:04:21.575Z",
+  "timestamp": "2026-09-02T11:41:23.680Z",
   "base": "https://raz-coaching-platform.onrender.com",
-  "head_sha": "437533bdc1d48241b12c7f27341c3c19c971c289",
-  "runtime": "launch-acceptance-v74-plyo-dose-v79-introduce-live36-20260831",
+  "head_sha": "7f074ea097057344ce7904c02294f6513d590977",
+  "runtime": "launch-acceptance-v82-camp-sharpening-hard-avatars-live37-20260902",
   "results": [
     {
       "id": "weightlifter_peak",
-      "job_id": "e0b152f2d8d9d7bfb8b18e17eefd048d",
+      "job_id": "7f9d102b793abafaf668692571deae16",
       "ok": false,
       "status": "error",
-      "stage": "refining",
-      "attempt": 4,
-      "detail": "internal repair: V34_PROGRESSION_LANGUAGE_MISMATCH+REQUESTED_STRENGTH_SESSIONS_UNACCOUNTED",
+      "stage": "generating",
+      "attempt": 1,
+      "detail": "initial generation",
       "last_seen_status": "error",
-      "error": "Internal coaching QA could not repair the candidate program after multiple passes. No client-facing program was saved. Please retry the build. QA trace: A1:WEEKLY_MRV_EXCEEDED+V38_CONSECUTIVE_CONFLICTING_EXPOSURE+V71_CLASSIC_SHARE_NOT_RISING -> A2:V34_PROGRESSION_LANGUAGE_MISMATCH -> A3:V34_PROGRESSION_LANGUAGE_MISMATCH+REQUESTED_STRENGTH_SESSIONS_UNACCOUNTED -> A4:V34_PROGRESSION_LANGUAGE_MISMATCH+REQUESTED_STRENGTH_SESSIONS_UNACCOUNTED. Last failure detail: Prescription/note consistency: Snatch (Week 2) claims reduced volume, but that metric did not fall from the immediately previous week. Snatch (Week 3) claims reduced volume, but that metric did not fall from the immediately previous week. Snatch (Week 4) claims reduced volume, but that metric did not fall from the immediately previous week. Make every quantitative claim in a note agree with that row's own Sets, Reps and Weight fields, or state it as an explicitly conditional option. Do not reference a load that is neither prescribed on the row nor an established benchmark. | Client requested 5 [QA:INTERNAL_QA_REPAIR_EXHAUSTED]",
+      "error": "You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/.",
       "program_chars": 0,
-      "seconds": 1044
+      "seconds": 4
     },
     {
       "id": "mma_fight_camp",
-      "job_id": "63f896a308450584193848b0c58d9f27",
-      "ok": true,
-      "status": "done",
-      "stage": "finalizing",
-      "attempt": 0,
-      "detail": "saving program",
-      "last_seen_status": "done",
-      "error": null,
-      "program_chars": 11800,
-      "seconds": 247
+      "job_id": "cfd11e863df64f5dfa770fbb49413abf",
+      "ok": false,
+      "status": "error",
+      "stage": "generating",
+      "attempt": 1,
+      "detail": "initial generation",
+      "last_seen_status": "error",
+      "error": "You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/.",
+      "program_chars": 0,
+      "seconds": 4
+    },
+    {
+      "id": "inseason_footballer",
+      "ok": false,
+      "error": "build not accepted 422 {\"error\":\"A few details are needed before I can build this accurately.\",\"clarification_required\":true,\"clarifications\":[{\"answer_type\":\"text\",\"required\":true,\"id\":\"competition_date\",\"prompt\":\"When is the event, and how much does it matter to you?\",\"help\":\"A date, or how many weeks away it is, plus w"
+    },
+    {
+      "id": "masters_return",
+      "job_id": "c6e9e71006b6c88e841a4cfd5b599ad0",
+      "ok": false,
+      "status": "error",
+      "stage": "generating",
+      "attempt": 1,
+      "detail": "initial generation",
+      "last_seen_status": "error",
+      "error": "You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/.",
+      "program_chars": 0,
+      "seconds": 4
     }
   ],
   "selection": [
     "weightlifter_peak",
-    "mma_fight_camp"
+    "mma_fight_camp",
+    "inseason_footballer",
+    "masters_return"
   ],
   "ok": false
 }
