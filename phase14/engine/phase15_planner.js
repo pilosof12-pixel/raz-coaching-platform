@@ -28,6 +28,7 @@ import { buildBallisticShareBrief } from './v79_ballistic_share.js';
 import { buildClusterBrief } from './v81_cluster_notation.js';
 import { buildCampSharpeningBrief } from './v82_camp_sharpening.js';
 import { buildInSeasonBrief } from './v83_in_season.js';
+import { buildInjuryConstraintBrief } from './v84_injury_constraint.js';
 import { buildSessionSubstanceBrief } from './v53_session_substance.js';
 import { buildLanguageAccuracyBrief } from './v46_language_accuracy.js';
 
@@ -295,6 +296,7 @@ export function buildDeterministicBrief(intake = {}) {
     buildClusterBrief(intake),
     buildCampSharpeningBrief(intake),
     buildInSeasonBrief(intake),
+    buildInjuryConstraintBrief(intake),
     buildSessionSubstanceBrief(intake),
     buildLanguageAccuracyBrief(intake),
     specialist,

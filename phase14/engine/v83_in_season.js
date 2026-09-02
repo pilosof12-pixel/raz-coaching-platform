@@ -19,7 +19,13 @@ import { parseWeek } from './v34_workload_accounting.js';
 const MATCH_INTENSITY = /\b(?:match|game|fixture|competition)\b/i;
 const SEASON_LANGUAGE = /\b(?:in[- ]season|mid[- ]season|the season|this season|league|fixture|matchday|match day|every (?:week|saturday|sunday)|most (?:saturdays|sundays|weeks)|each week|weekly match(?:es)?)\b/i;
 // Language that only makes sense when there is one thing to arrive at.
-const PEAKING_LANGUAGE = /\b(?:taper(?:ing|ed)?|peak(?:ing)? for|peak week|realisation|realization|competition week|fight week|meet week|arrive fresh on the day|build(?:ing)? towards? the event)\b/i;
+//
+// Deliberately narrow. Reducing gym load into match day is correct in-season
+// practice and is often called tapering, and another brief invites the model to
+// label a short session a "taper" to license two exercises. Neither is the
+// error here. The error is planning towards a single date, so the pattern
+// requires the event, not the word.
+const PEAKING_LANGUAGE = /\btaper(?:ing)?\s+(?:in)?to\s+(?:the\s+)?(?:event|competition|meet|fight|race|peak)\b|\btaper(?:ing)?\s+for\s+(?:the\s+)?(?:event|competition|meet|fight|race)\b|\bfinal taper\b|\bpeak(?:ing)? for\b|\bpeak week\b|\b(?:competition|fight|meet) week\b|\brealis?ation (?:phase|block|week)\b|\bbuild(?:ing)? towards? the (?:event|competition|meet|race)\b/i;
 
 const WEEKDAYS = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'];
 const LABEL = { mon: 'Monday', tue: 'Tuesday', wed: 'Wednesday', thu: 'Thursday', fri: 'Friday', sat: 'Saturday', sun: 'Sunday' };
@@ -122,14 +128,15 @@ export function collectInSeasonFlags(program, intake = {}) {
 // row fix below never touches the narrative -- and spend the attempt budget on
 // a sentence no amount of regeneration is guaranteed to reword.
 const SEASON_WORDING = [
-  [/\btaper(?:ing|ed)?\b/gi, 'keep the load light'],
+  [/\btaper(?:ing)?\s+(?:in)?to\s+(?:the\s+)?(?:event|competition|meet|fight|race|peak)\b/gi, 'keep the gym load light into match day'],
+  [/\btaper(?:ing)?\s+for\s+(?:the\s+)?(?:event|competition|meet|fight|race)\b/gi, 'keep the gym load light before matches'],
+  [/\bfinal taper\b/gi, 'lighter gym week'],
   [/\bpeak week\b/gi, 'match week'],
   [/\b(?:competition|fight|meet) week\b/gi, 'match week'],
   [/\bpeaking for\b/gi, 'staying ready for'],
   [/\bpeak for\b/gi, 'stay ready for'],
-  [/\brealis?ation\b/gi, 'match readiness'],
-  [/\barrive fresh on the day\b/gi, 'arrive fresh every match day'],
-  [/\bbuild(?:ing)? towards? the event\b/gi, 'staying ready every week'],
+  [/\brealis?ation (?:phase|block|week)\b/gi, 'match readiness'],
+  [/\bbuild(?:ing)? towards? the (?:event|competition|meet|race)\b/gi, 'staying ready every week'],
 ];
 
 export function repairSeasonNarrative(program, intake = {}) {
