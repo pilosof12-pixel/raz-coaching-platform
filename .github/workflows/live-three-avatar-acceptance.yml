@@ -157,21 +157,32 @@ jobs:
           const tagged = (String(process.env.COMMIT_MESSAGE||'').match(/\[AVATARS:([^\]]+)\]/i)||[])[1];
           const selectionRaw = (tagged || process.env.AVATAR_SELECTION || 'all').toLowerCase().trim();
           // 'all' stays the original three so existing behaviour is unchanged;
+          // Two deliberately hard cases. The footballer has no single event at all --
+          // a match most Saturdays, a season that outlasts the block, so nothing to
+          // taper into and every week has to be ready. The masters rower is a graded
+          // return after a disc injury, where the goal movement is the one that loads
+          // the injured tissue. Both are opt-in by name or via 'hard'.
+          const footballer={id:'inseason_footballer',intake:Object.assign({"age": 24, "language": "en", "experience": "Advanced (3+ years)", "bodyweight": "78 kg", "primary_goals": ["Stay available for selection every week through the second half of the season", "Hold my strength and sprint speed from now to the end of the season"], "secondary_goals": ["Improve repeated-sprint ability late in matches"], "maintenance_goals": ["Maintain the squat and hamstring strength I have"], "goal_priority_model": "tiered", "days_per_week": 2, "session_duration_minutes": 45, "gym_availability_mode": "limited", "available_gym_days": ["Tue", "Thu"], "training_location": "commercial_gym", "equipment": "Full club gym: barbells, dumbbells, racks, Nordic bench, sled, cable machines.", "sport": "Football (soccer), semi-professional", "sport_sessions_per_week": 5, "sport_schedule": [{"day": "Mon", "intensity": "light"}, {"day": "Tue", "intensity": "hard"}, {"day": "Wed", "intensity": "moderate"}, {"day": "Thu", "intensity": "hard"}, {"day": "Sat", "intensity": "match"}], "sleep_hours": "7", "recovery_rating": "Fair", "current_numbers": "Back Squat: 150 kg x 1\nTrap Bar Deadlift: 200 kg x 3\nNordic hamstring: 3 controlled reps each side\n30 m sprint: 4.05 s\nCurrently 5 football sessions plus a match most weeks", "performance_markers": ["30 m sprint: 4.05 s", "Countermovement jump: 38 cm"], "injuries": "Right hamstring: two grade-1 biceps femoris strains in the last 18 months, most recently 4 months ago. Currently symptom-free and fully training, but it tightens in the last 15 minutes of matches.", "pain": {"active": false, "description": "No current pain; occasional right hamstring tightness late in matches", "severity": "", "character": "", "next_day_baseline": "normal", "tolerated_movements": "All football work, sprinting, squatting and hinging are tolerated. Heavy eccentric hamstring work the day before a match is not."}, "mobility": {"active": false, "limitation": ""}, "notes": "This is an in-season block, not a pre-season one. There is a competitive match most Saturdays and the season runs well past this block, so there is no single event to peak for and no taper: the athlete has to be ready every single week. Matchday is Saturday. Two 45-minute gym sessions on Tuesday and Thursday, both after football. Gym work exists to keep him available and fast, never to make him sore for a match. Hamstring reinjury is the thing that would end his season.", "qa_diagnostics": true},{privacy_consent:consent()})};
+          const masters={id:'masters_return',intake:Object.assign({"age": 54, "language": "en", "experience": "Intermediate (returning after a long layoff)", "bodyweight": "68 kg", "primary_goals": ["Return to competitive masters rowing and race a 2 km erg again"], "secondary_goals": ["Rebuild lower-body and trunk strength safely"], "maintenance_goals": ["Keep the upper-body and aerobic base I still have"], "goal_priority_model": "tiered", "days_per_week": 4, "session_duration_minutes": 60, "gym_availability_mode": "flexible", "available_gym_days": [], "training_location": "commercial_gym", "equipment": "Full gym with rowing ergometer, barbells, dumbbells, cables, and a leg press.", "sport": "Rowing (masters)", "sport_sessions_per_week": 2, "sport_schedule": [], "sleep_hours": "6-7 hours, broken", "recovery_rating": "Poor to fair", "current_numbers": "2 km erg: 8:58 nine months ago, not tested since\nGoblet squat: 24 kg x 8 comfortable\nDeadlift: not attempted since the injury\nCurrently 2 easy erg sessions a week, 20-30 min each", "performance_markers": ["2 km erg: 8:58 (nine months ago)"], "injuries": "L4/L5 disc herniation nine months ago with right-leg symptoms. Discharged from physiotherapy six weeks ago and cleared for graded loading. No leg symptoms for three months. Loaded lumbar flexion under fatigue is the movement that reproduced symptoms.", "pain": {"active": true, "description": "Occasional low-back stiffness in the morning and after long sitting", "severity": "2/10, settles with movement", "character": "stiff, mechanical, no leg symptoms", "next_day_baseline": "returns to normal", "tolerated_movements": "Erg at low rate, goblet squats, split squats, cable work, carries and hip thrusts are all comfortable. Repeated loaded spinal flexion under fatigue is not, and was what caused the original injury."}, "mobility": {"active": true, "limitation": "Guarded lumbar flexion; hip flexion range is fine"}, "notes": "Post-menopausal, so bone loading matters and recovery is genuinely slower than it was. Returning after nine months away, discharged from physio and cleared for graded loading, but has not deadlifted since the injury and is nervous about it. Wants to race masters again rather than just be pain-free. The 2 km erg is the goal, but rowing is the exact movement that loads the injured tissue, so the return has to be built rather than assumed. Do not prescribe rehabilitation or treat this as a medical case: she is discharged and cleared. Train her.", "qa_diagnostics": true},{privacy_consent:consent()})};
           // the competition-prep pair is opt-in by name, or via 'comp'.
           const CORE = ['advanced_hybrid','youth_gymnastics','tactical_3k'];
           const COMP = ['weightlifter_peak','mma_fight_camp'];
+          const HARD = ['inseason_footballer','masters_return'];
           const alias = (x) =>
             x.startsWith('hyb') ? 'advanced_hybrid'
             : x.startsWith('you') ? 'youth_gymnastics'
             : x.startsWith('tac') ? 'tactical_3k'
             : x.startsWith('weight') || x.startsWith('lift') ? 'weightlifter_peak'
             : x.startsWith('mma') || x.startsWith('fight') ? 'mma_fight_camp'
+            : x.startsWith('foot') || x.startsWith('soccer') || x.startsWith('inseason') ? 'inseason_footballer'
+            : x.startsWith('master') || x.startsWith('row') ? 'masters_return'
             : x;
           const wanted = selectionRaw === 'all' || !selectionRaw ? CORE
             : selectionRaw === 'comp' ? COMP
-            : selectionRaw === 'everything' ? CORE.concat(COMP)
+            : selectionRaw === 'hard' ? HARD
+            : selectionRaw === 'everything' ? CORE.concat(COMP).concat(HARD)
             : selectionRaw.split(',').map(x=>x.trim()).filter(Boolean).map(alias);
-          const selected=[hybrid,youth,tactical,weightlifter,mmacamp].filter(a=>wanted.includes(a.id));
+          const selected=[hybrid,youth,tactical,weightlifter,mmacamp,footballer,masters].filter(a=>wanted.includes(a.id));
           if(!selected.length) throw new Error('No avatars selected: '+selectionRaw);
           console.log('Running avatars:', selected.map(a=>a.id).join(', '));
           result.selection=selected.map(a=>a.id);
@@ -197,7 +208,7 @@ jobs:
           fi
           mkdir -p docs/qa/live-three-avatar/latest
           cp docs/qa/live-three-avatar/result.json docs/qa/live-three-avatar/latest/result.json
-          for f in advanced_hybrid-program.txt youth_gymnastics-program.txt tactical_3k-program.txt weightlifter_peak-program.txt mma_fight_camp-program.txt; do
+          for f in advanced_hybrid-program.txt youth_gymnastics-program.txt tactical_3k-program.txt weightlifter_peak-program.txt mma_fight_camp-program.txt inseason_footballer-program.txt masters_return-program.txt; do
             if [ -f "docs/qa/live-three-avatar/$f" ]; then
               cp "docs/qa/live-three-avatar/$f" "docs/qa/live-three-avatar/latest/$f"
             else
