@@ -1,12 +1,12 @@
 {
-  "timestamp": "2026-09-02T11:41:23.680Z",
+  "timestamp": "2026-09-02T12:30:29.035Z",
   "base": "https://raz-coaching-platform.onrender.com",
-  "head_sha": "7f074ea097057344ce7904c02294f6513d590977",
-  "runtime": "launch-acceptance-v82-camp-sharpening-hard-avatars-live37-20260902",
+  "head_sha": "5250b19c81c169bd46668dbb740e1f12dfaa134a",
+  "runtime": "launch-acceptance-v83-season-v84-injury-constraint-live38-20260902",
   "results": [
     {
       "id": "weightlifter_peak",
-      "job_id": "7f9d102b793abafaf668692571deae16",
+      "job_id": "a0a2aa3a2c0d83d46bb25d2d5edd359a",
       "ok": false,
       "status": "error",
       "stage": "generating",
@@ -19,7 +19,7 @@
     },
     {
       "id": "mma_fight_camp",
-      "job_id": "cfd11e863df64f5dfa770fbb49413abf",
+      "job_id": "b2224c2d9708a790d76f07d791568d1f",
       "ok": false,
       "status": "error",
       "stage": "generating",
@@ -32,12 +32,20 @@
     },
     {
       "id": "inseason_footballer",
+      "job_id": "f4373db05bf88f3156719da51407e5dc",
       "ok": false,
-      "error": "build not accepted 422 {\"error\":\"A few details are needed before I can build this accurately.\",\"clarification_required\":true,\"clarifications\":[{\"answer_type\":\"text\",\"required\":true,\"id\":\"competition_date\",\"prompt\":\"When is the event, and how much does it matter to you?\",\"help\":\"A date, or how many weeks away it is, plus w"
+      "status": "error",
+      "stage": "generating",
+      "attempt": 1,
+      "detail": "initial generation",
+      "last_seen_status": "error",
+      "error": "You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/.",
+      "program_chars": 0,
+      "seconds": 4
     },
     {
       "id": "masters_return",
-      "job_id": "c6e9e71006b6c88e841a4cfd5b599ad0",
+      "job_id": "57beaaa136912fae5860b28635c42223",
       "ok": false,
       "status": "error",
       "stage": "generating",
