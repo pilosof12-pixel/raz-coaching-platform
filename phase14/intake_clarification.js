@@ -1,4 +1,5 @@
 import { bodyweightKg } from './engine/intake_bodyweight.js';
+import { isInSeason } from './engine/v83_in_season.js';
 
 function text(v) {
   if (Array.isArray(v)) return v.map(text).join(' | ');
@@ -118,7 +119,11 @@ export function detectIntakeClarifications(intake = {}) {
   const dateKnown = Boolean(intake?.competition_date || intake?.event_date)
     || /\bin\s+\d+\s*(?:days?|weeks?|months?)\b|\b\d+\s*(?:days?|weeks?)\s+(?:out|away)\b/i
       .test(text([intake?.primary_goals, intake?.secondary_goals, intake?.notes, intake?.clarification_answers]));
-  if (eventMentioned && !dateKnown) {
+  // An athlete who competes every week has no date to give, and asking for one
+  // blocked the build outright: "a competitive match most Saturdays" reads as an
+  // event to this rule, when it is a fixture list. A season is planned for
+  // availability, not counted down to.
+  if (eventMentioned && !dateKnown && !isInSeason(intake)) {
     addQuestion(out, intake, {
       id: 'competition_date',
       prompt: 'When is the event, and how much does it matter to you?',
