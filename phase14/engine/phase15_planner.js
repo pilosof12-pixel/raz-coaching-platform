@@ -32,6 +32,7 @@ import { buildInjuryConstraintBrief } from './v84_injury_constraint.js';
 import { buildConsolidationBrief, buildStartingLoadBrief } from './v85_block_fundamentals.js';
 import { buildClockBrief } from './v86_training_clock.js';
 import { buildEarnedClaimsBrief } from './v87_earned_claims.js';
+import { buildGoalPaceBrief } from './v88_goal_pace.js';
 import { buildSessionSubstanceBrief } from './v53_session_substance.js';
 import { buildLanguageAccuracyBrief } from './v46_language_accuracy.js';
 
@@ -304,6 +305,7 @@ export function buildDeterministicBrief(intake = {}) {
     buildStartingLoadBrief(intake),
     buildClockBrief(intake),
     buildEarnedClaimsBrief(intake),
+    buildGoalPaceBrief(intake),
     buildSessionSubstanceBrief(intake),
     buildLanguageAccuracyBrief(intake),
     specialist,

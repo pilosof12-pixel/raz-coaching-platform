@@ -34,7 +34,7 @@ import { repairFightWeekClock } from './v77_fight_week_clock.js';
 import { repairWarmupRampTarget } from './v34_prescription_consistency.js';
 import { repairClusterNotation } from './v81_cluster_notation.js';
 import { repairCampSharpening } from './v82_camp_sharpening.js';
-import { repairInSeason } from './v83_in_season.js';
+import { repairInSeason, appendTrainingWeek } from './v83_in_season.js';
 import { repairClockStatement } from './v86_training_clock.js';
 import { repairBallisticShare } from './v79_ballistic_share.js';
 import { appendCompetitionBlocks } from './v73_taper_audit.js';
@@ -1149,6 +1149,12 @@ export function repairDeterministicContradictions(program, intake = {}) {
   if (clocked !== candidate) {
     candidate = clocked;
     repairs.push({ type: 'v86_clock_stated' });
+  }
+
+  const shown = appendTrainingWeek(candidate, intake);
+  if (shown !== candidate) {
+    candidate = shown;
+    repairs.push({ type: 'v83_sport_week_shown' });
   }
 
   const inSeason = repairInSeason(candidate, intake);

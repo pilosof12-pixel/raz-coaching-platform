@@ -157,6 +157,12 @@ jobs:
           const tagged = (String(process.env.COMMIT_MESSAGE||'').match(/\[AVATARS:([^\]]+)\]/i)||[])[1];
           const selectionRaw = (tagged || process.env.AVATAR_SELECTION || 'all').toLowerCase().trim();
           // 'all' stays the original three so existing behaviour is unchanged;
+          // The same lifter with the meet four weeks out rather than eight, so the
+          // block runs INTO the qualifier: realization, realization, taper, competition
+          // week. The peaking path has never been generated live -- every weightlifter
+          // run so far has been a build block on the runway, which is why the review
+          // kept saying it was not a real peak.
+          const lifterMeet={id:'weightlifter_meet_week',intake:Object.assign({competition_date:weeksFromNow(4),event_type:'strength_meet',event_priority:'A'},{"age": 26, "language": "en", "experience": "Advanced (3+ years)", "bodyweight": "89 kg", "primary_goals": ["Snatch 120 kg at the national qualifier in 4 weeks", "Clean and jerk 150 kg at the same meet"], "secondary_goals": ["Keep front squat strength while sharpening the lifts"], "maintenance_goals": ["Maintain back squat and pulling strength"], "goal_priority_model": "tiered_equal_primary", "days_per_week": 5, "session_duration_minutes": 100, "gym_availability_mode": "flexible", "available_gym_days": [], "training_location": "commercial_gym", "equipment": "Full weightlifting facility: competition platforms, bumper plates, jerk blocks, pulling blocks, squat racks, GHD.", "sport": "Olympic weightlifting", "sport_schedule": [], "sleep_hours": "8", "recovery_rating": "Good", "current_numbers": "Snatch: 112 kg best in training, 108 kg at last meet\nClean and jerk: 141 kg best in training, 137 kg at last meet\nFront Squat: 165 kg x 1\nBack Squat: 195 kg x 1\nSnatch Pull: 130 kg x 3\nCurrent training: 5 sessions per week, all lifting-focused", "performance_markers": ["Snatch: 112 kg", "Clean and jerk: 141 kg"], "injuries": "Occasional left wrist discomfort in the jerk rack position; settles with wrist prep and does not limit loading.", "pain": {"active": false}, "mobility": {"active": false, "limitation": ""}, "notes": "The national qualifier is in 4 weeks, so this block runs into the meet: Week 4 IS competition week. This is the peak, not a build block. Competition lifts take priority over squat numbers. Five sessions per week is what he has been doing, but the block should decide what the last two weeks actually need.", "qa_diagnostics": true},{privacy_consent:consent()})};
           // Two deliberately hard cases. The footballer has no single event at all --
           // a match most Saturdays, a season that outlasts the block, so nothing to
           // taper into and every week has to be ready. The masters rower is a graded
@@ -166,12 +172,13 @@ jobs:
           const masters={id:'masters_return',intake:Object.assign({"age": 54, "language": "en", "experience": "Intermediate (returning after a long layoff)", "bodyweight": "68 kg", "primary_goals": ["Return to competitive masters rowing and race a 2 km erg again"], "secondary_goals": ["Rebuild lower-body and trunk strength safely"], "maintenance_goals": ["Keep the upper-body and aerobic base I still have"], "goal_priority_model": "tiered", "days_per_week": 4, "session_duration_minutes": 60, "gym_availability_mode": "flexible", "available_gym_days": [], "training_location": "commercial_gym", "equipment": "Full gym with rowing ergometer, barbells, dumbbells, cables, and a leg press.", "sport": "Rowing (masters)", "sport_sessions_per_week": 2, "sport_schedule": [], "sleep_hours": "6-7 hours, broken", "recovery_rating": "Poor to fair", "current_numbers": "2 km erg: 8:58 nine months ago, not tested since\nGoblet squat: 24 kg x 8 comfortable\nDeadlift: not attempted since the injury\nCurrently 2 easy erg sessions a week, 20-30 min each", "performance_markers": ["2 km erg: 8:58 (nine months ago)"], "injuries": "L4/L5 disc herniation nine months ago with right-leg symptoms. Discharged from physiotherapy six weeks ago and cleared for graded loading. No leg symptoms for three months. Loaded lumbar flexion under fatigue is the movement that reproduced symptoms.", "pain": {"active": true, "description": "Occasional low-back stiffness in the morning and after long sitting", "severity": "2/10, settles with movement", "character": "stiff, mechanical, no leg symptoms", "next_day_baseline": "returns to normal", "tolerated_movements": "Erg at low rate, goblet squats, split squats, cable work, carries and hip thrusts are all comfortable. Repeated loaded spinal flexion under fatigue is not, and was what caused the original injury."}, "mobility": {"active": true, "limitation": "Guarded lumbar flexion; hip flexion range is fine"}, "notes": "Post-menopausal, so bone loading matters and recovery is genuinely slower than it was. Returning after nine months away, discharged from physio and cleared for graded loading, but has not deadlifted since the injury and is nervous about it. Wants to race masters again rather than just be pain-free. The 2 km erg is the goal, but rowing is the exact movement that loads the injured tissue, so the return has to be built rather than assumed. Do not prescribe rehabilitation or treat this as a medical case: she is discharged and cleared. Train her.", "qa_diagnostics": true},{privacy_consent:consent()})};
           // the competition-prep pair is opt-in by name, or via 'comp'.
           const CORE = ['advanced_hybrid','youth_gymnastics','tactical_3k'];
-          const COMP = ['weightlifter_peak','mma_fight_camp'];
+          const COMP = ['weightlifter_peak','mma_fight_camp','weightlifter_meet_week'];
           const HARD = ['inseason_footballer','masters_return'];
           const alias = (x) =>
             x.startsWith('hyb') ? 'advanced_hybrid'
             : x.startsWith('you') ? 'youth_gymnastics'
             : x.startsWith('tac') ? 'tactical_3k'
+            : x.startsWith('meet') || x.startsWith('peak') ? 'weightlifter_meet_week'
             : x.startsWith('weight') || x.startsWith('lift') ? 'weightlifter_peak'
             : x.startsWith('mma') || x.startsWith('fight') ? 'mma_fight_camp'
             : x.startsWith('foot') || x.startsWith('soccer') || x.startsWith('inseason') ? 'inseason_footballer'
@@ -182,7 +189,7 @@ jobs:
             : selectionRaw === 'hard' ? HARD
             : selectionRaw === 'everything' ? CORE.concat(COMP).concat(HARD)
             : selectionRaw.split(',').map(x=>x.trim()).filter(Boolean).map(alias);
-          const selected=[hybrid,youth,tactical,weightlifter,mmacamp,footballer,masters].filter(a=>wanted.includes(a.id));
+          const selected=[hybrid,youth,tactical,weightlifter,mmacamp,footballer,masters,lifterMeet].filter(a=>wanted.includes(a.id));
           if(!selected.length) throw new Error('No avatars selected: '+selectionRaw);
           console.log('Running avatars:', selected.map(a=>a.id).join(', '));
           result.selection=selected.map(a=>a.id);
@@ -208,7 +215,7 @@ jobs:
           fi
           mkdir -p docs/qa/live-three-avatar/latest
           cp docs/qa/live-three-avatar/result.json docs/qa/live-three-avatar/latest/result.json
-          for f in advanced_hybrid-program.txt youth_gymnastics-program.txt tactical_3k-program.txt weightlifter_peak-program.txt mma_fight_camp-program.txt inseason_footballer-program.txt masters_return-program.txt; do
+          for f in advanced_hybrid-program.txt youth_gymnastics-program.txt tactical_3k-program.txt weightlifter_peak-program.txt mma_fight_camp-program.txt inseason_footballer-program.txt masters_return-program.txt weightlifter_meet_week-program.txt; do
             if [ -f "docs/qa/live-three-avatar/$f" ]; then
               cp "docs/qa/live-three-avatar/$f" "docs/qa/live-three-avatar/latest/$f"
             else

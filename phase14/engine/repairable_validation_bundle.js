@@ -40,7 +40,7 @@ import { collectSportTaperFlags } from './v78_sport_taper.js'; // V78-SPORT-TAPE
 import { collectBallisticShareFlags } from './v79_ballistic_share.js'; // V79-BALLISTIC-SHARE-WIRED
 import { collectClusterFlags } from './v81_cluster_notation.js'; // V81-CLUSTER-NOTATION-WIRED
 import { collectCampSharpeningFlags } from './v82_camp_sharpening.js'; // V82-CAMP-SHARPENING-WIRED
-import { collectInSeasonFlags } from './v83_in_season.js'; // V83-IN-SEASON-WIRED
+import { collectInSeasonFlags, collectSportWeekFlags } from './v83_in_season.js'; // V83-IN-SEASON-WIRED
 import { collectClockFlags } from './v86_training_clock.js'; // V86-TRAINING-CLOCK-WIRED
 import { collectLanguageAccuracyFlags, LANGUAGE_HARD_CODES, repairCountClaims } from './v46_language_accuracy.js'; // V46-LANGUAGE-ACCURACY-WIRED
 import { repairDeterministicContradictions } from './v35_deterministic_repair.js'; // V35-DETERMINISTIC-REPAIR-WIRED
@@ -561,7 +561,7 @@ export function collectRepairableValidationFailures(program, intake = {}, option
       ...collectSportTaperFlags(candidate, intake), ...collectBallisticShareFlags(candidate, intake),
       ...collectClusterFlags(candidate, intake),
       ...collectCampSharpeningFlags(candidate, intake),
-      ...collectInSeasonFlags(candidate, intake),
+      ...collectInSeasonFlags(candidate, intake), ...collectSportWeekFlags(candidate, intake),
       ...collectClockFlags(candidate, intake)];
     if (!lean.length) return;
     throw new RetriableValidationError(lean[0].code,

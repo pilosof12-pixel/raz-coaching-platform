@@ -207,3 +207,65 @@ export function buildInSeasonBrief(intake = {}) {
   ];
   return lines.join('\n');
 }
+
+// The sport is the load, and until it is on the page the gym is being planned
+// against something invisible. The fight camp has had a schedule block since
+// v78; an in-season athlete had nothing, so five football sessions and a match
+// appeared in the delivered programme only as passing mentions in prose.
+export function renderTrainingWeek(intake = {}) {
+  if (!isInSeason(intake)) return '';
+  const week = arr(intake.sport_schedule)
+    .map((s) => ({ day: dayKey(s && s.day), intensity: String((s && s.intensity) || '').trim() }))
+    .filter((s) => s.day);
+  if (!week.length) return '';
+
+  const gym = new Set(arr(intake.available_gym_days).map(dayKey).filter(Boolean));
+  const sport = String(intake.sport || 'sport').replace(/\s*\(.*$/, '').trim();
+  const guarded = new Set(protectedDays(intake));
+
+  const cells = WEEKDAYS.map((d) => {
+    const s = week.find((x) => x.day === d);
+    const parts = [];
+    if (s) {
+      parts.push(MATCH_INTENSITY.test(s.intensity)
+        ? `${sport} MATCH`
+        : `${sport} ${s.intensity.toLowerCase()}`);
+    }
+    if (gym.has(d)) parts.push('gym');
+    if (!parts.length) parts.push('rest');
+    const label = parts.join(' + ');
+    return guarded.has(d) ? `${label} (protected)` : label;
+  });
+
+  return [
+    'WEEKLY SCHEDULE',
+    'The sport is the load. The gym is placed around it, and the day before a match is protected.',
+    '',
+    ['', ...WEEKDAYS.map((d) => LABEL[d].slice(0, 3))].join(' | '),
+    ['Every week', ...cells].join(' | '),
+    '',
+    'This repeats for all four weeks: the fixture repeats, so the week does. Progress is measured in what the athlete can do on this schedule, not in load added to it.',
+  ].join('\n');
+}
+
+export function appendTrainingWeek(program, intake = {}) {
+  const source = String(program || '');
+  const rendered = renderTrainingWeek(intake);
+  if (!rendered || source.includes('WEEKLY SCHEDULE')) return source;
+  // Before the week tables, where the microcycle rule reads and a coach looks
+  // first -- and pipe-delimited, because the normalizer in that region collapses
+  // runs of whitespace and would flatten an aligned table into one line.
+  const at = source.search(/START_WEEK1_TSV/i);
+  if (at < 0) return `${source.replace(/\s*$/, '')}\n\n${rendered}\n`;
+  return `${source.slice(0, at).replace(/\s*$/, '')}\n\n${rendered}\n${source.slice(at)}`;
+}
+
+export function collectSportWeekFlags(program, intake = {}) {
+  if (!isInSeason(intake)) return [];
+  if (!arr(intake.sport_schedule).length) return [];
+  if (String(program || '').includes('WEEKLY SCHEDULE')) return [];
+  return [{
+    code: 'V83_SPORT_WEEK_NOT_SHOWN',
+    detail: 'The athlete trains and competes on a fixed weekly schedule, and the programme never shows it. Two gym sessions planned around five sport sessions and a match cannot be read, checked or adjusted unless the whole week is on the page. Show the week: sport, gym, match and rest days together.',
+  }];
+}
