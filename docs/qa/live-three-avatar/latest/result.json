@@ -1,12 +1,12 @@
 {
-  "timestamp": "2026-09-04T11:59:14.878Z",
+  "timestamp": "2026-09-04T13:18:15.129Z",
   "base": "https://raz-coaching-platform.onrender.com",
-  "head_sha": "a7070e9ad33b8ce741262723675eb8b4190947e6",
-  "runtime": "launch-acceptance-credits-restored-four-avatars-live39-20260904",
+  "head_sha": "c62f49fc818e31a5c2f3f97e99cdbacac7a9ce2e",
+  "runtime": "launch-acceptance-v88-goal-pace-peak-block-live40-20260904",
   "results": [
     {
       "id": "weightlifter_peak",
-      "job_id": "1481b30526bfebd32842c9d964e08505",
+      "job_id": "440c896f5971d9d5ce972b58e0ad5805",
       "ok": true,
       "status": "done",
       "stage": "finalizing",
@@ -14,54 +14,54 @@
       "detail": "saving program",
       "last_seen_status": "done",
       "error": null,
-      "program_chars": 21518,
-      "seconds": 353
+      "program_chars": 22266,
+      "seconds": 306
     },
     {
-      "id": "mma_fight_camp",
-      "job_id": "5822f1f6e4bc3dc9f8acdf984ab430cf",
+      "id": "inseason_footballer",
+      "job_id": "40ef569f4b78ac723c5c61059799b367",
+      "ok": true,
+      "status": "done",
+      "stage": "finalizing",
+      "attempt": 0,
+      "detail": "saving program",
+      "last_seen_status": "done",
+      "error": null,
+      "program_chars": 11148,
+      "seconds": 176
+    },
+    {
+      "id": "masters_return",
+      "job_id": "c9fbd401b71b64388c147fd4e16469ec",
+      "ok": true,
+      "status": "done",
+      "stage": "finalizing",
+      "attempt": 0,
+      "detail": "saving program",
+      "last_seen_status": "done",
+      "error": null,
+      "program_chars": 13558,
+      "seconds": 243
+    },
+    {
+      "id": "weightlifter_meet_week",
+      "job_id": "1d3884c9119edbb21347b9c5ce2094d5",
       "ok": false,
       "status": "error",
       "stage": "refining",
       "attempt": 4,
-      "detail": "internal repair: SPORT_DAY_COUPLING_VIOLATION+V77_FIGHT_WEEK_NOT_ON_THE_CLOCK",
+      "detail": "internal repair: V75_EFFORT_TOO_HIGH_DURING_CUT",
       "last_seen_status": "error",
-      "error": "Internal coaching QA could not repair the candidate program after multiple passes. No client-facing program was saved. Please retry the build. QA trace: A1:SPORT_DAY_COUPLING_VIOLATION+V34_NOTE_UNDEFINED_LOAD_REFERENCE+V77_FIGHT_WEEK_NOT_ON_THE_CLOCK -> A2:SPORT_DAY_COUPLING_VIOLATION+V77_FIGHT_WEEK_NOT_ON_THE_CLOCK -> A3:SPORT_DAY_COUPLING_VIOLATION+V74_NOVEL_EXERCISE_NEAR_EVENT -> A4:SPORT_DAY_COUPLING_VIOLATION+V77_FIGHT_WEEK_NOT_ON_THE_CLOCK. Last failure detail: PRIOR ATTEMPT FAILED SPORT/CALENDAR VALIDATION. days_per_week means requested strength sessions, not total active calendar days. Week 4: strength/skill-strength work is scheduled on unavailable day(s) fri day 7. Week 4: strength/skill-strength work is scheduled on unavailable day(s) tue day 3. Keep run-only, ruck-only, sport-only and conditioning-only days in the weekly calendar for fatigue/collision analysis, but do not count them toward the requested strength-session frequency. | Week 4 is competition week but Trap Bar Jump is presented by weekday alone. Fight week runs Day -7 to Day 0: ever [QA:INTERNAL_QA_REPAIR_EXHAUSTED]",
+      "error": "Internal coaching QA could not repair the candidate program after multiple passes. No client-facing program was saved. Please retry the build. QA trace: A1:EXERCISE_HALLUCINATION+V74_CAMP_SESSION_TOO_BUSY[Snatch Pull|Snatch Pull|Snatch Pull] -> A2:EXERCISE_HALLUCINATION+V75_EFFORT_TOO_HIGH_DURING_CUT[Snatch High Pull|Snatch High Pull|Snatch High Pull] -> A3:V75_EFFORT_TOO_HIGH_DURING_CUT -> A4:V75_EFFORT_TOO_HIGH_DURING_CUT. Last failure detail: Week 3 prescribes Snatch at RPE 7.5 while a routine weight cut is underway (about 4 kg to lose). A depleted athlete has less recovery margin, so the effort ceiling comes down with it. Week 4 is competition week but Snatch is presented by weekday alone. Fight week runs Day -7 to Day 0: every session should say how far it sits from the event, because that is the only thing that decides whether it belongs there. [QA:INTERNAL_QA_REPAIR_EXHAUSTED]",
       "program_chars": 0,
-      "seconds": 528
-    },
-    {
-      "id": "inseason_footballer",
-      "job_id": "dbb49b888fa56608e25e0e1750958de3",
-      "ok": true,
-      "status": "done",
-      "stage": "finalizing",
-      "attempt": 0,
-      "detail": "saving program",
-      "last_seen_status": "done",
-      "error": null,
-      "program_chars": 9747,
-      "seconds": 240
-    },
-    {
-      "id": "masters_return",
-      "job_id": "5c83cd92cf3e45c0d580d959945bf038",
-      "ok": true,
-      "status": "done",
-      "stage": "finalizing",
-      "attempt": 0,
-      "detail": "saving program",
-      "last_seen_status": "done",
-      "error": null,
-      "program_chars": 14215,
-      "seconds": 237
+      "seconds": 572
     }
   ],
   "selection": [
     "weightlifter_peak",
-    "mma_fight_camp",
     "inseason_footballer",
-    "masters_return"
+    "masters_return",
+    "weightlifter_meet_week"
   ],
   "ok": false
 }
