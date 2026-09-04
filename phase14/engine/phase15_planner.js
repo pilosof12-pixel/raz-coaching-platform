@@ -30,6 +30,8 @@ import { buildCampSharpeningBrief } from './v82_camp_sharpening.js';
 import { buildInSeasonBrief } from './v83_in_season.js';
 import { buildInjuryConstraintBrief } from './v84_injury_constraint.js';
 import { buildConsolidationBrief, buildStartingLoadBrief } from './v85_block_fundamentals.js';
+import { buildClockBrief } from './v86_training_clock.js';
+import { buildEarnedClaimsBrief } from './v87_earned_claims.js';
 import { buildSessionSubstanceBrief } from './v53_session_substance.js';
 import { buildLanguageAccuracyBrief } from './v46_language_accuracy.js';
 
@@ -300,6 +302,8 @@ export function buildDeterministicBrief(intake = {}) {
     buildInjuryConstraintBrief(intake),
     buildConsolidationBrief(intake),
     buildStartingLoadBrief(intake),
+    buildClockBrief(intake),
+    buildEarnedClaimsBrief(intake),
     buildSessionSubstanceBrief(intake),
     buildLanguageAccuracyBrief(intake),
     specialist,

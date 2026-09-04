@@ -35,6 +35,7 @@ import { repairWarmupRampTarget } from './v34_prescription_consistency.js';
 import { repairClusterNotation } from './v81_cluster_notation.js';
 import { repairCampSharpening } from './v82_camp_sharpening.js';
 import { repairInSeason } from './v83_in_season.js';
+import { repairClockStatement } from './v86_training_clock.js';
 import { repairBallisticShare } from './v79_ballistic_share.js';
 import { appendCompetitionBlocks } from './v73_taper_audit.js';
 import { appendCampSchedule } from './v78_sport_taper.js';
@@ -1144,6 +1145,12 @@ export function repairDeterministicContradictions(program, intake = {}) {
 
   // Last of the competition repairs: the clock is written after every other
   // rule has finished editing the notes it prefixes.
+  const clocked = repairClockStatement(candidate, intake);
+  if (clocked !== candidate) {
+    candidate = clocked;
+    repairs.push({ type: 'v86_clock_stated' });
+  }
+
   const inSeason = repairInSeason(candidate, intake);
   if (inSeason !== candidate) {
     candidate = inSeason;

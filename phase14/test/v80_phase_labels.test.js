@@ -8,7 +8,7 @@ import fs from 'node:fs';
 // claims the athlete is realising fitness for competition, which reads as more
 // advanced than the prescription actually is.
 const src = fs.readFileSync(new URL('../public/spreadsheet-parity.js', import.meta.url), 'utf8');
-const fn = src.slice(src.indexOf('const DEVELOPMENTAL_NARRATIVE'), src.indexOf('function applyTrackingValidation'));
+const fn = src.slice(src.indexOf('const DEVELOPMENTAL_NARRATIVE'), src.indexOf('function renderWeek'));
 const weekTitle = new Function('n', 'program', `${fn}; return weekTitle(n, program);`);
 
 const TACTICAL = fs.readFileSync(new URL('./fixtures/run84_tactical_3k.txt', import.meta.url), 'utf8');

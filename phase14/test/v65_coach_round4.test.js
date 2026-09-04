@@ -51,7 +51,7 @@ test('this block is not race-specific and must not be labelled so', () => {
 // the sheet cannot contradict the program's own opening sentence.
 test('the exporter does not call a developmental block Specificity', () => {
   const src = fs.readFileSync(new URL('../public/spreadsheet-parity.js', import.meta.url), 'utf8');
-  const fn = src.slice(src.indexOf('const DEVELOPMENTAL_NARRATIVE'), src.indexOf('function applyTrackingValidation'));
+  const fn = src.slice(src.indexOf('const DEVELOPMENTAL_NARRATIVE'), src.indexOf('function renderWeek'));
   const weekTitle = new Function('n', 'program', `${fn}; return weekTitle(n, program);`);
   assert.equal(weekTitle(3, TACTICAL), 'WEEK 3 — PEAK LOAD');
   assert.equal(weekTitle(3, 'A race-specific block for the event.\nSTART_WEEK1_TSV'), 'WEEK 3 — SPECIFICITY');

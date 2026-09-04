@@ -230,7 +230,7 @@
     if(age && age<18) rules.push('Skill quality comes before fatigue. No max-effort grinders or repeated failed attempts; stop when speed, position or confidence clearly deteriorates.');
     if(intake.pain?.active || (intake.injuries && !/none/i.test(String(intake.injuries)))) rules.push('Pain rule: stop or regress any movement that clearly worsens the reported issue; do not force the planned variation.');
     rules.push('If time or recovery is limited, remove the lowest-priority accessory before cutting the primary skill/strength exposure.');
-    rules.push('Video cells use a curated direct demo when available; otherwise they link to an exercise-specific YouTube search.');
+    rules.push('The exercise name is the demo link: a curated direct demo where one exists, otherwise an exercise-specific search.');
     return rules;
   }
 
@@ -478,34 +478,31 @@
       ? 'WEEK 3 — PEAK LOAD'
       : 'WEEK 3 — SPECIFICITY';
   }
-  function applyTrackingValidation(cell, kind) {
-    cell.dataValidation = kind==='status'
-      ? {type:'list',allowBlank:true,formulae:['"Not Started,In Progress,Complete"']}
-      : {type:'list',allowBlank:true,formulae:['",✓"']};
-  }
+
   function renderWeek(ws, intake, week, program) {
     ws.views=[{showGridLines:false,state:'frozen',ySplit:4}];
-    [29,23,9,17,14,16,50,13,38,14,9].forEach((w,i)=>ws.getColumn(i+1).width=w);
-    mergeTitle(ws,1,11,weekTitle(week.week, program),NAVY,16);
-    mergeTitle(ws,2,11,'Exact live production prescription in the approved client template. Day names are section bands, not a permanent data column.',NAVY_2,10,'FFDCE7F7');
-    const headers=['Exercise','Load / Target','Sets','Reps / Duration','Rest','Effort','Coaching Note','Log','Video','Status','Done'];
+    [32,24,9,18,14,16,58,16].forEach((w,i)=>ws.getColumn(i+1).width=w);
+    mergeTitle(ws,1,8,weekTitle(week.week, program),NAVY,16);
+    mergeTitle(ws,2,8,'Exact live production prescription in the approved client template. Day names are section bands, not a permanent data column.',NAVY_2,10,'FFDCE7F7');
+    // The exercise name carries its own demo link, so a separate Video column
+    // duplicated it. Status and Done were tracking scaffolding nobody asked
+    // for; Log is where an athlete writes what they actually did, and it reads
+    // best as the last thing on the row.
+    const headers=['Exercise','Load / Target','Sets','Reps / Duration','Rest','Effort','Coaching Note','Log'];
     let row=4;
     headers.forEach((v,j)=>{const c=ws.getRow(row).getCell(j+1);c.value=v;fill(c,HEADER);font(c,{size:10,bold:true,color:WHITE});align(c,{horizontal:'center'});});
     row++;
     const ss=sessions(week);
     ss.forEach((session,i)=>{
-      ws.mergeCells(row,1,row,11);
+      ws.mergeCells(row,1,row,8);
       const band=ws.getRow(row).getCell(1); band.value=sessionLabel(intake,session,i); fill(band,DAY_BAND); font(band,{size:10,bold:true,color:'FF0B1324'}); align(band); ws.getRow(row).height=24; row++;
       for(const r of session.rows){
-        const vals=[r.exercise,r.load,r.sets,r.reps,r.rest,r.effort,r.notes,'','','',''];
-        vals.forEach((v,j)=>{const c=ws.getRow(row).getCell(j+1);c.value=v;fill(c,BODY);font(c,{size:10});align(c,{horizontal:[2,3,4,5,6,9,10,11].includes(j+1)?'center':'left'});});
+        const vals=[r.exercise,r.load,r.sets,r.reps,r.rest,r.effort,r.notes,''];
+        vals.forEach((v,j)=>{const c=ws.getRow(row).getCell(j+1);c.value=v;fill(c,BODY);font(c,{size:10});align(c,{horizontal:[3,4,5,6].includes(j+1)?'center':'left'});});
         // The exercise name carries its own demo link, so a coach clicks the
         // thing they are reading rather than hunting for a separate column.
         // The Warm-Up sheet already reads this way; the week tables did not.
         setHyperlink(ws.getRow(row).getCell(1),r.exercise,r.exercise,false);
-        setHyperlink(ws.getRow(row).getCell(9),r.exercise,'Open demo',true);
-        applyTrackingValidation(ws.getRow(row).getCell(10),'status');
-        applyTrackingValidation(ws.getRow(row).getCell(11),'done');
         ws.getRow(row).height=34; row++;
       }
       row++;

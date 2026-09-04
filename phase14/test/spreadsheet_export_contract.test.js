@@ -15,9 +15,6 @@ const APPROVED_WEEK_HEADERS = [
   'Effort',
   'Coaching Note',
   'Log',
-  'Video',
-  'Status',
-  'Done',
 ];
 
 test('production start always runs launch:prepare before the server', () => {
@@ -33,7 +30,7 @@ test('launch runtime pins approved spreadsheet exporter after legacy parser and 
   assert.match(launch, /generationProgressPos > intakePolishPos/);
 });
 
-test('approved weekly spreadsheet contract is exactly 11 columns and never exposes Day as a data column', () => {
+test('approved weekly spreadsheet contract is exactly 8 columns, ending in Log, and never exposes Day as a data column', () => {
   const match = parity.match(/const headers=\[([^\]]+)\];/);
   assert.ok(match, 'renderWeek approved headers array not found');
   const headers = [...match[1].matchAll(/'([^']+)'/g)].map((m) => m[1]);
@@ -41,16 +38,20 @@ test('approved weekly spreadsheet contract is exactly 11 columns and never expos
   assert.equal(headers.includes('Day'), false);
 });
 
-test('approved exporter renders day/session labels as section bands before the 11-column table', () => {
-  const renderWeekStart = parity.indexOf('function renderWeek(ws, intake, week)');
+test('approved exporter renders day/session labels as section bands before the 8-column table', () => {
+  const renderWeekStart = parity.indexOf('function renderWeek(');
   const renderWeekEnd = parity.indexOf('async function buildParitySpreadsheet', renderWeekStart);
   assert.ok(renderWeekStart >= 0 && renderWeekEnd > renderWeekStart, 'renderWeek function not found');
   const renderWeek = parity.slice(renderWeekStart, renderWeekEnd);
 
-  const sessionBand = renderWeek.indexOf('mergeTitle(ws,row,11,`${sessionLabel(intake,s,i).toUpperCase()}');
+  // Assert the band as it is actually built. The previous form referred to an
+  // implementation that no longer exists and only matched because renderWeekEnd
+  // resolved to -1, so the slice ran past the end of the function.
+  const sessionBand = renderWeek.indexOf('band.value=sessionLabel(intake,session,i)');
   const headers = renderWeek.indexOf("const headers=['Exercise','Load / Target'");
   assert.ok(sessionBand >= 0, 'session/day section band not found');
-  assert.ok(headers > sessionBand, '11-column header must come after the section band');
+  assert.ok(headers < sessionBand, 'the header is written once, before the per-session bands');
+  assert.match(renderWeek, /ws\.mergeCells\(row,1,row,8\)/, 'the band spans the 8-column table');
   assert.match(renderWeek, /const ss=sessions\(week\)/);
 });
 

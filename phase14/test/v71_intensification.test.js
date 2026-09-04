@@ -110,7 +110,7 @@ test('a block running into the event says so instead', () => {
 // A phase name is a claim about the prescription underneath it.
 test('Week 4 is only called Consolidate / Express when volume actually falls', () => {
   const src = fs.readFileSync(new URL('../public/spreadsheet-parity.js', import.meta.url), 'utf8');
-  const fn = src.slice(src.indexOf('const DEVELOPMENTAL_NARRATIVE'), src.indexOf('function applyTrackingValidation'));
+  const fn = src.slice(src.indexOf('const DEVELOPMENTAL_NARRATIVE'), src.indexOf('function renderWeek'));
   const weekTitle = new Function('n', 'program', `${fn}; return weekTitle(n, program);`);
   assert.equal(weekTitle(4, BLOCK), 'WEEK 4 — PEAK LOAD', 'flat volume must not claim consolidation');
   assert.equal(weekTitle(4, repairIntensification(BLOCK, LIFTER)), 'WEEK 4 — CONSOLIDATE / EXPRESS');
