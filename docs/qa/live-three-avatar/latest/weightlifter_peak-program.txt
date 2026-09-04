@@ -1,0 +1,128 @@
+This is Weeks 1-4 of your 8-week run-in: a prepeak specificity build block, not a taper. The classic lifts get the best slots and the heaviest progression, front squat gets enough real dose to stay strong, and back squat plus pulling stay on maintenance while you sharpen the competition lifts during the cut.
+
+Weeks 2-3 push the competition-lift load ranges up with the same structure. Week 4 keeps the Tuesday and Wednesday technical work steady and only nudges the heavier Monday, Thursday and Friday singles if Week 3 was clean.
+
+Use your normal wrist prep before every front-rack day. If the left wrist changes from the usual settling discomfort to sharper or lingering pain, stay at the bottom of the load range, cut the last primary set, and use straps on Front Squat that day rather than forcing more rack volume. Flat days while making weight are not a cue to add work; weight-cut strategy itself is outside this plan.
+
+START_WEEK1_TSV
+Day	Exercise	Weight	Sets	Reps	Rest	Target RPE	Notes	Results
+Mon	[WARMUP] Overhead Squat	20-40 kg	2	3	60 sec	3	5-8 min general prep plus left wrist prep, then barbell ramp to work sets.; Squat-and-reach x 6; Bodyweight squat x 8; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Keep the warm-up specific and non-fatiguing.	
+Mon	Snatch	92-97 kg (82-87%)	6	1	2-3 min	7.5-8	Climb across 6 singles. Only add after a sharp make; if you miss or catch forward, repeat the last good load and cap the day there.	
+Mon	Front Squat	135-140 kg (82-85%)	3	2	3-4 min	7.5-8	Leg strength hold for the lifts. Use straps if the left wrist is sticky; if speed drops hard, stop at 2 sets.	
+Mon	Chest-Supported Row	RPE-selected load	3	8	90-120 sec	8	Upper-back support for turnover and receiving posture; no body English.	
+Mon	Side Plank	Bodyweight	3	35 sec/side	45 sec	7	Straight line from ankle to ear; stop before shaking changes position.	
+Tue	[WARMUP] Front Squat	20-60 kg	2	3	60 sec	3	5-8 min general prep plus left wrist prep, then rack holds and barbell ramp to work sets.; Ramp Pendlay Row in 3-4 quick sets to working load.; Keep the warm-up specific and non-fatiguing.; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12	
+Tue	Clean and Jerk	106-112 kg (75-79%)	6	1	2-3 min	6.5-7.5	Crisp practice singles. Stay between opener-speed and smooth training-speed; if rack discomfort builds, hold the low end and stop at 5-6 total makes.	
+Tue	Pendlay Row	RPE-selected load	3	3	3 min	7.5-8	Explosive barbell pulling support for turnover and finish without extra rack stress; reset from the floor every rep and use straps if helpful. If torso angle rises or bar speed dies, hold the load or reduce 2.5-5%.	
+Tue	Machine Hamstring Curl	RPE-selected load	2	8	75-90 sec	8	Low-soreness posterior-chain support without extra axial fatigue.	
+Wed	[WARMUP] Overhead Squat	20-40 kg	2	3	60 sec	3	5-8 min general prep plus shoulder and wrist prep, then barbell ramp to work sets.; Squat-and-reach x 6; Bodyweight squat x 8; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Keep the warm-up specific and non-fatiguing.	
+Wed	Snatch	80-86 kg (71-77%)	5	2	2 min	6.5-7	Technique doubles; reset every rep. If turnover or bottom position loosens, stay at the last sharp load.	
+Wed	Overhead Squat	RPE-selected load	3	2	2-3 min	6.5	Receiving-position strength; stay smooth and stop well before a grind.	
+Wed	Seated Cable Row	RPE-selected load	3	8	90-120 sec	8	Horizontal pulling maintenance for upper-back balance.	
+Thu	[WARMUP] Front Squat	20-60 kg	2	3	60 sec	3	5-8 min general prep plus left wrist prep, then rack holds and barbell ramp to work sets.; Squat-and-reach x 6; Bodyweight squat x 8; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Keep the warm-up specific and non-fatiguing.	
+Thu	Clean and Jerk	117-122 kg (83-87%)	6	1	3 min	7.5-8.5	Take 6 crisp heavy singles. If the clean slows or jerk lockout softens, repeat the last make instead of adding; cut set 6 if RPE runs past 8.5 early.	
+Thu	Front Squat	140-145 kg (85-88%)	2	2	3-4 min	8	Short strength hold only. Use straps if needed; if the cleans ran heavy, stay at 140 kg.	
+Thu	Chest-Supported Row	RPE-selected load	3	6	90-120 sec	8	Heavier upper-back maintenance; full squeeze each rep.	
+Thu	Machine Hamstring Curl	RPE-selected load	2	10	75-90 sec	7.5	Posterior-chain tissue support with low residual fatigue.	
+Fri	[WARMUP] Overhead Squat	20-40 kg	2	3	60 sec	3	5-8 min general prep plus shoulder and wrist prep, then barbell ramp to work sets.; Squat-and-reach x 6; Bodyweight squat x 8; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Ramp Back Squat: 60 kg x 5, 90 kg x 3, 117.5 kg x 1-2 before 150 kg work sets.; Keep the warm-up specific and non-fatiguing.	
+Fri	Snatch	90-95 kg (80-85%)	4	1	2-3 min	7.5-8	Meet-order singles from a full setup. If Thursday fatigue lingers, stay in the low half of the range.	
+Fri	Clean and Jerk	114-120 kg (81-85%)	4	1	2-3 min	7.5-8	Same meet-feel focus; if rack position is irritated after snatch, hold the low end and keep all reps clean.	
+Fri	Back Squat	150 kg (77%)	2	3	3-4 min	7	Maintenance dose only; keep this unchanged across the block unless it interferes with lift quality.	
+Fri	Seated Cable Row	RPE-selected load	3	8	90-120 sec	8	Horizontal pulling maintenance; stay strict.	
+Fri	Pallof Press	RPE-selected load	2	10/side	45-60 sec	7	Brace against rotation and keep ribs down.	
+END_WEEK1_TSV
+START_WEEK2_TSV
+Day	Exercise	Weight	Sets	Reps	Rest	Target RPE	Notes	Results
+Mon	[WARMUP] Overhead Squat	20-40 kg	2	3	60 sec	3	5-8 min general prep plus left wrist prep, then barbell ramp to work sets.; Squat-and-reach x 6; Bodyweight squat x 8; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Keep the warm-up specific and non-fatiguing.	
+Mon	Snatch	94-99 kg (84-88%)	6	1	2-3 min	7.5-8	Same structure. Only use the top half if last week was all makes; if you miss or catch forward, repeat the last good load and cap the day there. Support volume comes down this week so the classic lifts take a larger share as the meet approaches.	
+Mon	Front Squat	135-140 kg (82-85%)	3	2	3-4 min	7.5-8	Leg strength hold for the lifts. Use straps if the left wrist is sticky; if speed drops hard, stop at 2 sets.	
+Mon	Chest-Supported Row	RPE-selected load	3	8	90-120 sec	8	Upper-back support for turnover and receiving posture; no body English.	
+Mon	Side Plank	Bodyweight	1	35 sec/side	45 sec	7	Straight line from ankle to ear; stop before shaking changes position. Support volume trimmed to 1 set this week as the classic lifts take a larger share.	
+Tue	[WARMUP] Front Squat	20-60 kg	2	3	60 sec	3	5-8 min general prep plus left wrist prep, then rack holds and barbell ramp to work sets.; Ramp Pendlay Row in 3-4 quick sets to working load.; Keep the warm-up specific and non-fatiguing.; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12	
+Tue	Clean and Jerk	108-114 kg (77-81%)	6	1	2-3 min	6.5-7.5	Only move up if last week stayed crisp. If rack discomfort builds or split timing softens, stay at the lower end and finish with clean makes.	
+Tue	Pendlay Row	RPE-selected load	3	3	3 min	7.5-8	Explosive barbell pulling support for turnover and finish without extra rack stress; reset from the floor every rep and use straps if helpful. If torso angle rises or bar speed dies, hold the load or reduce 2.5-5%.	
+Tue	Machine Hamstring Curl	RPE-selected load	1	8	75-90 sec	8	Low-soreness posterior-chain support without extra axial fatigue. Support volume trimmed to 1 set this week as the classic lifts take a larger share.	
+Wed	[WARMUP] Overhead Squat	20-40 kg	2	3	60 sec	3	5-8 min general prep plus shoulder and wrist prep, then barbell ramp to work sets.; Squat-and-reach x 6; Bodyweight squat x 8; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Keep the warm-up specific and non-fatiguing.	
+Wed	Snatch	82-88 kg (73-79%)	5	2	2 min	6.5-7	Technique doubles; only move up if last week stayed sharp. If turnover or bottom position loosens, stay at the last clean load.	
+Wed	Overhead Squat	RPE-selected load	3	2	2-3 min	6.5	Receiving-position strength; stay smooth and stop well before a grind.	
+Wed	Seated Cable Row	RPE-selected load	3	8	90-120 sec	8	Horizontal pulling maintenance for upper-back balance.	
+Thu	[WARMUP] Front Squat	20-60 kg	2	3	60 sec	3	5-8 min general prep plus left wrist prep, then rack holds and barbell ramp to work sets.; Squat-and-reach x 6; Bodyweight squat x 8; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Keep the warm-up specific and non-fatiguing.	
+Thu	Clean and Jerk	119-124 kg (84-88%)	6	1	3 min	7.5-8.5	Only use the top half if last week was all makes. If the clean slows or jerk lockout softens, repeat the last make instead of adding.	
+Thu	Front Squat	140-145 kg (85-88%)	2	2	3-4 min	8	Short strength hold only. Use straps if needed; if the cleans ran heavy, stay at 140 kg.	
+Thu	Chest-Supported Row	RPE-selected load	3	6	90-120 sec	8	Heavier upper-back maintenance; full squeeze each rep.	
+Thu	Machine Hamstring Curl	RPE-selected load	1	10	75-90 sec	7.5	Posterior-chain tissue support with low residual fatigue. Support volume trimmed to 1 set this week as the classic lifts take a larger share.	
+Fri	[WARMUP] Overhead Squat	20-40 kg	2	3	60 sec	3	5-8 min general prep plus shoulder and wrist prep, then barbell ramp to work sets.; Squat-and-reach x 6; Bodyweight squat x 8; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Ramp Back Squat: 60 kg x 5, 90 kg x 3, 117.5 kg x 1-2 before 150 kg work sets.; Keep the warm-up specific and non-fatiguing.	
+Fri	Snatch	92-97 kg (82-87%)	4	1	2-3 min	7.5-8	Meet-order singles from a full setup. Only use the top half if Monday stayed clean; otherwise hold the lower end.	
+Fri	Clean and Jerk	116-122 kg (82-87%)	4	1	2-3 min	7.5-8	Same meet-feel focus; if Thursday still lingers in the rack or dip-drive timing, stay low and keep every rep clean.	
+Fri	Back Squat	150 kg (77%)	2	3	3-4 min	7	Maintenance dose only; keep this unchanged across the block unless it interferes with lift quality.	
+Fri	Seated Cable Row	RPE-selected load	3	8	90-120 sec	8	Horizontal pulling maintenance; stay strict.	
+Fri	Pallof Press	RPE-selected load	1	10/side	45-60 sec	7	Brace against rotation and keep ribs down. Support volume trimmed to 1 set this week as the classic lifts take a larger share.	
+END_WEEK2_TSV
+START_WEEK3_TSV
+Day	Exercise	Weight	Sets	Reps	Rest	Target RPE	Notes	Results
+Mon	[WARMUP] Overhead Squat	20-40 kg	2	3	60 sec	3	5-8 min general prep plus left wrist prep, then barbell ramp to work sets.; Squat-and-reach x 6; Bodyweight squat x 8; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Keep the warm-up specific and non-fatiguing.	
+Mon	Snatch	96-101 kg (86-90%)	6	1	2-3 min	8	Same structure. Only use the top half if last week was all makes; if you miss or catch forward, repeat the last good load and cap the day there. Support volume comes down this week so the classic lifts take a larger share as the meet approaches.	
+Mon	Front Squat	135-140 kg (82-85%)	3	2	3-4 min	7.5-8	Leg strength hold for the lifts. Use straps if the left wrist is sticky; if speed drops hard, stop at 2 sets.	
+Mon	Chest-Supported Row	RPE-selected load	1	8	90-120 sec	8	Upper-back support for turnover and receiving posture; no body English. Support volume trimmed to 1 set this week as the classic lifts take a larger share.	
+Mon	Side Plank	Bodyweight	1	35 sec/side	45 sec	7	Straight line from ankle to ear; stop before shaking changes position. Support volume trimmed to 1 set this week as the classic lifts take a larger share.	
+Tue	[WARMUP] Front Squat	20-60 kg	2	3	60 sec	3	5-8 min general prep plus left wrist prep, then rack holds and barbell ramp to work sets.; Ramp Pendlay Row in 3-4 quick sets to working load.; Keep the warm-up specific and non-fatiguing.; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12	
+Tue	Clean and Jerk	110-116 kg (78-82%)	6	1	2-3 min	6.5-7.5	Only move up if last week stayed crisp. If rack discomfort builds or split timing softens, stay at the lower end and finish with clean makes.	
+Tue	Pendlay Row	RPE-selected load	1	3	3 min	7.5-8	Explosive barbell pulling support for turnover and finish without extra rack stress; reset from the floor every rep and use straps if helpful. If torso angle rises or bar speed dies, hold the load or reduce 2.5-5%. Support volume trimmed to 1 set this week as the classic lifts take a larger share.	
+Tue	Machine Hamstring Curl	RPE-selected load	1	8	75-90 sec	8	Low-soreness posterior-chain support without extra axial fatigue. Support volume trimmed to 1 set this week as the classic lifts take a larger share.	
+Wed	[WARMUP] Overhead Squat	20-40 kg	2	3	60 sec	3	5-8 min general prep plus shoulder and wrist prep, then barbell ramp to work sets.; Squat-and-reach x 6; Bodyweight squat x 8; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Keep the warm-up specific and non-fatiguing.	
+Wed	Snatch	84-90 kg (75-80%)	5	2	2 min	6.5-7	Technique doubles; only move up if last week stayed sharp. If turnover or bottom position loosens, stay at the last clean load.	
+Wed	Overhead Squat	RPE-selected load	3	2	2-3 min	6.5	Receiving-position strength; stay smooth and stop well before a grind.	
+Wed	Seated Cable Row	RPE-selected load	2	8	90-120 sec	8	Horizontal pulling maintenance for upper-back balance. Support volume trimmed to 2 sets this week as the classic lifts take a larger share.	
+Thu	[WARMUP] Front Squat	20-60 kg	2	3	60 sec	3	5-8 min general prep plus left wrist prep, then rack holds and barbell ramp to work sets.; Squat-and-reach x 6; Bodyweight squat x 8; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Keep the warm-up specific and non-fatiguing.	
+Thu	Clean and Jerk	121-126 kg (86-89%)	6	1	3 min	8-8.5	Only use the top half if last week was all makes. If the clean slows or jerk lockout softens, repeat the last make instead of adding.	
+Thu	Front Squat	140-145 kg (85-88%)	2	2	3-4 min	8	Short strength hold only. Use straps if needed; if the cleans ran heavy, stay at 140 kg.	
+Thu	Chest-Supported Row	RPE-selected load	3	6	90-120 sec	8	Heavier upper-back maintenance; full squeeze each rep.	
+Thu	Machine Hamstring Curl	RPE-selected load	1	10	75-90 sec	7.5	Posterior-chain tissue support with low residual fatigue. Support volume trimmed to 1 set this week as the classic lifts take a larger share.	
+Fri	[WARMUP] Overhead Squat	20-40 kg	2	3	60 sec	3	5-8 min general prep plus shoulder and wrist prep, then barbell ramp to work sets.; Squat-and-reach x 6; Bodyweight squat x 8; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Ramp Back Squat: 60 kg x 5, 90 kg x 3, 117.5 kg x 1-2 before 150 kg work sets.; Keep the warm-up specific and non-fatiguing.	
+Fri	Snatch	93-98 kg (83-88%)	4	1	2-3 min	7.5-8	Meet-order singles from a full setup. Only use the top half if Monday stayed clean; otherwise hold the lower end.	
+Fri	Clean and Jerk	118-123 kg (84-87%)	4	1	2-3 min	7.5-8	Same meet-feel focus; if Thursday still lingers in the rack or dip-drive timing, stay low and keep every rep clean.	
+Fri	Back Squat	150 kg (77%)	2	3	3-4 min	7	Maintenance dose only; keep this unchanged across the block unless it interferes with lift quality.	
+Fri	Seated Cable Row	RPE-selected load	3	8	90-120 sec	8	Horizontal pulling maintenance; stay strict.	
+Fri	Pallof Press	RPE-selected load	1	10/side	45-60 sec	7	Brace against rotation and keep ribs down. Support volume trimmed to 1 set this week as the classic lifts take a larger share.	
+END_WEEK3_TSV
+START_WEEK4_TSV
+Day	Exercise	Weight	Sets	Reps	Rest	Target RPE	Notes	Results
+Mon	[WARMUP] Overhead Squat	20-40 kg	2	3	60 sec	3	5-8 min general prep plus left wrist prep, then barbell ramp to work sets.; Squat-and-reach x 6; Bodyweight squat x 8; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Keep the warm-up specific and non-fatiguing.	
+Mon	Snatch	97-102 kg (87-91%)	6	1	2-3 min	8-8.5	Retain Week 3 standard. Only take 100-102 kg if Week 3 was all makes; otherwise repeat the best clean Week 3 load. Support volume comes down this week so the classic lifts take a larger share as the meet approaches.	
+Mon	Front Squat	135-140 kg (82-85%)	3	2	3-4 min	7.5-8	Leg strength hold for the lifts. Use straps if the left wrist is sticky; if speed drops hard, stop at 2 sets.	
+Mon	Chest-Supported Row	RPE-selected load	1	8	90-120 sec	8	Upper-back support for turnover and receiving posture; no body English. Support volume trimmed to 1 set this week as the classic lifts take a larger share.	
+Mon	Side Plank	Bodyweight	1	35 sec/side	45 sec	7	Straight line from ankle to ear; stop before shaking changes position. Support volume trimmed to 1 set this week as the classic lifts take a larger share.	
+Tue	[WARMUP] Front Squat	20-60 kg	2	3	60 sec	3	5-8 min general prep plus left wrist prep, then rack holds and barbell ramp to work sets.; Ramp Pendlay Row in 3-4 quick sets to working load.; Keep the warm-up specific and non-fatiguing.; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12	
+Tue	Clean and Jerk	110-116 kg (78-82%)	6	1	2-3 min	6.5-7.5	Match the best clean Week 3 standard here; do not chase extra load on the technical day. If rack discomfort builds, stay low and finish with clean makes.	
+Tue	Pendlay Row	RPE-selected load	1	3	3 min	7.5-8	Explosive barbell pulling support for turnover and finish without extra rack stress; reset from the floor every rep and use straps if helpful. If torso angle rises or bar speed dies, hold the load or reduce 2.5-5%. Support volume trimmed to 1 set this week as the classic lifts take a larger share.	
+Tue	Machine Hamstring Curl	RPE-selected load	1	8	75-90 sec	8	Low-soreness posterior-chain support without extra axial fatigue. Support volume trimmed to 1 set this week as the classic lifts take a larger share.	
+Wed	[WARMUP] Overhead Squat	20-40 kg	2	3	60 sec	3	5-8 min general prep plus shoulder and wrist prep, then barbell ramp to work sets.; Squat-and-reach x 6; Bodyweight squat x 8; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Keep the warm-up specific and non-fatiguing.	
+Wed	Snatch	84-90 kg (75-80%)	5	2	2 min	6.5-7	Match the best Week 3 doubles; this day stays technical. If turnover or bottom position loosens, hold the last sharp load.	
+Wed	Overhead Squat	RPE-selected load	2	2	2-3 min	6.5	Receiving-position strength; stay smooth and stop well before a grind. Support volume trimmed to 2 sets this week as the classic lifts take a larger share.	
+Wed	Seated Cable Row	RPE-selected load	1	8	90-120 sec	8	Horizontal pulling maintenance for upper-back balance. Support volume trimmed to 1 set this week as the classic lifts take a larger share.	
+Thu	[WARMUP] Front Squat	20-60 kg	2	3	60 sec	3	5-8 min general prep plus left wrist prep, then rack holds and barbell ramp to work sets.; Squat-and-reach x 6; Bodyweight squat x 8; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Keep the warm-up specific and non-fatiguing.	
+Thu	Clean and Jerk	122-127 kg (87-90%)	6	1	3 min	8-8.5	Retain Week 3 standard. Only take 125-127 kg if Week 3 was all makes; otherwise repeat the best clean Week 3 load.	
+Thu	Front Squat	140-145 kg (85-88%)	2	2	3-4 min	8	Short strength hold only. Use straps if needed; if the cleans ran heavy, stay at 140 kg.	
+Thu	Chest-Supported Row	RPE-selected load	1	6	90-120 sec	8	Heavier upper-back maintenance; full squeeze each rep. Support volume trimmed to 1 set this week as the classic lifts take a larger share.	
+Thu	Machine Hamstring Curl	RPE-selected load	1	10	75-90 sec	7.5	Posterior-chain tissue support with low residual fatigue. Support volume trimmed to 1 set this week as the classic lifts take a larger share.	
+Fri	[WARMUP] Overhead Squat	20-40 kg	2	3	60 sec	3	5-8 min general prep plus shoulder and wrist prep, then barbell ramp to work sets.; Squat-and-reach x 6; Bodyweight squat x 8; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Ramp Back Squat: 60 kg x 5, 90 kg x 3, 117.5 kg x 1-2 before 150 kg work sets.; Keep the warm-up specific and non-fatiguing.	
+Fri	Snatch	94-99 kg (84-88%)	4	1	2-3 min	7.5-8	Meet-order singles from a full setup. Keep the best Week 3 quality; only nudge load if Monday stayed crisp.	
+Fri	Clean and Jerk	119-124 kg (84-88%)	4	1	2-3 min	7.5-8	Same meet-feel focus; keep the best Week 3 standard and stay low if Thursday still lingers.	
+Fri	Back Squat	150 kg (77%)	1	3	3-4 min	7	Maintenance dose only; keep this unchanged across the block unless it interferes with lift quality. Volume here steps down as the meet nears; the squat support is maintenance now, not a target.	
+Fri	Seated Cable Row	RPE-selected load	1	8	90-120 sec	8	Horizontal pulling maintenance; stay strict. Support volume trimmed to 1 set this week as the classic lifts take a larger share.	
+Fri	Pallof Press	RPE-selected load	1	10/side	45-60 sec	7	Brace against rotation and keep ribs down. Support volume trimmed to 1 set this week as the classic lifts take a larger share.	
+END_WEEK4_TSV
+
+TAPER AUDIT
+Event: strength meet, priority A, about 7.9 weeks out.
+This block does not reach the event: it is a build block, and the taper comes later.
+
+WEEK PHASES: 1=prepeak_specificity 2=prepeak_specificity 3=prepeak_specificity 4=prepeak_specificity EVENT=strength_meet
+
+    phase                sets  exercises  competition lift  power sets  peak RPE  peak % max
+W1  prepeak specificity  65    11         48%               31          8.5       87%
+W2  prepeak specificity  65    11         48%               31          8.5       88%
+W3  prepeak specificity  65    11         48%               31          8.5       90%
+W4  prepeak specificity  65    11         48%               31          8.5       91%
+
+Across the block: volume unchanged, exercises unchanged, competition-lift share unchanged, peak effort unchanged, accessory volume unchanged.
