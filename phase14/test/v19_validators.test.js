@@ -320,3 +320,34 @@ test("validateSportDayCoupling: gym day availability and requested session count
   ]);
   assert.doesNotThrow(() => validateSportDayCoupling(good, intake));
 });
+
+// ---------------------------------------------------------------------------
+// TEST: a deliberately light session is a training day, not a rest day.
+// ---------------------------------------------------------------------------
+test("validateSportDayCoupling: a taper session counts as a scheduled gym day", () => {
+  // Fight week is low by design. Trap bar jumps and pull-ups at RPE 6 classify
+  // as accessory work, so the day read as "rest" and the calendar validator
+  // reported the fighter training one day a week against the two he asked for.
+  // No rewrite could clear it: the session was already there. The better the
+  // taper, the more reliably the violation fired.
+  const taperIntake = {
+    sport: "MMA",
+    days_per_week: 2,
+    available_gym_days: ["Tue", "Fri"],
+    sport_schedule: [{ day: "Mon", intensity: "hard" }, { day: "Wed", intensity: "hard" }],
+  };
+  const taperWeek = program([
+    "Tue\tTrap Bar Jump\tLight\t3\t3\t90s\t6\tFull reset every rep.\t",
+    "Tue\tPull-up\tBodyweight\t1\t2\t90s\t6\tCrisp, then done.\t",
+    "Fri\tTrap Bar Jump\tLight\t3\t3\t90s\t6\tSpeed only.\t",
+    "Fri\tPush-up\tBodyweight\t1\t3\t60s\t6\tShort.\t",
+  ]);
+  const review = validateSportDayCoupling(taperWeek, taperIntake);
+  assert.equal(review.ok, true, "two light sessions are two gym days");
+
+  // A week that really does schedule only one day must still be caught.
+  const oneDay = program([
+    "Tue\tTrap Bar Jump\tLight\t3\t3\t90s\t6\tFull reset every rep.\t",
+  ]);
+  assert.throws(() => validateSportDayCoupling(oneDay, taperIntake), /SPORT_DAY_COUPLING_VIOLATION/);
+});

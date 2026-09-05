@@ -392,7 +392,8 @@ const EQUIP_LIST = [
   ["Toes-to-Bar", ["pull_up_bar"]], ["Hanging Leg Raise", ["pull_up_bar"]],
   ["Dip", ["dip_bars"]], ["Parallel Bar Dip", ["dip_bars"]],
   ["Ring Dip", ["rings"]], ["Ring Row", ["rings"]], ["Ring Muscle-up", ["rings"]],
-  ["Ring Support Hold", ["rings"]], ["Ring Push-up", ["rings"]], ["Ring Hamstring Curl", ["rings"]], ["Iron Cross", ["rings"]], ["Maltese", ["rings"]],
+  ["Ring Support Hold", ["rings"]], ["Iron Cross", ["rings"]], ["Maltese", ["rings"]],
+  ["Bar Muscle-up Transition Drill", ["pull_up_bar"]], ["Ring Push-up", ["rings"]], ["Ring Hamstring Curl", ["rings"]], ["Iron Cross", ["rings"]], ["Maltese", ["rings"]],
   ["Bar Muscle-up Transition Drill", ["pull_up_bar"]],
   // band movements
   ["Band Row", ["bands"]], ["Band Pull-Apart", ["bands"]], ["Band Face Pull", ["bands"]],
@@ -1504,6 +1505,13 @@ function classifyDayType(rows, header, isHebrew) {
   if (primaryUpper) return "heavy_upper";
   if (hasStrength) return "mixed";
   if (hasCond) return "conditioning";
+  // A day of prescribed work is a training day even when nothing in it is heavy
+  // enough to read as strength or conditioning. Fight week is exactly that: trap
+  // bar jumps and pull-ups at RPE 6 all classify as accessory, so the session
+  // became "rest" and the calendar validator reported the fighter training one
+  // day a week instead of two -- a violation no rewrite could fix, because the
+  // session was already there. The better the taper, the more reliably it fired.
+  if (rows.some((cells) => classifyRow(cells, header, isHebrew) !== "warmup")) return "light";
   return "rest";
 }
 
