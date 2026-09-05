@@ -47,8 +47,13 @@ const totalSets = (rows) => rows.reduce((n, r) => n + r.sets, 0);
 // --- 1. phase labels must be earned ----------------------------------------
 
 const PHASE_CLAIMS = [
+  // A taper is often staged: 60 sets to 51 to 38 into the meet is a real taper
+  // whose first week cuts only 15%. Judging a single week in isolation called
+  // that unearned, which it plainly is not -- so a week that starts a descent
+  // counts, as long as the descent continues.
   { label: 'taper', asLabel: /\btaper(?:ing)? week\b|\bweek[^.\n]{0,24}\b(?:is|as) a taper\b/i,
-    test: (w, prev) => totalSets(w) < totalSets(prev) * 0.85 },
+    test: (w, prev, later) => totalSets(w) < totalSets(prev) * 0.85
+      || (totalSets(w) < totalSets(prev) && later != null && totalSets(later) < totalSets(w) * 0.9) },
   { label: 'deload', asLabel: /\bdeload week\b|\bweek[^.\n]{0,24}\b(?:is|as) a deload\b/i,
     test: (w, prev) => totalSets(w) < totalSets(prev) * 0.85 },
   { label: 'consolidation', asLabel: /\bconsolidation week\b|\bweek[^.\n]{0,24}\b(?:is|as) a consolidation\b/i,
@@ -72,7 +77,8 @@ export function collectPhaseLabelFlags(program, intake = {}) {
       // technique before adding load" is a coaching verb, not a phase claim,
       // and reading it as one flagged a tactical block the coach rated 8.7.
       if (!claim.asLabel.test(scope)) continue;
-      if (claim.test(cur.rows, prev.rows)) continue;
+      const next = weekRows(source, week + 1);
+      if (claim.test(cur.rows, prev.rows, next ? next.rows : null)) continue;
       flags.push({
         code: 'V87_PHASE_LABEL_NOT_EARNED',
         week, claim: claim.label,

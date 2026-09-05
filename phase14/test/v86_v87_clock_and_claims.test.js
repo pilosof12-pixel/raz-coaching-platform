@@ -84,6 +84,17 @@ test('a week that calls itself a taper must actually taper', () => {
   assert.equal(collectPhaseLabelFlags(real, {}).length, 0, 'a genuine taper must pass');
 });
 
+test('a staged taper is judged across the descent, not one week at a time', () => {
+  // The meet block fell 60 -> 51 -> 38 sets. Week 3 cut 15% exactly, so a
+  // single-week threshold called a real taper unearned by one set.
+  const mk = (w, sets, note) => `START_WEEK${w}_TSV\nDay\tExercise\tWeight\tSets\tReps\tRest\tRPE\tNotes\tResults\nMon\tSquat\t100\t${sets}\t5\t3\t7\t${note}\t\nEND_WEEK${w}_TSV`;
+  const staged = `${mk(1, 60, 'build')}\n${mk(2, 51, 'This is a taper week.')}\n${mk(3, 38, 'competition week')}`;
+  assert.equal(collectPhaseLabelFlags(staged, {}).length, 0, 'a descent that keeps descending is a taper');
+  // A week that dips and then climbs back is not the start of anything.
+  const feint = `${mk(1, 60, 'build')}\n${mk(2, 57, 'This is a taper week.')}\n${mk(3, 60, 'more work')}`;
+  assert.equal(collectPhaseLabelFlags(feint, {}).length, 1, 'a dip that reverses is not a taper');
+});
+
 test('an accessory trained more often than the primary goal is flagged', () => {
   const program = read('run100_masters_return.txt');
   const flags = collectPriorityFlags(program, HARD.masters_return);
