@@ -1,38 +1,12 @@
 {
-  "timestamp": "2026-09-05T07:14:56.121Z",
+  "timestamp": "2026-09-05T07:53:52.264Z",
   "base": "https://raz-coaching-platform.onrender.com",
-  "head_sha": "2106506b5ab6bcc56391a505c50d4d3c4174f669",
-  "runtime": "launch-acceptance-v89-block-architecture-live42-20260905",
+  "head_sha": "deaf75fe6449e27b8e6bbbe4f0c402c7957969da",
+  "runtime": "launch-acceptance-v89-allocation-v77-inherit-live43-20260905",
   "results": [
     {
-      "id": "weightlifter_peak",
-      "job_id": "117dd6f37a3735b418a75ef7e0eea2a7",
-      "ok": true,
-      "status": "done",
-      "stage": "finalizing",
-      "attempt": 0,
-      "detail": "saving program",
-      "last_seen_status": "done",
-      "error": null,
-      "program_chars": 27946,
-      "seconds": 391
-    },
-    {
-      "id": "inseason_footballer",
-      "job_id": "6a3123f69bddf13ca2e59f5475a48bf0",
-      "ok": true,
-      "status": "done",
-      "stage": "finalizing",
-      "attempt": 0,
-      "detail": "saving program",
-      "last_seen_status": "done",
-      "error": null,
-      "program_chars": 11343,
-      "seconds": 256
-    },
-    {
       "id": "masters_return",
-      "job_id": "d237ee9cc3467575b0ed4e1b29213782",
+      "job_id": "4820f119fc0f1bc14423f88bfc15f4a8",
       "ok": true,
       "status": "done",
       "stage": "finalizing",
@@ -40,28 +14,26 @@
       "detail": "saving program",
       "last_seen_status": "done",
       "error": null,
-      "program_chars": 16210,
-      "seconds": 235
+      "program_chars": 16481,
+      "seconds": 240
     },
     {
       "id": "weightlifter_meet_week",
-      "job_id": "07edf633d5fdb9ac546683d2fa009d24",
-      "ok": false,
-      "status": "error",
-      "stage": "refining",
-      "attempt": 4,
-      "detail": "internal repair: V77_FIGHT_WEEK_NOT_ON_THE_CLOCK",
-      "last_seen_status": "error",
-      "error": "Internal coaching QA could not repair the candidate program after multiple passes. No client-facing program was saved. Please retry the build. QA trace: A1:V34_NOTE_UNDEFINED_LOAD_REFERENCE+V38_CONSECUTIVE_CONFLICTING_EXPOSURE+V77_FIGHT_WEEK_NOT_ON_THE_CLOCK -> A2:V77_FIGHT_WEEK_NOT_ON_THE_CLOCK -> A3:V77_FIGHT_WEEK_NOT_ON_THE_CLOCK -> A4:V77_FIGHT_WEEK_NOT_ON_THE_CLOCK. Last failure detail: Week 4 is competition week but Overhead Squat is presented by weekday alone. Competition week runs Day -7 to Day 0: every session should say how far it sits from the event, because that is the only thing that decides whether it belongs there. [QA:INTERNAL_QA_REPAIR_EXHAUSTED]",
-      "program_chars": 0,
-      "seconds": 485
+      "job_id": "012e520f5e0d1a7f44a3f203bd74afc9",
+      "ok": true,
+      "status": "done",
+      "stage": "finalizing",
+      "attempt": 0,
+      "detail": "saving program",
+      "last_seen_status": "done",
+      "error": null,
+      "program_chars": 20873,
+      "seconds": 667
     }
   ],
   "selection": [
-    "weightlifter_peak",
-    "inseason_footballer",
     "masters_return",
     "weightlifter_meet_week"
   ],
-  "ok": false
+  "ok": true
 }
