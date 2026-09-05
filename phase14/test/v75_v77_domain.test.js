@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 
 import { cutSize, makingWeight, collectWeightCutFlags } from '../engine/v75_weight_cut.js';
-import { collectFightWeekClockFlags } from '../engine/v77_fight_week_clock.js';
+import { collectFightWeekClockFlags, repairFightWeekClock } from '../engine/v77_fight_week_clock.js';
 
 const COMP = JSON.parse(fs.readFileSync(new URL('./fixtures/competition_avatars.json', import.meta.url), 'utf8'));
 const CORE = JSON.parse(fs.readFileSync(new URL('./fixtures/acceptance_intakes.json', import.meta.url), 'utf8'));
@@ -48,4 +48,23 @@ test('the event clock speaks the sport the athlete actually does', () => {
   const fighter = collectFightWeekClockFlags(bare, FIGHTER);
   assert.equal(fighter.length, 1);
   assert.match(fighter[0].detail, /Fight week runs Day -7 to Day 0/);
+});
+
+test('a continuation row with no day of its own is still placeable', () => {
+  // A session's rows often carry the day only on the first line. The collector
+  // flagged every row without a clock while the repair could only place rows
+  // whose day it resolved, so a continuation row was flagged forever and never
+  // fixed: four attempts, then a dead build. This killed the peak block twice.
+  const program = ['A block.', '', 'START_WEEK4_TSV',
+    'Day\tExercise\tWeight\tSets\tReps\tRest\tTarget RPE\tNotes\tResults',
+    'Wed\tSnatch\t100 kg\t3\t1\t3 min\t7\tCrisp singles.\t',
+    '\tOverhead Squat\t80 kg\t2\t3\t2 min\t6\tEasy.\t',
+    'END_WEEK4_TSV'].join('\n');
+
+  assert.equal(collectFightWeekClockFlags(program, LIFTER).length, 1);
+  const repaired = repairFightWeekClock(program, LIFTER);
+  assert.equal(collectFightWeekClockFlags(repaired, LIFTER).length, 0,
+    'the repair must be able to place every row the rule flags');
+  assert.match(repaired, /Day -3: Easy\./, 'the continuation row inherits its session day');
+  assert.equal(repairFightWeekClock(repaired, LIFTER), repaired, 'repair is not idempotent');
 });

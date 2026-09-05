@@ -5,7 +5,7 @@ import fs from 'node:fs';
 import {
   hasDayZero, collectDayZeroFlags, repairDayZeroClaims,
   matchOffsets, collectMatchDayFlags, repairMatchDayPlacement,
-  sportShareByWeek, collectAllocationFlags, buildBlockArchitectureBrief,
+  sportShareByWeek, collectAllocationFlags, repairAllocationShift, buildBlockArchitectureBrief,
 } from '../engine/v89_block_architecture.js';
 
 const T = new URL('./fixtures/', import.meta.url);
@@ -98,10 +98,36 @@ test('a flat sport share across a return block is flagged', () => {
   const program = read('run101_masters_return.txt');
   const shares = sportShareByWeek(program, HARD.masters_return);
   assert.equal(shares.length, 4);
-  assert.ok(shares.every((w) => Math.abs(w.share - shares[0].share) < 0.01), 'fixture should be flat');
+  // Measured in sets rather than rows: the delivered block drifts two points
+  // across four weeks, which read as flat to the coach because it is.
+  assert.ok(shares[3].share - shares[0].share < 0.03, 'fixture should barely move');
   const flags = collectAllocationFlags(program, HARD.masters_return);
   assert.equal(flags.length, 1);
   assert.match(flags[0].detail, /A return is not finished when the gym exercises progress/);
+});
+
+test('the allocation repair shifts the balance without inventing sport sessions', () => {
+  // A brief alone did not move this: the delivered block sat at 32% of sets in
+  // every week. The shift comes from the general work receding, which is the
+  // same mechanism the intensification block already uses -- the sport's own
+  // sets are untouched.
+  const program = read('run101_masters_return.txt');
+  const before = sportShareByWeek(program, HARD.masters_return);
+  const repaired = repairAllocationShift(program, HARD.masters_return);
+  const after = sportShareByWeek(repaired, HARD.masters_return);
+
+  assert.ok(after[3].share > before[3].share, 'week 4 must end more specific than it started');
+  assert.deepEqual(after.map((w) => w.sport), before.map((w) => w.sport), 'sport sets must not change');
+  assert.equal(collectAllocationFlags(repaired, HARD.masters_return).length, 0, 'the repair must answer its own flag');
+  assert.equal(repairAllocationShift(repaired, HARD.masters_return), repaired, 'repair is not idempotent');
+});
+
+test('the rule asks only for a shift trimming can reach', () => {
+  // Trimming has a floor of one set per row. A fixed target the block cannot
+  // hit is unrepairable and spends the attempt budget, which is how the peak
+  // block died twice.
+  const repaired = repairAllocationShift(read('run101_masters_return.txt'), HARD.masters_return);
+  assert.equal(collectAllocationFlags(repaired, HARD.masters_return).length, 0);
 });
 
 test('a block that does shift is not flagged', () => {

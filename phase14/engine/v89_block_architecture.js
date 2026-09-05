@@ -192,8 +192,12 @@ export function sportShareByWeek(program, intake = {}) {
     parsed.rows.forEach((cells) => {
       const name = String(cells[parsed.exercise] || '').trim();
       if (!name || isWarmup(name)) return;
-      total += 1;
-      if (re.test(name)) sport += 1;
+      // Sets, not rows: a row count cannot be moved without inventing or
+      // deleting exercises, and the honest way to shift the balance is to trim
+      // the general work that is standing in for the sport.
+      const sets = Number(String(cells[parsed.sets] || '').match(/\d+/)?.[0]) || 0;
+      total += sets;
+      if (re.test(name)) sport += sets;
     });
     if (!total) return null;
     out.push({ week, sport, total, share: sport / total });
@@ -201,9 +205,69 @@ export function sportShareByWeek(program, intake = {}) {
   return out;
 }
 
-// Not wired as a blocking rule: rebalancing a block toward the sport means
-// deciding what to remove and what to add, which is programming, not an edit.
-// The brief carries it; this collector is for offline QA.
+// The same mechanism the intensification block already uses: specificity rises
+// by the support work receding around the thing that matters, not by adding
+// sessions the athlete has no room for. A brief alone did not move this -- the
+// delivered block sat at 30% of sets in all four weeks -- so it is enforced.
+
+export function repairAllocationShift(program, intake = {}, now = Date.now()) {
+  if (governingClock(intake, now) !== CLOCK.REHAB) return String(program || '');
+  if (rehabStage(intake) === STAGE.PROTECTED) return String(program || '');
+  const re = sportPattern(intake);
+  if (!re) return String(program || '');
+  let out = String(program || '');
+
+  const start = sportShareByWeek(out, intake);
+  if (!start || start.length < 4) return out;
+  if (start[3].share >= start[0].share + 0.06) return out;
+
+  // Raise the share in the later weeks by trimming general accessory sets, in
+  // the order a coach would drop them, never below one set and never touching
+  // the sport itself.
+  for (const week of [3, 4]) {
+    const target = start[0].share + (week === 3 ? 0.03 : 0.06);
+    // Bounded only against a pathological program: the loop already stops when
+    // the target is met or nothing can be cut, and an arbitrary six passes left
+    // the share short of what the rule then demanded.
+    for (let pass = 0; pass < 60; pass += 1) {
+      const now2 = sportShareByWeek(out, intake);
+      if (!now2 || now2[week - 1].share >= target) break;
+      const parsed = parseWeek(out, week);
+      if (!parsed) break;
+      const rows = parsed.rows.map((c) => c.slice());
+      let cut = false;
+      for (const pattern of GENERAL_CUT_ORDER) {
+        const i = rows.findIndex((cells) => {
+          const name = String(cells[parsed.exercise] || '').trim();
+          if (!name || isWarmup(name) || re.test(name)) return false;
+          if (!pattern.test(name)) return false;
+          return (Number(String(cells[parsed.sets] || '').match(/\d+/)?.[0]) || 0) > 1;
+        });
+        if (i < 0) continue;
+        const sets = Number(String(rows[i][parsed.sets]).match(/\d+/)[0]);
+        rows[i][parsed.sets] = String(sets - 1);
+        if (Number.isInteger(parsed.notes)) {
+          const note = String(rows[i][parsed.notes] || '');
+          const add = 'Trimmed as the block shifts toward the sport: general work gives way as tolerance for the event improves.';
+          if (!note.includes('shifts toward the sport')) rows[i][parsed.notes] = note ? `${note} ${add}` : add;
+        }
+        cut = true;
+        break;
+      }
+      if (!cut) break;
+      const rebuilt = [parsed.header.join('\t'), ...rows.map((c) => c.join('\t'))].join('\n');
+      out = out.replace(parsed.re, `$1${rebuilt}$3`);
+    }
+  }
+  return out;
+}
+
+const GENERAL_CUT_ORDER = [
+  /\b(?:plank|dead bug|pallof|side plank|trunk|ab wheel)\b/i,
+  /\b(?:curl|extension|raise|fly|pull-?down|face pull)\b/i,
+  /\b(?:press|bench|row)\b/i,
+];
+
 export function collectAllocationFlags(program, intake = {}, now = Date.now()) {
   if (governingClock(intake, now) !== CLOCK.REHAB) return [];
   const stage = rehabStage(intake);
@@ -211,9 +275,39 @@ export function collectAllocationFlags(program, intake = {}, now = Date.now()) {
   const weeks = sportShareByWeek(program, intake);
   if (!weeks || weeks.length < 4) return [];
 
+  // A meaningful shift, not a rounding drift. The delivered block moved two
+  // points across four weeks and read as flat to the coach, which it was.
+  const MEANINGFUL_SHIFT = 0.06;
   const first = weeks[0].share;
   const last = weeks[weeks.length - 1].share;
-  if (last > first + 0.02) return [];
+  if (last >= first + MEANINGFUL_SHIFT) return [];
+
+  // Only ask for a shift the final week can actually reach. Trimming has a
+  // floor of one set per row, so simulate cutting everything cuttable in the
+  // week that has to rise and see where the share lands. Counting trimmable
+  // work across both weeks let week 3's leftovers keep the rule demanding a
+  // week-4 shift that had nothing left to give -- the same collector/repair
+  // divergence that killed the peak block twice.
+  const re = sportPattern(intake);
+  const parsed = parseWeek(program, 4);
+  if (!parsed) return [];
+  let sportSets = 0;
+  let floorTotal = 0;
+  parsed.rows.forEach((cells) => {
+    const name = String(cells[parsed.exercise] || '').trim();
+    if (!name || isWarmup(name)) return;
+    const sets = Number(String(cells[parsed.sets] || '').match(/\d+/)?.[0]) || 0;
+    if (re && re.test(name)) { sportSets += sets; floorTotal += sets; return; }
+    floorTotal += GENERAL_CUT_ORDER.some((pattern) => pattern.test(name)) ? Math.min(sets, 1) : sets;
+  });
+  // Ask for the smaller of "a meaningful shift" and "everything trimming can
+  // reach". A fixed target the block cannot hit is unrepairable and kills the
+  // build; a target of only what it can hit still has teeth, because the
+  // delivered block did not come close to it.
+  const achievable = floorTotal ? sportSets / floorTotal : 0;
+  const required = Math.min(first + MEANINGFUL_SHIFT, achievable);
+  if (required <= first + 0.005) return []; // nothing to ask for
+  if (last >= required - 0.005) return [];
 
   const shown = weeks.map((w) => `W${w.week} ${Math.round(w.share * 100)}%`).join(', ');
   return [{

@@ -63,6 +63,21 @@ function eventNoun(intake = {}) {
   return eventType(intake) === 'combat' ? 'Fight week' : 'Competition week';
 }
 
+// A session's rows often carry the day only on the first line, leaving the rest
+// blank. The collector flagged every row without a clock while the repair could
+// only place rows whose day it could resolve, so a continuation row was flagged
+// forever and never fixed -- four attempts, then a dead build. Both sides now
+// read the day the same way, inheriting it down the session, so they cannot
+// disagree about which rows are placeable.
+function rowsWithDays(parsed, intake, now) {
+  let lastDay = '';
+  return parsed.rows.map((cells) => {
+    const raw = String(cells[parsed.day] || '').trim();
+    if (raw) lastDay = raw;
+    return { cells, day: lastDay, out: daysOut(lastDay, intake, now) };
+  });
+}
+
 export function collectFightWeekClockFlags(program, intake = {}, now = Date.now()) {
   const profile = competitionProfile(intake, now);
   if (!profile || !eventWeekday(intake)) return [];
@@ -72,9 +87,10 @@ export function collectFightWeekClockFlags(program, intake = {}, now = Date.now(
     if (stateForWeek(intake, week, now) !== STATE.COMPETITION_WEEK) continue;
     const parsed = parseWeek(program, week);
     if (!parsed || !Number.isInteger(parsed.notes)) continue;
-    for (const cells of parsed.rows) {
+    for (const { cells, out: dayOut } of rowsWithDays(parsed, intake, now)) {
       const name = String(cells[parsed.exercise] || '').trim();
       if (!name || isWarmup(name)) continue;
+      if (dayOut == null) continue; // unplaceable: the repair cannot fix it, so do not demand it
       const note = String(cells[parsed.notes] || '');
       if (!CLOCK.test(note)) {
         flags.push({
@@ -102,12 +118,15 @@ export function repairFightWeekClock(program, intake = {}, now = Date.now()) {
 
     const rows = parsed.rows.map((c) => c.slice());
     let changed = false;
+    let carriedDay = '';
     for (const cells of rows) {
       const name = String(cells[parsed.exercise] || '').trim();
+      const rawDay = String(cells[parsed.day] || '').trim();
+      if (rawDay) carriedDay = rawDay;
       if (!name || isWarmup(name)) continue;
       const note = String(cells[parsed.notes] || '').trim();
       if (CLOCK.test(note)) continue;
-      const d = daysOut(cells[parsed.day], intake);
+      const d = daysOut(carriedDay, intake, now);
       if (d == null) continue;
 
       const label = d === 0 ? 'Day 0 (event day)' : `Day -${d}`;
