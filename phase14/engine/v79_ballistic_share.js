@@ -1,6 +1,6 @@
 // engine/v79_ballistic_share.js
 //
-// Near the fight, swap generic work out rather than trimming it down.
+// Near the event, swap generic work out rather than trimming it down.
 //
 // The camp economy rule cut sessions to a budget and the power rule added one
 // ballistic exposure, which together produced a smaller version of a gym
@@ -18,7 +18,7 @@
 // camp acquires soreness it cannot afford.
 
 import { parseWeek } from './v34_workload_accounting.js';
-import { STATE, stateForWeek, competitionProfile } from './v68_competition_state.js';
+import { STATE, stateForWeek, competitionProfile, nearEventPhrase, eventType } from './v68_competition_state.js';
 import { isPowerExposure } from './v72_combat_power.js';
 
 const NECK_GRIP = /\b(?:neck|grip|farmer|wrist)\b/i;
@@ -43,6 +43,14 @@ const BALLISTIC_OPTIONS = [
 ];
 
 function isWarmup(n) { return /^\s*\[WARMUP\]/i.test(String(n || '')); }
+
+// A primer is cheap by construction: it is thrown, jumped or pushed, and it
+// costs almost nothing to recover from. The classifier calls a barbell snatch a
+// power exposure too, and it is right about the physics -- but promoting one as
+// a "familiar ballistic swap" put Snatch 5 x 2 into a meet week at RPE 7, which
+// is a stimulus wearing a primer's name. The competition lift is the event, not
+// the thing you replace an accessory with.
+const LOW_COST_BALLISTIC = /\b(?:jump|throw|slam|toss|hop|bound|skip|med(?:icine)? ?ball|explosive push-?up|clap push-?up)\b/i;
 function txt(v) { return (Array.isArray(v) ? v : [v]).map((x) => String(x || '')).join(' '); }
 
 // Every ballistic movement the athlete has already performed earlier in this
@@ -56,6 +64,7 @@ function familiarBallistic(program, week) {
     parsed.rows.forEach((cells) => {
       const name = String(cells[parsed.exercise] || '').trim();
       if (!name || isWarmup(name) || !isPowerExposure(name)) return;
+      if (!LOW_COST_BALLISTIC.test(name)) return;
       if (seen.has(name)) return;
       const at = (i) => (Number.isInteger(i) ? String(cells[i] || '') : '');
       const rpeCol = parsed.header.findIndex((h) => /rpe|effort/i.test(String(h || '')));
@@ -146,7 +155,7 @@ export function collectBallisticShareFlags(program, intake = {}, now = Date.now(
       flags.push({
         code: 'V79_TOO_GENERIC_NEAR_EVENT',
         week, day,
-        detail: `Week ${week} ${day} is mostly generic gym work this close to the fight (${generic.join(', ')}). `
+        detail: `Week ${week} ${day} is mostly generic gym work this close to the event (${generic.join(', ')}). `
           + `As Day 0 approaches the session should look less like a gym programme and more like a small set of familiar ballistic and sport-support primers. Replace generic accessory work rather than only reducing its sets.`,
       });
     }
@@ -196,7 +205,7 @@ export function repairBallisticShare(program, intake = {}, now = Date.now()) {
         const rpeCol = parsed.header.findIndex((h) => /rpe|effort/i.test(String(h || '')));
         if (rpeCol >= 0) cells[rpeCol] = option.rpe;
         if (Number.isInteger(parsed.notes)) {
-          cells[parsed.notes] = `${option.note} Replaces ${target.name}: closer to the fight this buys more than another accessory set.`;
+          cells[parsed.notes] = `${option.note} Replaces ${target.name}: ${nearEventPhrase(intake)} this buys more than another accessory set.`;
         }
         changed = true;
       }
@@ -218,7 +227,7 @@ export function buildBallisticShareBrief(intake = {}, now = Date.now()) {
     '  PREFER WHAT THE ATHLETE ALREADY DOES, but do not refuse to introduce ballistic work late in the camp. Correctly dosed plyometrics leave very little soreness and build almost no muscle: they keep an athlete sharp, fast and powerful without accumulating fatigue, which is exactly what is wanted near the event.',
     '  THE DOSE IS WHAT MAKES THAT TRUE. A few crisp sets of a few reps -- roughly three sets of three, never beyond four sets of five, and well under twenty ground contacts -- with full recovery between them and the set stopped the moment speed drops. High-volume or high-rep jumping is a different exercise physiologically: the landing volume costs real tissue damage, and that does not belong in a taper.',
     '  Keep only the minimum strength maintenance the athlete needs. Every remaining generic exercise must justify itself against a ballistic or sport-specific alternative.',
-    '  The last session before the fight is a brief neural primer, not a gym session: two to four familiar explosive drills, ten to twenty minutes, or nothing at all if the cut or readiness says so.',
+    `  The last session before ${eventType(intake) === 'combat' ? 'the fight' : 'the event'} is a brief neural primer, not a gym session: two to four familiar explosive drills, ten to twenty minutes, or nothing at all if readiness says so.`,
     '  None of this is a licence to pile on volume. Everything here is technically clean, very low volume, and must leave no soreness -- the exposure is the point, the fatigue is not.',
   ].join('\n');
 }

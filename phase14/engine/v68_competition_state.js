@@ -182,6 +182,19 @@ export function freshnessPriority(state) {
   }
 }
 
+// The clock is the same for any event -- Day -7 to Day 0 -- but the words are
+// not. Telling a weightlifter about "fight week" is a rule speaking about a
+// sport the athlete does not do. It lived in the fight-week module, so the
+// ballistic-swap rule reintroduced the same mistake with its own wording; it
+// belongs here, where every event rule can reach it.
+export function eventNoun(intake = {}) {
+  return eventType(intake) === 'combat' ? 'Fight week' : 'Competition week';
+}
+
+export function nearEventPhrase(intake = {}) {
+  return eventType(intake) === 'combat' ? 'closer to the fight' : 'closer to the event';
+}
+
 export function competitionProfile(intake = {}, now = Date.now()) {
   if (!hasEvent(intake)) return null;
   const out = weeksOut(intake, now);

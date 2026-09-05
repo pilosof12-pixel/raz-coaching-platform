@@ -42,7 +42,8 @@ import { collectClusterFlags } from './v81_cluster_notation.js'; // V81-CLUSTER-
 import { collectCampSharpeningFlags } from './v82_camp_sharpening.js'; // V82-CAMP-SHARPENING-WIRED
 import { collectInSeasonFlags, collectSportWeekFlags } from './v83_in_season.js'; // V83-IN-SEASON-WIRED
 import { collectClockFlags } from './v86_training_clock.js'; // V86-TRAINING-CLOCK-WIRED
-import { collectDayZeroFlags, collectMatchDayFlags, collectAllocationFlags } from './v89_block_architecture.js'; // V89-BLOCK-ARCHITECTURE-WIRED
+import { collectDayZeroFlags, collectMatchDayFlags, collectAllocationFlags, collectSportFrequencyFlags } from './v89_block_architecture.js'; // V89-BLOCK-ARCHITECTURE-WIRED
+import { collectCompetitionWeekFlags } from './v90_competition_week.js'; // V90-COMPETITION-WEEK-WIRED
 import { collectLanguageAccuracyFlags, LANGUAGE_HARD_CODES, repairCountClaims } from './v46_language_accuracy.js'; // V46-LANGUAGE-ACCURACY-WIRED
 import { repairDeterministicContradictions } from './v35_deterministic_repair.js'; // V35-DETERMINISTIC-REPAIR-WIRED
 import { normalizeAdvancedHybridWeek4OapConsolidation } from './advanced_hybrid_oap_consolidation_normalizer.js';
@@ -565,7 +566,8 @@ export function collectRepairableValidationFailures(program, intake = {}, option
       ...collectInSeasonFlags(candidate, intake), ...collectSportWeekFlags(candidate, intake),
       ...collectClockFlags(candidate, intake),
       ...collectDayZeroFlags(candidate, intake), ...collectMatchDayFlags(candidate, intake),
-      ...collectAllocationFlags(candidate, intake)];
+      ...collectAllocationFlags(candidate, intake), ...collectSportFrequencyFlags(candidate, intake),
+      ...collectCompetitionWeekFlags(candidate, intake)];
     if (!lean.length) return;
     throw new RetriableValidationError(lean[0].code,
       lean.map((f) => f.detail).join(' '), { flags: lean });

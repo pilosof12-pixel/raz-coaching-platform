@@ -170,9 +170,23 @@ export function repairMatchDayPlacement(program, intake = {}) {
 
 // --- 3. a return shifts allocation toward the sport -------------------------
 
+// A gym pulling machine is not the sport. "Rowing (masters)" produced the
+// pattern /row/, which counted Cable Row, Seated Row Machine and
+// Chest-Supported Row as sport exposure -- so the block reported a 34% share of
+// the sport while the erg itself accounted for 15%, and the allocation rule
+// believed a shift that had not happened. Whatever the sport, a row that names
+// a gym implement is general work standing in for it.
+const GYM_IMPLEMENT = /\b(?:cable|seated|chest[- ]supported|machine|dumbbell|barbell|bent[- ]over|inverted|ring|pendlay|t[- ]bar|single[- ]arm|landmine)\b/i;
+
+export function isSportRow(name, re) {
+  const n = String(name || '');
+  if (!re || !re.test(n)) return false;
+  return !GYM_IMPLEMENT.test(n);
+}
+
 function sportPattern(intake = {}) {
   const sport = String(intake.sport || '').toLowerCase();
-  if (/row/.test(sport)) return /\b(?:erg|ergometer|row(?:ing)?)\b/i;
+  if (/row/.test(sport)) return /\b(?:erg|ergometer|on[- ]water|scull|sweep|row(?:ing)?)\b/i;
   if (/run|athletic/.test(sport)) return /\b(?:run|running|tempo|interval|track)\b/i;
   if (/swim/.test(sport)) return /\b(?:swim|pool)\b/i;
   if (/cycl|bike/.test(sport)) return /\b(?:bike|cycling|turbo)\b/i;
@@ -197,7 +211,7 @@ export function sportShareByWeek(program, intake = {}) {
       // the general work that is standing in for the sport.
       const sets = Number(String(cells[parsed.sets] || '').match(/\d+/)?.[0]) || 0;
       total += sets;
-      if (re.test(name)) sport += sets;
+      if (isSportRow(name, re)) sport += sets;
     });
     if (!total) return null;
     out.push({ week, sport, total, share: sport / total });
@@ -239,7 +253,7 @@ export function repairAllocationShift(program, intake = {}, now = Date.now()) {
       for (const pattern of GENERAL_CUT_ORDER) {
         const i = rows.findIndex((cells) => {
           const name = String(cells[parsed.exercise] || '').trim();
-          if (!name || isWarmup(name) || re.test(name)) return false;
+          if (!name || isWarmup(name) || isSportRow(name, re)) return false;
           if (!pattern.test(name)) return false;
           return (Number(String(cells[parsed.sets] || '').match(/\d+/)?.[0]) || 0) > 1;
         });
@@ -297,7 +311,7 @@ export function collectAllocationFlags(program, intake = {}, now = Date.now()) {
     const name = String(cells[parsed.exercise] || '').trim();
     if (!name || isWarmup(name)) return;
     const sets = Number(String(cells[parsed.sets] || '').match(/\d+/)?.[0]) || 0;
-    if (re && re.test(name)) { sportSets += sets; floorTotal += sets; return; }
+    if (isSportRow(name, re)) { sportSets += sets; floorTotal += sets; return; }
     floorTotal += GENERAL_CUT_ORDER.some((pattern) => pattern.test(name)) ? Math.min(sets, 1) : sets;
   });
   // Ask for the smaller of "a meaningful shift" and "everything trimming can
@@ -314,6 +328,139 @@ export function collectAllocationFlags(program, intake = {}, now = Date.now()) {
     code: 'V89_SPORT_ALLOCATION_NOT_SHIFTING',
     detail: `The sport's share of the work does not move across the block (${shown}). A return is not finished when the gym exercises progress: it is finished when the athlete is doing their sport again. As tolerance improves the allocation itself has to shift -- more of the week spent on the event, less on the general work that was standing in for it -- and here the gym progressed while the balance stayed exactly where it started.`,
   }];
+}
+
+// --- 4. the sport gets more of the week, not just a bigger slice of it ------
+//
+// Trimming accessory sets raises the sport's share arithmetically while the
+// athlete still touches their sport on exactly the same days. The coach read
+// that as what it is: "shift frequency and training budget toward the actual
+// sport, not only by trimming accessory sets but by replacing some gym work
+// with additional low-cost sport exposure." So the block has to buy the sport
+// another day, and pay for it by giving up a gym slot rather than by adding a
+// session the returning athlete has no room for.
+
+// How many days a week actually touch the sport.
+export function sportDaysByWeek(program, intake = {}) {
+  const re = sportPattern(intake);
+  if (!re) return null;
+  const out = [];
+  for (let week = 1; week <= 4; week += 1) {
+    const parsed = parseWeek(program, week);
+    if (!parsed) return null;
+    const days = new Set();
+    const sportDays = new Set();
+    let lastDay = '';
+    parsed.rows.forEach((cells) => {
+      const raw = String(cells[parsed.day] || '').trim();
+      if (raw) lastDay = raw;
+      const name = String(cells[parsed.exercise] || '').trim();
+      if (!name || isWarmup(name) || !lastDay) return;
+      days.add(lastDay);
+      if (isSportRow(name, re)) sportDays.add(lastDay);
+    });
+    out.push({ week, days: days.size, sport: sportDays.size, dayList: [...days], sportList: [...sportDays] });
+  }
+  return out;
+}
+
+export function collectSportFrequencyFlags(program, intake = {}, now = Date.now()) {
+  if (governingClock(intake, now) !== CLOCK.REHAB) return [];
+  if (rehabStage(intake) === STAGE.PROTECTED) return [];
+  const weeks = sportDaysByWeek(program, intake);
+  if (!weeks || weeks.length < 4) return [];
+  if (weeks[3].sport > weeks[0].sport) return [];
+  // Only ask for a day the week can actually give up: there must be a session
+  // with no sport in it and something general to replace.
+  if (!replaceableDay(program, 4, intake)) return [];
+  const shown = weeks.map((w) => `W${w.week} ${w.sport}/${w.days}`).join(', ');
+  return [{
+    code: 'V89_SPORT_FREQUENCY_STATIC',
+    detail: `The athlete touches their sport on the same number of days in week 4 as in week 1 (${shown} days). Trimming accessory sets moves the percentages without moving the training: as tolerance improves the sport should get more of the week, bought by replacing a gym slot with an additional low-cost exposure -- short, easy and well inside what the athlete tolerates -- not by adding a session on top.`,
+  }];
+}
+
+// A day carrying no sport work and at least one general exercise that could
+// give up its place.
+function replaceableDay(program, week, intake) {
+  const re = sportPattern(intake);
+  const parsed = parseWeek(program, week);
+  if (!re || !parsed) return null;
+  const byDay = new Map();
+  let lastDay = '';
+  parsed.rows.forEach((cells, index) => {
+    const raw = String(cells[parsed.day] || '').trim();
+    if (raw) lastDay = raw;
+    const name = String(cells[parsed.exercise] || '').trim();
+    if (!name || isWarmup(name) || !lastDay) return;
+    if (!byDay.has(lastDay)) byDay.set(lastDay, []);
+    byDay.get(lastDay).push({ index, name });
+  });
+  for (const [day, rows] of byDay) {
+    if (rows.some((r) => isSportRow(r.name, re))) continue;
+    for (const pattern of GENERAL_CUT_ORDER) {
+      const target = rows.find((r) => pattern.test(r.name));
+      if (target) return { parsed, day, target };
+    }
+  }
+  return null;
+}
+
+// The sport as the program already names it, so an added exposure uses a
+// movement the athlete is already doing and the dictionary already accepts.
+function sportExerciseName(program, intake) {
+  const re = sportPattern(intake);
+  if (!re) return null;
+  const counts = new Map();
+  for (let week = 1; week <= 4; week += 1) {
+    const parsed = parseWeek(program, week);
+    if (!parsed) continue;
+    parsed.rows.forEach((cells) => {
+      const name = String(cells[parsed.exercise] || '').replace(/^\s*\[WARMUP\]\s*/i, '').trim();
+      if (!name || !isSportRow(name, re)) return;
+      counts.set(name, (counts.get(name) || 0) + 1);
+    });
+  }
+  if (!counts.size) return null;
+  return [...counts.entries()].sort((a, b) => b[1] - a[1])[0][0];
+}
+
+export function repairSportFrequency(program, intake = {}, now = Date.now()) {
+  if (governingClock(intake, now) !== CLOCK.REHAB) return String(program || '');
+  if (rehabStage(intake) === STAGE.PROTECTED) return String(program || '');
+  let out = String(program || '');
+  const weeks = sportDaysByWeek(out, intake);
+  if (!weeks || weeks.length < 4) return out;
+  if (weeks[3].sport > weeks[0].sport) return out;
+  const name = sportExerciseName(out, intake);
+  if (!name) return out;
+
+  // Week 4 buys the day. Week 3 buys one too if it is still level with week 1,
+  // so the shift reads as a progression rather than a step at the end.
+  for (const week of [3, 4]) {
+    const before = sportDaysByWeek(out, intake);
+    if (!before) break;
+    if (before[week - 1].sport > before[0].sport) continue;
+    const spot = replaceableDay(out, week, intake);
+    if (!spot) continue;
+    const { parsed, target } = spot;
+    const rows = parsed.rows.map((c) => c.slice());
+    const cells = rows[target.index];
+    cells[parsed.exercise] = name;
+    if (Number.isInteger(parsed.load)) cells[parsed.load] = 'Easy, conversational';
+    cells[parsed.sets] = '1';
+    cells[parsed.reps] = week === 3 ? '15 min' : '20 min';
+    if (Number.isInteger(parsed.rest)) cells[parsed.rest] = 'n/a';
+    const rpeCol = parsed.header.findIndex((h) => /rpe|effort/i.test(String(h || '')));
+    if (rpeCol >= 0) cells[rpeCol] = '4';
+    if (Number.isInteger(parsed.notes)) {
+      cells[parsed.notes] = `Replaces ${target.name}: an extra low-cost exposure to the sport, easy throughout and well inside what is tolerated. `
+        + `The return is measured in how much of the week is spent on the sport, not in how much the gym work has progressed.`;
+    }
+    const rebuilt = [parsed.header.join('\t'), ...rows.map((c) => c.join('\t'))].join('\n');
+    out = out.replace(parsed.re, `$1${rebuilt}$3`);
+  }
+  return out;
 }
 
 // --- briefs -----------------------------------------------------------------
@@ -352,6 +499,8 @@ export function buildBlockArchitectureBrief(intake = {}, now = Date.now()) {
       stage === STAGE.PERFORMANCE
         ? '  This athlete is cleared, asymptomatic and well past the injury: the block should be visibly weighted toward the sport by Week 4, with gym work supporting it rather than dominating it.'
         : '  Shift the balance as tolerance is demonstrated, not on a fixed schedule -- but the direction across the block should be unmistakable.',
+      '  BUY THE SPORT ANOTHER DAY, AND PAY FOR IT. Trimming accessory sets moves the percentage without moving the training -- the athlete still touches their sport on exactly the same days. Replace a gym slot in the later weeks with an additional low-cost exposure to the sport: short, easy, well inside what the athlete tolerates, and taken instead of the general work rather than on top of it.',
+      '  A gym movement that shares a word with the sport is not the sport. A cable row is not rowing; a leg press is not cycling. Only the event itself counts toward the shift.',
       '  Say the shift out loud in the narrative, week by week, so the athlete can see the return happening rather than inferring it from exercise names.',
     );
   }

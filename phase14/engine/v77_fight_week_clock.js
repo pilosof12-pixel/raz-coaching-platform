@@ -13,7 +13,7 @@
 // spreadsheet carries it without the exporter needing to know anything.
 
 import { parseWeek } from './v34_workload_accounting.js';
-import { STATE, stateForWeek, competitionProfile, weeksOut, eventType } from './v68_competition_state.js';
+import { STATE, stateForWeek, competitionProfile, weeksOut, eventNoun } from './v68_competition_state.js';
 
 const DAY_MS = 24 * 60 * 60 * 1000;
 const WEEKDAYS = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'];
@@ -54,14 +54,6 @@ export function weighInDaysOut(intake = {}) {
 }
 
 const CLOCK = /^Day -?\d+( of \d+)?:/;
-
-// The clock is the same for any event -- Day -7 to Day 0 -- but the words are
-// not. Telling a weightlifter about "fight week" is the rule speaking about a
-// sport the athlete does not do, and it reads as though the engine has confused
-// them with someone else.
-function eventNoun(intake = {}) {
-  return eventType(intake) === 'combat' ? 'Fight week' : 'Competition week';
-}
 
 // A session's rows often carry the day only on the first line, leaving the rest
 // blank. The collector flagged every row without a clock while the repair could

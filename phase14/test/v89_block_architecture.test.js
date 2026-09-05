@@ -6,7 +6,10 @@ import {
   hasDayZero, collectDayZeroFlags, repairDayZeroClaims,
   matchOffsets, collectMatchDayFlags, repairMatchDayPlacement,
   sportShareByWeek, collectAllocationFlags, repairAllocationShift, buildBlockArchitectureBrief,
-} from '../engine/v89_block_architecture.js';
+  isSportRow,
+  sportDaysByWeek,
+  collectSportFrequencyFlags,
+  repairSportFrequency} from '../engine/v89_block_architecture.js';
 
 const T = new URL('./fixtures/', import.meta.url);
 const read = (f) => fs.readFileSync(new URL(f, T), 'utf8');
@@ -98,9 +101,11 @@ test('a flat sport share across a return block is flagged', () => {
   const program = read('run101_masters_return.txt');
   const shares = sportShareByWeek(program, HARD.masters_return);
   assert.equal(shares.length, 4);
-  // Measured in sets rather than rows: the delivered block drifts two points
-  // across four weeks, which read as flat to the coach because it is.
-  assert.ok(shares[3].share - shares[0].share < 0.03, 'fixture should barely move');
+  // Measured in sets rather than rows, and on the erg alone: counting Cable Row
+  // and Seated Row Machine as "rowing" put this fixture at 31% when the sport
+  // itself was 13.5%. Corrected, the block drifts three points across four
+  // weeks -- and only because week 4 carries less of everything.
+  assert.ok(shares[3].share - shares[0].share < 0.04, 'fixture should barely move');
   const flags = collectAllocationFlags(program, HARD.masters_return);
   assert.equal(flags.length, 1);
   assert.match(flags[0].detail, /A return is not finished when the gym exercises progress/);
@@ -157,4 +162,50 @@ test('each athlete gets the architecture brief their clock calls for', () => {
   for (const [id, intake] of Object.entries(CORE)) {
     assert.equal(buildBlockArchitectureBrief(intake), '', id);
   }
+});
+
+
+// --- 4. the sport gets more of the week, not just a bigger slice ------------
+
+test('a gym movement sharing a word with the sport is not the sport', () => {
+  // "Rowing (masters)" produced the pattern /row/, so Cable Row, Seated Row
+  // Machine and Chest-Supported Row all counted as sport exposure. The block
+  // reported a 34% share while the erg accounted for 15%, and the allocation
+  // rule believed a shift that had not happened.
+  const program = read('run101_masters_return.txt');
+  const shares = sportShareByWeek(program, HARD.masters_return);
+  assert.ok(shares[0].share < 0.2, `erg share should be small, got ${shares[0].share}`);
+  assert.ok(isSportRow('Rowing Ergometer', /\b(?:erg|ergometer|on[- ]water|scull|sweep|row(?:ing)?)\b/i));
+  for (const gym of ['Cable Row', 'Seated Row Machine', 'Chest-Supported Row', 'Barbell Row']) {
+    assert.equal(isSportRow(gym, /\b(?:erg|ergometer|on[- ]water|scull|sweep|row(?:ing)?)\b/i), false, gym);
+  }
+});
+
+test('a return that never touches the sport more often is flagged', () => {
+  const program = read('run101_masters_return.txt');
+  const days = sportDaysByWeek(program, HARD.masters_return);
+  assert.deepEqual(days.map((w) => w.sport), [2, 2, 2, 2], 'fixture touches the sport on the same days throughout');
+  const flags = collectSportFrequencyFlags(program, HARD.masters_return);
+  assert.equal(flags.length, 1);
+  assert.match(flags[0].detail, /Trimming accessory sets moves the percentages without moving the training/);
+});
+
+test('the frequency repair buys a sport day by giving up a gym slot', () => {
+  const program = read('run101_masters_return.txt');
+  const before = sportDaysByWeek(program, HARD.masters_return);
+  const repaired = repairSportFrequency(program, HARD.masters_return);
+  const after = sportDaysByWeek(repaired, HARD.masters_return);
+
+  assert.ok(after[3].sport > before[3].sport, 'week 4 must touch the sport more often');
+  assert.deepEqual(after.map((w) => w.days), before.map((w) => w.days), 'no session may be added on top');
+  assert.equal(collectSportFrequencyFlags(repaired, HARD.masters_return).length, 0, 'the repair must answer its own flag');
+  assert.equal(repairSportFrequency(repaired, HARD.masters_return), repaired, 'repair is not idempotent');
+  assert.match(repaired, /an extra low-cost exposure to the sport/);
+});
+
+test('the frequency rule leaves a protected-stage return alone', () => {
+  // Early after an injury, capacity first is correct: the rule must not push a
+  // freshly injured athlete back toward their sport on a schedule.
+  const protectedIntake = { ...HARD.masters_return, pain: { ...HARD.masters_return.pain, active: true, severity: '7/10, constant' }, injury_date: new Date().toISOString().slice(0, 10) };
+  assert.equal(collectSportFrequencyFlags(read('run101_masters_return.txt'), protectedIntake).length, 0);
 });

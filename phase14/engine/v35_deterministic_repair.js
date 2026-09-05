@@ -36,8 +36,9 @@ import { repairClusterNotation } from './v81_cluster_notation.js';
 import { repairCampSharpening } from './v82_camp_sharpening.js';
 import { repairInSeason, appendTrainingWeek } from './v83_in_season.js';
 import { repairClockStatement } from './v86_training_clock.js';
-import { repairDayZeroClaims, repairMatchDayPlacement, repairAllocationShift } from './v89_block_architecture.js';
+import { repairDayZeroClaims, repairMatchDayPlacement, repairAllocationShift, repairSportFrequency } from './v89_block_architecture.js';
 import { repairBallisticShare } from './v79_ballistic_share.js';
+import { repairCompetitionWeek } from './v90_competition_week.js';
 import { appendCompetitionBlocks } from './v73_taper_audit.js';
 import { appendCampSchedule } from './v78_sport_taper.js';
 import { classifyExercise, dayGap, stressSignature, dayKey as dayKeyOf } from './v38_movement_taxonomy.js';
@@ -1146,6 +1147,12 @@ export function repairDeterministicContradictions(program, intake = {}) {
 
   // Last of the competition repairs: the clock is written after every other
   // rule has finished editing the notes it prefixes.
+  const moreSport = repairSportFrequency(candidate, intake);
+  if (moreSport !== candidate) {
+    candidate = moreSport;
+    repairs.push({ type: 'v89_gym_slot_replaced_with_sport_exposure' });
+  }
+
   const allocated = repairAllocationShift(candidate, intake);
   if (allocated !== candidate) {
     candidate = allocated;
@@ -1206,6 +1213,15 @@ export function repairDeterministicContradictions(program, intake = {}) {
   if (ballistic !== candidate) {
     candidate = ballistic;
     repairs.push({ type: 'v79_ballistic_swapped' });
+  }
+
+  // Competition week last of the content repairs: the ballistic swap has
+  // finished deciding what the sessions are made of, so this is the only point
+  // where the week's real volume can be judged against Day 0.
+  const budgeted = repairCompetitionWeek(candidate, intake);
+  if (budgeted !== candidate) {
+    candidate = budgeted;
+    repairs.push({ type: 'v90_competition_week_freshness_budget' });
   }
 
   const onClock = repairFightWeekClock(candidate, intake);
