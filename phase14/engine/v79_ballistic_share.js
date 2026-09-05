@@ -87,7 +87,7 @@ function familiarBallistic(program, week) {
 // rightly: a live build died on exactly that contradiction between these two
 // rules. "Familiar" was in this file's own description of the work and nowhere
 // in the code that chose it.
-function chooseBallistic(intake, exclude = new Set(), familiar = new Map()) {
+function chooseBallistic(intake, exclude = new Set(), familiar = new Map(), used = new Set()) {
   // Prefer what the athlete has already done: same movement, same dose, nothing
   // to discover. But introducing one is legitimate too. Correctly dosed
   // ballistic work leaves very little soreness and builds almost no mass, so a
@@ -95,13 +95,20 @@ function chooseBallistic(intake, exclude = new Set(), familiar = new Map()) {
   // without costing recovery -- which is why the camp economy rule exempts it
   // from the novelty it otherwise refuses this close to the event. Every option
   // below is prescribed at that dose.
-  for (const [name, spec] of familiar) {
-    if (!exclude.has(name)) return spec;
-  }
   const kit = `${txt(intake.equipment)} ${txt(intake.training_location)}`;
-  return BALLISTIC_OPTIONS.find((o) => (!o.needs || o.needs.test(kit)) && !exclude.has(o.name))
-    || BALLISTIC_OPTIONS.find((o) => !o.needs && !exclude.has(o.name))
-    || null;
+  const fits = (o) => !o.needs || o.needs.test(kit);
+  const pick = (skipUsed) => {
+    for (const [name, spec] of familiar) {
+      if (exclude.has(name) || (skipUsed && used.has(name))) continue;
+      return spec;
+    }
+    return BALLISTIC_OPTIONS.find((o) => fits(o) && !exclude.has(o.name) && !(skipUsed && used.has(o.name)))
+      || BALLISTIC_OPTIONS.find((o) => !o.needs && !exclude.has(o.name) && !(skipUsed && used.has(o.name)))
+      || null;
+  };
+  // Vary it across the block first; fall back to repeating only when the
+  // athlete's kit leaves nothing else.
+  return pick(true) || pick(false);
 }
 
 function sessions(program, week) {
@@ -175,6 +182,7 @@ export function repairBallisticShare(program, intake = {}, now = Date.now()) {
     const familiar = familiarBallistic(out, week);
     const rows = parsed.rows.map((c) => c.slice());
     let changed = false;
+    const usedThisWeek = new Set();
 
     for (const [, sessionRows] of data.days) {
       if (sessionRows.length < 3) continue;
@@ -188,13 +196,14 @@ export function repairBallisticShare(program, intake = {}, now = Date.now()) {
       while (shareOf(view()) < 0.5) {
         const current = view();
         const present = new Set(current.filter((r) => isPowerExposure(r.name)).map((r) => r.name));
-        const option = chooseBallistic(intake, present, familiar);
+        const option = chooseBallistic(intake, present, familiar, usedThisWeek);
         if (!option) break;
 
         // Swap the most generic row rather than adding to the session.
         const target = current.find((r) => SWAPPABLE.test(r.name) && !isPowerExposure(r.name));
         if (!target) break;
         swapped.set(target.index, option.name);
+        usedThisWeek.add(option.name);
 
         const cells = rows[target.index];
         cells[parsed.exercise] = option.name;

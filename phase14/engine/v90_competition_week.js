@@ -26,6 +26,8 @@ const DAY_OFFSET = /day\s*-\s*(\d+)/i;
 // Reps a competition lift may keep, per lift, per session. Three singles keeps
 // the groove; ten reps of doubles is a training session wearing a taper's name.
 const TOUCH_BUDGET = 3;
+// Days of competition week a single exercise may appear on.
+const MAX_EXPOSURE_DAYS = 2;
 // A conditional on a row is not a conditional on the session. "Only if you feel
 // snappy" against one box jump left the rule satisfied while the snatches below
 // it were still prescribed flatly -- which is the exact week the coach read and
@@ -148,6 +150,30 @@ export function collectCompetitionWeekFlags(program, intake = {}, now = Date.now
     });
   });
 
+  // No exercise earns a place on most days of competition week. The budget was
+  // written against the competition lifts, so the ballistic swap quietly put
+  // Explosive Push-up 3 x 3 on all five days of a meet week -- the same
+  // redundant repeated exposure the coach objected to, wearing a different
+  // name. Freshness does not care which exercise is spending it.
+  const byExercise = new Map();
+  sessions.forEach((session) => {
+    new Set(session.rows.filter((r) => !matcher.re.test(r.name)).map((r) => r.name.toLowerCase())).forEach((name) => {
+      if (!byExercise.has(name)) byExercise.set(name, []);
+      byExercise.get(name).push(session);
+    });
+  });
+  for (const [name, on] of byExercise) {
+    if (on.length <= MAX_EXPOSURE_DAYS) continue;
+    const shown = on[0].rows.find((r) => r.name.toLowerCase() === name)?.name || name;
+    flags.push({
+      code: 'V90_EXPOSURE_REPEATED_ALL_WEEK',
+      week, day: on[on.length - 1].day,
+      detail: `${shown} appears on ${on.length} of the ${sessions.length} days in ${eventNoun(intake).toLowerCase()} (${on.map((x) => x.day).join(', ')}). `
+        + `Repeating one exposure most days is the same redundancy as repeated doubles: after the second, each one buys less and costs the same. `
+        + `Keep it to ${MAX_EXPOSURE_DAYS} days and let the rest of the week be quiet.`,
+    });
+  }
+
   // Sessions may not grow as Day 0 approaches.
   for (let i = 1; i < sessions.length; i += 1) {
     const prev = sessions[i - 1];
@@ -221,6 +247,25 @@ export function repairCompetitionWeek(program, intake = {}, now = Date.now()) {
       });
     });
   });
+
+  // 1b. One exposure, at most a couple of days. Drop the occurrences closest to
+  // the event: freshness argues for the quiet end of the week being the quiet
+  // one, and a session is never emptied to satisfy this.
+  const seen = new Map();
+  view().forEach((session) => {
+    new Set(session.rows.filter((r) => !matcher.re.test(r.name)).map((r) => r.name.toLowerCase())).forEach((name) => {
+      if (!seen.has(name)) seen.set(name, []);
+      seen.get(name).push(session);
+    });
+  });
+  for (const [name, on] of seen) {
+    for (let i = MAX_EXPOSURE_DAYS; i < on.length; i += 1) {
+      const session = on[i];
+      const live = session.rows.filter((r) => !dropped.has(r.index));
+      if (live.length <= 1) continue;
+      live.filter((r) => r.name.toLowerCase() === name).forEach((r) => { dropped.add(r.index); changed = true; });
+    }
+  }
 
   // 2. The week descends. Trim the least justified rows until it does.
   let sessions = view();

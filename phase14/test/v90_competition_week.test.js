@@ -125,3 +125,49 @@ test('the brief names the budget and the conditional last session', () => {
   assert.match(brief, /TECHNICAL WORK IS SINGLES/);
   assert.match(brief, /CONDITIONAL, NOT MANDATORY/);
 });
+
+test('no exposure earns a place on most days of competition week', () => {
+  // The budget was written against the competition lifts, so the ballistic swap
+  // put Explosive Push-up 3 x 3 on all five days of a meet week -- the coach's
+  // own objection to repeated exposure, wearing a different name.
+  const program = block([
+    row('Day -5', 'Snatch', 2, 1), row('Day -5', 'Explosive Push-up', 3, 3),
+    row('Day -4', 'Clean and jerk', 2, 1), row('Day -4', 'Explosive Push-up', 3, 3),
+    row('Day -3', 'Front Squat', 2, 1), row('Day -3', 'Explosive Push-up', 3, 3),
+    row('Day -2', 'Clean and jerk', 1, 1), row('Day -2', 'Explosive Push-up', 3, 3),
+    row('Day -1', 'Snatch', 1, 1, 'Optional; skip it if you are sharp.'), row('Day -1', 'Explosive Push-up', 3, 3),
+  ]);
+  const flags = collectCompetitionWeekFlags(program, MEET).filter((f) => f.code === 'V90_EXPOSURE_REPEATED_ALL_WEEK');
+  assert.equal(flags.length, 1);
+  assert.match(flags[0].detail, /Explosive Push-up appears on 5 of the 5 days/);
+
+  const fixed = repairCompetitionWeek(program, MEET);
+  assert.equal(collectCompetitionWeekFlags(fixed, MEET).length, 0);
+  assert.equal(repairCompetitionWeek(fixed, MEET), fixed, 'repair is not idempotent');
+  // Kept at the quiet end of the week, dropped nearest the event.
+  const w4 = fixed.slice(fixed.indexOf('START_WEEK4_TSV'));
+  assert.ok(/Day -5\tExplosive Push-up/.test(w4), 'the first exposures stay');
+  assert.ok(!/Day -1\tExplosive Push-up/.test(w4), 'the one before the event goes');
+});
+
+test('a session is never emptied to satisfy the exposure cap', () => {
+  const program = block([
+    row('Day -5', 'Explosive Push-up', 3, 3),
+    row('Day -4', 'Explosive Push-up', 3, 3),
+    row('Day -3', 'Explosive Push-up', 3, 3),
+  ]);
+  const fixed = repairCompetitionWeek(program, MEET);
+  assert.match(fixed, /Day -3\tExplosive Push-up/, 'the only row on a day is left alone');
+});
+
+test('the exposure cap does not govern the competition lifts', () => {
+  // A lifter is meant to touch the bar most days of competition week, and the
+  // lifts already have their own budget. Counting them here asked the repair to
+  // delete the event itself, which it will not do -- so the flag outlived its
+  // repair, and a flag that outlives its repair kills the build.
+  const program = block([
+    row('Day -5', 'Snatch', 2, 1), row('Day -4', 'Snatch', 2, 1),
+    row('Day -1', 'Snatch', 1, 1, 'Optional; skip it if you are sharp.'),
+  ]);
+  assert.equal(collectCompetitionWeekFlags(program, MEET).filter((f) => f.code === 'V90_EXPOSURE_REPEATED_ALL_WEEK').length, 0);
+});
