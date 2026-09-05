@@ -1,110 +1,114 @@
-This block is written for someone about 9 months past their injury, at the performance stage of the return, and it progresses on what the tissue tolerates rather than on the calendar. You’re about nine months out, cleared, and well past the protection phase, so this block trains the return to rowing rather than circling the old injury. We keep two direct erg exposures each week: Monday low-rate aerobic work to hold the base at low recovery cost, and Thursday controlled 2k-pace work in small, deliberate doses. Lower-body and trunk strength build around movements you already tolerate, with low spinal-fatigue choices doing most of the work.
+Nine months past the disc flare, cleared, and without leg symptoms for three months means this is a performance-stage return, not a rehab block. We’ll row on purpose from Week 1, but build the exact movement back with low-rate easy work, short race-pace touches, and spine-sparing strength that supports rowing instead of competing with it.
 
-Week 2 only lengthens the Thursday race-pace reps. Week 3 deliberately holds the erg dose and asks for one extra Goblet Squat rep only if Weeks 1-2 were clean, so you can tell what changed. Week 4 is consolidation: fewer support sets, the same easy Monday row, and fewer but slightly sharper Thursday reps so you finish fresher while keeping the best quality you earned.
+Week 2 only nudges the Thursday split faster. Week 3 keeps that faster split but makes the work reps longer and buys rowing a third short easy touch on Wednesday by trimming general work. Week 4 is a consolidation week: same moderate loads and best-earned split, but about a third less support volume so you finish fresher.
 
-Local stiffness that settles with movement and is back to baseline the next morning is a hold-and-monitor signal, not an automatic stop. If pain starts to travel, leg symptoms return, or you cannot keep a tall stacked posture on the erg, stop the aggravating set, swap that day’s lower-body work to Barbell Hip Thrust or Leg Press Machine at easy RPE 6-7, and repeat the last clean week instead of progressing.
+If stiffness warms out and you are back to baseline the next morning, stay on plan. If back pain goes above 3/10, any leg symptom returns, or erg posture starts folding under fatigue, keep the same load or split next week, cut one set that day, and shorten the row or reduce squat/lunge depth to the last clean braced range.
 
 START_WEEK1_TSV
 Day	Exercise	Weight	Sets	Reps	Rest	Target RPE	Notes	Results
-Mon	[WARMUP] Rowing Ergometer	Easy pace	1	6 min	N/A	2	18-20 spm; last minute add 3 x 10 firmer strokes.; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Band shoulder pass-through x 10; Scapular push-up x 8; Keep the warm-up specific and non-fatiguing.	
-Mon	Rowing Ergometer	2:40-2:48 /500 m	1	22 min	N/A	3.5	Low-rate Zone 2 at 18-20 spm. Nose-breathing or full-sentence talk test. If Thursday pace work suffers, keep this at 18-20 min rather than pushing the split.	
-Mon	Barbell Hip Thrust	RPE-selected load	2	8	90 sec	7	Low-spinal-fatigue posterior-chain support; 1-second squeeze at the top. If RPE climbs above 8 or you feel back load more than glutes, hold the load and stop at this dose.	
-Mon	Seated Cable Row	RPE-selected load	2	8	75 sec	7	Upper-back maintenance for the rowing finish; keep torso quiet.	
-Mon	Dumbbell Bench Press	RPE-selected load	2	8	75 sec	7	Maintenance only; leave 2-3 reps in reserve.	
-Mon	Side Plank	Bodyweight	2	30 sec/side	30 sec	6	Trunk stiffness, not max shaking; straight line head to heel.	
-Tue	[WARMUP] Rowing Ergometer	Easy pace	1	5 min	N/A	2	Easy strokes only; use this to loosen up after sitting.; Squat-and-reach x 6; Bodyweight squat x 8; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Ramp Goblet Squat: 7.5 kg x 5, 12.5 kg x 3, 15 kg x 1-2 before 20 kg work sets.; Keep the warm-up specific and non-fatiguing.	
-Tue	Goblet Squat	20 kg	3	6	2 min	6.5	About 83% of your current comfortable 24 kg x 8. Use a 2-second lower and stay tall. If RPE jumps above 7.5 or next-day stiffness runs above baseline, repeat this dose next week.	
-Tue	Leg Press Machine	RPE-selected load	2	10	90 sec	7	Quad and bone-loading support without chasing fatigue.	
-Tue	Chest-Supported Row	RPE-selected load	2	8	75 sec	7	Horizontal pulling volume with the low back supported.	
-Tue	Pallof Press	RPE-selected load	2	10/side	45 sec	6	Anti-rotation trunk work; smooth exhale on each press.	
-Tue	Seated Calf Raise	RPE-selected load	2	12	45 sec	7	Tissue-capacity work for ankle and calf.	
-Wed	[WARMUP] Rowing Ergometer	Easy pace	1	5 min	N/A	2	Short easy row only; this day stays low-cost.; Squat-and-reach x 6; Bodyweight squat x 8; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Band shoulder pass-through x 10; Wall slide x 8; Keep the warm-up specific and non-fatiguing.	
-Wed	Reverse Lunge	RPE-selected load	2	8/side	75 sec	6.5	This is the low-cost session: smooth reps only. If sleep is rough or legs feel heavy, use bodyweight and keep Thursday fresh.	
-Wed	Cable Row	RPE-selected load	2	10	60 sec	6.5	Easy upper-back maintenance; squeeze without leaning back.	
-Wed	Dumbbell Shoulder Press	RPE-selected load	2	8	60 sec	6.5	Press maintenance; stop well short of grind.	
-Wed	Farmer Carry	RPE-selected load	2	30 m	60 sec	6	Trunk and grip. First accessory to remove if recovery is poor.	
-Thu	[WARMUP] Rowing Ergometer	Easy pace	1	8 min	N/A	2	18-20 spm with 3 x 10-stroke builds before the work starts.; Squat-and-reach x 6; Bodyweight squat x 8; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Band shoulder pass-through x 10; Scapular push-up x 8; Keep the warm-up specific and non-fatiguing.	
-Thu	Rowing Ergometer	2:17-2:16 /500 m	5	250 m	2 min	7	24-26 spm. Stay tall through the finish. If split drifts more than 3 seconds or posture folds, hold the pace and cap the session at 4 reps.	
-Thu	Goblet Split Squat	RPE-selected load	2	8/side	75 sec	7	Lower-body support after the rowing work; keep torso stacked.	
-Thu	Seated Row Machine	RPE-selected load	2	10	60 sec	7	Easy upper-back maintenance.	
-Thu	Push-up	Bodyweight	2	8	60 sec	6.5	Smooth reps, 2-3 reps in reserve.	
-Thu	Side Plank	Bodyweight	2	30 sec/side	30 sec	6	Short trunk dose after the main work.	
+Mon	[WARMUP] Rowing Ergometer	N/A	1	6 min	N/A	2-3	Easy row, then a few hip and shoulder prep drills; finish warmer, not tired.; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Band shoulder pass-through x 10; Scapular push-up x 8; Keep the warm-up specific and non-fatiguing.	
+Mon	Rowing Ergometer	2:42-2:50 /500m	1	25 min	N/A	4-5	18-20 spm, conversational. If breathing or posture drifts, shorten to 20 min rather than pushing through fatigue.	
+Mon	Hip Thrust	RPE-selected load	2	8	90 sec	7	Pause 1 sec at top; if back discomfort rises above baseline, hold load and stop at 1 clean set.	
+Mon	Dumbbell Bench Press	RPE-selected load	2	8	90 sec	7	Upper-body maintenance; leave 2-3 reps in reserve.	
+Mon	Seated Cable Row	RPE-selected load	2	10	75 sec	7	Chest tall, no lumbar swing; this is support for rowing, not a max-effort row.	
+Mon	Side Plank	Bodyweight	2	25 sec/side	30 sec	6	Straight line ear-hip-ankle; stop before pelvis drops.	
+Tue	[WARMUP] Rowing Ergometer	N/A	1	5 min	N/A	2-3	Easy row plus 1-2 ramp sets on the first lift.; Squat-and-reach x 6; Bodyweight squat x 8; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Band shoulder pass-through x 10; Scapular push-up x 8; Ramp Goblet Squat: 7.5 kg x 5, 12.5 kg x 3, 15 kg x 1-2 before 20 kg work sets.; Keep the warm-up specific and non-fatiguing.	
+Tue	Goblet Squat	20 kg	4	6	2:00	6-7	About 83% of your 24 kg x8 comfortable anchor. Reintroduction volume only; if any set hits above 8 RPE or brace changes, keep 20 kg and stop at the last clean set.	
+Tue	Leg Press Machine	RPE-selected load	3	10	90 sec	7	Full foot pressure and controlled lower; choose a load that keeps the pelvis quiet.	
+Tue	Chest-Supported Row	RPE-selected load	3	8	90 sec	7	Pull to lower ribs with a brief pause; no neck reach.	
+Tue	Dumbbell Bench Press	RPE-selected load	3	8	90 sec	7	Same load across sets; leave 2 reps in reserve.	
+Tue	Farmer Carry	RPE-selected load	2	30 m	60 sec	7	Grip and trunk work; walk tall and even. If grip goes before posture, lighten the bells.	
+Wed	[WARMUP] Rowing Ergometer	N/A	1	5 min	N/A	2-3	Easy row, then hip and shoulder prep.; Squat-and-reach x 6; Bodyweight squat x 8; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Band shoulder pass-through x 10; Wall slide x 8; Keep the warm-up specific and non-fatiguing.	
+Wed	Reverse Lunge	RPE-selected load	2	8/leg	75 sec	6-7	Low-cost unilateral work; short stride is fine if it keeps the brace cleaner and Thursday fresher.	
+Wed	Dumbbell Shoulder Press	RPE-selected load	2	8	75 sec	7	Smooth reps, no grind.	
+Wed	Seated Cable Row	RPE-selected load	2	12	75 sec	7	Easy quality volume; keep the ribcage stacked.	
+Wed	Seated Calf Raise	RPE-selected load	2	12	60 sec	7	Controlled pause at the top and stretch at the bottom.	
+Wed	Pallof Press	RPE-selected load	2	10/side	45 sec	6	Exhale into the brace; no trunk turn.	
+Thu	[WARMUP] Rowing Ergometer	N/A	1	8 min	N/A	2-3	5 min easy, then 3 x 20 sec build with 40 sec easy; arrive ready, not tired.; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Band shoulder pass-through x 10; Scapular push-up x 8; Keep the warm-up specific and non-fatiguing.	
+Thu	Rowing Ergometer	2:16-2:18 /500m	4	250 m	2:00	7	20-24 spm. Short, clean touches near old 2k pace; if split fades by more than 2 sec or lumbar position softens, cut 1 interval and hold the split next week.	
+Thu	Hip Thrust	RPE-selected load	3	8	90 sec	7	Pause 1 sec at top; keep this submaximal after the erg.	
+Thu	Push-up	Bodyweight	2	10	60 sec	7	Elevate the hands if needed to keep all 10 reps smooth.	
+Thu	Cable Row	RPE-selected load	2	10	75 sec	7	Support pulling volume without hitching through the low back.	
+Thu	Pallof Press	RPE-selected load	2	10/side	45 sec	6	Brace first, press second.	
 END_WEEK1_TSV
 START_WEEK2_TSV
 Day	Exercise	Weight	Sets	Reps	Rest	Target RPE	Notes	Results
-Mon	[WARMUP] Rowing Ergometer	Easy pace	1	6 min	N/A	2	18-20 spm; last minute add 3 x 10 firmer strokes.; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Band shoulder pass-through x 10; Scapular push-up x 8; Keep the warm-up specific and non-fatiguing.	
-Mon	Rowing Ergometer	2:40-2:48 /500 m	1	22 min	N/A	3.5	Low-rate Zone 2 at 18-20 spm. Nose-breathing or full-sentence talk test. If Thursday pace work suffers, keep this at 18-20 min rather than pushing the split.	
-Mon	Barbell Hip Thrust	RPE-selected load	2	8	90 sec	7	Low-spinal-fatigue posterior-chain support; 1-second squeeze at the top. If RPE climbs above 8 or you feel back load more than glutes, hold the load and stop at this dose.	
-Mon	Seated Cable Row	RPE-selected load	2	8	75 sec	7	Upper-back maintenance for the rowing finish; keep torso quiet.	
-Mon	Dumbbell Bench Press	RPE-selected load	2	8	75 sec	7	Maintenance only; leave 2-3 reps in reserve.	
-Mon	Side Plank	Bodyweight	2	30 sec/side	30 sec	6	Trunk stiffness, not max shaking; straight line head to heel.	
-Tue	[WARMUP] Rowing Ergometer	Easy pace	1	5 min	N/A	2	Easy strokes only; use this to loosen up after sitting.; Squat-and-reach x 6; Bodyweight squat x 8; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Ramp Goblet Squat: 7.5 kg x 5, 12.5 kg x 3, 15 kg x 1-2 before 20 kg work sets.; Keep the warm-up specific and non-fatiguing.	
-Tue	Goblet Squat	20 kg	3	6	2 min	6.5	About 83% of your current comfortable 24 kg x 8. Use a 2-second lower and stay tall. If RPE jumps above 7.5 or next-day stiffness runs above baseline, repeat this dose next week.	
-Tue	Leg Press Machine	RPE-selected load	2	10	90 sec	7	Quad and bone-loading support without chasing fatigue.	
-Tue	Chest-Supported Row	RPE-selected load	2	8	75 sec	7	Horizontal pulling volume with the low back supported.	
-Tue	Pallof Press	RPE-selected load	2	10/side	45 sec	6	Anti-rotation trunk work; smooth exhale on each press.	
-Tue	Seated Calf Raise	RPE-selected load	2	12	45 sec	7	Tissue-capacity work for ankle and calf.	
-Wed	[WARMUP] Rowing Ergometer	Easy pace	1	5 min	N/A	2	Short easy row only; this day stays low-cost.; Squat-and-reach x 6; Bodyweight squat x 8; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Band shoulder pass-through x 10; Wall slide x 8; Keep the warm-up specific and non-fatiguing.	
-Wed	Reverse Lunge	RPE-selected load	2	8/side	75 sec	6.5	This is the low-cost session: smooth reps only. If sleep is rough or legs feel heavy, use bodyweight and keep Thursday fresh.	
-Wed	Cable Row	RPE-selected load	2	10	60 sec	6.5	Easy upper-back maintenance; squeeze without leaning back.	
-Wed	Dumbbell Shoulder Press	RPE-selected load	2	8	60 sec	6.5	Press maintenance; stop well short of grind.	
-Wed	Farmer Carry	RPE-selected load	2	30 m	60 sec	6	Trunk and grip. First accessory to remove if recovery is poor.	
-Thu	[WARMUP] Rowing Ergometer	Easy pace	1	8 min	N/A	2	18-20 spm with 3 x 10-stroke builds before the work starts.; Squat-and-reach x 6; Bodyweight squat x 8; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Band shoulder pass-through x 10; Scapular push-up x 8; Keep the warm-up specific and non-fatiguing.	
-Thu	Rowing Ergometer	2:17-2:16 /500 m	5	300 m	2 min	7.5	Only change this week is the rep length. If Week 1 was not clean, repeat 250 m instead. Stay tall through the finish and cap at 4 reps if posture slips.	
-Thu	Goblet Split Squat	RPE-selected load	2	8/side	75 sec	7	Lower-body support after the rowing work; keep torso stacked.	
-Thu	Seated Row Machine	RPE-selected load	2	10	60 sec	7	Easy upper-back maintenance.	
-Thu	Push-up	Bodyweight	2	8	60 sec	6.5	Smooth reps, 2-3 reps in reserve.	
-Thu	Side Plank	Bodyweight	2	30 sec/side	30 sec	6	Short trunk dose after the main work.	
+Mon	[WARMUP] Rowing Ergometer	N/A	1	6 min	N/A	2-3	Easy row, then a few hip and shoulder prep drills; finish warmer, not tired.; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Band shoulder pass-through x 10; Scapular push-up x 8; Keep the warm-up specific and non-fatiguing.	
+Mon	Rowing Ergometer	2:42-2:50 /500m	1	25 min	N/A	4-5	18-20 spm, conversational. If breathing or posture drifts, shorten to 20 min rather than pushing through fatigue.	
+Mon	Hip Thrust	RPE-selected load	2	8	90 sec	7	Pause 1 sec at top; if back discomfort rises above baseline, hold load and stop at 1 clean set.	
+Mon	Dumbbell Bench Press	RPE-selected load	2	8	90 sec	7	Upper-body maintenance; leave 2-3 reps in reserve.	
+Mon	Seated Cable Row	RPE-selected load	2	10	75 sec	7	Chest tall, no lumbar swing; this is support for rowing, not a max-effort row.	
+Mon	Side Plank	Bodyweight	2	25 sec/side	30 sec	6	Straight line ear-hip-ankle; stop before pelvis drops.	
+Tue	[WARMUP] Rowing Ergometer	N/A	1	5 min	N/A	2-3	Easy row plus 1-2 ramp sets on the first lift.; Squat-and-reach x 6; Bodyweight squat x 8; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Band shoulder pass-through x 10; Scapular push-up x 8; Ramp Goblet Squat: 7.5 kg x 5, 12.5 kg x 3, 15 kg x 1-2 before 20 kg work sets.; Keep the warm-up specific and non-fatiguing.	
+Tue	Goblet Squat	20 kg	4	7	2:00	7	Only add the seventh rep if Week 1 was back to baseline the next morning; otherwise repeat 4 x 6 at the same load.	
+Tue	Leg Press Machine	RPE-selected load	3	10	90 sec	7	Full foot pressure and controlled lower; choose a load that keeps the pelvis quiet.	
+Tue	Chest-Supported Row	RPE-selected load	3	8	90 sec	7	Pull to lower ribs with a brief pause; no neck reach.	
+Tue	Dumbbell Bench Press	RPE-selected load	3	8	90 sec	7	Same load across sets; leave 2 reps in reserve.	
+Tue	Farmer Carry	RPE-selected load	2	30 m	60 sec	7	Grip and trunk work; walk tall and even. If grip goes before posture, lighten the bells.	
+Wed	[WARMUP] Rowing Ergometer	N/A	1	5 min	N/A	2-3	Easy row, then hip and shoulder prep.; Squat-and-reach x 6; Bodyweight squat x 8; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Band shoulder pass-through x 10; Wall slide x 8; Keep the warm-up specific and non-fatiguing.	
+Wed	Reverse Lunge	RPE-selected load	2	8/leg	75 sec	6-7	Low-cost unilateral work; short stride is fine if it keeps the brace cleaner and Thursday fresher.	
+Wed	Dumbbell Shoulder Press	RPE-selected load	2	8	75 sec	7	Smooth reps, no grind.	
+Wed	Seated Cable Row	RPE-selected load	2	12	75 sec	7	Easy quality volume; keep the ribcage stacked.	
+Wed	Seated Calf Raise	RPE-selected load	2	12	60 sec	7	Controlled pause at the top and stretch at the bottom.	
+Wed	Pallof Press	RPE-selected load	2	10/side	45 sec	6	Exhale into the brace; no trunk turn.	
+Thu	[WARMUP] Rowing Ergometer	N/A	1	8 min	N/A	2-3	5 min easy, then 3 x 20 sec build with 40 sec easy; arrive ready, not tired.; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Band shoulder pass-through x 10; Scapular push-up x 8; Keep the warm-up specific and non-fatiguing.	
+Thu	Rowing Ergometer	2:15-2:17 /500m	4	250 m	2:00	7	Same total work, slightly faster split only. If RPE jumps above 8 or posture changes, return to Week 1 split and complete the set count.	
+Thu	Hip Thrust	RPE-selected load	3	8	90 sec	7	Pause 1 sec at top; keep this submaximal after the erg.	
+Thu	Push-up	Bodyweight	2	10	60 sec	7	Elevate the hands if needed to keep all 10 reps smooth.	
+Thu	Cable Row	RPE-selected load	2	10	75 sec	7	Support pulling volume without hitching through the low back.	
+Thu	Pallof Press	RPE-selected load	2	10/side	45 sec	6	Brace first, press second.	
 END_WEEK2_TSV
 START_WEEK3_TSV
 Day	Exercise	Weight	Sets	Reps	Rest	Target RPE	Notes	Results
-Mon	[WARMUP] Rowing Ergometer	Easy pace	1	6 min	N/A	2	18-20 spm; last minute add 3 x 10 firmer strokes.; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Band shoulder pass-through x 10; Scapular push-up x 8; Keep the warm-up specific and non-fatiguing.	
-Mon	Rowing Ergometer	2:40-2:48 /500 m	1	22 min	N/A	3.5	Low-rate Zone 2 at 18-20 spm. Nose-breathing or full-sentence talk test. If Thursday pace work suffers, keep this at 18-20 min rather than pushing the split.	
-Mon	Barbell Hip Thrust	RPE-selected load	2	8	90 sec	7	Low-spinal-fatigue posterior-chain support; 1-second squeeze at the top. If RPE climbs above 8 or you feel back load more than glutes, hold the load and stop at this dose.	
-Mon	Seated Cable Row	RPE-selected load	2	8	75 sec	7	Upper-back maintenance for the rowing finish; keep torso quiet.	
-Mon	Dumbbell Bench Press	RPE-selected load	2	8	75 sec	7	Maintenance only; leave 2-3 reps in reserve.	
-Mon	Side Plank	Bodyweight	1	30 sec/side	30 sec	6	Trunk stiffness, not max shaking; straight line head to heel. Trimmed as the block shifts toward the sport: general work gives way as tolerance for the event improves.	
-Tue	[WARMUP] Rowing Ergometer	Easy pace	1	5 min	N/A	2	Easy strokes only; use this to loosen up after sitting.; Squat-and-reach x 6; Bodyweight squat x 8; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Ramp Goblet Squat: 7.5 kg x 5, 12.5 kg x 3, 15 kg x 1-2 before 20 kg work sets.; Keep the warm-up specific and non-fatiguing.	
-Tue	Goblet Squat	20 kg	3	7	2 min	7	Only add this rep if Weeks 1-2 were clean and next-day stiffness returned to baseline. Same 2-second lower, same tall position; if not, repeat 3 x 6.	
-Tue	Leg Press Machine	RPE-selected load	2	10	90 sec	7	Quad and bone-loading support without chasing fatigue.	
-Tue	Chest-Supported Row	RPE-selected load	2	8	75 sec	7	Horizontal pulling volume with the low back supported.	
-Tue	Pallof Press	RPE-selected load	1	10/side	45 sec	6	Anti-rotation trunk work; smooth exhale on each press. Trimmed as the block shifts toward the sport: general work gives way as tolerance for the event improves.	
-Tue	Seated Calf Raise	RPE-selected load	1	12	45 sec	7	Tissue-capacity work for ankle and calf. Trimmed as the block shifts toward the sport: general work gives way as tolerance for the event improves.	
-Wed	[WARMUP] Rowing Ergometer	Easy pace	1	5 min	N/A	2	Short easy row only; this day stays low-cost.; Squat-and-reach x 6; Bodyweight squat x 8; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Band shoulder pass-through x 10; Wall slide x 8; Keep the warm-up specific and non-fatiguing.	
-Wed	Reverse Lunge	RPE-selected load	2	8/side	75 sec	6.5	This is the low-cost session: smooth reps only. If sleep is rough or legs feel heavy, use bodyweight and keep Thursday fresh.	
-Wed	Cable Row	RPE-selected load	2	10	60 sec	6.5	Easy upper-back maintenance; squeeze without leaning back.	
-Wed	Dumbbell Shoulder Press	RPE-selected load	2	8	60 sec	6.5	Press maintenance; stop well short of grind.	
-Wed	Farmer Carry	RPE-selected load	2	30 m	60 sec	6	Trunk and grip. First accessory to remove if recovery is poor.	
-Thu	[WARMUP] Rowing Ergometer	Easy pace	1	8 min	N/A	2	18-20 spm with 3 x 10-stroke builds before the work starts.; Squat-and-reach x 6; Bodyweight squat x 8; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Band shoulder pass-through x 10; Scapular push-up x 8; Keep the warm-up specific and non-fatiguing.	
-Thu	Rowing Ergometer	2:17-2:16 /500 m	5	300 m	2 min	7.5	Repeat last week on purpose so the rowing tolerance is earned before pace moves. Match last week's posture and finish quality before thinking about faster splits.	
-Thu	Goblet Split Squat	RPE-selected load	2	8/side	75 sec	7	Lower-body support after the rowing work; keep torso stacked.	
-Thu	Seated Row Machine	RPE-selected load	2	10	60 sec	7	Easy upper-back maintenance.	
-Thu	Push-up	Bodyweight	2	8	60 sec	6.5	Smooth reps, 2-3 reps in reserve.	
-Thu	Side Plank	Bodyweight	1	30 sec/side	30 sec	6	Short trunk dose after the main work. Trimmed as the block shifts toward the sport: general work gives way as tolerance for the event improves.	
+Mon	[WARMUP] Rowing Ergometer	N/A	1	6 min	N/A	2-3	Easy row, then a few hip and shoulder prep drills; finish warmer, not tired.; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Band shoulder pass-through x 10; Scapular push-up x 8; Keep the warm-up specific and non-fatiguing.	
+Mon	Rowing Ergometer	2:42-2:50 /500m	1	25 min	N/A	4-5	18-20 spm, conversational. If breathing or posture drifts, shorten to 20 min rather than pushing through fatigue.	
+Mon	Hip Thrust	RPE-selected load	2	8	90 sec	7	Pause 1 sec at top; if back discomfort rises above baseline, hold load and stop at 1 clean set.	
+Mon	Dumbbell Bench Press	RPE-selected load	2	8	90 sec	7	Upper-body maintenance; leave 2-3 reps in reserve.	
+Mon	Seated Cable Row	RPE-selected load	2	10	75 sec	7	Chest tall, no lumbar swing; this is support for rowing, not a max-effort row.	
+Mon	Side Plank	Bodyweight	1	25 sec/side	30 sec	6	Straight line ear-hip-ankle; stop before pelvis drops. Trimmed as the block shifts toward the sport: general work gives way as tolerance for the event improves.	
+Tue	[WARMUP] Rowing Ergometer	N/A	1	5 min	N/A	2-3	Easy row plus 1-2 ramp sets on the first lift.; Squat-and-reach x 6; Bodyweight squat x 8; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Band shoulder pass-through x 10; Scapular push-up x 8; Ramp Goblet Squat: 7.5 kg x 5, 12.5 kg x 3, 15 kg x 1-2 before 20 kg work sets.; Keep the warm-up specific and non-fatiguing.	
+Tue	Goblet Squat	20 kg	4	8	2:00	7-8	Only take the eighth rep if Week 2 stayed clean and Thursday rowing was unchanged the next day; otherwise repeat 4 x 7.	
+Tue	Leg Press Machine	RPE-selected load	3	10	90 sec	7	Full foot pressure and controlled lower; choose a load that keeps the pelvis quiet.	
+Tue	Chest-Supported Row	RPE-selected load	3	8	90 sec	7	Pull to lower ribs with a brief pause; no neck reach.	
+Tue	Dumbbell Bench Press	RPE-selected load	3	8	90 sec	7	Same load across sets; leave 2 reps in reserve.	
+Tue	Farmer Carry	RPE-selected load	2	30 m	60 sec	7	Grip and trunk work; walk tall and even. If grip goes before posture, lighten the bells.	
+Wed	[WARMUP] Rowing Ergometer	N/A	1	5 min	N/A	2-3	Easy row, then hip and shoulder prep.; Squat-and-reach x 6; Bodyweight squat x 8; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Band shoulder pass-through x 10; Wall slide x 8; Keep the warm-up specific and non-fatiguing.	
+Wed	Rowing Ergometer	2:44-2:52 /500m	1	12 min	N/A	3-4	18-20 spm. This buys rowing a third weekly touch; it should feel easier than Monday.	
+Wed	Reverse Lunge	RPE-selected load	2	8/leg	75 sec	6-7	Low-cost unilateral work; keep 2-3 reps in reserve so Thursday still feels fresh.	
+Wed	Dumbbell Shoulder Press	RPE-selected load	2	8	75 sec	7	Smooth reps, no grind.	
+Wed	Seated Cable Row	RPE-selected load	2	12	75 sec	7	Easy quality volume; keep the ribcage stacked.	
+Wed	Pallof Press	RPE-selected load	1	10/side	45 sec	6	Exhale into the brace; no trunk turn. Trimmed as the block shifts toward the sport: general work gives way as tolerance for the event improves.	
+Thu	[WARMUP] Rowing Ergometer	N/A	1	8 min	N/A	2-3	5 min easy, then 3 x 20 sec build with 40 sec easy; arrive ready, not tired.; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Band shoulder pass-through x 10; Scapular push-up x 8; Keep the warm-up specific and non-fatiguing.	
+Thu	Rowing Ergometer	2:15-2:17 /500m	4	300 m	2:00	7	Same split as Week 2; only the rep length increases. Stop at 3 intervals if the fourth would cost posture or split discipline.	
+Thu	Hip Thrust	RPE-selected load	3	8	90 sec	7	Pause 1 sec at top; keep this submaximal after the erg.	
+Thu	Push-up	Bodyweight	2	10	60 sec	7	Elevate the hands if needed to keep all 10 reps smooth.	
+Thu	Cable Row	RPE-selected load	2	10	75 sec	7	Support pulling volume without hitching through the low back.	
+Thu	Pallof Press	RPE-selected load	1	10/side	45 sec	6	Brace first, press second. Trimmed as the block shifts toward the sport: general work gives way as tolerance for the event improves.	
 END_WEEK3_TSV
 START_WEEK4_TSV
 Day	Exercise	Weight	Sets	Reps	Rest	Target RPE	Notes	Results
-Mon	[WARMUP] Rowing Ergometer	Easy pace	1	6 min	N/A	2	18-20 spm; last minute add 3 x 10 firmer strokes.; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Band shoulder pass-through x 10; Scapular push-up x 8; Keep the warm-up specific and non-fatiguing.	
-Mon	Rowing Ergometer	2:40-2:48 /500 m	1	22 min	N/A	3.5	Keep the same easy aerobic row; this week trims gym fatigue, not rowing rhythm.	
-Mon	Barbell Hip Thrust	RPE-selected load	1	8	90 sec	7	One clean support set only; keep the same top squeeze and finish fresher than Week 3.	
-Mon	Seated Cable Row	RPE-selected load	1	8	75 sec	7	One maintenance set; crisp pull, no torso swing.	
-Mon	Dumbbell Bench Press	RPE-selected load	1	8	75 sec	7	One maintenance set; stop with 2-3 reps in reserve.	
-Mon	Side Plank	Bodyweight	1	30 sec/side	30 sec	6	Short trunk dose only.	
-Tue	[WARMUP] Rowing Ergometer	Easy pace	1	5 min	N/A	2	Easy strokes only; use this to loosen up after sitting.; Squat-and-reach x 6; Bodyweight squat x 8; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Ramp Goblet Squat: 7.5 kg x 5, 12.5 kg x 3, 15 kg x 1-2 before 20 kg work sets.; Keep the warm-up specific and non-fatiguing.	
-Tue	Goblet Squat	20 kg	2	6	2 min	6.5	Same load, fewer sets. Keep the same tall position and finish with something left in reserve.	
-Tue	Leg Press Machine	RPE-selected load	1	10	90 sec	7	One support set only; no grind.	
-Tue	Chest-Supported Row	RPE-selected load	1	8	75 sec	7	One maintenance set with the chest supported.	
-Tue	Pallof Press	RPE-selected load	1	10/side	45 sec	6	Short anti-rotation trunk dose.	
-Tue	Seated Calf Raise	RPE-selected load	1	12	45 sec	7	One tissue-capacity set only.	
-Wed	[WARMUP] Rowing Ergometer	Easy pace	1	5 min	N/A	2	Short easy row only; this day stays very low-cost.; Squat-and-reach x 6; Bodyweight squat x 8; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Band shoulder pass-through x 10; Wall slide x 8; Keep the warm-up specific and non-fatiguing.	
-Wed	Reverse Lunge	RPE-selected load	1	8/side	75 sec	6.5	One easy set per side. If sleep or readiness is poor, use bodyweight and move on.	
-Wed	Cable Row	RPE-selected load	1	10	60 sec	6.5	One easy upper-back set.	
-Wed	Dumbbell Shoulder Press	RPE-selected load	1	8	60 sec	6.5	One maintenance set, well short of grind.	
-Wed	Farmer Carry	RPE-selected load	1	30 m	60 sec	6	Keep this easy; skip first if recovery is poor.	
-Thu	[WARMUP] Rowing Ergometer	Easy pace	1	8 min	N/A	2	18-20 spm with 3 x 10-stroke builds before the work starts.; Squat-and-reach x 6; Bodyweight squat x 8; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Band shoulder pass-through x 10; Scapular push-up x 8; Keep the warm-up specific and non-fatiguing.	
-Thu	Rowing Ergometer	2:16-2:15 /500 m	4	300 m	2 min	7.5	Fewer reps, slightly sharper split. Keep the best Week 3 posture and stroke shape; if faster pace costs posture, use Week 3 pace.	
-Thu	Goblet Split Squat	RPE-selected load	1	8/side	75 sec	7	One support set per side only; keep torso stacked.	
-Thu	Seated Row Machine	RPE-selected load	1	10	60 sec	7	One easy maintenance set.	
-Thu	Push-up	Bodyweight	1	8	60 sec	6.5	One smooth set, 2-3 reps in reserve.	
-Thu	Side Plank	Bodyweight	1	30 sec/side	30 sec	6	Short trunk dose to finish the block fresh.	
+Mon	[WARMUP] Rowing Ergometer	N/A	1	6 min	N/A	2-3	Easy row, then a few hip and shoulder prep drills; finish warmer, not tired.; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Band shoulder pass-through x 10; Scapular push-up x 8; Keep the warm-up specific and non-fatiguing.	
+Mon	Rowing Ergometer	2:42-2:50 /500m	1	25 min	N/A	4-5	18-20 spm, conversational. Keep it easy enough that you finish fresher than you started.	
+Mon	Hip Thrust	RPE-selected load	2	8	90 sec	7	Pause 1 sec at top; same clean standard as Week 3.	
+Mon	Dumbbell Bench Press	RPE-selected load	1	8	90 sec	7	Upper-body maintenance; leave 2-3 reps in reserve. Trimmed as the block shifts toward the sport: general work gives way as tolerance for the event improves.	
+Mon	Seated Cable Row	RPE-selected load	1	10	75 sec	7	Chest tall, no lumbar swing; crisp work only. Trimmed as the block shifts toward the sport: general work gives way as tolerance for the event improves.	
+Mon	Side Plank	Bodyweight	1	25 sec/side	30 sec	6	One clean brace set; leave the gym fresher than Week 3.	
+Tue	[WARMUP] Rowing Ergometer	N/A	1	5 min	N/A	2-3	Easy row plus 1-2 ramp sets on the first lift.; Squat-and-reach x 6; Bodyweight squat x 8; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Band shoulder pass-through x 10; Scapular push-up x 8; Ramp Goblet Squat: 7.5 kg x 5, 12.5 kg x 3, 15 kg x 1-2 before 20 kg work sets.; Keep the warm-up specific and non-fatiguing.	
+Tue	Goblet Squat	20 kg	3	6	2:00	6-7	Consolidation week: keep the same crisp standard, just 1 less set.	
+Tue	Leg Press Machine	RPE-selected load	2	10	90 sec	7	Controlled reps only; no extra chasing fatigue this week.	
+Tue	Chest-Supported Row	RPE-selected load	2	8	90 sec	7	Clean pause on each rep.	
+Tue	Dumbbell Bench Press	RPE-selected load	2	8	90 sec	7	Same load as prior weeks if it still leaves 2 reps in reserve.	
+Tue	Farmer Carry	RPE-selected load	1	30 m	60 sec	7	One quality trunk and grip pass only.	
+Wed	[WARMUP] Rowing Ergometer	N/A	1	5 min	N/A	2-3	Easy row, then hip and shoulder prep.; Squat-and-reach x 6; Bodyweight squat x 8; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Band shoulder pass-through x 10; Wall slide x 8; Keep the warm-up specific and non-fatiguing.	
+Wed	Rowing Ergometer	2:44-2:52 /500m	1	10 min	N/A	3-4	Easy technique touch; finish wanting more.	
+Wed	Reverse Lunge	RPE-selected load	2	8/leg	75 sec	6-7	Same easy clean standard as Week 3.	
+Wed	Dumbbell Shoulder Press	RPE-selected load	1	8	75 sec	7	One quality maintenance set only.	
+Wed	Seated Cable Row	RPE-selected load	1	12	75 sec	7	One crisp set; no chase for fatigue.	
+Wed	Pallof Press	RPE-selected load	1	10/side	45 sec	6	One clean brace set.	
+Thu	[WARMUP] Rowing Ergometer	N/A	1	8 min	N/A	2-3	5 min easy, then 3 x 20 sec build with 40 sec easy; arrive ready, not tired.; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Band shoulder pass-through x 10; Scapular push-up x 8; Keep the warm-up specific and non-fatiguing.	
+Thu	Rowing Ergometer	2:15-2:17 /500m	3	300 m	2:00	7	Hold the best Week 3 split with one less interval; finish fresh enough to row well next week.	
+Thu	Hip Thrust	RPE-selected load	2	8	90 sec	7	Pause 1 sec at top; keep it smooth and submaximal.	
+Thu	Push-up	Bodyweight	1	10	60 sec	7	One quality set only; elevate the hands if needed.	
+Thu	Cable Row	RPE-selected load	1	10	75 sec	7	Support pulling volume without hitching through the low back.	
+Thu	Pallof Press	RPE-selected load	1	10/side	45 sec	6	Brace first, press second.	
 END_WEEK4_TSV

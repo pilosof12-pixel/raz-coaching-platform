@@ -1,12 +1,25 @@
 {
-  "timestamp": "2026-09-05T07:53:52.264Z",
+  "timestamp": "2026-09-05T12:13:29.187Z",
   "base": "https://raz-coaching-platform.onrender.com",
-  "head_sha": "deaf75fe6449e27b8e6bbbe4f0c402c7957969da",
-  "runtime": "launch-acceptance-v89-allocation-v77-inherit-live43-20260905",
+  "head_sha": "17b2e760390e625ac6a3a5372e8a57dead159d1c",
+  "runtime": "live44 2026-09-05T12:12:13Z",
   "results": [
     {
-      "id": "masters_return",
-      "job_id": "4820f119fc0f1bc14423f88bfc15f4a8",
+      "id": "mma_fight_camp",
+      "job_id": "e9ab63a55a94f992078a94e66439819d",
+      "ok": false,
+      "status": "job_disappeared",
+      "stage": "generating",
+      "attempt": 2,
+      "detail": "regenerating after quality check",
+      "last_seen_status": "pending",
+      "error": "Job state absent for 180s after successful earlier polling; service likely restarted mid-build.",
+      "program_chars": 0,
+      "seconds": 625
+    },
+    {
+      "id": "inseason_footballer",
+      "job_id": "3eb6d48508a710021c3449fde4b3dfab",
       "ok": true,
       "status": "done",
       "stage": "finalizing",
@@ -14,12 +27,25 @@
       "detail": "saving program",
       "last_seen_status": "done",
       "error": null,
-      "program_chars": 16481,
-      "seconds": 240
+      "program_chars": 10240,
+      "seconds": 164
+    },
+    {
+      "id": "masters_return",
+      "job_id": "19422d1a09e40614d0f70dccb23d42e2",
+      "ok": true,
+      "status": "done",
+      "stage": "finalizing",
+      "attempt": 0,
+      "detail": "saving program",
+      "last_seen_status": "done",
+      "error": null,
+      "program_chars": 16120,
+      "seconds": 184
     },
     {
       "id": "weightlifter_meet_week",
-      "job_id": "012e520f5e0d1a7f44a3f203bd74afc9",
+      "job_id": "c5dd16cfc1478532f2a3b3e0e84c9861",
       "ok": true,
       "status": "done",
       "stage": "finalizing",
@@ -27,13 +53,15 @@
       "detail": "saving program",
       "last_seen_status": "done",
       "error": null,
-      "program_chars": 20873,
-      "seconds": 667
+      "program_chars": 17825,
+      "seconds": 379
     }
   ],
   "selection": [
+    "mma_fight_camp",
+    "inseason_footballer",
     "masters_return",
     "weightlifter_meet_week"
   ],
-  "ok": true
+  "ok": false
 }
