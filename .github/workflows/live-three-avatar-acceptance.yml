@@ -242,7 +242,13 @@ jobs:
             fi
             echo "push rejected (attempt ${attempt}); rebasing onto the branch"
             git fetch origin "${GITHUB_REF_NAME}"
-            git rebase "origin/${GITHUB_REF_NAME}" || { git rebase --abort; true; }
+            # autoStash, because the run leaves its own generated files unstaged in
+            # docs/qa/live-three-avatar and plain rebase refuses to start with a dirty
+            # tree. This retry was written to survive the branch moving during a
+            # twenty-minute run and had never once been able to: it failed with
+            # "cannot rebase: You have unstaged changes" and lost the evidence anyway.
+            git -c rebase.autoStash=true rebase "origin/${GITHUB_REF_NAME}" \
+              || { git rebase --abort 2>/dev/null; git stash pop 2>/dev/null; true; }
             sleep $((attempt * 3))
           done
           echo "::error::QA evidence could not be published after three attempts"
