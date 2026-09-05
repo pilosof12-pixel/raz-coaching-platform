@@ -31,9 +31,27 @@ function topOf(v) {
 }
 
 // "79 kg now, 77 kg class" -> 2 kg to lose. Also reads it out of free text.
+// Whether the athlete is making weight at all. Without a weight-class signal
+// there is no cut to reason about, and inferring one is how a weightlifter's
+// two snatch numbers -- 112 kg in training, 108 kg at his last meet -- became a
+// "4 kg weight cut" that capped his effort for a whole peak block and killed
+// the build.
+export function makingWeight(intake = {}) {
+  const said = `${txt(intake.weight_vs_class)} ${txt(intake.weight_class_status)} ${txt(intake.notes)}`;
+  if (intake.weigh_in_date) return true;
+  if (txt(intake.weight_vs_class).trim()) return true;
+  if (/\b(?:weight class|weigh[- ]?in|make weight|making weight|weight cut|cutting weight|division limit|class limit)\b/i.test(said)) return true;
+  return /\b(?:cut|lose|drop)\D{0,16}\d{1,2}(?:\.\d)?\s*kg\b/i.test(said);
+}
+
 export function cutSize(intake = {}) {
-  const source = `${txt(intake.weight_vs_class)} ${txt(intake.notes)} ${txt(intake.current_numbers)}`;
-  const pair = source.match(/(\d{2,3}(?:\.\d)?)\s*kg[^\d]{0,24}?(\d{2,3}(?:\.\d)?)\s*kg/i);
+  if (!makingWeight(intake)) return null;
+  // The bodyweight-versus-limit pair is only meaningful where the intake is
+  // actually talking about the class. Read anywhere else it matches any two kg
+  // numbers in a sentence, and a list of lifts is full of those.
+  const classText = `${txt(intake.weight_vs_class)} ${txt(intake.weight_class_status)}`;
+  const source = `${classText} ${txt(intake.notes)}`;
+  const pair = classText.match(/(\d{2,3}(?:\.\d)?)\s*kg[^\d]{0,24}?(\d{2,3}(?:\.\d)?)\s*kg/i);
   if (pair) {
     const a = Number(pair[1]);
     const b = Number(pair[2]);

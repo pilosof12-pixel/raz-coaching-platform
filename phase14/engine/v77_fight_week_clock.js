@@ -13,7 +13,7 @@
 // spreadsheet carries it without the exporter needing to know anything.
 
 import { parseWeek } from './v34_workload_accounting.js';
-import { STATE, stateForWeek, competitionProfile, weeksOut } from './v68_competition_state.js';
+import { STATE, stateForWeek, competitionProfile, weeksOut, eventType } from './v68_competition_state.js';
 
 const DAY_MS = 24 * 60 * 60 * 1000;
 const WEEKDAYS = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'];
@@ -55,6 +55,14 @@ export function weighInDaysOut(intake = {}) {
 
 const CLOCK = /^Day -?\d+( of \d+)?:/;
 
+// The clock is the same for any event -- Day -7 to Day 0 -- but the words are
+// not. Telling a weightlifter about "fight week" is the rule speaking about a
+// sport the athlete does not do, and it reads as though the engine has confused
+// them with someone else.
+function eventNoun(intake = {}) {
+  return eventType(intake) === 'combat' ? 'Fight week' : 'Competition week';
+}
+
 export function collectFightWeekClockFlags(program, intake = {}, now = Date.now()) {
   const profile = competitionProfile(intake, now);
   if (!profile || !eventWeekday(intake)) return [];
@@ -72,7 +80,7 @@ export function collectFightWeekClockFlags(program, intake = {}, now = Date.now(
         flags.push({
           code: 'V77_FIGHT_WEEK_NOT_ON_THE_CLOCK',
           week, exercise: name,
-          detail: `Week ${week} is competition week but ${name} is presented by weekday alone. Fight week runs Day -7 to Day 0: every session should say how far it sits from the event, because that is the only thing that decides whether it belongs there.`,
+          detail: `Week ${week} is competition week but ${name} is presented by weekday alone. ${eventNoun(intake)} runs Day -7 to Day 0: every session should say how far it sits from the event, because that is the only thing that decides whether it belongs there.`,
         });
         break;
       }
