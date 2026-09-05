@@ -1,12 +1,12 @@
 {
-  "timestamp": "2026-09-04T13:18:15.129Z",
+  "timestamp": "2026-09-05T07:14:56.121Z",
   "base": "https://raz-coaching-platform.onrender.com",
-  "head_sha": "c62f49fc818e31a5c2f3f97e99cdbacac7a9ce2e",
-  "runtime": "launch-acceptance-v88-goal-pace-peak-block-live40-20260904",
+  "head_sha": "2106506b5ab6bcc56391a505c50d4d3c4174f669",
+  "runtime": "launch-acceptance-v89-block-architecture-live42-20260905",
   "results": [
     {
       "id": "weightlifter_peak",
-      "job_id": "440c896f5971d9d5ce972b58e0ad5805",
+      "job_id": "117dd6f37a3735b418a75ef7e0eea2a7",
       "ok": true,
       "status": "done",
       "stage": "finalizing",
@@ -14,12 +14,12 @@
       "detail": "saving program",
       "last_seen_status": "done",
       "error": null,
-      "program_chars": 22266,
-      "seconds": 306
+      "program_chars": 27946,
+      "seconds": 391
     },
     {
       "id": "inseason_footballer",
-      "job_id": "40ef569f4b78ac723c5c61059799b367",
+      "job_id": "6a3123f69bddf13ca2e59f5475a48bf0",
       "ok": true,
       "status": "done",
       "stage": "finalizing",
@@ -27,12 +27,12 @@
       "detail": "saving program",
       "last_seen_status": "done",
       "error": null,
-      "program_chars": 11148,
-      "seconds": 176
+      "program_chars": 11343,
+      "seconds": 256
     },
     {
       "id": "masters_return",
-      "job_id": "c9fbd401b71b64388c147fd4e16469ec",
+      "job_id": "d237ee9cc3467575b0ed4e1b29213782",
       "ok": true,
       "status": "done",
       "stage": "finalizing",
@@ -40,21 +40,21 @@
       "detail": "saving program",
       "last_seen_status": "done",
       "error": null,
-      "program_chars": 13558,
-      "seconds": 243
+      "program_chars": 16210,
+      "seconds": 235
     },
     {
       "id": "weightlifter_meet_week",
-      "job_id": "1d3884c9119edbb21347b9c5ce2094d5",
+      "job_id": "07edf633d5fdb9ac546683d2fa009d24",
       "ok": false,
       "status": "error",
       "stage": "refining",
       "attempt": 4,
-      "detail": "internal repair: V75_EFFORT_TOO_HIGH_DURING_CUT",
+      "detail": "internal repair: V77_FIGHT_WEEK_NOT_ON_THE_CLOCK",
       "last_seen_status": "error",
-      "error": "Internal coaching QA could not repair the candidate program after multiple passes. No client-facing program was saved. Please retry the build. QA trace: A1:EXERCISE_HALLUCINATION+V74_CAMP_SESSION_TOO_BUSY[Snatch Pull|Snatch Pull|Snatch Pull] -> A2:EXERCISE_HALLUCINATION+V75_EFFORT_TOO_HIGH_DURING_CUT[Snatch High Pull|Snatch High Pull|Snatch High Pull] -> A3:V75_EFFORT_TOO_HIGH_DURING_CUT -> A4:V75_EFFORT_TOO_HIGH_DURING_CUT. Last failure detail: Week 3 prescribes Snatch at RPE 7.5 while a routine weight cut is underway (about 4 kg to lose). A depleted athlete has less recovery margin, so the effort ceiling comes down with it. Week 4 is competition week but Snatch is presented by weekday alone. Fight week runs Day -7 to Day 0: every session should say how far it sits from the event, because that is the only thing that decides whether it belongs there. [QA:INTERNAL_QA_REPAIR_EXHAUSTED]",
+      "error": "Internal coaching QA could not repair the candidate program after multiple passes. No client-facing program was saved. Please retry the build. QA trace: A1:V34_NOTE_UNDEFINED_LOAD_REFERENCE+V38_CONSECUTIVE_CONFLICTING_EXPOSURE+V77_FIGHT_WEEK_NOT_ON_THE_CLOCK -> A2:V77_FIGHT_WEEK_NOT_ON_THE_CLOCK -> A3:V77_FIGHT_WEEK_NOT_ON_THE_CLOCK -> A4:V77_FIGHT_WEEK_NOT_ON_THE_CLOCK. Last failure detail: Week 4 is competition week but Overhead Squat is presented by weekday alone. Competition week runs Day -7 to Day 0: every session should say how far it sits from the event, because that is the only thing that decides whether it belongs there. [QA:INTERNAL_QA_REPAIR_EXHAUSTED]",
       "program_chars": 0,
-      "seconds": 572
+      "seconds": 485
     }
   ],
   "selection": [
