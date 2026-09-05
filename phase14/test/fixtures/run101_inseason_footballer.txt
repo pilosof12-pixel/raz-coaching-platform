@@ -1,0 +1,82 @@
+Match day is Saturday, and every session in this block is placed by its distance from match day. These two post-football lifts are deliberately small and repeatable. The early-week session keeps a short acceleration dose, your squat exposure, and hamstring capacity; the later-week session is deliberately low-cost and match-protective. In-season, holding speed, squat strength, and clean hamstring work on the same weekly schedule is success.
+
+Weeks 2-4: only the running variable progresses if the prior week stayed clean. Tuesday accelerations get 5 m longer through Week 3, Thursday shuttle rest trims by 5 s through Week 3, while the squat and hamstring strength doses stay steady. Week 4 keeps the main loads but cuts accessory volume and one run rep so you finish fresher, not detrained.
+
+Pain/substitution: mild right-hamstring awareness that fully warms out is the ceiling. If tightness builds during Run, Shuttle Run, or Nordic Hamstring Curl, stop the faster or eccentric row first, keep only normal-looking strength work, and repeat the last clean week. Sharp pain, radiating symptoms, loss of stride, or next-day tightness above baseline means skip hamstring loading and get staff eyes on it. If Nordic Hamstring Curl feels too grabby on a given day, replace that row with Machine Hamstring Curl 2 x 8 at RPE 6-7.
+
+WEEKLY SCHEDULE
+The sport is the load. The gym is placed around it, and the day before a match is protected.
+
+ | Mon | Tue | Wed | Thu | Fri | Sat | Sun
+Every week | Football light | Football hard + gym | Football moderate | Football hard + gym | rest (protected) | Football MATCH | rest
+
+This repeats for all four weeks: the fixture repeats, so the week does. Progress is measured in what the athlete can do on this schedule, not in load added to it.
+
+START_WEEK1_TSV
+Day	Exercise	Weight	Sets	Reps	Rest	Target RPE	Notes	Results
+Tue	[WARMUP] Run	N/A	1	4 min	N/A	3	4 min easy run plus mobility and 2 progressive buildups. Take 2 quick Back Squat ramp sets after the Run row.; Squat-and-reach x 6; Bodyweight squat x 8; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Band shoulder pass-through x 10; Wall slide x 8; Ramp Back Squat: 47.5 kg x 5, 72.5 kg x 3, 92.5 kg x 1-2 before 120 kg work sets.; Keep the warm-up specific and non-fatiguing.	
+Tue	Back Squat	120 kg	2	3	3:00	7	About 80% of the 150 kg max. Up to 2 work sets; stop after 1 if RPE exceeds 8, bar speed drops, or technique shifts.	
+Tue	Chest-Supported Row	RPE-selected load	2	8	1:30	7	Clean scapular retraction and controlled lowering.	
+Tue	Overhead Press	RPE-selected load	2	5	2:00	6.5	Submaximal support work; hold the same load if the second set slows.	
+Tue	Nordic Hamstring Curl	Bodyweight	2	3	2:30	7	Controlled 3-4 second lower with light hand push on the way up. Stop before the right side loses length or cramps.	
+Tue	Side Plank	Bodyweight	2	30 s/side	0:45	6	Keep ribs down and pelvis level.	
+Tue	Run	N/A	4	20 m	2:30	N/A	Fast relaxed accelerations with full recovery. If timed keep reps within about 3% of the best one; stop if speed drops or the right hamstring feels sticky.	
+Thu	[WARMUP] Run	N/A	1	4 min	N/A	3	4 min easy run plus mobility and 2 progressive turn buildups. Take 2 quick Barbell Hip Thrust ramp sets after the Shuttle Run row; this session stays low-cost before the weekend.; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Band shoulder pass-through x 10; Wall slide x 8; Keep the warm-up specific and non-fatiguing.	
+Thu	Barbell Hip Thrust	RPE-selected load	2	6	2:00	6.5	Low-eccentric posterior-chain support. Hold load if football legs are heavy.	
+Thu	Cable Row	RPE-selected load	2	10	1:30	7	Smooth pull to lower ribs with no shrugging.	
+Thu	Overhead Press	RPE-selected load	2	5	2:00	6	Easy crisp reps only; no grinding.	
+Thu	Machine Hamstring Curl	RPE-selected load	2	8	1:30	7	Controlled squeeze and lower under control; keep it non-sore.	
+Thu	Pallof Press	RPE-selected load	2	10/side	0:45	6	Brace and resist rotation. First accessory to remove if time or legs are poor.	
+Thu	Shuttle Run	N/A	4	20 m	1:15	N/A	10 m out plus 10 m back. Fast even turns; smooth and crisp, not exhaustive. Stop if turn quality or hamstring feel drops.	
+END_WEEK1_TSV
+START_WEEK2_TSV
+Day	Exercise	Weight	Sets	Reps	Rest	Target RPE	Notes	Results
+Tue	[WARMUP] Run	N/A	1	4 min	N/A	3	4 min easy run plus mobility and 2 progressive buildups. Take 2 quick Back Squat ramp sets after the Run row.; Squat-and-reach x 6; Bodyweight squat x 8; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Band shoulder pass-through x 10; Wall slide x 8; Ramp Back Squat: 47.5 kg x 5, 72.5 kg x 3, 92.5 kg x 1-2 before 120 kg work sets.; Keep the warm-up specific and non-fatiguing.	
+Tue	Back Squat	120 kg	2	3	3:00	7	About 80% of the 150 kg max. Up to 2 work sets; stop after 1 if RPE exceeds 8, bar speed drops, or technique shifts.	
+Tue	Chest-Supported Row	RPE-selected load	2	8	1:30	7	Clean scapular retraction and controlled lowering.	
+Tue	Overhead Press	RPE-selected load	2	5	2:00	6.5	Submaximal support work; hold the same load if the second set slows.	
+Tue	Nordic Hamstring Curl	Bodyweight	2	3	2:30	7	Controlled 3-4 second lower with light hand push on the way up. Stop before the right side loses length or cramps.	
+Tue	Side Plank	Bodyweight	2	30 s/side	0:45	6	Keep ribs down and pelvis level.	
+Tue	Run	N/A	4	25 m	2:30	N/A	Only move to 25 m if Week 1 stayed clean. Fast relaxed accelerations with full recovery; stop if speed drops or the right hamstring feels sticky.	
+Thu	[WARMUP] Run	N/A	1	4 min	N/A	3	4 min easy run plus mobility and 2 progressive turn buildups. Take 2 quick Barbell Hip Thrust ramp sets after the Shuttle Run row; this session stays low-cost before the weekend.; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Band shoulder pass-through x 10; Wall slide x 8; Keep the warm-up specific and non-fatiguing.	
+Thu	Barbell Hip Thrust	RPE-selected load	2	6	2:00	6.5	Low-eccentric posterior-chain support. Hold load if football legs are heavy.	
+Thu	Cable Row	RPE-selected load	2	10	1:30	7	Smooth pull to lower ribs with no shrugging.	
+Thu	Overhead Press	RPE-selected load	2	5	2:00	6	Easy crisp reps only; no grinding.	
+Thu	Machine Hamstring Curl	RPE-selected load	2	8	1:30	7	Controlled squeeze and lower under control; keep it non-sore.	
+Thu	Pallof Press	RPE-selected load	2	10/side	0:45	6	Brace and resist rotation. First accessory to remove if time or legs are poor.	
+Thu	Shuttle Run	N/A	4	20 m	1:10	N/A	Only trim rest if Week 1 stayed clean. 10 m out plus 10 m back; fast even turns and smooth rhythm, not exhaustive.	
+END_WEEK2_TSV
+START_WEEK3_TSV
+Day	Exercise	Weight	Sets	Reps	Rest	Target RPE	Notes	Results
+Tue	[WARMUP] Run	N/A	1	4 min	N/A	3	4 min easy run plus mobility and 2 progressive buildups. Take 2 quick Back Squat ramp sets after the Run row.; Squat-and-reach x 6; Bodyweight squat x 8; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Band shoulder pass-through x 10; Wall slide x 8; Ramp Back Squat: 47.5 kg x 5, 72.5 kg x 3, 92.5 kg x 1-2 before 120 kg work sets.; Keep the warm-up specific and non-fatiguing.	
+Tue	Back Squat	120 kg	2	3	3:00	7	About 80% of the 150 kg max. Up to 2 work sets; stop after 1 if RPE exceeds 8, bar speed drops, or technique shifts.	
+Tue	Chest-Supported Row	RPE-selected load	2	8	1:30	7	Clean scapular retraction and controlled lowering.	
+Tue	Overhead Press	RPE-selected load	2	5	2:00	6.5	Submaximal support work; hold the same load if the second set slows.	
+Tue	Nordic Hamstring Curl	Bodyweight	2	3	2:30	7	Controlled 3-4 second lower with light hand push on the way up. Stop before the right side loses length or cramps.	
+Tue	Side Plank	Bodyweight	2	30 s/side	0:45	6	Keep ribs down and pelvis level.	
+Tue	Run	N/A	4	30 m	2:30	N/A	Only move to 30 m if Week 2 stayed clean. Fast relaxed accelerations with full recovery; if timed keep reps within about 3% of the best one.	
+Thu	[WARMUP] Run	N/A	1	4 min	N/A	3	4 min easy run plus mobility and 2 progressive turn buildups. Take 2 quick Barbell Hip Thrust ramp sets after the Shuttle Run row; this session stays low-cost before the weekend.; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Band shoulder pass-through x 10; Wall slide x 8; Keep the warm-up specific and non-fatiguing.	
+Thu	Barbell Hip Thrust	RPE-selected load	2	6	2:00	6.5	Low-eccentric posterior-chain support. Hold load if football legs are heavy.	
+Thu	Cable Row	RPE-selected load	2	10	1:30	7	Smooth pull to lower ribs with no shrugging.	
+Thu	Overhead Press	RPE-selected load	2	5	2:00	6	Easy crisp reps only; no grinding.	
+Thu	Machine Hamstring Curl	RPE-selected load	2	8	1:30	7	Controlled squeeze and lower under control; keep it non-sore.	
+Thu	Pallof Press	RPE-selected load	2	10/side	0:45	6	Brace and resist rotation. First accessory to remove if time or legs are poor.	
+Thu	Shuttle Run	N/A	4	20 m	1:05	N/A	Only trim rest if Week 2 stayed clean. 10 m out plus 10 m back; keep the turns sharp without turning this into conditioning.	
+END_WEEK3_TSV
+START_WEEK4_TSV
+Day	Exercise	Weight	Sets	Reps	Rest	Target RPE	Notes	Results
+Tue	[WARMUP] Run	N/A	1	4 min	N/A	3	Consolidation week: 4 min easy run plus mobility and 2 progressive buildups. Take 2 quick Back Squat ramp sets after the Run row.; Squat-and-reach x 6; Bodyweight squat x 8; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Band shoulder pass-through x 10; Wall slide x 8; Ramp Back Squat: 47.5 kg x 5, 72.5 kg x 3, 92.5 kg x 1-2 before 120 kg work sets.; Keep the warm-up specific and non-fatiguing.	
+Tue	Back Squat	120 kg	2	3	3:00	7	Keep the same load and bar speed standard. Up to 2 work sets; stop after 1 if RPE exceeds 8 or technique shifts.	
+Tue	Chest-Supported Row	RPE-selected load	1	8	1:30	7	One clean support set only this week.	
+Tue	Overhead Press	RPE-selected load	1	5	2:00	6.5	One crisp support set only; no grind.	
+Tue	Nordic Hamstring Curl	Bodyweight	2	3	2:30	7	Keep the same controlled hamstring standard as Week 3.	
+Tue	Side Plank	Bodyweight	1	30 s/side	0:45	6	Short trunk hold; leave feeling better than you started.	
+Tue	Run	N/A	3	30 m	2:30	N/A	Consolidation: match the best Week 3 rep quality with one fewer rep. Stop if speed drops or the right hamstring feels sticky.	
+Thu	[WARMUP] Run	N/A	1	4 min	N/A	3	Consolidation week: 4 min easy run plus mobility and 2 progressive turn buildups. Take 2 quick Barbell Hip Thrust ramp sets after the Shuttle Run row; keep this session tidy and low-cost.; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Band shoulder pass-through x 10; Wall slide x 8; Keep the warm-up specific and non-fatiguing.	
+Thu	Barbell Hip Thrust	RPE-selected load	2	6	2:00	6.5	Keep the same low-eccentric posterior-chain standard as Week 3.	
+Thu	Cable Row	RPE-selected load	1	10	1:30	7	One clean support set only this week.	
+Thu	Overhead Press	RPE-selected load	1	5	2:00	6	One crisp support set only; no grinding.	
+Thu	Machine Hamstring Curl	RPE-selected load	1	8	1:30	7	One controlled hamstring set only; keep it non-sore.	
+Thu	Pallof Press	RPE-selected load	1	10/side	0:45	6	Short trunk set only; remove it first if time is tight.	
+Thu	Shuttle Run	N/A	3	20 m	1:05	N/A	Consolidation: keep Week 3 turn quality with one fewer rep. Smooth and crisp, not exhaustive.	
+END_WEEK4_TSV

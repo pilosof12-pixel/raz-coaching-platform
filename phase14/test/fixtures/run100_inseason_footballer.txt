@@ -1,0 +1,66 @@
+These two sessions are low-cost in-season support because your only gym windows sit after hard football days. The job is to keep you selectable and keep your speed, squat strength, and hamstring robustness topped up without adding soreness. Holding these qualities through the season is the win.
+
+Weeks 2-4 move one lever at a time: Week 2 sharpens the Tuesday acceleration quality, Week 3 adds only one extra Prowler Push rep-set if the hamstring stays quiet, and Week 4 trims running and sled volume while keeping the best clean quality you earned. Squat, Nordics, rows, push-ups, and trunk work stay steady on purpose.
+
+If right hamstring awareness goes beyond mild tightness during build-ups or changes your stride, skip the accelerations or Prowler Push that day and keep the lift work at RPE 6 or less. Sharp pain, radiating symptoms, a cramp that does not clear, or a worse-than-normal next day means stop the hamstring-loaded work and get club physio/coach review before progressing.
+
+START_WEEK1_TSV
+Day	Exercise	Weight	Sets	Reps	Rest	Target RPE	Notes	Results
+Tue	[WARMUP] Run	Bodyweight	1	5 min	N/A	2-3	Easy jog, dynamic hips, then 2 x 20 m build-ups; if right hamstring feels more than mild awareness, skip Run and keep squat at RPE 6.; Squat-and-reach x 6; Bodyweight squat x 8; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Ramp Back Squat: 47.5 kg x 5, 72.5 kg x 3, 92.5 kg x 1-2 before 120 kg work sets.; Keep the warm-up specific and non-fatiguing.	
+Tue	Back Squat	120 kg	2	3	3:00	6.5-7	2 x 3 is a ceiling, not an obligation; do 1 set only if first set is above RPE 7, bar speed falls, or the hamstring tightens. Take 2-3 ramp sets first.	
+Tue	Chest-Supported Row	RPE-selected load	2	8	1:15	7	Controlled squeeze each rep; upper-back support without adding extra axial fatigue.	
+Tue	Nordic Hamstring Curl	Bodyweight	2	3	2:00	7	3-sec lower, light hand assist up if needed; stop the set if the right side loses control or cramps.	
+Tue	Side Plank	Bodyweight	2	30 s/side	0:45	6	Brace ribs down and keep a straight line; trunk support for sprint posture and late-match control.	
+Tue	Run	N/A	4	20 m	2:30	N/A	90-92% relaxed accelerations; full reset each rep; stop if stride shortens, speed drops, or hamstring awareness rises.	
+Thu	[WARMUP] Run	Bodyweight	1	5 min	N/A	2-3	Easy jog, dynamic hips, then 2 x 15 m build-ups; low-cost support day, so keep the whole session crisp and short.; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Band shoulder pass-through x 10; Scapular push-up x 8; Keep the warm-up specific and non-fatiguing.	
+Thu	Barbell Hip Thrust	RPE-selected load	2	5	2:00	6.5	Smooth lockout and controlled lower; if the hamstring tightens, shorten ROM and hold the load.	
+Thu	Seated Cable Row	RPE-selected load	2	8	1:15	7	Neutral torso and hard squeeze each rep; keep it clean, not fatiguing.	
+Thu	Push-up	RPE-selected load	2	8-12	1:00	7	Use bodyweight if it lands in range with 2-3 reps in reserve; add load only if needed.	
+Thu	Pallof Press	RPE-selected load	2	10/side	0:45	6	Quiet trunk and pelvis; first accessory to remove if football load or time is poor.	
+Thu	Prowler Push	RPE-selected load	4	15 m	1:00	6	Fast smooth steps, moderate load, no grinding; this supports repeat efforts with lower eccentric cost than extra shuttles. Stop if stride length shortens or hamstring awareness rises.	
+END_WEEK1_TSV
+START_WEEK2_TSV
+Day	Exercise	Weight	Sets	Reps	Rest	Target RPE	Notes	Results
+Tue	[WARMUP] Run	Bodyweight	1	5 min	N/A	2-3	Easy jog, dynamic hips, then 2 x 20 m build-ups; if right hamstring feels more than mild awareness, repeat Week 1 exactly or skip Run.; Squat-and-reach x 6; Bodyweight squat x 8; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Ramp Back Squat: 47.5 kg x 5, 72.5 kg x 3, 92.5 kg x 1-2 before 120 kg work sets.; Keep the warm-up specific and non-fatiguing.	
+Tue	Back Squat	120 kg	2	3	3:00	6.5-7	Keep the same maintenance dose; do 1 set only if first set is above RPE 7, bar speed falls, or the hamstring tightens. Take 2-3 ramp sets first.	
+Tue	Chest-Supported Row	RPE-selected load	2	8	1:15	7	Same dose as Week 1; clean upper-back work only.	
+Tue	Nordic Hamstring Curl	Bodyweight	2	3	2:00	7	Same dose as Week 1; 3-sec lower and stop if the right side loses control or cramps.	
+Tue	Side Plank	Bodyweight	2	30 s/side	0:45	6	Same dose as Week 1; keep the line straight and breathing controlled.	
+Tue	Run	N/A	4	20 m	2:30	N/A	92-94% relaxed accelerations only if Week 1 was clean; full reset each rep and stop at the first sign of stride change or speed drop.	
+Thu	[WARMUP] Run	Bodyweight	1	5 min	N/A	2-3	Easy jog, dynamic hips, then 2 x 15 m build-ups; low-cost support day, keep Saturday readiness in mind.; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Band shoulder pass-through x 10; Scapular push-up x 8; Keep the warm-up specific and non-fatiguing.	
+Thu	Barbell Hip Thrust	RPE-selected load	2	5	2:00	6.5	Same dose as Week 1; smooth lockout and controlled lower.	
+Thu	Seated Cable Row	RPE-selected load	2	8	1:15	7	Same dose as Week 1; clean reps only.	
+Thu	Push-up	RPE-selected load	2	8-12	1:00	7	Same dose as Week 1; keep 2-3 reps in reserve.	
+Thu	Pallof Press	RPE-selected load	2	10/side	0:45	6	Same dose as Week 1; first accessory to remove if football load or time is poor.	
+Thu	Prowler Push	RPE-selected load	4	15 m	1:00	6	Hold Week 1 dose while Tuesday sprint quality nudges up; fast smooth steps, no grinding. Stop if stride shortens or hamstring awareness rises.	
+END_WEEK2_TSV
+START_WEEK3_TSV
+Day	Exercise	Weight	Sets	Reps	Rest	Target RPE	Notes	Results
+Tue	[WARMUP] Run	Bodyweight	1	5 min	N/A	2-3	Easy jog, dynamic hips, then 2 x 20 m build-ups; if right hamstring feels more than mild awareness, keep Run at the Week 2 standard or skip it.; Squat-and-reach x 6; Bodyweight squat x 8; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Ramp Back Squat: 47.5 kg x 5, 72.5 kg x 3, 92.5 kg x 1-2 before 120 kg work sets.; Keep the warm-up specific and non-fatiguing.	
+Tue	Back Squat	120 kg	2	3	3:00	6.5-7	Same maintenance dose; do 1 set only if first set is above RPE 7, bar speed falls, or the hamstring tightens. Take 2-3 ramp sets first.	
+Tue	Chest-Supported Row	RPE-selected load	2	8	1:15	7	Same dose as prior weeks; clean upper-back work only.	
+Tue	Nordic Hamstring Curl	Bodyweight	2	3	2:00	7	Same dose as prior weeks; 3-sec lower and stop if the right side loses control or cramps.	
+Tue	Side Plank	Bodyweight	2	30 s/side	0:45	6	Same dose as prior weeks; steady breathing and no sagging.	
+Tue	Run	N/A	4	20 m	2:30	N/A	Match the best clean Week 2 quality; no extra reps this week so Thursday can take the sets of 20 reps, progression. Stop at the first sign of stride change or speed drop.	
+Thu	[WARMUP] Run	Bodyweight	1	5 min	N/A	2-3	Easy jog, dynamic hips, then 2 x 15 m build-ups; low-cost support day, and this week the only new stress is one extra Prowler Push rep-set.; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Band shoulder pass-through x 10; Scapular push-up x 8; Keep the warm-up specific and non-fatiguing.	
+Thu	Barbell Hip Thrust	RPE-selected load	2	5	2:00	6.5	Same dose as prior weeks; smooth lockout and controlled lower.	
+Thu	Seated Cable Row	RPE-selected load	2	8	1:15	7	Same dose as prior weeks; clean reps only.	
+Thu	Push-up	RPE-selected load	2	8-12	1:00	7	Same dose as prior weeks; keep 2-3 reps in reserve.	
+Thu	Pallof Press	RPE-selected load	2	10/side	0:45	6	Same dose as prior weeks; first accessory to remove if football load or time is poor.	
+Thu	Prowler Push	RPE-selected load	5	15 m	1:00	6	Add 1 rep-set only if Week 2 left no next-day hamstring tightness; keep the same smooth speed and moderate load, with no grinding.	
+END_WEEK3_TSV
+START_WEEK4_TSV
+Day	Exercise	Weight	Sets	Reps	Rest	Target RPE	Notes	Results
+Tue	[WARMUP] Run	Bodyweight	1	5 min	N/A	2-3	Easy jog, dynamic hips, then 2 x 20 m build-ups; if right hamstring feels more than mild awareness, skip Run and keep squat at RPE 6.; Squat-and-reach x 6; Bodyweight squat x 8; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Ramp Back Squat: 47.5 kg x 5, 72.5 kg x 3, 92.5 kg x 1-2 before 120 kg work sets.; Keep the warm-up specific and non-fatiguing.	
+Tue	Back Squat	120 kg	2	3	3:00	6.5-7	Same maintenance dose; do 1 set only if first set is above RPE 7, bar speed falls, or the hamstring tightens. Take 2-3 ramp sets first.	
+Tue	Chest-Supported Row	RPE-selected load	2	8	1:15	7	Same dose as prior weeks; clean upper-back work only.	
+Tue	Nordic Hamstring Curl	Bodyweight	2	3	2:00	7	Same dose as prior weeks; 3-sec lower and stop if the right side loses control or cramps.	
+Tue	Side Plank	Bodyweight	2	30 s/side	0:45	6	Same dose as prior weeks; steady breathing and no sagging.	
+Tue	Run	N/A	3	20 m	2:30	N/A	Retain the best clean Week 3 speed quality, but only for 3 reps; full reset each rep and stop at the first sign of stride change or speed drop.	
+Thu	[WARMUP] Run	Bodyweight	1	5 min	N/A	2-3	Easy jog, dynamic hips, then 2 x 15 m build-ups; low-cost support day, with Saturday readiness taking priority again.; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Band shoulder pass-through x 10; Scapular push-up x 8; Keep the warm-up specific and non-fatiguing.	
+Thu	Barbell Hip Thrust	RPE-selected load	2	5	2:00	6.5	Same dose as prior weeks; smooth lockout and controlled lower.	
+Thu	Seated Cable Row	RPE-selected load	2	8	1:15	7	Same dose as prior weeks; clean reps only.	
+Thu	Push-up	RPE-selected load	2	8-12	1:00	7	Same dose as prior weeks; keep 2-3 reps in reserve.	
+Thu	Pallof Press	RPE-selected load	2	10/side	0:45	6	Same dose as prior weeks; first accessory to remove if football load or time is poor.	
+Thu	Prowler Push	RPE-selected load	4	15 m	1:00	6	Return to 4 rep-sets; keep the same smooth speed and load earned in Week 3, with no grinding.	
+END_WEEK4_TSV

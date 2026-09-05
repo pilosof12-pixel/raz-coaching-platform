@@ -13,8 +13,13 @@ const T = new URL('./fixtures/', import.meta.url);
 const read = (f) => fs.readFileSync(new URL(f, T), 'utf8');
 const CORE = JSON.parse(read('acceptance_intakes.json'));
 const HARD = JSON.parse(read('hard_avatars.json'));
-const MASTERS = fs.readFileSync(new URL('../../docs/qa/live-three-avatar/latest/masters_return-program.txt', import.meta.url), 'utf8');
-const FOOTBALL = fs.readFileSync(new URL('../../docs/qa/live-three-avatar/latest/inseason_footballer-program.txt', import.meta.url), 'utf8');
+// The block BEFORE the pace fix: nothing faster than 2:32 against a 2:14.5
+// race pace, and an identical Wednesday piece in every week.
+const MASTERS = read('run100_masters_return.txt');
+// The block after it, which visits race pace and moves the intervals.
+const MASTERS_FIXED = read('run101_masters_return.txt');
+// The block before the weekly schedule was rendered.
+const FOOTBALL = read('run100_inseason_footballer.txt');
 
 test('a distance and a time are read as a pace', () => {
   const goals = pacedGoals(HARD.masters_return);
@@ -90,4 +95,10 @@ test('showing the week answers its own flag, and is idempotent', () => {
   assert.equal(appendTrainingWeek(shown, HARD.inseason_footballer), shown);
   assert.ok(shown.indexOf('WEEKLY SCHEDULE') < shown.search(/START_WEEK1_TSV/i), 'the week belongs before the tables');
   assert.equal((shown.match(/START_WEEK\d_TSV/g) || []).length, 4, 'week tables damaged');
+});
+
+test('the delivered block now visits race pace and moves it', () => {
+  // Regression guard on the fix itself, not just on the detector.
+  assert.equal(collectGoalPaceFlags(MASTERS_FIXED, HARD.masters_return).length, 0);
+  assert.match(MASTERS_FIXED, /2:1[0-9]-2:1[0-9]\/500/, 'race-pace work should be prescribed');
 });

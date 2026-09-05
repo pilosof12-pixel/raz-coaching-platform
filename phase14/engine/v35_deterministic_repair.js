@@ -36,6 +36,7 @@ import { repairClusterNotation } from './v81_cluster_notation.js';
 import { repairCampSharpening } from './v82_camp_sharpening.js';
 import { repairInSeason, appendTrainingWeek } from './v83_in_season.js';
 import { repairClockStatement } from './v86_training_clock.js';
+import { repairDayZeroClaims, repairMatchDayPlacement } from './v89_block_architecture.js';
 import { repairBallisticShare } from './v79_ballistic_share.js';
 import { appendCompetitionBlocks } from './v73_taper_audit.js';
 import { appendCampSchedule } from './v78_sport_taper.js';
@@ -1145,6 +1146,18 @@ export function repairDeterministicContradictions(program, intake = {}) {
 
   // Last of the competition repairs: the clock is written after every other
   // rule has finished editing the notes it prefixes.
+  const dayZero = repairDayZeroClaims(candidate, intake);
+  if (dayZero !== candidate) {
+    candidate = dayZero;
+    repairs.push({ type: 'v89_unearned_peak_language_removed' });
+  }
+
+  const placed = repairMatchDayPlacement(candidate, intake);
+  if (placed !== candidate) {
+    candidate = placed;
+    repairs.push({ type: 'v89_sessions_placed_by_match_day' });
+  }
+
   const clocked = repairClockStatement(candidate, intake);
   if (clocked !== candidate) {
     candidate = clocked;

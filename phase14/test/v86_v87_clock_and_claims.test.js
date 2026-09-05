@@ -85,7 +85,7 @@ test('a week that calls itself a taper must actually taper', () => {
 });
 
 test('an accessory trained more often than the primary goal is flagged', () => {
-  const program = fs.readFileSync(new URL('../../docs/qa/live-three-avatar/latest/masters_return-program.txt', import.meta.url), 'utf8');
+  const program = read('run100_masters_return.txt');
   const flags = collectPriorityFlags(program, HARD.masters_return);
   assert.ok(flags.length > 0, 'rowing twice a week against side plank three times is an inversion');
   assert.match(flags[0].detail, /primary/i);
