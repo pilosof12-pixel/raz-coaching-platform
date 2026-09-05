@@ -1,0 +1,74 @@
+These two post-football gym sessions are there to keep you selectable and keep your usual speed/strength qualities alive through the season, not to chase soreness or gym PRs. Your field work already gives you most of the week’s sprint, change-of-direction and repeated-effort load, so the gym just tops up three things: a small speed touch on MD-4, squat/hamstring maintenance, and a very small MD-2 repeated-sprint contact.
+
+Weeks 2-3 progress only one lever at a time: Week 2 adds one acceleration rep if Week 1 stayed crisp and the next-day hamstring baseline stayed normal; Week 3 holds that and slightly tightens the shuttle recovery if Week 2 felt controlled. Week 4 is a consolidation match week: main lift loads stay the same, non-essential volume drops, and finishing fresher is the win.
+
+Pain/substitutions: any sharp pain, radiating symptoms, giving-way, or a hamstring grab ends that row immediately. If the right hamstring feels more than mild tightness on Sprint, Shuttle Run or Nordic Hamstring Curl, cut the last rep first; if it still lingers, swap that hamstring row that day to Machine Hamstring Curl at RPE 6-7 and keep the rest of the session short and clean.
+
+WEEKLY SCHEDULE
+The sport is the load. The gym is placed around it, and the day before a match is protected.
+
+ | Mon | Tue | Wed | Thu | Fri | Sat | Sun
+Every week | Football light | Football hard + gym | Football moderate | Football hard + gym | rest (protected) | Football MATCH | rest
+
+This repeats for all four weeks: the fixture repeats, so the week does. Progress is measured in what the athlete can do on this schedule, not in load added to it.
+
+START_WEEK1_TSV
+Day	Exercise	Weight	Sets	Reps	Rest	Target RPE	Notes	Results
+Tue	[WARMUP] Run	Bodyweight	1	3 min	N/A	3	MD-4 reset after football: easy jog, 2 build-ups, then ramp the squat.; Squat-and-reach x 6; Bodyweight squat x 8; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Band shoulder pass-through x 10; Scapular push-up x 8; Ramp Back Squat: 45 kg x 5, 67.5 kg x 3, 87.5 kg x 1-2 before 112.5 kg work sets.; Keep the warm-up specific and non-fatiguing.	
+Tue	Back Squat	112.5 kg	2	3	3 min	7	About 75% of your 150 kg 1RM; maintenance dose only; stop after 1 set if RPE exceeds 8, bar speed falls, or football legs are not there.	
+Tue	Chest-Supported Row	RPE-selected load	2	8	90 s	7	Upper-back support with clean scapular motion; leave 2-3 reps in reserve.	
+Tue	Dumbbell Bench Press	RPE-selected load	2	6	90 s	7	Low-cost upper push; smooth tempo and no grinding.	
+Tue	Nordic Hamstring Curl	Bodyweight	2	2	2 min	7	Controlled lower and assisted return; stop if cramp, asymmetry, or a pulling sensation shows up.	
+Thu	[WARMUP] Run	Bodyweight	1	3 min	N/A	3	MD-2 short and sharp: easy jog, 1-2 build-ups, then hip extension prep.; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Band shoulder pass-through x 10; Scapular push-up x 8; Keep the warm-up specific and non-fatiguing.	
+Thu	Barbell Hip Thrust	RPE-selected load	2	5	2 min	6.5-7	Low-eccentric posterior-chain support; pick a load with about 3 reps in reserve and stop if back position changes.	
+Thu	Seated Cable Row	RPE-selected load	2	8	90 s	7	Horizontal pull balance; squeeze and control each rep.	
+Thu	Dumbbell Bench Press	RPE-selected load	2	8	90 s	7	Moderate press volume; leave 2-3 reps in reserve.	
+Thu	Machine Hamstring Curl	RPE-selected load	2	6	60-75 s	7	Hamstring tissue dose with low soreness cost; 2 s squeeze each rep.	
+Thu	Side Plank	Bodyweight	2	30 s/side	30 s	6	Trunk stiffness for sprinting and cutting; first row to drop if time or football fatigue is high.	
+Thu	Shuttle Run	Smooth 90% pace	4	20 m	60 s	7	10 m out plus 10 m back; crisp turn, not a test; if the first 2 reps already feel too costly, stop at 3.	
+END_WEEK1_TSV
+START_WEEK2_TSV
+Day	Exercise	Weight	Sets	Reps	Rest	Target RPE	Notes	Results
+Tue	[WARMUP] Run	Bodyweight	1	3 min	N/A	3	MD-4 reset after football: easy jog, 2 build-ups, then ramp the squat.; Squat-and-reach x 6; Bodyweight squat x 8; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Band shoulder pass-through x 10; Scapular push-up x 8; Ramp Back Squat: 45 kg x 5, 67.5 kg x 3, 87.5 kg x 1-2 before 112.5 kg work sets.; Keep the warm-up specific and non-fatiguing.	
+Tue	Back Squat	112.5 kg	2	3	3 min	7	About 75% of your 150 kg 1RM; maintenance dose only; stop after 1 set if RPE exceeds 8, bar speed falls, or football legs are not there.	
+Tue	Chest-Supported Row	RPE-selected load	2	8	90 s	7	Upper-back support with clean scapular motion; leave 2-3 reps in reserve.	
+Tue	Dumbbell Bench Press	RPE-selected load	2	6	90 s	7	Low-cost upper push; smooth tempo and no grinding.	
+Tue	Nordic Hamstring Curl	Bodyweight	2	2	2 min	7	Controlled lower and assisted return; stop if cramp, asymmetry, or a pulling sensation shows up.	
+Thu	[WARMUP] Run	Bodyweight	1	3 min	N/A	3	MD-2 short and sharp: easy jog, 1-2 build-ups, then hip extension prep.; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Band shoulder pass-through x 10; Scapular push-up x 8; Keep the warm-up specific and non-fatiguing.	
+Thu	Barbell Hip Thrust	RPE-selected load	2	5	2 min	6.5-7	Low-eccentric posterior-chain support; pick a load with about 3 reps in reserve and stop if back position changes.	
+Thu	Seated Cable Row	RPE-selected load	2	8	90 s	7	Horizontal pull balance; squeeze and control each rep.	
+Thu	Dumbbell Bench Press	RPE-selected load	2	8	90 s	7	Moderate press volume; leave 2-3 reps in reserve.	
+Thu	Machine Hamstring Curl	RPE-selected load	2	6	60-75 s	7	Hamstring tissue dose with low soreness cost; 2 s squeeze each rep.	
+Thu	Side Plank	Bodyweight	2	30 s/side	30 s	6	Trunk stiffness for sprinting and cutting; first row to drop if time or football fatigue is high.	
+Thu	Shuttle Run	Smooth 90% pace	4	20 m	60 s	7	10 m out plus 10 m back; crisp turn, not a test; if the first 2 reps already feel too costly, stop at 3.	
+END_WEEK2_TSV
+START_WEEK3_TSV
+Day	Exercise	Weight	Sets	Reps	Rest	Target RPE	Notes	Results
+Tue	[WARMUP] Run	Bodyweight	1	3 min	N/A	3	MD-4 reset after football: easy jog, 2 build-ups, then ramp the squat.; Squat-and-reach x 6; Bodyweight squat x 8; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Band shoulder pass-through x 10; Scapular push-up x 8; Ramp Back Squat: 45 kg x 5, 67.5 kg x 3, 87.5 kg x 1-2 before 112.5 kg work sets.; Keep the warm-up specific and non-fatiguing.	
+Tue	Back Squat	112.5 kg	2	3	3 min	7	About 75% of your 150 kg 1RM; maintenance dose only; stop after 1 set if RPE exceeds 8, bar speed falls, or football legs are not there.	
+Tue	Chest-Supported Row	RPE-selected load	2	8	90 s	7	Upper-back support with clean scapular motion; leave 2-3 reps in reserve.	
+Tue	Dumbbell Bench Press	RPE-selected load	2	6	90 s	7	Low-cost upper push; smooth tempo and no grinding.	
+Tue	Nordic Hamstring Curl	Bodyweight	2	2	2 min	7	Controlled lower and assisted return; stop if cramp, asymmetry, or a pulling sensation shows up.	
+Thu	[WARMUP] Run	Bodyweight	1	3 min	N/A	3	MD-2 short and sharp: easy jog, 1-2 build-ups, then hip extension prep.; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Band shoulder pass-through x 10; Scapular push-up x 8; Keep the warm-up specific and non-fatiguing.	
+Thu	Barbell Hip Thrust	RPE-selected load	2	5	2 min	6.5-7	Low-eccentric posterior-chain support; pick a load with about 3 reps in reserve and stop if back position changes.	
+Thu	Seated Cable Row	RPE-selected load	2	8	90 s	7	Horizontal pull balance; squeeze and control each rep.	
+Thu	Dumbbell Bench Press	RPE-selected load	2	8	90 s	7	Moderate press volume; leave 2-3 reps in reserve.	
+Thu	Machine Hamstring Curl	RPE-selected load	2	6	60-75 s	7	Hamstring tissue dose with low soreness cost; 2 s squeeze each rep.	
+Thu	Side Plank	Bodyweight	2	30 s/side	30 s	6	Trunk stiffness for sprinting and cutting; first row to drop if time or football fatigue is high.	
+Thu	Shuttle Run	Smooth 90% pace	4	20 m	50 s	7	10 m out plus 10 m back; only tighten the recovery if Week 2 felt controlled and next-day hamstring baseline stayed normal; otherwise repeat 60 s.	
+END_WEEK3_TSV
+START_WEEK4_TSV
+Day	Exercise	Weight	Sets	Reps	Rest	Target RPE	Notes	Results
+Tue	[WARMUP] Run	Bodyweight	1	3 min	N/A	3	MD-4 consolidation week: easy jog, 2 build-ups, then ramp the squat; keep it crisp and leave the gym fresher.; Squat-and-reach x 6; Bodyweight squat x 8; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Band shoulder pass-through x 10; Scapular push-up x 8; Ramp Back Squat: 45 kg x 5, 67.5 kg x 3, 87.5 kg x 1-2 before 112.5 kg work sets.; Keep the warm-up specific and non-fatiguing.	
+Tue	Back Squat	112.5 kg	2	3	3 min	7	About 75% of your 150 kg 1RM; hold the same maintenance load and stop after 1 set if RPE exceeds 8, bar speed falls, or football legs are not there.	
+Tue	Chest-Supported Row	RPE-selected load	1	8	90 s	7	Consolidation week: one clean support set only, leaving 2-3 reps in reserve.	
+Tue	Dumbbell Bench Press	RPE-selected load	1	6	90 s	7	Consolidation week: one clean support set only, no grinding.	
+Tue	Nordic Hamstring Curl	Bodyweight	1	2	2 min	7	Consolidation week: keep the controlled quality and stop if cramp, asymmetry, or a pulling sensation shows up.	
+Thu	[WARMUP] Run	Bodyweight	1	3 min	N/A	3	MD-2 consolidation week: easy jog, 1-2 build-ups, then hip extension prep; short and sharp only.; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Band shoulder pass-through x 10; Scapular push-up x 8; Keep the warm-up specific and non-fatiguing.	
+Thu	Barbell Hip Thrust	RPE-selected load	2	5	2 min	6.5-7	Hold the same low-eccentric posterior-chain load with about 3 reps in reserve; stop if back position changes.	
+Thu	Seated Cable Row	RPE-selected load	1	8	90 s	7	Consolidation week: one clean support set only.	
+Thu	Dumbbell Bench Press	RPE-selected load	1	8	90 s	7	Consolidation week: one clean support set only, leave 2-3 reps in reserve.	
+Thu	Machine Hamstring Curl	RPE-selected load	1	6	60-75 s	7	Consolidation week: one low-cost hamstring set with a 2 s squeeze each rep.	
+Thu	Side Plank	Bodyweight	1	30 s/side	30 s	6	Consolidation week: one trunk set only; skip this first if time or football fatigue is high.	
+Thu	Shuttle Run	Smooth 90% pace	3	20 m	60 s	7	10 m out plus 10 m back; keep the turns crisp, not exhaustive, and finish feeling ready for Saturday.	
+END_WEEK4_TSV
