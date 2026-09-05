@@ -1,66 +1,38 @@
 {
-  "timestamp": "2026-09-05T12:13:29.187Z",
+  "timestamp": "2026-09-05T12:53:11.772Z",
   "base": "https://raz-coaching-platform.onrender.com",
-  "head_sha": "17b2e760390e625ac6a3a5372e8a57dead159d1c",
-  "runtime": "live44 2026-09-05T12:12:13Z",
+  "head_sha": "1f75e702e710549d73fe738f3c765dcb0a740001",
+  "runtime": "live45 2026-09-05T12:52:24Z",
   "results": [
     {
       "id": "mma_fight_camp",
-      "job_id": "e9ab63a55a94f992078a94e66439819d",
+      "job_id": "9e0f9d140a79785b8143f5066ef85324",
       "ok": false,
-      "status": "job_disappeared",
+      "status": "error",
       "stage": "generating",
-      "attempt": 2,
+      "attempt": 3,
       "detail": "regenerating after quality check",
-      "last_seen_status": "pending",
-      "error": "Job state absent for 180s after successful earlier polling; service likely restarted mid-build.",
+      "last_seen_status": "error",
+      "error": "You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/.",
       "program_chars": 0,
-      "seconds": 625
-    },
-    {
-      "id": "inseason_footballer",
-      "job_id": "3eb6d48508a710021c3449fde4b3dfab",
-      "ok": true,
-      "status": "done",
-      "stage": "finalizing",
-      "attempt": 0,
-      "detail": "saving program",
-      "last_seen_status": "done",
-      "error": null,
-      "program_chars": 10240,
-      "seconds": 164
-    },
-    {
-      "id": "masters_return",
-      "job_id": "19422d1a09e40614d0f70dccb23d42e2",
-      "ok": true,
-      "status": "done",
-      "stage": "finalizing",
-      "attempt": 0,
-      "detail": "saving program",
-      "last_seen_status": "done",
-      "error": null,
-      "program_chars": 16120,
-      "seconds": 184
+      "seconds": 278
     },
     {
       "id": "weightlifter_meet_week",
-      "job_id": "c5dd16cfc1478532f2a3b3e0e84c9861",
-      "ok": true,
-      "status": "done",
-      "stage": "finalizing",
-      "attempt": 0,
-      "detail": "saving program",
-      "last_seen_status": "done",
-      "error": null,
-      "program_chars": 17825,
-      "seconds": 379
+      "job_id": "d06fea0e1c7ab7348e40ed629e07dd36",
+      "ok": false,
+      "status": "error",
+      "stage": "generating",
+      "attempt": 1,
+      "detail": "initial generation",
+      "last_seen_status": "error",
+      "error": "You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/.",
+      "program_chars": 0,
+      "seconds": 4
     }
   ],
   "selection": [
     "mma_fight_camp",
-    "inseason_footballer",
-    "masters_return",
     "weightlifter_meet_week"
   ],
   "ok": false
