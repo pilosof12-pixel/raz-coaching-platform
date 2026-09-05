@@ -73,7 +73,7 @@ export function collectCombatPowerFlags(program, intake = {}, now = Date.now()) 
 
 // Chosen for cost and for what the athlete actually has. Rotational throws come
 // first because rotational power is what strikes and takedowns are made of.
-const POWER_OPTIONS = [
+export const POWER_OPTIONS = [
   { name: 'Medicine Ball Rotational Throw', needs: /med(?:icine)? ?ball/i, sets: '3', reps: '3 per side', rest: '90 sec', rpe: '7',
     note: 'Rotational power for striking and takedown drive. Throw hard, reset fully, and stop the set the moment speed drops.' },
   { name: 'Trap Bar Jump', needs: /trap ?bar/i, sets: '3', reps: '3', rest: '2 min', rpe: '7',

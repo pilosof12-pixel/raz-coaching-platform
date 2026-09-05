@@ -291,6 +291,21 @@ export function repairCompetitionWeek(program, intake = {}, now = Date.now()) {
     }
   }
 
+  // 2b. Say what the trimming made. The structural audit accepts a short session
+  // when it is declared a taper or competition-prep session, which is exactly
+  // what these are. Trimming silently gave the meet week three
+  // V38_INCOMPLETE_SESSION failures the delivered program did not have -- this
+  // rule manufacturing a defect for a blocking gate it has no repair for.
+  view().forEach((session) => {
+    const live = session.rows.filter((r) => !dropped.has(r.index));
+    if (!live.length || live.length > 2) return;
+    if (!Number.isInteger(parsed.notes)) return;
+    const said = live.some((r) => /\bcompetition prep\b|\btaper\b/i.test(String(rows[r.index][parsed.notes] || '')));
+    if (said) return;
+    note(live[0].index, 'Competition prep: this session is deliberately short because the week is a descent into the event.');
+    changed = true;
+  });
+
   // 3. The final primer is an offer.
   sessions = view();
   const last = sessions[sessions.length - 1];

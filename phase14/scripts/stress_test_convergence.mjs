@@ -83,6 +83,40 @@ const INTAKES = {
   },
 };
 
+// The competition, in-season and return avatars were built after this harness
+// was written, and were never stress-tested: the three above are the only ones
+// it has ever covered. Their intakes are read out of the live acceptance
+// workflow rather than copied, so an avatar cannot pass here against a
+// definition of the athlete that differs from the one it is run with.
+const WORKFLOW = path.join(root, '..', '..', '.github', 'workflows', 'live-three-avatar-acceptance.yml');
+function workflowIntake(constName) {
+  const src = fs.readFileSync(WORKFLOW, 'utf8');
+  const seg = src.slice(src.indexOf(`const ${constName}=`));
+  const literal = seg.match(/\{"age"[\s\S]*?"qa_diagnostics": true\}/);
+  if (!literal) throw new Error(`stress: cannot read intake ${constName} from the acceptance workflow`);
+  return JSON.parse(literal[0]);
+}
+const inWeeks = (w) => new Date(Date.now() + w * 7 * 86400000).toISOString().slice(0, 10);
+
+Object.assign(INTAKES, {
+  weightlifter_peak: {
+    ...workflowIntake('weightlifter'),
+    competition_date: inWeeks(8), event_type: 'strength_meet', event_priority: 'A',
+  },
+  weightlifter_meet_week: {
+    ...workflowIntake('lifterMeet'),
+    competition_date: inWeeks(4), event_type: 'strength_meet', event_priority: 'A',
+  },
+  mma_fight_camp: {
+    ...workflowIntake('mmacamp'),
+    competition_date: inWeeks(4), weigh_in_date: inWeeks(4 - 1 / 7),
+    event_type: 'combat', event_priority: 'A',
+    weight_class_status: 'difficult', weight_vs_class: '81 kg now, 77 kg class',
+  },
+  inseason_footballer: workflowIntake('footballer'),
+  masters_return: workflowIntake('masters'),
+});
+
 // Each perturbation reproduces a defect that has actually failed a live run.
 // `applies` keeps a perturbation off avatars where it is meaningless.
 const PERTURBATIONS = [
@@ -177,6 +211,89 @@ const PERTURBATIONS = [
     applies: ['tactical_3k'],
     apply: (p) => p.replace(/(START_WEEK2_TSV[\s\S]*?)(\t)(\d+)( kg\t)/, (m, a, t, kg, u) => `${a}${t}${Number(kg) + 25}${u}`),
   },
+
+  // --- defects the competition, in-season and return blocks actually failed on
+  // this session. Each one cost a live attempt, a coach rating, or both.
+
+  {
+    id: 'repeated-doubles-in-comp-week', seen: 'run #104 meet week, coach 9.0',
+    applies: ['weightlifter_meet_week'],
+    // The ballistic swap promoted the competition lift as a "familiar primer"
+    // and carried its mid-block dose into the meet week: Snatch 5 x 2 at RPE 7.
+    apply: (p) => p.replace(/(START_WEEK4_TSV[\s\S]*?)\n(Day -4\t)([^\t]+)(\t[^\t]*\t)\d+(\t)\d+/,
+      (m, head, day, name, load, tab) => `${head}\n${day}Snatch${load}5${tab}2`),
+  },
+  {
+    id: 'one-exposure-every-day', seen: 'run #106 meet week, push-up on all five days',
+    applies: ['weightlifter_meet_week'],
+    apply: (p) => p.replace(/(START_WEEK4_TSV\s*\n[^\n]*\n)/,
+      '$1Day -5\tExplosive Push-up\tBodyweight\t3\t3\t90 sec\t7\tBallistic primer.\t\n'
+      + 'Day -4\tExplosive Push-up\tBodyweight\t3\t3\t90 sec\t7\tBallistic primer.\t\n'
+      + 'Day -3\tExplosive Push-up\tBodyweight\t3\t3\t90 sec\t7\tBallistic primer.\t\n'),
+  },
+  {
+    id: 'final-primer-mandatory', seen: 'coach review: "Day -1 primer is conditional, not mandatory"',
+    applies: ['weightlifter_meet_week'],
+    // Only inside the notes column, so the block structure survives: a
+    // perturbation has to produce a plausible program with a defect, not a
+    // corrupted file that fails the schema for reasons no live run would.
+    apply: (p) => p.replace(/(START_WEEK4_TSV[\s\S]*?END_WEEK4_TSV)/, (block) => block.split('\n').map((l) => {
+      const c = l.split('\t');
+      if (c.length > 8) c[7] = String(c[7] || '').replace(/\b(?:optional|skip it entirely|skip if[^.;]*|nothing at all)\b/gi, 'complete as written');
+      return c.join('\t');
+    }).join('\n')),
+  },
+  {
+    id: 'session-grows-into-day-zero', seen: 'run #104 meet week, Day -4 heavier than Day -5',
+    applies: ['weightlifter_meet_week'],
+    apply: (p) => p.replace(/(START_WEEK4_TSV\s*\n[^\n]*\n)/,
+      '$1Day -1\tChest-Supported Row\tRPE-selected load\t5\t8\t2 min\t8\tBack volume.\t\n'),
+  },
+  {
+    id: 'sport-allocation-flat', seen: 'run #101 masters, 31% in all four weeks',
+    applies: ['masters_return'],
+    // Put the general work back so the sport's share stops moving.
+    apply: (p) => p.replace(/(START_WEEK[34]_TSV[\s\S]*?END_WEEK[34]_TSV)/g, (block) => block.split('\n').map((l) => {
+      const c = l.split('\t');
+      if (c.length > 6 && !/erg|ergometer/i.test(c[1] || '')) {
+        const n = Number(String(c[3]).match(/\d+/)?.[0]);
+        if (Number.isFinite(n)) c[3] = String(n + 2);
+      }
+      return c.join('\t');
+    }).join('\n')),
+  },
+  {
+    id: 'sport-frequency-static', seen: 'coach review: shift frequency, not only accessory sets',
+    applies: ['masters_return'],
+    // Take the extra erg day back out of the later weeks.
+    apply: (p) => p.replace(/(START_WEEK[34]_TSV[\s\S]*?END_WEEK[34]_TSV)/g, (block) => {
+      const lines = block.split('\n');
+      let seen = 0;
+      return lines.filter((l) => {
+        const c = l.split('\t');
+        if (c.length > 6 && /^\s*Rowing Ergometer\s*$/i.test(c[1] || '')) { seen += 1; return seen <= 2; }
+        return true;
+      }).join('\n');
+    }),
+  },
+  {
+    id: 'taper-session-reads-as-rest', seen: 'MMA gym_day_count_mismatch, every week',
+    applies: ['mma_fight_camp', 'weightlifter_meet_week'],
+    // Drop every working row to RPE 5, which is what a well-built taper looks
+    // like -- and what made the whole session classify as a rest day. Header and
+    // marker lines are left alone so only the prescription changes.
+    apply: (p) => p.replace(/(START_WEEK4_TSV[\s\S]*?END_WEEK4_TSV)/, (block) => block.split('\n').map((l) => {
+      if (/^(?:START|END)_WEEK/.test(l) || /^Day\t/i.test(l)) return l;
+      const c = l.split('\t');
+      if (c.length > 8 && c[1] && !/^\s*\[WARMUP\]/i.test(c[1])) c[6] = '5';
+      return c.join('\t');
+    }).join('\n')),
+  },
+  {
+    id: 'match-day-labels-stripped', seen: 'coach instruction 2, in-season microcycle',
+    applies: ['inseason_footballer'],
+    apply: (p) => p.replace(/MD[-+]\d/g, 'Session'),
+  },
 ];
 
 function allFindings(program, intake, id) {
@@ -258,8 +375,9 @@ const tactical = per('tactical_3k');
 const hybrid = per('advanced_hybrid');
 
 console.log('\n--- convergence: defects repaired without asking the model again ---');
-for (const [name, s] of [['youth_gymnastics', youth], ['tactical_3k', tactical], ['advanced_hybrid', hybrid]]) {
-  console.log(`  ${name.padEnd(20)} ${s.converged}/${s.total} (${s.rate}%)   rubric 9+: ${s.nine}/${s.converged}`);
+for (const name of Object.keys(INTAKES)) {
+  const st = per(name);
+  console.log(`  ${name.padEnd(24)} ${st.converged}/${st.total} (${st.rate}%)   rubric 9+: ${st.nine}/${st.converged}`);
 }
 
 // Acceptance criteria, stated so the verdict is not a matter of opinion.
@@ -273,6 +391,14 @@ const checks = [
   ['Tactical converges on every defect', tactical.converged === tactical.total],
   ['Tactical holds 9+ on every converged program', tactical.nine === tactical.converged && tactical.converged > 0],
   ['Hybrid produces a releasable program', hybrid.converged > 0],
+  ...Object.keys(INTAKES).map((name) => {
+    const st = per(name);
+    // Every avatar must repair every defect without a regeneration, and must
+    // actually have been damaged: a perturbation that changes nothing tests
+    // nothing, and a green line built from those is worse than no line.
+    return [`${name} converges on every defect (${st.converged}/${st.total})`,
+      st.total > 0 && st.converged === st.total];
+  }),
   ['Hybrid converges on every defect', hybrid.converged === hybrid.total],
 ];
 
@@ -282,7 +408,7 @@ for (const [label, ok] of checks) {
   if (!ok) failed += 1;
   console.log(`  ${ok ? 'PASS' : 'FAIL'}  ${label}`);
 }
-const required = checks.slice(0, 5); // the last is aspirational, reported not enforced
+const required = checks.slice(0, checks.length - 1); // the last is aspirational, reported not enforced
 const requiredFailed = required.filter(([, ok]) => !ok).length;
 console.log(`\nVERDICT: ${requiredFailed === 0 ? 'PASS' : 'FAIL'} (${required.length - requiredFailed}/${required.length} required checks)`);
 process.exitCode = requiredFailed === 0 ? 0 : 1;

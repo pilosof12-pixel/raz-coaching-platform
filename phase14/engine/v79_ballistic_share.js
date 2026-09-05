@@ -27,7 +27,7 @@ const SLED = /\b(?:prowler|sled|push drive|acceleration)\b/i;
 const SWAPPABLE = /\b(?:row|pulldown|fly|curl|extension|lateral raise|plank|dead bug|shoulder press|bench|chest press|leg press|calf)\b/i;
 
 // Ordered by how sport-specific they are for a fighter.
-const BALLISTIC_OPTIONS = [
+export const BALLISTIC_OPTIONS = [
   { name: 'Medicine Ball Rotational Throw', needs: /med(?:icine)? ?ball/i, sets: '3', reps: '3 per side', rest: '90 sec', rpe: '7',
     note: 'Rotational power for striking and takedown drive. Throw hard, reset fully, stop the moment speed drops.' },
   { name: 'Medicine Ball Scoop Throw', needs: /med(?:icine)? ?ball/i, sets: '3', reps: '3', rest: '90 sec', rpe: '7',

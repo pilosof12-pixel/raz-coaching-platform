@@ -129,6 +129,11 @@ const DICTIONARY_LIST = [
   "Nordic Hamstring Curl", "Plank", "Hollow Hold", "Hollow Body Rock",
   "Superman Hold", "Dead Bug", "Bird Dog", "Glute Bridge",
   "Single-Leg Glute Bridge", "Ring Push-up", "Ring Hamstring Curl", "Box Jump", "Broad Jump", "Tuck Jump",
+  // Ballistic and loaded-jump work the repair layer itself prescribes. These are
+  // not model inventions: v79 and v72 insert them by name, and until they were
+  // listed here the engine was writing exercises its own gate rejects.
+  "Explosive Push-up", "Medicine Ball Slam", "Medicine Ball Scoop Throw",
+  "Medicine Ball Rotational Throw", "Trap Bar Jump",
   "Burpee", "Mountain Climber", "Wall Sit", "Calf Raise",
   "Standing Calf Raise", "Seated Calf Raise", "Sit-up", "Crunch",
   "Russian Twist", "V-Up", "Flutter Kick", "Bear Crawl", "Ring Support Hold",
