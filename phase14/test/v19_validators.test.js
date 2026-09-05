@@ -15,6 +15,7 @@ import {
   ELITE_UNILATERAL_TRIGGER,
   enforceIntradayConditioningOrder,
   validateSportDayCoupling,
+  swapSportDayContent,
   validateWeeklyVolumeBudget,
   reformatWarmupCells,
   RetriableValidationError,
@@ -350,4 +351,47 @@ test("validateSportDayCoupling: a taper session counts as a scheduled gym day", 
     "Tue\tTrap Bar Jump\tLight\t3\t3\t90s\t6\tFull reset every rep.\t",
   ]);
   assert.throws(() => validateSportDayCoupling(oneDay, taperIntake), /SPORT_DAY_COUPLING_VIOLATION/);
+});
+
+// ---------------------------------------------------------------------------
+// TEST: the sport-day gate must be answerable.
+// ---------------------------------------------------------------------------
+test("swapSportDayContent moves a session off a day the athlete cannot attend", () => {
+  // This repair was a stub that returned the program unchanged, so
+  // SPORT_DAY_COUPLING_VIOLATION -- a blocking gate -- could never be answered:
+  // every program that tripped it was regenerated until the attempt budget ran
+  // out and the build died with the customer already charged.
+  const intake = {
+    sport: 'MMA', days_per_week: 2, available_gym_days: ['Tue', 'Fri'],
+    sport_schedule: [{ day: 'Mon', intensity: 'hard' }],
+  };
+  const misplaced = program([
+    "Tue\tTrap Bar Jump\tLight\t3\t3\t90s\t6\tFull reset.\t",
+    "Wed\tTrap Bar Jump\tLight\t3\t3\t90s\t6\tSpeed only.\t",
+    "\tPull-up\tBodyweight\t2\t5\t90s\t6\tContinuation row.\t",
+  ]);
+  assert.throws(() => validateSportDayCoupling(misplaced, intake), /SPORT_DAY_COUPLING_VIOLATION/);
+
+  const fixed = swapSportDayContent(misplaced, intake);
+  assert.equal(validateSportDayCoupling(fixed, intake).ok, true, 'the repair must answer the gate');
+  assert.equal(swapSportDayContent(fixed, intake), fixed, 'repair is not idempotent');
+  assert.match(fixed, /Fri\tTrap Bar Jump/, 'the session moves to a day the athlete has');
+  assert.ok(!/Wed\tTrap Bar Jump/.test(fixed), 'and leaves the day they do not');
+  // The continuation row carries no day of its own and must stay with its session.
+  assert.match(fixed, /Fri\tTrap Bar Jump[^\n]*\n\tPull-up/);
+});
+
+test("the repair never invents or deletes a session to satisfy a count", () => {
+  // Moving rows cannot conjure a session that is not there. A repair that
+  // pretended otherwise would satisfy the gate by misrepresenting the week.
+  const intake = { sport: 'MMA', days_per_week: 2, available_gym_days: ['Tue', 'Fri'], sport_schedule: [] };
+  const onlyOne = program(["Tue\tTrap Bar Jump\tLight\t3\t3\t90s\t6\tFull reset.\t"]);
+  assert.equal(swapSportDayContent(onlyOne, intake), onlyOne, 'nothing to move, nothing invented');
+  assert.throws(() => validateSportDayCoupling(onlyOne, intake), /SPORT_DAY_COUPLING_VIOLATION/);
+});
+
+test("an athlete with no stated gym days is left alone", () => {
+  const intake = { sport: 'BJJ', sport_schedule: [] };
+  const p = program(["Wed\tBack Squat\t150 kg\t3\t3\t3 min\t8\tHeavy.\t"]);
+  assert.equal(swapSportDayContent(p, intake), p);
 });

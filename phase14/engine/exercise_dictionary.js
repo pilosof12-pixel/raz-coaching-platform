@@ -1603,8 +1603,63 @@ export function validateSportDayCoupling(program, intake = {}) {
 // entire training days merely because they sit within 48h of sport. Only an
 // explicit short-gap hard collision is annotated; the retry prompt should solve
 // the schedule because moving a whole day can damage goal specificity.
+// SPORT_DAY_COUPLING_VIOLATION is a blocking gate, and this was its registered
+// repair -- returning the program untouched. So the gate could never be
+// answered: every program that tripped it was regenerated until the attempt
+// budget ran out, and the build died with the customer already charged.
+//
+// The one violation a repair can honestly resolve is a session placed on a day
+// the athlete cannot attend. That is a scheduling mistake with a correct
+// deterministic answer: move the session to a day they can. It is not a
+// judgement about training content, so nothing is invented and nothing is lost.
+//
+// A day-count mismatch is deliberately left alone. Moving rows cannot conjure a
+// session that is not there or delete one the athlete asked for, and a repair
+// that pretends otherwise would hand back a program that satisfies the gate by
+// misrepresenting the week.
 export function swapSportDayContent(program, intake = {}) {
-  return program;
+  const available = Array.isArray(intake.available_gym_days)
+    ? [...new Set(intake.available_gym_days.map(dayIndex).filter((i) => i >= 0))].sort((a, b) => a - b)
+    : [];
+  if (!available.length) return program;
+  const availableSet = new Set(available);
+
+  const timeline = buildStrengthTimeline(program, intake);
+  const misplaced = timeline
+    .map((type, i) => (type !== "rest" && !availableSet.has(i) ? i : -1))
+    .filter((i) => i >= 0);
+  if (!misplaced.length) return program;
+
+  // Only days the athlete has free: never stack a moved session on top of one
+  // that is already there.
+  const free = available.filter((i) => timeline[i] === "rest");
+  if (!free.length) return program;
+
+  const label = (i) => WEEK_ORDER[i].charAt(0).toUpperCase() + WEEK_ORDER[i].slice(1);
+  const moves = new Map();
+  misplaced.forEach((from, n) => { if (n < free.length) moves.set(WEEK_ORDER[from], label(free[n])); });
+  if (!moves.size) return program;
+
+  // Rows carry a day token only on the first line of a session; the rest inherit
+  // it. Rewrite the tokens that are present and leave the continuation rows to
+  // follow, exactly as every other day-aware rule in the engine reads them.
+  let header = null;
+  let inBlock = false;
+  return String(program || "").split("\n").map((line) => {
+    if (/^\s*START_WEEK\d+_TSV/i.test(line)) { inBlock = true; header = null; return line; }
+    if (/^\s*END_WEEK\d+_TSV/i.test(line)) { inBlock = false; header = null; return line; }
+    if (!inBlock) return line;
+    const cells = line.split("\t");
+    if (!header) { header = cells.map((c) => c.trim().toLowerCase()); return line; }
+    const idx = colIdx(header, "day");
+    if (idx < 0 || idx >= cells.length) return line;
+    const token = String(cells[idx] || "").trim();
+    if (!token) return line;
+    const to = moves.get(token.toLowerCase().slice(0, 3));
+    if (!to) return line;
+    cells[idx] = to;
+    return cells.join("\t");
+  }).join("\n");
 }
 
 function capitalize(s) { return String(s || "").charAt(0).toUpperCase() + String(s || "").slice(1); }
