@@ -1,0 +1,29 @@
+name: Live Render stress test
+
+on:
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  live-stress:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Run live avatar stress test
+        run: node scripts/live_stress_test.mjs
+      - name: Upload stress output
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: live-stress-output
+          path: stress-output/
+          if-no-files-found: warn
