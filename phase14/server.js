@@ -1669,6 +1669,10 @@ async function generateValidatedProgram(intake, onProgress = async () => {}) {
   const failCounts = Object.create(null);
   let lastValid = null;
   const deadline = Date.now() + BUILD_JOB_TIMEOUT_MS;
+  // Timeouts and empty responses are infrastructure, not quality verdicts, so
+  // they retry on their own budget rather than eating the repair attempts.
+  let transientRetries = 0;
+  const MAX_TRANSIENT_RETRIES = 3;
 
   for (let attempt = 1; attempt <= MAX_ATTEMPTS; attempt++) {
     if (Date.now() >= deadline) {
@@ -1700,10 +1704,25 @@ async function generateValidatedProgram(intake, onProgress = async () => {}) {
       const retriable = e?.code === "OPENAI_EMPTY_OUTPUT" || aborted;
       // The deadline check at the top of the loop still owns the real limit, so
       // a retry can only happen when there is genuinely budget left for one.
-      if (!retriable || attempt >= MAX_ATTEMPTS) throw e;
+      //
+      // And if an abort is not a verdict on the program, it must not cost a
+      // quality attempt either. It did: the attempt counter advanced on every
+      // timeout, so a slow intake burned its whole repair budget without one
+      // program ever being judged, and the fourth abort was fatal while job
+      // budget still sat unspent -- which is how the Hyrox block died after
+      // twenty-seven minutes without the QA chain ever seeing a candidate.
+      // Transient failures now retry against the deadline on their own
+      // counter; the quality budget is spent only on programs QA rejected.
+      if (!retriable) throw e;
       const reason = aborted ? "generation exceeded the request ceiling" : "empty model output";
-      console.warn(`generateValidatedProgram: ${reason} on attempt ${attempt}/${MAX_ATTEMPTS}; retrying`);
-      await onProgress("refining", attempt, aborted ? "generation timed out; retrying" : "model returned no content; retrying");
+      if (transientRetries >= MAX_TRANSIENT_RETRIES || Date.now() >= deadline) {
+        console.warn(`generateValidatedProgram: ${reason}, transient budget exhausted (${transientRetries}/${MAX_TRANSIENT_RETRIES})`);
+        throw e;
+      }
+      transientRetries++;
+      attempt--; // this attempt judged nothing, so it does not count as one
+      console.warn(`generateValidatedProgram: ${reason}; transient retry ${transientRetries}/${MAX_TRANSIENT_RETRIES}`);
+      await onProgress("refining", attempt + 1, aborted ? "generation timed out; retrying" : "model returned no content; retrying");
       continue;
     }
     if (!isValidProgram(raw)) {
