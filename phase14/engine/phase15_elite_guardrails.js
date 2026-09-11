@@ -136,7 +136,11 @@ export function eventProgressionBearing(item) {
   // representation as progression-bearing rather than forcing stylistic wording.
   const clockTarget = /\b\d{1,2}:\d{2}(?:\s*(?:-|–|to)\s*\d{1,2}:\d{2})?\b/.test(s);
   const distanceTarget = /\b\d+(?:\.\d+)?\s*(?:m|km)\b/i.test(s);
-  return explicitTarget || (clockTarget && distanceTarget); // ROWING-500M-SPLIT-PROGRESSION + DISTANCE-CLOCK-TARGET
+  const runWalkTarget = /\b\d+(?:\.\d+)?\s*min(?:ute)?s?\b[^.;]{0,30}\b(?:run|jog)\b[^.;]{0,40}\b\d+(?:\.\d+)?\s*min(?:ute)?s?\b[^.;]{0,20}\bwalk\b/i.test(s)
+    || /\brun[- ]?walk\b[^.;]{0,40}\b\d+(?:\.\d+)?\s*min(?:ute)?s?\b/i.test(s);
+  const continuousTarget = /\b\d+(?:\.\d+)?\s*min(?:ute)?s?\b[^.;]{0,30}\b(?:continuous|unbroken|without walking|non[- ]?stop)\b/i.test(s)
+    || /\b(?:continuous|unbroken|non[- ]?stop)\b[^.;]{0,30}\b\d+(?:\.\d+)?\s*min(?:ute)?s?\b/i.test(s);
+  return explicitTarget || (clockTarget && distanceTarget) || runWalkTarget || continuousTarget; // ROWING-500M-SPLIT-PROGRESSION + DISTANCE-CLOCK-TARGET + RETURN-TO-RUN-DURATION
 }
 
 function currentRunningRaceAnchor(intake={}) {

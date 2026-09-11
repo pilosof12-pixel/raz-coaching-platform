@@ -454,8 +454,16 @@ export const LOCATION_EQUIPMENT_WHITELIST = new Map([
     "pull_up_bar", "dip_bars", "parallel_bars", "bench", "rings", "bands",
     "weighted_vest", "backpack", "sprint_lane", "hill", "stairs",
   ])],
-  ["hotel_room", new Set(["bands", "doorframe_bar"])],
-  ["travel", new Set(["bands", "doorframe_bar"])],
+  ["hotel_room", new Set([
+    "bands", "doorframe_bar", "pull_up_bar", "dumbbells", "adjustable_dumbbells",
+    "kettlebells", "bench", "treadmill", "bike", "rower", "cable_stack", "machine",
+    "weighted_vest", "backpack", "stairs",
+  ])],
+  ["travel", new Set([
+    "bands", "doorframe_bar", "pull_up_bar", "dumbbells", "adjustable_dumbbells",
+    "kettlebells", "bench", "treadmill", "bike", "rower", "cable_stack", "machine",
+    "weighted_vest", "backpack", "stairs", "sprint_lane", "hill",
+  ])],
   ["home_bodyweight", new Set()], // {} + intake extras (handled as union below)
   ["home_gym", new Set([
     "barbell", "rack", "plates", "bench", "adjustable_dumbbells", "dumbbells",
