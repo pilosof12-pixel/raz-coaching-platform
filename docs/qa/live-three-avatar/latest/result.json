@@ -1,39 +1,73 @@
 {
-  "timestamp": "2026-09-05T12:53:11.772Z",
+  "timestamp": "2026-09-11T11:39:51.674Z",
   "base": "https://raz-coaching-platform.onrender.com",
-  "head_sha": "1f75e702e710549d73fe738f3c765dcb0a740001",
-  "runtime": "live45 2026-09-05T12:52:24Z",
+  "head_sha": "5b904baf731c3185a17ea816c969f19a6511d71d",
+  "runtime": "live46 2026-09-11T11:38:29Z",
   "results": [
     {
       "id": "mma_fight_camp",
-      "job_id": "9e0f9d140a79785b8143f5066ef85324",
-      "ok": false,
-      "status": "error",
-      "stage": "generating",
-      "attempt": 3,
-      "detail": "regenerating after quality check",
-      "last_seen_status": "error",
-      "error": "You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/.",
-      "program_chars": 0,
-      "seconds": 278
+      "job_id": "f84f11ebdf617fdcf42e52ec51c33b13",
+      "ok": true,
+      "status": "done",
+      "stage": "finalizing",
+      "attempt": 0,
+      "detail": "saving program",
+      "last_seen_status": "done",
+      "error": null,
+      "program_chars": 12023,
+      "seconds": 418
     },
     {
-      "id": "weightlifter_meet_week",
-      "job_id": "d06fea0e1c7ab7348e40ed629e07dd36",
+      "id": "hebrew_lifter",
+      "job_id": "e8c73ab5bd5bbb677c1c4bfe78ff8806",
+      "ok": true,
+      "status": "done",
+      "stage": "finalizing",
+      "attempt": 0,
+      "detail": "saving program",
+      "last_seen_status": "done",
+      "error": null,
+      "program_chars": 11377,
+      "seconds": 250
+    },
+    {
+      "id": "dual_event_hyrox",
+      "job_id": "324d32e751419e8ad9425b1d85e79fc5",
       "ok": false,
       "status": "error",
       "stage": "generating",
-      "attempt": 1,
-      "detail": "initial generation",
+      "attempt": 4,
+      "detail": "regenerating after quality check",
       "last_seen_status": "error",
-      "error": "You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/.",
+      "error": "This operation was aborted [QA:20]",
       "program_chars": 0,
-      "seconds": 4
+      "seconds": 1651
+    },
+    {
+      "id": "travelling_exec",
+      "ok": false,
+      "error": "build not accepted 400 {\"error\":\"Please choose a valid training location.\"}"
+    },
+    {
+      "id": "postpartum_runner",
+      "job_id": "c836b17f2ebb4aba7627936f13f61f9f",
+      "ok": false,
+      "status": "error",
+      "stage": "refining",
+      "attempt": 4,
+      "detail": "internal repair: EVENT_PROGRESSING_SESSION_MISSING",
+      "last_seen_status": "error",
+      "error": "Internal coaching QA could not repair the candidate program after multiple passes. No client-facing program was saved. Please retry the build. QA trace: A1:EVENT_PROGRESSING_SESSION_MISSING -> A2:EVENT_PROGRESSING_SESSION_MISSING -> A3:EVENT_PROGRESSING_SESSION_MISSING -> A4:EVENT_PROGRESSING_SESSION_MISSING. Last failure detail: Week 2: The running performance goal 'Run a continuous 10 km again' has no progression-bearing event-specific session in Week 1. For marathon preparation, an explicitly identified long run with a prescribed duration/distance is a valid event-specific progression anchor; other events still require their source-supported pace/power/split/interval or equivalent progression. [QA:INTERNAL_QA_REPAIR_EXHAUSTED]",
+      "program_chars": 0,
+      "seconds": 443
     }
   ],
   "selection": [
     "mma_fight_camp",
-    "weightlifter_meet_week"
+    "hebrew_lifter",
+    "dual_event_hyrox",
+    "travelling_exec",
+    "postpartum_runner"
   ],
   "ok": false
 }
