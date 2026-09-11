@@ -133,7 +133,7 @@ const DICTIONARY_LIST = [
   // not model inventions: v79 and v72 insert them by name, and until they were
   // listed here the engine was writing exercises its own gate rejects.
   "Explosive Push-up", "Medicine Ball Slam", "Medicine Ball Scoop Throw",
-  "Medicine Ball Rotational Throw", "Trap Bar Jump",
+  "Medicine Ball Rotational Throw", "Trap Bar Jump", "Trap Bar Deadlift",
   "Burpee", "Mountain Climber", "Wall Sit", "Calf Raise",
   "Standing Calf Raise", "Seated Calf Raise", "Sit-up", "Crunch",
   "Russian Twist", "V-Up", "Flutter Kick", "Bear Crawl", "Ring Support Hold",
@@ -284,6 +284,8 @@ const ALIAS_LIST = [
   ["Step Up", "Step-Up"],
   ["Step Ups", "Step-Up"],
   ["Box Jumps", "Box Jump"],
+  ["Hex Bar Deadlift", "Trap Bar Deadlift"],
+  ["Trap-Bar Deadlift", "Trap Bar Deadlift"],
   ["Hill Sprints", "Hill Sprint"],
   ["Sprints", "Sprint"],
   ["Muscle Up", "Muscle-up"],
@@ -1690,21 +1692,46 @@ export function swapSportDayContent(program, intake = {}) {
   // follow, exactly as every other day-aware rule in the engine reads them.
   let header = null;
   let inBlock = false;
-  return String(program || "").split("\n").map((line) => {
-    if (/^\s*START_WEEK\d+_TSV/i.test(line)) { inBlock = true; header = null; return line; }
-    if (/^\s*END_WEEK\d+_TSV/i.test(line)) { inBlock = false; header = null; return line; }
-    if (!inBlock) return line;
+  let exIdx = -1;
+  let dayIdx = -1;
+  let currentDay = "";
+  const seenPerDay = new Map(); // week-scoped: day -> Set(exercise)
+  const out = [];
+  for (const line of String(program || "").split("\n")) {
+    if (/^\s*START_WEEK\d+_TSV/i.test(line)) {
+      inBlock = true; header = null; currentDay = ""; seenPerDay.clear(); out.push(line); continue;
+    }
+    if (/^\s*END_WEEK\d+_TSV/i.test(line)) { inBlock = false; header = null; out.push(line); continue; }
+    if (!inBlock) { out.push(line); continue; }
     const cells = line.split("\t");
-    if (!header) { header = cells.map((c) => c.trim().toLowerCase()); return line; }
-    const idx = colIdx(header, "day");
-    if (idx < 0 || idx >= cells.length) return line;
-    const token = String(cells[idx] || "").trim();
-    if (!token) return line;
-    const to = moves.get(token.toLowerCase().slice(0, 3));
-    if (!to) return line;
-    cells[idx] = to;
-    return cells.join("\t");
-  }).join("\n");
+    if (!header) {
+      header = cells.map((c) => c.trim().toLowerCase());
+      dayIdx = colIdx(header, "day");
+      exIdx = colIdx(header, "exercise");
+      out.push(line);
+      continue;
+    }
+    if (dayIdx < 0 || dayIdx >= cells.length) { out.push(line); continue; }
+    const token = String(cells[dayIdx] || "").trim();
+    if (token) currentDay = token;
+    const to = moves.get(currentDay.toLowerCase().slice(0, 3));
+    const day = to || currentDay;
+    if (to && token) cells[dayIdx] = to;
+    else if (to) cells[dayIdx] = "";
+
+    // One exposure of a movement per day. A moved row that names something the
+    // destination already trains is dropped, not stacked on top of it.
+    const name = exIdx >= 0 ? String(cells[exIdx] || "").trim().toLowerCase() : "";
+    if (name && !/^\s*\[/.test(name)) {
+      const key = day.toLowerCase().slice(0, 3);
+      if (!seenPerDay.has(key)) seenPerDay.set(key, new Set());
+      const seen = seenPerDay.get(key);
+      if (to && seen.has(name)) continue;
+      seen.add(name);
+    }
+    out.push(cells.join("\t"));
+  }
+  return out.join("\n");
 }
 
 function capitalize(s) { return String(s || "").charAt(0).toUpperCase() + String(s || "").slice(1); }

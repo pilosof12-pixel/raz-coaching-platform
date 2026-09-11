@@ -9,6 +9,7 @@ import {
   validateAndCalibrateSkills,
   coreExerciseName,
   norm,
+  swapSportDayContent,
 } from './exercise_dictionary.js';
 import { repairPhase15Program } from './phase15_program_qa.js';
 import { validatePhase15FinalProgram } from './phase15_final_qa.js';
@@ -228,6 +229,22 @@ function aggregateError(flags) {
 function applyDeterministicCandidateRepairs(program, intake = {}) {
   let candidate = String(program || '');
   const repairs = [];
+
+  // A session on a day the athlete cannot attend has a deterministic answer:
+  // move it to a day they can. This has to run here, before the gates, because
+  // validateSportDayCouplingSemantic is checked long before the late repair
+  // chain -- a repair that runs after its own gate never clears it.
+  //
+  // The repair itself was only ever wired into hardSubstitute, and the pipeline
+  // stopped calling that when the final safety net was replaced by a hard
+  // failure. So nothing ran it in production at all, and
+  // SPORT_DAY_COUPLING_VIOLATION became unanswerable: it killed a fight camp
+  // and a dual-event block in a single paid run.
+  const placedOnAvailableDays = swapSportDayContent(candidate, intake);
+  if (placedOnAvailableDays !== candidate) {
+    candidate = placedOnAvailableDays;
+    repairs.push({ type: 'v19_sport_day_placement' });
+  }
 
   const warmed = enrichSpecificWarmups(candidate, intake);
   if (warmed !== candidate) {
