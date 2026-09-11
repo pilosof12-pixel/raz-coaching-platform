@@ -1,72 +1,66 @@
 {
-  "timestamp": "2026-09-11T11:39:51.674Z",
+  "timestamp": "2026-09-11T13:59:48.443Z",
   "base": "https://raz-coaching-platform.onrender.com",
-  "head_sha": "5b904baf731c3185a17ea816c969f19a6511d71d",
-  "runtime": "live46 2026-09-11T11:38:29Z",
+  "head_sha": "7be47b1ea88fda5bd410327d1c8df63c2b80ae31",
+  "runtime": "live47 2026-09-11T13:58:56Z",
   "results": [
     {
       "id": "mma_fight_camp",
-      "job_id": "f84f11ebdf617fdcf42e52ec51c33b13",
-      "ok": true,
-      "status": "done",
-      "stage": "finalizing",
-      "attempt": 0,
-      "detail": "saving program",
-      "last_seen_status": "done",
-      "error": null,
-      "program_chars": 12023,
-      "seconds": 418
-    },
-    {
-      "id": "hebrew_lifter",
-      "job_id": "e8c73ab5bd5bbb677c1c4bfe78ff8806",
-      "ok": true,
-      "status": "done",
-      "stage": "finalizing",
-      "attempt": 0,
-      "detail": "saving program",
-      "last_seen_status": "done",
-      "error": null,
-      "program_chars": 11377,
-      "seconds": 250
-    },
-    {
-      "id": "dual_event_hyrox",
-      "job_id": "324d32e751419e8ad9425b1d85e79fc5",
-      "ok": false,
-      "status": "error",
-      "stage": "generating",
-      "attempt": 4,
-      "detail": "regenerating after quality check",
-      "last_seen_status": "error",
-      "error": "This operation was aborted [QA:20]",
-      "program_chars": 0,
-      "seconds": 1651
-    },
-    {
-      "id": "travelling_exec",
-      "ok": false,
-      "error": "build not accepted 400 {\"error\":\"Please choose a valid training location.\"}"
-    },
-    {
-      "id": "postpartum_runner",
-      "job_id": "c836b17f2ebb4aba7627936f13f61f9f",
+      "job_id": "7ebc202771c330f4e5828d66860b7390",
       "ok": false,
       "status": "error",
       "stage": "refining",
       "attempt": 4,
-      "detail": "internal repair: EVENT_PROGRESSING_SESSION_MISSING",
+      "detail": "internal repair: SPORT_DAY_COUPLING_VIOLATION+V82_POWER_EXPOSURE_DUPLICATED",
       "last_seen_status": "error",
-      "error": "Internal coaching QA could not repair the candidate program after multiple passes. No client-facing program was saved. Please retry the build. QA trace: A1:EVENT_PROGRESSING_SESSION_MISSING -> A2:EVENT_PROGRESSING_SESSION_MISSING -> A3:EVENT_PROGRESSING_SESSION_MISSING -> A4:EVENT_PROGRESSING_SESSION_MISSING. Last failure detail: Week 2: The running performance goal 'Run a continuous 10 km again' has no progression-bearing event-specific session in Week 1. For marathon preparation, an explicitly identified long run with a prescribed duration/distance is a valid event-specific progression anchor; other events still require their source-supported pace/power/split/interval or equivalent progression. [QA:INTERNAL_QA_REPAIR_EXHAUSTED]",
+      "error": "Internal coaching QA could not repair the candidate program after multiple passes. No client-facing program was saved. Please retry the build. QA trace: A1:V82_POWER_EXPOSURE_DUPLICATED+TSV_WEEK_BLOCK_MISSING -> A2:SPORT_DAY_COUPLING_VIOLATION+V82_POWER_EXPOSURE_DUPLICATED -> A3:SPORT_DAY_COUPLING_VIOLATION+V82_POWER_EXPOSURE_DUPLICATED -> A4:SPORT_DAY_COUPLING_VIOLATION+V82_POWER_EXPOSURE_DUPLICATED. Last failure detail: PRIOR ATTEMPT FAILED SPORT/CALENDAR VALIDATION. days_per_week means requested strength sessions, not total active calendar days. Week 4: strength/skill-strength work is scheduled on unavailable day(s) day 4. Week 4: strength/skill-strength work is scheduled on unavailable day(s) day 1. Keep run-only, ruck-only, sport-only and conditioning-only days in the weekly calendar for fatigue/collision analysis, but do not count them toward the requested strength-session frequency. | Week 3 runs Explosive Push-up on both Tue and Fri. Two doses of one movement is not two exposures -- it is the same stimu [QA:INTERNAL_QA_REPAIR_EXHAUSTED]",
       "program_chars": 0,
-      "seconds": 443
+      "seconds": 698
+    },
+    {
+      "id": "hebrew_lifter",
+      "job_id": "b2d84f22f63798d21a58cdbfd5c728a6",
+      "ok": true,
+      "status": "done",
+      "stage": "finalizing",
+      "attempt": 0,
+      "detail": "saving program",
+      "last_seen_status": "done",
+      "error": null,
+      "program_chars": 10881,
+      "seconds": 212
+    },
+    {
+      "id": "dual_event_hyrox",
+      "job_id": "b10a7b9f2b5501995fd3f73ba276dcb2",
+      "ok": false,
+      "status": "error",
+      "stage": "refining",
+      "attempt": 4,
+      "detail": "internal repair: SPORT_DAY_COUPLING_VIOLATION",
+      "last_seen_status": "error",
+      "error": "Internal coaching QA could not repair the candidate program after multiple passes. No client-facing program was saved. Please retry the build. QA trace: A1:SPORT_DAY_COUPLING_VIOLATION -> A2:SPORT_DAY_COUPLING_VIOLATION -> A3:SPORT_DAY_COUPLING_VIOLATION+V74_CAMP_SESSION_TOO_BUSY -> A4:SPORT_DAY_COUPLING_VIOLATION. Last failure detail: PRIOR ATTEMPT FAILED SPORT/CALENDAR VALIDATION. days_per_week means requested strength sessions, not total active calendar days. Week 1: expected 4 strength/skill-strength days, found 6 (monday, tuesday, wednesday, thursday, fri sport only, sun sport only). Week 2: expected 4 strength/skill-strength days, found 6 (monday, tuesday, wednesday, thursday, fri sport only, sun sport only). Week 3: expected 4 strength/skill-strength days, found 6 (monday, tuesday, wednesday, thursday, fri sport only, sun sport only). Keep run-only, ruck-only, sport-only and conditioning-only days in the weekly calend [QA:INTERNAL_QA_REPAIR_EXHAUSTED]",
+      "program_chars": 0,
+      "seconds": 621
+    },
+    {
+      "id": "postpartum_runner",
+      "job_id": "40b62545c860d5353987a0d169d39f13",
+      "ok": true,
+      "status": "done",
+      "stage": "finalizing",
+      "attempt": 0,
+      "detail": "saving program",
+      "last_seen_status": "done",
+      "error": null,
+      "program_chars": 14498,
+      "seconds": 285
     }
   ],
   "selection": [
     "mma_fight_camp",
     "hebrew_lifter",
     "dual_event_hyrox",
-    "travelling_exec",
     "postpartum_runner"
   ],
   "ok": false

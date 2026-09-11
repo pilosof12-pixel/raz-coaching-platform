@@ -1,90 +1,85 @@
-הבלוק הזה מדויק ל-3 ימים רצופים עם התאוששות בינונית: שני הוא היום הכי ממוקד למטרות הכוח, שלישי בונה נפח תומך לפלג הגוף העליון בעייפות נשלטת, ורביעי שומר דפוס וכוח בלי להכביד יותר מדי.
+המטרה כאן היא התקדמות נקייה בסקוואט ובלחיצת חזה, בלי לנפח עייפות מיותרת. יש לך שתי חשיפות ישירות לכל תנועה בכל שבוע, ועוד נפח חכם לפלג גוף עליון כדי לקדם גם כוח וגם מסת שריר.
 
-בשבוע 2 מעלים מעט את דרישת העבודה רק בתרגילי המטרה של יום שני אם ה-RPE נשאר בטווח. בשבוע 3 מחזיקים את תרגילי המטרה ומוסיפים מעט נפח תמיכה לגב ולפלג הגוף העליון. שבוע 4 הוא שבוע קונסולידציה: פחות סטים, אותו סטנדרט טכני, כדי לצאת רענן יותר ולא “לרדוף” אחרי עייפות.
+שבוע 2 מחזיק את המשקלים הראשיים ומשפר שליטה/נפח בתרגילי התמיכה. שבוע 3 מנסה קפיצה קטנה בתרגילים הראשיים רק אם שבוע 2 נשאר נקי ובטווח ה-RPE. שבוע 4 הוא שבוע קונסולידציה: פחות סטים, בערך אותה עצימות, כדי לצאת רענן יותר ולא “להפסיד” כוח.
 
-אם הכתף הימנית לא נרגעת אחרי החימום או הכאב עולה מעל 3/10, החלף באותו יום Weighted Push-up ל-Push-up ושמור 2-3 חזרות ברזרבה. אם אין Prowler במכון, החלף באותו יום ל-Heavy Farmer Carry באותו RPE ולמרחק דומה; אם גם זה מרגיש כבד מדי לגב או לאחיזה, קצץ סט אחד.
+אם כאב הכתף הימנית לא נרגע אחרי החימום או עולה מעל 3/10, עצור את Bench Press באותו יום, עבור ל-Dumbbell Bench Press ב-RPE עד 7, ואל תנסה “לדחוף דרך זה”. אם בסקוואט הברייסינג או העומק נשברים, הורד 2.5-5 ק״ג או חתוך סט אחד וחזור על השבוע המוצלח האחרון.
 
 START_WEEK1_TSV
 Day	Exercise	Weight	Sets	Reps	Rest	Target RPE	Notes	Results
-Mon	[WARMUP] Skipping Warm-up	משקל גוף	1	3-4 דק׳	30 שנ׳	N/A	העלה דופק בעדינות והכן קרסוליים וברכיים.; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Band shoulder pass-through x 10; Scapular push-up x 8; Keep the warm-up specific and non-fatiguing.	
-Mon	[WARMUP] Band Pull-Apart Warm-up	גומייה קלה	2	15	30-45 שנ׳	N/A	פתיחת כתפיים עדינה; בלי כאב חד.	
-Mon	Weighted Push-up	בחירת עומס לפי RPE	4	4-6	150 שנ׳	7.5	מצא עומס ל-4-6 נקיות עם כ-2 חזרות ברזרבה. אם הכתף עולה מעל 3/10 או הטכניקה נשברת, הורד עומס או עבור ל-Push-up.	
-Mon	Chest-Supported Row	בחירת עומס לפי RPE	3	8-10	90 שנ׳	8	התחל בתחתית הטווח; כשכל הסטים מגיעים ל-10 נקי, העלה מעט עומס.	
-Mon	Side Plank	משקל גוף	3	30-40 שנ׳ לכל צד	45 שנ׳	N/A	שמור קו גוף ישר ובטן פעילה; עצור לפני רעד שמפרק מנח.	
-Mon	Prowler Push	בחירת עומס לפי RPE	6	20 מ׳	90-120 שנ׳	7	דחיפות קצרות וחזקות; עבודה עצבית, לא מטבולית. אם הקצב נופל או הגב מתעגל, הורד עומס או חתוך סט.	
-Tue	[WARMUP] Skipping Warm-up	משקל גוף	1	3 דק׳	30 שנ׳	N/A	העלה דופק קלות והכן את הכתפיים והמרפקים.; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Band shoulder pass-through x 10; Scapular push-up x 8; Keep the warm-up specific and non-fatiguing.	
-Tue	[WARMUP] Band Pull-Apart Warm-up	גומייה קלה	2	15	30-45 שנ׳	N/A	חימום כתפיים עדין לפני הדחיקות.	
-Tue	Weighted Push-up	בחירת עומס לפי RPE	3	6-8	120-150 שנ׳	7	יום נפח נמוך-עייפות; שמור 2-3 חזרות ברזרבה. אם יום שני יושב חזק, שמור אותו עומס או הורד מעט.	
-Tue	Seated Cable Row	בחירת עומס לפי RPE	3	8-10	75-90 שנ׳	8	שליטה מלאה בשכמות; כשתגיע ל-10 בכל הסטים, העלה מעט עומס.	
-Tue	One-Arm Dumbbell Row	בחירת עומס לפי RPE	2	10-12 לכל צד	60-75 שנ׳	8	עבוד יד-יד בלי סיבוב גו; כשתגיע ל-12 בכל צד, העלה מעט עומס.	
-Tue	Zone-2 Row	קצב קל יציב	1	10 דק׳	N/A	5-6	תחזוקה אירובית בלבד; קצב שאפשר לדבר בו.	
-Wed	[WARMUP] Skipping Warm-up	משקל גוף	1	3-4 דק׳	30 שנ׳	N/A	העלה דופק והכן ירכיים וקרסוליים.; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Band shoulder pass-through x 10; Scapular push-up x 8; Keep the warm-up specific and non-fatiguing.	
-Wed	[WARMUP] Band Pull-Apart Warm-up	גומייה קלה	2	15	30-45 שנ׳	N/A	פתיחת כתפיים קלה לפני הדחיקות.	
-Wed	Push-up	משקל גוף	3	8-12	90 שנ׳	7	שליטה מלאה בטווח; עצור 2-3 חזרות לפני כשל. אם הכתף רגישה, קצר מעט טווח ושמור כאב עד 3/10.	
-Wed	Chest-Supported Row	בחירת עומס לפי RPE	3	10-12	75-90 שנ׳	8	משוך למגע עקבי וסיים כל חזרה בשליטה; כשתגיע ל-12 בכל הסטים, העלה מעט עומס.	
-Wed	Prowler Push	בחירת עומס לפי RPE	5	15-20 מ׳	90-120 שנ׳	6.5	יום שימור דפוס; השאר מהיר ונקי. אם הרגליים כבדות, קצץ ל-4 סטים.	
-Wed	Heavy Farmer Carry	בחירת עומס לפי RPE	4	20 מ׳	60-75 שנ׳	7.5	הליכה יציבה וקצרה; אם האחיזה נפתחת או היציבה קורסת, הורד עומס.	
+Mon	[WARMUP] Band Pull-Apart Warm-up	משקל גוף	2	15	30-45 שנ׳	N/A	חימום כתף ושכמות; לפני Bench Press ו-Back Squat בצע גם 2-4 סטים מדורגים.; Squat-and-reach x 6; Bodyweight squat x 8; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Band shoulder pass-through x 10; Scapular push-up x 8; סקוואט עם הושטה x 6; סקוואט משקל גוף x 8; מתח סקפולרי 2 x 5-6; פתיחת גומייה x 10-12; העברת גומייה מעל הראש x 10; שכיבת סמיכה סקפולרית x 8	
+Mon	Bench Press	67.5-70 ק"ג	4	4	3 דק׳	7.5-8	התחל בקצה התחתון; אם סט 1 כבר מעל 8 או שהכתף לא נרגעת, החזק/רד 2.5-5 ק״ג או עבור ל-Dumbbell Bench Press ב-RPE 7.	
+Mon	Back Squat	80-82.5 ק"ג	3	5	2.5-3 דק׳	6.5-7	חשיפה תומכת וזולה; אם הברייסינג או העומק נשברים, הורד מעט או עצור אחרי 2 סטים טובים.	
+Mon	Chest-Supported Row	עומס לפי RPE	3	8	90 שנ׳	8	חתירה תומכת ליציבות בלחיצה; שמור שליטה מלאה בשיא הכיווץ.	
+Mon	Side Plank	משקל גוף	2	30-40 שנ׳/צד	45 שנ׳	7	בטן וצד; שמור קו גוף ישר ונשימה רגועה.	
+Tue	[WARMUP] Band Pull-Apart Warm-up	משקל גוף	2	15	30-45 שנ׳	N/A	חימום כתף ושכמות; קצר ומדויק לפני עבודת פלג הגוף העליון.; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Band shoulder pass-through x 10; Scapular push-up x 8; מתח סקפולרי 2 x 5-6; פתיחת גומייה x 10-12; העברת גומייה מעל הראש x 10; שכיבת סמיכה סקפולרית x 8	
+Tue	Dumbbell Bench Press	עומס לפי RPE	3	8	2 דק׳	8	בחר עומס שתוכל לשמור איתו 3x8 נקי; אל תעלה משקל לפני שכל 3 הסטים מגיעים ל-10 באותו RPE.	
+Tue	Seated Cable Row	עומס לפי RPE	3	10	90 שנ׳	8	חתירה אופקית לאיזון כתפיים ולתמיכת לחיצה.	
+Tue	Pull-up	משקל גוף	2	5-6	2 דק׳	7-8	השאר 1-2 חזרות במיכל; אם 6 שוברת קצב, הישאר על 5.	
+Tue	Pallof Press	עומס לפי RPE	2	10/צד	45 שנ׳	7	אנטי-רוטציה; קצר, נקי ובלי פיצוי בגב.	
+Tue	Zone-2 Row	קצב קל יציב	1	8 דקות	N/A	5	תחזוקת אירובי בלבד; נשימה רגועה, בלי לצבור עייפות לרביעי.	
+Wed	[WARMUP] Band Pull-Apart Warm-up	משקל גוף	2	15	30-45 שנ׳	N/A	חימום כתף ושכמות; לפני Back Squat ו-Bench Press בצע גם 2-4 סטים מדורגים.; Squat-and-reach x 6; Bodyweight squat x 8; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Band shoulder pass-through x 10; Scapular push-up x 8; סקוואט עם הושטה x 6; סקוואט משקל גוף x 8; מתח סקפולרי 2 x 5-6; פתיחת גומייה x 10-12; העברת גומייה מעל הראש x 10; שכיבת סמיכה סקפולרית x 8	
+Wed	Back Squat	92.5-95 ק"ג	4	4	3 דק׳	7.5-8	היום הכבד לסקוואט; אם סט 1 כבר מעל 8 או שהעומק לא עקבי, החזק/רד 2.5-5 ק״ג ושמור 4x4 נקי.	
+Wed	Bench Press	60-62.5 ק"ג	3	6	2.5 דק׳	7	חשיפה שנייה ללחיצה; אם הכתף מציקה אחרי החימום, אחיזה מעט צרה יותר ושמור RPE עד 7, או עבור ל-Dumbbell Bench Press.	
+Wed	Cable Row	עומס לפי RPE	3	8	90 שנ׳	8	חתירה בלי עומס צירי מיותר אחרי הסקוואט.	
+Wed	Dead Bug	משקל גוף	2	8/צד	45 שנ׳	6	שליטה בגו; צלעות למטה ונשיפה מלאה בכל חזרה.	
 END_WEEK1_TSV
+
 START_WEEK2_TSV
 Day	Exercise	Weight	Sets	Reps	Rest	Target RPE	Notes	Results
-Mon	[WARMUP] Skipping Warm-up	משקל גוף	1	3-4 דק׳	30 שנ׳	N/A	העלה דופק בעדינות והכן קרסוליים וברכיים.; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Band shoulder pass-through x 10; Scapular push-up x 8; Keep the warm-up specific and non-fatiguing.	
-Mon	[WARMUP] Band Pull-Apart Warm-up	גומייה קלה	2	15	30-45 שנ׳	N/A	פתיחת כתפיים עדינה; בלי כאב חד.	
-Mon	Weighted Push-up	בחירת עומס לפי RPE	4	4-6	150 שנ׳	8	נסה להוסיף חזרה כוללת או מעט עומס רק אם שבוע 1 נשאר נקי. כאב כתף מעל 3/10 = הורד עומס או עבור ל-Push-up.	
-Mon	Chest-Supported Row	בחירת עומס לפי RPE	3	8-10	90 שנ׳	8	שמור אותו מבנה; כשכל הסטים מגיעים ל-10 נקי, העלה מעט עומס.	
-Mon	Side Plank	משקל גוף	3	30-40 שנ׳ לכל צד	45 שנ׳	N/A	שמור קו גוף ישר ובטן פעילה; עצור לפני רעד שמפרק מנח.	
-Mon	Prowler Push	בחירת עומס לפי RPE	6	20 מ׳	90-120 שנ׳	7.5	אם שבוע 1 היה בתוך הטווח, הוסף מעט עומס. אם הקצב נופל או היציבה נשברת, חזור לעומס שבוע 1.	
-Tue	[WARMUP] Skipping Warm-up	משקל גוף	1	3 דק׳	30 שנ׳	N/A	העלה דופק קלות והכן את הכתפיים והמרפקים.; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Band shoulder pass-through x 10; Scapular push-up x 8; Keep the warm-up specific and non-fatiguing.	
-Tue	[WARMUP] Band Pull-Apart Warm-up	גומייה קלה	2	15	30-45 שנ׳	N/A	חימום כתפיים עדין לפני הדחיקות.	
-Tue	Weighted Push-up	בחירת עומס לפי RPE	3	6-8	120-150 שנ׳	7	יום נפח נמוך-עייפות; שמור 2-3 חזרות ברזרבה. אם יום שני כבד, הישאר בקצה התחתון של הטווח.	
-Tue	Seated Cable Row	בחירת עומס לפי RPE	3	8-10	75-90 שנ׳	8	שליטה מלאה בשכמות; כשתגיע ל-10 בכל הסטים, העלה מעט עומס.	
-Tue	One-Arm Dumbbell Row	בחירת עומס לפי RPE	2	10-12 לכל צד	60-75 שנ׳	8	עבוד יד-יד בלי סיבוב גו; כשתגיע ל-12 בכל צד, העלה מעט עומס.	
-Tue	Zone-2 Row	קצב קל יציב	1	10 דק׳	N/A	5-6	תחזוקה אירובית בלבד; קצב שאפשר לדבר בו.	
-Wed	[WARMUP] Skipping Warm-up	משקל גוף	1	3-4 דק׳	30 שנ׳	N/A	העלה דופק והכן ירכיים וקרסוליים.; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Band shoulder pass-through x 10; Scapular push-up x 8; Keep the warm-up specific and non-fatiguing.	
-Wed	[WARMUP] Band Pull-Apart Warm-up	גומייה קלה	2	15	30-45 שנ׳	N/A	פתיחת כתפיים קלה לפני הדחיקות.	
-Wed	Push-up	משקל גוף	3	8-12	90 שנ׳	7	שליטה מלאה בטווח; עצור 2-3 חזרות לפני כשל. אם הכתף רגישה, קצר מעט טווח ושמור כאב עד 3/10.	
-Wed	Chest-Supported Row	בחירת עומס לפי RPE	3	10-12	75-90 שנ׳	8	משוך למגע עקבי וסיים כל חזרה בשליטה; כשתגיע ל-12 בכל הסטים, העלה מעט עומס.	
-Wed	Prowler Push	בחירת עומס לפי RPE	5	15-20 מ׳	90-120 שנ׳	6.5	יום שימור דפוס; השאר מהיר ונקי. אם הרגליים כבדות, קצץ ל-4 סטים.	
-Wed	Heavy Farmer Carry	בחירת עומס לפי RPE	4	20 מ׳	60-75 שנ׳	7.5	הליכה יציבה וקצרה; אם האחיזה נפתחת או היציבה קורסת, הורד עומס.	
+Mon	[WARMUP] Band Pull-Apart Warm-up	משקל גוף	2	15	30-45 שנ׳	N/A	חימום כתף ושכמות; לפני Bench Press ו-Back Squat בצע גם 2-4 סטים מדורגים.; Squat-and-reach x 6; Bodyweight squat x 8; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Band shoulder pass-through x 10; Scapular push-up x 8; סקוואט עם הושטה x 6; סקוואט משקל גוף x 8; מתח סקפולרי 2 x 5-6; פתיחת גומייה x 10-12; העברת גומייה מעל הראש x 10; שכיבת סמיכה סקפולרית x 8	
+Mon	Bench Press	67.5-70 ק"ג	4	4	3 דק׳	7.5-8	שמור את משקל שבוע 1 אם היה בטווח; המטרה השבוע היא בר מהיר ויציב יותר, לא גירוד בכוח. אם RPE קופץ, החזק/רד מעט.	
+Mon	Back Squat	82.5-85 ק"ג	3	5	2.5-3 דק׳	7	עלה רק אם שבוע 1 נשאר נקי ועדיין זול; אחרת חזור על אותו משקל.	
+Mon	Chest-Supported Row	עומס לפי RPE	3	9	90 שנ׳	8	שמור שליטה מלאה; אם הסט השלישי נמרח, חזור ל-8 חזרות.	
+Mon	Side Plank	משקל גוף	2	35-40 שנ׳/צד	45 שנ׳	7	החזק יציב בלי סיבוב אגן.	
+Tue	[WARMUP] Band Pull-Apart Warm-up	משקל גוף	2	15	30-45 שנ׳	N/A	חימום כתף ושכמות; קצר ומדויק לפני עבודת פלג הגוף העליון.; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Band shoulder pass-through x 10; Scapular push-up x 8; מתח סקפולרי 2 x 5-6; פתיחת גומייה x 10-12; העברת גומייה מעל הראש x 10; שכיבת סמיכה סקפולרית x 8	
+Tue	Dumbbell Bench Press	עומס לפי RPE	3	9	2 דק׳	8	שמור אותו עומס אם שבוע 1 היה בטווח; אם כבר בסט הראשון זה מעל 8, חזור ל-8 חזרות.	
+Tue	Seated Cable Row	עומס לפי RPE	3	11	90 שנ׳	8	הוסף חזרה רק אם איכות המשיכה נשמרת בלי נדנוד גוף.	
+Tue	Pull-up	משקל גוף	2	6	2 דק׳	7-8	כל החזרות נקיות; אם הסט השני נשבר, חזור ל-5 בשבוע הבא.	
+Tue	Pallof Press	עומס לפי RPE	2	10/צד	45 שנ׳	7	אנטי-רוטציה; קצר ונקי.	
+Tue	Zone-2 Row	קצב קל יציב	1	8 דקות	N/A	5	אותו מינון בדיוק; זו תחזוקה, לא אימון שמעמיס.	
+Wed	[WARMUP] Band Pull-Apart Warm-up	משקל גוף	2	15	30-45 שנ׳	N/A	חימום כתף ושכמות; לפני Back Squat ו-Bench Press בצע גם 2-4 סטים מדורגים.; Squat-and-reach x 6; Bodyweight squat x 8; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Band shoulder pass-through x 10; Scapular push-up x 8; סקוואט עם הושטה x 6; סקוואט משקל גוף x 8; מתח סקפולרי 2 x 5-6; פתיחת גומייה x 10-12; העברת גומייה מעל הראש x 10; שכיבת סמיכה סקפולרית x 8	
+Wed	Back Squat	92.5-95 ק"ג	4	4	3 דק׳	7.5-8	אותו צעד כמו שבוע 1; המטרה היא יציבות וברייסינג טובים יותר. אם זה מרגיש כבד יותר משבוע 1, אל תכריח.	
+Wed	Bench Press	62.5-65 ק"ג	3	6	2.5 דק׳	7	עלה רק אם שבוע 1 נשאר עד 7; אם לא, שמור את משקל שבוע 1.	
+Wed	Cable Row	עומס לפי RPE	3	9	90 שנ׳	8	חתירה נקייה אחרי הסקוואט; אל תהפוך את זה להטיית גב.	
+Wed	Dead Bug	משקל גוף	2	8/צד	45 שנ׳	6	אותו תקן נשימה ושליטה כמו שבוע 1.	
 END_WEEK2_TSV
+
 START_WEEK3_TSV
 Day	Exercise	Weight	Sets	Reps	Rest	Target RPE	Notes	Results
-Mon	[WARMUP] Skipping Warm-up	משקל גוף	1	3-4 דק׳	30 שנ׳	N/A	העלה דופק בעדינות והכן קרסוליים וברכיים.; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Band shoulder pass-through x 10; Scapular push-up x 8; Keep the warm-up specific and non-fatiguing.	
-Mon	[WARMUP] Band Pull-Apart Warm-up	גומייה קלה	2	15	30-45 שנ׳	N/A	פתיחת כתפיים עדינה; בלי כאב חד.	
-Mon	Weighted Push-up	בחירת עומס לפי RPE	4	4-6	150 שנ׳	8	שמור את עומס שבוע 2 אלא אם כל 4 הסטים הגיעו לקצה העליון בטכניקה טובה; אז העלה מעט וחזור לתחתית הטווח.	
-Mon	Chest-Supported Row	בחירת עומס לפי RPE	3	8-10	90 שנ׳	8	שמור אותו מבנה; כשכל הסטים מגיעים ל-10 נקי, העלה מעט עומס.	
-Mon	Side Plank	משקל גוף	3	30-40 שנ׳ לכל צד	45 שנ׳	N/A	שמור קו גוף ישר ובטן פעילה; עצור לפני רעד שמפרק מנח.	
-Mon	Prowler Push	בחירת עומס לפי RPE	6	20 מ׳	90-120 שנ׳	7.5	החזק את עומס שבוע 2 ונסה לגרום לו להרגיש מהיר ונקי יותר; רק אם כל הסטים נשארו חלקים אפשר תוספת קטנה.	
-Tue	[WARMUP] Skipping Warm-up	משקל גוף	1	3 דק׳	30 שנ׳	N/A	העלה דופק קלות והכן את הכתפיים והמרפקים.; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Band shoulder pass-through x 10; Scapular push-up x 8; Keep the warm-up specific and non-fatiguing.	
-Tue	[WARMUP] Band Pull-Apart Warm-up	גומייה קלה	2	15	30-45 שנ׳	N/A	חימום כתפיים עדין לפני הדחיקות.	
-Tue	Weighted Push-up	בחירת עומס לפי RPE	3	6-8	120-150 שנ׳	7	יום נפח נמוך-עייפות; שמור 2-3 חזרות ברזרבה. אם יום שני כבד, הישאר בקצה התחתון של הטווח.	
-Tue	Seated Cable Row	בחירת עומס לפי RPE	4	8-10	75-90 שנ׳	8	השבוע מתווסף רק סט עבודה אחד; שמור שליטה מלאה ואל תהפוך לגריינד.	
-Tue	One-Arm Dumbbell Row	בחירת עומס לפי RPE	3	10-12 לכל צד	60-75 שנ׳	8	עוד סט נקי השבוע; אם הטווח מתקצר או הגו מסתובב, חזור למבנה של שבוע 2.	
-Tue	Zone-2 Row	קצב קל יציב	1	10 דק׳	N/A	5-6	תחזוקה אירובית בלבד; קצב שאפשר לדבר בו.	
-Wed	[WARMUP] Skipping Warm-up	משקל גוף	1	3-4 דק׳	30 שנ׳	N/A	העלה דופק והכן ירכיים וקרסוליים.; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Band shoulder pass-through x 10; Scapular push-up x 8; Keep the warm-up specific and non-fatiguing.	
-Wed	[WARMUP] Band Pull-Apart Warm-up	גומייה קלה	2	15	30-45 שנ׳	N/A	פתיחת כתפיים קלה לפני הדחיקות.	
-Wed	Push-up	משקל גוף	3	8-12	90 שנ׳	7	שליטה מלאה בטווח; עצור 2-3 חזרות לפני כשל. אם הכתף רגישה, קצר מעט טווח ושמור כאב עד 3/10.	
-Wed	Chest-Supported Row	בחירת עומס לפי RPE	4	10-12	75-90 שנ׳	8	השבוע נוסף סט עבודה אחד; שמור מגע עקבי ושליטה מלאה בכל חזרה.	
-Wed	Prowler Push	בחירת עומס לפי RPE	5	15-20 מ׳	90-120 שנ׳	6.5	יום שימור דפוס; השאר מהיר ונקי. אם הרגליים כבדות, קצץ ל-4 סטים.	
-Wed	Heavy Farmer Carry	בחירת עומס לפי RPE	4	20 מ׳	60-75 שנ׳	7.5	הליכה יציבה וקצרה; אם האחיזה נפתחת או היציבה קורסת, הורד עומס.	
+Mon	[WARMUP] Band Pull-Apart Warm-up	משקל גוף	2	15	30-45 שנ׳	N/A	חימום כתף ושכמות; לפני Bench Press ו-Back Squat בצע גם 2-4 סטים מדורגים.; Squat-and-reach x 6; Bodyweight squat x 8; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Band shoulder pass-through x 10; Scapular push-up x 8; סקוואט עם הושטה x 6; סקוואט משקל גוף x 8; מתח סקפולרי 2 x 5-6; פתיחת גומייה x 10-12; העברת גומייה מעל הראש x 10; שכיבת סמיכה סקפולרית x 8	
+Mon	Bench Press	70-72.5 ק"ג	4	4	3 דק׳	8	נסה קפיצה קטנה רק אם שבוע 2 היה נקי ובטווח; אם סט 1 כבר מעל 8 או הכתף לא שקטה, חזור מיד למשקל שבוע 2.	
+Mon	Back Squat	82.5-85 ק"ג	3	5	2.5-3 דק׳	7	החזק את מינון התמיכה משבוע 2; אל תהפוך את היום הזה לעוד יום כבד.	
+Mon	Chest-Supported Row	עומס לפי RPE	3	9	90 שנ׳	8	שמור את אותה עבודה הטובה של שבוע 2.	
+Mon	Side Plank	משקל גוף	2	35-40 שנ׳/צד	45 שנ׳	7	אותו תקן, בלי לרדוף אחרי עייפות.	
+Tue	[WARMUP] Band Pull-Apart Warm-up	משקל גוף	2	15	30-45 שנ׳	N/A	חימום כתף ושכמות; קצר ומדויק לפני עבודת פלג הגוף העליון.; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Band shoulder pass-through x 10; Scapular push-up x 8; מתח סקפולרי 2 x 5-6; פתיחת גומייה x 10-12; העברת גומייה מעל הראש x 10; שכיבת סמיכה סקפולרית x 8	
+Tue	Dumbbell Bench Press	עומס לפי RPE	3	9	2 דק׳	8	שמור את מינון שבוע 2; המטרה השבוע היא לאכול התאוששות לטובת הראשיים.	
+Tue	Seated Cable Row	עומס לפי RPE	3	11	90 שנ׳	8	החזק את אותה עבודה אם האיכות נשמרת.	
+Tue	Pull-up	משקל גוף	2	6	2 דק׳	7-8	כל החזרות נקיות; אל תגרד כשל.	
+Tue	Pallof Press	עומס לפי RPE	2	10/צד	45 שנ׳	7	אנטי-רוטציה יציב וקצר.	
+Tue	Zone-2 Row	קצב קל יציב	1	8 דקות	N/A	5	אותו מינון תחזוקה בדיוק.	
+Wed	[WARMUP] Band Pull-Apart Warm-up	משקל גוף	2	15	30-45 שנ׳	N/A	חימום כתף ושכמות; לפני Back Squat ו-Bench Press בצע גם 2-4 סטים מדורגים.; Squat-and-reach x 6; Bodyweight squat x 8; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Band shoulder pass-through x 10; Scapular push-up x 8; סקוואט עם הושטה x 6; סקוואט משקל גוף x 8; מתח סקפולרי 2 x 5-6; פתיחת גומייה x 10-12; העברת גומייה מעל הראש x 10; שכיבת סמיכה סקפולרית x 8	
+Wed	Back Squat	95-97.5 ק"ג	4	4	3 דק׳	8	נסה קפיצה קטנה רק אם שבוע 2 היה נקי; אם הברייסינג, העומק או מהירות המוט נופלים מוקדם, חזור מיד למשקל שבוע 2.	
+Wed	Bench Press	62.5-65 ק"ג	3	6	2.5 דק׳	7	החזק את החשיפה השנייה משבוע 2; לא מוסיפים עוד עומס אם הראשי עלה.	
+Wed	Cable Row	עומס לפי RPE	3	9	90 שנ׳	8	אותה איכות חתירה משבוע 2, בלי מומנטום.	
+Wed	Dead Bug	משקל גוף	2	8/צד	45 שנ׳	6	שליטה מלאה בגו ונשיפה בכל חזרה.	
 END_WEEK3_TSV
+
 START_WEEK4_TSV
 Day	Exercise	Weight	Sets	Reps	Rest	Target RPE	Notes	Results
-Mon	[WARMUP] Skipping Warm-up	משקל גוף	1	3-4 דק׳	30 שנ׳	N/A	העלה דופק בעדינות והכן קרסוליים וברכיים.; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Band shoulder pass-through x 10; Scapular push-up x 8; Keep the warm-up specific and non-fatiguing.	
-Mon	[WARMUP] Band Pull-Apart Warm-up	גומייה קלה	2	15	30-45 שנ׳	N/A	פתיחת כתפיים עדינה; בלי כאב חד.	
-Mon	Weighted Push-up	בחירת עומס לפי RPE	3	4-6	150 שנ׳	7.5-8	שמור את העומס הטוב של שבוע 3, פחות סטים. אם הכתף לא אוהבת את היום, עבור ל-Push-up באותו RPE.	
-Mon	Chest-Supported Row	בחירת עומס לפי RPE	2	8-10	90 שנ׳	8	אותו עומס של שבוע 3 אם הוא נקי; פחות סטים, אותה שליטה.	
-Mon	Side Plank	משקל גוף	2	30-40 שנ׳ לכל צד	45 שנ׳	N/A	פחות נפח השבוע; שמור איכות וקו גוף יציב.	
-Mon	Prowler Push	בחירת עומס לפי RPE	4	20 מ׳	90-120 שנ׳	7	שבוע קונסולידציה: שמור את העומס הטוב של שבוע 3, פחות סטים ובלי לרדוף אחרי עייפות.	
-Tue	[WARMUP] Skipping Warm-up	משקל גוף	1	3 דק׳	30 שנ׳	N/A	העלה דופק קלות והכן את הכתפיים והמרפקים.; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Band shoulder pass-through x 10; Scapular push-up x 8; Keep the warm-up specific and non-fatiguing.	
-Tue	[WARMUP] Band Pull-Apart Warm-up	גומייה קלה	2	15	30-45 שנ׳	N/A	חימום כתפיים עדין לפני הדחיקות.	
-Tue	Weighted Push-up	בחירת עומס לפי RPE	2	6-8	120-150 שנ׳	7	פחות סטים, אותו סטנדרט טכני. אם יום שני עדיין מורגש, הישאר בקצה התחתון של הטווח.	
-Tue	Seated Cable Row	בחירת עומס לפי RPE	3	8-10	75-90 שנ׳	8	שמור את עומס שבוע 3 אם הטכניקה נשארת נקייה; פחות סט אחד.	
-Tue	One-Arm Dumbbell Row	בחירת עומס לפי RPE	2	10-12 לכל צד	60-75 שנ׳	8	פחות סטים השבוע; בלי סיבוב גו ובלי קיצור טווח.	
-Tue	Zone-2 Row	קצב קל יציב	1	10 דק׳	N/A	5-6	תחזוקה אירובית בלבד; אל תנסה להפוך את זה לאימון קשה.	
-Wed	[WARMUP] Skipping Warm-up	משקל גוף	1	3-4 דק׳	30 שנ׳	N/A	העלה דופק והכן ירכיים וקרסוליים.; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Band shoulder pass-through x 10; Scapular push-up x 8; Keep the warm-up specific and non-fatiguing.	
-Wed	[WARMUP] Band Pull-Apart Warm-up	גומייה קלה	2	15	30-45 שנ׳	N/A	פתיחת כתפיים קלה לפני הדחיקות.	
-Wed	Push-up	משקל גוף	2	8-12	90 שנ׳	7	פחות סטים, אותה שליטה. עצור 2-3 חזרות לפני כשל.	
-Wed	Chest-Supported Row	בחירת עומס לפי RPE	3	10-12	75-90 שנ׳	8	אותו עומס של שבוע 3 אם הוא נשאר נקי; פחות נפח.	
-Wed	Prowler Push	בחירת עומס לפי RPE	4	15-20 מ׳	90-120 שנ׳	6.5	שמור קצב נקי ומהיר כמו בשבוע 3, רק עם פחות סטים. אם הרגליים כבדות, הישאר ב-15 מ׳.	
-Wed	Heavy Farmer Carry	בחירת עומס לפי RPE	3	20 מ׳	60-75 שנ׳	7	הליכה יציבה בלבד; השבוע יוצאים רעננים יותר, לא כבדים יותר.	
+Mon	[WARMUP] Band Pull-Apart Warm-up	משקל גוף	2	15	30-45 שנ׳	N/A	חימום כתף ושכמות; לפני Bench Press ו-Back Squat בצע גם 2-4 סטים מדורגים.; Squat-and-reach x 6; Bodyweight squat x 8; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Band shoulder pass-through x 10; Scapular push-up x 8; סקוואט עם הושטה x 6; סקוואט משקל גוף x 8; מתח סקפולרי 2 x 5-6; פתיחת גומייה x 10-12; העברת גומייה מעל הראש x 10; שכיבת סמיכה סקפולרית x 8	
+Mon	Bench Press	70-72.5 ק"ג	3	4	3 דק׳	7.5-8	שבוע קונסולידציה: פחות סטים, אותה איכות. אם לא הרווחת את העלייה של שבוע 3, בצע במשקל שבוע 2.	
+Mon	Back Squat	80-82.5 ק"ג	2	5	2.5-3 דק׳	6.5-7	חשיפה תומכת קצרה; צא רענן, לא מרוסק.	
+Mon	Chest-Supported Row	עומס לפי RPE	2	8	90 שנ׳	8	חתוך סט אחד ושמור את איכות שבוע 3.	
+Mon	Side Plank	משקל גוף	1	30-40 שנ׳/צד	45 שנ׳	7	סט אחד איכותי לכל צד.	
+Tue	[WARMUP] Band Pull-Apart Warm-up	משקל גוף	2	15	30-45 שנ׳	N/A	חימום כתף ושכמות; קצר ומדויק לפני עבודת פלג הגוף העליון.; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Band shoulder pass-through x 10; Scapular push-up x 8; מתח סקפולרי 2 x 5-6; פתיחת גומייה x 10-12; העברת גומייה מעל הראש x 10; שכיבת סמיכה סקפולרית x 8	
+Tue	Dumbbell Bench Press	עומס לפי RPE	2	8	2 דק׳	8	פחות נפח, אותו תקן; אל תעלה עומס השבוע.	
+Tue	Seated Cable Row	עומס לפי RPE	2	10	90 שנ׳	8	שמור שליטה מלאה וחתוך סט אחד.	
+Tue	Pull-up	משקל גוף	2	5	2 דק׳	7	תחזוק איכות משיכה בלי להתקרב לכשל.	
+Tue	Pallof Press	עומס לפי RPE	1	10/צד	45 שנ׳	7	קצר ונקי בלבד.	
+Tue	Zone-2 Row	קצב קל יציב	1	8 דקות	N/A	5	מינון התחזוקה נשאר זהה גם בשבוע הקונסולידציה.	
+Wed	[WARMUP] Band Pull-Apart Warm-up	משקל גוף	2	15	30-45 שנ׳	N/A	חימום כתף ושכמות; לפני Back Squat ו-Bench Press בצע גם 2-4 סטים מדורגים.; Squat-and-reach x 6; Bodyweight squat x 8; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Band shoulder pass-through x 10; Scapular push-up x 8; סקוואט עם הושטה x 6; סקוואט משקל גוף x 8; מתח סקפולרי 2 x 5-6; פתיחת גומייה x 10-12; העברת גומייה מעל הראש x 10; שכיבת סמיכה סקפולרית x 8	
+Wed	Back Squat	95-97.5 ק"ג	3	4	3 דק׳	7.5-8	פחות סטים, אותה תנועה חזקה. אם שבוע 3 היה גבולי, חזור למשקל שבוע 2.	
+Wed	Bench Press	62.5-65 ק"ג	2	6	2.5 דק׳	7	שמור את התקן הטוב ביותר של שבוע 2-3 בלי להעמיס עוד עייפות.	
+Wed	Cable Row	עומס לפי RPE	2	8	90 שנ׳	8	פחות נפח, אותה איכות חתירה.	
+Wed	Dead Bug	משקל גוף	1	8/צד	45 שנ׳	6	סט אחד מסודר עם נשיפה מלאה.	
 END_WEEK4_TSV
