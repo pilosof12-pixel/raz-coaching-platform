@@ -10,6 +10,8 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 
+import fs from 'node:fs';
+
 import { enrichSpecificWarmups } from '../engine/specific_warmup_enrichment.js';
 
 const HEAD = 'Day\tExercise\tWeight\tSets\tReps\tRest\tTarget RPE\tNotes\tResults';
@@ -101,4 +103,19 @@ test('the ramp line keeps its one canonical form for the rules that parse it', (
   const out = enrichSpecificWarmups(program, { language: 'he' });
   assert.match(out, /Ramp Back Squat:[^;\t]*before 140 kg work sets\./,
     'the parseable form survives so the ramp-target rule still governs');
+});
+
+test('the live generation path passes the intake, not just the QA bundle', () => {
+  // The drills were translated and the Hebrew program still came back with
+  // twelve English fragments: the intake reached enrichSpecificWarmups on the
+  // QA-bundle path but not on the primary generation path, which is injected
+  // into the server by the build scripts. lang defaulted to English and the
+  // translation never ran where it mattered.
+  for (const script of ['scripts/final_pipeline_lock.mjs', 'scripts/apply_advanced_hybrid_oap_pipeline_wiring.mjs']) {
+    const src = fs.readFileSync(new URL(`../${script}`, import.meta.url), 'utf8');
+    const withIntake = 'enrichSpecificWarmups(repairUnbenchmarkedVariationLoads(fixInvalidExerciseNames(raw), intake), intake)';
+    const withoutIntake = 'enrichSpecificWarmups(repairUnbenchmarkedVariationLoads(fixInvalidExerciseNames(raw), intake))';
+    assert.ok(src.includes(withIntake), `${script} must hand the intake to enrichSpecificWarmups`);
+    assert.ok(!src.includes(withoutIntake), `${script} still calls enrichSpecificWarmups without the intake`);
+  }
 });

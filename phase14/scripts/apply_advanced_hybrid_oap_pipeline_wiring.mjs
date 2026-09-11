@@ -18,7 +18,7 @@ export function patchAdvancedHybridOapPipelineSource(input) {
       `${importAnchor}\nimport { normalizeAdvancedHybridWeek4OapConsolidation } from "./engine/advanced_hybrid_oap_consolidation_normalizer.js"; // ${OAP_PIPELINE_MARKER}`,
     );
 
-    const programAnchor = '    let program = normalizeYouthPrimarySkillOrder(enrichSpecificWarmups(repairUnbenchmarkedVariationLoads(fixInvalidExerciseNames(raw), intake)), intake).program; // step 1: DETERMINISTIC-UNBENCHMARKED-LOAD-REPAIR + SPECIFIC-WARMUP-ENRICHMENT + YOUTH-SKILL-ORDER-REPAIR';
+    const programAnchor = '    let program = normalizeYouthPrimarySkillOrder(enrichSpecificWarmups(repairUnbenchmarkedVariationLoads(fixInvalidExerciseNames(raw), intake), intake), intake).program; // step 1: DETERMINISTIC-UNBENCHMARKED-LOAD-REPAIR + SPECIFIC-WARMUP-ENRICHMENT + YOUTH-SKILL-ORDER-REPAIR';
     const programCount = source.split(programAnchor).length - 1;
     if (programCount !== 1) throw new Error(`Advanced Hybrid OAP pipeline program anchor expected once, found ${programCount}`);
     source = source.replace(
