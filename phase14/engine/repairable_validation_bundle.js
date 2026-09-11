@@ -228,7 +228,7 @@ function applyDeterministicCandidateRepairs(program, intake = {}) {
   let candidate = String(program || '');
   const repairs = [];
 
-  const warmed = enrichSpecificWarmups(candidate);
+  const warmed = enrichSpecificWarmups(candidate, intake);
   if (warmed !== candidate) {
     candidate = warmed;
     repairs.push({ type: 'specific_warmup_enrichment' });

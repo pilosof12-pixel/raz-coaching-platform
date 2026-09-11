@@ -97,13 +97,40 @@ function priorityRampRows(work) {
   return [...byMovement.values()].sort((a, b) => a.order - b.order);
 }
 
-function drillList(families) {
+// A Hebrew client received Hebrew coaching notes with English drill lists
+// inside them. Every mixed-language fragment in the delivered Hebrew program
+// came from here: five strings, twelve appearances each.
+//
+// The convention this settles: an exercise NAME stays English, because the
+// dictionary is English-canonical and the hallucination gate and every repair
+// key on it -- and Israeli lifters use English movement names in the gym. A
+// drill list inside a note is not a name, it is coaching prose, so it is
+// written in the athlete's language like the rest of the note around it.
+const DRILLS = {
+  en: {
+    hinge: ['Hip-hinge drill x 8', 'Glute bridge x 10'],
+    squat: ['Squat-and-reach x 6', 'Bodyweight squat x 8'],
+    pull: ['Scapular pull-up 2 x 5-6', 'Band pull-apart x 10-12'],
+    overhead: ['Band shoulder pass-through x 10', 'Wall slide x 8'],
+    push: ['Band shoulder pass-through x 10', 'Scapular push-up x 8'],
+  },
+  he: {
+    hinge: ['\u05ea\u05e8\u05d2\u05d9\u05dc \u05e6\u05d9\u05e8 \u05d9\u05e8\u05da x 8', '\u05d2\u05e9\u05e8 \u05d9\u05e9\u05d1\u05df x 10'],
+    squat: ['\u05e1\u05e7\u05d5\u05d5\u05d0\u05d8 \u05e2\u05dd \u05d4\u05d5\u05e9\u05d8\u05d4 x 6', '\u05e1\u05e7\u05d5\u05d5\u05d0\u05d8 \u05de\u05e9\u05e7\u05dc \u05d2\u05d5\u05e3 x 8'],
+    pull: ['\u05de\u05ea\u05d7 \u05e1\u05e7\u05e4\u05d5\u05dc\u05e8\u05d9 2 x 5-6', '\u05e4\u05ea\u05d9\u05d7\u05ea \u05d2\u05d5\u05de\u05d9\u05d9\u05d4 x 10-12'],
+    overhead: ['\u05d4\u05e2\u05d1\u05e8\u05ea \u05d2\u05d5\u05de\u05d9\u05d9\u05d4 \u05de\u05e2\u05dc \u05d4\u05e8\u05d0\u05e9 x 10', '\u05d4\u05d7\u05dc\u05e7\u05ea \u05e7\u05d9\u05e8 x 8'],
+    push: ['\u05d4\u05e2\u05d1\u05e8\u05ea \u05d2\u05d5\u05de\u05d9\u05d9\u05d4 \u05de\u05e2\u05dc \u05d4\u05e8\u05d0\u05e9 x 10', '\u05e9\u05db\u05d9\u05d1\u05ea \u05e1\u05de\u05d9\u05db\u05d4 \u05e1\u05e7\u05e4\u05d5\u05dc\u05e8\u05d9\u05ea x 8'],
+  },
+};
+
+function drillList(families, lang = 'en') {
+  const table = DRILLS[lang] || DRILLS.en;
   const drills = [];
-  if (families.has('hinge')) drills.push('Hip-hinge drill x 8', 'Glute bridge x 10');
-  if (families.has('squat')) drills.push('Squat-and-reach x 6', 'Bodyweight squat x 8');
-  if (families.has('pull')) drills.push('Scapular pull-up 2 x 5-6', 'Band pull-apart x 10-12');
-  if (families.has('overhead')) drills.push('Band shoulder pass-through x 10', 'Wall slide x 8');
-  if (families.has('horizontal_push') && !families.has('overhead')) drills.push('Band shoulder pass-through x 10', 'Scapular push-up x 8');
+  if (families.has('hinge')) drills.push(...table.hinge);
+  if (families.has('squat')) drills.push(...table.squat);
+  if (families.has('pull')) drills.push(...table.pull);
+  if (families.has('overhead')) drills.push(...table.overhead);
+  if (families.has('horizontal_push') && !families.has('overhead')) drills.push(...table.push);
   return [...new Set(drills)].slice(0, 6);
 }
 
@@ -168,7 +195,7 @@ function makeWarmupCells(headerLength, index, day, note, hardRun) {
   return cells;
 }
 
-function enrichWeekBlock(block) {
+function enrichWeekBlock(block, lang = 'en') {
   const lines = String(block || '').split('\n');
   if (lines.length < 2) return block;
   const header = lines[0].split('\t');
@@ -199,7 +226,7 @@ function enrichWeekBlock(block) {
     if (!work.length) continue;
 
     const families = new Set(work.map(({ cells }) => exerciseFamily(cells[exIdx])));
-    const drills = drillList(families);
+    const drills = drillList(families, lang);
     const rampWork = priorityRampRows(work.map(({ cells }) => ({
       exercise: cells[exIdx],
       weight: cells[weightIdx],
@@ -267,11 +294,14 @@ function enrichWeekBlock(block) {
   return [header.join('\t'), ...kept.map((cells) => cells.join('\t'))].join('\n');
 }
 
-export function enrichSpecificWarmups(program) {
+export function enrichSpecificWarmups(program, intake = {}) {
   let out = String(program || '');
+  // The athlete's language, so the drills inside a note are written in the same
+  // language as the note. Defaulted, so every existing caller keeps English.
+  const lang = String(intake?.language || 'en').toLowerCase().startsWith('he') ? 'he' : 'en';
   for (let week = 1; week <= 4; week++) {
     const re = new RegExp(`(START_WEEK${week}_TSV\\s*\\n)([\\s\\S]*?)(\\nEND_WEEK${week}_TSV)`, 'i');
-    out = out.replace(re, (_m, start, block, end) => start + enrichWeekBlock(block) + end);
+    out = out.replace(re, (_m, start, block, end) => start + enrichWeekBlock(block, lang) + end);
   }
   return out;
 }

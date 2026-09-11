@@ -629,6 +629,19 @@
     return out.join("\n").replace(/\n{3,}/g, "\n\n");
   }
 
+  // The engine writes ramp lines in one canonical English form because four
+  // separate rules parse it, including a repair loop -- emitting Hebrew at
+  // source would make those rules silently stop governing Hebrew clients. So
+  // the wrapper words are localised here instead, at the view, the same way the
+  // [WARMUP] marker is stripped. The movement name stays English by convention.
+  function localiseRamp(text, hebrew) {
+    if (!hebrew) return text;
+    return String(text).replace(
+      /Ramp\s+([A-Za-z][A-Za-z\- ]*?):\s*([^;]*?)\bbefore\s+(\+?[\d.]+\s*(?:kg|%))\s+work sets\./gi,
+      (_m, movement, ramp, target) => `\u05d7\u05d9\u05de\u05d5\u05dd \u05de\u05d3\u05d5\u05e8\u05d2 ${movement.trim()}: ${ramp.trim()} \u05dc\u05e4\u05e0\u05d9 \u05e1\u05d8\u05d9\u05dd \u05e9\u05dc ${target}.`,
+    ).replace(/\bbodyweight\b/gi, '\u05de\u05e9\u05e7\u05dc \u05d2\u05d5\u05e3');
+  }
+
   function renderProgram(program) {
     const host = $("program-render");
     if (!host) return false;
@@ -696,7 +709,10 @@
         // The engine routes on a [WARMUP] marker in the exercise name. It is
         // ours, not the client's: strip it here the way the spreadsheet does,
         // and let the row's own styling say that it is the warm-up.
-        td.textContent = i === exIdx ? String(c).replace(/^\s*\[(?:WARMUP|חימום)\]\s*/i, "") : c;
+        const hebrewRow = /[\u0590-\u05FF]/.test(cells.join(" "));
+        td.textContent = i === exIdx
+          ? String(c).replace(/^\s*\[(?:WARMUP|חימום)\]\s*/i, "")
+          : (i === notesIdx ? localiseRamp(c, hebrewRow) : c);
         if (i === dayIdx) td.className = "col-day";
         else if (i === exIdx) td.className = "col-ex";
         else if (i === rpeIdx) td.className = "col-rpe";
