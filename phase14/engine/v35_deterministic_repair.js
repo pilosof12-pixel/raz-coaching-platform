@@ -40,6 +40,7 @@ import { repairDayZeroClaims, repairMatchDayPlacement, repairAllocationShift, re
 import { repairBallisticShare } from './v79_ballistic_share.js';
 import { repairCompetitionWeek } from './v90_competition_week.js';
 import { repairTimelineIntegrity } from './v91_timeline_integrity.js';
+import { repairPrescriptionIntegrity } from './v92_prescription_integrity.js';
 import { appendCompetitionBlocks } from './v73_taper_audit.js';
 import { appendCampSchedule } from './v78_sport_taper.js';
 import { classifyExercise, dayGap, stressSignature, dayKey as dayKeyOf } from './v38_movement_taxonomy.js';
@@ -1240,6 +1241,12 @@ export function repairDeterministicContradictions(program, intake = {}) {
   if (documented !== candidate) {
     candidate = documented;
     repairs.push({ type: 'v73_v78_blocks_appended' });
+  }
+
+  const honest = repairPrescriptionIntegrity(candidate, intake);
+  if (honest !== candidate) {
+    candidate = honest;
+    repairs.push({ type: 'v92_prescription_says_what_decides' });
   }
 
   const coherent = repairTimelineIntegrity(candidate, intake);

@@ -45,6 +45,7 @@ import { collectClockFlags } from './v86_training_clock.js'; // V86-TRAINING-CLO
 import { collectDayZeroFlags, collectMatchDayFlags, collectAllocationFlags, collectSportFrequencyFlags } from './v89_block_architecture.js'; // V89-BLOCK-ARCHITECTURE-WIRED
 import { collectCompetitionWeekFlags } from './v90_competition_week.js'; // V90-COMPETITION-WEEK-WIRED
 import { collectTimelineIntegrityFlags } from './v91_timeline_integrity.js'; // V91-TIMELINE-INTEGRITY-WIRED
+import { collectPrescriptionIntegrityFlags } from './v92_prescription_integrity.js'; // V92-PRESCRIPTION-INTEGRITY-WIRED
 import { collectLanguageAccuracyFlags, LANGUAGE_HARD_CODES, repairCountClaims } from './v46_language_accuracy.js'; // V46-LANGUAGE-ACCURACY-WIRED
 import { repairDeterministicContradictions } from './v35_deterministic_repair.js'; // V35-DETERMINISTIC-REPAIR-WIRED
 import { normalizeAdvancedHybridWeek4OapConsolidation } from './advanced_hybrid_oap_consolidation_normalizer.js';
@@ -568,7 +569,8 @@ export function collectRepairableValidationFailures(program, intake = {}, option
       ...collectClockFlags(candidate, intake),
       ...collectDayZeroFlags(candidate, intake), ...collectMatchDayFlags(candidate, intake),
       ...collectAllocationFlags(candidate, intake), ...collectSportFrequencyFlags(candidate, intake),
-      ...collectCompetitionWeekFlags(candidate, intake), ...collectTimelineIntegrityFlags(candidate, intake)];
+      ...collectCompetitionWeekFlags(candidate, intake), ...collectTimelineIntegrityFlags(candidate, intake),
+      ...collectPrescriptionIntegrityFlags(candidate, intake)];
     if (!lean.length) return;
     throw new RetriableValidationError(lean[0].code,
       lean.map((f) => f.detail).join(' '), { flags: lean });

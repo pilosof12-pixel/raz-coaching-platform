@@ -36,6 +36,7 @@ import { buildGoalPaceBrief } from './v88_goal_pace.js';
 import { buildBlockArchitectureBrief } from './v89_block_architecture.js';
 import { buildCompetitionWeekBrief } from './v90_competition_week.js';
 import { buildTimelineIntegrityBrief } from './v91_timeline_integrity.js';
+import { buildPrescriptionIntegrityBrief } from './v92_prescription_integrity.js';
 import { buildSessionSubstanceBrief } from './v53_session_substance.js';
 import { buildLanguageAccuracyBrief } from './v46_language_accuracy.js';
 
@@ -312,6 +313,7 @@ export function buildDeterministicBrief(intake = {}) {
     buildBlockArchitectureBrief(intake),
     buildCompetitionWeekBrief(intake),
     buildTimelineIntegrityBrief(intake),
+    buildPrescriptionIntegrityBrief(intake),
     buildSessionSubstanceBrief(intake),
     buildLanguageAccuracyBrief(intake),
     specialist,
