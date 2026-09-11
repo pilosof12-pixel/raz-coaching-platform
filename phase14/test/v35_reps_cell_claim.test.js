@@ -4,9 +4,23 @@ import fs from 'node:fs';
 
 import { collectProgressionLanguageFlags } from '../engine/v34_prescription_consistency.js';
 import { repairDeterministicContradictions } from '../engine/v35_deterministic_repair.js';
+// Dates here are relative, never literal. A pinned competition date is four
+// weeks out on the day it is written and two weeks out a fortnight later, and
+// the block it describes quietly becomes a different block: two tests in this
+// suite started failing on an ordinary Friday for no reason but the calendar.
+const iso = (w) => new Date(Date.now() + w * 7 * 86400000).toISOString().slice(0, 10);
+// Some assertions depend on which weekday the event lands on -- a Wednesday
+// session is Day -3 only when the event is a Saturday. This pins the weekday as
+// well as the distance, so the test means the same thing every day it runs.
+const isoOn = (weeks, weekday) => {
+  const d = new Date(Date.now() + weeks * 7 * 86400000);
+  d.setUTCDate(d.getUTCDate() + ((weekday - d.getUTCDay() + 7) % 7));
+  return d.toISOString().slice(0, 10);
+};
+
 
 const COMP = JSON.parse(fs.readFileSync(new URL('./fixtures/competition_avatars.json', import.meta.url), 'utf8'));
-const LIFTER = { ...COMP.weightlifter_peak, competition_date: '2026-10-26' };
+const LIFTER = { ...COMP.weightlifter_peak, competition_date: iso(8) };
 const FLAT = fs.readFileSync(new URL('./fixtures/run92_weightlifter_flat.txt', import.meta.url), 'utf8');
 
 // Monday's Snatch is a flat 5 x 2 in every week of this fixture, so any claim

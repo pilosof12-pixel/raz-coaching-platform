@@ -113,8 +113,22 @@ test('a movement carried through the block is not novel', () => {
 // build almost no mass, so they sharpen without costing recovery. The exemption
 // is conditional on that dose, because that is what makes the claim true.
 import { isWellDosedPlyometric } from '../engine/v74_camp_economy.js';
+// Dates here are relative, never literal. A pinned competition date is four
+// weeks out on the day it is written and two weeks out a fortnight later, and
+// the block it describes quietly becomes a different block: two tests in this
+// suite started failing on an ordinary Friday for no reason but the calendar.
+const iso = (w) => new Date(Date.now() + w * 7 * 86400000).toISOString().slice(0, 10);
+// Some assertions depend on which weekday the event lands on -- a Wednesday
+// session is Day -3 only when the event is a Saturday. This pins the weekday as
+// well as the distance, so the test means the same thing every day it runs.
+const isoOn = (weeks, weekday) => {
+  const d = new Date(Date.now() + weeks * 7 * 86400000);
+  d.setUTCDate(d.getUTCDate() + ((weekday - d.getUTCDay() + 7) % 7));
+  return d.toISOString().slice(0, 10);
+};
 
-const FIGHTER_LATE = { ...COMP.mma_fight_camp, competition_date: '2026-09-27', weigh_in_date: '2026-09-26' };
+
+const FIGHTER_LATE = { ...COMP.mma_fight_camp, competition_date: iso(4), weigh_in_date: iso(4 - 1 / 7) };
 
 // Introduce a movement for the first time in Week 3, a taper week.
 function introduceInTaper(name, sets, reps) {

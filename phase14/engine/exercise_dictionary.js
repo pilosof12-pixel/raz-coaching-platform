@@ -469,20 +469,33 @@ export const LOCATION_EQUIPMENT_WHITELIST = new Map([
 ]);
 
 // Free-form intake.equipment -> normalized token set.
+// An equipment note is prose, and prose says what is missing as often as what is
+// there. "No barbell, no rack, ever" was read word by word and whitelisted both,
+// so an athlete who told us what they do not have was handed exactly that -- and
+// the equipment gate, working from the same tokens, saw nothing wrong.
+//
+// Items are already split on commas, so a negation is self-contained: "no
+// barbell" arrives as its own item. What it names is collected and subtracted at
+// the end, so an explicit denial beats a mention anywhere else in the note.
+// "No more than 20 kg" is a limit, not a denial, and is deliberately not caught.
+const EQUIPMENT_DENIAL = /\b(?:no|without|never|none|neither|nor)\b(?!\s+(?:more|less|fewer|bigger|heavier|lighter|higher|lower)\b)|\b(?:do not|don't|doesn't|does not|haven't|have not|has not|hasn't|cannot|can't) have\b|\bnot available\b|\bunavailable\b/i;
+
 export function normalizeEquipmentTokens(equipment) {
   const tokens = new Set();
+  const denied = new Set();
   let items = [];
   if (Array.isArray(equipment)) items = equipment;
-  else if (typeof equipment === "string") items = equipment.split(/[,;/\n]+/);
+  else if (typeof equipment === "string") items = equipment.split(/[,;/\n.]+/);
   else if (equipment && typeof equipment === "object") items = Object.values(equipment).flat();
   for (const raw of items) {
     const s = String(raw || "").toLowerCase().trim();
     if (!s) continue;
-    const add = (t) => tokens.add(t);
-    if (/\bbar\s?bell\b|\bbarbell\b/.test(s)) add("barbell");
+    const negated = EQUIPMENT_DENIAL.test(s);
+    const add = (t) => (negated ? denied : tokens).add(t);
+    if (/\bbar\s?bells?\b|\bbarbells?\b/.test(s)) add("barbell");
     if (/\bplate/.test(s)) add("plates");
-    if (/\brack\b|power rack|squat rack|half rack/.test(s)) add("rack");
-    if (/\bbench\b/.test(s)) add("bench");
+    if (/\bracks?\b|power racks?|squat racks?|half racks?/.test(s)) add("rack");
+    if (/\bbench(?:es)?\b/.test(s)) add("bench");
     if (/adjustable dumbbell/.test(s)) { add("dumbbells"); add("adjustable_dumbbells"); }
     else if (/\bdumbbell|\bdb\b/.test(s)) add("dumbbells");
     if (/\bkettlebell|\bkb\b/.test(s)) add("kettlebells");
@@ -514,6 +527,7 @@ export function normalizeEquipmentTokens(equipment) {
     if (/\bhill\b/.test(s)) add("hill");
     if (/\bstair/.test(s)) add("stairs");
   }
+  for (const t of denied) tokens.delete(t);
   return tokens;
 }
 

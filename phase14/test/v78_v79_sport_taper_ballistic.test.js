@@ -10,6 +10,20 @@ import {
   collectBallisticShareFlags, repairBallisticShare, buildBallisticShareBrief,
 } from '../engine/v79_ballistic_share.js';
 import { collectNoveltyFlags } from '../engine/v74_camp_economy.js';
+// Dates here are relative, never literal. A pinned competition date is four
+// weeks out on the day it is written and two weeks out a fortnight later, and
+// the block it describes quietly becomes a different block: two tests in this
+// suite started failing on an ordinary Friday for no reason but the calendar.
+const iso = (w) => new Date(Date.now() + w * 7 * 86400000).toISOString().slice(0, 10);
+// Some assertions depend on which weekday the event lands on -- a Wednesday
+// session is Day -3 only when the event is a Saturday. This pins the weekday as
+// well as the distance, so the test means the same thing every day it runs.
+const isoOn = (weeks, weekday) => {
+  const d = new Date(Date.now() + weeks * 7 * 86400000);
+  d.setUTCDate(d.getUTCDate() + ((weekday - d.getUTCDay() + 7) % 7));
+  return d.toISOString().slice(0, 10);
+};
+
 
 // A swap near the event may only promote a movement the athlete has already
 // done, so a camp with no earlier ballistic work gives the rule nothing to
@@ -38,7 +52,7 @@ function seedFamiliar(names) {
 const COMP = JSON.parse(fs.readFileSync(new URL('./fixtures/competition_avatars.json', import.meta.url), 'utf8'));
 const CORE = JSON.parse(fs.readFileSync(new URL('./fixtures/acceptance_intakes.json', import.meta.url), 'utf8'));
 const CAMP = fs.readFileSync(new URL('./fixtures/run92_mma_fight_camp_pre_rules.txt', import.meta.url), 'utf8');
-const FIGHTER = { ...COMP.mma_fight_camp, competition_date: '2026-09-27', weigh_in_date: '2026-09-26' };
+const FIGHTER = { ...COMP.mma_fight_camp, competition_date: iso(4), weigh_in_date: iso(4 - 1 / 7) };
 const HYBRID = fs.readFileSync(new URL('./fixtures/run81_advanced_hybrid.txt', import.meta.url), 'utf8');
 
 test('an athlete with no event is untouched by either module', () => {
@@ -55,7 +69,7 @@ test('an athlete with no event is untouched by either module', () => {
 test('a lifter has no sport schedule to taper', () => {
   // The weightlifter competes, but the competition lift IS the gym work --
   // there is no separate sport to withdraw, so v78 must stay silent.
-  const lifter = { ...COMP.weightlifter_peak, competition_date: '2026-10-26' };
+  const lifter = { ...COMP.weightlifter_peak, competition_date: iso(8) };
   assert.equal(governsSportTaper(lifter), false);
   assert.equal(collectSportTaperFlags(CAMP, lifter).length, 0);
   assert.equal(buildSportTaperBrief(lifter), '');

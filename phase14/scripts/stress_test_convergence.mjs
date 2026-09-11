@@ -97,6 +97,17 @@ function workflowIntake(constName) {
   return JSON.parse(literal[0]);
 }
 const inWeeks = (w) => new Date(Date.now() + w * 7 * 86400000).toISOString().slice(0, 10);
+const onSaturday = (w) => {
+  const d = new Date(Date.now() + w * 7 * 86400000);
+  d.setUTCDate(d.getUTCDate() - ((d.getUTCDay() - 6 + 7) % 7));
+  return d.toISOString().slice(0, 10);
+};
+const dayBefore = (iso) => {
+  const d = new Date(`${iso}T00:00:00Z`);
+  d.setUTCDate(d.getUTCDate() - 1);
+  return d.toISOString().slice(0, 10);
+};
+const FIGHT_DAY = onSaturday(4);
 
 Object.assign(INTAKES, {
   weightlifter_peak: {
@@ -109,7 +120,7 @@ Object.assign(INTAKES, {
   },
   mma_fight_camp: {
     ...workflowIntake('mmacamp'),
-    competition_date: inWeeks(4), weigh_in_date: inWeeks(4 - 1 / 7),
+    competition_date: FIGHT_DAY, weigh_in_date: dayBefore(FIGHT_DAY),
     event_type: 'combat', event_priority: 'A',
     weight_class_status: 'difficult', weight_vs_class: '81 kg now, 77 kg class',
   },

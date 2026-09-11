@@ -8,7 +8,15 @@ import { collectFightWeekClockFlags, repairFightWeekClock } from '../engine/v77_
 const COMP = JSON.parse(fs.readFileSync(new URL('./fixtures/competition_avatars.json', import.meta.url), 'utf8'));
 const CORE = JSON.parse(fs.readFileSync(new URL('./fixtures/acceptance_intakes.json', import.meta.url), 'utf8'));
 const iso = (w) => new Date(Date.now() + w * 7 * 86400000).toISOString().slice(0, 10);
-const LIFTER = { ...COMP.weightlifter_meet_week, competition_date: iso(4), event_type: 'strength_meet', event_priority: 'A' };
+// A Wednesday session is Day -3 only when the event is a Saturday, so the
+// weekday is pinned as well as the distance. Without it this test passed on
+// Saturdays and failed every other day of the week.
+const isoOnSaturday = (weeks) => {
+  const d = new Date(Date.now() + weeks * 7 * 86400000);
+  d.setUTCDate(d.getUTCDate() - ((d.getUTCDay() - 6 + 7) % 7));
+  return d.toISOString().slice(0, 10);
+};
+const LIFTER = { ...COMP.weightlifter_meet_week, competition_date: isoOnSaturday(4), event_type: 'strength_meet', event_priority: 'A' };
 const FIGHTER = {
   ...COMP.mma_fight_camp, competition_date: iso(4), weigh_in_date: iso(4 - 1 / 7),
   event_type: 'combat', event_priority: 'A',
