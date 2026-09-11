@@ -78,7 +78,7 @@ test('youth primary-skill-order repair remains wired before coaching QA', () => 
   assert.match(out, /YOUTH-SKILL-ORDER-REPAIR-WIRED/);
   assert.match(
     out,
-    /normalizeYouthPrimarySkillOrder\(enrichSpecificWarmups\(repairUnbenchmarkedVariationLoads\(fixInvalidExerciseNames\(raw\), intake\)\), intake\)\.program/,
+    /normalizeYouthPrimarySkillOrder\(enrichSpecificWarmups\(repairUnbenchmarkedVariationLoads\(fixInvalidExerciseNames\(raw\), intake\), intake\), intake\)\.program/,
   );
 });
 
