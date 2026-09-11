@@ -229,7 +229,6 @@ function enrichWeekBlock(block) {
     const needsWarmup = hardRun || rampWork.length > 0;
     if (!warmups.length) {
       if (!needsWarmup) continue;
-      appendUnique(parts, 'Keep the warm-up specific and non-fatiguing.');
       insertions.push({
         index: Math.min(...entries.map((entry) => entry.i)),
         cells: makeWarmupCells(header.length, index, day, parts.join('; '), hardRun),
@@ -238,15 +237,34 @@ function enrichWeekBlock(block) {
     }
 
     if (!parts.length) continue;
-    appendUnique(parts, 'Keep the warm-up specific and non-fatiguing.');
+    // No closing boilerplate. The drills are listed in the note already, so the
+    // sentence added nothing this day did not show, and repeating it verbatim on
+    // every session of every week is what makes an output read as templated
+    // rather than coached. It was English too, so it surfaced untranslated in
+    // the middle of Hebrew programs.
     warmups[0].cells[notesIdx] = parts.join('; ');
+
+    // One warm-up block per session. Only the first was ever enriched, so a day
+    // that already had a general warm-up and then picked up a specific one
+    // carried both -- the Hebrew lifter got a skipping warm-up that listed band
+    // pull-aparts, and a separate band pull-apart warm-up underneath it.
+    for (let i = 1; i < warmups.length; i += 1) {
+      const extra = String(warmups[i].cells[notesIdx] || '').trim();
+      if (extra) {
+        const merged = parts.slice();
+        for (const piece of extra.split(/\s*;\s*/)) appendUnique(merged, piece.trim());
+        warmups[0].cells[notesIdx] = merged.join('; ');
+      }
+      warmups[i].cells.dropRow = true;
+    }
   }
 
   // Insert from bottom to top so each recorded original row index remains valid.
   insertions.sort((a, b) => b.index - a.index);
   for (const insertion of insertions) rows.splice(insertion.index, 0, insertion.cells);
 
-  return [header.join('\t'), ...rows.map((cells) => cells.join('\t'))].join('\n');
+  const kept = rows.filter((cells) => !cells.dropRow);
+  return [header.join('\t'), ...kept.map((cells) => cells.join('\t'))].join('\n');
 }
 
 export function enrichSpecificWarmups(program) {

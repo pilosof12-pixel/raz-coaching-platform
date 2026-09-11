@@ -689,9 +689,14 @@
         tr.className = "day-start";
         lastDay = dayVal;
       }
+      const isWarmupRow = exIdx >= 0 && /^\s*\[(?:WARMUP|חימום)\]/i.test(cells[exIdx] || "");
+      if (isWarmupRow) tr.classList.add("warmup-row");
       cells.forEach((c, i) => {
         const td = document.createElement("td");
-        td.textContent = c;
+        // The engine routes on a [WARMUP] marker in the exercise name. It is
+        // ours, not the client's: strip it here the way the spreadsheet does,
+        // and let the row's own styling say that it is the warm-up.
+        td.textContent = i === exIdx ? String(c).replace(/^\s*\[(?:WARMUP|חימום)\]\s*/i, "") : c;
         if (i === dayIdx) td.className = "col-day";
         else if (i === exIdx) td.className = "col-ex";
         else if (i === rpeIdx) td.className = "col-rpe";
@@ -721,7 +726,7 @@
     currentToken = token;
     if (token) store.set(LS_TOKEN, token);
     // Always keep the raw text in the (hidden) <pre> for Copy/parse safety.
-    $("program-text").textContent = program;
+    $("program-text").textContent = String(program).replace(/\[(?:WARMUP|חימום)\]\s*/gi, "");
     $("token-display").textContent = token;
     $("program-card").classList.remove("hidden");
     // Render the clean narrative + styled table. If parsing fails, fall back
