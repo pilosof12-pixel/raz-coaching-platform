@@ -395,3 +395,30 @@ test("an athlete with no stated gym days is left alone", () => {
   const p = program(["Wed\tBack Squat\t150 kg\t3\t3\t3 min\t8\tHeavy.\t"]);
   assert.equal(swapSportDayContent(p, intake), p);
 });
+
+// ---------------------------------------------------------------------------
+// TEST: the sport-day gate stays answerable when nothing is free.
+// ---------------------------------------------------------------------------
+test("swapSportDayContent merges onto the nearest training day when none is free", () => {
+  // A fight camp died here. Week 4 carried strength work on two days the
+  // athlete does not have, and both of his training days were already in use,
+  // so there was no free slot: the repair returned the program untouched
+  // through all four attempts and the build was lost. The work cannot stay
+  // where it is -- he cannot attend that day -- so it merges onto the nearest
+  // day he does have, and the volume rules downstream own what that costs.
+  const intake = { sport: 'MMA', days_per_week: 2, available_gym_days: ['Tue', 'Fri'], sport_schedule: [] };
+  const misplaced = program([
+    "Tue\tTrap Bar Jump\tLight\t3\t3\t90s\t7\tOn plan.\t",
+    "Thu\tBack Squat\t120 kg\t3\t3\t3 min\t8\tUnavailable day.\t",
+    "Fri\tPull-up\tBodyweight\t3\t5\t90s\t7\tOn plan.\t",
+    "Mon\tBench Press\t90 kg\t3\t5\t2 min\t8\tUnavailable day.\t",
+  ]);
+  assert.throws(() => validateSportDayCoupling(misplaced, intake), /SPORT_DAY_COUPLING_VIOLATION/);
+
+  const fixed = swapSportDayContent(misplaced, intake);
+  assert.equal(validateSportDayCoupling(fixed, intake).ok, true, 'the gate must be answerable');
+  assert.equal(swapSportDayContent(fixed, intake), fixed, 'repair is not idempotent');
+  assert.ok(!/^Thu\t/m.test(fixed) && !/^Mon\t/m.test(fixed), 'nothing is left on a day he cannot attend');
+  assert.match(fixed, /Back Squat/, 'the work itself is not discarded');
+  assert.match(fixed, /Bench Press/);
+});

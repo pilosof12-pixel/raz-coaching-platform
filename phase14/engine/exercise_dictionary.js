@@ -1652,14 +1652,37 @@ export function swapSportDayContent(program, intake = {}) {
     .filter((i) => i >= 0);
   if (!misplaced.length) return program;
 
-  // Only days the athlete has free: never stack a moved session on top of one
-  // that is already there.
-  const free = available.filter((i) => timeline[i] === "rest");
-  if (!free.length) return program;
-
   const label = (i) => WEEK_ORDER[i].charAt(0).toUpperCase() + WEEK_ORDER[i].slice(1);
+  // Prefer a day the athlete has free, so a moved session does not land on top
+  // of one already there.
+  const free = available.filter((i) => timeline[i] === "rest");
+
+  // When nothing is free the session still cannot stay where it is: the athlete
+  // cannot attend that day, so the work simply would not happen. Giving up here
+  // left the gate unanswerable, and a fight camp died on it -- week 4 carried
+  // strength work on two unavailable days with both training days already in
+  // use, so there was no free slot and the repair returned the program
+  // untouched through all four attempts. Merge onto the nearest day they do
+  // have instead; the session-size and volume rules downstream have their own
+  // repairs for a day that ends up too full.
+  const nearest = (from) => {
+    let best = -1;
+    let bestGap = 99;
+    for (const i of available) {
+      const gap = Math.min(Math.abs(i - from), 7 - Math.abs(i - from));
+      if (gap < bestGap) { bestGap = gap; best = i; }
+    }
+    return best;
+  };
+
   const moves = new Map();
-  misplaced.forEach((from, n) => { if (n < free.length) moves.set(WEEK_ORDER[from], label(free[n])); });
+  const takenFree = new Set();
+  misplaced.forEach((from) => {
+    const slot = free.find((i) => !takenFree.has(i));
+    if (slot != null) { takenFree.add(slot); moves.set(WEEK_ORDER[from], label(slot)); return; }
+    const to = nearest(from);
+    if (to >= 0) moves.set(WEEK_ORDER[from], label(to));
+  });
   if (!moves.size) return program;
 
   // Rows carry a day token only on the first line of a session; the rest inherit

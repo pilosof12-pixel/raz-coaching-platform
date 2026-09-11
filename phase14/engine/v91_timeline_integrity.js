@@ -218,9 +218,23 @@ export function buildTimelineIntegrityBrief(intake = {}, now = Date.now()) {
   const week = eventWeek(intake, now);
   const eventDay = eventWeekday(intake);
   if (!week || !eventDay) return '';
+  // Enumerating "Day -4, Day -3, Day -2, Day -1" read as a prescription for four
+  // sessions. It went to a fighter who trains twice a week and his week 4 came
+  // back with strength work on days he does not have, which no repair could
+  // place and which killed the build. The offsets are labels for the sessions
+  // the athlete already has, not a list of sessions to create.
+  const eventIndex = WEEKDAYS.indexOf(eventDay);
+  const gymDays = (Array.isArray(intake.available_gym_days) ? intake.available_gym_days : [])
+    .map((d) => dayKey(d)).filter(Boolean);
+  const offsets = gymDays
+    .map((d) => `${LABEL[d]} = Day -${eventIndex - WEEKDAYS.indexOf(d)}`)
+    .filter((x) => !/Day -0|Day --/.test(x));
   return [
     '* THE PROGRAM MAY NOT CONTRADICT ITSELF ABOUT THE CALENDAR.',
-    `  Day 0 is ${LABEL[eventDay]}. Every session in week ${week} must be named by its distance from it -- Day -4, Day -3, Day -2, Day -1 -- and the week stops there.`,
+    `  Day 0 is ${LABEL[eventDay]}. Label each session in week ${week} by its distance from it, and let the week stop there.`,
+    offsets.length
+      ? `  THIS DOES NOT ADD SESSIONS. Week ${week} has exactly the same number of gym sessions as every other week, on the same days: ${offsets.join(', ')}. The offsets are names for those sessions, not a list of sessions to create.`
+      : `  THIS DOES NOT ADD SESSIONS. Week ${week} has exactly the same number of gym sessions as every other week, on the same days. The offsets are names for those sessions, not a list of sessions to create.`,
     '  NOTHING IS SCHEDULED ON DAY 0, and nothing after it belongs to this block. The athlete is competing that day.',
     '  The camp calendar and the week table are two views of one week. They must name the same training days, in the same places. If the table trains on Tuesday and Friday, the calendar shows gym on Tuesday and Friday and on no other day.',
     '  Hard contact comes down every week and reaches zero in the event week.',

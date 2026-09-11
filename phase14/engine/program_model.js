@@ -106,9 +106,29 @@ function norm(value) {
   return normalizeSemanticText(value);
 }
 
+// A day cell is not always a bare weekday. Models annotate it -- "Fri (sport
+// only)", "Sun - sport only" -- and an unrecognised label became a day of its
+// own, so one week held "monday, tuesday, wednesday, thursday, fri sport only,
+// sun sport only" and counted as six training days against the four requested.
+// Read the weekday out of the label and let the annotation be an annotation.
 export function normalizeDay(value) {
   const n = norm(value).replace(/\.$/, '');
-  return DAY_ALIASES.get(n) || n || 'unknown';
+  const direct = DAY_ALIASES.get(n);
+  if (direct) return direct;
+  for (const token of n.split(/[^a-z]+/)) {
+    const hit = DAY_ALIASES.get(token);
+    if (hit) return hit;
+  }
+  return n || 'unknown';
+}
+
+// The same annotation says the day is not a strength session. The frequency
+// rule's own message asks for exactly this -- keep sport-only and run-only days
+// in the calendar for collision analysis, but do not count them toward the
+// requested strength frequency -- and nothing was reading it.
+const NON_STRENGTH_DAY_LABEL = /\b(?:sport|run|running|ruck|conditioning|recovery|cardio|skills?)[\s-]*only\b/i;
+export function dayLabelExcludesStrength(value) {
+  return NON_STRENGTH_DAY_LABEL.test(String(value || ''));
 }
 
 function stripWarmupPrefix(value) {
@@ -342,8 +362,10 @@ export function parseProgramModel(program, intake = {}) {
     if (!parsed) continue;
     const daysByName = new Map();
 
+    const sportOnlyDays = new Set();
     for (const row of parsed.rows) {
       const day = normalizeDay(row.day);
+      if (dayLabelExcludesStrength(row.day)) sportOnlyDays.add(day);
       if (!daysByName.has(day)) {
         daysByName.set(day, {
           day,
@@ -392,7 +414,8 @@ export function parseProgramModel(program, intake = {}) {
           source: 'tsv',
           purpose: goalFamily || modality,
           priority: 'support',
-          counts_toward_strength_frequency: modality === 'strength' || modality === 'skill',
+          counts_toward_strength_frequency: (modality === 'strength' || modality === 'skill')
+            && !sportOnlyDays.has(day),
           exercises: [],
         };
         dayModel.sessions.push(session);
