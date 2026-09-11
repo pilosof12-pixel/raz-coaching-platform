@@ -39,6 +39,7 @@ import { repairClockStatement } from './v86_training_clock.js';
 import { repairDayZeroClaims, repairMatchDayPlacement, repairAllocationShift, repairSportFrequency } from './v89_block_architecture.js';
 import { repairBallisticShare } from './v79_ballistic_share.js';
 import { repairCompetitionWeek } from './v90_competition_week.js';
+import { repairTimelineIntegrity } from './v91_timeline_integrity.js';
 import { appendCompetitionBlocks } from './v73_taper_audit.js';
 import { appendCampSchedule } from './v78_sport_taper.js';
 import { classifyExercise, dayGap, stressSignature, dayKey as dayKeyOf } from './v38_movement_taxonomy.js';
@@ -1233,9 +1234,18 @@ export function repairDeterministicContradictions(program, intake = {}) {
   // Deliverables, appended once everything else has settled: the audit reports
   // the block that actually shipped, not an intermediate one.
   const documented = appendCampSchedule(appendCompetitionBlocks(candidate, intake), intake);
+  // Deliberately after the calendar is written: the contradiction this repair
+  // resolves is between the calendar and the week table, so it has to run on
+  // the document that actually ships, not an intermediate one.
   if (documented !== candidate) {
     candidate = documented;
     repairs.push({ type: 'v73_v78_blocks_appended' });
+  }
+
+  const coherent = repairTimelineIntegrity(candidate, intake);
+  if (coherent !== candidate) {
+    candidate = coherent;
+    repairs.push({ type: 'v91_timeline_made_consistent' });
   }
 
   const intensified = repairIntensification(candidate, intake);

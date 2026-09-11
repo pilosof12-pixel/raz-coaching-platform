@@ -15,6 +15,7 @@
 
 import { parseWeek } from './v34_workload_accounting.js';
 import { STATE, stateForWeek, competitionProfile, eventType } from './v68_competition_state.js';
+import { eventWeekday } from './v77_fight_week_clock.js';
 
 const WEEKDAYS = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'];
 const LABEL = { mon: 'Mon', tue: 'Tue', wed: 'Wed', thu: 'Thu', fri: 'Fri', sat: 'Sat', sun: 'Sun' };
@@ -61,13 +62,18 @@ export function sportTaperPlan(intake = {}, now = Date.now()) {
 }
 
 // The camp the athlete actually trains, rendered so the taper is visible.
-export function renderCampSchedule(intake = {}, now = Date.now()) {
+export function renderCampSchedule(intake = {}, now = Date.now(), options = {}) {
   const plan = sportTaperPlan(intake, now);
   if (!plan) return '';
   const week = sportWeek(intake);
-  const gym = arr(intake.available_gym_days).map(dayKey).filter(Boolean);
+  const planned = arr(intake.available_gym_days).map(dayKey).filter(Boolean);
+  const actual = options.workingDays instanceof Map ? options.workingDays : null;
+  const gymFor = (weekNumber) => {
+    const days = actual?.get(weekNumber);
+    return days && days.size ? [...days] : planned;
+  };
 
-  const dayCell = (day, hardTarget, hardBaseline) => {
+  const dayCell = (day, hardTarget, hardBaseline, gym) => {
     const s = week.find((x) => x.day === day);
     const parts = [];
     if (s) {
@@ -83,16 +89,27 @@ export function renderCampSchedule(intake = {}, now = Date.now()) {
 
   const lines = ['CAMP SCHEDULE', 'Sport sessions are load. The gym is built around them, and the contact comes down as the fight approaches.', ''];
   const head = ['', ...WEEKDAYS.map((d) => LABEL[d]), 'hard contact'];
+  const eventDay = eventWeekday(intake);
+  const eventIndex = eventDay ? WEEKDAYS.indexOf(eventDay) : -1;
+  const finalWeek = plan[plan.length - 1]?.week;
+
   const rows = plan.map((p) => {
+    const gym = gymFor(p.week);
     let remaining = p.hardTarget;
-    const cells = WEEKDAYS.map((d) => {
+    const isEventWeek = eventIndex >= 0 && p.week === finalWeek && p.state === STATE.COMPETITION_WEEK;
+    const cells = WEEKDAYS.map((d, i) => {
+      // The week that contains Day 0 stops at Day 0. Nothing is scheduled on
+      // the fight itself, and nothing beyond it belongs to this block at all.
+      if (isEventWeek && i === eventIndex) return 'FIGHT DAY';
+      if (isEventWeek && i > eventIndex) return '-';
+      const clock = isEventWeek ? `D-${eventIndex - i} ` : '';
       const s = week.find((x) => x.day === d);
       if (s && isHard(s.intensity)) {
         const keep = remaining > 0;
         if (keep) remaining -= 1;
-        return (keep ? 'MMA hard' : 'MMA technical') + (gym.includes(d) ? ' + gym' : '');
+        return clock + (keep ? 'MMA hard' : 'MMA technical') + (gym.includes(d) ? ' + gym' : '');
       }
-      return dayCell(d, p.hardTarget, p.hardBaseline);
+      return clock + dayCell(d, p.hardTarget, p.hardBaseline, gym);
     });
     return [`W${p.week}`, ...cells, `${p.hardTarget} of ${p.hardBaseline}`];
   });
@@ -106,6 +123,28 @@ export function renderCampSchedule(intake = {}, now = Date.now()) {
   lines.push(line(head), ...rows.map(line));
   lines.push('', `Hard contact falls ${plan[0].hardTarget} to ${plan[plan.length - 1].hardTarget} across the block. The last hard session sits far enough from Day 0 that soreness, cognitive fatigue and sleep disruption have resolved.`);
   return lines.join('\n');
+}
+
+// Which weekdays each week's table actually trains on. The calendar is a view
+// of this, not a second opinion about it.
+export function workingDaysByWeek(program) {
+  const out = new Map();
+  for (let w = 1; w <= 4; w += 1) {
+    const parsed = parseWeek(program, w);
+    if (!parsed) continue;
+    const days = new Set();
+    let lastDay = '';
+    parsed.rows.forEach((cells) => {
+      const raw = String(cells[parsed.day] || '').trim();
+      if (raw) lastDay = raw;
+      const name = String(cells[parsed.exercise] || '').trim();
+      if (!name || /^\s*\[WARMUP\]/i.test(name)) return;
+      const key = dayKey(lastDay);
+      if (key) days.add(key);
+    });
+    if (days.size) out.set(w, days);
+  }
+  return out;
 }
 
 const ADDRESSES_SPORT = /\b(?:sparring|spar|live (?:work|rounds)|hard contact|mat time|wrestl|rolling)\b/i;
@@ -137,7 +176,7 @@ export function buildSportTaperBrief(intake = {}, now = Date.now()) {
 
 export function appendCampSchedule(program, intake = {}, now = Date.now()) {
   const source = String(program || '');
-  const schedule = renderCampSchedule(intake, now);
+  const schedule = renderCampSchedule(intake, now, { workingDays: workingDaysByWeek(source) });
   if (!schedule || source.includes('CAMP SCHEDULE')) return source;
 
   // Before the week tables, not after them. The schedule is the context the
