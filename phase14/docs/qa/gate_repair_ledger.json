@@ -1,0 +1,2447 @@
+[
+  {
+    "code": "ADVANCED_HYBRID_BENCHMARK_LOADING",
+    "modules": [
+      "engine/advanced_hybrid_quality.js"
+    ],
+    "repairs": [],
+    "wired": [],
+    "tested": true,
+    "stressed": false,
+    "killedLive": ""
+  },
+  {
+    "code": "ADVANCED_HYBRID_CALENDAR_DRIFT",
+    "modules": [
+      "engine/advanced_hybrid_quality.js"
+    ],
+    "repairs": [],
+    "wired": [],
+    "tested": true,
+    "stressed": false,
+    "killedLive": ""
+  },
+  {
+    "code": "ADVANCED_HYBRID_DENSE_72H_PRIMARY_WINDOW",
+    "modules": [
+      "engine/manual_acceptance_quality.js"
+    ],
+    "repairs": [],
+    "wired": [],
+    "tested": false,
+    "stressed": false,
+    "killedLive": ""
+  },
+  {
+    "code": "ADVANCED_HYBRID_EXTRA_HARD_CONDITIONING",
+    "modules": [
+      "engine/advanced_hybrid_quality.js"
+    ],
+    "repairs": [],
+    "wired": [],
+    "tested": true,
+    "stressed": false,
+    "killedLive": ""
+  },
+  {
+    "code": "ADVANCED_HYBRID_LONG_RUN_PRECEDES_HEAVY_SQUAT",
+    "modules": [
+      "engine/manual_acceptance_quality.js"
+    ],
+    "repairs": [],
+    "wired": [],
+    "tested": true,
+    "stressed": false,
+    "killedLive": ""
+  },
+  {
+    "code": "ADVANCED_HYBRID_MARATHON_SUBORDINATION",
+    "modules": [
+      "engine/advanced_hybrid_quality.js"
+    ],
+    "repairs": [],
+    "wired": [],
+    "tested": false,
+    "stressed": false,
+    "killedLive": ""
+  },
+  {
+    "code": "ADVANCED_HYBRID_OAP_SIDE_DOSING_AMBIGUOUS",
+    "modules": [
+      "engine/manual_acceptance_quality.js"
+    ],
+    "repairs": [],
+    "wired": [],
+    "tested": true,
+    "stressed": false,
+    "killedLive": ""
+  },
+  {
+    "code": "ADVANCED_HYBRID_OAP_SPECIFICITY",
+    "modules": [
+      "engine/advanced_hybrid_quality.js"
+    ],
+    "repairs": [],
+    "wired": [],
+    "tested": true,
+    "stressed": false,
+    "killedLive": "2026-08-28 advanced_hybrid"
+  },
+  {
+    "code": "ADVANCED_HYBRID_OHP_ARCHITECTURE",
+    "modules": [
+      "engine/advanced_hybrid_quality.js"
+    ],
+    "repairs": [],
+    "wired": [],
+    "tested": true,
+    "stressed": false,
+    "killedLive": ""
+  },
+  {
+    "code": "ADVANCED_HYBRID_RUN_BASELINE_EXCEEDED",
+    "modules": [
+      "engine/advanced_hybrid_quality.js"
+    ],
+    "repairs": [],
+    "wired": [],
+    "tested": false,
+    "stressed": false,
+    "killedLive": ""
+  },
+  {
+    "code": "ADVANCED_HYBRID_SQUAT_LOAD_EXCEEDS_CURRENT_CAPACITY",
+    "modules": [
+      "engine/manual_acceptance_quality.js"
+    ],
+    "repairs": [],
+    "wired": [],
+    "tested": true,
+    "stressed": false,
+    "killedLive": ""
+  },
+  {
+    "code": "ADVANCED_HYBRID_SQUAT_SPECIFICITY",
+    "modules": [
+      "engine/advanced_hybrid_quality.js"
+    ],
+    "repairs": [],
+    "wired": [],
+    "tested": true,
+    "stressed": false,
+    "killedLive": ""
+  },
+  {
+    "code": "ADVANCED_HYBRID_WEEK4_NOT_CONSOLIDATING",
+    "modules": [
+      "engine/advanced_hybrid_quality.js"
+    ],
+    "repairs": [],
+    "wired": [],
+    "tested": true,
+    "stressed": false,
+    "killedLive": ""
+  },
+  {
+    "code": "ADVANCED_HYBRID_WEEK4_OAP_VOLUME_INCREASED",
+    "modules": [
+      "engine/advanced_hybrid_quality.js"
+    ],
+    "repairs": [],
+    "wired": [],
+    "tested": true,
+    "stressed": false,
+    "killedLive": ""
+  },
+  {
+    "code": "ADVANCED_SKILL_REGRESSION",
+    "modules": [
+      "engine/phase15_program_qa.js"
+    ],
+    "repairs": [
+      "repairPhase15Program"
+    ],
+    "wired": [
+      "repairPhase15Program"
+    ],
+    "tested": false,
+    "stressed": false,
+    "killedLive": ""
+  },
+  {
+    "code": "CARDIO_ONLY_STRENGTH_DAY",
+    "modules": [
+      "engine/phase15_program_qa.js"
+    ],
+    "repairs": [
+      "repairPhase15Program"
+    ],
+    "wired": [
+      "repairPhase15Program"
+    ],
+    "tested": false,
+    "stressed": false,
+    "killedLive": ""
+  },
+  {
+    "code": "CLIENT_OUTPUT_NOT_READY",
+    "modules": [
+      "engine/phase15_program_qa.js"
+    ],
+    "repairs": [
+      "repairPhase15Program"
+    ],
+    "wired": [
+      "repairPhase15Program"
+    ],
+    "tested": true,
+    "stressed": false,
+    "killedLive": ""
+  },
+  {
+    "code": "COACH_SPEC_V1_AH_ADJACENT_HIGH_STRESS_PULLING",
+    "modules": [
+      "engine/coaching_spec_v1_quality.js"
+    ],
+    "repairs": [],
+    "wired": [],
+    "tested": true,
+    "stressed": false,
+    "killedLive": ""
+  },
+  {
+    "code": "COACH_SPEC_V1_AH_DUAL_SQUAT_FATIGUE",
+    "modules": [
+      "engine/coaching_spec_v1_quality.js"
+    ],
+    "repairs": [],
+    "wired": [],
+    "tested": true,
+    "stressed": false,
+    "killedLive": ""
+  },
+  {
+    "code": "COACH_SPEC_V1_AH_MAINTENANCE_AUTO_OVERLOAD",
+    "modules": [
+      "engine/coaching_spec_v1_quality.js"
+    ],
+    "repairs": [],
+    "wired": [],
+    "tested": true,
+    "stressed": false,
+    "killedLive": ""
+  },
+  {
+    "code": "COACH_SPEC_V1_AH_RECOVERY_HIERARCHY_OVERLOADED",
+    "modules": [
+      "engine/coaching_spec_v1_quality.js"
+    ],
+    "repairs": [],
+    "wired": [],
+    "tested": true,
+    "stressed": false,
+    "killedLive": ""
+  },
+  {
+    "code": "COACH_SPEC_V1_AH_UNCONDITIONAL_MAJOR_LIFT_PROGRESSION",
+    "modules": [
+      "engine/coaching_spec_v1_quality.js"
+    ],
+    "repairs": [],
+    "wired": [],
+    "tested": false,
+    "stressed": false,
+    "killedLive": ""
+  },
+  {
+    "code": "COACH_SPEC_V1_T3K01_NO_RACE_DEMAND_PROGRESSION",
+    "modules": [
+      "engine/v40_tactical_hard_rules.js"
+    ],
+    "repairs": [],
+    "wired": [],
+    "tested": false,
+    "stressed": false,
+    "killedLive": ""
+  },
+  {
+    "code": "COACH_SPEC_V1_T3K03_QUALITY_VOLUME_LOW",
+    "modules": [
+      "engine/v40_tactical_hard_rules.js"
+    ],
+    "repairs": [],
+    "wired": [],
+    "tested": false,
+    "stressed": false,
+    "killedLive": ""
+  },
+  {
+    "code": "COACH_SPEC_V1_T3K08_SACRIFICE_HIERARCHY_INVERTED",
+    "modules": [
+      "engine/v40_tactical_hard_rules.js"
+    ],
+    "repairs": [],
+    "wired": [],
+    "tested": false,
+    "stressed": false,
+    "killedLive": ""
+  },
+  {
+    "code": "COACH_SPEC_V1_T3K_400_ONLY_BLOCK",
+    "modules": [
+      "engine/coaching_spec_v1_quality.js"
+    ],
+    "repairs": [],
+    "wired": [],
+    "tested": true,
+    "stressed": false,
+    "killedLive": ""
+  },
+  {
+    "code": "COACH_SPEC_V1_T3K_EVENT_PROGRESSION_INCOHERENT",
+    "modules": [
+      "engine/coaching_spec_v1_quality.js"
+    ],
+    "repairs": [],
+    "wired": [],
+    "tested": true,
+    "stressed": false,
+    "killedLive": ""
+  },
+  {
+    "code": "COACH_SPEC_V1_T3K_EVENT_PROGRESSION_NOT_RETAINED",
+    "modules": [
+      "engine/coaching_spec_v1_quality.js"
+    ],
+    "repairs": [],
+    "wired": [],
+    "tested": true,
+    "stressed": false,
+    "killedLive": ""
+  },
+  {
+    "code": "COACH_SPEC_V1_T3K_EVENT_PROGRESSION_STATIC",
+    "modules": [
+      "engine/coaching_spec_v1_quality.js"
+    ],
+    "repairs": [],
+    "wired": [],
+    "tested": true,
+    "stressed": false,
+    "killedLive": ""
+  },
+  {
+    "code": "COACH_SPEC_V1_T3K_KEY_RUN_PRECEDED_BY_STRENGTH",
+    "modules": [
+      "engine/coaching_spec_v1_quality.js"
+    ],
+    "repairs": [],
+    "wired": [],
+    "tested": true,
+    "stressed": false,
+    "killedLive": ""
+  },
+  {
+    "code": "COACH_SPEC_V1_T3K_PACE_FROM_GOAL_NOT_CAPACITY",
+    "modules": [
+      "engine/v49_spec_gap_rules.js"
+    ],
+    "repairs": [],
+    "wired": [],
+    "tested": true,
+    "stressed": false,
+    "killedLive": ""
+  },
+  {
+    "code": "COACH_SPEC_V1_T3K_RUCK_MULTI_VARIABLE_PROGRESSION",
+    "modules": [
+      "engine/coaching_spec_v1_quality.js"
+    ],
+    "repairs": [],
+    "wired": [],
+    "tested": true,
+    "stressed": false,
+    "killedLive": ""
+  },
+  {
+    "code": "COACH_SPEC_V1_T3K_SHIN_SYMPTOM_GATE_MISSING",
+    "modules": [
+      "engine/coaching_spec_v1_quality.js"
+    ],
+    "repairs": [],
+    "wired": [],
+    "tested": true,
+    "stressed": false,
+    "killedLive": ""
+  },
+  {
+    "code": "COACH_SPEC_V1_YG_FAILURE_BASED_DEFAULT",
+    "modules": [
+      "engine/coaching_spec_v1_quality.js"
+    ],
+    "repairs": [],
+    "wired": [],
+    "tested": true,
+    "stressed": false,
+    "killedLive": ""
+  },
+  {
+    "code": "COACH_SPEC_V1_YG_HANDSTAND_BALANCE_SPECIFICITY_MISSING",
+    "modules": [
+      "engine/coaching_spec_v1_quality.js"
+    ],
+    "repairs": [],
+    "wired": [],
+    "tested": false,
+    "stressed": false,
+    "killedLive": ""
+  },
+  {
+    "code": "COACH_SPEC_V1_YG_POWER_VOLUME_BEFORE_OUTPUT",
+    "modules": [
+      "engine/v49_spec_gap_rules.js"
+    ],
+    "repairs": [],
+    "wired": [],
+    "tested": true,
+    "stressed": false,
+    "killedLive": ""
+  },
+  {
+    "code": "COACH_SPEC_V1_YG_SKILL_REST_TOO_SHORT",
+    "modules": [
+      "engine/coaching_spec_v1_quality.js"
+    ],
+    "repairs": [],
+    "wired": [],
+    "tested": false,
+    "stressed": false,
+    "killedLive": ""
+  },
+  {
+    "code": "COACH_SPEC_V1_YG_SKILL_STOP_RULE_MISSING",
+    "modules": [
+      "engine/coaching_spec_v1_quality.js"
+    ],
+    "repairs": [],
+    "wired": [],
+    "tested": true,
+    "stressed": false,
+    "killedLive": ""
+  },
+  {
+    "code": "CONCURRENT_ENDURANCE_REDUNDANCY_UNJUSTIFIED",
+    "modules": [
+      "engine/phase15_elite_guardrails.js"
+    ],
+    "repairs": [
+      "repairUnbenchmarkedVariationLoads"
+    ],
+    "wired": [],
+    "tested": false,
+    "stressed": false,
+    "killedLive": ""
+  },
+  {
+    "code": "CONTINUOUS_RUN_EXCEEDS_CURRENT_RACE_BENCHMARK",
+    "modules": [
+      "engine/phase15_elite_guardrails.js"
+    ],
+    "repairs": [
+      "repairUnbenchmarkedVariationLoads"
+    ],
+    "wired": [],
+    "tested": true,
+    "stressed": false,
+    "killedLive": ""
+  },
+  {
+    "code": "EQUIPMENT_VIOLATION",
+    "modules": [
+      "engine/exercise_dictionary.js"
+    ],
+    "repairs": [
+      "normalizeEquipmentTokens",
+      "enforceUnilateralIntensityFloor",
+      "enforceIntradayConditioningOrder",
+      "normalizedSportSchedule",
+      "swapSportDayContent",
+      "trimAccessorySets"
+    ],
+    "wired": [
+      "enforceUnilateralIntensityFloor",
+      "enforceIntradayConditioningOrder",
+      "swapSportDayContent"
+    ],
+    "tested": true,
+    "stressed": false,
+    "killedLive": ""
+  },
+  {
+    "code": "EVENT_PROGRESSING_SESSION_MISSING",
+    "modules": [
+      "engine/phase15_elite_guardrails.js"
+    ],
+    "repairs": [
+      "repairUnbenchmarkedVariationLoads"
+    ],
+    "wired": [],
+    "tested": true,
+    "stressed": false,
+    "killedLive": "2026-09-11 postpartum_runner"
+  },
+  {
+    "code": "EXERCISE_HALLUCINATION",
+    "modules": [
+      "engine/exercise_dictionary.js"
+    ],
+    "repairs": [
+      "normalizeEquipmentTokens",
+      "enforceUnilateralIntensityFloor",
+      "enforceIntradayConditioningOrder",
+      "normalizedSportSchedule",
+      "swapSportDayContent",
+      "trimAccessorySets"
+    ],
+    "wired": [
+      "enforceUnilateralIntensityFloor",
+      "enforceIntradayConditioningOrder",
+      "swapSportDayContent"
+    ],
+    "tested": true,
+    "stressed": false,
+    "killedLive": ""
+  },
+  {
+    "code": "FAR_SECONDARY_STRENGTH_TOKEN_DOSE",
+    "modules": [
+      "engine/phase15_program_qa.js"
+    ],
+    "repairs": [
+      "repairPhase15Program"
+    ],
+    "wired": [
+      "repairPhase15Program"
+    ],
+    "tested": false,
+    "stressed": false,
+    "killedLive": ""
+  },
+  {
+    "code": "GOAL_COMPONENT_COVERAGE_MISSING",
+    "modules": [
+      "engine/goal_progression_graph.js"
+    ],
+    "repairs": [],
+    "wired": [],
+    "tested": true,
+    "stressed": false,
+    "killedLive": ""
+  },
+  {
+    "code": "HARD_RUN_WARMUP_MISSING",
+    "modules": [
+      "engine/coaching_acceptance_quality.js"
+    ],
+    "repairs": [],
+    "wired": [],
+    "tested": true,
+    "stressed": false,
+    "killedLive": ""
+  },
+  {
+    "code": "HEAVY_STRENGTH_RAMP_MISSING",
+    "modules": [
+      "engine/advanced_hybrid_quality.js"
+    ],
+    "repairs": [],
+    "wired": [],
+    "tested": true,
+    "stressed": false,
+    "killedLive": ""
+  },
+  {
+    "code": "INTRADAY_ORDER_VIOLATION",
+    "modules": [
+      "engine/exercise_dictionary.js"
+    ],
+    "repairs": [
+      "normalizeEquipmentTokens",
+      "enforceUnilateralIntensityFloor",
+      "enforceIntradayConditioningOrder",
+      "normalizedSportSchedule",
+      "swapSportDayContent",
+      "trimAccessorySets"
+    ],
+    "wired": [
+      "enforceUnilateralIntensityFloor",
+      "enforceIntradayConditioningOrder",
+      "swapSportDayContent"
+    ],
+    "tested": false,
+    "stressed": false,
+    "killedLive": ""
+  },
+  {
+    "code": "LOW_INTENSITY_PACE_CONTRADICTS_CURRENT_PERFORMANCE",
+    "modules": [
+      "engine/phase15_elite_guardrails.js"
+    ],
+    "repairs": [
+      "repairUnbenchmarkedVariationLoads"
+    ],
+    "wired": [],
+    "tested": true,
+    "stressed": false,
+    "killedLive": ""
+  },
+  {
+    "code": "MARATHON_QUALITY_DOUBLE_PROGRESSION",
+    "modules": [
+      "engine/phase15_final_qa.js"
+    ],
+    "repairs": [],
+    "wired": [],
+    "tested": false,
+    "stressed": false,
+    "killedLive": ""
+  },
+  {
+    "code": "MARATHON_STACKED_VOLUME_PROGRESSION",
+    "modules": [
+      "engine/phase15_final_qa.js"
+    ],
+    "repairs": [],
+    "wired": [],
+    "tested": false,
+    "stressed": false,
+    "killedLive": ""
+  },
+  {
+    "code": "MARATHON_STRENGTH_MAINTENANCE_OVERLOAD",
+    "modules": [
+      "engine/phase15_final_qa.js"
+    ],
+    "repairs": [],
+    "wired": [],
+    "tested": false,
+    "stressed": false,
+    "killedLive": ""
+  },
+  {
+    "code": "MARATHON_WEEK1_VOLUME_ABOVE_CURRENT",
+    "modules": [
+      "engine/phase15_final_qa.js"
+    ],
+    "repairs": [],
+    "wired": [],
+    "tested": false,
+    "stressed": false,
+    "killedLive": ""
+  },
+  {
+    "code": "MULTI_OUTCOME_GOAL_UNDERCOVERED",
+    "modules": [
+      "engine/phase15_program_qa.js"
+    ],
+    "repairs": [
+      "repairPhase15Program"
+    ],
+    "wired": [
+      "repairPhase15Program"
+    ],
+    "tested": false,
+    "stressed": false,
+    "killedLive": ""
+  },
+  {
+    "code": "NAMED_GOAL_DIRECT_EXPOSURE_MISSING",
+    "modules": [
+      "engine/phase15_elite_guardrails.js"
+    ],
+    "repairs": [
+      "repairUnbenchmarkedVariationLoads"
+    ],
+    "wired": [],
+    "tested": true,
+    "stressed": false,
+    "killedLive": ""
+  },
+  {
+    "code": "PAIN_TOLERANCE_CONFLICT",
+    "modules": [
+      "engine/phase15_quality_rules.js"
+    ],
+    "repairs": [
+      "enforcePowerBeforeStrength"
+    ],
+    "wired": [],
+    "tested": false,
+    "stressed": false,
+    "killedLive": ""
+  },
+  {
+    "code": "PAIN_TOLERANCE_NOT_ACKNOWLEDGED",
+    "modules": [
+      "engine/phase15_program_qa.js"
+    ],
+    "repairs": [
+      "repairPhase15Program"
+    ],
+    "wired": [
+      "repairPhase15Program"
+    ],
+    "tested": false,
+    "stressed": false,
+    "killedLive": ""
+  },
+  {
+    "code": "PHASE15_QUALITY_VIOLATION",
+    "modules": [
+      "engine/client_output_qa.js",
+      "engine/repairable_validation_bundle.js"
+    ],
+    "repairs": [],
+    "wired": [],
+    "tested": true,
+    "stressed": false,
+    "killedLive": ""
+  },
+  {
+    "code": "PRIMARY_EXACT_MOVEMENT_MISSING",
+    "modules": [
+      "engine/phase15_elite_guardrails.js"
+    ],
+    "repairs": [
+      "repairUnbenchmarkedVariationLoads"
+    ],
+    "wired": [],
+    "tested": true,
+    "stressed": false,
+    "killedLive": ""
+  },
+  {
+    "code": "PROGRAM_MODEL_NO_WEEK_BLOCKS",
+    "modules": [
+      "engine/program_model.js"
+    ],
+    "repairs": [
+      "normalizeSemanticText",
+      "normalizeDay"
+    ],
+    "wired": [],
+    "tested": false,
+    "stressed": false,
+    "killedLive": ""
+  },
+  {
+    "code": "PROGRESSION_ARCHITECTURE_MISSING",
+    "modules": [
+      "engine/coaching_progression_gpp.js"
+    ],
+    "repairs": [],
+    "wired": [],
+    "tested": true,
+    "stressed": false,
+    "killedLive": ""
+  },
+  {
+    "code": "PULL_UP_DOSE_EXCEEDS_KNOWN_CAPACITY",
+    "modules": [
+      "engine/coaching_progression_gpp.js"
+    ],
+    "repairs": [],
+    "wired": [],
+    "tested": true,
+    "stressed": false,
+    "killedLive": ""
+  },
+  {
+    "code": "REQUESTED_STRENGTH_SESSIONS_UNACCOUNTED",
+    "modules": [
+      "engine/phase15_elite_guardrails.js",
+      "scripts/apply_strength_session_microdose_accounting.mjs"
+    ],
+    "repairs": [
+      "repairUnbenchmarkedVariationLoads"
+    ],
+    "wired": [],
+    "tested": true,
+    "stressed": false,
+    "killedLive": "2026-08-31 weightlifter_peak"
+  },
+  {
+    "code": "RING_DIP_DOSE_EXCEEDS_KNOWN_CAPACITY",
+    "modules": [
+      "engine/manual_acceptance_quality.js"
+    ],
+    "repairs": [],
+    "wired": [],
+    "tested": true,
+    "stressed": false,
+    "killedLive": ""
+  },
+  {
+    "code": "SECONDARY_GOAL_NARRATIVE_CONTRADICTION",
+    "modules": [
+      "engine/phase15_program_qa.js"
+    ],
+    "repairs": [
+      "repairPhase15Program"
+    ],
+    "wired": [
+      "repairPhase15Program"
+    ],
+    "tested": false,
+    "stressed": false,
+    "killedLive": ""
+  },
+  {
+    "code": "SESSION_TIME_BUDGET_EXCEEDED",
+    "modules": [
+      "engine/phase15_program_qa.js",
+      "engine/phase15_quality_rules.js"
+    ],
+    "repairs": [
+      "repairPhase15Program",
+      "enforcePowerBeforeStrength"
+    ],
+    "wired": [
+      "repairPhase15Program"
+    ],
+    "tested": false,
+    "stressed": false,
+    "killedLive": ""
+  },
+  {
+    "code": "SPINAL_LOAD_REQUIRES_TOLERANCE_CHECK",
+    "modules": [
+      "engine/phase15_quality_rules.js"
+    ],
+    "repairs": [
+      "enforcePowerBeforeStrength"
+    ],
+    "wired": [],
+    "tested": false,
+    "stressed": false,
+    "killedLive": ""
+  },
+  {
+    "code": "SPORT_DAY_COUPLING_VIOLATION",
+    "modules": [
+      "engine/exercise_dictionary.js",
+      "engine/semantic_program_qa.js"
+    ],
+    "repairs": [
+      "normalizeEquipmentTokens",
+      "enforceUnilateralIntensityFloor",
+      "enforceIntradayConditioningOrder",
+      "normalizedSportSchedule",
+      "swapSportDayContent",
+      "trimAccessorySets"
+    ],
+    "wired": [
+      "enforceUnilateralIntensityFloor",
+      "enforceIntradayConditioningOrder",
+      "swapSportDayContent"
+    ],
+    "tested": true,
+    "stressed": false,
+    "killedLive": "2026-09-04/11/12 mma + dual_event x4"
+  },
+  {
+    "code": "SPORT_MODALITY_SPECIFICITY_MISSING",
+    "modules": [
+      "engine/phase15_program_qa.js"
+    ],
+    "repairs": [
+      "repairPhase15Program"
+    ],
+    "wired": [
+      "repairPhase15Program"
+    ],
+    "tested": false,
+    "stressed": false,
+    "killedLive": ""
+  },
+  {
+    "code": "STRICT_OHP_SPECIFICITY_UNDERDOSED",
+    "modules": [
+      "engine/phase15_program_qa.js"
+    ],
+    "repairs": [
+      "repairPhase15Program"
+    ],
+    "wired": [
+      "repairPhase15Program"
+    ],
+    "tested": false,
+    "stressed": false,
+    "killedLive": ""
+  },
+  {
+    "code": "TACTICAL_3K_INTERVAL_PROGRESSION_VIOLATION",
+    "modules": [
+      "engine/tactical_3k_gpp_quality.js"
+    ],
+    "repairs": [],
+    "wired": [],
+    "tested": true,
+    "stressed": false,
+    "killedLive": ""
+  },
+  {
+    "code": "TACTICAL_GPP_COVERAGE_MISSING",
+    "modules": [
+      "engine/coaching_progression_gpp.js"
+    ],
+    "repairs": [],
+    "wired": [],
+    "tested": true,
+    "stressed": false,
+    "killedLive": ""
+  },
+  {
+    "code": "TACTICAL_RUCK_WARMUP_MISREPRESENTED",
+    "modules": [
+      "engine/tactical_manual_acceptance.js"
+    ],
+    "repairs": [],
+    "wired": [],
+    "tested": true,
+    "stressed": false,
+    "killedLive": ""
+  },
+  {
+    "code": "TACTICAL_SCHEDULE_ARCHITECTURE_VIOLATION",
+    "modules": [
+      "engine/coaching_progression_gpp.js"
+    ],
+    "repairs": [],
+    "wired": [],
+    "tested": true,
+    "stressed": false,
+    "killedLive": ""
+  },
+  {
+    "code": "TACTICAL_STRENGTH_SESSION_TOO_THIN",
+    "modules": [
+      "engine/tactical_3k_gpp_quality.js"
+    ],
+    "repairs": [],
+    "wired": [],
+    "tested": true,
+    "stressed": false,
+    "killedLive": ""
+  },
+  {
+    "code": "TACTICAL_WEIGHTED_PULL_DOSE_TOO_CLOSE_TO_BENCHMARK",
+    "modules": [
+      "engine/tactical_manual_acceptance.js"
+    ],
+    "repairs": [],
+    "wired": [],
+    "tested": true,
+    "stressed": false,
+    "killedLive": ""
+  },
+  {
+    "code": "TACTICAL_WEIGHTED_PULL_EXPOSURE_AMBIGUOUS",
+    "modules": [
+      "engine/tactical_manual_acceptance.js"
+    ],
+    "repairs": [],
+    "wired": [],
+    "tested": true,
+    "stressed": false,
+    "killedLive": ""
+  },
+  {
+    "code": "TARGET_MODALITY_EXPOSURE_REDUCED",
+    "modules": [
+      "engine/phase15_elite_guardrails.js"
+    ],
+    "repairs": [
+      "repairUnbenchmarkedVariationLoads"
+    ],
+    "wired": [],
+    "tested": true,
+    "stressed": false,
+    "killedLive": ""
+  },
+  {
+    "code": "TSV_PARSE_FAIL",
+    "modules": [
+      "engine/phase15_program_qa.js"
+    ],
+    "repairs": [
+      "repairPhase15Program"
+    ],
+    "wired": [
+      "repairPhase15Program"
+    ],
+    "tested": false,
+    "stressed": false,
+    "killedLive": ""
+  },
+  {
+    "code": "TSV_ROW_COLUMN_COUNT_MISMATCH",
+    "modules": [
+      "engine/phase15_final_qa.js"
+    ],
+    "repairs": [],
+    "wired": [],
+    "tested": true,
+    "stressed": false,
+    "killedLive": "2026-09-12 mma_fight_camp"
+  },
+  {
+    "code": "TSV_SCHEMA_VIOLATION",
+    "modules": [
+      "engine/phase15_final_qa.js"
+    ],
+    "repairs": [],
+    "wired": [],
+    "tested": false,
+    "stressed": false,
+    "killedLive": ""
+  },
+  {
+    "code": "TSV_WEEK_BLOCK_MISSING",
+    "modules": [
+      "engine/phase15_final_qa.js"
+    ],
+    "repairs": [],
+    "wired": [],
+    "tested": false,
+    "stressed": false,
+    "killedLive": ""
+  },
+  {
+    "code": "UNBENCHMARKED_VARIATION_LOAD_TOO_ASSERTIVE",
+    "modules": [
+      "engine/phase15_elite_guardrails.js"
+    ],
+    "repairs": [
+      "repairUnbenchmarkedVariationLoads"
+    ],
+    "wired": [],
+    "tested": true,
+    "stressed": false,
+    "killedLive": ""
+  },
+  {
+    "code": "UNILATERAL_UNDERSTIMULATION",
+    "modules": [
+      "engine/exercise_dictionary.js"
+    ],
+    "repairs": [
+      "normalizeEquipmentTokens",
+      "enforceUnilateralIntensityFloor",
+      "enforceIntradayConditioningOrder",
+      "normalizedSportSchedule",
+      "swapSportDayContent",
+      "trimAccessorySets"
+    ],
+    "wired": [
+      "enforceUnilateralIntensityFloor",
+      "enforceIntradayConditioningOrder",
+      "swapSportDayContent"
+    ],
+    "tested": true,
+    "stressed": false,
+    "killedLive": ""
+  },
+  {
+    "code": "UNREQUESTED_CONDITIONING_INTERFERENCE",
+    "modules": [
+      "engine/phase15_program_qa.js"
+    ],
+    "repairs": [
+      "repairPhase15Program"
+    ],
+    "wired": [
+      "repairPhase15Program"
+    ],
+    "tested": false,
+    "stressed": false,
+    "killedLive": ""
+  },
+  {
+    "code": "V34_DUPLICATE_SPECIFIC_RAMP",
+    "modules": [
+      "engine/v34_prescription_consistency.js"
+    ],
+    "repairs": [
+      "repairWarmupRampTarget"
+    ],
+    "wired": [
+      "repairWarmupRampTarget"
+    ],
+    "tested": true,
+    "stressed": false,
+    "killedLive": ""
+  },
+  {
+    "code": "V34_NOTE_PER_SET_MISMATCH",
+    "modules": [
+      "engine/v34_prescription_consistency.js"
+    ],
+    "repairs": [
+      "repairWarmupRampTarget"
+    ],
+    "wired": [
+      "repairWarmupRampTarget"
+    ],
+    "tested": true,
+    "stressed": false,
+    "killedLive": ""
+  },
+  {
+    "code": "V34_NOTE_REP_WORD_MISMATCH",
+    "modules": [
+      "engine/v34_prescription_consistency.js"
+    ],
+    "repairs": [
+      "repairWarmupRampTarget"
+    ],
+    "wired": [
+      "repairWarmupRampTarget"
+    ],
+    "tested": true,
+    "stressed": false,
+    "killedLive": ""
+  },
+  {
+    "code": "V34_NOTE_TOTAL_MISMATCH",
+    "modules": [
+      "engine/v34_prescription_consistency.js"
+    ],
+    "repairs": [
+      "repairWarmupRampTarget"
+    ],
+    "wired": [
+      "repairWarmupRampTarget"
+    ],
+    "tested": true,
+    "stressed": false,
+    "killedLive": ""
+  },
+  {
+    "code": "V34_NOTE_UNCONDITIONAL_ADDITION",
+    "modules": [
+      "engine/v34_prescription_consistency.js"
+    ],
+    "repairs": [
+      "repairWarmupRampTarget"
+    ],
+    "wired": [
+      "repairWarmupRampTarget"
+    ],
+    "tested": true,
+    "stressed": false,
+    "killedLive": ""
+  },
+  {
+    "code": "V34_NOTE_UNDEFINED_LOAD_REFERENCE",
+    "modules": [
+      "engine/v34_prescription_consistency.js"
+    ],
+    "repairs": [
+      "repairWarmupRampTarget"
+    ],
+    "wired": [
+      "repairWarmupRampTarget"
+    ],
+    "tested": true,
+    "stressed": false,
+    "killedLive": ""
+  },
+  {
+    "code": "V34_PROGRESSION_LANGUAGE_MISMATCH",
+    "modules": [
+      "engine/v34_prescription_consistency.js"
+    ],
+    "repairs": [
+      "repairWarmupRampTarget"
+    ],
+    "wired": [
+      "repairWarmupRampTarget"
+    ],
+    "tested": true,
+    "stressed": false,
+    "killedLive": "2026-08-30/31 weightlifter_peak x3"
+  },
+  {
+    "code": "V34_RUNNING_VOLUME_ABOVE_BASELINE",
+    "modules": [
+      "engine/v34_workload_accounting.js"
+    ],
+    "repairs": [],
+    "wired": [],
+    "tested": true,
+    "stressed": false,
+    "killedLive": ""
+  },
+  {
+    "code": "V34_WARMUP_HEAVIER_THAN_WORK",
+    "modules": [
+      "engine/v34_prescription_consistency.js"
+    ],
+    "repairs": [
+      "repairWarmupRampTarget"
+    ],
+    "wired": [
+      "repairWarmupRampTarget"
+    ],
+    "tested": true,
+    "stressed": false,
+    "killedLive": ""
+  },
+  {
+    "code": "V34_WARMUP_TARGET_MISMATCH",
+    "modules": [
+      "engine/v34_prescription_consistency.js"
+    ],
+    "repairs": [
+      "repairWarmupRampTarget"
+    ],
+    "wired": [
+      "repairWarmupRampTarget"
+    ],
+    "tested": true,
+    "stressed": false,
+    "killedLive": ""
+  },
+  {
+    "code": "V35_BLOCK_SPECIFICITY_OVERSTATED",
+    "modules": [
+      "engine/v35_coaching_standards.js"
+    ],
+    "repairs": [],
+    "wired": [],
+    "tested": true,
+    "stressed": false,
+    "killedLive": ""
+  },
+  {
+    "code": "V35_CONFLICTING_SYMPTOM_ALGORITHM",
+    "modules": [
+      "engine/v35_coaching_standards.js"
+    ],
+    "repairs": [],
+    "wired": [],
+    "tested": true,
+    "stressed": false,
+    "killedLive": ""
+  },
+  {
+    "code": "V35_NARRATIVE_PROGRESSION_CLAIM_UNSUPPORTED",
+    "modules": [
+      "engine/v35_coaching_standards.js"
+    ],
+    "repairs": [],
+    "wired": [],
+    "tested": true,
+    "stressed": false,
+    "killedLive": ""
+  },
+  {
+    "code": "V35_SECONDARY_VOLUME_CREEP",
+    "modules": [
+      "engine/v35_coaching_standards.js"
+    ],
+    "repairs": [],
+    "wired": [],
+    "tested": true,
+    "stressed": false,
+    "killedLive": "2026-08-29 advanced_hybrid"
+  },
+  {
+    "code": "V35_VOLUME_NARRATIVE_MISMATCH",
+    "modules": [
+      "engine/v35_coaching_standards.js"
+    ],
+    "repairs": [],
+    "wired": [],
+    "tested": true,
+    "stressed": false,
+    "killedLive": ""
+  },
+  {
+    "code": "V38_CARRY_PACE_ONLY_PROGRESSION",
+    "modules": [
+      "engine/v38_structural_audit.js"
+    ],
+    "repairs": [],
+    "wired": [],
+    "tested": true,
+    "stressed": false,
+    "killedLive": ""
+  },
+  {
+    "code": "V38_CONSECUTIVE_CONFLICTING_EXPOSURE",
+    "modules": [
+      "engine/v38_structural_audit.js"
+    ],
+    "repairs": [],
+    "wired": [],
+    "tested": true,
+    "stressed": false,
+    "killedLive": ""
+  },
+  {
+    "code": "V38_INCOMPLETE_SESSION",
+    "modules": [
+      "engine/v38_structural_audit.js"
+    ],
+    "repairs": [],
+    "wired": [],
+    "tested": true,
+    "stressed": false,
+    "killedLive": ""
+  },
+  {
+    "code": "V38_MISSING_MOVEMENT_CATEGORY",
+    "modules": [
+      "engine/v38_structural_audit.js"
+    ],
+    "repairs": [],
+    "wired": [],
+    "tested": true,
+    "stressed": false,
+    "killedLive": ""
+  },
+  {
+    "code": "V38_SKILL_WITHOUT_FOUNDATION",
+    "modules": [
+      "engine/v38_structural_audit.js"
+    ],
+    "repairs": [],
+    "wired": [],
+    "tested": true,
+    "stressed": false,
+    "killedLive": ""
+  },
+  {
+    "code": "V42_CONDITIONING_STACKED_ON_SPORT_DAYS",
+    "modules": [
+      "engine/v42_recovery_budget.js"
+    ],
+    "repairs": [],
+    "wired": [],
+    "tested": true,
+    "stressed": false,
+    "killedLive": ""
+  },
+  {
+    "code": "V42_LOW_COST_CLAIM_CONTRADICTED",
+    "modules": [
+      "engine/v42_recovery_budget.js"
+    ],
+    "repairs": [],
+    "wired": [],
+    "tested": true,
+    "stressed": false,
+    "killedLive": ""
+  },
+  {
+    "code": "V42_MULTIPLE_STRESSORS_RAISED",
+    "modules": [
+      "engine/v42_progression_discipline.js"
+    ],
+    "repairs": [],
+    "wired": [],
+    "tested": true,
+    "stressed": false,
+    "killedLive": ""
+  },
+  {
+    "code": "V42_PRIMARY_WORK_ON_HARD_SPORT_DAY",
+    "modules": [
+      "engine/v42_recovery_budget.js"
+    ],
+    "repairs": [],
+    "wired": [],
+    "tested": true,
+    "stressed": false,
+    "killedLive": ""
+  },
+  {
+    "code": "V43_INJURY_RESPONSE_NOT_CAUSAL",
+    "modules": [
+      "engine/v43_coaching_governance.js"
+    ],
+    "repairs": [],
+    "wired": [],
+    "tested": true,
+    "stressed": false,
+    "killedLive": ""
+  },
+  {
+    "code": "V43_MAINTENANCE_AUTO_PROGRESSED",
+    "modules": [
+      "engine/v43_coaching_governance.js"
+    ],
+    "repairs": [],
+    "wired": [],
+    "tested": true,
+    "stressed": false,
+    "killedLive": ""
+  },
+  {
+    "code": "V43_NO_AUTOREGULATION_PATH",
+    "modules": [
+      "engine/v43_coaching_governance.js"
+    ],
+    "repairs": [],
+    "wired": [],
+    "tested": true,
+    "stressed": false,
+    "killedLive": ""
+  },
+  {
+    "code": "V43_SESSION_EXCEEDS_TIME_BUDGET",
+    "modules": [
+      "engine/v43_coaching_governance.js"
+    ],
+    "repairs": [],
+    "wired": [],
+    "tested": true,
+    "stressed": false,
+    "killedLive": ""
+  },
+  {
+    "code": "V43_SKILL_QUOTA_WITHOUT_CEILING",
+    "modules": [
+      "engine/v43_coaching_governance.js"
+    ],
+    "repairs": [],
+    "wired": [],
+    "tested": true,
+    "stressed": false,
+    "killedLive": ""
+  },
+  {
+    "code": "V46_COUNT_CLAIM_MISMATCH",
+    "modules": [
+      "engine/v46_language_accuracy.js"
+    ],
+    "repairs": [
+      "repairCountClaims"
+    ],
+    "wired": [
+      "repairCountClaims"
+    ],
+    "tested": true,
+    "stressed": false,
+    "killedLive": ""
+  },
+  {
+    "code": "V46_OPTIONAL_QUALIFIER_ON_PRIMARY",
+    "modules": [
+      "engine/v46_language_accuracy.js"
+    ],
+    "repairs": [
+      "repairCountClaims"
+    ],
+    "wired": [
+      "repairCountClaims"
+    ],
+    "tested": false,
+    "stressed": false,
+    "killedLive": ""
+  },
+  {
+    "code": "V46_SCHEDULE_EXCEEDS_STATED_FREQUENCY",
+    "modules": [
+      "engine/v46_language_accuracy.js"
+    ],
+    "repairs": [
+      "repairCountClaims"
+    ],
+    "wired": [
+      "repairCountClaims"
+    ],
+    "tested": true,
+    "stressed": false,
+    "killedLive": ""
+  },
+  {
+    "code": "V46_TEXT_DEFECT",
+    "modules": [
+      "engine/v46_language_accuracy.js"
+    ],
+    "repairs": [
+      "repairCountClaims"
+    ],
+    "wired": [
+      "repairCountClaims"
+    ],
+    "tested": true,
+    "stressed": false,
+    "killedLive": ""
+  },
+  {
+    "code": "V52_KEY_SESSION_CROWDED",
+    "modules": [
+      "engine/v52_session_hierarchy.js"
+    ],
+    "repairs": [
+      "repairSessionHierarchy",
+      "repairKeySessionCrowding"
+    ],
+    "wired": [
+      "repairSessionHierarchy",
+      "repairKeySessionCrowding"
+    ],
+    "tested": true,
+    "stressed": false,
+    "killedLive": ""
+  },
+  {
+    "code": "V52_SECONDARY_BETWEEN_PRIMARIES",
+    "modules": [
+      "engine/v52_session_hierarchy.js"
+    ],
+    "repairs": [
+      "repairSessionHierarchy",
+      "repairKeySessionCrowding"
+    ],
+    "wired": [
+      "repairSessionHierarchy",
+      "repairKeySessionCrowding"
+    ],
+    "tested": true,
+    "stressed": false,
+    "killedLive": ""
+  },
+  {
+    "code": "V53_ACCESSORY_BELOW_DEMONSTRATED_LEVEL",
+    "modules": [
+      "engine/v53_session_substance.js"
+    ],
+    "repairs": [],
+    "wired": [],
+    "tested": true,
+    "stressed": false,
+    "killedLive": ""
+  },
+  {
+    "code": "V53_PRESCRIBES_DECLINED_MOVEMENT",
+    "modules": [
+      "engine/v53_session_substance.js"
+    ],
+    "repairs": [],
+    "wired": [],
+    "tested": true,
+    "stressed": false,
+    "killedLive": ""
+  },
+  {
+    "code": "V53_THIN_SESSION",
+    "modules": [
+      "engine/v53_session_substance.js"
+    ],
+    "repairs": [],
+    "wired": [],
+    "tested": false,
+    "stressed": false,
+    "killedLive": ""
+  },
+  {
+    "code": "V53_UNDERLOADED_ACCESSORY",
+    "modules": [
+      "engine/v53_session_substance.js"
+    ],
+    "repairs": [],
+    "wired": [],
+    "tested": true,
+    "stressed": false,
+    "killedLive": ""
+  },
+  {
+    "code": "V56_PRE_PRIMARY_DAY_OVERLOADED",
+    "modules": [
+      "engine/v56_primary_day_protection.js"
+    ],
+    "repairs": [
+      "repairPrePrimaryLoad"
+    ],
+    "wired": [
+      "repairPrePrimaryLoad"
+    ],
+    "tested": true,
+    "stressed": false,
+    "killedLive": ""
+  },
+  {
+    "code": "V57_ACCESSORY_STEALS_ENDURANCE_RECOVERY",
+    "modules": [
+      "engine/v57_endurance_volume_governor.js"
+    ],
+    "repairs": [
+      "repairEnduranceVolume"
+    ],
+    "wired": [
+      "repairEnduranceVolume"
+    ],
+    "tested": true,
+    "stressed": false,
+    "killedLive": ""
+  },
+  {
+    "code": "V58_MALFORMED_COACHING_PROSE",
+    "modules": [
+      "engine/v58_semantic_cleanup.js"
+    ],
+    "repairs": [
+      "repairSemanticProse"
+    ],
+    "wired": [
+      "repairSemanticProse"
+    ],
+    "tested": false,
+    "stressed": false,
+    "killedLive": ""
+  },
+  {
+    "code": "V61_FREQUENCY_CLAIM_MISMATCH",
+    "modules": [
+      "engine/v61_weekly_exposures.js"
+    ],
+    "repairs": [
+      "repairFrequencyClaim"
+    ],
+    "wired": [
+      "repairFrequencyClaim"
+    ],
+    "tested": true,
+    "stressed": false,
+    "killedLive": ""
+  },
+  {
+    "code": "V70_COMBAT_CONDITIONING_DUPLICATED",
+    "modules": [
+      "engine/v70_competition_rules.js"
+    ],
+    "repairs": [
+      "repairCompetitionBlock"
+    ],
+    "wired": [
+      "repairCompetitionBlock"
+    ],
+    "tested": false,
+    "stressed": false,
+    "killedLive": ""
+  },
+  {
+    "code": "V70_COMPETITION_WEEK_HIGH_DAMAGE",
+    "modules": [
+      "engine/v70_competition_rules.js"
+    ],
+    "repairs": [
+      "repairCompetitionBlock"
+    ],
+    "wired": [
+      "repairCompetitionBlock"
+    ],
+    "tested": true,
+    "stressed": false,
+    "killedLive": ""
+  },
+  {
+    "code": "V70_COMPETITION_WEEK_NEAR_FAILURE",
+    "modules": [
+      "engine/v70_competition_rules.js"
+    ],
+    "repairs": [
+      "repairCompetitionBlock"
+    ],
+    "wired": [
+      "repairCompetitionBlock"
+    ],
+    "tested": true,
+    "stressed": false,
+    "killedLive": ""
+  },
+  {
+    "code": "V70_TAPER_VOLUME_NOT_REDUCED",
+    "modules": [
+      "engine/v70_competition_rules.js"
+    ],
+    "repairs": [
+      "repairCompetitionBlock"
+    ],
+    "wired": [
+      "repairCompetitionBlock"
+    ],
+    "tested": true,
+    "stressed": false,
+    "killedLive": ""
+  },
+  {
+    "code": "V71_CLASSIC_SHARE_NOT_RISING",
+    "modules": [
+      "engine/v71_intensification.js"
+    ],
+    "repairs": [
+      "repairIntensification",
+      "repairLateSupportVolume"
+    ],
+    "wired": [
+      "repairIntensification"
+    ],
+    "tested": true,
+    "stressed": false,
+    "killedLive": ""
+  },
+  {
+    "code": "V71_INTENSIFICATION_VOLUME_FLAT",
+    "modules": [
+      "engine/v71_intensification.js"
+    ],
+    "repairs": [
+      "repairIntensification",
+      "repairLateSupportVolume"
+    ],
+    "wired": [
+      "repairIntensification"
+    ],
+    "tested": true,
+    "stressed": false,
+    "killedLive": ""
+  },
+  {
+    "code": "V71_MISSING_PERCENT_OF_MAX",
+    "modules": [
+      "engine/v71_intensification.js"
+    ],
+    "repairs": [
+      "repairIntensification",
+      "repairLateSupportVolume"
+    ],
+    "wired": [
+      "repairIntensification"
+    ],
+    "tested": true,
+    "stressed": false,
+    "killedLive": ""
+  },
+  {
+    "code": "V71_SECONDARY_PRESS_NOT_REDUCED",
+    "modules": [
+      "engine/v71_intensification.js"
+    ],
+    "repairs": [
+      "repairIntensification",
+      "repairLateSupportVolume"
+    ],
+    "wired": [
+      "repairIntensification"
+    ],
+    "tested": true,
+    "stressed": false,
+    "killedLive": ""
+  },
+  {
+    "code": "V71_SQUAT_SUPPORT_FLAT_IN_FINAL_WEEK",
+    "modules": [
+      "engine/v71_intensification.js"
+    ],
+    "repairs": [
+      "repairIntensification",
+      "repairLateSupportVolume"
+    ],
+    "wired": [
+      "repairIntensification"
+    ],
+    "tested": true,
+    "stressed": false,
+    "killedLive": ""
+  },
+  {
+    "code": "V72_COMBAT_NO_POWER_EXPOSURE",
+    "modules": [
+      "engine/v72_combat_power.js"
+    ],
+    "repairs": [
+      "repairCombatPower"
+    ],
+    "wired": [
+      "repairCombatPower"
+    ],
+    "tested": true,
+    "stressed": false,
+    "killedLive": ""
+  },
+  {
+    "code": "V72_HIGH_COST_PLYOMETRIC_IN_FIGHT_WEEK",
+    "modules": [
+      "engine/v72_combat_power.js"
+    ],
+    "repairs": [
+      "repairCombatPower"
+    ],
+    "wired": [
+      "repairCombatPower"
+    ],
+    "tested": true,
+    "stressed": false,
+    "killedLive": ""
+  },
+  {
+    "code": "V73_BLOCK_DOES_NOT_MOVE",
+    "modules": [
+      "engine/v73_taper_audit.js"
+    ],
+    "repairs": [],
+    "wired": [],
+    "tested": true,
+    "stressed": false,
+    "killedLive": ""
+  },
+  {
+    "code": "V74_CAMP_SESSION_TOO_BUSY",
+    "modules": [
+      "engine/v74_camp_economy.js"
+    ],
+    "repairs": [
+      "repairCampEconomy"
+    ],
+    "wired": [
+      "repairCampEconomy"
+    ],
+    "tested": false,
+    "stressed": false,
+    "killedLive": ""
+  },
+  {
+    "code": "V74_NOVEL_EXERCISE_NEAR_EVENT",
+    "modules": [
+      "engine/v74_camp_economy.js"
+    ],
+    "repairs": [
+      "repairCampEconomy"
+    ],
+    "wired": [
+      "repairCampEconomy"
+    ],
+    "tested": true,
+    "stressed": false,
+    "killedLive": "2026-08-31 mma_fight_camp"
+  },
+  {
+    "code": "V75_EFFORT_TOO_HIGH_DURING_CUT",
+    "modules": [
+      "engine/v75_weight_cut.js"
+    ],
+    "repairs": [
+      "repairWeightCutLoad"
+    ],
+    "wired": [
+      "repairWeightCutLoad"
+    ],
+    "tested": true,
+    "stressed": false,
+    "killedLive": "2026-09-04 weightlifter_meet_week"
+  },
+  {
+    "code": "V76_CONDITIONING_DUPLICATES_SPORT",
+    "modules": [
+      "engine/v76_conditioning_gap.js"
+    ],
+    "repairs": [],
+    "wired": [],
+    "tested": true,
+    "stressed": false,
+    "killedLive": ""
+  },
+  {
+    "code": "V77_FIGHT_WEEK_NOT_ON_THE_CLOCK",
+    "modules": [
+      "engine/v77_fight_week_clock.js"
+    ],
+    "repairs": [
+      "repairFightWeekClock"
+    ],
+    "wired": [
+      "repairFightWeekClock"
+    ],
+    "tested": true,
+    "stressed": false,
+    "killedLive": "2026-09-04 mma, 2026-09-05 meet_week"
+  },
+  {
+    "code": "V78_SPORT_TAPER_NOT_ADDRESSED",
+    "modules": [
+      "engine/v78_sport_taper.js"
+    ],
+    "repairs": [],
+    "wired": [],
+    "tested": true,
+    "stressed": false,
+    "killedLive": ""
+  },
+  {
+    "code": "V79_TOO_GENERIC_NEAR_EVENT",
+    "modules": [
+      "engine/v79_ballistic_share.js"
+    ],
+    "repairs": [
+      "repairBallisticShare"
+    ],
+    "wired": [
+      "repairBallisticShare"
+    ],
+    "tested": false,
+    "stressed": false,
+    "killedLive": ""
+  },
+  {
+    "code": "V81_CLUSTER_LABELLED_AS_STRAIGHT_SET",
+    "modules": [
+      "engine/v81_cluster_notation.js"
+    ],
+    "repairs": [
+      "repairClusterNotation"
+    ],
+    "wired": [
+      "repairClusterNotation"
+    ],
+    "tested": true,
+    "stressed": false,
+    "killedLive": ""
+  },
+  {
+    "code": "V82_ALACTIC_RECOVERY_TOO_SHORT",
+    "modules": [
+      "engine/v82_camp_sharpening.js"
+    ],
+    "repairs": [
+      "repairCampSharpening"
+    ],
+    "wired": [
+      "repairCampSharpening"
+    ],
+    "tested": true,
+    "stressed": false,
+    "killedLive": ""
+  },
+  {
+    "code": "V82_FINAL_PRIMER_TOO_LONG",
+    "modules": [
+      "engine/v82_camp_sharpening.js"
+    ],
+    "repairs": [
+      "repairCampSharpening"
+    ],
+    "wired": [
+      "repairCampSharpening"
+    ],
+    "tested": true,
+    "stressed": false,
+    "killedLive": ""
+  },
+  {
+    "code": "V82_POWER_EXPOSURE_DUPLICATED",
+    "modules": [
+      "engine/v82_camp_sharpening.js"
+    ],
+    "repairs": [
+      "repairCampSharpening"
+    ],
+    "wired": [
+      "repairCampSharpening"
+    ],
+    "tested": true,
+    "stressed": false,
+    "killedLive": "2026-09-11/12 mma_fight_camp x2"
+  },
+  {
+    "code": "V83_HIGH_COST_WORK_BEFORE_MATCH",
+    "modules": [
+      "engine/v83_in_season.js"
+    ],
+    "repairs": [
+      "repairSeasonNarrative",
+      "repairInSeason"
+    ],
+    "wired": [
+      "repairInSeason"
+    ],
+    "tested": true,
+    "stressed": false,
+    "killedLive": ""
+  },
+  {
+    "code": "V83_SEASON_PLANNED_AS_EVENT",
+    "modules": [
+      "engine/v83_in_season.js"
+    ],
+    "repairs": [
+      "repairSeasonNarrative",
+      "repairInSeason"
+    ],
+    "wired": [
+      "repairInSeason"
+    ],
+    "tested": true,
+    "stressed": false,
+    "killedLive": ""
+  },
+  {
+    "code": "V83_SPORT_WEEK_NOT_SHOWN",
+    "modules": [
+      "engine/v83_in_season.js"
+    ],
+    "repairs": [
+      "repairSeasonNarrative",
+      "repairInSeason"
+    ],
+    "wired": [
+      "repairInSeason"
+    ],
+    "tested": false,
+    "stressed": false,
+    "killedLive": ""
+  },
+  {
+    "code": "V84_CONTRAINDICATED_MOVEMENT_PRESCRIBED",
+    "modules": [
+      "engine/v84_injury_constraint.js"
+    ],
+    "repairs": [],
+    "wired": [],
+    "tested": true,
+    "stressed": false,
+    "killedLive": ""
+  },
+  {
+    "code": "V86_GOVERNING_CLOCK_NOT_STATED",
+    "modules": [
+      "engine/v86_training_clock.js"
+    ],
+    "repairs": [
+      "repairClockStatement"
+    ],
+    "wired": [
+      "repairClockStatement"
+    ],
+    "tested": false,
+    "stressed": false,
+    "killedLive": ""
+  },
+  {
+    "code": "V87_PHASE_LABEL_NOT_EARNED",
+    "modules": [
+      "engine/v87_earned_claims.js"
+    ],
+    "repairs": [],
+    "wired": [],
+    "tested": false,
+    "stressed": false,
+    "killedLive": ""
+  },
+  {
+    "code": "V87_PRIMARY_GOAL_UNDER_TRAINED",
+    "modules": [
+      "engine/v87_earned_claims.js"
+    ],
+    "repairs": [],
+    "wired": [],
+    "tested": false,
+    "stressed": false,
+    "killedLive": ""
+  },
+  {
+    "code": "V87_REPEATED_WEEK_UNEXPLAINED",
+    "modules": [
+      "engine/v87_earned_claims.js"
+    ],
+    "repairs": [],
+    "wired": [],
+    "tested": false,
+    "stressed": false,
+    "killedLive": ""
+  },
+  {
+    "code": "V88_GOAL_PACE_NEVER_TOUCHED",
+    "modules": [
+      "engine/v88_goal_pace.js"
+    ],
+    "repairs": [],
+    "wired": [],
+    "tested": true,
+    "stressed": false,
+    "killedLive": ""
+  },
+  {
+    "code": "V88_PACE_NEVER_MOVES",
+    "modules": [
+      "engine/v88_goal_pace.js"
+    ],
+    "repairs": [],
+    "wired": [],
+    "tested": false,
+    "stressed": false,
+    "killedLive": ""
+  },
+  {
+    "code": "V89_PEAK_CLAIMED_WITHOUT_DAY_ZERO",
+    "modules": [
+      "engine/v89_block_architecture.js"
+    ],
+    "repairs": [
+      "repairDayZeroClaims",
+      "repairMatchDayPlacement",
+      "repairAllocationShift",
+      "repairSportFrequency"
+    ],
+    "wired": [
+      "repairDayZeroClaims",
+      "repairMatchDayPlacement",
+      "repairAllocationShift",
+      "repairSportFrequency"
+    ],
+    "tested": false,
+    "stressed": false,
+    "killedLive": ""
+  },
+  {
+    "code": "V89_SESSIONS_NOT_PLACED_BY_MATCH_DAY",
+    "modules": [
+      "engine/v89_block_architecture.js"
+    ],
+    "repairs": [
+      "repairDayZeroClaims",
+      "repairMatchDayPlacement",
+      "repairAllocationShift",
+      "repairSportFrequency"
+    ],
+    "wired": [
+      "repairDayZeroClaims",
+      "repairMatchDayPlacement",
+      "repairAllocationShift",
+      "repairSportFrequency"
+    ],
+    "tested": false,
+    "stressed": false,
+    "killedLive": ""
+  },
+  {
+    "code": "V89_SPORT_ALLOCATION_NOT_SHIFTING",
+    "modules": [
+      "engine/v89_block_architecture.js"
+    ],
+    "repairs": [
+      "repairDayZeroClaims",
+      "repairMatchDayPlacement",
+      "repairAllocationShift",
+      "repairSportFrequency"
+    ],
+    "wired": [
+      "repairDayZeroClaims",
+      "repairMatchDayPlacement",
+      "repairAllocationShift",
+      "repairSportFrequency"
+    ],
+    "tested": false,
+    "stressed": false,
+    "killedLive": ""
+  },
+  {
+    "code": "V89_SPORT_FREQUENCY_STATIC",
+    "modules": [
+      "engine/v89_block_architecture.js"
+    ],
+    "repairs": [
+      "repairDayZeroClaims",
+      "repairMatchDayPlacement",
+      "repairAllocationShift",
+      "repairSportFrequency"
+    ],
+    "wired": [
+      "repairDayZeroClaims",
+      "repairMatchDayPlacement",
+      "repairAllocationShift",
+      "repairSportFrequency"
+    ],
+    "tested": false,
+    "stressed": false,
+    "killedLive": ""
+  },
+  {
+    "code": "V90_EXPOSURE_REPEATED_ALL_WEEK",
+    "modules": [
+      "engine/v90_competition_week.js"
+    ],
+    "repairs": [
+      "repairCompetitionWeek"
+    ],
+    "wired": [
+      "repairCompetitionWeek"
+    ],
+    "tested": true,
+    "stressed": false,
+    "killedLive": ""
+  },
+  {
+    "code": "V90_FINAL_PRIMER_MANDATORY",
+    "modules": [
+      "engine/v90_competition_week.js"
+    ],
+    "repairs": [
+      "repairCompetitionWeek"
+    ],
+    "wired": [
+      "repairCompetitionWeek"
+    ],
+    "tested": true,
+    "stressed": false,
+    "killedLive": ""
+  },
+  {
+    "code": "V90_SESSION_GROWS_INTO_DAY_ZERO",
+    "modules": [
+      "engine/v90_competition_week.js"
+    ],
+    "repairs": [
+      "repairCompetitionWeek"
+    ],
+    "wired": [
+      "repairCompetitionWeek"
+    ],
+    "tested": true,
+    "stressed": false,
+    "killedLive": ""
+  },
+  {
+    "code": "V90_TECHNICAL_TOUCH_REDUNDANT",
+    "modules": [
+      "engine/v90_competition_week.js"
+    ],
+    "repairs": [
+      "repairCompetitionWeek"
+    ],
+    "wired": [
+      "repairCompetitionWeek"
+    ],
+    "tested": true,
+    "stressed": false,
+    "killedLive": ""
+  },
+  {
+    "code": "V91_CALENDAR_TRAINS_THROUGH_THE_EVENT",
+    "modules": [
+      "engine/v91_timeline_integrity.js"
+    ],
+    "repairs": [
+      "repairTimelineIntegrity"
+    ],
+    "wired": [
+      "repairTimelineIntegrity"
+    ],
+    "tested": true,
+    "stressed": false,
+    "killedLive": ""
+  },
+  {
+    "code": "V91_COMBAT_LOAD_NOT_DECREASING",
+    "modules": [
+      "engine/v91_timeline_integrity.js"
+    ],
+    "repairs": [
+      "repairTimelineIntegrity"
+    ],
+    "wired": [
+      "repairTimelineIntegrity"
+    ],
+    "tested": false,
+    "stressed": false,
+    "killedLive": ""
+  },
+  {
+    "code": "V91_SESSION_ON_OR_AFTER_DAY_ZERO",
+    "modules": [
+      "engine/v91_timeline_integrity.js"
+    ],
+    "repairs": [
+      "repairTimelineIntegrity"
+    ],
+    "wired": [
+      "repairTimelineIntegrity"
+    ],
+    "tested": true,
+    "stressed": false,
+    "killedLive": ""
+  },
+  {
+    "code": "V91_TIMELINE_VIEWS_DISAGREE",
+    "modules": [
+      "engine/v91_timeline_integrity.js"
+    ],
+    "repairs": [
+      "repairTimelineIntegrity"
+    ],
+    "wired": [
+      "repairTimelineIntegrity"
+    ],
+    "tested": true,
+    "stressed": false,
+    "killedLive": "2026-09-12 mma_fight_camp"
+  },
+  {
+    "code": "V92_FALSE_PRECISION_LOAD",
+    "modules": [
+      "engine/v92_prescription_integrity.js"
+    ],
+    "repairs": [
+      "repairPrescriptionIntegrity"
+    ],
+    "wired": [
+      "repairPrescriptionIntegrity"
+    ],
+    "tested": true,
+    "stressed": false,
+    "killedLive": ""
+  },
+  {
+    "code": "V92_NOVEL_EXERCISE_NEAR_EVENT",
+    "modules": [
+      "engine/v92_prescription_integrity.js"
+    ],
+    "repairs": [
+      "repairPrescriptionIntegrity"
+    ],
+    "wired": [
+      "repairPrescriptionIntegrity"
+    ],
+    "tested": true,
+    "stressed": false,
+    "killedLive": ""
+  },
+  {
+    "code": "V92_NO_FATIGUE_STOP_RULE",
+    "modules": [
+      "engine/v92_prescription_integrity.js"
+    ],
+    "repairs": [
+      "repairPrescriptionIntegrity"
+    ],
+    "wired": [
+      "repairPrescriptionIntegrity"
+    ],
+    "tested": true,
+    "stressed": false,
+    "killedLive": ""
+  },
+  {
+    "code": "WEEKLY_MRV_EXCEEDED",
+    "modules": [
+      "engine/exercise_dictionary.js",
+      "engine/semantic_program_qa.js"
+    ],
+    "repairs": [
+      "normalizeEquipmentTokens",
+      "enforceUnilateralIntensityFloor",
+      "enforceIntradayConditioningOrder",
+      "normalizedSportSchedule",
+      "swapSportDayContent",
+      "trimAccessorySets"
+    ],
+    "wired": [
+      "enforceUnilateralIntensityFloor",
+      "enforceIntradayConditioningOrder",
+      "swapSportDayContent"
+    ],
+    "tested": true,
+    "stressed": false,
+    "killedLive": "2026-08-29 advanced_hybrid"
+  },
+  {
+    "code": "WEEK_BLOCK_STRUCTURE_INVALID",
+    "modules": [
+      "engine/phase15_program_qa.js"
+    ],
+    "repairs": [
+      "repairPhase15Program"
+    ],
+    "wired": [
+      "repairPhase15Program"
+    ],
+    "tested": false,
+    "stressed": false,
+    "killedLive": ""
+  },
+  {
+    "code": "YOUTH_CONSOLIDATION_RESET_TO_BASELINE",
+    "modules": [
+      "engine/coaching_consolidation_quality.js"
+    ],
+    "repairs": [],
+    "wired": [],
+    "tested": true,
+    "stressed": false,
+    "killedLive": ""
+  },
+  {
+    "code": "YOUTH_FLEXIBLE_SCHEDULE_INVENTED_WEEKDAYS",
+    "modules": [
+      "engine/manual_acceptance_quality.js"
+    ],
+    "repairs": [],
+    "wired": [],
+    "tested": true,
+    "stressed": false,
+    "killedLive": ""
+  },
+  {
+    "code": "YOUTH_HANDSTAND_ATTEMPT_VOLUME_EXCESSIVE",
+    "modules": [
+      "engine/manual_acceptance_quality.js"
+    ],
+    "repairs": [],
+    "wired": [],
+    "tested": true,
+    "stressed": false,
+    "killedLive": ""
+  },
+  {
+    "code": "YOUTH_PRIMARY_SKILL_NOT_FRESH",
+    "modules": [
+      "engine/manual_acceptance_quality.js"
+    ],
+    "repairs": [],
+    "wired": [],
+    "tested": true,
+    "stressed": false,
+    "killedLive": ""
+  },
+  {
+    "code": "YOUTH_PROGRESSION_QUALITY_MISSING",
+    "modules": [
+      "engine/coaching_acceptance_quality.js"
+    ],
+    "repairs": [],
+    "wired": [],
+    "tested": true,
+    "stressed": false,
+    "killedLive": ""
+  },
+  {
+    "code": "ZONE2_DOSE_TOO_SMALL",
+    "modules": [
+      "engine/phase15_program_qa.js"
+    ],
+    "repairs": [
+      "repairPhase15Program"
+    ],
+    "wired": [
+      "repairPhase15Program"
+    ],
+    "tested": false,
+    "stressed": false,
+    "killedLive": ""
+  }
+]

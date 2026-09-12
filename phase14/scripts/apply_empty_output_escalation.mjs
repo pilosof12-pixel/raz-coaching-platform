@@ -145,5 +145,17 @@ if (!s.includes(exhaustNew)) {
   s = s.replace(exhaustOld, exhaustNew);
 }
 
+// 5. Say what the program cost. Every successful build reported attempt 0,
+// because the save path passes a literal 0 -- so across fifty-five paid builds
+// nobody could tell whether the repair loop had ever salvaged one. That is the
+// single number that says whether three extra generations per failure are
+// worth paying for. buildUsage.calls already counts them; report it.
+const savedOld = '    await progress("finalizing", 0, "saving program");';
+const savedNew = '    await progress("finalizing", Number(buildUsage?.calls || 0), `saving program after ${Number(buildUsage?.calls || 0)} model call(s)`);';
+if (!s.includes(savedNew)) {
+  if (!s.includes(savedOld)) throw new Error('save-progress anchor missing');
+  s = s.replace(savedOld, savedNew);
+}
+
 if (s !== before) fs.writeFileSync(target, s);
 console.log('empty-output escalation applied');

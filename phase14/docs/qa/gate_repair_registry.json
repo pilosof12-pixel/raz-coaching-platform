@@ -1,0 +1,34 @@
+{
+  "_why": "Every blocking code the engine can raise must have an answer. A gate with no deterministic repair depends on the model complying when told; when it does not, the loop asks four times, fails four times, and the build dies with nothing saved. Thirteen paid builds died that way, and in twelve of them the killing flag was already present on an earlier attempt -- re-asking never cleared it. This file is the list of gates we have knowingly left without a repair, and why. The guard test fails when a code appears that is neither repaired, nor exercised, nor listed here, so new debt has to be argued for rather than discovered by a paid run.",
+  "_status_values": {
+    "model-can-answer": "The defect is something the model can genuinely rewrite when told, and no deterministic repair could do better. A missing week block cannot be invented by a repair.",
+    "needs-repair": "This should have a deterministic repair and does not. It is a dead build waiting for the right intake."
+  },
+  "accepted": {
+    "TSV_WEEK_BLOCK_MISSING": { "status": "model-can-answer", "note": "A week the model never wrote cannot be synthesised without inventing training. Seen live twice, cleared both times on the next attempt." },
+    "TSV_SCHEMA_VIOLATION": { "status": "model-can-answer", "note": "A wrong header is a rewrite, not a repair. Row shape below the header is now repaired deterministically by engine/tsv_shape.js." },
+    "PROGRAM_MODEL_NO_WEEK_BLOCKS": { "status": "model-can-answer", "note": "Same as above: there is no program to repair." },
+
+    "PAIN_TOLERANCE_CONFLICT": { "status": "needs-repair", "note": "Safety rule. A movement the athlete named as painful must be substituted, and the dictionary already knows tolerated alternatives. High priority: it fires on exactly the intakes that need it most." },
+    "SPINAL_LOAD_REQUIRES_TOLERANCE_CHECK": { "status": "needs-repair", "note": "Same family as above." },
+    "V53_THIN_SESSION": { "status": "needs-repair", "note": "A session below substance has a deterministic answer -- the same one V38_INCOMPLETE_SESSION uses." },
+    "V87_PHASE_LABEL_NOT_EARNED": { "status": "needs-repair", "note": "A label the volume does not support is a wording repair: restate the week rather than reject the program." },
+    "V87_REPEATED_WEEK_UNEXPLAINED": { "status": "needs-repair", "note": "Wording repair." },
+    "V87_PRIMARY_GOAL_UNDER_TRAINED": { "status": "needs-repair", "note": "Structural; needs a real exposure added, which is why it has none." },
+    "V88_PACE_NEVER_MOVES": { "status": "needs-repair", "note": "Adjacent to EVENT_PROGRESSING_SESSION_MISSING, which killed the postpartum build." },
+    "CONCURRENT_ENDURANCE_REDUNDANCY_UNJUSTIFIED": { "status": "needs-repair", "note": "Fires on hybrid and tactical athletes, the two most common paid avatars." },
+    "ADVANCED_HYBRID_DENSE_72H_PRIMARY_WINDOW": { "status": "needs-repair", "note": "Seen live in a dead build's first attempt." },
+    "ADVANCED_HYBRID_MARATHON_SUBORDINATION": { "status": "needs-repair", "note": "" },
+    "ADVANCED_HYBRID_RUN_BASELINE_EXCEEDED": { "status": "needs-repair", "note": "" },
+    "MARATHON_QUALITY_DOUBLE_PROGRESSION": { "status": "needs-repair", "note": "Four marathon gates, none repaired, all in final QA where a throw is fatal." },
+    "MARATHON_STACKED_VOLUME_PROGRESSION": { "status": "needs-repair", "note": "" },
+    "MARATHON_STRENGTH_MAINTENANCE_OVERLOAD": { "status": "needs-repair", "note": "" },
+    "MARATHON_WEEK1_VOLUME_ABOVE_CURRENT": { "status": "needs-repair", "note": "" },
+    "COACH_SPEC_V1_AH_UNCONDITIONAL_MAJOR_LIFT_PROGRESSION": { "status": "needs-repair", "note": "" },
+    "COACH_SPEC_V1_T3K01_NO_RACE_DEMAND_PROGRESSION": { "status": "needs-repair", "note": "" },
+    "COACH_SPEC_V1_T3K03_QUALITY_VOLUME_LOW": { "status": "needs-repair", "note": "" },
+    "COACH_SPEC_V1_T3K08_SACRIFICE_HIERARCHY_INVERTED": { "status": "needs-repair", "note": "" },
+    "COACH_SPEC_V1_YG_HANDSTAND_BALANCE_SPECIFICITY_MISSING": { "status": "needs-repair", "note": "" },
+    "COACH_SPEC_V1_YG_SKILL_REST_TOO_SHORT": { "status": "needs-repair", "note": "" }
+  }
+}
