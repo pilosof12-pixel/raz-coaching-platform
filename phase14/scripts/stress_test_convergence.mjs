@@ -126,6 +126,12 @@ Object.assign(INTAKES, {
   },
   inseason_footballer: workflowIntake('footballer'),
   masters_return: workflowIntake('masters'),
+  // Both of these produced for the first time in run #110, so until now neither
+  // had a program to stress. The Hebrew client is the only non-English avatar
+  // the suite covers, and the postpartum return is the only athlete whose
+  // progression is measured in time on feet rather than pace.
+  hebrew_lifter: workflowIntake('hebrewLifter'),
+  postpartum_runner: workflowIntake('postpartum'),
 });
 
 // Each perturbation reproduces a defect that has actually failed a live run.
@@ -304,6 +310,29 @@ const PERTURBATIONS = [
     id: 'match-day-labels-stripped', seen: 'coach instruction 2, in-season microcycle',
     applies: ['inseason_footballer'],
     apply: (p) => p.replace(/MD[-+]\d/g, 'Session'),
+  },
+
+  {
+    id: 'english-drills-in-hebrew-notes', seen: 'coach review of the Hebrew lifter',
+    applies: ['hebrew_lifter'],
+    // The state the Hebrew program actually shipped in: Hebrew coaching notes
+    // with English drill lists inside them.
+    apply: (p) => p.replace(/\u05de\u05ea\u05d7 \u05e1\u05e7\u05e4\u05d5\u05dc\u05e8\u05d9/g, 'Scapular pull-up')
+      .replace(/\u05e4\u05ea\u05d9\u05d7\u05ea \u05d2\u05d5\u05de\u05d9\u05d9\u05d4/g, 'Band pull-apart'),
+  },
+  {
+    id: 'warmup-boilerplate-restored', seen: 'coach review: output reads as templated',
+    applies: ['hebrew_lifter', 'postpartum_runner'],
+    apply: (p) => p.replace(/(\[WARMUP\][^\n]*?)\t([^\t]*)\t\t?$/gm,
+      (m, head, note) => `${head}\t${note} Keep the warm-up specific and non-fatiguing.\t`),
+  },
+  {
+    id: 'paced-target-forced-on-a-return', seen: 'run #109: the postpartum build died on this',
+    applies: ['postpartum_runner'],
+    // Strip the duration-based progression that makes a return-to-running
+    // legible, which is what the guardrail used to demand a pace target for.
+    apply: (p) => p.replace(/\b\d+\s*min(?:ute)?s?\s+(?:run|jog)[^;\t]*/gi, 'easy running')
+      .replace(/\brun-?walk\b/gi, 'easy running'),
   },
 ];
 
