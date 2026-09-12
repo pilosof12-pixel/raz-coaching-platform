@@ -602,7 +602,7 @@
     ],
     "repairs": [],
     "wired": [],
-    "tested": false,
+    "tested": true,
     "stressed": false,
     "killedLive": ""
   },
@@ -613,7 +613,7 @@
     ],
     "repairs": [],
     "wired": [],
-    "tested": false,
+    "tested": true,
     "stressed": false,
     "killedLive": ""
   },
@@ -624,7 +624,7 @@
     ],
     "repairs": [],
     "wired": [],
-    "tested": false,
+    "tested": true,
     "stressed": false,
     "killedLive": ""
   },
@@ -635,7 +635,7 @@
     ],
     "repairs": [],
     "wired": [],
-    "tested": false,
+    "tested": true,
     "stressed": false,
     "killedLive": ""
   },

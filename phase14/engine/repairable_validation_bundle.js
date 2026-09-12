@@ -11,6 +11,7 @@ import {
   norm,
   swapSportDayContent,
 } from './exercise_dictionary.js';
+import { repairMarathonProgression } from './marathon_progression.js';
 import { repairPainTolerance, collectPainToleranceFlags } from './pain_tolerance.js';
 import { normalizeWeekTsvShape } from './tsv_shape.js';
 import { repairPhase15Program } from './phase15_program_qa.js';
@@ -257,6 +258,17 @@ function applyDeterministicCandidateRepairs(program, intake = {}) {
   if (painSafe !== candidate) {
     candidate = painSafe;
     repairs.push({ type: 'pain_tolerance_substitution' });
+  }
+
+  // Four marathon rules live in final QA, where the only answer to a flag was a
+  // throw. Each message already stated its own fix -- hold week 1 to the
+  // distance the athlete runs, progress one lever per transition, keep a
+  // maintenance lift maintenance -- so the fix happens here instead of being
+  // read aloud to the model four times.
+  const marathonHeld = repairMarathonProgression(candidate, intake);
+  if (marathonHeld !== candidate) {
+    candidate = marathonHeld;
+    repairs.push({ type: 'marathon_one_lever_per_transition' });
   }
 
   const warmed = enrichSpecificWarmups(candidate, intake);

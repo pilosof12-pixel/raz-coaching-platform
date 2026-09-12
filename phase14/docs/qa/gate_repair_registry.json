@@ -53,22 +53,6 @@
       "status": "needs-repair",
       "note": ""
     },
-    "MARATHON_QUALITY_DOUBLE_PROGRESSION": {
-      "status": "needs-repair",
-      "note": "Four marathon gates, none repaired, all in final QA where a throw is fatal."
-    },
-    "MARATHON_STACKED_VOLUME_PROGRESSION": {
-      "status": "needs-repair",
-      "note": ""
-    },
-    "MARATHON_STRENGTH_MAINTENANCE_OVERLOAD": {
-      "status": "needs-repair",
-      "note": ""
-    },
-    "MARATHON_WEEK1_VOLUME_ABOVE_CURRENT": {
-      "status": "needs-repair",
-      "note": ""
-    },
     "COACH_SPEC_V1_AH_UNCONDITIONAL_MAJOR_LIFT_PROGRESSION": {
       "status": "needs-repair",
       "note": ""
