@@ -118,3 +118,93 @@ test('the trap bar deadlift is a real exercise', () => {
   assert.equal(matchDictionary('Trap Bar Deadlift').status, 'hit');
   assert.notEqual(matchDictionary('Hex Bar Deadlift').status, 'miss');
 });
+
+// --- run #112 --------------------------------------------------------------
+
+test('a fight week labelled by the countdown the brief asks for still ships', () => {
+  // QA trace: "A1:SPORT_DAY_COUPLING_VIOLATION+V91_TIMELINE_VIEWS_DISAGREE ->
+  // ... -> A4:V82_POWER_EXPOSURE_DUPLICATED ... the calendar shows a gym
+  // session on Tue, Fri that the week table does not contain".
+  //
+  // It did contain them. The timeline brief asks the model to label the event
+  // week by distance from the event, and every reader in the engine took the
+  // first three characters of the day cell -- so "Day -4 (Tue)" read as "day",
+  // the week table appeared to hold no training days at all, and the rule that
+  // exists to catch two views disagreeing fired on a program where they
+  // agreed. No repair could answer it, because there was nothing wrong.
+  const FIGHT = onSaturday(4);
+  const fighter = {
+    ...COMP.mma_fight_camp,
+    competition_date: FIGHT,
+    weigh_in_date: new Date(Date.parse(FIGHT) - DAY).toISOString().slice(0, 10),
+    event_type: 'combat',
+    event_priority: 'A',
+  };
+  const stop = 'Stop the session if bar speed drops.';
+  const session = (day, w, note) => [
+    row(day, 'Trap Bar Jump', 'Light', 3, 3, `Week ${w} power. ${stop}`),
+    row(day, 'Pull-up', 'Bodyweight', 3, 5, `Week ${w} pulling. ${stop}`),
+    row(day, 'Barbell Hip Thrust', '100 kg', 3, 5, `Week ${w} hinge. ${stop}`),
+    row(day, 'Pallof Press', 'Light', 2, '6/side', `Week ${w} trunk. ${note} ${stop}`),
+  ];
+  const onPlan = (w) => [...session('Tue', w, 'On plan.'), ...session('Fri', w, 'On plan.')];
+  const program = [
+    week(1, onPlan(1)), week(2, onPlan(2)), week(3, onPlan(3)),
+    // Same two days, named the way the engine itself asked for them.
+    week(4, [...session('Day -4 (Tue)', 4, 'Four days out.'),
+      ...session('Day -1 (Fri)', 4, 'This session is optional: skip it entirely if you are already sharp.')]),
+  ].join('\n');
+
+  const verdict = releasable(program, fighter);
+  assert.ok(verdict.ok, `a countdown-labelled week must not read as an empty one: ${verdict.codes.join(', ')}`);
+});
+
+test('rows one cell short do not end the build', () => {
+  // QA trace: forty-six TSV_ROW_COLUMN_COUNT_MISMATCH in a single attempt.
+  // Final QA threw on them and nothing repaired them, so a missing trailing
+  // cell -- a typing accident with one correct answer -- cost a paid attempt.
+  const FIGHT = onSaturday(4);
+  const fighter = {
+    ...COMP.mma_fight_camp,
+    competition_date: FIGHT,
+    weigh_in_date: new Date(Date.parse(FIGHT) - DAY).toISOString().slice(0, 10),
+    event_type: 'combat',
+    event_priority: 'A',
+  };
+  const stop = 'Stop the session if bar speed drops.';
+  // Every row missing its Results cell.
+  const short = (day, name, load, sets, reps, note) =>
+    [day, name, load, String(sets), String(reps), '2 min', '7', note].join('\t');
+  const session = (day, w, note) => [
+    short(day, 'Trap Bar Jump', 'Light', 3, 3, `Week ${w} power. ${stop}`),
+    short(day, 'Pull-up', 'Bodyweight', 3, 5, `Week ${w} pulling. ${stop}`),
+    short(day, 'Barbell Hip Thrust', '100 kg', 3, 5, `Week ${w} hinge. ${stop}`),
+    short(day, 'Pallof Press', 'Light', 2, '6/side', `Week ${w} trunk. ${note} ${stop}`),
+  ];
+  const onPlan = (w) => [...session('Tue', w, 'On plan.'), ...session('Fri', w, 'On plan.')];
+  const program = [
+    week(1, onPlan(1)), week(2, onPlan(2)), week(3, onPlan(3)),
+    week(4, [...session('Day -4 (Tue)', 4, 'Four days out.'),
+      ...session('Day -1 (Fri)', 4, 'This session is optional: skip it entirely if you are already sharp.')]),
+  ].join('\n');
+
+  const verdict = releasable(program, fighter);
+  assert.ok(verdict.ok, `a missing trailing cell must be repaired, not fatal: ${verdict.codes.join(', ')}`);
+});
+
+test('an empty model response is answered with a different request, not the same one', () => {
+  // The dual-event block returned OPENAI_EMPTY_OUTPUT after seventeen minutes.
+  // The transient budget existed, but it would have re-sent byte-for-byte the
+  // request that had just spent its whole token budget thinking.
+  const runtime = fs.readFileSync(new URL('../server.phase15.js', import.meta.url), 'utf8');
+  assert.match(runtime, /async function runEngineRaw\(userContent, engineOptions = \{\}\)/);
+  assert.match(runtime, /max_output_tokens: effectiveMaxOutputTokens/);
+  assert.match(runtime, /reasoning: \{ effort: effectiveReasoningEffort \}/);
+  // The retry raises the ceiling, and a second empty response lowers the effort.
+  assert.match(runtime, /engineOptions = \{ \.\.\.engineOptions, maxOutputTokens: Math\.min\(96000/);
+  assert.match(runtime, /if \(transientRetries >= 2\) engineOptions\.reasoningEffort = "medium"/);
+  // And the failure explains itself in the artefact rather than in logs nobody
+  // on the acceptance side can read.
+  assert.match(runtime, /incomplete_details\?\.reason/);
+  assert.match(runtime, /JOB_BUDGET_SPENT/);
+});

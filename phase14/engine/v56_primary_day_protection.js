@@ -16,6 +16,7 @@
 // So this does not move the primary work. It protects it, by holding the
 // pre-primary day's secondary load to a technical dose.
 
+import { weekdayKey as dayKey } from './weekday.js';
 import { parseWeek } from './v34_workload_accounting.js';
 import { goalTierFor } from './v52_session_hierarchy.js';
 
@@ -33,10 +34,6 @@ const PROTECTED_RPE = '7';
 
 function arr(v) { return Array.isArray(v) ? v : v ? [v] : []; }
 function isWarmup(name) { return /^\s*\[WARMUP\]/i.test(String(name || '')); }
-function dayKey(day) {
-  const d = String(day || '').trim().toLowerCase().slice(0, 3);
-  return WEEKDAYS.includes(d) ? d : null;
-}
 
 // The top of a range is the number that decides the cost: "7-7.5" is a set
 // the athlete may take to 7.5, not a set capped at 7.

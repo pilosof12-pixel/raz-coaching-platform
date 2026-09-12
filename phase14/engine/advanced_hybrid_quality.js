@@ -1,4 +1,5 @@
 import { RetriableValidationError } from './exercise_dictionary.js';
+import { weekdayKey } from './weekday.js';
 import { isHighConcurrencyHybrid, currentRunBaseline, marathonGoalTier } from './advanced_hybrid_concurrency.js';
 
 // Exposure matchers for the Advanced Hybrid rules. Each rule below asks whether
@@ -52,7 +53,10 @@ function parseWeeks(program) {
       return '';
     };
     weeks.get(week).push({
-      day: lower(get('day')),
+      // The weekday the cell names, not the text of the cell: "Monday" and
+      // "Day -4 (Mon)" are both Monday, and comparing raw text against the
+      // intake's "Mon" made the calendar rule fire on a calendar that matched.
+      day: weekdayKey(get('day')) || lower(get('day')),
       exercise: get('exercise'),
       load: get('weight', 'load / target', 'load/target'),
       sets: get('sets'),
@@ -102,7 +106,7 @@ export function validateAdvancedHybridQualitySemantic(program, intake = {}) {
   if (weeks.size < 4) return { ok: true, skipped: false };
   const primary = goalText(intake, 'primary');
   const allGoals = goalText(intake);
-  const fixedDays = arr(intake.available_gym_days).map(lower).filter(Boolean).sort();
+  const fixedDays = arr(intake.available_gym_days).map((d) => weekdayKey(d) || lower(d)).filter(Boolean).sort();
 
   for (const [week, rows] of weeks) {
     const work = rows.filter((r) => !isWarmup(r));

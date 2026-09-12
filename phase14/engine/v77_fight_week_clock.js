@@ -12,6 +12,7 @@
 // is written into the prescription instead, where the athlete reads it and the
 // spreadsheet carries it without the exporter needing to know anything.
 
+import { weekdayKey as dayKey } from './weekday.js';
 import { parseWeek } from './v34_workload_accounting.js';
 import { STATE, stateForWeek, competitionProfile, weeksOut, eventNoun } from './v68_competition_state.js';
 
@@ -19,10 +20,6 @@ const DAY_MS = 24 * 60 * 60 * 1000;
 const WEEKDAYS = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'];
 
 function isWarmup(n) { return /^\s*\[WARMUP\]/i.test(String(n || '')); }
-function dayKey(d) {
-  const s = String(d || '').trim().toLowerCase().slice(0, 3);
-  return WEEKDAYS.includes(s) ? s : null;
-}
 
 // Which weekday the event falls on, when a real date is known.
 export function eventWeekday(intake = {}) {

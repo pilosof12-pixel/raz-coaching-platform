@@ -14,6 +14,7 @@
 //   The masters rower's sport share was 31% of rows in all four weeks, to the
 //   row, while the individual exercises progressed underneath it.
 
+import { weekdayKey as dayKey } from './weekday.js';
 import { parseWeek } from './v34_workload_accounting.js';
 import { competitionProfile, STATE, stateForWeek, eventType } from './v68_competition_state.js';
 import { isInSeason, matchDays } from './v83_in_season.js';
@@ -22,10 +23,6 @@ import { governingClock, CLOCK, rehabStage, STAGE } from './v86_training_clock.j
 const WEEKDAYS = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'];
 function arr(v) { return Array.isArray(v) ? v : v ? [v] : []; }
 function isWarmup(n) { return /^\s*\[WARMUP\]/i.test(String(n || '')); }
-function dayKey(d) {
-  const s = String(d || '').trim().toLowerCase().slice(0, 3);
-  return WEEKDAYS.includes(s) ? s : null;
-}
 
 // --- 1. no peak or taper without a Day 0 ------------------------------------
 

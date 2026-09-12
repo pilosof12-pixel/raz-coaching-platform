@@ -27,7 +27,11 @@ test('the patch is idempotent', () => {
 // definition against fakes rather than trusting the string.
 async function loadHelper(fetchImpl) {
   const start = built.indexOf('// OPENAI-TRANSPORT-TRANSIENT-RETRY');
-  const end = built.indexOf('async function runEngineRaw(userContent) {');
+  // Bounded by where runEngineRaw begins, whatever arguments it has taken on
+  // since: pinning the whole signature meant a later patch that added one
+  // silently sliced the entire file in here instead of the helper.
+  const end = built.search(/async function runEngineRaw\(/);
+  assert.ok(end > start, 'the helper must be bounded by runEngineRaw');
   const source = built.slice(start, end);
   const factory = new Function('fetch', `${source}; return { openAIFetchWithTransportRetry, isTransientTransportError };`);
   return factory(fetchImpl);

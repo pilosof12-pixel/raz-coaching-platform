@@ -334,6 +334,21 @@ const PERTURBATIONS = [
     apply: (p) => p.replace(/\b\d+\s*min(?:ute)?s?\s+(?:run|jog)[^;\t]*/gi, 'easy running')
       .replace(/\brun-?walk\b/gi, 'easy running'),
   },
+  {
+    id: 'event-week-labelled-by-countdown', seen: 'run #112: the fight camp died on this',
+    // The timeline brief asks the model to name the event week by distance from
+    // the event. Every day reader in the engine took the first three characters
+    // of the cell, so "Day -4 (Tue)" read as "day" and the week table looked
+    // empty -- which failed the rule that checks the two views agree, on a
+    // program in which they did.
+    apply: (p) => p.replace(/^(Mon|Tue|Wed|Thu|Fri|Sat|Sun)\t/gm, (m, d) => `Day -4 (${d})\t`),
+  },
+  {
+    id: 'rows-one-cell-short', seen: 'run #112: forty-six column-count flags in one attempt',
+    // A missing trailing cell is a typing accident with one correct answer, and
+    // final QA used to end the build over it.
+    apply: (p) => p.replace(/^([^\t\n]*\t[^\n]*)\t$/gm, '$1'),
+  },
 ];
 
 function allFindings(program, intake, id) {

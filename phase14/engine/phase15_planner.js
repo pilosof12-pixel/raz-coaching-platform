@@ -1,3 +1,4 @@
+import { weekdayKey } from './weekday.js';
 import { buildSpecialistRules } from './phase15_specialist_rules.js';
 import { buildProgressionGppBrief } from './coaching_progression_gpp.js';
 import { buildAcceptanceQualityBrief } from './coaching_acceptance_quality.js';
@@ -250,7 +251,7 @@ export function buildDeterministicBrief(intake = {}) {
   // Preserve the legacy same-day clean list for existing placement rules. Readiness
   // ranking is intentionally scoped only to the advanced OAP neural exposure.
   const cleanDays = days.filter(d => !sport[d]);
-  const dayKeyOf = (label) => String(label || '').trim().slice(0, 3).toLowerCase();
+  const dayKeyOf = (label) => weekdayKey(label) || String(label || '').trim().slice(0, 3).toLowerCase();
   const readinessScoreFor = (label) => readinessScores.find(x => x.day === dayKeyOf(label));
   const readinessRanked = readinessScores.map(x => days.find(d => dayKeyOf(d) === x.day)).filter(Boolean);
   const oapReadinessDays = readinessRanked;

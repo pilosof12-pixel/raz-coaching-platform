@@ -8,6 +8,8 @@
 // Categories deliberately mirror the coaching brief's weekly-coverage list so a
 // coverage report can be produced directly from them.
 
+import { weekdayKey } from './weekday.js';
+
 export const CATEGORY = {
   VERTICAL_PULL: 'vertical_pull',
   HORIZONTAL_PULL: 'horizontal_pull',
@@ -150,10 +152,7 @@ export const WEEKDAYS = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'];
 
 // A week is a continuous cycle: Sunday precedes Monday exactly as Monday
 // precedes Tuesday. Every adjacency check must use this, never array order.
-export function dayKey(day) {
-  const d = String(day || '').trim().slice(0, 3).toLowerCase();
-  return WEEKDAYS.includes(d) ? d : null;
-}
+export function dayKey(day) { return weekdayKey(day); }
 export function nextDay(day) {
   const i = WEEKDAYS.indexOf(dayKey(day));
   return i < 0 ? null : WEEKDAYS[(i + 1) % 7];

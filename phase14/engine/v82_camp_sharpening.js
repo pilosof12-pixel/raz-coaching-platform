@@ -8,6 +8,7 @@
 // work anywhere in a striking and wrestling camp. Each of those is a small
 // prescription error with a mechanical correction.
 
+import { weekdayKey } from './weekday.js';
 import { parseWeek } from './v34_workload_accounting.js';
 import { STATE, stateForWeek, competitionProfile, eventType } from './v68_competition_state.js';
 import { isPowerExposure } from './v72_combat_power.js';
@@ -59,7 +60,7 @@ function weekRows(program, week) {
     const name = String(cells[parsed.exercise] || '').trim();
     const day = String(cells[parsed.day] || '').trim();
     if (!name || !day || isWarmup(name)) return;
-    rows.push({ index, name, day, dayKey: day.toLowerCase().slice(0, 3) });
+    rows.push({ index, name, day, dayKey: weekdayKey(day) || '' });
   });
   return { parsed, rows };
 }

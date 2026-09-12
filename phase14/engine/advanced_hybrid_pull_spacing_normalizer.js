@@ -1,3 +1,4 @@
+import { weekdayKey } from './weekday.js';
 import { isHighConcurrencyHybrid } from './advanced_hybrid_concurrency.js';
 
 const WEEKDAYS = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'];
@@ -19,7 +20,7 @@ function upperNum(raw) {
   const nums = [...String(raw || '').matchAll(/\d+(?:\.\d+)?/g)].map((m) => Number(m[0])).filter(Number.isFinite);
   return nums.length ? Math.max(...nums) : null;
 }
-function dayIndex(day) { return WEEKDAYS.indexOf(String(day || '').trim().slice(0, 3).toLowerCase()); }
+function dayIndex(day) { return WEEKDAYS.indexOf(weekdayKey(day)); }
 function adjacentDays(a, b) {
   const ia = dayIndex(a), ib = dayIndex(b);
   if (ia < 0 || ib < 0) return false;

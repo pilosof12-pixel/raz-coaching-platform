@@ -27,6 +27,7 @@ import {
   selectRungForSkill,
   renderSkillWorkForRung,
 } from "./skill_progressions.js";
+import { weekdayKey } from './weekday.js';
 import { bodyweightKg } from "./intake_bodyweight.js";
 
 // ---------------------------------------------------------------------------
@@ -1480,8 +1481,7 @@ export function forceIntradayReorder(program, intake = {}) {
 // ---------------------------------------------------------------------------
 const WEEK_ORDER = ["mon", "tue", "wed", "thu", "fri", "sat", "sun"];
 function dayIndex(tok) {
-  const t = String(tok || "").toLowerCase().slice(0, 3);
-  return WEEK_ORDER.indexOf(t);
+  return WEEK_ORDER.indexOf(weekdayKey(tok));
 }
 
 // Canonical sport schedule reader. New intake uses sport_schedule:
@@ -1714,7 +1714,7 @@ export function swapSportDayContent(program, intake = {}) {
     if (dayIdx < 0 || dayIdx >= cells.length) { out.push(line); continue; }
     const token = String(cells[dayIdx] || "").trim();
     if (token) currentDay = token;
-    const to = moves.get(currentDay.toLowerCase().slice(0, 3));
+    const to = moves.get(weekdayKey(currentDay));
     const day = to || currentDay;
     if (to && token) cells[dayIdx] = to;
     else if (to) cells[dayIdx] = "";
@@ -1723,7 +1723,7 @@ export function swapSportDayContent(program, intake = {}) {
     // destination already trains is dropped, not stacked on top of it.
     const name = exIdx >= 0 ? String(cells[exIdx] || "").trim().toLowerCase() : "";
     if (name && !/^\s*\[/.test(name)) {
-      const key = day.toLowerCase().slice(0, 3);
+      const key = weekdayKey(day) || day.toLowerCase();
       if (!seenPerDay.has(key)) seenPerDay.set(key, new Set());
       const seen = seenPerDay.get(key);
       if (to && seen.has(name)) continue;

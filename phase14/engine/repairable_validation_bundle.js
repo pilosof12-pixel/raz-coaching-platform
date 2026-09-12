@@ -11,6 +11,7 @@ import {
   norm,
   swapSportDayContent,
 } from './exercise_dictionary.js';
+import { normalizeWeekTsvShape } from './tsv_shape.js';
 import { repairPhase15Program } from './phase15_program_qa.js';
 import { validatePhase15FinalProgram } from './phase15_final_qa.js';
 import { parseProgramModel } from './program_model.js';
@@ -311,6 +312,18 @@ export function collectRepairableValidationFailures(program, intake = {}, option
   let schedule = [];
   let mrv_trim = null;
   let deterministic_repairs = [];
+
+  // Before anything reads the table, make sure the table is readable. A row
+  // with eight cells instead of nine is a typing accident with one correct
+  // answer, and final QA used to end the build over it -- forty-six of them in
+  // one fight camp week, which cost a paid attempt and produced nothing. This
+  // has to sit ahead of the dictionary pass: every repair below parses the
+  // week, and the ones that follow only run when that pass succeeds.
+  const shaped = normalizeWeekTsvShape(candidate);
+  if (shaped.repaired) {
+    candidate = shaped.program;
+    deterministic_repairs.push({ type: 'tsv_row_shape', rows: shaped.rows });
+  }
 
   // Normalize the model-authored exercise vocabulary first. Deterministic coaching
   // floors are only applied after that initial dictionary pass so they operate on

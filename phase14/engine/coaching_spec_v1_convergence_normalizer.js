@@ -1,3 +1,4 @@
+import { weekdayKey } from './weekday.js';
 import { isHighConcurrencyHybrid } from './advanced_hybrid_concurrency.js';
 import { endurancePerformanceIntegrityFlags, eventProgressionBearing } from './phase15_elite_guardrails.js';
 import { projectedWeeklyRunningKm } from './v34_workload_accounting.js';
@@ -24,7 +25,7 @@ function upperNum(raw) {
   const nums = [...String(raw || '').matchAll(/\d+(?:\.\d+)?/g)].map((m) => Number(m[0])).filter(Number.isFinite);
   return nums.length ? Math.max(...nums) : null;
 }
-function dayIndex(day) { return WEEKDAYS.indexOf(String(day || '').trim().slice(0, 3).toLowerCase()); }
+function dayIndex(day) { return WEEKDAYS.indexOf(weekdayKey(day)); }
 function formatClock(seconds) {
   const s = Math.max(0, Math.round(Number(seconds) || 0));
   return `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`;
@@ -739,7 +740,7 @@ export function normalizeTactical3KRaceSpecificity(program, intake = {}) {
       const prev = priorWeekdayName(keyDay);
       if (!prev) continue;
       parsed.rows.forEach((cells, row) => {
-        if (String(cells[parsed.day] || '').trim().slice(0, 3).toLowerCase() !== prev) return;
+        if (weekdayKey(cells[parsed.day]) !== prev) return;
         const name = String(cells[parsed.exercise] || '').trim();
         if (isWarmup(name) || !isLowerStrengthName(name)) return;
         const setCount = firstNum(cells[parsed.sets]);

@@ -11,6 +11,7 @@
 // or where support work sits relative to anything else. It objects to exactly
 // one thing: lower-priority work interrupting the run of primary exposures.
 
+import { weekdayKey } from './weekday.js';
 import { parseWeek } from './v34_workload_accounting.js';
 
 function arr(v) { return Array.isArray(v) ? v : v ? [v] : []; }
@@ -160,7 +161,7 @@ export function repairSessionHierarchy(program, intake = {}) {
 // must not be back to back.
 
 const WEEK_ORDER = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'];
-const dayIndex = (d) => WEEK_ORDER.indexOf(String(d || '').trim().slice(0, 3).toLowerCase());
+const dayIndex = (d) => WEEK_ORDER.indexOf(weekdayKey(d));
 function circularGap(from, to) {
   const a = dayIndex(from), b = dayIndex(to);
   if (a < 0 || b < 0) return null;

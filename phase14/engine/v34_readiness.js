@@ -7,6 +7,8 @@
 // weekdays or avatar names. Nothing in this module knows what "Monday" or
 // "Advanced Hybrid" means.
 
+import { weekdayKey } from './weekday.js';
+
 const WEEKDAYS = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'];
 // Cost charged to a day whose predecessor is one of this athlete's own training
 // days when no explicit prior-day load is supplied.
@@ -19,10 +21,7 @@ function txt(v) {
   return String(v || '');
 }
 function lower(v) { return String(v || '').toLowerCase(); }
-function dayKey(day) {
-  const d = lower(day).trim().slice(0, 3);
-  return WEEKDAYS.includes(d) ? d : null;
-}
+const dayKey = weekdayKey;
 function priorDay(day) {
   const i = WEEKDAYS.indexOf(day);
   return i < 0 ? null : WEEKDAYS[(i + 6) % 7];

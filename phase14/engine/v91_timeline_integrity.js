@@ -21,6 +21,7 @@
 //   - do the calendar and the week table agree about which days carry work?
 //   - does combat load actually come down into the event week?
 
+import { weekdayKey as dayKey } from './weekday.js';
 import { parseWeek } from './v34_workload_accounting.js';
 import { STATE, stateForWeek, competitionProfile, eventNoun } from './v68_competition_state.js';
 import { eventWeekday } from './v77_fight_week_clock.js';
@@ -30,10 +31,6 @@ const WEEKDAYS = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'];
 const LABEL = { mon: 'Mon', tue: 'Tue', wed: 'Wed', thu: 'Thu', fri: 'Fri', sat: 'Sat', sun: 'Sun' };
 
 function isWarmup(n) { return /^\s*\[WARMUP\]/i.test(String(n || '')); }
-function dayKey(d) {
-  const s = String(d || '').trim().toLowerCase().slice(0, 3);
-  return WEEKDAYS.includes(s) ? s : null;
-}
 
 function eventWeek(intake, now) {
   if (!competitionProfile(intake, now)) return 0;

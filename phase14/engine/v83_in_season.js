@@ -14,6 +14,7 @@
 // given a date that does not exist. Recognising a recurring fixture is what
 // lets the rest of the engine plan for availability instead of a peak.
 
+import { weekdayKey as dayKey } from './weekday.js';
 import { parseWeek } from './v34_workload_accounting.js';
 
 const MATCH_INTENSITY = /\b(?:match|game|fixture|competition)\b/i;
@@ -33,10 +34,6 @@ const LABEL = { mon: 'Monday', tue: 'Tuesday', wed: 'Wednesday', thu: 'Thursday'
 function arr(v) { return Array.isArray(v) ? v : v ? [v] : []; }
 function txt(v) { return arr(v).map((x) => String(x || '')).join(' '); }
 function isWarmup(n) { return /^\s*\[WARMUP\]/i.test(String(n || '')); }
-function dayKey(d) {
-  const s = String(d || '').trim().toLowerCase().slice(0, 3);
-  return WEEKDAYS.includes(s) ? s : null;
-}
 
 // The days the athlete actually competes, read from the schedule they gave us.
 export function matchDays(intake = {}) {

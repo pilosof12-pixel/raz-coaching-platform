@@ -18,6 +18,7 @@
 //   maintenance through a season is the clearest case -- but then the block
 //   should say so. Unstated repetition is indistinguishable from copy-paste.
 
+import { weekdayKey as dayKey } from './weekday.js';
 import { parseWeek } from './v34_workload_accounting.js';
 
 function isWarmup(n) { return /^\s*\[WARMUP\]/i.test(String(n || '')); }
@@ -34,7 +35,7 @@ function weekRows(program, week) {
     if (!name || isWarmup(name)) return;
     rows.push({
       index, name,
-      day: String(cells[parsed.day] || '').trim().toLowerCase().slice(0, 3),
+      day: dayKey(cells[parsed.day]) || '',
       sets: num(cells[parsed.sets]) || 0,
       reps: String(cells[parsed.reps] || '').trim(),
       load: Number.isInteger(parsed.load) ? String(cells[parsed.load] || '').trim() : '',

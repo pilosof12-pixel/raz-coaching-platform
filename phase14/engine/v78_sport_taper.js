@@ -13,6 +13,7 @@
 // enough that soreness, cognitive fatigue and sleep disruption have resolved
 // before Day 0.
 
+import { weekdayKey as dayKey } from './weekday.js';
 import { parseWeek } from './v34_workload_accounting.js';
 import { STATE, stateForWeek, competitionProfile, eventType } from './v68_competition_state.js';
 import { eventWeekday } from './v77_fight_week_clock.js';
@@ -21,10 +22,6 @@ const WEEKDAYS = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'];
 const LABEL = { mon: 'Mon', tue: 'Tue', wed: 'Wed', thu: 'Thu', fri: 'Fri', sat: 'Sat', sun: 'Sun' };
 
 function arr(v) { return Array.isArray(v) ? v : v ? [v] : []; }
-function dayKey(d) {
-  const s = String(d || '').trim().toLowerCase().slice(0, 3);
-  return WEEKDAYS.includes(s) ? s : null;
-}
 const isHard = (i) => /hard|spar|live|competition|intense/i.test(String(i || ''));
 const isLight = (i) => /light|easy|technical|drill|recovery/i.test(String(i || ''));
 
