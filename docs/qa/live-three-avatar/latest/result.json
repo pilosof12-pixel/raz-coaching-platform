@@ -1,67 +1,39 @@
 {
-  "timestamp": "2026-09-11T13:59:48.443Z",
+  "timestamp": "2026-09-12T12:42:27.734Z",
   "base": "https://raz-coaching-platform.onrender.com",
-  "head_sha": "7be47b1ea88fda5bd410327d1c8df63c2b80ae31",
-  "runtime": "live47 2026-09-11T13:58:56Z",
+  "head_sha": "5fa60bfcabd8e4f083b56665b7b2846f7ce9ed51",
+  "runtime": "live48 2026-09-12T12:41:50Z",
   "results": [
     {
       "id": "mma_fight_camp",
-      "job_id": "7ebc202771c330f4e5828d66860b7390",
+      "job_id": "872edbe305eebf2ff3757421c76e8af2",
       "ok": false,
       "status": "error",
       "stage": "refining",
       "attempt": 4,
-      "detail": "internal repair: SPORT_DAY_COUPLING_VIOLATION+V82_POWER_EXPOSURE_DUPLICATED",
+      "detail": "internal repair: V82_POWER_EXPOSURE_DUPLICATED",
       "last_seen_status": "error",
-      "error": "Internal coaching QA could not repair the candidate program after multiple passes. No client-facing program was saved. Please retry the build. QA trace: A1:V82_POWER_EXPOSURE_DUPLICATED+TSV_WEEK_BLOCK_MISSING -> A2:SPORT_DAY_COUPLING_VIOLATION+V82_POWER_EXPOSURE_DUPLICATED -> A3:SPORT_DAY_COUPLING_VIOLATION+V82_POWER_EXPOSURE_DUPLICATED -> A4:SPORT_DAY_COUPLING_VIOLATION+V82_POWER_EXPOSURE_DUPLICATED. Last failure detail: PRIOR ATTEMPT FAILED SPORT/CALENDAR VALIDATION. days_per_week means requested strength sessions, not total active calendar days. Week 4: strength/skill-strength work is scheduled on unavailable day(s) day 4. Week 4: strength/skill-strength work is scheduled on unavailable day(s) day 1. Keep run-only, ruck-only, sport-only and conditioning-only days in the weekly calendar for fatigue/collision analysis, but do not count them toward the requested strength-session frequency. | Week 3 runs Explosive Push-up on both Tue and Fri. Two doses of one movement is not two exposures -- it is the same stimu [QA:INTERNAL_QA_REPAIR_EXHAUSTED]",
+      "error": "Internal coaching QA could not repair the candidate program after multiple passes. No client-facing program was saved. Please retry the build. QA trace: A1:SPORT_DAY_COUPLING_VIOLATION+V91_TIMELINE_VIEWS_DISAGREE -> A2:TSV_ROW_COLUMN_COUNT_MISMATCH+TSV_ROW_COLUMN_COUNT_MISMATCH+TSV_ROW_COLUMN_COUNT_MISMATCH+TSV_ROW_COLUMN_COUNT_MISMATCH+TSV_ROW_COLUMN_COUNT_MISMATCH+TSV_ROW_COLUMN_COUNT_MISMATCH+TSV_ROW_COLUMN_COUNT_MISMATCH+TSV_ROW_COLUMN_COUNT_MISMATCH+TSV_ROW_COLUMN_COUNT_MISMATCH+TSV_ROW_COLUMN_COUNT_MISMATCH+TSV_ROW_COLUMN_COUNT_MISMATCH+TSV_ROW_COLUMN_COUNT_MISMATCH+TSV_ROW_COLUMN_COUNT_MISMATCH+TSV_ROW_COLUMN_COUNT_MISMATCH+TSV_ROW_COLUMN_COUNT_MISMATCH+TSV_ROW_COLUMN_COUNT_MISMATCH+TSV_ROW_COLUMN_COUNT_MISMATCH+TSV_ROW_COLUMN_COUNT_MISMATCH+TSV_ROW_COLUMN_COUNT_MISMATCH+TSV_ROW_COLUMN_COUNT_MISMATCH+TSV_ROW_COLUMN_COUNT_MISMATCH+TSV_ROW_COLUMN_COUNT_MISMATCH+TSV_ROW_COLUMN_COUNT_MISMATCH+TSV_ROW_COLUMN_COUNT_MISMATCH+TSV_ROW_COLUMN_COUNT_MISMATCH+TSV_ROW_COLUMN_COUNT_MISMATCH+TSV_ROW_COLUMN_COUNT_MISMATCH+TSV_ROW_COLUMN_COUNT_MISMATCH+TSV_ROW_COLUMN_COUNT_MISMATCH+TSV_ROW_COLUMN_COUNT_MISMATCH+TSV_ROW_COLUMN_COUNT_MISMATCH+TSV_ROW_COLUMN_COUNT_MISMATCH+TSV_ROW_COLUMN_COUNT_MISMATCH+TSV_ROW_COLUMN_COUNT_MISMATCH+TSV_ROW_COLUMN_COUNT_MISMATCH+TSV_ROW_COLUMN_COUNT_MISMATCH+TSV_ROW_COLUMN_COUNT_MISMATCH+TSV_ROW_COLUMN_COUNT_MISMATCH+TSV_ROW_COLUMN_COUNT_MISMATCH+TSV_ROW_COLUMN_COUNT_MISMATCH+TSV_ROW_COLUMN_COUNT_MISMATCH+TSV_ROW_COLUMN_COUNT_MISMATCH+TSV_ROW_COLUMN_COUNT_MISMATCH+TSV_ROW_COLUMN_COUNT_MISMATCH+TSV_ROW_COLUMN_COUNT_MISMATCH+TSV_ROW_COLUMN_COUNT_MISMATCH -> A4:V82_POWER_EXPOSURE_DUPLICATED. Last failure detail: Week 4 runs Medicine Ball Scoop Throw on both Day -4 (Tue) and Day -1 (Fri). Two doses of one movement is not two exposures -- it is the same stimulus twice, and this close to the fight one of those slots should buy something the block does not already have. Rotational throwing trains the plane the sport is fought in and nothing else here covers it. The calendar and the week table disagree about fight week: the calendar shows a gym session on Tue, Fri that the week table does not contain. An athlete reading the two cannot tell which is the program. They have to name the same days. [QA:INTERNAL_QA_REPAIR_EXHAUSTED]",
       "program_chars": 0,
-      "seconds": 698
-    },
-    {
-      "id": "hebrew_lifter",
-      "job_id": "b2d84f22f63798d21a58cdbfd5c728a6",
-      "ok": true,
-      "status": "done",
-      "stage": "finalizing",
-      "attempt": 0,
-      "detail": "saving program",
-      "last_seen_status": "done",
-      "error": null,
-      "program_chars": 10881,
-      "seconds": 212
+      "seconds": 669
     },
     {
       "id": "dual_event_hyrox",
-      "job_id": "b10a7b9f2b5501995fd3f73ba276dcb2",
+      "job_id": "4c4fff319f0ff5b45b05a6df05bae894",
       "ok": false,
       "status": "error",
-      "stage": "refining",
-      "attempt": 4,
-      "detail": "internal repair: SPORT_DAY_COUPLING_VIOLATION",
+      "stage": "generating",
+      "attempt": 1,
+      "detail": "initial generation",
       "last_seen_status": "error",
-      "error": "Internal coaching QA could not repair the candidate program after multiple passes. No client-facing program was saved. Please retry the build. QA trace: A1:SPORT_DAY_COUPLING_VIOLATION -> A2:SPORT_DAY_COUPLING_VIOLATION -> A3:SPORT_DAY_COUPLING_VIOLATION+V74_CAMP_SESSION_TOO_BUSY -> A4:SPORT_DAY_COUPLING_VIOLATION. Last failure detail: PRIOR ATTEMPT FAILED SPORT/CALENDAR VALIDATION. days_per_week means requested strength sessions, not total active calendar days. Week 1: expected 4 strength/skill-strength days, found 6 (monday, tuesday, wednesday, thursday, fri sport only, sun sport only). Week 2: expected 4 strength/skill-strength days, found 6 (monday, tuesday, wednesday, thursday, fri sport only, sun sport only). Week 3: expected 4 strength/skill-strength days, found 6 (monday, tuesday, wednesday, thursday, fri sport only, sun sport only). Keep run-only, ruck-only, sport-only and conditioning-only days in the weekly calend [QA:INTERNAL_QA_REPAIR_EXHAUSTED]",
+      "error": "OpenAI returned no output_text content. [QA:OPENAI_EMPTY_OUTPUT]",
       "program_chars": 0,
-      "seconds": 621
-    },
-    {
-      "id": "postpartum_runner",
-      "job_id": "40b62545c860d5353987a0d169d39f13",
-      "ok": true,
-      "status": "done",
-      "stage": "finalizing",
-      "attempt": 0,
-      "detail": "saving program",
-      "last_seen_status": "done",
-      "error": null,
-      "program_chars": 14498,
-      "seconds": 285
+      "seconds": 1037
     }
   ],
   "selection": [
     "mma_fight_camp",
-    "hebrew_lifter",
-    "dual_event_hyrox",
-    "postpartum_runner"
+    "dual_event_hyrox"
   ],
   "ok": false
 }
