@@ -670,13 +670,17 @@
   {
     "code": "PAIN_TOLERANCE_CONFLICT",
     "modules": [
+      "engine/pain_tolerance.js",
       "engine/phase15_quality_rules.js"
     ],
     "repairs": [
+      "repairPainTolerance",
       "enforcePowerBeforeStrength"
     ],
-    "wired": [],
-    "tested": false,
+    "wired": [
+      "repairPainTolerance"
+    ],
+    "tested": true,
     "stressed": false,
     "killedLive": ""
   },
@@ -691,7 +695,7 @@
     "wired": [
       "repairPhase15Program"
     ],
-    "tested": false,
+    "tested": true,
     "stressed": false,
     "killedLive": ""
   },
@@ -822,7 +826,7 @@
       "enforcePowerBeforeStrength"
     ],
     "wired": [],
-    "tested": false,
+    "tested": true,
     "stressed": false,
     "killedLive": ""
   },

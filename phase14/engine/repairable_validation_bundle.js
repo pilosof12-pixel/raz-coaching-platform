@@ -11,6 +11,7 @@ import {
   norm,
   swapSportDayContent,
 } from './exercise_dictionary.js';
+import { repairPainTolerance, collectPainToleranceFlags } from './pain_tolerance.js';
 import { normalizeWeekTsvShape } from './tsv_shape.js';
 import { repairPhase15Program } from './phase15_program_qa.js';
 import { validatePhase15FinalProgram } from './phase15_final_qa.js';
@@ -245,6 +246,17 @@ function applyDeterministicCandidateRepairs(program, intake = {}) {
   if (placedOnAvailableDays !== candidate) {
     candidate = placedOnAvailableDays;
     repairs.push({ type: 'v19_sport_day_placement' });
+  }
+
+  // A movement the pain rule refuses must not survive to the client, and a
+  // tolerance-gated one must carry its condition. Both were computed and then
+  // dropped: the refusal was never read at all, and the condition had no repair
+  // behind its flag. This runs with the other placement repairs, before any
+  // gate reads the table.
+  const painSafe = repairPainTolerance(candidate, intake);
+  if (painSafe !== candidate) {
+    candidate = painSafe;
+    repairs.push({ type: 'pain_tolerance_substitution' });
   }
 
   const warmed = enrichSpecificWarmups(candidate, intake);
@@ -595,6 +607,7 @@ export function collectRepairableValidationFailures(program, intake = {}, option
       ...collectSportTaperFlags(candidate, intake), ...collectBallisticShareFlags(candidate, intake),
       ...collectClusterFlags(candidate, intake),
       ...collectCampSharpeningFlags(candidate, intake),
+      ...collectPainToleranceFlags(candidate, intake),
       ...collectInSeasonFlags(candidate, intake), ...collectSportWeekFlags(candidate, intake),
       ...collectClockFlags(candidate, intake),
       ...collectDayZeroFlags(candidate, intake), ...collectMatchDayFlags(candidate, intake),
