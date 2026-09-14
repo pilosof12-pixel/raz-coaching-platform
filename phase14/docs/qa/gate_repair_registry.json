@@ -5,6 +5,18 @@
     "needs-repair": "This should have a deterministic repair and does not. It is a dead build waiting for the right intake."
   },
   "accepted": {
+    "ADVANCED_HYBRID_CALENDAR_DRIFT": {
+      "status": "repair-demonstrated-gate-unproven",
+      "note": "Exercised by the event-week-labelled-by-countdown stress perturbation, which is where it was found; no test names the code."
+    },
+    "ADVANCED_HYBRID_MARATHON_SUBORDINATION": {
+      "status": "repair-demonstrated-gate-unproven",
+      "note": "As above, demonstrated in high_concurrency_repairs.test.js."
+    },
+    "ADVANCED_HYBRID_RUN_BASELINE_EXCEEDED": {
+      "status": "repair-demonstrated-gate-unproven",
+      "note": "The repair is demonstrated in spec_floor_repairs.test.js. What is not demonstrated is that the validator would refuse without it: it reads a parsed program model whose conditions a minimal fixture does not meet."
+    },
     "ADVANCED_SKILL_REGRESSION": {
       "status": "repair-exists-unproven",
       "note": "engine/phase15_program_qa.js exports repairPhase15Program, but nothing shows it clearing this code."
@@ -13,13 +25,25 @@
       "status": "repair-exists-unproven",
       "note": "engine/phase15_program_qa.js exports repairPhase15Program, but nothing shows it clearing this code."
     },
+    "COACH_SPEC_V1_YG_HANDSTAND_BALANCE_SPECIFICITY_MISSING": {
+      "status": "repair-demonstrated-gate-unproven",
+      "note": "As above, demonstrated in spec_floor_repairs.test.js."
+    },
+    "COACH_SPEC_V1_YG_SKILL_REST_TOO_SHORT": {
+      "status": "repair-demonstrated-gate-unproven",
+      "note": "As above, demonstrated in spec_floor_repairs.test.js."
+    },
+    "CONCURRENT_ENDURANCE_REDUNDANCY_UNJUSTIFIED": {
+      "status": "repair-demonstrated-gate-unproven",
+      "note": "The repair is demonstrated in spec_floor_repairs.test.js; the validator condition has not been reproduced."
+    },
     "FAR_SECONDARY_STRENGTH_TOKEN_DOSE": {
       "status": "repair-exists-unproven",
       "note": "engine/phase15_program_qa.js exports repairPhase15Program, but nothing shows it clearing this code."
     },
     "INTRADAY_ORDER_VIOLATION": {
-      "status": "repair-exists-unproven",
-      "note": "engine/exercise_dictionary.js exports enforceUnilateralIntensityFloor, but nothing shows it clearing this code."
+      "status": "unproven-no-fixture",
+      "note": "forceIntradayReorder now runs before the check, so the reorder it builds is no longer discarded. I could not construct a program that makes the check throw, so convergence is asserted nowhere."
     },
     "MULTI_OUTCOME_GOAL_UNDERCOVERED": {
       "status": "repair-exists-unproven",
@@ -52,14 +76,6 @@
     "TSV_WEEK_BLOCK_MISSING": {
       "status": "model-can-answer",
       "note": "A week the model never wrote cannot be synthesised without inventing training. Seen live twice, cleared both times on the next attempt."
-    },
-    "V79_TOO_GENERIC_NEAR_EVENT": {
-      "status": "repair-exists-unproven",
-      "note": "engine/v79_ballistic_share.js exports repairBallisticShare, but nothing shows it clearing this code."
-    },
-    "V83_SPORT_WEEK_NOT_SHOWN": {
-      "status": "repair-exists-unproven",
-      "note": "engine/v83_in_season.js exports repairInSeason, but nothing shows it clearing this code."
     },
     "WEEK_BLOCK_STRUCTURE_INVALID": {
       "status": "model-can-answer",

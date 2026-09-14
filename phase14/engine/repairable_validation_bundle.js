@@ -5,6 +5,7 @@ import {
   validateEquipmentAgainstLocation,
   enforceUnilateralIntensityFloor,
   enforceIntradayConditioningOrder,
+  forceIntradayReorder,
   reformatWarmupCells,
   validateAndCalibrateSkills,
   coreExerciseName,
@@ -452,6 +453,20 @@ export function collectRepairableValidationFailures(program, intake = {}, option
 
   runRepairable(flags, () => validateEquipmentAgainstLocation(candidate, intake));
   runRepairable(flags, () => enforceUnilateralIntensityFloor(candidate, intake));
+
+  // enforceIntradayConditioningOrder reorders the day and then throws, so the
+  // reordered program it built is discarded and the flag stands. The
+  // deterministic answer already exists -- forceIntradayReorder, written for
+  // exactly this -- and was reachable only through hardSubstitute, which the
+  // pipeline stopped calling. Same root cause as the sport-day gate: a repair
+  // nobody ran, and a rule that could refuse a program with no way to answer
+  // it. Reorder first; the check then passes, and still refuses a day the
+  // reorder genuinely cannot sequence.
+  const reordered = forceIntradayReorder(candidate, intake);
+  if (typeof reordered === 'string' && reordered !== candidate) {
+    candidate = reordered;
+    deterministic_repairs.push({ type: 'intraday_order_forced' });
+  }
 
   const ordered = runRepairable(flags, () => enforceIntradayConditioningOrder(candidate, intake));
   if (ordered.ok && typeof ordered.value === 'string') candidate = ordered.value;

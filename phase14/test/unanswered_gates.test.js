@@ -140,3 +140,63 @@ test('the clock the block is governed by is stated', () => {
     'the repair must answer its own flag');
   assert.equal(repairClockStatement(fixed, FIGHTER), fixed, 'repair is not idempotent');
 });
+
+// --- two more, and one I could not raise ------------------------------------
+
+import { collectSportWeekFlags, appendTrainingWeek } from '../engine/v83_in_season.js';
+import { collectBallisticShareFlags, repairBallisticShare } from '../engine/v79_ballistic_share.js';
+import { repairDeterministicContradictions } from '../engine/v35_deterministic_repair.js';
+
+const HARD = JSON.parse(read('hard_avatars.json'));
+
+test('an in-season athlete is shown the week their sport already fills', () => {
+  // The repair is appendTrainingWeek, not repairInSeason -- which is why the
+  // first probe reported this as unanswerable. The v35 chain is what calls it,
+  // so the proof runs through the chain production actually uses.
+  const p = `This block builds strength.\n\n${four([r('Tue', 'Back Squat', '120 kg', 3, '5', '2 min', 7, 'Strength.')])}`;
+  const intake = HARD.inseason_footballer;
+  assert.deepEqual(collectSportWeekFlags(p, intake).map((f) => f.code), ['V83_SPORT_WEEK_NOT_SHOWN']);
+
+  const direct = appendTrainingWeek(p, intake);
+  assert.deepEqual(collectSportWeekFlags(direct, intake).map((f) => f.code), []);
+  assert.equal(appendTrainingWeek(direct, intake), direct, 'repair is not idempotent');
+
+  const chained = repairDeterministicContradictions(p, intake);
+  const prog = typeof chained === 'string' ? chained : chained.program;
+  assert.deepEqual(collectSportWeekFlags(prog, intake).map((f) => f.code), [],
+    'and the chain production runs must clear it too');
+});
+
+test('a session that still looks like a gym programme near the event is sharpened', () => {
+  const session = (d) => [
+    r(d, 'Trap Bar Jump', 'Light', 3, '3', '2 min', 7, 'Power.'),
+    r(d, 'Chest-Supported Row', '60 kg', 3, '10', '2 min', 7, 'General.'),
+    r(d, 'Leg Press', '200 kg', 3, '10', '2 min', 7, 'General.'),
+    r(d, 'Lateral Raise', '10 kg', 3, '15', '60 sec', 7, 'General.'),
+  ];
+  const p = [1, 2, 3, 4].map((n) => wk(n, [...session('Tue'), ...session('Fri')])).join('\n\n');
+  assert.ok(collectBallisticShareFlags(p, FIGHTER).map((f) => f.code).includes('V79_TOO_GENERIC_NEAR_EVENT'));
+
+  const fixed = repairBallisticShare(p, FIGHTER);
+  assert.deepEqual(collectBallisticShareFlags(fixed, FIGHTER).map((f) => f.code), [],
+    'the repair must answer its own flag');
+  assert.equal(repairBallisticShare(fixed, FIGHTER), fixed, 'repair is not idempotent');
+});
+
+test('the intraday reorder survives the check instead of being thrown away', () => {
+  // enforceIntradayConditioningOrder builds a reordered program and then throws,
+  // so the reorder it just did is discarded and the flag stands. The
+  // deterministic answer -- forceIntradayReorder -- was written for exactly this
+  // and was reachable only through hardSubstitute, which the pipeline stopped
+  // calling. It now runs before the check.
+  //
+  // I could not construct a program that makes the check throw, so this asserts
+  // the wiring rather than the convergence, and INTRADAY_ORDER_VIOLATION stays
+  // recorded as unproven. Claiming otherwise would be the same mistake the
+  // ledger made.
+  const bundle = fs.readFileSync(new URL('../engine/repairable_validation_bundle.js', import.meta.url), 'utf8');
+  assert.match(bundle, /const reordered = forceIntradayReorder\(candidate, intake\)/);
+  assert.ok(bundle.indexOf('forceIntradayReorder(candidate, intake)')
+    < bundle.indexOf('enforceIntradayConditioningOrder(candidate, intake)'),
+    'the reorder has to run before the rule that refuses over it');
+});

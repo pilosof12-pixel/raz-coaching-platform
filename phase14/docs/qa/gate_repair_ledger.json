@@ -39,7 +39,7 @@
       "repairRunBaseline",
       "repairMarathonSubordination"
     ],
-    "tested": true,
+    "tested": false,
     "stressed": false,
     "killedLive": ""
   },
@@ -123,7 +123,7 @@
       "repairRunBaseline",
       "repairMarathonSubordination"
     ],
-    "tested": true,
+    "tested": false,
     "stressed": false,
     "killedLive": ""
   },
@@ -209,7 +209,7 @@
       "repairRunBaseline",
       "repairMarathonSubordination"
     ],
-    "tested": true,
+    "tested": false,
     "stressed": false,
     "killedLive": ""
   },
@@ -767,7 +767,7 @@
       "repairUnconditionalProgression",
       "repairHandstandBalance"
     ],
-    "tested": true,
+    "tested": false,
     "stressed": false,
     "killedLive": ""
   },
@@ -807,7 +807,7 @@
       "repairUnconditionalProgression",
       "repairHandstandBalance"
     ],
-    "tested": true,
+    "tested": false,
     "stressed": false,
     "killedLive": ""
   },
@@ -852,7 +852,7 @@
     "wired": [
       "repairEnduranceRedundancy"
     ],
-    "tested": true,
+    "tested": false,
     "stressed": false,
     "killedLive": ""
   },
@@ -2897,7 +2897,7 @@
     "wired": [
       "repairBallisticShare"
     ],
-    "tested": false,
+    "tested": true,
     "stressed": false,
     "killedLive": ""
   },
@@ -3040,7 +3040,7 @@
     "wired": [
       "repairInSeason"
     ],
-    "tested": false,
+    "tested": true,
     "stressed": false,
     "killedLive": ""
   },

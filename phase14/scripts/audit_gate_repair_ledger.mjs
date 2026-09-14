@@ -44,8 +44,18 @@ function readAll(dir, skip = /node_modules/) {
 
 const engineFiles = [...readAll(path.join(root, 'engine')), ...readAll(path.join(root, 'scripts'))];
 const testFiles = readAll(path.join(root, 'test'));
-const testText = testFiles.map((f) => fs.readFileSync(f, 'utf8')).join('\n');
-const stressText = fs.readFileSync(path.join(root, 'scripts', 'stress_test_convergence.mjs'), 'utf8');
+// Comments are stripped before matching. A code named in a comment -- including
+// a comment saying the code is unproven -- was being counted as proof, which is
+// the precise failure this file exists to prevent: evidence inferred from
+// something that is not evidence.
+function codeBearingLines(src) {
+  return src.split('\n')
+    .filter((line) => !/^\s*(?:\/\/|\*|\/\*)/.test(line))
+    .map((line) => line.replace(/\/\/.*$/, ''))
+    .join('\n');
+}
+const testText = testFiles.map((f) => codeBearingLines(fs.readFileSync(f, 'utf8'))).join('\n');
+const stressText = codeBearingLines(fs.readFileSync(path.join(root, 'scripts', 'stress_test_convergence.mjs'), 'utf8'));
 
 // Every code, and the module that raises it.
 const CODE_RE = [
