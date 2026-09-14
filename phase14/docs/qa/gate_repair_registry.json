@@ -5,22 +5,6 @@
     "needs-repair": "This should have a deterministic repair and does not. It is a dead build waiting for the right intake."
   },
   "accepted": {
-    "TSV_WEEK_BLOCK_MISSING": {
-      "status": "model-can-answer",
-      "note": "A week the model never wrote cannot be synthesised without inventing training. Seen live twice, cleared both times on the next attempt."
-    },
-    "TSV_SCHEMA_VIOLATION": {
-      "status": "model-can-answer",
-      "note": "A wrong header is a rewrite, not a repair. Row shape below the header is now repaired deterministically by engine/tsv_shape.js."
-    },
-    "PROGRAM_MODEL_NO_WEEK_BLOCKS": {
-      "status": "model-can-answer",
-      "note": "Same as above: there is no program to repair."
-    },
-    "CONCURRENT_ENDURANCE_REDUNDANCY_UNJUSTIFIED": {
-      "status": "needs-repair",
-      "note": "Fires on hybrid and tactical athletes, the two most common paid avatars."
-    },
     "ADVANCED_HYBRID_DENSE_72H_PRIMARY_WINDOW": {
       "status": "needs-repair",
       "note": "Seen live in a dead build's first attempt."
@@ -29,9 +13,13 @@
       "status": "needs-repair",
       "note": ""
     },
-    "ADVANCED_HYBRID_RUN_BASELINE_EXCEEDED": {
-      "status": "needs-repair",
-      "note": ""
+    "ADVANCED_SKILL_REGRESSION": {
+      "status": "repair-exists-unproven",
+      "note": "engine/phase15_program_qa.js exports repairPhase15Program, but nothing shows it clearing this code."
+    },
+    "CARDIO_ONLY_STRENGTH_DAY": {
+      "status": "repair-exists-unproven",
+      "note": "engine/phase15_program_qa.js exports repairPhase15Program, but nothing shows it clearing this code."
     },
     "COACH_SPEC_V1_AH_UNCONDITIONAL_MAJOR_LIFT_PROGRESSION": {
       "status": "needs-repair",
@@ -53,9 +41,109 @@
       "status": "needs-repair",
       "note": ""
     },
-    "COACH_SPEC_V1_YG_SKILL_REST_TOO_SHORT": {
-      "status": "needs-repair",
-      "note": ""
+    "FAR_SECONDARY_STRENGTH_TOKEN_DOSE": {
+      "status": "repair-exists-unproven",
+      "note": "engine/phase15_program_qa.js exports repairPhase15Program, but nothing shows it clearing this code."
+    },
+    "INTRADAY_ORDER_VIOLATION": {
+      "status": "repair-exists-unproven",
+      "note": "engine/exercise_dictionary.js exports enforceUnilateralIntensityFloor, but nothing shows it clearing this code."
+    },
+    "MULTI_OUTCOME_GOAL_UNDERCOVERED": {
+      "status": "repair-exists-unproven",
+      "note": "engine/phase15_program_qa.js exports repairPhase15Program, but nothing shows it clearing this code."
+    },
+    "PROGRAM_MODEL_NO_WEEK_BLOCKS": {
+      "status": "model-can-answer",
+      "note": "Same as above: there is no program to repair."
+    },
+    "SECONDARY_GOAL_NARRATIVE_CONTRADICTION": {
+      "status": "repair-exists-unproven",
+      "note": "engine/phase15_program_qa.js exports repairPhase15Program, but nothing shows it clearing this code."
+    },
+    "SESSION_TIME_BUDGET_EXCEEDED": {
+      "status": "repair-exists-unproven",
+      "note": "engine/phase15_program_qa.js exports repairPhase15Program, but nothing shows it clearing this code."
+    },
+    "SPORT_MODALITY_SPECIFICITY_MISSING": {
+      "status": "repair-exists-unproven",
+      "note": "engine/phase15_program_qa.js exports repairPhase15Program, but nothing shows it clearing this code."
+    },
+    "STRICT_OHP_SPECIFICITY_UNDERDOSED": {
+      "status": "repair-exists-unproven",
+      "note": "engine/phase15_program_qa.js exports repairPhase15Program, but nothing shows it clearing this code."
+    },
+    "TSV_PARSE_FAIL": {
+      "status": "repair-exists-unproven",
+      "note": "engine/phase15_program_qa.js exports repairPhase15Program, but nothing shows it clearing this code."
+    },
+    "TSV_SCHEMA_VIOLATION": {
+      "status": "model-can-answer",
+      "note": "A wrong header is a rewrite, not a repair. Row shape below the header is now repaired deterministically by engine/tsv_shape.js."
+    },
+    "TSV_WEEK_BLOCK_MISSING": {
+      "status": "model-can-answer",
+      "note": "A week the model never wrote cannot be synthesised without inventing training. Seen live twice, cleared both times on the next attempt."
+    },
+    "UNREQUESTED_CONDITIONING_INTERFERENCE": {
+      "status": "repair-exists-unproven",
+      "note": "engine/phase15_program_qa.js exports repairPhase15Program, but nothing shows it clearing this code."
+    },
+    "V46_OPTIONAL_QUALIFIER_ON_PRIMARY": {
+      "status": "repair-exists-unproven",
+      "note": "engine/v46_language_accuracy.js exports repairCountClaims, but nothing shows it clearing this code."
+    },
+    "V58_MALFORMED_COACHING_PROSE": {
+      "status": "repair-exists-unproven",
+      "note": "engine/v58_semantic_cleanup.js exports repairSemanticProse, but nothing shows it clearing this code."
+    },
+    "V70_COMBAT_CONDITIONING_DUPLICATED": {
+      "status": "repair-exists-unproven",
+      "note": "engine/v70_competition_rules.js exports repairCompetitionBlock, but nothing shows it clearing this code."
+    },
+    "V74_CAMP_SESSION_TOO_BUSY": {
+      "status": "repair-exists-unproven",
+      "note": "engine/v74_camp_economy.js exports repairCampEconomy, but nothing shows it clearing this code."
+    },
+    "V79_TOO_GENERIC_NEAR_EVENT": {
+      "status": "repair-exists-unproven",
+      "note": "engine/v79_ballistic_share.js exports repairBallisticShare, but nothing shows it clearing this code."
+    },
+    "V83_SPORT_WEEK_NOT_SHOWN": {
+      "status": "repair-exists-unproven",
+      "note": "engine/v83_in_season.js exports repairInSeason, but nothing shows it clearing this code."
+    },
+    "V86_GOVERNING_CLOCK_NOT_STATED": {
+      "status": "repair-exists-unproven",
+      "note": "engine/v86_training_clock.js exports repairClockStatement, but nothing shows it clearing this code."
+    },
+    "V89_PEAK_CLAIMED_WITHOUT_DAY_ZERO": {
+      "status": "repair-exists-unproven",
+      "note": "engine/v89_block_architecture.js exports repairDayZeroClaims, but nothing shows it clearing this code."
+    },
+    "V89_SESSIONS_NOT_PLACED_BY_MATCH_DAY": {
+      "status": "repair-exists-unproven",
+      "note": "engine/v89_block_architecture.js exports repairDayZeroClaims, but nothing shows it clearing this code."
+    },
+    "V89_SPORT_ALLOCATION_NOT_SHIFTING": {
+      "status": "repair-exists-unproven",
+      "note": "engine/v89_block_architecture.js exports repairDayZeroClaims, but nothing shows it clearing this code."
+    },
+    "V89_SPORT_FREQUENCY_STATIC": {
+      "status": "repair-exists-unproven",
+      "note": "engine/v89_block_architecture.js exports repairDayZeroClaims, but nothing shows it clearing this code."
+    },
+    "V91_COMBAT_LOAD_NOT_DECREASING": {
+      "status": "repair-exists-unproven",
+      "note": "engine/v91_timeline_integrity.js exports repairTimelineIntegrity, but nothing shows it clearing this code."
+    },
+    "WEEK_BLOCK_STRUCTURE_INVALID": {
+      "status": "repair-exists-unproven",
+      "note": "engine/phase15_program_qa.js exports repairPhase15Program, but nothing shows it clearing this code."
+    },
+    "ZONE2_DOSE_TOO_SMALL": {
+      "status": "repair-exists-unproven",
+      "note": "engine/phase15_program_qa.js exports repairPhase15Program, but nothing shows it clearing this code."
     }
   },
   "_unenforced_why": "Rules that exist, are tested, and that nothing in production calls. Only their briefs reach the model, so a program that breaks one is never checked. V84_CONTRAINDICATED_MOVEMENT_PRESCRIBED sat here until it was noticed: the athlete's own account of what reproduces their symptoms was validated by nothing at all. Some of these are deliberate -- a rule with no possible repair should teach rather than refuse -- but the list must not grow by accident, so the guard test fails when a rule joins it silently.",

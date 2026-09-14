@@ -1,5 +1,6 @@
 import { RetriableValidationError } from './exercise_dictionary.js';
 import { weekdayKey } from './weekday.js';
+import { parseWeek as parseWeekRows } from './v34_workload_accounting.js';
 import { isHighConcurrencyHybrid, currentRunBaseline, marathonGoalTier } from './advanced_hybrid_concurrency.js';
 
 // Exposure matchers for the Advanced Hybrid rules. Each rule below asks whether
@@ -224,4 +225,51 @@ export function validateAdvancedHybridQualitySemantic(program, intake = {}) {
   }
 
   return { ok: true, skipped: false };
+}
+
+// --- repair ----------------------------------------------------------------
+//
+// Week 1 may not prescribe more direct running than the athlete demonstrably
+// already does. The rule was right and had no answer, so a hybrid intake that
+// tripped it spent four generations and produced nothing.
+//
+// The answer is the distance itself, and only the distance: the run keeps its
+// place in the week, its day and its purpose, and comes down to what the
+// athlete has actually run. Starting a block above someone's demonstrated
+// volume is the first thing that breaks them.
+export function repairRunBaseline(program, intake = {}) {
+  if (!isHighConcurrencyHybrid(intake)) return String(program || '');
+  const baseline = currentRunBaseline(intake);
+  if (!baseline.weekly_km) return String(program || '');
+
+  const parsed = parseWeekRows(program, 1);
+  if (!parsed) return String(program || '');
+  const cells = parsed.rows.map((c) => c.slice());
+  let changed = false;
+  parsed.rows.forEach((row, i) => {
+    const name = String(row[parsed.exercise] || '').trim();
+    if (!/^(?:run|running)$/i.test(name)) return;
+    // The rule reads the distance out of load, reps AND notes, so capping one
+    // cell leaves the flag standing on whichever of the other two carried it.
+    const columns = [parsed.load, parsed.reps, parsed.notes].filter(Number.isInteger);
+    let capped = false;
+    for (const col of columns) {
+      const raw = String(row[col] || '');
+      const next = raw.replace(/\b(\d+(?:\.\d+)?)\s*km\b/ig,
+        (whole, n) => (Number(n) > baseline.weekly_km ? `${baseline.weekly_km} km` : whole));
+      if (next === raw) continue;
+      cells[i][col] = next;
+      capped = true;
+    }
+    if (!capped) return;
+    if (Number.isInteger(parsed.notes)) {
+      const note = String(cells[i][parsed.notes] || '').trim();
+      const add = `Week 1 starts from what you already run, about ${baseline.weekly_km} km, and builds from there.`;
+      if (!/starts from what you already run/.test(note)) cells[i][parsed.notes] = note ? `${note} ${add}` : add;
+    }
+    changed = true;
+  });
+  if (!changed) return String(program || '');
+  const rebuilt = [parsed.header.join('\t'), ...cells.map((c) => c.join('\t'))].join('\n');
+  return String(program || '').replace(parsed.re, `$1${rebuilt}$3`);
 }

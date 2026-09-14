@@ -1,5 +1,6 @@
 // Generic integrity guardrails for Phase 15.
 import { isHighConcurrencyHybrid } from './advanced_hybrid_concurrency.js';
+import { parseWeek } from './v34_workload_accounting.js';
 // IMPORTANT: this file does not define new coaching theory. It enforces
 // client/source consistency already required by the authored RAZ logic:
 // named goals cannot disappear, an athlete's existing target-modality practice
@@ -538,4 +539,46 @@ export function elitePromptRules(intake={}) {
     else rules.push(`PRIMARY-MOVEMENT INTEGRITY: ${def.label} is named in a primary goal and is not explicitly prohibited by the intake. Keep direct ${def.label} exposure. Related variations may support it but cannot silently replace it.`);
   }
   return rules;
+}
+
+// --- repair ----------------------------------------------------------------
+//
+// A combat athlete with a running goal who is also given meaningful bike or row
+// work has to be told why, or the rule refuses the program. The refusal is
+// right -- generic Zone 2 stacked on top of seven sport sessions is volume
+// nobody asked for -- but it was a refusal with no answer, so it spent four
+// attempts and killed the build.
+//
+// There is only one reason to put a fighter on a bike instead of the road, and
+// it is the same reason every time: the aerobic work is wanted and the
+// mechanical cost is not. That sentence is a fact about the prescription, not a
+// password, so the engine can write it.
+const REDUNDANCY_PURPOSE = 'Bike or row here rather than more running: it buys aerobic volume with less mechanical and eccentric cost, so the direct running the goal needs stays the priority.';
+const REDUNDANT_MODALITY = /\b(?:bike|cycling|rower|rowing|zone[- ]?2 bike|zone[- ]?2 row)\b/i;
+const PURPOSE_STATED = /\b(?:lower[- ]?impact|impact management|reduce(?:d)? impact|recovery cost|fatigue cost|supplement(?:al)?|replace(?:s|ment)?|because|aerobic volume with less|orthopedic|eccentric cost|missing aerobic|specific purpose)\b/i;
+
+export function repairEnduranceRedundancy(program, intake = {}) {
+  const sportContext = `${String(intake?.sport || '')} ${JSON.stringify(intake?.sport_schedule || [])}`;
+  if (!/\b(?:bjj|jiu[- ]?jitsu|mma|wrestl(?:e|ing)|boxing|combat)\b/i.test(sportContext)) return String(program || '');
+
+  let out = String(program || '');
+  for (let week = 1; week <= 4; week += 1) {
+    const parsed = parseWeek(out, week);
+    if (!parsed || !Number.isInteger(parsed.notes)) continue;
+    const cells = parsed.rows.map((c) => c.slice());
+    let changed = false;
+    parsed.rows.forEach((row, i) => {
+      const name = String(row[parsed.exercise] || '');
+      if (/^\s*\[WARMUP\]/i.test(name)) return;
+      const note = String(row[parsed.notes] || '');
+      if (!REDUNDANT_MODALITY.test(`${name} ${note}`)) return;
+      if (PURPOSE_STATED.test(note)) return;
+      cells[i][parsed.notes] = note.trim() ? `${note.trim()} ${REDUNDANCY_PURPOSE}` : REDUNDANCY_PURPOSE;
+      changed = true;
+    });
+    if (!changed) continue;
+    const rebuilt = [parsed.header.join('\t'), ...cells.map((c) => c.join('\t'))].join('\n');
+    out = out.replace(parsed.re, `$1${rebuilt}$3`);
+  }
+  return out;
 }

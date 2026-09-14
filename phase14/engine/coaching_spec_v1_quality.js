@@ -1,6 +1,8 @@
 import { RetriableValidationError } from './exercise_dictionary.js';
 import { parseProgramModel, WEEKDAY_ORDER } from './program_model.js';
 import { isHighConcurrencyHybrid, externalSportSessions } from './advanced_hybrid_concurrency.js';
+import { isYouthIntake } from './coaching_acceptance_quality.js';
+import { parseWeek as parseWeekRows } from './v34_workload_accounting.js';
 
 function arr(v) { return Array.isArray(v) ? v : v ? [v] : []; }
 function text(v) {
@@ -606,4 +608,44 @@ export function buildCoachingSpecV1Brief(intake = {}) {
   }
 
   return lines.join('\n');
+}
+
+// --- repair ----------------------------------------------------------------
+//
+// YG-03 refuses a program that gives a skill or power movement less than thirty
+// seconds of rest, and until now had no way to mend one. The rule's own message
+// says what it wants -- "use a flexible quality-preserving rest prescription" --
+// and that is a value, not a judgement: a handstand or a muscle-up trained on a
+// conditioning clock stops being skill practice, so the clock is what changes.
+const HIGH_SKILL = /handstand|muscle[- ]?up|transition|hip[- ]?to[- ]?bar|box jump|broad jump/i;
+const QUALITY_REST = '60-90 sec';
+
+export function repairSkillRest(program, intake = {}) {
+  if (!isYouthIntake(intake)) return String(program || '');
+  let out = String(program || '');
+  for (let week = 1; week <= 4; week += 1) {
+    const parsed = parseWeekRows(out, week);
+    if (!parsed) continue;
+    if (!Number.isInteger(parsed.rest)) continue;
+    const cells = parsed.rows.map((c) => c.slice());
+    let changed = false;
+    parsed.rows.forEach((row, i) => {
+      const name = String(row[parsed.exercise] || '');
+      if (/^\s*\[WARMUP\]/i.test(name) || !HIGH_SKILL.test(name)) return;
+      const raw = String(row[parsed.rest] || '');
+      const m = raw.match(/(\d+(?:\.\d+)?)\s*(?:s|sec|secs|seconds?)\b/i);
+      if (!m || Number(m[1]) >= 30) return;
+      cells[i][parsed.rest] = QUALITY_REST;
+      if (Number.isInteger(parsed.notes)) {
+        const note = String(cells[i][parsed.notes] || '').trim();
+        const add = 'Rest long enough that every rep looks like the last good one; this is skill practice, not conditioning.';
+        if (!/skill practice, not conditioning/.test(note)) cells[i][parsed.notes] = note ? `${note} ${add}` : add;
+      }
+      changed = true;
+    });
+    if (!changed) continue;
+    const rebuilt = [parsed.header.join('\t'), ...cells.map((c) => c.join('\t'))].join('\n');
+    out = out.replace(parsed.re, `$1${rebuilt}$3`);
+  }
+  return out;
 }

@@ -8,8 +8,12 @@
       "validateAdvancedHybridQualitySemantic"
     ],
     "reachable": true,
-    "repairs": [],
-    "wired": [],
+    "repairs": [
+      "repairRunBaseline"
+    ],
+    "wired": [
+      "repairRunBaseline"
+    ],
     "tested": true,
     "stressed": false,
     "killedLive": ""
@@ -23,8 +27,12 @@
       "validateAdvancedHybridQualitySemantic"
     ],
     "reachable": true,
-    "repairs": [],
-    "wired": [],
+    "repairs": [
+      "repairRunBaseline"
+    ],
+    "wired": [
+      "repairRunBaseline"
+    ],
     "tested": true,
     "stressed": false,
     "killedLive": ""
@@ -53,8 +61,12 @@
       "validateAdvancedHybridQualitySemantic"
     ],
     "reachable": true,
-    "repairs": [],
-    "wired": [],
+    "repairs": [
+      "repairRunBaseline"
+    ],
+    "wired": [
+      "repairRunBaseline"
+    ],
     "tested": true,
     "stressed": false,
     "killedLive": ""
@@ -83,8 +95,12 @@
       "validateAdvancedHybridQualitySemantic"
     ],
     "reachable": true,
-    "repairs": [],
-    "wired": [],
+    "repairs": [
+      "repairRunBaseline"
+    ],
+    "wired": [
+      "repairRunBaseline"
+    ],
     "tested": false,
     "stressed": false,
     "killedLive": ""
@@ -113,8 +129,12 @@
       "validateAdvancedHybridQualitySemantic"
     ],
     "reachable": true,
-    "repairs": [],
-    "wired": [],
+    "repairs": [
+      "repairRunBaseline"
+    ],
+    "wired": [
+      "repairRunBaseline"
+    ],
     "tested": true,
     "stressed": false,
     "killedLive": "2026-08-28 advanced_hybrid"
@@ -128,8 +148,12 @@
       "validateAdvancedHybridQualitySemantic"
     ],
     "reachable": true,
-    "repairs": [],
-    "wired": [],
+    "repairs": [
+      "repairRunBaseline"
+    ],
+    "wired": [
+      "repairRunBaseline"
+    ],
     "tested": true,
     "stressed": false,
     "killedLive": ""
@@ -143,9 +167,13 @@
       "validateAdvancedHybridQualitySemantic"
     ],
     "reachable": true,
-    "repairs": [],
-    "wired": [],
-    "tested": false,
+    "repairs": [
+      "repairRunBaseline"
+    ],
+    "wired": [
+      "repairRunBaseline"
+    ],
+    "tested": true,
     "stressed": false,
     "killedLive": ""
   },
@@ -173,8 +201,12 @@
       "validateAdvancedHybridQualitySemantic"
     ],
     "reachable": true,
-    "repairs": [],
-    "wired": [],
+    "repairs": [
+      "repairRunBaseline"
+    ],
+    "wired": [
+      "repairRunBaseline"
+    ],
     "tested": true,
     "stressed": false,
     "killedLive": ""
@@ -188,8 +220,12 @@
       "validateAdvancedHybridQualitySemantic"
     ],
     "reachable": true,
-    "repairs": [],
-    "wired": [],
+    "repairs": [
+      "repairRunBaseline"
+    ],
+    "wired": [
+      "repairRunBaseline"
+    ],
     "tested": true,
     "stressed": false,
     "killedLive": ""
@@ -203,8 +239,12 @@
       "validateAdvancedHybridQualitySemantic"
     ],
     "reachable": true,
-    "repairs": [],
-    "wired": [],
+    "repairs": [
+      "repairRunBaseline"
+    ],
+    "wired": [
+      "repairRunBaseline"
+    ],
     "tested": true,
     "stressed": false,
     "killedLive": ""
@@ -275,8 +315,12 @@
       "validateAdvancedHybridCoachingSpecV1"
     ],
     "reachable": true,
-    "repairs": [],
-    "wired": [],
+    "repairs": [
+      "repairSkillRest"
+    ],
+    "wired": [
+      "repairSkillRest"
+    ],
     "tested": true,
     "stressed": false,
     "killedLive": ""
@@ -290,8 +334,12 @@
       "validateAdvancedHybridCoachingSpecV1"
     ],
     "reachable": true,
-    "repairs": [],
-    "wired": [],
+    "repairs": [
+      "repairSkillRest"
+    ],
+    "wired": [
+      "repairSkillRest"
+    ],
     "tested": true,
     "stressed": false,
     "killedLive": ""
@@ -305,8 +353,12 @@
       "validateAdvancedHybridCoachingSpecV1"
     ],
     "reachable": true,
-    "repairs": [],
-    "wired": [],
+    "repairs": [
+      "repairSkillRest"
+    ],
+    "wired": [
+      "repairSkillRest"
+    ],
     "tested": true,
     "stressed": false,
     "killedLive": ""
@@ -320,8 +372,12 @@
       "validateAdvancedHybridCoachingSpecV1"
     ],
     "reachable": true,
-    "repairs": [],
-    "wired": [],
+    "repairs": [
+      "repairSkillRest"
+    ],
+    "wired": [
+      "repairSkillRest"
+    ],
     "tested": true,
     "stressed": false,
     "killedLive": ""
@@ -335,8 +391,12 @@
       "validateAdvancedHybridCoachingSpecV1"
     ],
     "reachable": true,
-    "repairs": [],
-    "wired": [],
+    "repairs": [
+      "repairSkillRest"
+    ],
+    "wired": [
+      "repairSkillRest"
+    ],
     "tested": false,
     "stressed": false,
     "killedLive": ""
@@ -395,8 +455,12 @@
       "validateTactical3KCoachingSpecV1"
     ],
     "reachable": true,
-    "repairs": [],
-    "wired": [],
+    "repairs": [
+      "repairSkillRest"
+    ],
+    "wired": [
+      "repairSkillRest"
+    ],
     "tested": true,
     "stressed": false,
     "killedLive": ""
@@ -410,8 +474,12 @@
       "collectYouthCoachingSpecV1ReviewSignals"
     ],
     "reachable": false,
-    "repairs": [],
-    "wired": [],
+    "repairs": [
+      "repairSkillRest"
+    ],
+    "wired": [
+      "repairSkillRest"
+    ],
     "tested": true,
     "stressed": false,
     "killedLive": ""
@@ -425,8 +493,12 @@
       "collectYouthCoachingSpecV1ReviewSignals"
     ],
     "reachable": false,
-    "repairs": [],
-    "wired": [],
+    "repairs": [
+      "repairSkillRest"
+    ],
+    "wired": [
+      "repairSkillRest"
+    ],
     "tested": true,
     "stressed": false,
     "killedLive": ""
@@ -440,8 +512,12 @@
       "collectYouthCoachingSpecV1ReviewSignals"
     ],
     "reachable": false,
-    "repairs": [],
-    "wired": [],
+    "repairs": [
+      "repairSkillRest"
+    ],
+    "wired": [
+      "repairSkillRest"
+    ],
     "tested": true,
     "stressed": false,
     "killedLive": ""
@@ -455,8 +531,12 @@
       "validateTactical3KCoachingSpecV1"
     ],
     "reachable": true,
-    "repairs": [],
-    "wired": [],
+    "repairs": [
+      "repairSkillRest"
+    ],
+    "wired": [
+      "repairSkillRest"
+    ],
     "tested": true,
     "stressed": false,
     "killedLive": ""
@@ -485,8 +565,12 @@
       "validateTactical3KCoachingSpecV1"
     ],
     "reachable": true,
-    "repairs": [],
-    "wired": [],
+    "repairs": [
+      "repairSkillRest"
+    ],
+    "wired": [
+      "repairSkillRest"
+    ],
     "tested": true,
     "stressed": false,
     "killedLive": ""
@@ -500,8 +584,12 @@
       "validateTactical3KCoachingSpecV1"
     ],
     "reachable": true,
-    "repairs": [],
-    "wired": [],
+    "repairs": [
+      "repairSkillRest"
+    ],
+    "wired": [
+      "repairSkillRest"
+    ],
     "tested": true,
     "stressed": false,
     "killedLive": ""
@@ -515,8 +603,12 @@
       "validateYouthCoachingSpecV1HardRules"
     ],
     "reachable": true,
-    "repairs": [],
-    "wired": [],
+    "repairs": [
+      "repairSkillRest"
+    ],
+    "wired": [
+      "repairSkillRest"
+    ],
     "tested": true,
     "stressed": false,
     "killedLive": ""
@@ -530,8 +622,12 @@
       "validateYouthCoachingSpecV1HardRules"
     ],
     "reachable": true,
-    "repairs": [],
-    "wired": [],
+    "repairs": [
+      "repairSkillRest"
+    ],
+    "wired": [
+      "repairSkillRest"
+    ],
     "tested": false,
     "stressed": false,
     "killedLive": ""
@@ -560,9 +656,13 @@
       "validateYouthCoachingSpecV1HardRules"
     ],
     "reachable": true,
-    "repairs": [],
-    "wired": [],
-    "tested": false,
+    "repairs": [
+      "repairSkillRest"
+    ],
+    "wired": [
+      "repairSkillRest"
+    ],
+    "tested": true,
     "stressed": false,
     "killedLive": ""
   },
@@ -575,8 +675,12 @@
       "validateYouthCoachingSpecV1HardRules"
     ],
     "reachable": true,
-    "repairs": [],
-    "wired": [],
+    "repairs": [
+      "repairSkillRest"
+    ],
+    "wired": [
+      "repairSkillRest"
+    ],
     "tested": true,
     "stressed": false,
     "killedLive": ""
@@ -591,10 +695,13 @@
     ],
     "reachable": true,
     "repairs": [
-      "repairUnbenchmarkedVariationLoads"
+      "repairUnbenchmarkedVariationLoads",
+      "repairEnduranceRedundancy"
     ],
-    "wired": [],
-    "tested": false,
+    "wired": [
+      "repairEnduranceRedundancy"
+    ],
+    "tested": true,
     "stressed": false,
     "killedLive": ""
   },
@@ -608,9 +715,12 @@
     ],
     "reachable": true,
     "repairs": [
-      "repairUnbenchmarkedVariationLoads"
+      "repairUnbenchmarkedVariationLoads",
+      "repairEnduranceRedundancy"
     ],
-    "wired": [],
+    "wired": [
+      "repairEnduranceRedundancy"
+    ],
     "tested": true,
     "stressed": false,
     "killedLive": ""
@@ -651,9 +761,12 @@
     ],
     "reachable": true,
     "repairs": [
-      "repairUnbenchmarkedVariationLoads"
+      "repairUnbenchmarkedVariationLoads",
+      "repairEnduranceRedundancy"
     ],
-    "wired": [],
+    "wired": [
+      "repairEnduranceRedundancy"
+    ],
     "tested": true,
     "stressed": false,
     "killedLive": "2026-09-11 postpartum_runner"
@@ -742,8 +855,12 @@
       "validateAdvancedHybridQualitySemantic"
     ],
     "reachable": true,
-    "repairs": [],
-    "wired": [],
+    "repairs": [
+      "repairRunBaseline"
+    ],
+    "wired": [
+      "repairRunBaseline"
+    ],
     "tested": true,
     "stressed": false,
     "killedLive": ""
@@ -784,9 +901,12 @@
     ],
     "reachable": true,
     "repairs": [
-      "repairUnbenchmarkedVariationLoads"
+      "repairUnbenchmarkedVariationLoads",
+      "repairEnduranceRedundancy"
     ],
-    "wired": [],
+    "wired": [
+      "repairEnduranceRedundancy"
+    ],
     "tested": true,
     "stressed": false,
     "killedLive": ""
@@ -880,9 +1000,12 @@
     ],
     "reachable": true,
     "repairs": [
-      "repairUnbenchmarkedVariationLoads"
+      "repairUnbenchmarkedVariationLoads",
+      "repairEnduranceRedundancy"
     ],
-    "wired": [],
+    "wired": [
+      "repairEnduranceRedundancy"
+    ],
     "tested": true,
     "stressed": false,
     "killedLive": ""
@@ -953,9 +1076,12 @@
     ],
     "reachable": true,
     "repairs": [
-      "repairUnbenchmarkedVariationLoads"
+      "repairUnbenchmarkedVariationLoads",
+      "repairEnduranceRedundancy"
     ],
-    "wired": [],
+    "wired": [
+      "repairEnduranceRedundancy"
+    ],
     "tested": true,
     "stressed": false,
     "killedLive": ""
@@ -1020,9 +1146,12 @@
     ],
     "reachable": true,
     "repairs": [
-      "repairUnbenchmarkedVariationLoads"
+      "repairUnbenchmarkedVariationLoads",
+      "repairEnduranceRedundancy"
     ],
-    "wired": [],
+    "wired": [
+      "repairEnduranceRedundancy"
+    ],
     "tested": true,
     "stressed": false,
     "killedLive": "2026-08-31 weightlifter_peak"
@@ -1281,9 +1410,12 @@
     ],
     "reachable": true,
     "repairs": [
-      "repairUnbenchmarkedVariationLoads"
+      "repairUnbenchmarkedVariationLoads",
+      "repairEnduranceRedundancy"
     ],
-    "wired": [],
+    "wired": [
+      "repairEnduranceRedundancy"
+    ],
     "tested": true,
     "stressed": false,
     "killedLive": ""
@@ -1362,9 +1494,12 @@
     ],
     "reachable": true,
     "repairs": [
-      "repairUnbenchmarkedVariationLoads"
+      "repairUnbenchmarkedVariationLoads",
+      "repairEnduranceRedundancy"
     ],
-    "wired": [],
+    "wired": [
+      "repairEnduranceRedundancy"
+    ],
     "tested": true,
     "stressed": false,
     "killedLive": ""

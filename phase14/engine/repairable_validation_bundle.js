@@ -11,6 +11,9 @@ import {
   norm,
   swapSportDayContent,
 } from './exercise_dictionary.js';
+import { repairSkillRest } from './coaching_spec_v1_quality.js';
+import { repairEnduranceRedundancy } from './phase15_elite_guardrails.js';
+import { repairRunBaseline } from './advanced_hybrid_quality.js';
 import { repairInjuryConstraint, collectInjuryConstraintFlags } from './v84_injury_constraint.js';
 import { repairMarathonProgression } from './marathon_progression.js';
 import { repairPainTolerance, collectPainToleranceFlags } from './pain_tolerance.js';
@@ -262,6 +265,20 @@ function applyDeterministicCandidateRepairs(program, intake = {}) {
   // IS tolerated, and choosing from a list the athlete wrote themselves is not
   // a judgement made on their behalf. Where no substitute exists the row is
   // left alone and reported as a warning rather than refusing the program.
+  // Three more rules that could refuse a program and had no way to mend one.
+  // A skill movement on a conditioning clock gets its rest back; a fighter's
+  // bike session gets the one sentence that says why it is a bike and not a
+  // run; week 1 running comes back to what the athlete already runs. Each is a
+  // value the rule itself names, not a judgement it was waiting on.
+  const restHeld = repairSkillRest(candidate, intake);
+  if (restHeld !== candidate) { candidate = restHeld; repairs.push({ type: 'skill_rest_quality' }); }
+
+  const redundancyExplained = repairEnduranceRedundancy(candidate, intake);
+  if (redundancyExplained !== candidate) { candidate = redundancyExplained; repairs.push({ type: 'endurance_redundancy_purpose' }); }
+
+  const runHeld = repairRunBaseline(candidate, intake);
+  if (runHeld !== candidate) { candidate = runHeld; repairs.push({ type: 'run_baseline_cap' }); }
+
   const injurySafe = repairInjuryConstraint(candidate, intake);
   if (injurySafe !== candidate) {
     candidate = injurySafe;

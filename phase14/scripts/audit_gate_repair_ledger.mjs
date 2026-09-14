@@ -65,8 +65,12 @@ for (const file of engineFiles) {
   }
 }
 
-// A module that raises a flag and also exports a repair for it is the shape
-// that converges. Anything else leans on the model.
+// A module that raises a flag and also exports a repair is suggestive, and no
+// more than that. Adding one repair to a module made every code that module
+// raises look answered -- which is how three codes quietly left the debt list
+// without anything having been done about them. So this is recorded as a lead
+// and never counted as proof. The only evidence that a code can be answered is
+// a test or a stress perturbation that names it and shows it clearing.
 const repairExports = new Map(); // file -> [repair function names]
 for (const file of engineFiles) {
   const src = fs.readFileSync(file, 'utf8');
@@ -206,17 +210,16 @@ for (const [code, files] of [...raisedIn].sort()) {
 }
 
 const live = ledger.filter((r) => r.reachable);
-const unrepaired = live.filter((r) => !r.wired.length);
-const untested = live.filter((r) => !r.tested && !r.stressed);
-const naked = live.filter((r) => !r.wired.length && !r.tested && !r.stressed);
+const proven = live.filter((r) => r.tested || r.stressed);
+const unproven = live.filter((r) => !r.tested && !r.stressed);
+const leadOnly = unproven.filter((r) => r.wired.length);
 const provenKillers = ledger.filter((r) => r.killedLive);
 
 console.log(`GATE / REPAIR LEDGER  --  ${ledger.length} codes defined, ${live.length} of them able to refuse a build\n`);
-console.log(`  ${String(ledger.length - live.length).padStart(3)}  cannot block: the module is unreachable, or nothing calls the function that raises it`);
-console.log(`  ${String(live.length - unrepaired.length).padStart(3)}  have a deterministic repair the production chain calls`);
-console.log(`  ${String(unrepaired.length).padStart(3)}  have none: the model complies or the build dies`);
-console.log(`  ${String(untested.length).padStart(3)}  are named by no test and no stress perturbation`);
-console.log(`  ${String(naked.length).padStart(3)}  are BOTH unrepaired and unexercised  <-- where the next dead build comes from`);
+console.log(`  ${String(ledger.length - live.length).padStart(3)}  cannot block: nothing production calls raises them`);
+console.log(`  ${String(proven.length).padStart(3)}  are proven: a test or a stress case names the code and shows it clearing`);
+console.log(`  ${String(unproven.length).padStart(3)}  are unproven: nothing has ever demonstrated one of these being answered`);
+console.log(`      of which ${leadOnly.length} sit in a module that exports some repair -- a lead, not proof`);
 console.log(`  ${String(provenKillers.length).padStart(3)}  have already killed a paid build\n`);
 
 console.log('--- codes that have killed a live build ---');
@@ -226,13 +229,9 @@ for (const r of provenKillers.sort((a, b) => a.code.localeCompare(b.code))) {
   console.log(`  ${r.code.padEnd(42)} ${state.padEnd(30)} ${r.killedLive}`);
 }
 
-if (process.argv.includes('--full')) {
-  console.log('\n--- every unrepaired, unexercised code ---');
-  for (const r of naked) console.log(`  ${r.code.padEnd(46)} ${r.modules.join(', ')}`);
-} else {
-  console.log(`\n--- ${Math.min(25, naked.length)} of ${naked.length} unrepaired and unexercised (use --full for all) ---`);
-  for (const r of naked.slice(0, 25)) console.log(`  ${r.code.padEnd(46)} ${r.modules[0]}`);
-}
+const shown = process.argv.includes('--full') ? unproven : unproven.slice(0, 25);
+console.log(`\n--- ${shown.length} of ${unproven.length} unproven${process.argv.includes('--full') ? '' : ' (use --full for all)'} ---`);
+for (const r of shown) console.log(`  ${r.code.padEnd(48)}${r.wired.length ? 'lead: ' + r.wired[0] : ''}`);
 
 fs.writeFileSync(path.join(root, 'docs', 'qa', 'gate_repair_ledger.json'), `${JSON.stringify(ledger, null, 2)}\n`);
 console.log(`\nledger written to docs/qa/gate_repair_ledger.json`);

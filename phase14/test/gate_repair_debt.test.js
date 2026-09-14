@@ -30,10 +30,12 @@ function ledger() {
 const registry = JSON.parse(fs.readFileSync(new URL('docs/qa/gate_repair_registry.json', root), 'utf8'));
 
 test('no blocking code is unrepaired, unexercised and unaccounted for', () => {
-  // Only gates that can actually refuse a build. A rule whose collector nothing
-  // calls cannot kill anything, and counting it here pointed the work at the
-  // wrong place -- see the unenforced list below for that problem.
-  const naked = ledger().filter((r) => r.reachable && !r.wired.length && !r.tested && !r.stressed);
+  // Only gates that can actually refuse a build, and only proof counts. A
+  // repair exported by the same module is a lead: adding one to a module made
+  // every code it raises look answered, and three codes left this list without
+  // anything having been done about them. A code is answered when a test or a
+  // stress case names it and shows it clearing, and not before.
+  const naked = ledger().filter((r) => r.reachable && !r.tested && !r.stressed);
   const unlisted = naked.filter((r) => !registry.accepted[r.code]);
   assert.deepEqual(unlisted.map((r) => r.code), [],
     'A new gate can refuse a program with no way to answer it. Give it a deterministic repair, '
@@ -63,7 +65,7 @@ test('the registry does not outlive the debt it records', () => {
   const byCode = new Map(all.map((r) => [r.code, r]));
   const stale = Object.keys(registry.accepted).filter((code) => {
     const r = byCode.get(code);
-    return r && (!r.reachable || r.wired.length || r.tested || r.stressed);
+    return r && (!r.reachable || r.tested || r.stressed);
   });
   assert.deepEqual(stale, [], 'these codes now have an answer and should be removed from the registry');
 });
