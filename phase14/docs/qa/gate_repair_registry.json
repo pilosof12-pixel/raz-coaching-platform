@@ -53,26 +53,6 @@
       "status": "model-can-answer",
       "note": "A week the model never wrote cannot be synthesised without inventing training. Seen live twice, cleared both times on the next attempt."
     },
-    "UNREQUESTED_CONDITIONING_INTERFERENCE": {
-      "status": "repair-exists-unproven",
-      "note": "engine/phase15_program_qa.js exports repairPhase15Program, but nothing shows it clearing this code."
-    },
-    "V46_OPTIONAL_QUALIFIER_ON_PRIMARY": {
-      "status": "repair-exists-unproven",
-      "note": "engine/v46_language_accuracy.js exports repairCountClaims, but nothing shows it clearing this code."
-    },
-    "V58_MALFORMED_COACHING_PROSE": {
-      "status": "repair-exists-unproven",
-      "note": "engine/v58_semantic_cleanup.js exports repairSemanticProse, but nothing shows it clearing this code."
-    },
-    "V70_COMBAT_CONDITIONING_DUPLICATED": {
-      "status": "repair-exists-unproven",
-      "note": "engine/v70_competition_rules.js exports repairCompetitionBlock, but nothing shows it clearing this code."
-    },
-    "V74_CAMP_SESSION_TOO_BUSY": {
-      "status": "repair-exists-unproven",
-      "note": "engine/v74_camp_economy.js exports repairCampEconomy, but nothing shows it clearing this code."
-    },
     "V79_TOO_GENERIC_NEAR_EVENT": {
       "status": "repair-exists-unproven",
       "note": "engine/v79_ballistic_share.js exports repairBallisticShare, but nothing shows it clearing this code."
@@ -81,17 +61,9 @@
       "status": "repair-exists-unproven",
       "note": "engine/v83_in_season.js exports repairInSeason, but nothing shows it clearing this code."
     },
-    "V86_GOVERNING_CLOCK_NOT_STATED": {
-      "status": "repair-exists-unproven",
-      "note": "engine/v86_training_clock.js exports repairClockStatement, but nothing shows it clearing this code."
-    },
     "WEEK_BLOCK_STRUCTURE_INVALID": {
       "status": "model-can-answer",
       "note": "Duplicated or missing week markers mean the document structure is wrong, not the training. Synthesising a week would be inventing training."
-    },
-    "ZONE2_DOSE_TOO_SMALL": {
-      "status": "repair-exists-unproven",
-      "note": "engine/phase15_program_qa.js exports repairPhase15Program, but nothing shows it clearing this code."
     }
   },
   "_unenforced_why": "Rules that exist, are tested, and that nothing in production calls. Only their briefs reach the model, so a program that breaks one is never checked. V84_CONTRAINDICATED_MOVEMENT_PRESCRIBED sat here until it was noticed: the athlete's own account of what reproduces their symptoms was validated by nothing at all. Some of these are deliberate -- a rule with no possible repair should teach rather than refuse -- but the list must not grow by accident, so the guard test fails when a rule joins it silently.",

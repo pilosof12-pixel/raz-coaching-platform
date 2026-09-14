@@ -175,8 +175,37 @@ export function repairCompetitionBlock(program, intake = {}, now = Date.now()) {
       }
     }
 
+    // Generic conditioning for an athlete whose sport already supplies it is
+    // removed, because that is what the rule means: not "explain it better",
+    // but "do not prescribe it". The repair was missing entirely -- the rule
+    // could refuse a program over an assault bike and nothing could answer it.
+    const dropped = new Set();
+    if (profile.eventType === 'combat' && wk.state !== STATE.NORMAL) {
+      const working = [];
+      let lastDay = '';
+      const dayOf = [];
+      rows.forEach((cells, i) => {
+        const raw = String(cells[parsed.day] || '').trim();
+        if (raw) lastDay = raw;
+        dayOf[i] = lastDay;
+        const name = String(cells[parsed.exercise] || '').trim();
+        if (name && !isWarmup(name)) working.push(i);
+      });
+      const countOnDay = (day) => working.filter((i) => dayOf[i] === day && !dropped.has(i)).length;
+      for (const i of working) {
+        const name = String(rows[i][parsed.exercise] || '').trim();
+        if (!REDUNDANT_CONDITIONING.test(name)) continue;
+        // Never leave a day with nothing on it. A session emptied to satisfy a
+        // rule is a different defect, not a fix.
+        if (countOnDay(dayOf[i]) <= 1) continue;
+        dropped.add(i);
+        changed = true;
+      }
+    }
+
     if (!changed) continue;
-    const rebuilt = [parsed.header.join('\t'), ...rows.map((c) => c.join('\t'))].join('\n');
+    const kept = rows.filter((_, i) => !dropped.has(i));
+    const rebuilt = [parsed.header.join('\t'), ...kept.map((c) => c.join('\t'))].join('\n');
     out = out.replace(parsed.re, `$1${rebuilt}$3`);
   }
   return out;

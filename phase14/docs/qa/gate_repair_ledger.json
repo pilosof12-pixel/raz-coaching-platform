@@ -1748,7 +1748,7 @@
     "wired": [
       "repairPhase15Program"
     ],
-    "tested": false,
+    "tested": true,
     "stressed": false,
     "killedLive": ""
   },
@@ -2263,10 +2263,12 @@
     "advisory": false,
     "reachable": true,
     "repairs": [
-      "repairCountClaims"
+      "repairCountClaims",
+      "repairOptionalQualifiers"
     ],
     "wired": [
-      "repairCountClaims"
+      "repairCountClaims",
+      "repairOptionalQualifiers"
     ],
     "tested": true,
     "stressed": false,
@@ -2283,12 +2285,14 @@
     "advisory": false,
     "reachable": true,
     "repairs": [
-      "repairCountClaims"
+      "repairCountClaims",
+      "repairOptionalQualifiers"
     ],
     "wired": [
-      "repairCountClaims"
+      "repairCountClaims",
+      "repairOptionalQualifiers"
     ],
-    "tested": false,
+    "tested": true,
     "stressed": false,
     "killedLive": ""
   },
@@ -2303,10 +2307,12 @@
     "advisory": false,
     "reachable": true,
     "repairs": [
-      "repairCountClaims"
+      "repairCountClaims",
+      "repairOptionalQualifiers"
     ],
     "wired": [
-      "repairCountClaims"
+      "repairCountClaims",
+      "repairOptionalQualifiers"
     ],
     "tested": true,
     "stressed": false,
@@ -2323,10 +2329,12 @@
     "advisory": false,
     "reachable": true,
     "repairs": [
-      "repairCountClaims"
+      "repairCountClaims",
+      "repairOptionalQualifiers"
     ],
     "wired": [
-      "repairCountClaims"
+      "repairCountClaims",
+      "repairOptionalQualifiers"
     ],
     "tested": true,
     "stressed": false,
@@ -2496,7 +2504,7 @@
     "wired": [
       "repairSemanticProse"
     ],
-    "tested": false,
+    "tested": true,
     "stressed": false,
     "killedLive": ""
   },
@@ -2536,7 +2544,7 @@
     "wired": [
       "repairCompetitionBlock"
     ],
-    "tested": false,
+    "tested": true,
     "stressed": false,
     "killedLive": ""
   },
@@ -2777,7 +2785,7 @@
     "wired": [
       "repairCampEconomy"
     ],
-    "tested": false,
+    "tested": true,
     "stressed": false,
     "killedLive": ""
   },
@@ -3072,7 +3080,7 @@
     "wired": [
       "repairClockStatement"
     ],
-    "tested": false,
+    "tested": true,
     "stressed": false,
     "killedLive": ""
   },
@@ -3637,7 +3645,7 @@
     "wired": [
       "repairPhase15Program"
     ],
-    "tested": false,
+    "tested": true,
     "stressed": false,
     "killedLive": ""
   }

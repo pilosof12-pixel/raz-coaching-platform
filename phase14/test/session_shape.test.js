@@ -80,7 +80,11 @@ test('an athlete who asked for easy aerobic work is not given intervals', () => 
     row('Wed', 'Interval Run', 1, '6 x 400 m', '2 min', 'Hard conditioning.'),
     row('Wed', 'Zone-2 Bike', 1, '25 min', '-', 'Steady.'),
   ]);
+  assert.ok(codesOf(p, AEROBIC_ONLY).includes('UNREQUESTED_CONDITIONING_INTERFERENCE'),
+    'the fixture gives them what they asked not to be given');
   const fixed = repairLowFatigueAerobic(p, AEROBIC_ONLY);
+  assert.ok(!codesOf(fixed, AEROBIC_ONLY).includes('UNREQUESTED_CONDITIONING_INTERFERENCE'),
+    'the repair must answer its own flag');
   assert.ok(!/Interval Run/.test(fixed), 'the work they asked not to be given is not given');
   assert.match(fixed, /Zone-2 Bike/, 'and the work they did ask for stays');
   assert.equal(repairLowFatigueAerobic(fixed, AEROBIC_ONLY), fixed, 'repair is not idempotent');
@@ -91,7 +95,10 @@ test('a warm-up-sized aerobic dose is made big enough to do something', () => {
     row('Mon', 'Zone-2 Bike', 1, '8 min', '-', 'Easy spin.'),
     row('Wed', 'Zone-2 Bike', 1, '10 min', '-', 'Easy spin.'),
   ]);
+  assert.ok(codesOf(p, AEROBIC_ONLY).includes('ZONE2_DOSE_TOO_SMALL'), 'the fixture doses too small');
   const fixed = repairLowFatigueAerobic(p, AEROBIC_ONLY);
+  assert.ok(!codesOf(fixed, AEROBIC_ONLY).includes('ZONE2_DOSE_TOO_SMALL'),
+    'the repair must answer its own flag');
   const minutes = fixed.split('\n').filter((l) => /Zone-2 Bike/.test(l)).map((l) => Number(cell(l, 4).match(/\d+/)[0]));
   assert.ok(minutes.every((m) => m >= 20), `each exposure is meaningful: ${minutes.join(', ')}`);
   assert.match(fixed, /conversational/);

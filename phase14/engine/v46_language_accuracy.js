@@ -243,3 +243,51 @@ export function buildLanguageAccuracyBrief(intake = {}) {
     'On primary-goal work, never leave "optional" or "earned" standing without naming what is optional. The prescribed sets are not discretionary; only a stated addition is.',
   ].join('\n');
 }
+
+// A qualifier that makes primary-goal work sound discretionary has one correct
+// answer, and it is not a better sentence: the work is not optional. The rule
+// asks the model to "state the addition the qualifier applies to", which is
+// right when there is an addition -- and when there is not, the qualifier was
+// simply wrong and comes out.
+//
+// This had no repair at all. repairCountClaims, which the ledger credited for
+// it, only ever touched count claims. So a note reading "Optional if you feel
+// fresh" against a primary lift refused the program four times and delivered
+// nothing.
+export function repairOptionalQualifiers(program, intake = {}) {
+  let out = String(program || '');
+  const isPrimary = (name) => goalTierFor(name, intake) === 'primary';
+
+  for (let week = 1; week <= 4; week += 1) {
+    const parsed = parseWeek(out, week);
+    if (!parsed || !Number.isInteger(parsed.notes)) continue;
+    const cells = parsed.rows.map((c) => c.slice());
+    let changed = false;
+
+    parsed.rows.forEach((row, i) => {
+      const name = String(row[parsed.exercise] || '').trim();
+      if (!name || isWarmup(name) || !isPrimary(name)) return;
+      const note = String(cells[i][parsed.notes] || '');
+      const m = note.match(OPTIONAL_QUALIFIER);
+      if (!m) return;
+      const window = note.slice(Math.max(0, m.index - 90), m.index + 40);
+      if (NAMES_AN_ADDITION.test(window)) return;
+
+      // Drop the sentence the qualifier lives in, and say what is true instead.
+      const kept = note
+        .split(/(?<=[.!?])\s+/)
+        .filter((sentence) => !OPTIONAL_QUALIFIER.test(sentence))
+        .join(' ')
+        .replace(/\s{2,}/g, ' ')
+        .trim();
+      const plain = `${name} is work toward your main goal, so it is prescribed rather than offered. If you are flat, take the lighter end of the range; do not skip it.`;
+      cells[i][parsed.notes] = kept ? `${kept} ${plain}` : plain;
+      changed = true;
+    });
+
+    if (!changed) continue;
+    const rebuilt = [parsed.header.join('\t'), ...cells.map((c) => c.join('\t'))].join('\n');
+    out = out.replace(parsed.re, `$1${rebuilt}$3`);
+  }
+  return out;
+}

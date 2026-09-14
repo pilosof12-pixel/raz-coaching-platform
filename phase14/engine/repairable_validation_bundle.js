@@ -11,6 +11,7 @@ import {
   norm,
   swapSportDayContent,
 } from './exercise_dictionary.js';
+import { repairOptionalQualifiers } from './v46_language_accuracy.js';
 import { repairSessionTimeBudget, repairLowFatigueAerobic } from './session_shape.js';
 import { repairTacticalHardRules } from './v40_tactical_hard_rules.js';
 import { repairUnconditionalProgression, repairHandstandBalance } from './coaching_spec_v1_quality.js';
@@ -288,6 +289,13 @@ function applyDeterministicCandidateRepairs(program, intake = {}) {
   // A session that will not fit in the time the athlete has gets shorter, and
   // an athlete who asked for low-fatigue aerobic work is not given intervals.
   // Both rules refuse programs; neither could mend one.
+  // A qualifier that makes primary-goal work sound discretionary, and generic
+  // conditioning for an athlete whose sport already supplies it. Both rules
+  // refuse programs; neither had a repair, and the ledger credited both to
+  // repairs that never touched them.
+  const notOptional = repairOptionalQualifiers(candidate, intake);
+  if (notOptional !== candidate) { candidate = notOptional; repairs.push({ type: 'primary_work_not_optional' }); }
+
   const withinTime = repairSessionTimeBudget(candidate, intake);
   if (withinTime !== candidate) { candidate = withinTime; repairs.push({ type: 'session_time_budget' }); }
 
