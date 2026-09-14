@@ -11,6 +11,7 @@ import {
   norm,
   swapSportDayContent,
 } from './exercise_dictionary.js';
+import { repairSessionTimeBudget, repairLowFatigueAerobic } from './session_shape.js';
 import { repairTacticalHardRules } from './v40_tactical_hard_rules.js';
 import { repairUnconditionalProgression, repairHandstandBalance } from './coaching_spec_v1_quality.js';
 import { repairMarathonSubordination } from './advanced_hybrid_quality.js';
@@ -284,6 +285,15 @@ function applyDeterministicCandidateRepairs(program, intake = {}) {
   // A freestanding-handstand goal with no balance work in the week is a block
   // missing the thing the goal is made of. Put it in rather than refuse four
   // times and deliver nothing.
+  // A session that will not fit in the time the athlete has gets shorter, and
+  // an athlete who asked for low-fatigue aerobic work is not given intervals.
+  // Both rules refuse programs; neither could mend one.
+  const withinTime = repairSessionTimeBudget(candidate, intake);
+  if (withinTime !== candidate) { candidate = withinTime; repairs.push({ type: 'session_time_budget' }); }
+
+  const aerobic = repairLowFatigueAerobic(candidate, intake);
+  if (aerobic !== candidate) { candidate = aerobic; repairs.push({ type: 'low_fatigue_aerobic' }); }
+
   const balanced = repairHandstandBalance(candidate, intake);
   if (balanced !== candidate) { candidate = balanced; repairs.push({ type: 'handstand_balance_specificity' }); }
 

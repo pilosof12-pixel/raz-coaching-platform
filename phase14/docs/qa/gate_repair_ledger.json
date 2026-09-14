@@ -1392,7 +1392,7 @@
     "wired": [
       "repairPhase15Program"
     ],
-    "tested": false,
+    "tested": true,
     "stressed": false,
     "killedLive": ""
   },

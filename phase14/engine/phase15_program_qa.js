@@ -36,7 +36,7 @@ function field(intake, names, fallback = null) {
   return fallback;
 }
 
-function sessionLimit(intake) {
+export function sessionLimit(intake) {
   const raw = field(intake, ["session_duration_minutes","session_duration_min","session_minutes","time_per_session","available_minutes","session_length"]);
   if (Number.isFinite(Number(raw))) return Number(raw);
   const nums = [...String(raw || '').matchAll(/\d{2,3}/g)].map(m => Number(m[0])).filter(Number.isFinite);
@@ -57,7 +57,7 @@ function currentOapReps(intake) {
   return null;
 }
 
-function rowsByDay(parsed) {
+export function rowsByDay(parsed) {
   const d = parsed.idx.day, e = parsed.idx.exercise, s = parsed.idx.sets;
   const r = parsed.idx.reps >= 0 ? parsed.idx.reps : parsed.idx["reps/duration"];
   const rest = parsed.idx.rest;
@@ -94,7 +94,7 @@ function farOhpGoal(intake) {
   return hi >= lo * 1.15 ? { current:lo, target:hi } : null;
 }
 
-function asksLowFatigueAerobicOnly(intake) {
+export function asksLowFatigueAerobicOnly(intake) {
   const text = JSON.stringify({secondary:intake.secondary_goals, maintenance:intake.maintenance_goals, notes:intake.notes}).toLowerCase();
   return /(zone\s*2|aerobic base|aerobic conditioning|day to day energy|low fatigue)/.test(text) && /(do not add hard|without reducing|without compromising|2 to 3 zone|two to three zone|low fatigue)/.test(text);
 }

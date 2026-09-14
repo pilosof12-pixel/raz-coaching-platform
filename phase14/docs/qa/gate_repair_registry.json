@@ -33,10 +33,6 @@
       "status": "repair-exists-unproven",
       "note": "engine/phase15_program_qa.js exports repairPhase15Program, but nothing shows it clearing this code."
     },
-    "SESSION_TIME_BUDGET_EXCEEDED": {
-      "status": "repair-exists-unproven",
-      "note": "engine/phase15_program_qa.js exports repairPhase15Program, but nothing shows it clearing this code."
-    },
     "SPORT_MODALITY_SPECIFICITY_MISSING": {
       "status": "repair-exists-unproven",
       "note": "engine/phase15_program_qa.js exports repairPhase15Program, but nothing shows it clearing this code."
@@ -46,8 +42,8 @@
       "note": "engine/phase15_program_qa.js exports repairPhase15Program, but nothing shows it clearing this code."
     },
     "TSV_PARSE_FAIL": {
-      "status": "repair-exists-unproven",
-      "note": "engine/phase15_program_qa.js exports repairPhase15Program, but nothing shows it clearing this code."
+      "status": "model-can-answer",
+      "note": "A week whose table cannot be parsed at all has no rows to repair. Row shape below the header is now handled by engine/tsv_shape.js; this fires when there is no table."
     },
     "TSV_SCHEMA_VIOLATION": {
       "status": "model-can-answer",
@@ -90,8 +86,8 @@
       "note": "engine/v86_training_clock.js exports repairClockStatement, but nothing shows it clearing this code."
     },
     "WEEK_BLOCK_STRUCTURE_INVALID": {
-      "status": "repair-exists-unproven",
-      "note": "engine/phase15_program_qa.js exports repairPhase15Program, but nothing shows it clearing this code."
+      "status": "model-can-answer",
+      "note": "Duplicated or missing week markers mean the document structure is wrong, not the training. Synthesising a week would be inventing training."
     },
     "ZONE2_DOSE_TOO_SMALL": {
       "status": "repair-exists-unproven",
