@@ -30,11 +30,30 @@ function ledger() {
 const registry = JSON.parse(fs.readFileSync(new URL('docs/qa/gate_repair_registry.json', root), 'utf8'));
 
 test('no blocking code is unrepaired, unexercised and unaccounted for', () => {
-  const naked = ledger().filter((r) => !r.wired.length && !r.tested && !r.stressed);
+  // Only gates that can actually refuse a build. A rule whose collector nothing
+  // calls cannot kill anything, and counting it here pointed the work at the
+  // wrong place -- see the unenforced list below for that problem.
+  const naked = ledger().filter((r) => r.reachable && !r.wired.length && !r.tested && !r.stressed);
   const unlisted = naked.filter((r) => !registry.accepted[r.code]);
   assert.deepEqual(unlisted.map((r) => r.code), [],
     'A new gate can refuse a program with no way to answer it. Give it a deterministic repair, '
     + 'exercise it in the stress suite, or add it to docs/qa/gate_repair_registry.json with a reason.');
+});
+
+test('a rule does not stop being enforced without anyone noticing', () => {
+  // V84_CONTRAINDICATED_MOVEMENT_PRESCRIBED was written, tested, and called by
+  // nothing. For as long as that was true, the most specific safety information
+  // in the whole intake -- the athlete's own account of what reproduces their
+  // symptoms -- was checked against the program by nobody. Some rules are
+  // deliberately brief-only, but the set must be a decision rather than a
+  // discovery.
+  const unenforced = ledger().filter((r) => !r.reachable).map((r) => r.code).sort();
+  const listed = [...(registry.unenforced || [])].sort();
+  assert.deepEqual(unenforced.filter((c) => !listed.includes(c)), [],
+    'this rule is no longer enforced anywhere. Wire it with a repair, or list it in '
+    + 'docs/qa/gate_repair_registry.json under "unenforced" to say that is intended.');
+  assert.deepEqual(listed.filter((c) => !unenforced.includes(c)), [],
+    'these are enforced again and should leave the unenforced list');
 });
 
 test('the registry does not outlive the debt it records', () => {
@@ -44,7 +63,7 @@ test('the registry does not outlive the debt it records', () => {
   const byCode = new Map(all.map((r) => [r.code, r]));
   const stale = Object.keys(registry.accepted).filter((code) => {
     const r = byCode.get(code);
-    return r && (r.wired.length || r.tested || r.stressed);
+    return r && (!r.reachable || r.wired.length || r.tested || r.stressed);
   });
   assert.deepEqual(stale, [], 'these codes now have an answer and should be removed from the registry');
 });

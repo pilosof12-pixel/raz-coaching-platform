@@ -100,3 +100,140 @@ export function buildInjuryConstraintBrief(intake = {}) {
   lines.push('  If the goal movement is also the movement that injured them, that is the block: build the exposure back deliberately and gradually rather than assuming it or avoiding it.');
   return lines.join('\n');
 }
+
+// --- repair -------------------------------------------------------------
+//
+// The note above was right when it was written: a blocking code with no repair
+// spends four attempts and fails the build. What it missed is that the intake
+// usually names the answer. "Trap bar deadlift, split squats, sled pushes, hip
+// thrusts and all upper body are comfortable. Heavy back squat is not." -- the
+// athlete has listed both halves, and choosing from a list they wrote
+// themselves is not a coaching judgement made on their behalf.
+//
+// So the rule now fires only where it can be answered. A contraindicated
+// movement with a tolerated substitute of the same pattern is swapped. One
+// without stays a brief, exactly as before, because refusing a program we
+// cannot mend helps nobody.
+
+import { classifyExercise } from './v38_movement_taxonomy.js';
+import { matchDictionary } from './exercise_dictionary.js';
+
+// The half of the sentence that says what IS tolerated.
+export function toleratedMovements(intake = {}) {
+  const pain = intake && intake.pain ? intake.pain : {};
+  const said = txt(pain.tolerated_movements);
+  const positive = [];
+  for (const clause of said.split(/(?<=[.;])/)) {
+    if (/\b(?:is|are)\s+not\b|\bavoid\b|\bcannot\b|\bcan't\b/i.test(clause)) continue;
+    positive.push(clause);
+  }
+  const text = positive.join(' ').toLowerCase();
+  const forbidden = forbiddenMovements(intake);
+  return NAMED_MOVEMENTS
+    .filter((m) => text.includes(m))
+    .filter((m) => !forbidden.includes(m));
+}
+
+// The athlete's own words, turned into a name the dictionary accepts. "split
+// squats" is what they wrote; "Bulgarian Split Squat" is what a program says.
+const CANONICAL_FORMS = {
+  'trap bar deadlift': ['Trap Bar Deadlift'],
+  'romanian deadlift': ['Romanian Deadlift', 'Dumbbell Romanian Deadlift'],
+  deadlift: ['Trap Bar Deadlift', 'Deadlift'],
+  'split squat': ['Bulgarian Split Squat', 'Split Squat'],
+  lunge: ['Walking Lunge', 'Reverse Lunge'],
+  'step-up': ['Step-up'],
+  'leg press': ['Leg Press'],
+  'hip thrust': ['Barbell Hip Thrust', 'Hip Thrust'],
+  'leg curl': ['Leg Curl', 'Lying Leg Curl'],
+  'leg extension': ['Leg Extension'],
+  'front squat': ['Front Squat'],
+  'back squat': ['Back Squat'],
+  'bench press': ['Bench Press'],
+  'overhead press': ['Overhead Press'],
+  'push press': ['Push Press'],
+  'pull-up': ['Pull-up'],
+  'chin-up': ['Chin-up'],
+  'barbell row': ['Barbell Row'],
+  'bent-over row': ['Bent-Over Row'],
+  dip: ['Dip'],
+  running: ['Easy Run'],
+};
+
+function canonicalFor(movement) {
+  for (const name of CANONICAL_FORMS[movement] || []) {
+    const hit = matchDictionary(name);
+    if (hit && hit.status === 'hit') return name;
+  }
+  return null;
+}
+
+// Prefer a substitute that trains the same thing. A fighter who cannot back
+// squat should get another way to load the legs, not another upper-body push --
+// and the honest answer for a painful bilateral squat is usually a unilateral
+// or a hinge, not a different squat, so the match is on family before category.
+const LOWER = new Set(['knee_dominant', 'hip_dominant', 'unilateral_lower']);
+function familyOf(name) {
+  const category = classifyExercise(name)?.category || '';
+  return { category, lower: LOWER.has(category) };
+}
+
+function chooseSubstitute(original, tolerated, alreadyOnDay) {
+  const want = familyOf(original);
+  if (!want.category) return null;
+  const options = tolerated.map(canonicalFor).filter(Boolean)
+    .filter((n) => !alreadyOnDay.has(n.toLowerCase()))
+    .map((n) => ({ name: n, ...familyOf(n) }))
+    .filter((o) => o.lower === want.lower);
+  if (!options.length) return null;
+  return (options.find((o) => o.category === want.category) || options[0]).name;
+}
+
+export function repairInjuryConstraint(program, intake = {}) {
+  const forbidden = forbiddenMovements(intake);
+  if (!forbidden.length) return String(program || '');
+  const tolerated = toleratedMovements(intake);
+  if (!tolerated.length) return String(program || '');
+
+  let out = String(program || '');
+  for (let week = 1; week <= 4; week += 1) {
+    const parsed = parseWeek(out, week);
+    if (!parsed) continue;
+    const cells = parsed.rows.map((c) => c.slice());
+
+    const onDay = new Map();
+    let lastDay = '';
+    parsed.rows.forEach((row) => {
+      const raw = String(row[parsed.day] || '').trim();
+      if (raw) lastDay = raw;
+      const name = String(row[parsed.exercise] || '').trim();
+      if (!name || isWarmup(name)) return;
+      if (!onDay.has(lastDay)) onDay.set(lastDay, new Set());
+      onDay.get(lastDay).add(name.toLowerCase());
+    });
+
+    let changed = false;
+    lastDay = '';
+    parsed.rows.forEach((row, i) => {
+      const raw = String(row[parsed.day] || '').trim();
+      if (raw) lastDay = raw;
+      const name = String(row[parsed.exercise] || '').trim();
+      if (!name || isWarmup(name)) return;
+      if (!forbidden.some((m) => name.toLowerCase().includes(m))) return;
+      const swap = chooseSubstitute(name, tolerated, onDay.get(lastDay) || new Set());
+      if (!swap) return; // no answer: leave it, and let the warning say so
+      onDay.get(lastDay)?.delete(name.toLowerCase());
+      onDay.get(lastDay)?.add(swap.toLowerCase());
+      cells[i][parsed.exercise] = swap;
+      if (Number.isInteger(parsed.load)) cells[i][parsed.load] = 'RPE-selected load';
+      if (Number.isInteger(parsed.notes)) {
+        cells[i][parsed.notes] = `Replaces ${name}, which you told us you do not tolerate. This trains the same quality in a position you said is comfortable. Build the load back gradually and stop if the old symptoms appear.`;
+      }
+      changed = true;
+    });
+    if (!changed) continue;
+    const rebuilt = [parsed.header.join('\t'), ...cells.map((c) => c.join('\t'))].join('\n');
+    out = out.replace(parsed.re, `$1${rebuilt}$3`);
+  }
+  return out;
+}

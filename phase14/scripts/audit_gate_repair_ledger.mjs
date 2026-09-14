@@ -98,14 +98,105 @@ const LIVE_KILLERS = new Map(Object.entries({
   TSV_ROW_COLUMN_COUNT_MISMATCH: '2026-09-12 mma_fight_camp',
 }));
 
+// Can this code block a build at all?
+//
+// Three modules -- v53, v87, v88 -- export collectors that nothing in
+// production calls. Only their briefs are used, to instruct the model. Their
+// codes cannot refuse a program, so counting them as dead-build risk inflates
+// the number and points the work at the wrong place. A code is reachable only
+// if the exported function that raises it is called somewhere inside the
+// module closure production actually loads.
+const PRODUCTION_ROOTS = [
+  'engine/repairable_validation_bundle.js',
+  'engine/phase15_final_qa.js',
+  'engine/phase15_program_qa.js',
+  'engine/v35_deterministic_repair.js',
+  'server.phase15.js',
+];
+
+function importsOf(relPath) {
+  const abs = path.join(root, relPath);
+  if (!fs.existsSync(abs)) return [];
+  const src = fs.readFileSync(abs, 'utf8');
+  const out = [];
+  for (const m of src.matchAll(/from\s+['"](\.[^'"]+)['"]/g)) {
+    const target = path.relative(root, path.resolve(path.dirname(abs), m[1]));
+    if (fs.existsSync(path.join(root, target))) out.push(target);
+  }
+  return out;
+}
+
+const reachableModules = new Set();
+(function walk(list) {
+  for (const f of list) {
+    if (reachableModules.has(f)) continue;
+    reachableModules.add(f);
+    walk(importsOf(f));
+  }
+})(PRODUCTION_ROOTS);
+
+// Module reachability alone says nothing: the planner imports v87 to build a
+// brief, which makes the module loaded and its collectors still dead. So the
+// walk is over FUNCTIONS. A function is live when something production calls
+// reaches it, and a function that is only ever called by its own module's other
+// dead functions stays dead.
+const bodies = new Map(); // name -> body text
+for (const file of reachableModules) {
+  const abs = path.join(root, file);
+  if (!fs.existsSync(abs)) continue;
+  const src = fs.readFileSync(abs, 'utf8');
+  const starts = [...src.matchAll(/(?:export\s+)?(?:async\s+)?function\s+(\w+)\s*\(/g)];
+  starts.forEach((m, i) => {
+    const end = i + 1 < starts.length ? starts[i + 1].index : src.length;
+    const body = src.slice(m.index, end);
+    bodies.set(m[1], (bodies.get(m[1]) || '') + '\n' + body);
+  });
+}
+
+// Everything the runtime itself calls, plus the two aggregate entry points.
+const runtimeSrc = fs.existsSync(path.join(root, 'server.phase15.js'))
+  ? fs.readFileSync(path.join(root, 'server.phase15.js'), 'utf8') : '';
+const entries = new Set(['collectRepairableValidationFailures', 'validateRepairableProgramBundle',
+  'validatePhase15FinalProgram', 'validatePhase15Program', 'repairDeterministicContradictions']);
+for (const m of runtimeSrc.matchAll(/\b(\w+)\s*\(/g)) if (bodies.has(m[1])) entries.add(m[1]);
+
+const liveFunctions = new Set();
+(function reach(names) {
+  for (const name of names) {
+    if (liveFunctions.has(name)) continue;
+    liveFunctions.add(name);
+    const body = bodies.get(name);
+    if (!body) continue;
+    const called = [...body.matchAll(/\b(\w+)\s*\(/g)].map((m) => m[1]).filter((n) => bodies.has(n) && n !== name);
+    reach(called);
+  }
+})([...entries]);
+
+// The exported function a code sits inside, so we can ask whether anything
+// calls it.
+function enclosingExport(file, code) {
+  const src = fs.readFileSync(path.join(root, file), 'utf8');
+  const at = src.indexOf(code);
+  if (at < 0) return null;
+  const before = src.slice(0, at);
+  const matches = [...before.matchAll(/export function (\w+)/g)];
+  return matches.length ? matches[matches.length - 1][1] : null;
+}
+
 const ledger = [];
 for (const [code, files] of [...raisedIn].sort()) {
   const modules = [...files];
   const repairsNearby = modules.flatMap((f) => repairExports.get(f) || []);
   const wired = repairsNearby.filter((n) => new RegExp(`\\b${n}\\(`).test(wiredText));
+  const owners = modules.map((f) => enclosingExport(f, code)).filter(Boolean);
+  // Raised by a module production loads, from a function production calls.
+  const reachable = modules.some((f) => reachableModules.has(f))
+    && (!owners.length || owners.some((fn) => liveFunctions.has(fn)));
   ledger.push({
     code,
     modules,
+    owners,
+    reachable,
     repairs: repairsNearby,
     wired,
     tested: testText.includes(code),
@@ -114,13 +205,15 @@ for (const [code, files] of [...raisedIn].sort()) {
   });
 }
 
-const unrepaired = ledger.filter((r) => !r.wired.length);
-const untested = ledger.filter((r) => !r.tested && !r.stressed);
-const naked = ledger.filter((r) => !r.wired.length && !r.tested && !r.stressed);
+const live = ledger.filter((r) => r.reachable);
+const unrepaired = live.filter((r) => !r.wired.length);
+const untested = live.filter((r) => !r.tested && !r.stressed);
+const naked = live.filter((r) => !r.wired.length && !r.tested && !r.stressed);
 const provenKillers = ledger.filter((r) => r.killedLive);
 
-console.log(`GATE / REPAIR LEDGER  --  ${ledger.length} blocking codes\n`);
-console.log(`  ${String(ledger.length - unrepaired.length).padStart(3)}  have a deterministic repair the production chain calls`);
+console.log(`GATE / REPAIR LEDGER  --  ${ledger.length} codes defined, ${live.length} of them able to refuse a build\n`);
+console.log(`  ${String(ledger.length - live.length).padStart(3)}  cannot block: the module is unreachable, or nothing calls the function that raises it`);
+console.log(`  ${String(live.length - unrepaired.length).padStart(3)}  have a deterministic repair the production chain calls`);
 console.log(`  ${String(unrepaired.length).padStart(3)}  have none: the model complies or the build dies`);
 console.log(`  ${String(untested.length).padStart(3)}  are named by no test and no stress perturbation`);
 console.log(`  ${String(naked.length).padStart(3)}  are BOTH unrepaired and unexercised  <-- where the next dead build comes from`);

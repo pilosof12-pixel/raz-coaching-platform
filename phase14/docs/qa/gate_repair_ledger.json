@@ -4,6 +4,10 @@
     "modules": [
       "engine/advanced_hybrid_quality.js"
     ],
+    "owners": [
+      "validateAdvancedHybridQualitySemantic"
+    ],
+    "reachable": true,
     "repairs": [],
     "wired": [],
     "tested": true,
@@ -15,6 +19,10 @@
     "modules": [
       "engine/advanced_hybrid_quality.js"
     ],
+    "owners": [
+      "validateAdvancedHybridQualitySemantic"
+    ],
+    "reachable": true,
     "repairs": [],
     "wired": [],
     "tested": true,
@@ -26,6 +34,10 @@
     "modules": [
       "engine/manual_acceptance_quality.js"
     ],
+    "owners": [
+      "validateAdvancedHybridManualAcceptanceSemantic"
+    ],
+    "reachable": true,
     "repairs": [],
     "wired": [],
     "tested": false,
@@ -37,6 +49,10 @@
     "modules": [
       "engine/advanced_hybrid_quality.js"
     ],
+    "owners": [
+      "validateAdvancedHybridQualitySemantic"
+    ],
+    "reachable": true,
     "repairs": [],
     "wired": [],
     "tested": true,
@@ -48,6 +64,10 @@
     "modules": [
       "engine/manual_acceptance_quality.js"
     ],
+    "owners": [
+      "validateAdvancedHybridManualAcceptanceSemantic"
+    ],
+    "reachable": true,
     "repairs": [],
     "wired": [],
     "tested": true,
@@ -59,6 +79,10 @@
     "modules": [
       "engine/advanced_hybrid_quality.js"
     ],
+    "owners": [
+      "validateAdvancedHybridQualitySemantic"
+    ],
+    "reachable": true,
     "repairs": [],
     "wired": [],
     "tested": false,
@@ -70,6 +94,10 @@
     "modules": [
       "engine/manual_acceptance_quality.js"
     ],
+    "owners": [
+      "validateAdvancedHybridManualAcceptanceSemantic"
+    ],
+    "reachable": true,
     "repairs": [],
     "wired": [],
     "tested": true,
@@ -81,6 +109,10 @@
     "modules": [
       "engine/advanced_hybrid_quality.js"
     ],
+    "owners": [
+      "validateAdvancedHybridQualitySemantic"
+    ],
+    "reachable": true,
     "repairs": [],
     "wired": [],
     "tested": true,
@@ -92,6 +124,10 @@
     "modules": [
       "engine/advanced_hybrid_quality.js"
     ],
+    "owners": [
+      "validateAdvancedHybridQualitySemantic"
+    ],
+    "reachable": true,
     "repairs": [],
     "wired": [],
     "tested": true,
@@ -103,6 +139,10 @@
     "modules": [
       "engine/advanced_hybrid_quality.js"
     ],
+    "owners": [
+      "validateAdvancedHybridQualitySemantic"
+    ],
+    "reachable": true,
     "repairs": [],
     "wired": [],
     "tested": false,
@@ -114,6 +154,10 @@
     "modules": [
       "engine/manual_acceptance_quality.js"
     ],
+    "owners": [
+      "validateAdvancedHybridManualAcceptanceSemantic"
+    ],
+    "reachable": true,
     "repairs": [],
     "wired": [],
     "tested": true,
@@ -125,6 +169,10 @@
     "modules": [
       "engine/advanced_hybrid_quality.js"
     ],
+    "owners": [
+      "validateAdvancedHybridQualitySemantic"
+    ],
+    "reachable": true,
     "repairs": [],
     "wired": [],
     "tested": true,
@@ -136,6 +184,10 @@
     "modules": [
       "engine/advanced_hybrid_quality.js"
     ],
+    "owners": [
+      "validateAdvancedHybridQualitySemantic"
+    ],
+    "reachable": true,
     "repairs": [],
     "wired": [],
     "tested": true,
@@ -147,6 +199,10 @@
     "modules": [
       "engine/advanced_hybrid_quality.js"
     ],
+    "owners": [
+      "validateAdvancedHybridQualitySemantic"
+    ],
+    "reachable": true,
     "repairs": [],
     "wired": [],
     "tested": true,
@@ -158,6 +214,10 @@
     "modules": [
       "engine/phase15_program_qa.js"
     ],
+    "owners": [
+      "validatePhase15Program"
+    ],
+    "reachable": true,
     "repairs": [
       "repairPhase15Program"
     ],
@@ -173,6 +233,10 @@
     "modules": [
       "engine/phase15_program_qa.js"
     ],
+    "owners": [
+      "validatePhase15Program"
+    ],
+    "reachable": true,
     "repairs": [
       "repairPhase15Program"
     ],
@@ -188,6 +252,10 @@
     "modules": [
       "engine/phase15_program_qa.js"
     ],
+    "owners": [
+      "validatePhase15Program"
+    ],
+    "reachable": true,
     "repairs": [
       "repairPhase15Program"
     ],
@@ -203,6 +271,10 @@
     "modules": [
       "engine/coaching_spec_v1_quality.js"
     ],
+    "owners": [
+      "validateAdvancedHybridCoachingSpecV1"
+    ],
+    "reachable": true,
     "repairs": [],
     "wired": [],
     "tested": true,
@@ -214,6 +286,10 @@
     "modules": [
       "engine/coaching_spec_v1_quality.js"
     ],
+    "owners": [
+      "validateAdvancedHybridCoachingSpecV1"
+    ],
+    "reachable": true,
     "repairs": [],
     "wired": [],
     "tested": true,
@@ -225,6 +301,10 @@
     "modules": [
       "engine/coaching_spec_v1_quality.js"
     ],
+    "owners": [
+      "validateAdvancedHybridCoachingSpecV1"
+    ],
+    "reachable": true,
     "repairs": [],
     "wired": [],
     "tested": true,
@@ -236,6 +316,10 @@
     "modules": [
       "engine/coaching_spec_v1_quality.js"
     ],
+    "owners": [
+      "validateAdvancedHybridCoachingSpecV1"
+    ],
+    "reachable": true,
     "repairs": [],
     "wired": [],
     "tested": true,
@@ -247,6 +331,10 @@
     "modules": [
       "engine/coaching_spec_v1_quality.js"
     ],
+    "owners": [
+      "validateAdvancedHybridCoachingSpecV1"
+    ],
+    "reachable": true,
     "repairs": [],
     "wired": [],
     "tested": false,
@@ -258,6 +346,10 @@
     "modules": [
       "engine/v40_tactical_hard_rules.js"
     ],
+    "owners": [
+      "auditRaceDemandExposure"
+    ],
+    "reachable": true,
     "repairs": [],
     "wired": [],
     "tested": false,
@@ -269,6 +361,10 @@
     "modules": [
       "engine/v40_tactical_hard_rules.js"
     ],
+    "owners": [
+      "auditQualityVolume"
+    ],
+    "reachable": true,
     "repairs": [],
     "wired": [],
     "tested": false,
@@ -280,6 +376,10 @@
     "modules": [
       "engine/v40_tactical_hard_rules.js"
     ],
+    "owners": [
+      "auditSacrificeHierarchy"
+    ],
+    "reachable": true,
     "repairs": [],
     "wired": [],
     "tested": false,
@@ -291,6 +391,10 @@
     "modules": [
       "engine/coaching_spec_v1_quality.js"
     ],
+    "owners": [
+      "validateTactical3KCoachingSpecV1"
+    ],
+    "reachable": true,
     "repairs": [],
     "wired": [],
     "tested": true,
@@ -302,6 +406,10 @@
     "modules": [
       "engine/coaching_spec_v1_quality.js"
     ],
+    "owners": [
+      "collectYouthCoachingSpecV1ReviewSignals"
+    ],
+    "reachable": false,
     "repairs": [],
     "wired": [],
     "tested": true,
@@ -313,6 +421,10 @@
     "modules": [
       "engine/coaching_spec_v1_quality.js"
     ],
+    "owners": [
+      "collectYouthCoachingSpecV1ReviewSignals"
+    ],
+    "reachable": false,
     "repairs": [],
     "wired": [],
     "tested": true,
@@ -324,6 +436,10 @@
     "modules": [
       "engine/coaching_spec_v1_quality.js"
     ],
+    "owners": [
+      "collectYouthCoachingSpecV1ReviewSignals"
+    ],
+    "reachable": false,
     "repairs": [],
     "wired": [],
     "tested": true,
@@ -335,6 +451,10 @@
     "modules": [
       "engine/coaching_spec_v1_quality.js"
     ],
+    "owners": [
+      "validateTactical3KCoachingSpecV1"
+    ],
+    "reachable": true,
     "repairs": [],
     "wired": [],
     "tested": true,
@@ -346,6 +466,10 @@
     "modules": [
       "engine/v49_spec_gap_rules.js"
     ],
+    "owners": [
+      "collectIntervalPaceOriginFlags"
+    ],
+    "reachable": false,
     "repairs": [],
     "wired": [],
     "tested": true,
@@ -357,6 +481,10 @@
     "modules": [
       "engine/coaching_spec_v1_quality.js"
     ],
+    "owners": [
+      "validateTactical3KCoachingSpecV1"
+    ],
+    "reachable": true,
     "repairs": [],
     "wired": [],
     "tested": true,
@@ -368,6 +496,10 @@
     "modules": [
       "engine/coaching_spec_v1_quality.js"
     ],
+    "owners": [
+      "validateTactical3KCoachingSpecV1"
+    ],
+    "reachable": true,
     "repairs": [],
     "wired": [],
     "tested": true,
@@ -379,6 +511,10 @@
     "modules": [
       "engine/coaching_spec_v1_quality.js"
     ],
+    "owners": [
+      "validateYouthCoachingSpecV1HardRules"
+    ],
+    "reachable": true,
     "repairs": [],
     "wired": [],
     "tested": true,
@@ -390,6 +526,10 @@
     "modules": [
       "engine/coaching_spec_v1_quality.js"
     ],
+    "owners": [
+      "validateYouthCoachingSpecV1HardRules"
+    ],
+    "reachable": true,
     "repairs": [],
     "wired": [],
     "tested": false,
@@ -401,6 +541,10 @@
     "modules": [
       "engine/v49_spec_gap_rules.js"
     ],
+    "owners": [
+      "collectPowerOutputFlags"
+    ],
+    "reachable": false,
     "repairs": [],
     "wired": [],
     "tested": true,
@@ -412,6 +556,10 @@
     "modules": [
       "engine/coaching_spec_v1_quality.js"
     ],
+    "owners": [
+      "validateYouthCoachingSpecV1HardRules"
+    ],
+    "reachable": true,
     "repairs": [],
     "wired": [],
     "tested": false,
@@ -423,6 +571,10 @@
     "modules": [
       "engine/coaching_spec_v1_quality.js"
     ],
+    "owners": [
+      "validateYouthCoachingSpecV1HardRules"
+    ],
+    "reachable": true,
     "repairs": [],
     "wired": [],
     "tested": true,
@@ -434,6 +586,10 @@
     "modules": [
       "engine/phase15_elite_guardrails.js"
     ],
+    "owners": [
+      "endurancePerformanceIntegrityFlags"
+    ],
+    "reachable": true,
     "repairs": [
       "repairUnbenchmarkedVariationLoads"
     ],
@@ -447,6 +603,10 @@
     "modules": [
       "engine/phase15_elite_guardrails.js"
     ],
+    "owners": [
+      "endurancePerformanceIntegrityFlags"
+    ],
+    "reachable": true,
     "repairs": [
       "repairUnbenchmarkedVariationLoads"
     ],
@@ -460,6 +620,10 @@
     "modules": [
       "engine/exercise_dictionary.js"
     ],
+    "owners": [
+      "collectExerciseRows"
+    ],
+    "reachable": true,
     "repairs": [
       "normalizeEquipmentTokens",
       "enforceUnilateralIntensityFloor",
@@ -482,6 +646,10 @@
     "modules": [
       "engine/phase15_elite_guardrails.js"
     ],
+    "owners": [
+      "endurancePerformanceIntegrityFlags"
+    ],
+    "reachable": true,
     "repairs": [
       "repairUnbenchmarkedVariationLoads"
     ],
@@ -495,6 +663,10 @@
     "modules": [
       "engine/exercise_dictionary.js"
     ],
+    "owners": [
+      "collectExerciseRows"
+    ],
+    "reachable": true,
     "repairs": [
       "normalizeEquipmentTokens",
       "enforceUnilateralIntensityFloor",
@@ -517,6 +689,10 @@
     "modules": [
       "engine/phase15_program_qa.js"
     ],
+    "owners": [
+      "validatePhase15Program"
+    ],
+    "reachable": true,
     "repairs": [
       "repairPhase15Program"
     ],
@@ -532,6 +708,10 @@
     "modules": [
       "engine/goal_progression_graph.js"
     ],
+    "owners": [
+      "validateGoalComponentCoverageSemantic"
+    ],
+    "reachable": true,
     "repairs": [],
     "wired": [],
     "tested": true,
@@ -543,6 +723,10 @@
     "modules": [
       "engine/coaching_acceptance_quality.js"
     ],
+    "owners": [
+      "validateHardRunWarmupSemantic"
+    ],
+    "reachable": true,
     "repairs": [],
     "wired": [],
     "tested": true,
@@ -554,6 +738,10 @@
     "modules": [
       "engine/advanced_hybrid_quality.js"
     ],
+    "owners": [
+      "validateAdvancedHybridQualitySemantic"
+    ],
+    "reachable": true,
     "repairs": [],
     "wired": [],
     "tested": true,
@@ -565,6 +753,10 @@
     "modules": [
       "engine/exercise_dictionary.js"
     ],
+    "owners": [
+      "collectExerciseRows"
+    ],
+    "reachable": true,
     "repairs": [
       "normalizeEquipmentTokens",
       "enforceUnilateralIntensityFloor",
@@ -587,6 +779,10 @@
     "modules": [
       "engine/phase15_elite_guardrails.js"
     ],
+    "owners": [
+      "endurancePerformanceIntegrityFlags"
+    ],
+    "reachable": true,
     "repairs": [
       "repairUnbenchmarkedVariationLoads"
     ],
@@ -600,6 +796,10 @@
     "modules": [
       "engine/phase15_final_qa.js"
     ],
+    "owners": [
+      "marathonStackedProgressionFlags"
+    ],
+    "reachable": true,
     "repairs": [],
     "wired": [],
     "tested": true,
@@ -611,6 +811,10 @@
     "modules": [
       "engine/phase15_final_qa.js"
     ],
+    "owners": [
+      "marathonStackedProgressionFlags"
+    ],
+    "reachable": true,
     "repairs": [],
     "wired": [],
     "tested": true,
@@ -622,6 +826,10 @@
     "modules": [
       "engine/phase15_final_qa.js"
     ],
+    "owners": [
+      "marathonStrengthMaintenanceFlags"
+    ],
+    "reachable": true,
     "repairs": [],
     "wired": [],
     "tested": true,
@@ -633,6 +841,10 @@
     "modules": [
       "engine/phase15_final_qa.js"
     ],
+    "owners": [
+      "weekOneRunningVolumeFlags"
+    ],
+    "reachable": true,
     "repairs": [],
     "wired": [],
     "tested": true,
@@ -644,6 +856,10 @@
     "modules": [
       "engine/phase15_program_qa.js"
     ],
+    "owners": [
+      "validatePhase15Program"
+    ],
+    "reachable": true,
     "repairs": [
       "repairPhase15Program"
     ],
@@ -659,6 +875,10 @@
     "modules": [
       "engine/phase15_elite_guardrails.js"
     ],
+    "owners": [
+      "goalDoseFlags"
+    ],
+    "reachable": true,
     "repairs": [
       "repairUnbenchmarkedVariationLoads"
     ],
@@ -673,6 +893,10 @@
       "engine/pain_tolerance.js",
       "engine/phase15_quality_rules.js"
     ],
+    "owners": [
+      "painToleranceGate"
+    ],
+    "reachable": true,
     "repairs": [
       "repairPainTolerance",
       "enforcePowerBeforeStrength"
@@ -689,6 +913,10 @@
     "modules": [
       "engine/phase15_program_qa.js"
     ],
+    "owners": [
+      "validatePhase15Program"
+    ],
+    "reachable": true,
     "repairs": [
       "repairPhase15Program"
     ],
@@ -705,6 +933,10 @@
       "engine/client_output_qa.js",
       "engine/repairable_validation_bundle.js"
     ],
+    "owners": [
+      "stripNonExerciseScheduleRows"
+    ],
+    "reachable": true,
     "repairs": [],
     "wired": [],
     "tested": true,
@@ -716,6 +948,10 @@
     "modules": [
       "engine/phase15_elite_guardrails.js"
     ],
+    "owners": [
+      "exactPrimaryMovementFlags"
+    ],
+    "reachable": true,
     "repairs": [
       "repairUnbenchmarkedVariationLoads"
     ],
@@ -729,6 +965,10 @@
     "modules": [
       "engine/program_model.js"
     ],
+    "owners": [
+      "parseProgramModel"
+    ],
+    "reachable": true,
     "repairs": [
       "normalizeSemanticText",
       "normalizeDay"
@@ -743,6 +983,10 @@
     "modules": [
       "engine/coaching_progression_gpp.js"
     ],
+    "owners": [
+      "validateProgressionArchitectureSemantic"
+    ],
+    "reachable": true,
     "repairs": [],
     "wired": [],
     "tested": true,
@@ -754,6 +998,10 @@
     "modules": [
       "engine/coaching_progression_gpp.js"
     ],
+    "owners": [
+      "validateKnownMaxPullUpDoseSemantic"
+    ],
+    "reachable": true,
     "repairs": [],
     "wired": [],
     "tested": true,
@@ -766,6 +1014,11 @@
       "engine/phase15_elite_guardrails.js",
       "scripts/apply_strength_session_microdose_accounting.mjs"
     ],
+    "owners": [
+      "strengthSessionAccountingFlags",
+      "strengthSessionAccountingFlags"
+    ],
+    "reachable": true,
     "repairs": [
       "repairUnbenchmarkedVariationLoads"
     ],
@@ -779,6 +1032,10 @@
     "modules": [
       "engine/manual_acceptance_quality.js"
     ],
+    "owners": [
+      "validateYouthManualAcceptanceSemantic"
+    ],
+    "reachable": true,
     "repairs": [],
     "wired": [],
     "tested": true,
@@ -790,6 +1047,10 @@
     "modules": [
       "engine/phase15_program_qa.js"
     ],
+    "owners": [
+      "validatePhase15Program"
+    ],
+    "reachable": true,
     "repairs": [
       "repairPhase15Program"
     ],
@@ -806,6 +1067,11 @@
       "engine/phase15_program_qa.js",
       "engine/phase15_quality_rules.js"
     ],
+    "owners": [
+      "validatePhase15Program",
+      "validateSessionTimeBudget"
+    ],
+    "reachable": true,
     "repairs": [
       "repairPhase15Program",
       "enforcePowerBeforeStrength"
@@ -822,6 +1088,10 @@
     "modules": [
       "engine/phase15_quality_rules.js"
     ],
+    "owners": [
+      "painToleranceGate"
+    ],
+    "reachable": true,
     "repairs": [
       "enforcePowerBeforeStrength"
     ],
@@ -836,6 +1106,11 @@
       "engine/exercise_dictionary.js",
       "engine/semantic_program_qa.js"
     ],
+    "owners": [
+      "collectExerciseRows",
+      "validateSportDayCouplingSemantic"
+    ],
+    "reachable": true,
     "repairs": [
       "normalizeEquipmentTokens",
       "enforceUnilateralIntensityFloor",
@@ -858,6 +1133,10 @@
     "modules": [
       "engine/phase15_program_qa.js"
     ],
+    "owners": [
+      "validatePhase15Program"
+    ],
+    "reachable": true,
     "repairs": [
       "repairPhase15Program"
     ],
@@ -873,6 +1152,10 @@
     "modules": [
       "engine/phase15_program_qa.js"
     ],
+    "owners": [
+      "validatePhase15Program"
+    ],
+    "reachable": true,
     "repairs": [
       "repairPhase15Program"
     ],
@@ -888,6 +1171,10 @@
     "modules": [
       "engine/tactical_3k_gpp_quality.js"
     ],
+    "owners": [
+      "validateTactical3KIntervalProgressionSemantic"
+    ],
+    "reachable": true,
     "repairs": [],
     "wired": [],
     "tested": true,
@@ -899,6 +1186,10 @@
     "modules": [
       "engine/coaching_progression_gpp.js"
     ],
+    "owners": [
+      "validateTacticalGppCoverageSemantic"
+    ],
+    "reachable": true,
     "repairs": [],
     "wired": [],
     "tested": true,
@@ -910,6 +1201,10 @@
     "modules": [
       "engine/tactical_manual_acceptance.js"
     ],
+    "owners": [
+      "validateTacticalManualAcceptanceSemantic"
+    ],
+    "reachable": true,
     "repairs": [],
     "wired": [],
     "tested": true,
@@ -921,6 +1216,10 @@
     "modules": [
       "engine/coaching_progression_gpp.js"
     ],
+    "owners": [
+      "validateTacticalScheduleArchitectureSemantic"
+    ],
+    "reachable": true,
     "repairs": [],
     "wired": [],
     "tested": true,
@@ -932,6 +1231,10 @@
     "modules": [
       "engine/tactical_3k_gpp_quality.js"
     ],
+    "owners": [
+      "validateTacticalStrengthCompletenessSemantic"
+    ],
+    "reachable": true,
     "repairs": [],
     "wired": [],
     "tested": true,
@@ -943,6 +1246,10 @@
     "modules": [
       "engine/tactical_manual_acceptance.js"
     ],
+    "owners": [
+      "validateTacticalManualAcceptanceSemantic"
+    ],
+    "reachable": true,
     "repairs": [],
     "wired": [],
     "tested": true,
@@ -954,6 +1261,10 @@
     "modules": [
       "engine/tactical_manual_acceptance.js"
     ],
+    "owners": [
+      "validateTacticalManualAcceptanceSemantic"
+    ],
+    "reachable": true,
     "repairs": [],
     "wired": [],
     "tested": true,
@@ -965,6 +1276,10 @@
     "modules": [
       "engine/phase15_elite_guardrails.js"
     ],
+    "owners": [
+      "endurancePerformanceIntegrityFlags"
+    ],
+    "reachable": true,
     "repairs": [
       "repairUnbenchmarkedVariationLoads"
     ],
@@ -978,6 +1293,10 @@
     "modules": [
       "engine/phase15_program_qa.js"
     ],
+    "owners": [
+      "validatePhase15Program"
+    ],
+    "reachable": true,
     "repairs": [
       "repairPhase15Program"
     ],
@@ -993,6 +1312,10 @@
     "modules": [
       "engine/phase15_final_qa.js"
     ],
+    "owners": [
+      "allWeekTsvShapeFlags"
+    ],
+    "reachable": true,
     "repairs": [],
     "wired": [],
     "tested": true,
@@ -1004,6 +1327,10 @@
     "modules": [
       "engine/phase15_final_qa.js"
     ],
+    "owners": [
+      "allWeekTsvShapeFlags"
+    ],
+    "reachable": true,
     "repairs": [],
     "wired": [],
     "tested": false,
@@ -1015,6 +1342,10 @@
     "modules": [
       "engine/phase15_final_qa.js"
     ],
+    "owners": [
+      "allWeekTsvShapeFlags"
+    ],
+    "reachable": true,
     "repairs": [],
     "wired": [],
     "tested": false,
@@ -1026,6 +1357,10 @@
     "modules": [
       "engine/phase15_elite_guardrails.js"
     ],
+    "owners": [
+      "unbenchmarkedVariationLoadFlags"
+    ],
+    "reachable": true,
     "repairs": [
       "repairUnbenchmarkedVariationLoads"
     ],
@@ -1039,6 +1374,10 @@
     "modules": [
       "engine/exercise_dictionary.js"
     ],
+    "owners": [
+      "collectExerciseRows"
+    ],
+    "reachable": true,
     "repairs": [
       "normalizeEquipmentTokens",
       "enforceUnilateralIntensityFloor",
@@ -1061,6 +1400,10 @@
     "modules": [
       "engine/phase15_program_qa.js"
     ],
+    "owners": [
+      "validatePhase15Program"
+    ],
+    "reachable": true,
     "repairs": [
       "repairPhase15Program"
     ],
@@ -1076,6 +1419,10 @@
     "modules": [
       "engine/v34_prescription_consistency.js"
     ],
+    "owners": [
+      "collectWarmupSanityFlags"
+    ],
+    "reachable": true,
     "repairs": [
       "repairWarmupRampTarget"
     ],
@@ -1091,6 +1438,10 @@
     "modules": [
       "engine/v34_prescription_consistency.js"
     ],
+    "owners": [
+      "collectPrescriptionConsistencyFlags"
+    ],
+    "reachable": true,
     "repairs": [
       "repairWarmupRampTarget"
     ],
@@ -1106,6 +1457,10 @@
     "modules": [
       "engine/v34_prescription_consistency.js"
     ],
+    "owners": [
+      "collectRepWordFlags"
+    ],
+    "reachable": true,
     "repairs": [
       "repairWarmupRampTarget"
     ],
@@ -1121,6 +1476,10 @@
     "modules": [
       "engine/v34_prescription_consistency.js"
     ],
+    "owners": [
+      "collectPrescriptionConsistencyFlags"
+    ],
+    "reachable": true,
     "repairs": [
       "repairWarmupRampTarget"
     ],
@@ -1136,6 +1495,10 @@
     "modules": [
       "engine/v34_prescription_consistency.js"
     ],
+    "owners": [
+      "collectPrescriptionConsistencyFlags"
+    ],
+    "reachable": true,
     "repairs": [
       "repairWarmupRampTarget"
     ],
@@ -1151,6 +1514,10 @@
     "modules": [
       "engine/v34_prescription_consistency.js"
     ],
+    "owners": [
+      "collectPrescriptionConsistencyFlags"
+    ],
+    "reachable": true,
     "repairs": [
       "repairWarmupRampTarget"
     ],
@@ -1166,6 +1533,10 @@
     "modules": [
       "engine/v34_prescription_consistency.js"
     ],
+    "owners": [
+      "collectProgressionLanguageFlags"
+    ],
+    "reachable": true,
     "repairs": [
       "repairWarmupRampTarget"
     ],
@@ -1181,6 +1552,10 @@
     "modules": [
       "engine/v34_workload_accounting.js"
     ],
+    "owners": [
+      "runningVolumeSignals"
+    ],
+    "reachable": false,
     "repairs": [],
     "wired": [],
     "tested": true,
@@ -1192,6 +1567,10 @@
     "modules": [
       "engine/v34_prescription_consistency.js"
     ],
+    "owners": [
+      "collectWarmupSanityFlags"
+    ],
+    "reachable": true,
     "repairs": [
       "repairWarmupRampTarget"
     ],
@@ -1207,6 +1586,10 @@
     "modules": [
       "engine/v34_prescription_consistency.js"
     ],
+    "owners": [
+      "collectWarmupSanityFlags"
+    ],
+    "reachable": true,
     "repairs": [
       "repairWarmupRampTarget"
     ],
@@ -1222,6 +1605,10 @@
     "modules": [
       "engine/v35_coaching_standards.js"
     ],
+    "owners": [
+      "collectBlockSpecificityFlags"
+    ],
+    "reachable": true,
     "repairs": [],
     "wired": [],
     "tested": true,
@@ -1233,6 +1620,10 @@
     "modules": [
       "engine/v35_coaching_standards.js"
     ],
+    "owners": [
+      "collectSymptomAlgorithmFlags"
+    ],
+    "reachable": true,
     "repairs": [],
     "wired": [],
     "tested": true,
@@ -1244,6 +1635,10 @@
     "modules": [
       "engine/v35_coaching_standards.js"
     ],
+    "owners": [
+      "collectNarrativeClaimFlags"
+    ],
+    "reachable": true,
     "repairs": [],
     "wired": [],
     "tested": true,
@@ -1255,6 +1650,10 @@
     "modules": [
       "engine/v35_coaching_standards.js"
     ],
+    "owners": [
+      "collectSecondaryVolumeCreepFlags"
+    ],
+    "reachable": true,
     "repairs": [],
     "wired": [],
     "tested": true,
@@ -1266,6 +1665,10 @@
     "modules": [
       "engine/v35_coaching_standards.js"
     ],
+    "owners": [
+      "collectVolumeNarrativeFlags"
+    ],
+    "reachable": true,
     "repairs": [],
     "wired": [],
     "tested": true,
@@ -1277,6 +1680,10 @@
     "modules": [
       "engine/v38_structural_audit.js"
     ],
+    "owners": [
+      "auditLoadedCarryProgression"
+    ],
+    "reachable": true,
     "repairs": [],
     "wired": [],
     "tested": true,
@@ -1288,6 +1695,10 @@
     "modules": [
       "engine/v38_structural_audit.js"
     ],
+    "owners": [
+      "auditCircularScheduling"
+    ],
+    "reachable": true,
     "repairs": [],
     "wired": [],
     "tested": true,
@@ -1299,6 +1710,10 @@
     "modules": [
       "engine/v38_structural_audit.js"
     ],
+    "owners": [
+      "auditSessionCompleteness"
+    ],
+    "reachable": true,
     "repairs": [],
     "wired": [],
     "tested": true,
@@ -1310,6 +1725,10 @@
     "modules": [
       "engine/v38_structural_audit.js"
     ],
+    "owners": [
+      "auditWeeklyCoverage"
+    ],
+    "reachable": true,
     "repairs": [],
     "wired": [],
     "tested": true,
@@ -1321,6 +1740,10 @@
     "modules": [
       "engine/v38_structural_audit.js"
     ],
+    "owners": [
+      "auditFoundationalStrength"
+    ],
+    "reachable": true,
     "repairs": [],
     "wired": [],
     "tested": true,
@@ -1332,6 +1755,10 @@
     "modules": [
       "engine/v42_recovery_budget.js"
     ],
+    "owners": [
+      "collectRecoveryBudgetFlags"
+    ],
+    "reachable": true,
     "repairs": [],
     "wired": [],
     "tested": true,
@@ -1343,6 +1770,10 @@
     "modules": [
       "engine/v42_recovery_budget.js"
     ],
+    "owners": [
+      "collectRecoveryBudgetFlags"
+    ],
+    "reachable": true,
     "repairs": [],
     "wired": [],
     "tested": true,
@@ -1354,6 +1785,10 @@
     "modules": [
       "engine/v42_progression_discipline.js"
     ],
+    "owners": [
+      "collectProgressionDisciplineFlags"
+    ],
+    "reachable": false,
     "repairs": [],
     "wired": [],
     "tested": true,
@@ -1365,6 +1800,10 @@
     "modules": [
       "engine/v42_recovery_budget.js"
     ],
+    "owners": [
+      "collectRecoveryBudgetFlags"
+    ],
+    "reachable": true,
     "repairs": [],
     "wired": [],
     "tested": true,
@@ -1376,6 +1815,10 @@
     "modules": [
       "engine/v43_coaching_governance.js"
     ],
+    "owners": [
+      "collectCausalInjuryResponseFlags"
+    ],
+    "reachable": true,
     "repairs": [],
     "wired": [],
     "tested": true,
@@ -1387,6 +1830,10 @@
     "modules": [
       "engine/v43_coaching_governance.js"
     ],
+    "owners": [
+      "collectMaintenanceDriftFlags"
+    ],
+    "reachable": true,
     "repairs": [],
     "wired": [],
     "tested": true,
@@ -1398,6 +1845,10 @@
     "modules": [
       "engine/v43_coaching_governance.js"
     ],
+    "owners": [
+      "collectAutoregulationFlags"
+    ],
+    "reachable": true,
     "repairs": [],
     "wired": [],
     "tested": true,
@@ -1409,6 +1860,10 @@
     "modules": [
       "engine/v43_coaching_governance.js"
     ],
+    "owners": [
+      "collectSessionDurationFlags"
+    ],
+    "reachable": true,
     "repairs": [],
     "wired": [],
     "tested": true,
@@ -1420,6 +1875,10 @@
     "modules": [
       "engine/v43_coaching_governance.js"
     ],
+    "owners": [
+      "collectSkillCeilingFlags"
+    ],
+    "reachable": true,
     "repairs": [],
     "wired": [],
     "tested": true,
@@ -1431,6 +1890,10 @@
     "modules": [
       "engine/v46_language_accuracy.js"
     ],
+    "owners": [
+      "collectCountClaimFlags"
+    ],
+    "reachable": true,
     "repairs": [
       "repairCountClaims"
     ],
@@ -1446,6 +1909,10 @@
     "modules": [
       "engine/v46_language_accuracy.js"
     ],
+    "owners": [
+      "collectOptionalQualifierFlags"
+    ],
+    "reachable": true,
     "repairs": [
       "repairCountClaims"
     ],
@@ -1461,6 +1928,10 @@
     "modules": [
       "engine/v46_language_accuracy.js"
     ],
+    "owners": [
+      "collectScheduleFrequencyFlags"
+    ],
+    "reachable": true,
     "repairs": [
       "repairCountClaims"
     ],
@@ -1476,6 +1947,10 @@
     "modules": [
       "engine/v46_language_accuracy.js"
     ],
+    "owners": [
+      "collectTextDefectFlags"
+    ],
+    "reachable": true,
     "repairs": [
       "repairCountClaims"
     ],
@@ -1491,6 +1966,10 @@
     "modules": [
       "engine/v52_session_hierarchy.js"
     ],
+    "owners": [
+      "collectKeySessionCrowdingFlags"
+    ],
+    "reachable": true,
     "repairs": [
       "repairSessionHierarchy",
       "repairKeySessionCrowding"
@@ -1508,6 +1987,10 @@
     "modules": [
       "engine/v52_session_hierarchy.js"
     ],
+    "owners": [
+      "collectSessionHierarchyFlags"
+    ],
+    "reachable": true,
     "repairs": [
       "repairSessionHierarchy",
       "repairKeySessionCrowding"
@@ -1525,6 +2008,10 @@
     "modules": [
       "engine/v53_session_substance.js"
     ],
+    "owners": [
+      "collectAccessoryLevelFlags"
+    ],
+    "reachable": false,
     "repairs": [],
     "wired": [],
     "tested": true,
@@ -1536,6 +2023,10 @@
     "modules": [
       "engine/v53_session_substance.js"
     ],
+    "owners": [
+      "collectAdherenceFlags"
+    ],
+    "reachable": false,
     "repairs": [],
     "wired": [],
     "tested": true,
@@ -1547,6 +2038,10 @@
     "modules": [
       "engine/v53_session_substance.js"
     ],
+    "owners": [
+      "collectThinSessionFlags"
+    ],
+    "reachable": false,
     "repairs": [],
     "wired": [],
     "tested": false,
@@ -1558,6 +2053,10 @@
     "modules": [
       "engine/v53_session_substance.js"
     ],
+    "owners": [
+      "collectUnderloadedAccessoryFlags"
+    ],
+    "reachable": false,
     "repairs": [],
     "wired": [],
     "tested": true,
@@ -1569,6 +2068,10 @@
     "modules": [
       "engine/v56_primary_day_protection.js"
     ],
+    "owners": [
+      "collectPrePrimaryLoadFlags"
+    ],
+    "reachable": true,
     "repairs": [
       "repairPrePrimaryLoad"
     ],
@@ -1584,6 +2087,10 @@
     "modules": [
       "engine/v57_endurance_volume_governor.js"
     ],
+    "owners": [
+      "collectEnduranceVolumeFlags"
+    ],
+    "reachable": true,
     "repairs": [
       "repairEnduranceVolume"
     ],
@@ -1599,6 +2106,10 @@
     "modules": [
       "engine/v58_semantic_cleanup.js"
     ],
+    "owners": [
+      "collectSemanticFlags"
+    ],
+    "reachable": true,
     "repairs": [
       "repairSemanticProse"
     ],
@@ -1614,6 +2125,10 @@
     "modules": [
       "engine/v61_weekly_exposures.js"
     ],
+    "owners": [
+      "collectFrequencyClaimFlags"
+    ],
+    "reachable": true,
     "repairs": [
       "repairFrequencyClaim"
     ],
@@ -1629,6 +2144,10 @@
     "modules": [
       "engine/v70_competition_rules.js"
     ],
+    "owners": [
+      "collectCompetitionFlags"
+    ],
+    "reachable": true,
     "repairs": [
       "repairCompetitionBlock"
     ],
@@ -1644,6 +2163,10 @@
     "modules": [
       "engine/v70_competition_rules.js"
     ],
+    "owners": [
+      "collectCompetitionFlags"
+    ],
+    "reachable": true,
     "repairs": [
       "repairCompetitionBlock"
     ],
@@ -1659,6 +2182,10 @@
     "modules": [
       "engine/v70_competition_rules.js"
     ],
+    "owners": [
+      "collectCompetitionFlags"
+    ],
+    "reachable": true,
     "repairs": [
       "repairCompetitionBlock"
     ],
@@ -1674,6 +2201,10 @@
     "modules": [
       "engine/v70_competition_rules.js"
     ],
+    "owners": [
+      "collectCompetitionFlags"
+    ],
+    "reachable": true,
     "repairs": [
       "repairCompetitionBlock"
     ],
@@ -1689,6 +2220,10 @@
     "modules": [
       "engine/v71_intensification.js"
     ],
+    "owners": [
+      "collectIntensificationFlags"
+    ],
+    "reachable": true,
     "repairs": [
       "repairIntensification",
       "repairLateSupportVolume"
@@ -1705,6 +2240,10 @@
     "modules": [
       "engine/v71_intensification.js"
     ],
+    "owners": [
+      "collectIntensificationFlags"
+    ],
+    "reachable": true,
     "repairs": [
       "repairIntensification",
       "repairLateSupportVolume"
@@ -1721,6 +2260,10 @@
     "modules": [
       "engine/v71_intensification.js"
     ],
+    "owners": [
+      "collectIntensificationFlags"
+    ],
+    "reachable": true,
     "repairs": [
       "repairIntensification",
       "repairLateSupportVolume"
@@ -1737,6 +2280,10 @@
     "modules": [
       "engine/v71_intensification.js"
     ],
+    "owners": [
+      "collectIntensificationFlags"
+    ],
+    "reachable": true,
     "repairs": [
       "repairIntensification",
       "repairLateSupportVolume"
@@ -1753,6 +2300,10 @@
     "modules": [
       "engine/v71_intensification.js"
     ],
+    "owners": [
+      "collectIntensificationFlags"
+    ],
+    "reachable": true,
     "repairs": [
       "repairIntensification",
       "repairLateSupportVolume"
@@ -1769,6 +2320,10 @@
     "modules": [
       "engine/v72_combat_power.js"
     ],
+    "owners": [
+      "collectCombatPowerFlags"
+    ],
+    "reachable": true,
     "repairs": [
       "repairCombatPower"
     ],
@@ -1784,6 +2339,10 @@
     "modules": [
       "engine/v72_combat_power.js"
     ],
+    "owners": [
+      "collectCombatPowerFlags"
+    ],
+    "reachable": true,
     "repairs": [
       "repairCombatPower"
     ],
@@ -1799,6 +2358,10 @@
     "modules": [
       "engine/v73_taper_audit.js"
     ],
+    "owners": [
+      "collectAuditFlags"
+    ],
+    "reachable": true,
     "repairs": [],
     "wired": [],
     "tested": true,
@@ -1810,6 +2373,10 @@
     "modules": [
       "engine/v74_camp_economy.js"
     ],
+    "owners": [
+      "collectEconomyFlags"
+    ],
+    "reachable": true,
     "repairs": [
       "repairCampEconomy"
     ],
@@ -1825,6 +2392,10 @@
     "modules": [
       "engine/v74_camp_economy.js"
     ],
+    "owners": [
+      "collectNoveltyFlags"
+    ],
+    "reachable": true,
     "repairs": [
       "repairCampEconomy"
     ],
@@ -1840,6 +2411,10 @@
     "modules": [
       "engine/v75_weight_cut.js"
     ],
+    "owners": [
+      "collectWeightCutFlags"
+    ],
+    "reachable": true,
     "repairs": [
       "repairWeightCutLoad"
     ],
@@ -1855,6 +2430,10 @@
     "modules": [
       "engine/v76_conditioning_gap.js"
     ],
+    "owners": [
+      "collectConditioningFlags"
+    ],
+    "reachable": true,
     "repairs": [],
     "wired": [],
     "tested": true,
@@ -1866,6 +2445,10 @@
     "modules": [
       "engine/v77_fight_week_clock.js"
     ],
+    "owners": [
+      "collectFightWeekClockFlags"
+    ],
+    "reachable": true,
     "repairs": [
       "repairFightWeekClock"
     ],
@@ -1881,6 +2464,10 @@
     "modules": [
       "engine/v78_sport_taper.js"
     ],
+    "owners": [
+      "collectSportTaperFlags"
+    ],
+    "reachable": true,
     "repairs": [],
     "wired": [],
     "tested": true,
@@ -1892,6 +2479,10 @@
     "modules": [
       "engine/v79_ballistic_share.js"
     ],
+    "owners": [
+      "collectBallisticShareFlags"
+    ],
+    "reachable": true,
     "repairs": [
       "repairBallisticShare"
     ],
@@ -1907,6 +2498,10 @@
     "modules": [
       "engine/v81_cluster_notation.js"
     ],
+    "owners": [
+      "collectClusterFlags"
+    ],
+    "reachable": true,
     "repairs": [
       "repairClusterNotation"
     ],
@@ -1922,6 +2517,10 @@
     "modules": [
       "engine/v82_camp_sharpening.js"
     ],
+    "owners": [
+      "collectCampSharpeningFlags"
+    ],
+    "reachable": true,
     "repairs": [
       "repairCampSharpening"
     ],
@@ -1937,6 +2536,10 @@
     "modules": [
       "engine/v82_camp_sharpening.js"
     ],
+    "owners": [
+      "collectCampSharpeningFlags"
+    ],
+    "reachable": true,
     "repairs": [
       "repairCampSharpening"
     ],
@@ -1952,6 +2555,10 @@
     "modules": [
       "engine/v82_camp_sharpening.js"
     ],
+    "owners": [
+      "collectCampSharpeningFlags"
+    ],
+    "reachable": true,
     "repairs": [
       "repairCampSharpening"
     ],
@@ -1967,6 +2574,10 @@
     "modules": [
       "engine/v83_in_season.js"
     ],
+    "owners": [
+      "collectInSeasonFlags"
+    ],
+    "reachable": true,
     "repairs": [
       "repairSeasonNarrative",
       "repairInSeason"
@@ -1983,6 +2594,10 @@
     "modules": [
       "engine/v83_in_season.js"
     ],
+    "owners": [
+      "collectInSeasonFlags"
+    ],
+    "reachable": true,
     "repairs": [
       "repairSeasonNarrative",
       "repairInSeason"
@@ -1999,6 +2614,10 @@
     "modules": [
       "engine/v83_in_season.js"
     ],
+    "owners": [
+      "collectSportWeekFlags"
+    ],
+    "reachable": true,
     "repairs": [
       "repairSeasonNarrative",
       "repairInSeason"
@@ -2015,8 +2634,16 @@
     "modules": [
       "engine/v84_injury_constraint.js"
     ],
-    "repairs": [],
-    "wired": [],
+    "owners": [
+      "collectInjuryConstraintFlags"
+    ],
+    "reachable": true,
+    "repairs": [
+      "repairInjuryConstraint"
+    ],
+    "wired": [
+      "repairInjuryConstraint"
+    ],
     "tested": true,
     "stressed": false,
     "killedLive": ""
@@ -2026,6 +2653,10 @@
     "modules": [
       "engine/v86_training_clock.js"
     ],
+    "owners": [
+      "collectClockFlags"
+    ],
+    "reachable": true,
     "repairs": [
       "repairClockStatement"
     ],
@@ -2041,6 +2672,10 @@
     "modules": [
       "engine/v87_earned_claims.js"
     ],
+    "owners": [
+      "collectPhaseLabelFlags"
+    ],
+    "reachable": false,
     "repairs": [],
     "wired": [],
     "tested": false,
@@ -2052,6 +2687,10 @@
     "modules": [
       "engine/v87_earned_claims.js"
     ],
+    "owners": [
+      "collectPriorityFlags"
+    ],
+    "reachable": false,
     "repairs": [],
     "wired": [],
     "tested": false,
@@ -2063,6 +2702,10 @@
     "modules": [
       "engine/v87_earned_claims.js"
     ],
+    "owners": [
+      "collectRepetitionFlags"
+    ],
+    "reachable": false,
     "repairs": [],
     "wired": [],
     "tested": false,
@@ -2074,6 +2717,10 @@
     "modules": [
       "engine/v88_goal_pace.js"
     ],
+    "owners": [
+      "collectGoalPaceFlags"
+    ],
+    "reachable": false,
     "repairs": [],
     "wired": [],
     "tested": true,
@@ -2085,6 +2732,10 @@
     "modules": [
       "engine/v88_goal_pace.js"
     ],
+    "owners": [
+      "collectStaticPaceFlags"
+    ],
+    "reachable": false,
     "repairs": [],
     "wired": [],
     "tested": false,
@@ -2096,6 +2747,10 @@
     "modules": [
       "engine/v89_block_architecture.js"
     ],
+    "owners": [
+      "collectDayZeroFlags"
+    ],
+    "reachable": true,
     "repairs": [
       "repairDayZeroClaims",
       "repairMatchDayPlacement",
@@ -2117,6 +2772,10 @@
     "modules": [
       "engine/v89_block_architecture.js"
     ],
+    "owners": [
+      "collectMatchDayFlags"
+    ],
+    "reachable": true,
     "repairs": [
       "repairDayZeroClaims",
       "repairMatchDayPlacement",
@@ -2138,6 +2797,10 @@
     "modules": [
       "engine/v89_block_architecture.js"
     ],
+    "owners": [
+      "collectAllocationFlags"
+    ],
+    "reachable": true,
     "repairs": [
       "repairDayZeroClaims",
       "repairMatchDayPlacement",
@@ -2159,6 +2822,10 @@
     "modules": [
       "engine/v89_block_architecture.js"
     ],
+    "owners": [
+      "collectSportFrequencyFlags"
+    ],
+    "reachable": true,
     "repairs": [
       "repairDayZeroClaims",
       "repairMatchDayPlacement",
@@ -2180,6 +2847,10 @@
     "modules": [
       "engine/v90_competition_week.js"
     ],
+    "owners": [
+      "collectCompetitionWeekFlags"
+    ],
+    "reachable": true,
     "repairs": [
       "repairCompetitionWeek"
     ],
@@ -2195,6 +2866,10 @@
     "modules": [
       "engine/v90_competition_week.js"
     ],
+    "owners": [
+      "collectCompetitionWeekFlags"
+    ],
+    "reachable": true,
     "repairs": [
       "repairCompetitionWeek"
     ],
@@ -2210,6 +2885,10 @@
     "modules": [
       "engine/v90_competition_week.js"
     ],
+    "owners": [
+      "collectCompetitionWeekFlags"
+    ],
+    "reachable": true,
     "repairs": [
       "repairCompetitionWeek"
     ],
@@ -2225,6 +2904,10 @@
     "modules": [
       "engine/v90_competition_week.js"
     ],
+    "owners": [
+      "collectCompetitionWeekFlags"
+    ],
+    "reachable": true,
     "repairs": [
       "repairCompetitionWeek"
     ],
@@ -2240,6 +2923,10 @@
     "modules": [
       "engine/v91_timeline_integrity.js"
     ],
+    "owners": [
+      "collectTimelineIntegrityFlags"
+    ],
+    "reachable": true,
     "repairs": [
       "repairTimelineIntegrity"
     ],
@@ -2255,6 +2942,10 @@
     "modules": [
       "engine/v91_timeline_integrity.js"
     ],
+    "owners": [
+      "collectTimelineIntegrityFlags"
+    ],
+    "reachable": true,
     "repairs": [
       "repairTimelineIntegrity"
     ],
@@ -2270,6 +2961,10 @@
     "modules": [
       "engine/v91_timeline_integrity.js"
     ],
+    "owners": [
+      "collectTimelineIntegrityFlags"
+    ],
+    "reachable": true,
     "repairs": [
       "repairTimelineIntegrity"
     ],
@@ -2285,6 +2980,10 @@
     "modules": [
       "engine/v91_timeline_integrity.js"
     ],
+    "owners": [
+      "collectTimelineIntegrityFlags"
+    ],
+    "reachable": true,
     "repairs": [
       "repairTimelineIntegrity"
     ],
@@ -2300,6 +2999,10 @@
     "modules": [
       "engine/v92_prescription_integrity.js"
     ],
+    "owners": [
+      "collectPrescriptionIntegrityFlags"
+    ],
+    "reachable": true,
     "repairs": [
       "repairPrescriptionIntegrity"
     ],
@@ -2315,6 +3018,10 @@
     "modules": [
       "engine/v92_prescription_integrity.js"
     ],
+    "owners": [
+      "collectPrescriptionIntegrityFlags"
+    ],
+    "reachable": true,
     "repairs": [
       "repairPrescriptionIntegrity"
     ],
@@ -2330,6 +3037,10 @@
     "modules": [
       "engine/v92_prescription_integrity.js"
     ],
+    "owners": [
+      "collectPrescriptionIntegrityFlags"
+    ],
+    "reachable": true,
     "repairs": [
       "repairPrescriptionIntegrity"
     ],
@@ -2346,6 +3057,11 @@
       "engine/exercise_dictionary.js",
       "engine/semantic_program_qa.js"
     ],
+    "owners": [
+      "collectExerciseRows",
+      "validateWeeklyVolumeBudgetSemantic"
+    ],
+    "reachable": true,
     "repairs": [
       "normalizeEquipmentTokens",
       "enforceUnilateralIntensityFloor",
@@ -2368,6 +3084,10 @@
     "modules": [
       "engine/phase15_program_qa.js"
     ],
+    "owners": [
+      "validatePhase15Program"
+    ],
+    "reachable": true,
     "repairs": [
       "repairPhase15Program"
     ],
@@ -2383,6 +3103,10 @@
     "modules": [
       "engine/coaching_consolidation_quality.js"
     ],
+    "owners": [
+      "validateYouthConsolidationRetentionSemantic"
+    ],
+    "reachable": true,
     "repairs": [],
     "wired": [],
     "tested": true,
@@ -2394,6 +3118,10 @@
     "modules": [
       "engine/manual_acceptance_quality.js"
     ],
+    "owners": [
+      "validateYouthManualAcceptanceSemantic"
+    ],
+    "reachable": true,
     "repairs": [],
     "wired": [],
     "tested": true,
@@ -2405,6 +3133,10 @@
     "modules": [
       "engine/manual_acceptance_quality.js"
     ],
+    "owners": [
+      "validateYouthManualAcceptanceSemantic"
+    ],
+    "reachable": true,
     "repairs": [],
     "wired": [],
     "tested": true,
@@ -2416,6 +3148,10 @@
     "modules": [
       "engine/manual_acceptance_quality.js"
     ],
+    "owners": [
+      "validateYouthManualAcceptanceSemantic"
+    ],
+    "reachable": true,
     "repairs": [],
     "wired": [],
     "tested": true,
@@ -2427,6 +3163,10 @@
     "modules": [
       "engine/coaching_acceptance_quality.js"
     ],
+    "owners": [
+      "validateYouthProgressionQualitySemantic"
+    ],
+    "reachable": true,
     "repairs": [],
     "wired": [],
     "tested": true,
@@ -2438,6 +3178,10 @@
     "modules": [
       "engine/phase15_program_qa.js"
     ],
+    "owners": [
+      "validatePhase15Program"
+    ],
+    "reachable": true,
     "repairs": [
       "repairPhase15Program"
     ],

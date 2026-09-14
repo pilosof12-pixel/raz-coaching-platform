@@ -1,5 +1,5 @@
 {
-  "_why": "Every blocking code the engine can raise must have an answer. A gate with no deterministic repair depends on the model complying when told; when it does not, the loop asks four times, fails four times, and the build dies with nothing saved. Thirteen paid builds died that way, and in twelve of them the killing flag was already present on an earlier attempt -- re-asking never cleared it. This file is the list of gates we have knowingly left without a repair, and why. The guard test fails when a code appears that is neither repaired, nor exercised, nor listed here, so new debt has to be argued for rather than discovered by a paid run.",
+  "_why": "Every blocking code the engine can raise must have an answer. A gate with no deterministic repair depends on the model complying when told; when it does not, the loop asks four times, fails four times, and the build dies with nothing saved. Thirteen paid builds died that way, and in twelve of them the killing flag was already present on an earlier attempt -- re-asking never cleared it. This file is the list of gates we have knowingly left without a repair, and why. The guard test fails when a code appears that is neither repaired, nor exercised, nor listed here, so new debt has to be argued for rather than discovered by a paid run. Codes whose collectors production never calls are not listed here: the ledger now proves reachability at function level, so a brief-only rule is not counted as dead-build risk.",
   "_status_values": {
     "model-can-answer": "The defect is something the model can genuinely rewrite when told, and no deterministic repair could do better. A missing week block cannot be invented by a repair.",
     "needs-repair": "This should have a deterministic repair and does not. It is a dead build waiting for the right intake."
@@ -16,26 +16,6 @@
     "PROGRAM_MODEL_NO_WEEK_BLOCKS": {
       "status": "model-can-answer",
       "note": "Same as above: there is no program to repair."
-    },
-    "V53_THIN_SESSION": {
-      "status": "needs-repair",
-      "note": "A session below substance has a deterministic answer -- the same one V38_INCOMPLETE_SESSION uses."
-    },
-    "V87_PHASE_LABEL_NOT_EARNED": {
-      "status": "needs-repair",
-      "note": "A label the volume does not support is a wording repair: restate the week rather than reject the program."
-    },
-    "V87_REPEATED_WEEK_UNEXPLAINED": {
-      "status": "needs-repair",
-      "note": "Wording repair."
-    },
-    "V87_PRIMARY_GOAL_UNDER_TRAINED": {
-      "status": "needs-repair",
-      "note": "Structural; needs a real exposure added, which is why it has none."
-    },
-    "V88_PACE_NEVER_MOVES": {
-      "status": "needs-repair",
-      "note": "Adjacent to EVENT_PROGRESSING_SESSION_MISSING, which killed the postpartum build."
     },
     "CONCURRENT_ENDURANCE_REDUNDANCY_UNJUSTIFIED": {
       "status": "needs-repair",
@@ -77,5 +57,24 @@
       "status": "needs-repair",
       "note": ""
     }
-  }
+  },
+  "_unenforced_why": "Rules that exist, are tested, and that nothing in production calls. Only their briefs reach the model, so a program that breaks one is never checked. V84_CONTRAINDICATED_MOVEMENT_PRESCRIBED sat here until it was noticed: the athlete's own account of what reproduces their symptoms was validated by nothing at all. Some of these are deliberate -- a rule with no possible repair should teach rather than refuse -- but the list must not grow by accident, so the guard test fails when a rule joins it silently.",
+  "unenforced": [
+    "COACH_SPEC_V1_T3K_EVENT_PROGRESSION_INCOHERENT",
+    "COACH_SPEC_V1_T3K_EVENT_PROGRESSION_NOT_RETAINED",
+    "COACH_SPEC_V1_T3K_EVENT_PROGRESSION_STATIC",
+    "COACH_SPEC_V1_T3K_PACE_FROM_GOAL_NOT_CAPACITY",
+    "COACH_SPEC_V1_YG_POWER_VOLUME_BEFORE_OUTPUT",
+    "V34_RUNNING_VOLUME_ABOVE_BASELINE",
+    "V42_MULTIPLE_STRESSORS_RAISED",
+    "V53_ACCESSORY_BELOW_DEMONSTRATED_LEVEL",
+    "V53_PRESCRIBES_DECLINED_MOVEMENT",
+    "V53_THIN_SESSION",
+    "V53_UNDERLOADED_ACCESSORY",
+    "V87_PHASE_LABEL_NOT_EARNED",
+    "V87_PRIMARY_GOAL_UNDER_TRAINED",
+    "V87_REPEATED_WEEK_UNEXPLAINED",
+    "V88_GOAL_PACE_NEVER_TOUCHED",
+    "V88_PACE_NEVER_MOVES"
+  ]
 }

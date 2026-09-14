@@ -11,6 +11,7 @@ import {
   norm,
   swapSportDayContent,
 } from './exercise_dictionary.js';
+import { repairInjuryConstraint, collectInjuryConstraintFlags } from './v84_injury_constraint.js';
 import { repairMarathonProgression } from './marathon_progression.js';
 import { repairPainTolerance, collectPainToleranceFlags } from './pain_tolerance.js';
 import { normalizeWeekTsvShape } from './tsv_shape.js';
@@ -254,6 +255,19 @@ function applyDeterministicCandidateRepairs(program, intake = {}) {
   // dropped: the refusal was never read at all, and the condition had no repair
   // behind its flag. This runs with the other placement repairs, before any
   // gate reads the table.
+  // The athlete told us which movements reproduce their symptoms, and until now
+  // nothing checked the program against that. The collector existed, was
+  // tested, and was never called -- deliberately, because a blocking code with
+  // no repair kills builds. It has one now: the same intake usually names what
+  // IS tolerated, and choosing from a list the athlete wrote themselves is not
+  // a judgement made on their behalf. Where no substitute exists the row is
+  // left alone and reported as a warning rather than refusing the program.
+  const injurySafe = repairInjuryConstraint(candidate, intake);
+  if (injurySafe !== candidate) {
+    candidate = injurySafe;
+    repairs.push({ type: 'injury_constraint_substitution' });
+  }
+
   const painSafe = repairPainTolerance(candidate, intake);
   if (painSafe !== candidate) {
     candidate = painSafe;
@@ -632,6 +646,16 @@ export function collectRepairableValidationFailures(program, intake = {}, option
   });
 
   runRepairable(flags, () => validatePhase15FinalProgram(candidate, intake));
+
+  // Contraindicated movements the substitution could not answer. These do not
+  // refuse the program -- there is no safe swap to make, and failing the build
+  // helps nobody -- but they must never be silent either.
+  const unresolvedInjury = collectInjuryConstraintFlags(candidate, intake);
+  if (unresolvedInjury.length) {
+    warnings = [...warnings, ...unresolvedInjury.map((f) => ({
+      code: f.code, week: f.week, exercise: f.exercise, message: f.detail,
+    }))];
+  }
 
   return {
     ok: flags.length === 0,
