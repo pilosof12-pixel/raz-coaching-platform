@@ -12,6 +12,10 @@ import {
   norm,
   swapSportDayContent,
 } from './exercise_dictionary.js';
+import {
+  repairGoalNarrative, repairOverheadExposure,
+  repairModalityExposure, repairAdvancedSkillExposure,
+} from './goal_exposure.js';
 import { repairOptionalQualifiers } from './v46_language_accuracy.js';
 import { repairSessionTimeBudget, repairLowFatigueAerobic } from './session_shape.js';
 import { repairTacticalHardRules } from './v40_tactical_hard_rules.js';
@@ -294,6 +298,22 @@ function applyDeterministicCandidateRepairs(program, intake = {}) {
   // conditioning for an athlete whose sport already supplies it. Both rules
   // refuse programs; neither had a repair, and the ledger credited both to
   // repairs that never touched them.
+  // Four rules that refuse a program for missing an exposure the athlete's own
+  // goal requires, and could not put it there. Convert before adding: a press
+  // that is not strict becomes the strict press the goal named, and an eccentric
+  // on a movement the athlete already owns becomes assisted volume.
+  const narrated = repairGoalNarrative(candidate, intake);
+  if (narrated !== candidate) { candidate = narrated; repairs.push({ type: 'goal_narrative_matches_goal' }); }
+
+  const overhead = repairOverheadExposure(candidate, intake);
+  if (overhead !== candidate) { candidate = overhead; repairs.push({ type: 'overhead_press_exposure' }); }
+
+  const modality = repairModalityExposure(candidate, intake);
+  if (modality !== candidate) { candidate = modality; repairs.push({ type: 'named_modality_exposure' }); }
+
+  const skill = repairAdvancedSkillExposure(candidate, intake);
+  if (skill !== candidate) { candidate = skill; repairs.push({ type: 'advanced_skill_exposure' }); }
+
   const notOptional = repairOptionalQualifiers(candidate, intake);
   if (notOptional !== candidate) { candidate = notOptional; repairs.push({ type: 'primary_work_not_optional' }); }
 
