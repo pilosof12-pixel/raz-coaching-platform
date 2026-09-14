@@ -5,14 +5,6 @@
     "needs-repair": "This should have a deterministic repair and does not. It is a dead build waiting for the right intake."
   },
   "accepted": {
-    "ADVANCED_HYBRID_DENSE_72H_PRIMARY_WINDOW": {
-      "status": "needs-repair",
-      "note": "Seen live in a dead build's first attempt."
-    },
-    "ADVANCED_HYBRID_MARATHON_SUBORDINATION": {
-      "status": "needs-repair",
-      "note": ""
-    },
     "ADVANCED_SKILL_REGRESSION": {
       "status": "repair-exists-unproven",
       "note": "engine/phase15_program_qa.js exports repairPhase15Program, but nothing shows it clearing this code."
@@ -20,26 +12,6 @@
     "CARDIO_ONLY_STRENGTH_DAY": {
       "status": "repair-exists-unproven",
       "note": "engine/phase15_program_qa.js exports repairPhase15Program, but nothing shows it clearing this code."
-    },
-    "COACH_SPEC_V1_AH_UNCONDITIONAL_MAJOR_LIFT_PROGRESSION": {
-      "status": "needs-repair",
-      "note": ""
-    },
-    "COACH_SPEC_V1_T3K01_NO_RACE_DEMAND_PROGRESSION": {
-      "status": "needs-repair",
-      "note": ""
-    },
-    "COACH_SPEC_V1_T3K03_QUALITY_VOLUME_LOW": {
-      "status": "needs-repair",
-      "note": ""
-    },
-    "COACH_SPEC_V1_T3K08_SACRIFICE_HIERARCHY_INVERTED": {
-      "status": "needs-repair",
-      "note": ""
-    },
-    "COACH_SPEC_V1_YG_HANDSTAND_BALANCE_SPECIFICITY_MISSING": {
-      "status": "needs-repair",
-      "note": ""
     },
     "FAR_SECONDARY_STRENGTH_TOKEN_DOSE": {
       "status": "repair-exists-unproven",
@@ -148,6 +120,7 @@
   },
   "_unenforced_why": "Rules that exist, are tested, and that nothing in production calls. Only their briefs reach the model, so a program that breaks one is never checked. V84_CONTRAINDICATED_MOVEMENT_PRESCRIBED sat here until it was noticed: the athlete's own account of what reproduces their symptoms was validated by nothing at all. Some of these are deliberate -- a rule with no possible repair should teach rather than refuse -- but the list must not grow by accident, so the guard test fails when a rule joins it silently.",
   "unenforced": [
+    "COACH_SPEC_V1_T3K03_QUALITY_VOLUME_LOW",
     "COACH_SPEC_V1_T3K_EVENT_PROGRESSION_INCOHERENT",
     "COACH_SPEC_V1_T3K_EVENT_PROGRESSION_NOT_RETAINED",
     "COACH_SPEC_V1_T3K_EVENT_PROGRESSION_STATIC",

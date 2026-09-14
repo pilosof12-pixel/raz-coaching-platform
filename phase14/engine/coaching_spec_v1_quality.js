@@ -649,3 +649,108 @@ export function repairSkillRest(program, intake = {}) {
   }
   return out;
 }
+
+// AH-07 refuses a week that puts more weight on the bar without saying what
+// earns it. The rule's own sentence names the condition -- achieved RPE, bar
+// speed, technique, pain or recovery -- and the alternative it wants when the
+// condition is not met: repeat the prior load. That is a sentence, not a
+// judgement, and a program should not die for the want of it.
+const PROGRESSION_CONDITION = 'Take the increase only if last week\'s top set moved at the same speed and finished at or under its target RPE, with no pain and sleep intact. If any of that is missing, repeat last week\'s weight.';
+const MAJOR_LIFTS = /^(?:back squat|overhead press)$/i;
+
+export function repairUnconditionalProgression(program, intake = {}) {
+  if (!isHighConcurrencyHybrid(intake)) return String(program || '');
+  let out = String(program || '');
+
+  const loadOf = (text) => {
+    const m = String(text || '').match(/(\d+(?:\.\d+)?)\s*kg\b/i);
+    return m ? Number(m[1]) : null;
+  };
+
+  const previous = new Map(); // lift -> last week's load
+  for (let week = 1; week <= 4; week += 1) {
+    const parsed = parseWeekRows(out, week);
+    if (!parsed) continue;
+    const cells = parsed.rows.map((c) => c.slice());
+    let changed = false;
+
+    parsed.rows.forEach((row, i) => {
+      const name = String(row[parsed.exercise] || '').trim();
+      if (!MAJOR_LIFTS.test(name)) return;
+      const key = name.toLowerCase();
+      const load = Number.isInteger(parsed.load) ? loadOf(row[parsed.load]) : null;
+      const before = previous.get(key);
+      if (load != null) previous.set(key, load);
+      if (before == null || load == null || load <= before + 0.1) return;
+      if (!Number.isInteger(parsed.notes)) return;
+      const note = String(cells[i][parsed.notes] || '');
+      // The predicate accepts a wide vocabulary, so say nothing if the note
+      // already carries a condition of its own.
+      if (/\b(?:if|only if|provided|when|otherwise|repeat|hold|stay|unless|bar speed|rpe|quality|recovery|symptom|pain)\b/i.test(`${note} ${row[parsed.load] || ''}`)) return;
+      cells[i][parsed.notes] = note.trim() ? `${note.trim()} ${PROGRESSION_CONDITION}` : PROGRESSION_CONDITION;
+      changed = true;
+    });
+
+    if (!changed) continue;
+    const rebuilt = [parsed.header.join('\t'), ...cells.map((c) => c.join('\t'))].join('\n');
+    out = out.replace(parsed.re, `$1${rebuilt}$3`);
+  }
+  return out;
+}
+
+// YG-05 refuses a week that trains a freestanding-handstand goal without any
+// balance-specific work in it. The rule is right and had no answer, which is a
+// strange way to treat a thirteen-year-old's stated goal: the block was failed
+// four times for missing the one thing the goal is made of, and then nothing
+// was delivered at all.
+//
+// The answer is to put it in. "Controlled Handstand Kick-up" is the entry the
+// rule's own list names first and the only one of them the dictionary accepts,
+// and a kick-up is where freestanding balance actually starts -- you cannot
+// float what you cannot enter. It goes on the day that already trains
+// handstands, so it sits with the skill rather than beside it.
+const BALANCE_WORK = /controlled handstand kick[- ]?up|freestanding handstand|wall float|toe pull|heel pull/i;
+const BALANCE_MOVEMENT = 'Controlled Handstand Kick-up';
+
+export function repairHandstandBalance(program, intake = {}) {
+  if (!isYouthIntake(intake)) return String(program || '');
+  const state = youthAcquisition(intake);
+  if (!state.handstand || !state.establishedWall) return String(program || '');
+
+  let out = String(program || '');
+  for (let week = 1; week <= 4; week += 1) {
+    const parsed = parseWeekRows(out, week);
+    if (!parsed) continue;
+    const names = parsed.rows.map((r) => String(r[parsed.exercise] || ''));
+    if (names.some((n) => BALANCE_WORK.test(n))) continue;
+
+    // Prefer the day that already trains handstands; otherwise the first day.
+    let anchor = parsed.rows.findIndex((r) => /handstand/i.test(String(r[parsed.exercise] || '')));
+    if (anchor < 0) anchor = 0;
+    let day = '';
+    for (let i = anchor; i >= 0; i -= 1) {
+      const raw = String(parsed.rows[i][parsed.day] || '').trim();
+      if (raw) { day = raw; break; }
+    }
+    if (!day) continue;
+
+    const row = new Array(parsed.header.length).fill('');
+    row[parsed.day] = '';
+    row[parsed.exercise] = BALANCE_MOVEMENT;
+    if (Number.isInteger(parsed.load)) row[parsed.load] = 'Bodyweight';
+    row[parsed.sets] = '4';
+    row[parsed.reps] = '3';
+    if (Number.isInteger(parsed.rest)) row[parsed.rest] = '60-90 sec';
+    const rpeCol = parsed.header.findIndex((h) => /target rpe|effort/i.test(String(h || '')));
+    if (rpeCol >= 0) row[rpeCol] = '6';
+    if (Number.isInteger(parsed.notes)) {
+      row[parsed.notes] = 'Kick up under control and hold whatever balance you find, even a second. This is the skill the freestanding handstand is made of, and it is practised fresh, never tired.';
+    }
+
+    const rows = parsed.rows.map((c) => c.slice());
+    rows.splice(anchor + 1, 0, row);
+    const rebuilt = [parsed.header.join('\t'), ...rows.map((c) => c.join('\t'))].join('\n');
+    out = out.replace(parsed.re, `$1${rebuilt}$3`);
+  }
+  return out;
+}

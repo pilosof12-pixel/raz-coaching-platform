@@ -95,3 +95,40 @@ test('a run already inside the baseline is not touched', () => {
   const p = wk(1, [['Sun', 'Run', '-', '1', '16 km', '-', '5', 'Long aerobic run.', ''].join('\t')]);
   assert.equal(repairRunBaseline(p, HYBRID), p);
 });
+
+// COACH_SPEC_V1_YG_HANDSTAND_BALANCE_SPECIFICITY_MISSING
+import { repairHandstandBalance } from '../engine/coaching_spec_v1_quality.js';
+
+const HANDSTAND_YOUTH = {
+  ...YOUTH,
+  current_numbers: 'Wall-facing handstand about 15 seconds; back-to-wall about 20 seconds. No reliable unsupported balance yet.',
+};
+
+test('a freestanding-handstand goal gets the skill the goal is made of', () => {
+  const p = [1, 2, 3, 4].map((n) => wk(n, [
+    ['Mon', 'Wall Handstand Hold', 'BW', '4', '20 sec', '60 sec', '6', 'Hold tall.', ''].join('\t'),
+    ['Mon', 'Ring Row', 'BW', '3', '8', '60 sec', '7', 'Pull.', ''].join('\t'),
+  ])).join('\n\n');
+  const fixed = repairHandstandBalance(p, HANDSTAND_YOUTH);
+  const added = fixed.split('\n').filter((l) => /Controlled Handstand Kick-up/.test(l));
+  assert.equal(added.length, 4, 'one in every week');
+  // It sits with the handstand work, not at the end of the week.
+  const week1 = fixed.slice(fixed.indexOf('START_WEEK1'), fixed.indexOf('END_WEEK1')).split('\n').filter((l) => l.includes('\t'));
+  assert.match(week1[1], /Wall Handstand Hold/);
+  assert.match(week1[2], /Controlled Handstand Kick-up/);
+  // Skill dosing: submaximal, fresh, and off the conditioning clock.
+  assert.equal(cells(added[0])[6], '6');
+  assert.equal(cells(added[0])[5], '60-90 sec');
+  assert.match(cells(added[0])[7], /practised fresh, never tired/);
+  assert.equal(repairHandstandBalance(fixed, HANDSTAND_YOUTH), fixed, 'repair is not idempotent');
+});
+
+test('a week that already has balance work is left alone', () => {
+  const p = wk(1, [['Mon', 'Controlled Handstand Kick-up', 'BW', '4', '3', '60-90 sec', '6', 'Kick up.', ''].join('\t')]);
+  assert.equal(repairHandstandBalance(p, HANDSTAND_YOUTH), p);
+});
+
+test('a youth athlete with no handstand goal is untouched', () => {
+  const p = wk(1, [['Mon', 'Ring Row', 'BW', '3', '8', '60 sec', '7', 'Pull.', ''].join('\t')]);
+  assert.equal(repairHandstandBalance(p, { ...YOUTH, primary_goals: ['Achieve first bar muscle-up'] }), p);
+});

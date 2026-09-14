@@ -187,6 +187,27 @@ function enclosingExport(file, code) {
   return matches.length ? matches[matches.length - 1][1] : null;
 }
 
+// Severity is the third thing that decides whether a code can refuse anything.
+// The tactical audit emits findings at 'hard' and 'advisory', and its only
+// consumer keeps the hard ones -- so an advisory-only code cannot block a build
+// however loudly it is worded. Counting those as dead-build risk sent me
+// writing a repair for a rule that says of itself "this is a contextual
+// default, not a universal minimum".
+function advisoryOnly(code) {
+  let seen = false;
+  for (const file of engineFiles) {
+    const src = fs.readFileSync(file, 'utf8');
+    for (const m of src.matchAll(new RegExp(`code:\\s*['"]${code}['"]([\\s\\S]{0,200})`, 'g'))) {
+      const near = m[1];
+      const sev = near.match(/severity:\s*['"](\w+)['"]/);
+      if (!sev) return false;      // emitted with no severity at all: assume it blocks
+      if (sev[1] !== 'advisory') return false;
+      seen = true;
+    }
+  }
+  return seen;
+}
+
 const ledger = [];
 for (const [code, files] of [...raisedIn].sort()) {
   const modules = [...files];
@@ -194,12 +215,15 @@ for (const [code, files] of [...raisedIn].sort()) {
   const wired = repairsNearby.filter((n) => new RegExp(`\\b${n}\\(`).test(wiredText));
   const owners = modules.map((f) => enclosingExport(f, code)).filter(Boolean);
   // Raised by a module production loads, from a function production calls.
-  const reachable = modules.some((f) => reachableModules.has(f))
+  const advisory = advisoryOnly(code);
+  const reachable = !advisory
+    && modules.some((f) => reachableModules.has(f))
     && (!owners.length || owners.some((fn) => liveFunctions.has(fn)));
   ledger.push({
     code,
     modules,
     owners,
+    advisory,
     reachable,
     repairs: repairsNearby,
     wired,
@@ -216,7 +240,7 @@ const leadOnly = unproven.filter((r) => r.wired.length);
 const provenKillers = ledger.filter((r) => r.killedLive);
 
 console.log(`GATE / REPAIR LEDGER  --  ${ledger.length} codes defined, ${live.length} of them able to refuse a build\n`);
-console.log(`  ${String(ledger.length - live.length).padStart(3)}  cannot block: nothing production calls raises them`);
+console.log(`  ${String(ledger.length - live.length).padStart(3)}  cannot block: advisory-only, or nothing production calls raises them`);
 console.log(`  ${String(proven.length).padStart(3)}  are proven: a test or a stress case names the code and shows it clearing`);
 console.log(`  ${String(unproven.length).padStart(3)}  are unproven: nothing has ever demonstrated one of these being answered`);
 console.log(`      of which ${leadOnly.length} sit in a module that exports some repair -- a lead, not proof`);

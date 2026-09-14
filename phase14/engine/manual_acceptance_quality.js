@@ -1,6 +1,8 @@
 import { RetriableValidationError } from './exercise_dictionary.js';
 import { parseProgramModel, WEEKDAY_ORDER } from './program_model.js';
 import { isHighConcurrencyHybrid, currentRunBaseline } from './advanced_hybrid_concurrency.js';
+import { parseWeek as parseWeekRows } from './v34_workload_accounting.js';
+import { weekdayKey } from './weekday.js';
 
 function arr(v) { return Array.isArray(v) ? v : v ? [v] : []; }
 function text(v) {
@@ -255,4 +257,96 @@ export function validateAdvancedHybridManualAcceptanceSemantic(program, intake =
   }
 
   return { ok: true, skipped: false, model };
+}
+
+// --- repair ----------------------------------------------------------------
+//
+// A long run two days before the primary heavy squat, with a substantive
+// session in between, puts three meaningful days inside one 72-hour window and
+// the squat pays for it. The rule names its own two answers: move the long run,
+// or make the intervening session genuinely low-cost.
+//
+// The second is the one a machine can take. Moving a long run rearranges the
+// whole week and the reasons it sits where it does are not in the program;
+// lightening one day is a dose change with a stated target, roughly RPE 6 and
+// compact. The session keeps its movements and its place -- the athlete still
+// trains that day -- it simply stops competing with the goal it is meant to
+// serve.
+const LOW_COST_RPE = '6';
+const LOW_COST_SETS = 2;
+const LOW_COST_NOTE = 'Kept deliberately light: this sits between your long run and your heavy squat, and its job is to leave both of those intact. Move well, stop early, and do not chase it.';
+
+export function repairDense72hWindow(program, intake = {}) {
+  if (!isHighConcurrencyHybrid(intake)) return String(program || '');
+  const squat1rm = currentBackSquat1rm(intake);
+  if (!squat1rm) return String(program || '');
+  const longestKm = currentRunBaseline(intake).longest_km || 0;
+  const runFloor = Math.max(12, longestKm * 0.75);
+
+  let out = String(program || '');
+  for (let week = 1; week <= 4; week += 1) {
+    const parsed = parseWeekRows(out, week);
+    if (!parsed) continue;
+    const rpeCol = parsed.header.findIndex((h) => /target rpe|effort/i.test(String(h || '')));
+
+    // Rows by weekday, inheriting the day down continuation rows.
+    const byDay = new Map();
+    let lastDay = '';
+    parsed.rows.forEach((row, i) => {
+      const raw = String(row[parsed.day] || '').trim();
+      if (raw) lastDay = raw;
+      const key = weekdayKey(lastDay);
+      if (!key) return;
+      if (!byDay.has(key)) byDay.set(key, []);
+      byDay.get(key).push(i);
+    });
+
+    const num = (v) => { const m = String(v || '').match(/\d+(?:\.\d+)?/); return m ? Number(m[0]) : null; };
+    const kmOf = (i) => {
+      const text = `${parsed.rows[i][parsed.reps] || ''} ${Number.isInteger(parsed.load) ? parsed.rows[i][parsed.load] : ''}`;
+      const m = text.match(/(\d+(?:\.\d+)?)\s*km\b/i);
+      return m ? Number(m[1]) : null;
+    };
+
+    const ORDER = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'];
+    const cells = parsed.rows.map((c) => c.slice());
+    let changed = false;
+
+    for (const [dayKeyName, indices] of byDay) {
+      const heavy = indices.some((i) => /^back squat$/i.test(String(parsed.rows[i][parsed.exercise] || '').trim())
+        && (num(Number.isInteger(parsed.load) ? parsed.rows[i][parsed.load] : '') || 0) >= squat1rm * 0.80);
+      if (!heavy) continue;
+      const heavyIndex = ORDER.indexOf(dayKeyName);
+      const longRunDay = ORDER[(heavyIndex + 5) % 7];
+      const middleDay = ORDER[(heavyIndex + 6) % 7];
+      const priorRows = byDay.get(longRunDay) || [];
+      const middleRows = byDay.get(middleDay) || [];
+      if (!priorRows.length || !middleRows.length) continue;
+
+      const hasLongRun = priorRows.some((i) => /^(?:run|running)$/i.test(String(parsed.rows[i][parsed.exercise] || '').trim())
+        && (kmOf(i) || 0) >= runFloor);
+      if (!hasLongRun) continue;
+
+      for (const i of middleRows) {
+        const name = String(parsed.rows[i][parsed.exercise] || '').trim();
+        if (!name || /^\s*\[WARMUP\]/i.test(name)) continue;
+        const rpe = rpeCol >= 0 ? num(cells[i][rpeCol]) : null;
+        const sets = num(cells[i][parsed.sets]);
+        if (!((rpe != null && rpe >= 7) || (sets != null && sets >= 3))) continue;
+        if (rpeCol >= 0) cells[i][rpeCol] = LOW_COST_RPE;
+        if (sets != null && sets > LOW_COST_SETS) cells[i][parsed.sets] = String(LOW_COST_SETS);
+        if (Number.isInteger(parsed.notes)) {
+          const note = String(cells[i][parsed.notes] || '').trim();
+          if (!note.includes('leave both of those intact')) {
+            cells[i][parsed.notes] = note ? `${note} ${LOW_COST_NOTE}` : LOW_COST_NOTE;
+          }
+        }
+        changed = true;
+      }
+    }
+    if (!changed) continue;
+    const rebuilt = [parsed.header.join('\t'), ...cells.map((c) => c.join('\t'))].join('\n');
+    out = out.replace(parsed.re, `$1${rebuilt}$3`);
+  }
+  return out;
 }

@@ -11,6 +11,10 @@ import {
   norm,
   swapSportDayContent,
 } from './exercise_dictionary.js';
+import { repairTacticalHardRules } from './v40_tactical_hard_rules.js';
+import { repairUnconditionalProgression, repairHandstandBalance } from './coaching_spec_v1_quality.js';
+import { repairMarathonSubordination } from './advanced_hybrid_quality.js';
+import { repairDense72hWindow } from './manual_acceptance_quality.js';
 import { repairSkillRest } from './coaching_spec_v1_quality.js';
 import { repairEnduranceRedundancy } from './phase15_elite_guardrails.js';
 import { repairRunBaseline } from './advanced_hybrid_quality.js';
@@ -270,6 +274,31 @@ function applyDeterministicCandidateRepairs(program, intake = {}) {
   // bike session gets the one sentence that says why it is a bike and not a
   // run; week 1 running comes back to what the athlete already runs. Each is a
   // value the rule itself names, not a judgement it was waiting on.
+  // Three high-concurrency rules that named their own answer and could not
+  // apply it: say what earns the extra weight on the bar, keep the support run
+  // subordinate, and make the day between a long run and a heavy squat
+  // genuinely low-cost.
+  // The two hard tactical rules. T3K-01 wants the key session to move toward
+  // race demand; T3K-08 wants the accessories cut before the race work is. Both
+  // named an ordering, and an ordering is code.
+  // A freestanding-handstand goal with no balance work in the week is a block
+  // missing the thing the goal is made of. Put it in rather than refuse four
+  // times and deliver nothing.
+  const balanced = repairHandstandBalance(candidate, intake);
+  if (balanced !== candidate) { candidate = balanced; repairs.push({ type: 'handstand_balance_specificity' }); }
+
+  const raceSpecific = repairTacticalHardRules(candidate, intake);
+  if (raceSpecific !== candidate) { candidate = raceSpecific; repairs.push({ type: 'tactical_race_demand_and_hierarchy' }); }
+
+  const conditioned = repairUnconditionalProgression(candidate, intake);
+  if (conditioned !== candidate) { candidate = conditioned; repairs.push({ type: 'progression_condition_stated' }); }
+
+  const subordinated = repairMarathonSubordination(candidate, intake);
+  if (subordinated !== candidate) { candidate = subordinated; repairs.push({ type: 'marathon_support_run_subordinated' }); }
+
+  const windowProtected = repairDense72hWindow(candidate, intake);
+  if (windowProtected !== candidate) { candidate = windowProtected; repairs.push({ type: 'primary_readiness_window_protected' }); }
+
   const restHeld = repairSkillRest(candidate, intake);
   if (restHeld !== candidate) { candidate = restHeld; repairs.push({ type: 'skill_rest_quality' }); }
 

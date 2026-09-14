@@ -7,12 +7,15 @@
     "owners": [
       "validateAdvancedHybridQualitySemantic"
     ],
+    "advisory": false,
     "reachable": true,
     "repairs": [
-      "repairRunBaseline"
+      "repairRunBaseline",
+      "repairMarathonSubordination"
     ],
     "wired": [
-      "repairRunBaseline"
+      "repairRunBaseline",
+      "repairMarathonSubordination"
     ],
     "tested": true,
     "stressed": false,
@@ -26,12 +29,15 @@
     "owners": [
       "validateAdvancedHybridQualitySemantic"
     ],
+    "advisory": false,
     "reachable": true,
     "repairs": [
-      "repairRunBaseline"
+      "repairRunBaseline",
+      "repairMarathonSubordination"
     ],
     "wired": [
-      "repairRunBaseline"
+      "repairRunBaseline",
+      "repairMarathonSubordination"
     ],
     "tested": true,
     "stressed": false,
@@ -45,10 +51,15 @@
     "owners": [
       "validateAdvancedHybridManualAcceptanceSemantic"
     ],
+    "advisory": false,
     "reachable": true,
-    "repairs": [],
-    "wired": [],
-    "tested": false,
+    "repairs": [
+      "repairDense72hWindow"
+    ],
+    "wired": [
+      "repairDense72hWindow"
+    ],
+    "tested": true,
     "stressed": false,
     "killedLive": ""
   },
@@ -60,12 +71,15 @@
     "owners": [
       "validateAdvancedHybridQualitySemantic"
     ],
+    "advisory": false,
     "reachable": true,
     "repairs": [
-      "repairRunBaseline"
+      "repairRunBaseline",
+      "repairMarathonSubordination"
     ],
     "wired": [
-      "repairRunBaseline"
+      "repairRunBaseline",
+      "repairMarathonSubordination"
     ],
     "tested": true,
     "stressed": false,
@@ -79,9 +93,14 @@
     "owners": [
       "validateAdvancedHybridManualAcceptanceSemantic"
     ],
+    "advisory": false,
     "reachable": true,
-    "repairs": [],
-    "wired": [],
+    "repairs": [
+      "repairDense72hWindow"
+    ],
+    "wired": [
+      "repairDense72hWindow"
+    ],
     "tested": true,
     "stressed": false,
     "killedLive": ""
@@ -94,14 +113,17 @@
     "owners": [
       "validateAdvancedHybridQualitySemantic"
     ],
+    "advisory": false,
     "reachable": true,
     "repairs": [
-      "repairRunBaseline"
+      "repairRunBaseline",
+      "repairMarathonSubordination"
     ],
     "wired": [
-      "repairRunBaseline"
+      "repairRunBaseline",
+      "repairMarathonSubordination"
     ],
-    "tested": false,
+    "tested": true,
     "stressed": false,
     "killedLive": ""
   },
@@ -113,9 +135,14 @@
     "owners": [
       "validateAdvancedHybridManualAcceptanceSemantic"
     ],
+    "advisory": false,
     "reachable": true,
-    "repairs": [],
-    "wired": [],
+    "repairs": [
+      "repairDense72hWindow"
+    ],
+    "wired": [
+      "repairDense72hWindow"
+    ],
     "tested": true,
     "stressed": false,
     "killedLive": ""
@@ -128,12 +155,15 @@
     "owners": [
       "validateAdvancedHybridQualitySemantic"
     ],
+    "advisory": false,
     "reachable": true,
     "repairs": [
-      "repairRunBaseline"
+      "repairRunBaseline",
+      "repairMarathonSubordination"
     ],
     "wired": [
-      "repairRunBaseline"
+      "repairRunBaseline",
+      "repairMarathonSubordination"
     ],
     "tested": true,
     "stressed": false,
@@ -147,12 +177,15 @@
     "owners": [
       "validateAdvancedHybridQualitySemantic"
     ],
+    "advisory": false,
     "reachable": true,
     "repairs": [
-      "repairRunBaseline"
+      "repairRunBaseline",
+      "repairMarathonSubordination"
     ],
     "wired": [
-      "repairRunBaseline"
+      "repairRunBaseline",
+      "repairMarathonSubordination"
     ],
     "tested": true,
     "stressed": false,
@@ -166,12 +199,15 @@
     "owners": [
       "validateAdvancedHybridQualitySemantic"
     ],
+    "advisory": false,
     "reachable": true,
     "repairs": [
-      "repairRunBaseline"
+      "repairRunBaseline",
+      "repairMarathonSubordination"
     ],
     "wired": [
-      "repairRunBaseline"
+      "repairRunBaseline",
+      "repairMarathonSubordination"
     ],
     "tested": true,
     "stressed": false,
@@ -185,9 +221,14 @@
     "owners": [
       "validateAdvancedHybridManualAcceptanceSemantic"
     ],
+    "advisory": false,
     "reachable": true,
-    "repairs": [],
-    "wired": [],
+    "repairs": [
+      "repairDense72hWindow"
+    ],
+    "wired": [
+      "repairDense72hWindow"
+    ],
     "tested": true,
     "stressed": false,
     "killedLive": ""
@@ -200,12 +241,15 @@
     "owners": [
       "validateAdvancedHybridQualitySemantic"
     ],
+    "advisory": false,
     "reachable": true,
     "repairs": [
-      "repairRunBaseline"
+      "repairRunBaseline",
+      "repairMarathonSubordination"
     ],
     "wired": [
-      "repairRunBaseline"
+      "repairRunBaseline",
+      "repairMarathonSubordination"
     ],
     "tested": true,
     "stressed": false,
@@ -219,12 +263,15 @@
     "owners": [
       "validateAdvancedHybridQualitySemantic"
     ],
+    "advisory": false,
     "reachable": true,
     "repairs": [
-      "repairRunBaseline"
+      "repairRunBaseline",
+      "repairMarathonSubordination"
     ],
     "wired": [
-      "repairRunBaseline"
+      "repairRunBaseline",
+      "repairMarathonSubordination"
     ],
     "tested": true,
     "stressed": false,
@@ -238,12 +285,15 @@
     "owners": [
       "validateAdvancedHybridQualitySemantic"
     ],
+    "advisory": false,
     "reachable": true,
     "repairs": [
-      "repairRunBaseline"
+      "repairRunBaseline",
+      "repairMarathonSubordination"
     ],
     "wired": [
-      "repairRunBaseline"
+      "repairRunBaseline",
+      "repairMarathonSubordination"
     ],
     "tested": true,
     "stressed": false,
@@ -257,6 +307,7 @@
     "owners": [
       "validatePhase15Program"
     ],
+    "advisory": false,
     "reachable": true,
     "repairs": [
       "repairPhase15Program"
@@ -276,6 +327,7 @@
     "owners": [
       "validatePhase15Program"
     ],
+    "advisory": false,
     "reachable": true,
     "repairs": [
       "repairPhase15Program"
@@ -295,6 +347,7 @@
     "owners": [
       "validatePhase15Program"
     ],
+    "advisory": false,
     "reachable": true,
     "repairs": [
       "repairPhase15Program"
@@ -314,12 +367,17 @@
     "owners": [
       "validateAdvancedHybridCoachingSpecV1"
     ],
+    "advisory": false,
     "reachable": true,
     "repairs": [
-      "repairSkillRest"
+      "repairSkillRest",
+      "repairUnconditionalProgression",
+      "repairHandstandBalance"
     ],
     "wired": [
-      "repairSkillRest"
+      "repairSkillRest",
+      "repairUnconditionalProgression",
+      "repairHandstandBalance"
     ],
     "tested": true,
     "stressed": false,
@@ -333,12 +391,17 @@
     "owners": [
       "validateAdvancedHybridCoachingSpecV1"
     ],
+    "advisory": false,
     "reachable": true,
     "repairs": [
-      "repairSkillRest"
+      "repairSkillRest",
+      "repairUnconditionalProgression",
+      "repairHandstandBalance"
     ],
     "wired": [
-      "repairSkillRest"
+      "repairSkillRest",
+      "repairUnconditionalProgression",
+      "repairHandstandBalance"
     ],
     "tested": true,
     "stressed": false,
@@ -352,12 +415,17 @@
     "owners": [
       "validateAdvancedHybridCoachingSpecV1"
     ],
+    "advisory": false,
     "reachable": true,
     "repairs": [
-      "repairSkillRest"
+      "repairSkillRest",
+      "repairUnconditionalProgression",
+      "repairHandstandBalance"
     ],
     "wired": [
-      "repairSkillRest"
+      "repairSkillRest",
+      "repairUnconditionalProgression",
+      "repairHandstandBalance"
     ],
     "tested": true,
     "stressed": false,
@@ -371,12 +439,17 @@
     "owners": [
       "validateAdvancedHybridCoachingSpecV1"
     ],
+    "advisory": false,
     "reachable": true,
     "repairs": [
-      "repairSkillRest"
+      "repairSkillRest",
+      "repairUnconditionalProgression",
+      "repairHandstandBalance"
     ],
     "wired": [
-      "repairSkillRest"
+      "repairSkillRest",
+      "repairUnconditionalProgression",
+      "repairHandstandBalance"
     ],
     "tested": true,
     "stressed": false,
@@ -390,14 +463,19 @@
     "owners": [
       "validateAdvancedHybridCoachingSpecV1"
     ],
+    "advisory": false,
     "reachable": true,
     "repairs": [
-      "repairSkillRest"
+      "repairSkillRest",
+      "repairUnconditionalProgression",
+      "repairHandstandBalance"
     ],
     "wired": [
-      "repairSkillRest"
+      "repairSkillRest",
+      "repairUnconditionalProgression",
+      "repairHandstandBalance"
     ],
-    "tested": false,
+    "tested": true,
     "stressed": false,
     "killedLive": ""
   },
@@ -409,10 +487,15 @@
     "owners": [
       "auditRaceDemandExposure"
     ],
+    "advisory": false,
     "reachable": true,
-    "repairs": [],
-    "wired": [],
-    "tested": false,
+    "repairs": [
+      "repairTacticalHardRules"
+    ],
+    "wired": [
+      "repairTacticalHardRules"
+    ],
+    "tested": true,
     "stressed": false,
     "killedLive": ""
   },
@@ -424,9 +507,14 @@
     "owners": [
       "auditQualityVolume"
     ],
-    "reachable": true,
-    "repairs": [],
-    "wired": [],
+    "advisory": true,
+    "reachable": false,
+    "repairs": [
+      "repairTacticalHardRules"
+    ],
+    "wired": [
+      "repairTacticalHardRules"
+    ],
     "tested": false,
     "stressed": false,
     "killedLive": ""
@@ -439,10 +527,15 @@
     "owners": [
       "auditSacrificeHierarchy"
     ],
+    "advisory": false,
     "reachable": true,
-    "repairs": [],
-    "wired": [],
-    "tested": false,
+    "repairs": [
+      "repairTacticalHardRules"
+    ],
+    "wired": [
+      "repairTacticalHardRules"
+    ],
+    "tested": true,
     "stressed": false,
     "killedLive": ""
   },
@@ -454,12 +547,17 @@
     "owners": [
       "validateTactical3KCoachingSpecV1"
     ],
+    "advisory": false,
     "reachable": true,
     "repairs": [
-      "repairSkillRest"
+      "repairSkillRest",
+      "repairUnconditionalProgression",
+      "repairHandstandBalance"
     ],
     "wired": [
-      "repairSkillRest"
+      "repairSkillRest",
+      "repairUnconditionalProgression",
+      "repairHandstandBalance"
     ],
     "tested": true,
     "stressed": false,
@@ -473,12 +571,17 @@
     "owners": [
       "collectYouthCoachingSpecV1ReviewSignals"
     ],
+    "advisory": false,
     "reachable": false,
     "repairs": [
-      "repairSkillRest"
+      "repairSkillRest",
+      "repairUnconditionalProgression",
+      "repairHandstandBalance"
     ],
     "wired": [
-      "repairSkillRest"
+      "repairSkillRest",
+      "repairUnconditionalProgression",
+      "repairHandstandBalance"
     ],
     "tested": true,
     "stressed": false,
@@ -492,12 +595,17 @@
     "owners": [
       "collectYouthCoachingSpecV1ReviewSignals"
     ],
+    "advisory": false,
     "reachable": false,
     "repairs": [
-      "repairSkillRest"
+      "repairSkillRest",
+      "repairUnconditionalProgression",
+      "repairHandstandBalance"
     ],
     "wired": [
-      "repairSkillRest"
+      "repairSkillRest",
+      "repairUnconditionalProgression",
+      "repairHandstandBalance"
     ],
     "tested": true,
     "stressed": false,
@@ -511,12 +619,17 @@
     "owners": [
       "collectYouthCoachingSpecV1ReviewSignals"
     ],
+    "advisory": false,
     "reachable": false,
     "repairs": [
-      "repairSkillRest"
+      "repairSkillRest",
+      "repairUnconditionalProgression",
+      "repairHandstandBalance"
     ],
     "wired": [
-      "repairSkillRest"
+      "repairSkillRest",
+      "repairUnconditionalProgression",
+      "repairHandstandBalance"
     ],
     "tested": true,
     "stressed": false,
@@ -530,12 +643,17 @@
     "owners": [
       "validateTactical3KCoachingSpecV1"
     ],
+    "advisory": false,
     "reachable": true,
     "repairs": [
-      "repairSkillRest"
+      "repairSkillRest",
+      "repairUnconditionalProgression",
+      "repairHandstandBalance"
     ],
     "wired": [
-      "repairSkillRest"
+      "repairSkillRest",
+      "repairUnconditionalProgression",
+      "repairHandstandBalance"
     ],
     "tested": true,
     "stressed": false,
@@ -549,6 +667,7 @@
     "owners": [
       "collectIntervalPaceOriginFlags"
     ],
+    "advisory": false,
     "reachable": false,
     "repairs": [],
     "wired": [],
@@ -564,12 +683,17 @@
     "owners": [
       "validateTactical3KCoachingSpecV1"
     ],
+    "advisory": false,
     "reachable": true,
     "repairs": [
-      "repairSkillRest"
+      "repairSkillRest",
+      "repairUnconditionalProgression",
+      "repairHandstandBalance"
     ],
     "wired": [
-      "repairSkillRest"
+      "repairSkillRest",
+      "repairUnconditionalProgression",
+      "repairHandstandBalance"
     ],
     "tested": true,
     "stressed": false,
@@ -583,12 +707,17 @@
     "owners": [
       "validateTactical3KCoachingSpecV1"
     ],
+    "advisory": false,
     "reachable": true,
     "repairs": [
-      "repairSkillRest"
+      "repairSkillRest",
+      "repairUnconditionalProgression",
+      "repairHandstandBalance"
     ],
     "wired": [
-      "repairSkillRest"
+      "repairSkillRest",
+      "repairUnconditionalProgression",
+      "repairHandstandBalance"
     ],
     "tested": true,
     "stressed": false,
@@ -602,12 +731,17 @@
     "owners": [
       "validateYouthCoachingSpecV1HardRules"
     ],
+    "advisory": false,
     "reachable": true,
     "repairs": [
-      "repairSkillRest"
+      "repairSkillRest",
+      "repairUnconditionalProgression",
+      "repairHandstandBalance"
     ],
     "wired": [
-      "repairSkillRest"
+      "repairSkillRest",
+      "repairUnconditionalProgression",
+      "repairHandstandBalance"
     ],
     "tested": true,
     "stressed": false,
@@ -621,14 +755,19 @@
     "owners": [
       "validateYouthCoachingSpecV1HardRules"
     ],
+    "advisory": false,
     "reachable": true,
     "repairs": [
-      "repairSkillRest"
+      "repairSkillRest",
+      "repairUnconditionalProgression",
+      "repairHandstandBalance"
     ],
     "wired": [
-      "repairSkillRest"
+      "repairSkillRest",
+      "repairUnconditionalProgression",
+      "repairHandstandBalance"
     ],
-    "tested": false,
+    "tested": true,
     "stressed": false,
     "killedLive": ""
   },
@@ -640,6 +779,7 @@
     "owners": [
       "collectPowerOutputFlags"
     ],
+    "advisory": false,
     "reachable": false,
     "repairs": [],
     "wired": [],
@@ -655,12 +795,17 @@
     "owners": [
       "validateYouthCoachingSpecV1HardRules"
     ],
+    "advisory": false,
     "reachable": true,
     "repairs": [
-      "repairSkillRest"
+      "repairSkillRest",
+      "repairUnconditionalProgression",
+      "repairHandstandBalance"
     ],
     "wired": [
-      "repairSkillRest"
+      "repairSkillRest",
+      "repairUnconditionalProgression",
+      "repairHandstandBalance"
     ],
     "tested": true,
     "stressed": false,
@@ -674,12 +819,17 @@
     "owners": [
       "validateYouthCoachingSpecV1HardRules"
     ],
+    "advisory": false,
     "reachable": true,
     "repairs": [
-      "repairSkillRest"
+      "repairSkillRest",
+      "repairUnconditionalProgression",
+      "repairHandstandBalance"
     ],
     "wired": [
-      "repairSkillRest"
+      "repairSkillRest",
+      "repairUnconditionalProgression",
+      "repairHandstandBalance"
     ],
     "tested": true,
     "stressed": false,
@@ -693,6 +843,7 @@
     "owners": [
       "endurancePerformanceIntegrityFlags"
     ],
+    "advisory": false,
     "reachable": true,
     "repairs": [
       "repairUnbenchmarkedVariationLoads",
@@ -713,6 +864,7 @@
     "owners": [
       "endurancePerformanceIntegrityFlags"
     ],
+    "advisory": false,
     "reachable": true,
     "repairs": [
       "repairUnbenchmarkedVariationLoads",
@@ -733,6 +885,7 @@
     "owners": [
       "collectExerciseRows"
     ],
+    "advisory": false,
     "reachable": true,
     "repairs": [
       "normalizeEquipmentTokens",
@@ -759,6 +912,7 @@
     "owners": [
       "endurancePerformanceIntegrityFlags"
     ],
+    "advisory": false,
     "reachable": true,
     "repairs": [
       "repairUnbenchmarkedVariationLoads",
@@ -779,6 +933,7 @@
     "owners": [
       "collectExerciseRows"
     ],
+    "advisory": false,
     "reachable": true,
     "repairs": [
       "normalizeEquipmentTokens",
@@ -805,6 +960,7 @@
     "owners": [
       "validatePhase15Program"
     ],
+    "advisory": false,
     "reachable": true,
     "repairs": [
       "repairPhase15Program"
@@ -824,6 +980,7 @@
     "owners": [
       "validateGoalComponentCoverageSemantic"
     ],
+    "advisory": false,
     "reachable": true,
     "repairs": [],
     "wired": [],
@@ -839,6 +996,7 @@
     "owners": [
       "validateHardRunWarmupSemantic"
     ],
+    "advisory": false,
     "reachable": true,
     "repairs": [],
     "wired": [],
@@ -854,12 +1012,15 @@
     "owners": [
       "validateAdvancedHybridQualitySemantic"
     ],
+    "advisory": false,
     "reachable": true,
     "repairs": [
-      "repairRunBaseline"
+      "repairRunBaseline",
+      "repairMarathonSubordination"
     ],
     "wired": [
-      "repairRunBaseline"
+      "repairRunBaseline",
+      "repairMarathonSubordination"
     ],
     "tested": true,
     "stressed": false,
@@ -873,6 +1034,7 @@
     "owners": [
       "collectExerciseRows"
     ],
+    "advisory": false,
     "reachable": true,
     "repairs": [
       "normalizeEquipmentTokens",
@@ -899,6 +1061,7 @@
     "owners": [
       "endurancePerformanceIntegrityFlags"
     ],
+    "advisory": false,
     "reachable": true,
     "repairs": [
       "repairUnbenchmarkedVariationLoads",
@@ -919,6 +1082,7 @@
     "owners": [
       "marathonStackedProgressionFlags"
     ],
+    "advisory": false,
     "reachable": true,
     "repairs": [],
     "wired": [],
@@ -934,6 +1098,7 @@
     "owners": [
       "marathonStackedProgressionFlags"
     ],
+    "advisory": false,
     "reachable": true,
     "repairs": [],
     "wired": [],
@@ -949,6 +1114,7 @@
     "owners": [
       "marathonStrengthMaintenanceFlags"
     ],
+    "advisory": false,
     "reachable": true,
     "repairs": [],
     "wired": [],
@@ -964,6 +1130,7 @@
     "owners": [
       "weekOneRunningVolumeFlags"
     ],
+    "advisory": false,
     "reachable": true,
     "repairs": [],
     "wired": [],
@@ -979,6 +1146,7 @@
     "owners": [
       "validatePhase15Program"
     ],
+    "advisory": false,
     "reachable": true,
     "repairs": [
       "repairPhase15Program"
@@ -998,6 +1166,7 @@
     "owners": [
       "goalDoseFlags"
     ],
+    "advisory": false,
     "reachable": true,
     "repairs": [
       "repairUnbenchmarkedVariationLoads",
@@ -1019,6 +1188,7 @@
     "owners": [
       "painToleranceGate"
     ],
+    "advisory": false,
     "reachable": true,
     "repairs": [
       "repairPainTolerance",
@@ -1039,6 +1209,7 @@
     "owners": [
       "validatePhase15Program"
     ],
+    "advisory": false,
     "reachable": true,
     "repairs": [
       "repairPhase15Program"
@@ -1059,6 +1230,7 @@
     "owners": [
       "stripNonExerciseScheduleRows"
     ],
+    "advisory": false,
     "reachable": true,
     "repairs": [],
     "wired": [],
@@ -1074,6 +1246,7 @@
     "owners": [
       "exactPrimaryMovementFlags"
     ],
+    "advisory": false,
     "reachable": true,
     "repairs": [
       "repairUnbenchmarkedVariationLoads",
@@ -1094,6 +1267,7 @@
     "owners": [
       "parseProgramModel"
     ],
+    "advisory": false,
     "reachable": true,
     "repairs": [
       "normalizeSemanticText",
@@ -1112,6 +1286,7 @@
     "owners": [
       "validateProgressionArchitectureSemantic"
     ],
+    "advisory": false,
     "reachable": true,
     "repairs": [],
     "wired": [],
@@ -1127,6 +1302,7 @@
     "owners": [
       "validateKnownMaxPullUpDoseSemantic"
     ],
+    "advisory": false,
     "reachable": true,
     "repairs": [],
     "wired": [],
@@ -1144,6 +1320,7 @@
       "strengthSessionAccountingFlags",
       "strengthSessionAccountingFlags"
     ],
+    "advisory": false,
     "reachable": true,
     "repairs": [
       "repairUnbenchmarkedVariationLoads",
@@ -1164,9 +1341,14 @@
     "owners": [
       "validateYouthManualAcceptanceSemantic"
     ],
+    "advisory": false,
     "reachable": true,
-    "repairs": [],
-    "wired": [],
+    "repairs": [
+      "repairDense72hWindow"
+    ],
+    "wired": [
+      "repairDense72hWindow"
+    ],
     "tested": true,
     "stressed": false,
     "killedLive": ""
@@ -1179,6 +1361,7 @@
     "owners": [
       "validatePhase15Program"
     ],
+    "advisory": false,
     "reachable": true,
     "repairs": [
       "repairPhase15Program"
@@ -1200,6 +1383,7 @@
       "validatePhase15Program",
       "validateSessionTimeBudget"
     ],
+    "advisory": false,
     "reachable": true,
     "repairs": [
       "repairPhase15Program",
@@ -1220,6 +1404,7 @@
     "owners": [
       "painToleranceGate"
     ],
+    "advisory": false,
     "reachable": true,
     "repairs": [
       "enforcePowerBeforeStrength"
@@ -1239,6 +1424,7 @@
       "collectExerciseRows",
       "validateSportDayCouplingSemantic"
     ],
+    "advisory": false,
     "reachable": true,
     "repairs": [
       "normalizeEquipmentTokens",
@@ -1265,6 +1451,7 @@
     "owners": [
       "validatePhase15Program"
     ],
+    "advisory": false,
     "reachable": true,
     "repairs": [
       "repairPhase15Program"
@@ -1284,6 +1471,7 @@
     "owners": [
       "validatePhase15Program"
     ],
+    "advisory": false,
     "reachable": true,
     "repairs": [
       "repairPhase15Program"
@@ -1303,6 +1491,7 @@
     "owners": [
       "validateTactical3KIntervalProgressionSemantic"
     ],
+    "advisory": false,
     "reachable": true,
     "repairs": [],
     "wired": [],
@@ -1318,6 +1507,7 @@
     "owners": [
       "validateTacticalGppCoverageSemantic"
     ],
+    "advisory": false,
     "reachable": true,
     "repairs": [],
     "wired": [],
@@ -1333,6 +1523,7 @@
     "owners": [
       "validateTacticalManualAcceptanceSemantic"
     ],
+    "advisory": false,
     "reachable": true,
     "repairs": [],
     "wired": [],
@@ -1348,6 +1539,7 @@
     "owners": [
       "validateTacticalScheduleArchitectureSemantic"
     ],
+    "advisory": false,
     "reachable": true,
     "repairs": [],
     "wired": [],
@@ -1363,6 +1555,7 @@
     "owners": [
       "validateTacticalStrengthCompletenessSemantic"
     ],
+    "advisory": false,
     "reachable": true,
     "repairs": [],
     "wired": [],
@@ -1378,6 +1571,7 @@
     "owners": [
       "validateTacticalManualAcceptanceSemantic"
     ],
+    "advisory": false,
     "reachable": true,
     "repairs": [],
     "wired": [],
@@ -1393,6 +1587,7 @@
     "owners": [
       "validateTacticalManualAcceptanceSemantic"
     ],
+    "advisory": false,
     "reachable": true,
     "repairs": [],
     "wired": [],
@@ -1408,6 +1603,7 @@
     "owners": [
       "endurancePerformanceIntegrityFlags"
     ],
+    "advisory": false,
     "reachable": true,
     "repairs": [
       "repairUnbenchmarkedVariationLoads",
@@ -1428,6 +1624,7 @@
     "owners": [
       "validatePhase15Program"
     ],
+    "advisory": false,
     "reachable": true,
     "repairs": [
       "repairPhase15Program"
@@ -1447,6 +1644,7 @@
     "owners": [
       "allWeekTsvShapeFlags"
     ],
+    "advisory": false,
     "reachable": true,
     "repairs": [],
     "wired": [],
@@ -1462,6 +1660,7 @@
     "owners": [
       "allWeekTsvShapeFlags"
     ],
+    "advisory": false,
     "reachable": true,
     "repairs": [],
     "wired": [],
@@ -1477,6 +1676,7 @@
     "owners": [
       "allWeekTsvShapeFlags"
     ],
+    "advisory": false,
     "reachable": true,
     "repairs": [],
     "wired": [],
@@ -1492,6 +1692,7 @@
     "owners": [
       "unbenchmarkedVariationLoadFlags"
     ],
+    "advisory": false,
     "reachable": true,
     "repairs": [
       "repairUnbenchmarkedVariationLoads",
@@ -1512,6 +1713,7 @@
     "owners": [
       "collectExerciseRows"
     ],
+    "advisory": false,
     "reachable": true,
     "repairs": [
       "normalizeEquipmentTokens",
@@ -1538,6 +1740,7 @@
     "owners": [
       "validatePhase15Program"
     ],
+    "advisory": false,
     "reachable": true,
     "repairs": [
       "repairPhase15Program"
@@ -1557,6 +1760,7 @@
     "owners": [
       "collectWarmupSanityFlags"
     ],
+    "advisory": false,
     "reachable": true,
     "repairs": [
       "repairWarmupRampTarget"
@@ -1576,6 +1780,7 @@
     "owners": [
       "collectPrescriptionConsistencyFlags"
     ],
+    "advisory": false,
     "reachable": true,
     "repairs": [
       "repairWarmupRampTarget"
@@ -1595,6 +1800,7 @@
     "owners": [
       "collectRepWordFlags"
     ],
+    "advisory": false,
     "reachable": true,
     "repairs": [
       "repairWarmupRampTarget"
@@ -1614,6 +1820,7 @@
     "owners": [
       "collectPrescriptionConsistencyFlags"
     ],
+    "advisory": false,
     "reachable": true,
     "repairs": [
       "repairWarmupRampTarget"
@@ -1633,6 +1840,7 @@
     "owners": [
       "collectPrescriptionConsistencyFlags"
     ],
+    "advisory": false,
     "reachable": true,
     "repairs": [
       "repairWarmupRampTarget"
@@ -1652,6 +1860,7 @@
     "owners": [
       "collectPrescriptionConsistencyFlags"
     ],
+    "advisory": false,
     "reachable": true,
     "repairs": [
       "repairWarmupRampTarget"
@@ -1671,6 +1880,7 @@
     "owners": [
       "collectProgressionLanguageFlags"
     ],
+    "advisory": false,
     "reachable": true,
     "repairs": [
       "repairWarmupRampTarget"
@@ -1690,6 +1900,7 @@
     "owners": [
       "runningVolumeSignals"
     ],
+    "advisory": false,
     "reachable": false,
     "repairs": [],
     "wired": [],
@@ -1705,6 +1916,7 @@
     "owners": [
       "collectWarmupSanityFlags"
     ],
+    "advisory": false,
     "reachable": true,
     "repairs": [
       "repairWarmupRampTarget"
@@ -1724,6 +1936,7 @@
     "owners": [
       "collectWarmupSanityFlags"
     ],
+    "advisory": false,
     "reachable": true,
     "repairs": [
       "repairWarmupRampTarget"
@@ -1743,6 +1956,7 @@
     "owners": [
       "collectBlockSpecificityFlags"
     ],
+    "advisory": false,
     "reachable": true,
     "repairs": [],
     "wired": [],
@@ -1758,6 +1972,7 @@
     "owners": [
       "collectSymptomAlgorithmFlags"
     ],
+    "advisory": false,
     "reachable": true,
     "repairs": [],
     "wired": [],
@@ -1773,6 +1988,7 @@
     "owners": [
       "collectNarrativeClaimFlags"
     ],
+    "advisory": false,
     "reachable": true,
     "repairs": [],
     "wired": [],
@@ -1788,6 +2004,7 @@
     "owners": [
       "collectSecondaryVolumeCreepFlags"
     ],
+    "advisory": false,
     "reachable": true,
     "repairs": [],
     "wired": [],
@@ -1803,6 +2020,7 @@
     "owners": [
       "collectVolumeNarrativeFlags"
     ],
+    "advisory": false,
     "reachable": true,
     "repairs": [],
     "wired": [],
@@ -1818,6 +2036,7 @@
     "owners": [
       "auditLoadedCarryProgression"
     ],
+    "advisory": false,
     "reachable": true,
     "repairs": [],
     "wired": [],
@@ -1833,6 +2052,7 @@
     "owners": [
       "auditCircularScheduling"
     ],
+    "advisory": false,
     "reachable": true,
     "repairs": [],
     "wired": [],
@@ -1848,6 +2068,7 @@
     "owners": [
       "auditSessionCompleteness"
     ],
+    "advisory": false,
     "reachable": true,
     "repairs": [],
     "wired": [],
@@ -1863,6 +2084,7 @@
     "owners": [
       "auditWeeklyCoverage"
     ],
+    "advisory": false,
     "reachable": true,
     "repairs": [],
     "wired": [],
@@ -1878,6 +2100,7 @@
     "owners": [
       "auditFoundationalStrength"
     ],
+    "advisory": false,
     "reachable": true,
     "repairs": [],
     "wired": [],
@@ -1893,6 +2116,7 @@
     "owners": [
       "collectRecoveryBudgetFlags"
     ],
+    "advisory": false,
     "reachable": true,
     "repairs": [],
     "wired": [],
@@ -1908,6 +2132,7 @@
     "owners": [
       "collectRecoveryBudgetFlags"
     ],
+    "advisory": false,
     "reachable": true,
     "repairs": [],
     "wired": [],
@@ -1923,6 +2148,7 @@
     "owners": [
       "collectProgressionDisciplineFlags"
     ],
+    "advisory": false,
     "reachable": false,
     "repairs": [],
     "wired": [],
@@ -1938,6 +2164,7 @@
     "owners": [
       "collectRecoveryBudgetFlags"
     ],
+    "advisory": false,
     "reachable": true,
     "repairs": [],
     "wired": [],
@@ -1953,6 +2180,7 @@
     "owners": [
       "collectCausalInjuryResponseFlags"
     ],
+    "advisory": false,
     "reachable": true,
     "repairs": [],
     "wired": [],
@@ -1968,6 +2196,7 @@
     "owners": [
       "collectMaintenanceDriftFlags"
     ],
+    "advisory": false,
     "reachable": true,
     "repairs": [],
     "wired": [],
@@ -1983,6 +2212,7 @@
     "owners": [
       "collectAutoregulationFlags"
     ],
+    "advisory": false,
     "reachable": true,
     "repairs": [],
     "wired": [],
@@ -1998,6 +2228,7 @@
     "owners": [
       "collectSessionDurationFlags"
     ],
+    "advisory": false,
     "reachable": true,
     "repairs": [],
     "wired": [],
@@ -2013,6 +2244,7 @@
     "owners": [
       "collectSkillCeilingFlags"
     ],
+    "advisory": false,
     "reachable": true,
     "repairs": [],
     "wired": [],
@@ -2028,6 +2260,7 @@
     "owners": [
       "collectCountClaimFlags"
     ],
+    "advisory": false,
     "reachable": true,
     "repairs": [
       "repairCountClaims"
@@ -2047,6 +2280,7 @@
     "owners": [
       "collectOptionalQualifierFlags"
     ],
+    "advisory": false,
     "reachable": true,
     "repairs": [
       "repairCountClaims"
@@ -2066,6 +2300,7 @@
     "owners": [
       "collectScheduleFrequencyFlags"
     ],
+    "advisory": false,
     "reachable": true,
     "repairs": [
       "repairCountClaims"
@@ -2085,6 +2320,7 @@
     "owners": [
       "collectTextDefectFlags"
     ],
+    "advisory": false,
     "reachable": true,
     "repairs": [
       "repairCountClaims"
@@ -2104,6 +2340,7 @@
     "owners": [
       "collectKeySessionCrowdingFlags"
     ],
+    "advisory": false,
     "reachable": true,
     "repairs": [
       "repairSessionHierarchy",
@@ -2125,6 +2362,7 @@
     "owners": [
       "collectSessionHierarchyFlags"
     ],
+    "advisory": false,
     "reachable": true,
     "repairs": [
       "repairSessionHierarchy",
@@ -2146,6 +2384,7 @@
     "owners": [
       "collectAccessoryLevelFlags"
     ],
+    "advisory": false,
     "reachable": false,
     "repairs": [],
     "wired": [],
@@ -2161,6 +2400,7 @@
     "owners": [
       "collectAdherenceFlags"
     ],
+    "advisory": false,
     "reachable": false,
     "repairs": [],
     "wired": [],
@@ -2176,6 +2416,7 @@
     "owners": [
       "collectThinSessionFlags"
     ],
+    "advisory": false,
     "reachable": false,
     "repairs": [],
     "wired": [],
@@ -2191,6 +2432,7 @@
     "owners": [
       "collectUnderloadedAccessoryFlags"
     ],
+    "advisory": false,
     "reachable": false,
     "repairs": [],
     "wired": [],
@@ -2206,6 +2448,7 @@
     "owners": [
       "collectPrePrimaryLoadFlags"
     ],
+    "advisory": false,
     "reachable": true,
     "repairs": [
       "repairPrePrimaryLoad"
@@ -2225,6 +2468,7 @@
     "owners": [
       "collectEnduranceVolumeFlags"
     ],
+    "advisory": false,
     "reachable": true,
     "repairs": [
       "repairEnduranceVolume"
@@ -2244,6 +2488,7 @@
     "owners": [
       "collectSemanticFlags"
     ],
+    "advisory": false,
     "reachable": true,
     "repairs": [
       "repairSemanticProse"
@@ -2263,6 +2508,7 @@
     "owners": [
       "collectFrequencyClaimFlags"
     ],
+    "advisory": false,
     "reachable": true,
     "repairs": [
       "repairFrequencyClaim"
@@ -2282,6 +2528,7 @@
     "owners": [
       "collectCompetitionFlags"
     ],
+    "advisory": false,
     "reachable": true,
     "repairs": [
       "repairCompetitionBlock"
@@ -2301,6 +2548,7 @@
     "owners": [
       "collectCompetitionFlags"
     ],
+    "advisory": false,
     "reachable": true,
     "repairs": [
       "repairCompetitionBlock"
@@ -2320,6 +2568,7 @@
     "owners": [
       "collectCompetitionFlags"
     ],
+    "advisory": false,
     "reachable": true,
     "repairs": [
       "repairCompetitionBlock"
@@ -2339,6 +2588,7 @@
     "owners": [
       "collectCompetitionFlags"
     ],
+    "advisory": false,
     "reachable": true,
     "repairs": [
       "repairCompetitionBlock"
@@ -2358,6 +2608,7 @@
     "owners": [
       "collectIntensificationFlags"
     ],
+    "advisory": false,
     "reachable": true,
     "repairs": [
       "repairIntensification",
@@ -2378,6 +2629,7 @@
     "owners": [
       "collectIntensificationFlags"
     ],
+    "advisory": false,
     "reachable": true,
     "repairs": [
       "repairIntensification",
@@ -2398,6 +2650,7 @@
     "owners": [
       "collectIntensificationFlags"
     ],
+    "advisory": false,
     "reachable": true,
     "repairs": [
       "repairIntensification",
@@ -2418,6 +2671,7 @@
     "owners": [
       "collectIntensificationFlags"
     ],
+    "advisory": false,
     "reachable": true,
     "repairs": [
       "repairIntensification",
@@ -2438,6 +2692,7 @@
     "owners": [
       "collectIntensificationFlags"
     ],
+    "advisory": false,
     "reachable": true,
     "repairs": [
       "repairIntensification",
@@ -2458,6 +2713,7 @@
     "owners": [
       "collectCombatPowerFlags"
     ],
+    "advisory": false,
     "reachable": true,
     "repairs": [
       "repairCombatPower"
@@ -2477,6 +2733,7 @@
     "owners": [
       "collectCombatPowerFlags"
     ],
+    "advisory": false,
     "reachable": true,
     "repairs": [
       "repairCombatPower"
@@ -2496,6 +2753,7 @@
     "owners": [
       "collectAuditFlags"
     ],
+    "advisory": false,
     "reachable": true,
     "repairs": [],
     "wired": [],
@@ -2511,6 +2769,7 @@
     "owners": [
       "collectEconomyFlags"
     ],
+    "advisory": false,
     "reachable": true,
     "repairs": [
       "repairCampEconomy"
@@ -2530,6 +2789,7 @@
     "owners": [
       "collectNoveltyFlags"
     ],
+    "advisory": false,
     "reachable": true,
     "repairs": [
       "repairCampEconomy"
@@ -2549,6 +2809,7 @@
     "owners": [
       "collectWeightCutFlags"
     ],
+    "advisory": false,
     "reachable": true,
     "repairs": [
       "repairWeightCutLoad"
@@ -2568,6 +2829,7 @@
     "owners": [
       "collectConditioningFlags"
     ],
+    "advisory": false,
     "reachable": true,
     "repairs": [],
     "wired": [],
@@ -2583,6 +2845,7 @@
     "owners": [
       "collectFightWeekClockFlags"
     ],
+    "advisory": false,
     "reachable": true,
     "repairs": [
       "repairFightWeekClock"
@@ -2602,6 +2865,7 @@
     "owners": [
       "collectSportTaperFlags"
     ],
+    "advisory": false,
     "reachable": true,
     "repairs": [],
     "wired": [],
@@ -2617,6 +2881,7 @@
     "owners": [
       "collectBallisticShareFlags"
     ],
+    "advisory": false,
     "reachable": true,
     "repairs": [
       "repairBallisticShare"
@@ -2636,6 +2901,7 @@
     "owners": [
       "collectClusterFlags"
     ],
+    "advisory": false,
     "reachable": true,
     "repairs": [
       "repairClusterNotation"
@@ -2655,6 +2921,7 @@
     "owners": [
       "collectCampSharpeningFlags"
     ],
+    "advisory": false,
     "reachable": true,
     "repairs": [
       "repairCampSharpening"
@@ -2674,6 +2941,7 @@
     "owners": [
       "collectCampSharpeningFlags"
     ],
+    "advisory": false,
     "reachable": true,
     "repairs": [
       "repairCampSharpening"
@@ -2693,6 +2961,7 @@
     "owners": [
       "collectCampSharpeningFlags"
     ],
+    "advisory": false,
     "reachable": true,
     "repairs": [
       "repairCampSharpening"
@@ -2712,6 +2981,7 @@
     "owners": [
       "collectInSeasonFlags"
     ],
+    "advisory": false,
     "reachable": true,
     "repairs": [
       "repairSeasonNarrative",
@@ -2732,6 +3002,7 @@
     "owners": [
       "collectInSeasonFlags"
     ],
+    "advisory": false,
     "reachable": true,
     "repairs": [
       "repairSeasonNarrative",
@@ -2752,6 +3023,7 @@
     "owners": [
       "collectSportWeekFlags"
     ],
+    "advisory": false,
     "reachable": true,
     "repairs": [
       "repairSeasonNarrative",
@@ -2772,6 +3044,7 @@
     "owners": [
       "collectInjuryConstraintFlags"
     ],
+    "advisory": false,
     "reachable": true,
     "repairs": [
       "repairInjuryConstraint"
@@ -2791,6 +3064,7 @@
     "owners": [
       "collectClockFlags"
     ],
+    "advisory": false,
     "reachable": true,
     "repairs": [
       "repairClockStatement"
@@ -2810,6 +3084,7 @@
     "owners": [
       "collectPhaseLabelFlags"
     ],
+    "advisory": false,
     "reachable": false,
     "repairs": [],
     "wired": [],
@@ -2825,6 +3100,7 @@
     "owners": [
       "collectPriorityFlags"
     ],
+    "advisory": false,
     "reachable": false,
     "repairs": [],
     "wired": [],
@@ -2840,6 +3116,7 @@
     "owners": [
       "collectRepetitionFlags"
     ],
+    "advisory": false,
     "reachable": false,
     "repairs": [],
     "wired": [],
@@ -2855,6 +3132,7 @@
     "owners": [
       "collectGoalPaceFlags"
     ],
+    "advisory": false,
     "reachable": false,
     "repairs": [],
     "wired": [],
@@ -2870,6 +3148,7 @@
     "owners": [
       "collectStaticPaceFlags"
     ],
+    "advisory": false,
     "reachable": false,
     "repairs": [],
     "wired": [],
@@ -2885,6 +3164,7 @@
     "owners": [
       "collectDayZeroFlags"
     ],
+    "advisory": false,
     "reachable": true,
     "repairs": [
       "repairDayZeroClaims",
@@ -2910,6 +3190,7 @@
     "owners": [
       "collectMatchDayFlags"
     ],
+    "advisory": false,
     "reachable": true,
     "repairs": [
       "repairDayZeroClaims",
@@ -2935,6 +3216,7 @@
     "owners": [
       "collectAllocationFlags"
     ],
+    "advisory": false,
     "reachable": true,
     "repairs": [
       "repairDayZeroClaims",
@@ -2960,6 +3242,7 @@
     "owners": [
       "collectSportFrequencyFlags"
     ],
+    "advisory": false,
     "reachable": true,
     "repairs": [
       "repairDayZeroClaims",
@@ -2985,6 +3268,7 @@
     "owners": [
       "collectCompetitionWeekFlags"
     ],
+    "advisory": false,
     "reachable": true,
     "repairs": [
       "repairCompetitionWeek"
@@ -3004,6 +3288,7 @@
     "owners": [
       "collectCompetitionWeekFlags"
     ],
+    "advisory": false,
     "reachable": true,
     "repairs": [
       "repairCompetitionWeek"
@@ -3023,6 +3308,7 @@
     "owners": [
       "collectCompetitionWeekFlags"
     ],
+    "advisory": false,
     "reachable": true,
     "repairs": [
       "repairCompetitionWeek"
@@ -3042,6 +3328,7 @@
     "owners": [
       "collectCompetitionWeekFlags"
     ],
+    "advisory": false,
     "reachable": true,
     "repairs": [
       "repairCompetitionWeek"
@@ -3061,6 +3348,7 @@
     "owners": [
       "collectTimelineIntegrityFlags"
     ],
+    "advisory": false,
     "reachable": true,
     "repairs": [
       "repairTimelineIntegrity"
@@ -3080,6 +3368,7 @@
     "owners": [
       "collectTimelineIntegrityFlags"
     ],
+    "advisory": false,
     "reachable": true,
     "repairs": [
       "repairTimelineIntegrity"
@@ -3099,6 +3388,7 @@
     "owners": [
       "collectTimelineIntegrityFlags"
     ],
+    "advisory": false,
     "reachable": true,
     "repairs": [
       "repairTimelineIntegrity"
@@ -3118,6 +3408,7 @@
     "owners": [
       "collectTimelineIntegrityFlags"
     ],
+    "advisory": false,
     "reachable": true,
     "repairs": [
       "repairTimelineIntegrity"
@@ -3137,6 +3428,7 @@
     "owners": [
       "collectPrescriptionIntegrityFlags"
     ],
+    "advisory": false,
     "reachable": true,
     "repairs": [
       "repairPrescriptionIntegrity"
@@ -3156,6 +3448,7 @@
     "owners": [
       "collectPrescriptionIntegrityFlags"
     ],
+    "advisory": false,
     "reachable": true,
     "repairs": [
       "repairPrescriptionIntegrity"
@@ -3175,6 +3468,7 @@
     "owners": [
       "collectPrescriptionIntegrityFlags"
     ],
+    "advisory": false,
     "reachable": true,
     "repairs": [
       "repairPrescriptionIntegrity"
@@ -3196,6 +3490,7 @@
       "collectExerciseRows",
       "validateWeeklyVolumeBudgetSemantic"
     ],
+    "advisory": false,
     "reachable": true,
     "repairs": [
       "normalizeEquipmentTokens",
@@ -3222,6 +3517,7 @@
     "owners": [
       "validatePhase15Program"
     ],
+    "advisory": false,
     "reachable": true,
     "repairs": [
       "repairPhase15Program"
@@ -3241,6 +3537,7 @@
     "owners": [
       "validateYouthConsolidationRetentionSemantic"
     ],
+    "advisory": false,
     "reachable": true,
     "repairs": [],
     "wired": [],
@@ -3256,9 +3553,14 @@
     "owners": [
       "validateYouthManualAcceptanceSemantic"
     ],
+    "advisory": false,
     "reachable": true,
-    "repairs": [],
-    "wired": [],
+    "repairs": [
+      "repairDense72hWindow"
+    ],
+    "wired": [
+      "repairDense72hWindow"
+    ],
     "tested": true,
     "stressed": false,
     "killedLive": ""
@@ -3271,9 +3573,14 @@
     "owners": [
       "validateYouthManualAcceptanceSemantic"
     ],
+    "advisory": false,
     "reachable": true,
-    "repairs": [],
-    "wired": [],
+    "repairs": [
+      "repairDense72hWindow"
+    ],
+    "wired": [
+      "repairDense72hWindow"
+    ],
     "tested": true,
     "stressed": false,
     "killedLive": ""
@@ -3286,9 +3593,14 @@
     "owners": [
       "validateYouthManualAcceptanceSemantic"
     ],
+    "advisory": false,
     "reachable": true,
-    "repairs": [],
-    "wired": [],
+    "repairs": [
+      "repairDense72hWindow"
+    ],
+    "wired": [
+      "repairDense72hWindow"
+    ],
     "tested": true,
     "stressed": false,
     "killedLive": ""
@@ -3301,6 +3613,7 @@
     "owners": [
       "validateYouthProgressionQualitySemantic"
     ],
+    "advisory": false,
     "reachable": true,
     "repairs": [],
     "wired": [],
@@ -3316,6 +3629,7 @@
     "owners": [
       "validatePhase15Program"
     ],
+    "advisory": false,
     "reachable": true,
     "repairs": [
       "repairPhase15Program"

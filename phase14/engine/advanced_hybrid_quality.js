@@ -273,3 +273,67 @@ export function repairRunBaseline(program, intake = {}) {
   const rebuilt = [parsed.header.join('\t'), ...cells.map((c) => c.join('\t'))].join('\n');
   return String(program || '').replace(parsed.re, `$1${rebuilt}$3`);
 }
+
+// While the marathon sits behind primary strength and skill goals, each week
+// carries exactly one substantive easy run and no extra hard endurance. The
+// rule said so and could not enforce it, so a hybrid week that drifted into two
+// runs -- or one run nobody had called easy -- failed four times and produced
+// nothing.
+//
+// Both halves have a mechanical answer. A run that is not described as easy is
+// described as easy, because that is what a support run is. Extra runs are
+// removed, which is precisely what "do not add extra hard endurance work"
+// asks -- and never the last piece of work on a day, so no session is emptied
+// to satisfy a wording rule.
+const EASY_LANGUAGE = /easy|zone\s*2|conversational/i;
+const SUPPORT_RUN_NOTE = 'Easy, conversational pace: this run supports the marathon while the strength and skill goals stay in front of it. If you cannot talk through it, it is too fast.';
+
+export function repairMarathonSubordination(program, intake = {}) {
+  if (!isHighConcurrencyHybrid(intake)) return String(program || '');
+  if (marathonGoalTier(intake) !== 'secondary') return String(program || '');
+
+  let out = String(program || '');
+  for (let week = 1; week <= 4; week += 1) {
+    const parsed = parseWeekRows(out, week);
+    if (!parsed) continue;
+
+    const runs = [];
+    const perDay = new Map();
+    let lastDay = '';
+    parsed.rows.forEach((row, i) => {
+      const raw = String(row[parsed.day] || '').trim();
+      if (raw) lastDay = raw;
+      const name = String(row[parsed.exercise] || '').trim();
+      if (!name || /^\s*\[WARMUP\]/i.test(name)) return;
+      perDay.set(lastDay, (perDay.get(lastDay) || 0) + 1);
+      if (/^(?:run|running)$/i.test(name)) runs.push({ index: i, day: lastDay });
+    });
+    if (!runs.length) continue;
+
+    const cells = parsed.rows.map((c) => c.slice());
+    const noteOf = (i) => (Number.isInteger(parsed.notes) ? String(cells[i][parsed.notes] || '') : '');
+    const loadOf = (i) => (Number.isInteger(parsed.load) ? String(cells[i][parsed.load] || '') : '');
+
+    // Keep the one that already reads as the support run, otherwise the first.
+    const keep = runs.find((r) => EASY_LANGUAGE.test(`${loadOf(r.index)} ${noteOf(r.index)}`)) || runs[0];
+    const drop = new Set();
+    for (const r of runs) {
+      if (r === keep) continue;
+      if ((perDay.get(r.day) || 0) <= 1) continue; // never empty a day
+      drop.add(r.index);
+      perDay.set(r.day, (perDay.get(r.day) || 1) - 1);
+    }
+
+    let changed = drop.size > 0;
+    if (Number.isInteger(parsed.notes) && !EASY_LANGUAGE.test(`${loadOf(keep.index)} ${noteOf(keep.index)}`)) {
+      const note = noteOf(keep.index).trim();
+      cells[keep.index][parsed.notes] = note ? `${note} ${SUPPORT_RUN_NOTE}` : SUPPORT_RUN_NOTE;
+      changed = true;
+    }
+    if (!changed) continue;
+    const kept = cells.filter((_, i) => !drop.has(i));
+    const rebuilt = [parsed.header.join('\t'), ...kept.map((c) => c.join('\t'))].join('\n');
+    out = out.replace(parsed.re, `$1${rebuilt}$3`);
+  }
+  return out;
+}

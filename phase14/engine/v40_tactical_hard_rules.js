@@ -14,6 +14,9 @@
 // regardless of why. That inversion is what this checks.
 
 import { CATEGORY, classifyExercise } from './v38_movement_taxonomy.js';
+// The local parseWeek above returns neither the header nor the match, so the
+// repair below uses the shared reader that can put a week back together.
+import { parseWeek as parseWeekRows } from './v34_workload_accounting.js';
 
 function arr(v) { return Array.isArray(v) ? v : v ? [v] : []; }
 function txt(v) {
@@ -230,4 +233,121 @@ export function buildTacticalHardRuleBrief(intake = {}) {
     `T3K-03: a primary interval session for a trained athlete usually carries roughly ${QUALITY_VOLUME_FLOOR_M}-${QUALITY_VOLUME_CEILING_M} m of meaningful quality running. Treat that as a default framework, not a rule: an early or deliberately reduced week may sit below it, and should say so.`,
     'T3K-08: if recovery forces something to be cut, cut in this order - nonessential accessories, then extra hypertrophy, then secondary strength volume, then secondary ruck progression, then surplus easy aerobic volume, and only then the key race-specific session. Never reduce the key session while accessory or secondary strength volume holds or rises. Safety overrides this order.',
   ].join('\n');
+}
+
+// --- repair ------------------------------------------------------------------
+//
+// T3K-01 and T3K-08 are the two hard tactical rules, and neither had a way to
+// answer itself. Both name their own fix.
+//
+// T3K-01: "extend the repetitions, add quality volume, or bring the pace closer
+// to the goal demand." Of the three, extending the repetition is the one a
+// machine can take responsibly -- pace targets belong to the athlete's current
+// capacity, and inventing a faster one is exactly the false precision the coach
+// objected to elsewhere. So the key session's repetition grows across the block,
+// which is what race specificity means: closer to the demand, not merely more
+// of the same.
+//
+// T3K-08: "remove nonessential accessories, extra hypertrophy, secondary
+// strength volume ... before reducing the key session." That is an ordering, and
+// an ordering is code. When a week cuts the key session while accessory volume
+// holds, the accessories come down instead.
+
+const REP_EXTENSION = 1.12;   // enough to clear the rule's 1.05 threshold
+const MIN_ACCESSORY_SETS = 1;
+
+export function repairTacticalHardRules(program, intake = {}) {
+  const race = raceProfile(intake);
+  if (!race) return String(program || '');
+  let out = String(program || '');
+
+  // --- T3K-01: the key session moves toward race demand -----------------
+  const reps = qualityReps(out);
+  if (reps.length >= 2) {
+    const paced = reps.filter((r) => Number.isFinite(r.fastestPace));
+    const paceCloser = paced.length >= 2 && paced[paced.length - 1].fastestPace < paced[0].fastestPace * 0.995;
+    const repsLonger = reps.some((r) => r.longest > reps[0].longest * 1.05);
+    const volumeGrew = reps.some((r) => r.metres > reps[0].metres * 1.08);
+    if (!paceCloser && !repsLonger && !volumeGrew) {
+      const base = reps[0].longest;
+      // Grow the repetition in the weeks after the first, leaving week 4 alone:
+      // the final week is a taper by design everywhere else in this file.
+      for (const { week } of reps.filter((r) => r.week > reps[0].week && r.week < 4)) {
+        const parsed = parseWeekRows(out, week);
+        if (!parsed) continue;
+        const cells = parsed.rows.map((c) => c.slice());
+        let changed = false;
+        parsed.rows.forEach((row, i) => {
+          const name = String(row[parsed.exercise] || '');
+          if (isWarmup(name) || classifyExercise(name).category !== CATEGORY.ENDURANCE) return;
+          const sets = firstNum(row[parsed.sets]) || 0;
+          const raw = String(row[parsed.reps] || '');
+          const m = raw.match(/\b(\d{2,4})\s*m\b/i);
+          if (!m || sets < 2 || Number(m[1]) < base) return;
+          const grown = Math.round((Number(m[1]) * REP_EXTENSION) / 50) * 50;
+          if (grown <= Number(m[1])) return;
+          cells[i][parsed.reps] = raw.replace(/\b\d{2,4}\s*m\b/i, `${grown} m`);
+          if (Number.isInteger(parsed.notes)) {
+            const note = String(cells[i][parsed.notes] || '').trim();
+            const add = `Longer repetitions than last block week: race specificity means getting closer to the ${race.km} km demand, not repeating the same session.`;
+            if (!note.includes('race specificity means')) cells[i][parsed.notes] = note ? `${note} ${add}` : add;
+          }
+          changed = true;
+        });
+        if (!changed) continue;
+        const rebuilt = [parsed.header.join('\t'), ...cells.map((c) => c.join('\t'))].join('\n');
+        out = out.replace(parsed.re, `$1${rebuilt}$3`);
+      }
+    }
+  }
+
+  // --- T3K-08: the accessories are cut before the key session ------------
+  const after = qualityReps(out);
+  for (let i = 1; i < after.length; i += 1) {
+    const week = after[i].week;
+    if (week === 4) continue;
+    if (!(after[i].metres < after[i - 1].metres * 0.92)) continue;
+    const before = parseWeekRows(out, after[i - 1].week);
+    const now = parseWeekRows(out, week);
+    if (!before || !now) continue;
+    const target = lowerPriorityLoad(before).sets;
+    let current = lowerPriorityLoad(now).sets;
+    if (current < target) continue;
+
+    const cells = now.rows.map((c) => c.slice());
+    // Trim the heaviest accessories first, and never take a movement below a
+    // single working set: the rule asks for less of the secondary work, not for
+    // its removal.
+    const trimmable = now.rows
+      .map((row, index) => ({ index, name: String(row[now.exercise] || '').trim(), sets: firstNum(row[now.sets]) }))
+      .filter((r) => r.name && !isWarmup(r.name) && Number.isFinite(r.sets) && r.sets > MIN_ACCESSORY_SETS)
+      .filter((r) => {
+        const { category } = classifyExercise(r.name);
+        return category !== CATEGORY.ENDURANCE && category !== CATEGORY.LOADED_CARRY;
+      })
+      .sort((a, b) => b.sets - a.sets);
+    if (!trimmable.length) continue;
+
+    let changed = false;
+    let guard = 0;
+    while (current >= target && guard < 200) {
+      guard += 1;
+      const next = trimmable.filter((r) => (firstNum(cells[r.index][now.sets]) || 0) > MIN_ACCESSORY_SETS)
+        .sort((a, b) => (firstNum(cells[b.index][now.sets]) || 0) - (firstNum(cells[a.index][now.sets]) || 0))[0];
+      if (!next) break;
+      const have = firstNum(cells[next.index][now.sets]) || 0;
+      cells[next.index][now.sets] = String(have - 1);
+      current -= 1;
+      changed = true;
+      if (Number.isInteger(now.notes)) {
+        const note = String(cells[next.index][now.notes] || '').trim();
+        const add = 'Accessory volume comes down before the key session does: this week protects the race work, and this is the work that gives way for it.';
+        if (!note.includes('before the key session does')) cells[next.index][now.notes] = note ? `${note} ${add}` : add;
+      }
+    }
+    if (!changed) continue;
+    const rebuilt = [now.header.join('\t'), ...cells.map((c) => c.join('\t'))].join('\n');
+    out = out.replace(now.re, `$1${rebuilt}$3`);
+  }
+  return out;
 }
