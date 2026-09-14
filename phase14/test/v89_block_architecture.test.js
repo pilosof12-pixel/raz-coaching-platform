@@ -31,9 +31,9 @@ test('a block only has Day 0 when it reaches the event', () => {
 
 test('peaking language without Day 0 is refused, and rewritten plainly', () => {
   const claims = `Week 4 is peak week and we taper into it.${TAIL}`;
-  assert.equal(collectDayZeroFlags(claims, LIFT8).length, 1);
+  assert.deepEqual(collectDayZeroFlags(claims, LIFT8).map((f) => f.code), ['V89_PEAK_CLAIMED_WITHOUT_DAY_ZERO']);
   const fixed = repairDayZeroClaims(claims, LIFT8);
-  assert.equal(collectDayZeroFlags(fixed, LIFT8).length, 0);
+  assert.deepEqual(collectDayZeroFlags(fixed, LIFT8).map((f) => f.code), []);
   // Verb forms must survive the rewrite: "we easing into it" is not English.
   assert.match(fixed, /we ease into it/);
   assert.doesNotMatch(fixed, /easing into it/);
@@ -42,12 +42,12 @@ test('peaking language without Day 0 is refused, and rewritten plainly', () => {
 
 test('the same language is allowed when the block earns it', () => {
   const claims = `Week 4 is peak week and we taper into it.${TAIL}`;
-  assert.equal(collectDayZeroFlags(claims, LIFT4).length, 0, 'this block does reach the meet');
+  assert.deepEqual(collectDayZeroFlags(claims, LIFT4).map((f) => f.code), [], 'this block does reach the meet');
 });
 
 test('an in-season taper into match day is not a peaking claim', () => {
   const p = `We taper the gym load into match day so he is fresh on Saturday.${TAIL}`;
-  assert.equal(collectDayZeroFlags(p, HARD.inseason_footballer).length, 0);
+  assert.deepEqual(collectDayZeroFlags(p, HARD.inseason_footballer).map((f) => f.code), []);
 });
 
 test('the week tables are untouched by the rewrite', () => {
@@ -68,9 +68,9 @@ test('gym days are positioned relative to the match', () => {
 
 test('sessions presented as bare weekdays are flagged and labelled', () => {
   const program = read('run101_inseason_footballer.txt');
-  assert.equal(collectMatchDayFlags(program, HARD.inseason_footballer).length, 1);
+  assert.deepEqual(collectMatchDayFlags(program, HARD.inseason_footballer).map((f) => f.code), ['V89_SESSIONS_NOT_PLACED_BY_MATCH_DAY']);
   const placed = repairMatchDayPlacement(program, HARD.inseason_footballer);
-  assert.equal(collectMatchDayFlags(placed, HARD.inseason_footballer).length, 0);
+  assert.deepEqual(collectMatchDayFlags(placed, HARD.inseason_footballer).map((f) => f.code), []);
   assert.match(placed, /MD-4/);
   assert.match(placed, /MD-2/);
   assert.equal(repairMatchDayPlacement(placed, HARD.inseason_footballer), placed, 'repair is not idempotent');
@@ -88,7 +88,7 @@ test('the label is written once per session, not on every row', () => {
 
 test('an athlete with no fixture is left alone', () => {
   for (const [id, intake] of Object.entries(CORE)) {
-    assert.equal(collectMatchDayFlags(read('run81_advanced_hybrid.txt'), intake).length, 0, id);
+    assert.deepEqual(collectMatchDayFlags(read('run81_advanced_hybrid.txt'), intake).map((f) => f.code), [], id);
     assert.equal(repairMatchDayPlacement(read('run81_advanced_hybrid.txt'), intake), read('run81_advanced_hybrid.txt'), id);
   }
 });
@@ -107,7 +107,7 @@ test('a flat sport share across a return block is flagged', () => {
   // weeks -- and only because week 4 carries less of everything.
   assert.ok(shares[3].share - shares[0].share < 0.04, 'fixture should barely move');
   const flags = collectAllocationFlags(program, HARD.masters_return);
-  assert.equal(flags.length, 1);
+  assert.deepEqual(flags.map((f) => f.code), ['V89_SPORT_ALLOCATION_NOT_SHIFTING']);
   assert.match(flags[0].detail, /A return is not finished when the gym exercises progress/);
 });
 
@@ -123,7 +123,7 @@ test('the allocation repair shifts the balance without inventing sport sessions'
 
   assert.ok(after[3].share > before[3].share, 'week 4 must end more specific than it started');
   assert.deepEqual(after.map((w) => w.sport), before.map((w) => w.sport), 'sport sets must not change');
-  assert.equal(collectAllocationFlags(repaired, HARD.masters_return).length, 0, 'the repair must answer its own flag');
+  assert.deepEqual(collectAllocationFlags(repaired, HARD.masters_return).map((f) => f.code), [], 'the repair must answer its own flag');
   assert.equal(repairAllocationShift(repaired, HARD.masters_return), repaired, 'repair is not idempotent');
 });
 
@@ -132,7 +132,7 @@ test('the rule asks only for a shift trimming can reach', () => {
   // hit is unrepairable and spends the attempt budget, which is how the peak
   // block died twice.
   const repaired = repairAllocationShift(read('run101_masters_return.txt'), HARD.masters_return);
-  assert.equal(collectAllocationFlags(repaired, HARD.masters_return).length, 0);
+  assert.deepEqual(collectAllocationFlags(repaired, HARD.masters_return).map((f) => f.code), []);
 });
 
 test('a block that does shift is not flagged', () => {
@@ -141,14 +141,14 @@ test('a block that does shift is not flagged', () => {
   const gym = 'Tue\tGoblet Squat\t24 kg\t3\t8\t2 min\t7\tn\t';
   const shifting = [wk(1, [erg, gym, gym, gym].join('\n')), wk(2, [erg, erg, gym, gym].join('\n')),
     wk(3, [erg, erg, erg, gym].join('\n')), wk(4, [erg, erg, erg, gym].join('\n'))].join('\n');
-  assert.equal(collectAllocationFlags(shifting, HARD.masters_return).length, 0);
+  assert.deepEqual(collectAllocationFlags(shifting, HARD.masters_return).map((f) => f.code), []);
 });
 
 test('athletes not returning from injury are not judged on allocation', () => {
   for (const [id, intake] of Object.entries(CORE)) {
-    assert.equal(collectAllocationFlags(read('run81_advanced_hybrid.txt'), intake).length, 0, id);
+    assert.deepEqual(collectAllocationFlags(read('run81_advanced_hybrid.txt'), intake).map((f) => f.code), [], id);
   }
-  assert.equal(collectAllocationFlags(read('run81_advanced_hybrid.txt'), LIFT4).length, 0);
+  assert.deepEqual(collectAllocationFlags(read('run81_advanced_hybrid.txt'), LIFT4).map((f) => f.code), []);
 });
 
 // --- briefs -----------------------------------------------------------------
@@ -186,7 +186,7 @@ test('a return that never touches the sport more often is flagged', () => {
   const days = sportDaysByWeek(program, HARD.masters_return);
   assert.deepEqual(days.map((w) => w.sport), [2, 2, 2, 2], 'fixture touches the sport on the same days throughout');
   const flags = collectSportFrequencyFlags(program, HARD.masters_return);
-  assert.equal(flags.length, 1);
+  assert.deepEqual(flags.map((f) => f.code), ['V89_SPORT_FREQUENCY_STATIC']);
   assert.match(flags[0].detail, /Trimming accessory sets moves the percentages without moving the training/);
 });
 
@@ -198,7 +198,7 @@ test('the frequency repair buys a sport day by giving up a gym slot', () => {
 
   assert.ok(after[3].sport > before[3].sport, 'week 4 must touch the sport more often');
   assert.deepEqual(after.map((w) => w.days), before.map((w) => w.days), 'no session may be added on top');
-  assert.equal(collectSportFrequencyFlags(repaired, HARD.masters_return).length, 0, 'the repair must answer its own flag');
+  assert.deepEqual(collectSportFrequencyFlags(repaired, HARD.masters_return).map((f) => f.code), [], 'the repair must answer its own flag');
   assert.equal(repairSportFrequency(repaired, HARD.masters_return), repaired, 'repair is not idempotent');
   assert.match(repaired, /an extra low-cost exposure to the sport/);
 });
@@ -207,5 +207,5 @@ test('the frequency rule leaves a protected-stage return alone', () => {
   // Early after an injury, capacity first is correct: the rule must not push a
   // freshly injured athlete back toward their sport on a schedule.
   const protectedIntake = { ...HARD.masters_return, pain: { ...HARD.masters_return.pain, active: true, severity: '7/10, constant' }, injury_date: new Date().toISOString().slice(0, 10) };
-  assert.equal(collectSportFrequencyFlags(read('run101_masters_return.txt'), protectedIntake).length, 0);
+  assert.deepEqual(collectSportFrequencyFlags(read('run101_masters_return.txt'), protectedIntake).map((f) => f.code), []);
 });

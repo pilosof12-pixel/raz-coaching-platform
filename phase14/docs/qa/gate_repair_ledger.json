@@ -3178,7 +3178,7 @@
       "repairAllocationShift",
       "repairSportFrequency"
     ],
-    "tested": false,
+    "tested": true,
     "stressed": false,
     "killedLive": ""
   },
@@ -3204,7 +3204,7 @@
       "repairAllocationShift",
       "repairSportFrequency"
     ],
-    "tested": false,
+    "tested": true,
     "stressed": false,
     "killedLive": ""
   },
@@ -3230,7 +3230,7 @@
       "repairAllocationShift",
       "repairSportFrequency"
     ],
-    "tested": false,
+    "tested": true,
     "stressed": false,
     "killedLive": ""
   },
@@ -3256,7 +3256,7 @@
       "repairAllocationShift",
       "repairSportFrequency"
     ],
-    "tested": false,
+    "tested": true,
     "stressed": false,
     "killedLive": ""
   },
@@ -3376,7 +3376,7 @@
     "wired": [
       "repairTimelineIntegrity"
     ],
-    "tested": false,
+    "tested": true,
     "stressed": false,
     "killedLive": ""
   },

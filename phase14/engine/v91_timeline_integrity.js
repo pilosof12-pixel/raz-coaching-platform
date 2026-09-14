@@ -142,18 +142,29 @@ export function collectTimelineIntegrityFlags(program, intake = {}, now = Date.n
   //    check, and the one a taper is actually judged by.
   const plan = sportTaperPlan(intake, now);
   if (plan && plan.length) {
-    const hard = plan.map((p) => p.hardTarget);
+    // Only the run-up to the event is a taper. A block that continues past the
+    // event has the athlete back in ordinary training the week after it, and
+    // reading that as "hard contact rising into the fight" failed a program
+    // that was right -- unrepairably, because this is computed from the
+    // intake's own dates and no edit to the program can move it. Four of the
+    // five event timings tripped it: one, two, three and five weeks out.
+    const zero = plan.findIndex((p) => p.state === STATE.COMPETITION_WEEK);
+    const runUp = zero >= 0 ? plan.slice(0, zero + 1) : plan;
+    const hard = runUp.map((p) => p.hardTarget);
     for (let i = 1; i < hard.length; i += 1) {
       if (hard[i] > hard[i - 1]) {
         flags.push({
           code: 'V91_COMBAT_LOAD_NOT_DECREASING',
-          week: plan[i].week,
-          detail: `Hard contact rises into week ${plan[i].week} (${hard.join(' -> ')}). Sparring is the largest stressor in the camp, so it has to come down as the event approaches, not up.`,
+          week: runUp[i].week,
+          detail: `Hard contact rises into week ${runUp[i].week} (${hard.join(' -> ')}). Sparring is the largest stressor in the camp, so it has to come down as the event approaches, not up.`,
         });
         break;
       }
     }
-    if (hard[hard.length - 1] > 0) {
+    // And only the event week itself has to reach zero. When the event sits
+    // beyond this block there is no such week, and a taper that has come down
+    // to one hard session is doing exactly what it should.
+    if (zero >= 0 && hard[hard.length - 1] > 0) {
       flags.push({
         code: 'V91_COMBAT_LOAD_NOT_DECREASING',
         week,

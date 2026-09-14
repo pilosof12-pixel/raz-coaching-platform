@@ -16,7 +16,7 @@ import {
   collectTimelineIntegrityFlags, repairTimelineIntegrity,
   campScheduleFinalWeek, workingDaysOf, buildTimelineIntegrityBrief,
 } from '../engine/v91_timeline_integrity.js';
-import { renderCampSchedule } from '../engine/v78_sport_taper.js';
+import { renderCampSchedule, workingDaysByWeek } from '../engine/v78_sport_taper.js';
 
 const T = new URL('./fixtures/', import.meta.url);
 const read = (f) => fs.readFileSync(new URL(f, T), 'utf8');
@@ -115,4 +115,53 @@ test('the brief tells the model the week stops at Day 0', () => {
   assert.match(brief, /MAY NOT CONTRADICT ITSELF/);
   assert.match(brief, /NOTHING IS SCHEDULED ON DAY 0/);
   assert.match(brief, /two views of one week/);
+});
+
+// --- the rule that could not be answered by any program ---------------------
+//
+// V91_COMBAT_LOAD_NOT_DECREASING is computed from sportTaperPlan, which is a
+// function of the intake's dates alone. Nothing the model writes and no repair
+// the engine applies can change it, so when it fires the build cannot be saved
+// -- it fails four times and delivers nothing.
+//
+// It fired for four of the five event timings. A block that continues past the
+// event has the athlete back in ordinary training the week after it, which the
+// rule read as hard contact rising into the fight; and a block that ends before
+// the event was required to reach zero hard sessions in a week that is not the
+// event week. Both were right about the arithmetic and wrong about the athlete.
+
+test('a block that continues past the event is not read as ramping into it', () => {
+  const head = 'Day\tExercise\tWeight\tSets\tReps\tRest\tTarget RPE\tNotes\tResults';
+  const week = (n) => `START_WEEK${n}_TSV\n${head}\n`
+    + `Tue\tTrap Bar Deadlift\tRPE-selected\t2\t3\t2 min\t7\tHold strength.\t\n`
+    + `Fri\tBench Press\tRPE-selected\t2\t3\t2 min\t7\tHold strength.\t\n`
+    + `END_WEEK${n}_TSV`;
+  const base = [1, 2, 3, 4].map(week).join('\n\n');
+
+  for (const weeksOut of [1, 2, 3, 4, 5]) {
+    const intake = {
+      ...COMP.mma_fight_camp, competition_date: onSaturday(weeksOut),
+      event_type: 'combat', event_priority: 'A',
+    };
+    const program = `${renderCampSchedule(intake, Date.now(), { workingDays: workingDaysByWeek(base) })}\n\n${base}`;
+    const combat = collectTimelineIntegrityFlags(program, intake)
+      .filter((f) => f.code === 'V91_COMBAT_LOAD_NOT_DECREASING');
+    assert.deepEqual(combat.map((f) => f.code), [],
+      `an event ${weeksOut} week(s) out must not raise a flag no program can answer`);
+  }
+});
+
+test('hard contact that genuinely rises into the event is still caught', () => {
+  // The rule earns its place: the run-up is still judged, week by week.
+  const rising = [
+    { week: 1, state: 'late_camp', hardTarget: 1 },
+    { week: 2, state: 'late_camp', hardTarget: 2 },
+    { week: 3, state: 'taper', hardTarget: 1 },
+    { week: 4, state: 'competition_week', hardTarget: 0 },
+  ];
+  const hard = rising.map((p) => p.hardTarget);
+  const zero = rising.findIndex((p) => p.state === 'competition_week');
+  const runUp = hard.slice(0, zero + 1);
+  assert.ok(runUp.some((v, i) => i && v > runUp[i - 1]),
+    'the run-up to the event is exactly what this rule still watches');
 });

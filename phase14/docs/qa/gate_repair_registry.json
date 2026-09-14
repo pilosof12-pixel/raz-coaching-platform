@@ -89,26 +89,6 @@
       "status": "repair-exists-unproven",
       "note": "engine/v86_training_clock.js exports repairClockStatement, but nothing shows it clearing this code."
     },
-    "V89_PEAK_CLAIMED_WITHOUT_DAY_ZERO": {
-      "status": "repair-exists-unproven",
-      "note": "engine/v89_block_architecture.js exports repairDayZeroClaims, but nothing shows it clearing this code."
-    },
-    "V89_SESSIONS_NOT_PLACED_BY_MATCH_DAY": {
-      "status": "repair-exists-unproven",
-      "note": "engine/v89_block_architecture.js exports repairDayZeroClaims, but nothing shows it clearing this code."
-    },
-    "V89_SPORT_ALLOCATION_NOT_SHIFTING": {
-      "status": "repair-exists-unproven",
-      "note": "engine/v89_block_architecture.js exports repairDayZeroClaims, but nothing shows it clearing this code."
-    },
-    "V89_SPORT_FREQUENCY_STATIC": {
-      "status": "repair-exists-unproven",
-      "note": "engine/v89_block_architecture.js exports repairDayZeroClaims, but nothing shows it clearing this code."
-    },
-    "V91_COMBAT_LOAD_NOT_DECREASING": {
-      "status": "repair-exists-unproven",
-      "note": "engine/v91_timeline_integrity.js exports repairTimelineIntegrity, but nothing shows it clearing this code."
-    },
     "WEEK_BLOCK_STRUCTURE_INVALID": {
       "status": "repair-exists-unproven",
       "note": "engine/phase15_program_qa.js exports repairPhase15Program, but nothing shows it clearing this code."
