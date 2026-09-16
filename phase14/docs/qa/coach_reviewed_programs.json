@@ -1,0 +1,73 @@
+{
+  "_why": "The three delivered programs the reviewing coach scored in Phase 1, mapped to the committed fixtures that hold them. Derived once by matching audit signatures and opening lines after the scratchpad copies were lost in a container rebuild; recorded here so it never has to be derived again. Dimension scores are the coach's, and reproduce his overall score through engine/coach_standard.js.",
+  "programs": [
+    {
+      "id": "program-1",
+      "fixture": "test/fixtures/run101_weightlifter_peak.txt",
+      "type": "weightlifting",
+      "overall": 8.2,
+      "identified_by": "TAPER AUDIT W1-W3 all 69 sets at 39% competition share; contains the unsupported '4 kg cut' claim; peak intensity 82/84/87% never reaching the 89-90% band",
+      "dimensions": {
+        "competition_lift_specificity": 7.8,
+        "loading_progression": 8.4,
+        "fatigue_management": 8.1,
+        "athlete_specific_modification": 8.6,
+        "execution_rules": 8.8
+      },
+      "findings": [
+        { "cost": 0.55, "what": "Snatch Pull 130 kg x 3 is a named maintenance benchmark with no direct pulling exposure anywhere" },
+        { "cost": 0.35, "what": "intensity never reaches the 89-90% intensification band" },
+        { "cost": 0.20, "what": "five consecutive training days despite flexible availability" },
+        { "cost": 0.20, "what": "accessory redundancy: four rowing exposures" },
+        { "cost": 0.15, "what": "contingency creates an adjacent duplicate squat" },
+        { "cost": 0.10, "what": "audit reports 69 sets in Weeks 1 and 2 while the text says volume comes down" },
+        { "cost": 0.10, "what": "asserts a 'routine 4 kg cut' with no support in the intake" }
+      ]
+    },
+    {
+      "id": "program-2",
+      "fixture": "test/fixtures/run81_tactical_3k.txt",
+      "type": "tactical_endurance",
+      "overall": 7.6,
+      "identified_by": "opens 'Here's your corrected five-day flow'; Back Squat 120 kg 2x3; Weighted Pull-up +22.5 kg 3x4 in all four weeks",
+      "dimensions": {
+        "primary_goal_specificity": 7.0,
+        "progression_and_overload": 7.4,
+        "concurrent_training_structure": 7.8,
+        "secondary_goal_integration": 8.2,
+        "athlete_specific_constraints": 8.5,
+        "execution_rules": 8.6
+      },
+      "findings": [
+        { "cost": 0.50, "what": "promises to rebuild toward 18-20 km/week, leaves both easy runs at 25 min for four weeks" },
+        { "cost": 0.40, "what": "interval progression stays ~4:08-4:12/km through Week 4 against a 4:00/km goal pace" },
+        { "cost": 0.25, "what": "ruck cut to ~6.3-6.5 km when the athlete tolerates 8-10 km and the goal is 10 km" },
+        { "cost": 0.20, "what": "three consecutive lower-body days (Sat ruck, Sun lunge + run, Mon squat + run)" },
+        { "cost": 0.15, "what": "weighted pull-up fixed at +22.5 kg 3x4 for four weeks against a demonstrated +30 kg x 5" },
+        { "cost": 0.10, "what": "days_per_week: 3 against five calendar training days, interpretation never stated" }
+      ]
+    },
+    {
+      "id": "program-3",
+      "fixture": "test/fixtures/run113_mma_camp_delivered.txt",
+      "type": "combat_camp",
+      "overall": 8.9,
+      "identified_by": "late-camp audit W1 24 sets; every Friday note reads 'after hard MMA' against a technical Friday",
+      "dimensions": {
+        "camp_specificity_and_hierarchy": 9.4,
+        "fatigue_and_sport_integration": 9.2,
+        "strength_and_power_maintenance": 8.3,
+        "injury_and_symptom_modification": 9.3,
+        "taper_and_competition_week": 9.1,
+        "execution_rules": 9.4
+      },
+      "findings": [
+        { "cost": 0.40, "what": "hip thrust is the main lower-body lift while Trap Bar Deadlift is pain-free with a 190 kg x 3 benchmark" },
+        { "cost": 0.20, "what": "Day -1 stacks MMA technical work and an optional gym primer after a hard 4 kg cut" },
+        { "cost": 0.15, "what": "accessory marginal return on seven MMA sessions a week" },
+        { "cost": 0.15, "what": "silently changes Friday from the intake's 'hard' to technical" },
+        { "cost": 0.05, "what": "Week 3 Friday note says 'after hard MMA' while the camp schedule says technical" }
+      ]
+    }
+  ]
+}

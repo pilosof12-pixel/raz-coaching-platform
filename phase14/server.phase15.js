@@ -73,10 +73,29 @@ const OPENAI_API_KEY = process.env.OPENAI_API_KEY || "";
 const OPENAI_MODEL = process.env.OPENAI_MODEL || "gpt-5.4";
 const OPENAI_REASONING_EFFORT = process.env.OPENAI_REASONING_EFFORT || "high";
 const OPENAI_MAX_OUTPUT_TOKENS = Number(process.env.OPENAI_MAX_OUTPUT_TOKENS || 32000); // QUALITY-PRESERVING-HIGH-REASONING-HEADROOM
-const AI_REQUEST_TIMEOUT_MS = Number(process.env.AI_REQUEST_TIMEOUT_MS || (OPENAI_API_KEY ? 420000 : 110000));
-const BUILD_JOB_TIMEOUT_MS = Number(process.env.BUILD_JOB_TIMEOUT_MS || (OPENAI_API_KEY ? 600000 : 210000));
+const AI_REQUEST_TIMEOUT_MS = Number(process.env.AI_REQUEST_TIMEOUT_MS || (OPENAI_API_KEY ? 780000 : 110000));
+const BUILD_JOB_TIMEOUT_MS = Number(process.env.BUILD_JOB_TIMEOUT_MS || (OPENAI_API_KEY ? 1740000 : 210000));
 let lastAIUsage = null;
+// The rules the delivered program still breaks, or null when it breaks none.
+// Read at the save boundary and reported on the job. // QA-SALVAGE-DELIVERY
+let lastQaSalvage = null;
 let lastBuildTiming = null;
+// Per-build token accounting. lastAIUsage only ever held the most recent
+// call, so a build that spent four attempts reported the cost of one. The
+// price of a program is the sum of every attempt it took, and until that is
+// measured nobody can say what a generated program costs.
+let buildUsage = null;
+function resetBuildUsage() {
+  lastQaSalvage = null; buildUsage = { calls: 0, input_tokens: 0, cached_input_tokens: 0, output_tokens: 0, reasoning_tokens: 0, openai_ms: 0 }; }
+function recordBuildUsage(u) {
+  if (!buildUsage) resetBuildUsage();
+  buildUsage.calls += 1;
+  buildUsage.input_tokens += Number(u?.input_tokens || 0);
+  buildUsage.cached_input_tokens += Number(u?.cached_input_tokens || 0);
+  buildUsage.output_tokens += Number(u?.output_tokens || 0);
+  buildUsage.reasoning_tokens += Number(u?.reasoning_tokens || 0);
+  buildUsage.openai_ms += Number(u?.elapsed_ms || 0);
+}
 
 // ---------- Reasoning budget (program QUALITY, env-switchable) ----------
 // 2.5-flash is a thinking model. The engine's GOAL-COVERAGE PRE-FLIGHT GATE is
@@ -315,7 +334,60 @@ function normalizeOpenAIExerciseNames(text, intake = null) {
   return out.join("\n");
 }
 
-async function runEngineRaw(userContent) {
+// OPENAI-TRANSPORT-TRANSIENT-RETRY
+function isTransientTransportError(e) {
+  // undici reports a dropped connection as TypeError: fetch failed and puts
+  // the real reason on .cause.
+  const code = e?.cause?.code || e?.code || "";
+  if (["ECONNRESET","ECONNREFUSED","ETIMEDOUT","EPIPE","EAI_AGAIN","ENOTFOUND","UND_ERR_SOCKET","UND_ERR_CONNECT_TIMEOUT"].includes(code)) return true;
+  return e instanceof TypeError && /fetch failed|network|socket/i.test(String(e.message || ""));
+}
+
+async function isQuotaExhausted(response) {
+  try {
+    // Clone so the caller still gets an unread body.
+    const data = await response.clone().json();
+    const detail = `${data?.error?.code || ""} ${data?.error?.type || ""} ${data?.error?.message || ""}`;
+    return /insufficient_quota|no credits remaining|exceeded your current quota|billing/i.test(detail);
+  } catch (_) {
+    return false;
+  }
+}
+
+async function openAIFetchWithTransportRetry(url, init, signal, maxAttempts = 3) {
+  let lastError = null;
+  for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+    try {
+      const r = await fetch(url, init);
+      // 429 and 5xx are the provider asking us to come back, not a verdict
+      // on the request. The body is a string, so it is safe to re-send.
+      //
+      // Except when the 429 means the account is out of money. That is as
+      // permanent as a 400, and retrying it just spends the build deadline
+      // on an answer that cannot change.
+      if (r.status === 429 && await isQuotaExhausted(r)) return r;
+      if ((r.status === 429 || r.status >= 500) && attempt < maxAttempts) {
+        lastError = new Error("OpenAI HTTP " + r.status);
+        console.warn(`openAIFetchWithTransportRetry: HTTP ${r.status} on attempt ${attempt}/${maxAttempts}; retrying`);
+      } else {
+        return r;
+      }
+    } catch (e) {
+      // Our own timeout is deterministic: asking again cannot help and only
+      // spends the build deadline.
+      if (signal?.aborted) throw e;
+      if (!isTransientTransportError(e) || attempt >= maxAttempts) throw e;
+      lastError = e;
+      console.warn(`openAIFetchWithTransportRetry: ${e?.message || e} on attempt ${attempt}/${maxAttempts}; retrying`);
+    }
+    await new Promise((resolve) => setTimeout(resolve, attempt * 2000));
+    if (signal?.aborted) break;
+  }
+  throw lastError || new Error("OpenAI request failed after transport retries.");
+}
+async function runEngineRaw(userContent, engineOptions = {}) {
+  const effectiveMaxOutputTokens = Number(engineOptions?.maxOutputTokens || OPENAI_MAX_OUTPUT_TOKENS);
+  const effectiveReasoningEffort = String(engineOptions?.reasoningEffort || OPENAI_REASONING_EFFORT); // EMPTY-OUTPUT-ESCALATION
   let sourceGroundedGeminiFallback = false;
   if (OPENAI_API_KEY) {
     const controller = new AbortController();
@@ -330,7 +402,7 @@ async function runEngineRaw(userContent) {
       if (developerChars > 20000) throw new Error("OpenAI developer prompt unexpectedly large.");
       if (/A NEW CLIENT has submitted/i.test(String(userContent || "")) && sentUserChars > 70000) throw new Error("OpenAI compact build prompt exceeded 70000 characters."); // OPENAI-COMPACT-PROMPT-BUDGET-70K
       console.log("OpenAI Phase15 prompt layout:", JSON.stringify({ developer_chars: developerChars, source_user_chars: sourceUserChars, sent_user_chars: sentUserChars, legacy_engine_chars_not_sent: ENGINE.length, execution_path: "deterministic-skeleton-v5.2.10-source-grounded" }));
-      const r = await fetch("https://api.openai.com/v1/responses", {
+      const r = await openAIFetchWithTransportRetry("https://api.openai.com/v1/responses", {
         method: "POST",
         headers: {
           "Authorization": "Bearer " + OPENAI_API_KEY,
@@ -342,12 +414,12 @@ async function runEngineRaw(userContent) {
             { role: "developer", content: OPENAI_COMPACT_DEVELOPER },
             { role: "user", content: compactUser }
           ],
-          reasoning: { effort: OPENAI_REASONING_EFFORT },
-          max_output_tokens: OPENAI_MAX_OUTPUT_TOKENS,
+          reasoning: { effort: effectiveReasoningEffort },
+          max_output_tokens: effectiveMaxOutputTokens,
           prompt_cache_key: "raz-phase15-source-grounded-v5-2-10"
         }),
         signal: controller.signal
-      });
+      }, controller.signal);
       const data = await r.json().catch(() => ({}));
       if (!r.ok) {
         const msg = data?.error?.message || ("OpenAI HTTP " + r.status);
@@ -364,16 +436,31 @@ async function runEngineRaw(userContent) {
       const cached = Number(u.input_tokens_details?.cached_tokens || 0);
       const reasoning = Number(u.output_tokens_details?.reasoning_tokens || 0);
       lastAIUsage = {
-        provider: "openai", model: OPENAI_MODEL, reasoning_effort: OPENAI_REASONING_EFFORT,
+        provider: "openai", model: OPENAI_MODEL, reasoning_effort: effectiveReasoningEffort,
+        max_output_tokens: effectiveMaxOutputTokens, response_status: data?.status || "",
+        incomplete_reason: data?.incomplete_details?.reason || "",
         input_tokens: input, cached_input_tokens: cached, output_tokens: output, reasoning_tokens: reasoning,
         developer_chars: developerChars, source_user_prompt_chars: sourceUserChars, sent_user_prompt_chars: sentUserChars,
         legacy_engine_chars_not_sent: ENGINE.length, execution_path: "deterministic-skeleton-v5.2.10-source-grounded",
         elapsed_ms: Date.now() - started
       };
       console.log("OpenAI generation usage:", JSON.stringify(lastAIUsage));
+      recordBuildUsage(lastAIUsage);
       if (!text) {
-        const emptyOutputError = new Error("OpenAI returned no output_text content.");
+        const incompleteReason = String(data?.incomplete_details?.reason || "");
+        const ranOutOfRoom = incompleteReason === "max_output_tokens";
+        const emptyOutputError = new Error(ranOutOfRoom
+          ? "OpenAI spent the whole output budget reasoning and wrote no program (max_output_tokens)."
+          : "OpenAI returned no output_text content.");
         emptyOutputError.code = "OPENAI_EMPTY_OUTPUT";
+        emptyOutputError.incompleteReason = incompleteReason;
+        emptyOutputError.reasoningTokens = reasoning;
+        emptyOutputError.maxOutputTokens = effectiveMaxOutputTokens;
+        console.warn("OpenAI empty output:", JSON.stringify({
+          response_status: data?.status || "", incomplete_reason: incompleteReason,
+          reasoning_tokens: reasoning, output_tokens: output, max_output_tokens: effectiveMaxOutputTokens,
+          reasoning_effort: effectiveReasoningEffort
+        }));
         emptyOutputError.status = 503; // OPENAI-EMPTY-OUTPUT-TRANSIENT-RETRY
         throw emptyOutputError;
       }
@@ -1277,13 +1364,30 @@ function stripForbiddenColumns(md) {
 //   - hyphenated words: pull-up, push-up, one-arm, 90-degree, Zone 2-5
 //   - numeric ranges: 8-12 reps, 60-90s, RPE 7-8
 // It only rewrites em/en dashes and a spaced hyphen used as a sentence connector.
+// The prose substitutions themselves, so a table row can apply them per cell
+// without re-implementing them.
+function prose(l) {
+  return l
+    .replace(/\s+[\u2014\u2013]\s+/g, ", ")
+    .replace(/([A-Za-z0-9])[\u2014\u2013]([A-Za-z0-9])/g, "$1, $2")
+    .replace(/\s+-\s+/g, ", ")
+    .replace(/[\u2014\u2013]/g, ", ")
+    .replace(/,\s*,/g, ",").replace(/,\s*\./g, ".").replace(/\(\s*,\s*/g, "(").replace(/\s+,/g, ",");
+}
+
 function dehyphenateProse(s) {
   if (!s) return s;
   return s.split("\n").map((line) => {
     // Never touch a markdown table separator row (e.g. |---|:--:|---|).
     if (/^\s*\|[\s:|-]+\|\s*$/.test(line)) return line;
-    // Inside table rows, only the dashes WITHIN cell text matter; the same
-    // word-boundary rules below are safe there too, so we treat all lines alike.
+    // Inside a table row, a cell that is nothing but a dash is not prose: it is
+    // the calendar saying there is no training that day. Rule 3 below rewrote
+    // it to a comma, so the delivered fight camp showed "FIGHT DAY |, |" on the
+    // Sunday after the fight. Cells are treated one at a time, and a cell that
+    // is only a dash is left exactly as it is.
+    if ((line.match(/\|/g) || []).length >= 2) {
+      return line.split('|').map((cell) => (cell.trim() === '-' ? cell : prose(cell))).join('|');
+    }
     let l = line;
     // 1) Em/en dash used as a parenthetical or clause break, with spaces around it:
     //    "squats — they build..."  ->  "squats, they build..."
@@ -2091,7 +2195,15 @@ async function generateValidatedProgram(intake, onProgress = async () => {}) {
   let repairCandidate = null;
   let repairFeedback = "";
   const qaTrace = [];
+  let lastRepairDetail = "";
   const deadline = Date.now() + BUILD_JOB_TIMEOUT_MS;
+  // Timeouts and empty responses are infrastructure, not quality verdicts, so
+  // they retry on their own budget rather than eating the repair attempts.
+  let transientRetries = 0;
+  const MAX_TRANSIENT_RETRIES = 3;
+  // Raised per empty output: more room to write, and -- once it is clear the
+  // thinking is what is eating the budget -- less room to think.
+  let engineOptions = {};
 
   for (let attempt = 1; attempt <= MAX_ATTEMPTS; attempt++) {
     if (Date.now() >= deadline) {
@@ -2106,7 +2218,65 @@ async function generateValidatedProgram(intake, onProgress = async () => {}) {
     const userContent = repairCandidate
       ? buildInternalQualityRepairPrompt(intake, repairCandidate, cumulativeRepairFeedback)
       : (amendments.length ? basePrompt + "\n\n=== ACCUMULATED QA CORRECTIONS ===\n" + amendments.join("\n\n") : basePrompt);
-    const raw = await runEngineRaw(userContent);
+    // An empty model response is transient, not a verdict on the program: with
+    // high reasoning effort the model can spend its whole output budget thinking
+    // and emit nothing. It used to be retriable only through the Gemini
+    // fallback, and with OpenAI as the sole provider that branch is unreachable,
+    // so a single empty response failed the entire build on attempt 1. Spend an
+    // attempt on it instead.
+    let raw;
+    try {
+      raw = await runEngineRaw(userContent, engineOptions);
+    } catch (e) {
+      // A generation that ran past the request ceiling is not a verdict on the
+      // program either. Observed generation times run from 211s to past 420s,
+      // so the ceiling sits inside the normal distribution rather than beyond
+      // it -- and an abort was ending the build outright, leaving the whole
+      // remaining build budget unspent. Run #79 lost both avatars that way,
+      // each at 422s, with nineteen minutes of budget untouched.
+      const aborted = e?.name === "AbortError" || /operation was aborted/i.test(String(e?.message || ""));
+      const retriable = e?.code === "OPENAI_EMPTY_OUTPUT" || aborted;
+      // The deadline check at the top of the loop still owns the real limit, so
+      // a retry can only happen when there is genuinely budget left for one.
+      //
+      // And if an abort is not a verdict on the program, it must not cost a
+      // quality attempt either. It did: the attempt counter advanced on every
+      // timeout, so a slow intake burned its whole repair budget without one
+      // program ever being judged, and the fourth abort was fatal while job
+      // budget still sat unspent -- which is how the Hyrox block died after
+      // twenty-seven minutes without the QA chain ever seeing a candidate.
+      // Transient failures now retry against the deadline on their own
+      // counter; the quality budget is spent only on programs QA rejected.
+      if (!retriable) throw e;
+      const reason = aborted ? "generation exceeded the request ceiling" : "empty model output";
+      if (transientRetries >= MAX_TRANSIENT_RETRIES || Date.now() >= deadline) {
+        const outOfTime = Date.now() >= deadline;
+        console.warn(`generateValidatedProgram: ${reason}, ${outOfTime ? "job budget spent" : "transient budget exhausted"} (${transientRetries}/${MAX_TRANSIENT_RETRIES})`);
+        qaTrace.push(`T${transientRetries + 1}:${aborted ? "request_ceiling" : "empty_output"}${e?.incompleteReason ? "(" + e.incompleteReason + ")" : ""}:${outOfTime ? "JOB_BUDGET_SPENT" : "TRANSIENT_BUDGET_SPENT"}`);
+        e.qa_trace = qaTrace.slice();
+        e.message = `${e.message} QA trace: ${qaTrace.join(" -> ")}.`;
+        throw e;
+      }
+      transientRetries++;
+      attempt--; // this attempt judged nothing, so it does not count as one
+      if (e?.code === "OPENAI_EMPTY_OUTPUT") {
+        const ceiling = Number(engineOptions.maxOutputTokens || OPENAI_MAX_OUTPUT_TOKENS);
+        engineOptions = { ...engineOptions, maxOutputTokens: Math.min(96000, Math.round(ceiling * 1.5)) };
+        // A second empty response says the reasoning, not the ceiling, is the
+        // constraint. Spend the budget on the program instead.
+        if (transientRetries >= 2) engineOptions.reasoningEffort = "medium";
+        console.warn("generateValidatedProgram: empty output; escalating", JSON.stringify(engineOptions));
+      }
+      // The transient failures belong in the trace the acceptance artefact
+      // records. Without them a build that never reached QA reports only its
+      // last error, and the question "did the retry even run?" needs the
+      // service logs to answer -- which is how two runs went by without anyone
+      // being able to say why the dual-event block produced nothing.
+      qaTrace.push(`T${transientRetries}:${aborted ? "request_ceiling" : "empty_output"}${e?.incompleteReason ? "(" + e.incompleteReason + ")" : ""}`);
+      console.warn(`generateValidatedProgram: ${reason}; transient retry ${transientRetries}/${MAX_TRANSIENT_RETRIES}`);
+      await onProgress("refining", attempt + 1, aborted ? "generation timed out; retrying" : "model returned no content; retrying");
+      continue;
+    }
     if (!isValidProgram(raw)) {
       console.warn(
         `generateValidatedProgram: invalid/degenerate output attempt ${attempt}/${MAX_ATTEMPTS} ` +
@@ -2115,7 +2285,7 @@ async function generateValidatedProgram(intake, onProgress = async () => {}) {
       await onProgress("refining", attempt, "structural output check failed");
       continue;
     }
-    let program = normalizeYouthPrimarySkillOrder(enrichSpecificWarmups(repairUnbenchmarkedVariationLoads(fixInvalidExerciseNames(raw), intake)), intake).program; // step 1: DETERMINISTIC-UNBENCHMARKED-LOAD-REPAIR + SPECIFIC-WARMUP-ENRICHMENT + YOUTH-SKILL-ORDER-REPAIR
+    let program = normalizeYouthPrimarySkillOrder(enrichSpecificWarmups(repairUnbenchmarkedVariationLoads(fixInvalidExerciseNames(raw), intake), intake), intake).program; // step 1: DETERMINISTIC-UNBENCHMARKED-LOAD-REPAIR + SPECIFIC-WARMUP-ENRICHMENT + YOUTH-SKILL-ORDER-REPAIR
     program = normalizeAdvancedHybridWeek4OapConsolidation(program, intake).program; // ADVANCED-HYBRID-OAP-CONSOLIDATION-REPAIR-WIRED
     try {
       await onProgress("validating", attempt, "exercise and coaching validators");
@@ -2185,6 +2355,39 @@ async function generateValidatedProgram(intake, onProgress = async () => {}) {
         }
 
         qaTrace.push(`A${attempt}:${repairLabel}${qaUnknownSuffix}`); // QA-DIAGNOSTIC-UNKNOWN-NAMES
+        // The code alone says which rule refused, never why it kept refusing.
+        // Twice the fix for a repeated code was a guess at what the model had
+        // written, because the message that named the missing thing was thrown
+        // away here.
+        const flagText = (Array.isArray(err && err.flags) && err.flags.length
+          ? err.flags.map((f) => (f && (f.detail || f.message || f.amendment)) || f && f.code).filter(Boolean).join(" | ")
+          : String((err && err.message) || ""));
+        // A message names the rule; it does not show what the model actually
+        // wrote. Two fixes this week were guesses at the offending row, and
+        // one of them was wrong. A failed build saves no program, so the row
+        // has to travel with the error or it is gone. Diagnostics-only.
+        try {
+          const evidenceRows = (Array.isArray(err && err.flags) ? err.flags : [])
+            .filter((f) => f && f.week && f.exercise)
+            .slice(0, 3)
+            .map((f) => {
+              const text = String(program || "");
+              const start = text.indexOf("START_WEEK" + f.week + "_TSV");
+              const stop = text.indexOf("END_WEEK" + f.week + "_TSV");
+              if (start < 0 || stop < 0 || stop < start) return "";
+              const lines = text.slice(start, stop).split("\n").filter(Boolean);
+              const header = (lines.find((l) => l.indexOf("\t") >= 0) || "").split("\t");
+              let col = header.findIndex((h) => /exercise|movement/i.test(String(h || "")));
+              if (col < 0) col = 1;
+              const want = String(f.exercise).trim().toLowerCase();
+              const line = lines.find((l) => String(l.split("\t")[col] || "").trim().toLowerCase() === want);
+              return line ? "W" + f.week + " " + line.replace(/\t/g, " | ").slice(0, 200) : "";
+            })
+            .filter(Boolean)
+            .join("  //  ");
+          lastRepairDetail = (evidenceRows ? "Offending rows: " + evidenceRows + " || " : "") + flagText.slice(0, 600);
+        } catch (e) { lastRepairDetail = flagText.slice(0, 600); }
+        if (!lastRepairDetail) lastRepairDetail = flagText.slice(0, 600);
         failCounts[repairLabel] = (failCounts[repairLabel] || 0) + 1;
         console.warn(
           `generateValidatedProgram: grounded internal repair for ${repairLabel} on attempt ${attempt}/${MAX_ATTEMPTS} ` +
@@ -2211,15 +2414,65 @@ async function generateValidatedProgram(intake, onProgress = async () => {}) {
   }
   if (lastValid) {
     const trace = qaTrace.join(" -> ");
-    const debugSuffix = intake && intake.qa_diagnostics === true && trace ? ` QA trace: ${trace}.` : "";
-    const err = new Error("Internal coaching QA could not repair the candidate program after multiple passes. No client-facing program was saved. Please retry the build." + debugSuffix);
-    err.code = "INTERNAL_QA_REPAIR_EXHAUSTED";
-    err.qa_trace = qaTrace.slice();
-    throw err;
-  }
+    // Take the candidate as far as the deterministic chain goes. The bundle
+    // applies every repair it has and hands back the improved program whether
+    // or not the flags cleared, so this is strictly better than what the model
+    // last wrote, even when something remains.
+    let salvaged = lastValid;
+    let unresolved = [];
+    try {
+      const swept = validateRepairableProgramBundle(salvaged, intake);
+      salvaged = swept.program || salvaged;
+    } catch (sweepErr) {
+      if (typeof sweepErr?.program === "string" && sweepErr.program) salvaged = sweepErr.program;
+      const flags = Array.isArray(sweepErr?.flags) ? sweepErr.flags : [];
+      unresolved = [...new Set(flags.map((f) => f && f.code).filter(Boolean))];
+      if (!unresolved.length && sweepErr?.code) unresolved = [sweepErr.code];
+    }
+    if (!unresolved.length) unresolved = ["INTERNAL_QA_REPAIR_EXHAUSTED"];
+    lastQaSalvage = {
+      codes: unresolved,
+      qa_trace: qaTrace.slice(),
+      detail: String(lastRepairDetail || "").slice(0, 600),
+    };
+    console.warn("generateValidatedProgram: delivering a repaired candidate with unresolved rules:",
+      JSON.stringify({ unresolved, trace }));
+    return reformatWarmupCells(salvaged);
+  } // QA-SALVAGE-TAIL
   throw new Error(
     "The program generator returned an unusable result after multiple attempts. Please try again."
   );
+}
+
+// A background job that rejects must be recorded against its own job id and go
+// no further. Without this the rejection is unhandled, Node terminates the
+// process, and every other in-flight build dies with it -- the caller sees its
+// job simply stop existing.
+async function failJobSafely(jobId, err, label) {
+  console.error(`${label} job rejected:`, err && (err.stack || err.message || err));
+  try {
+    await store.finishJob(jobId, "error", null, err?.message || "Engine error.", Date.now());
+  } catch (storeErr) {
+    console.error(`could not record ${label} job failure:`, storeErr && storeErr.message);
+  }
+}
+
+// A pending job whose process is gone would otherwise poll as a bare 404
+// forever, which reads as "the job disappeared" rather than "the service
+// restarted". Reap on updated_at, well past any real gap between progress
+// stages, so a slow but living job is never touched.
+const STALE_JOB_MS = Number(process.env.STALE_JOB_MS || 15 * 60 * 1000);
+async function reapInterruptedJobs() {
+  if (typeof store.staleJobs !== "function") return;
+  const stale = await store.staleJobs(Date.now() - STALE_JOB_MS);
+  for (const job of stale) {
+    console.warn("reaping interrupted job:", job.id);
+    try {
+      await store.finishJob(job.id, "error", null,
+        "The build was interrupted before it finished, most likely by a service restart. No program was saved. Please start the build again.",
+        Date.now());
+    } catch (e) { console.warn("could not reap job:", e && e.message); }
+  }
 }
 
 async function runBuildJob(jobId, token, intake, isNewToken = false) {
@@ -2228,6 +2481,7 @@ async function runBuildJob(jobId, token, intake, isNewToken = false) {
     catch (e) { console.warn("job progress update failed:", e && e.message); }
   };
   const buildStarted = Date.now();
+  resetBuildUsage();
   await progress("preparing", 0, isNewToken ? "fast new-client intake persist" : "saving intake and preparing engine");
   let persistMs = 0;
   try {
@@ -2247,17 +2501,30 @@ async function runBuildJob(jobId, token, intake, isNewToken = false) {
   try {
     const generationStarted = Date.now();
     const program = privacyScrub(await generateValidatedProgram(intake, progress), intake);
-    validatePhase15FinalProgram(program, intake); // SAVE-BOUNDARY-FINAL-QA
+    try {
+      validatePhase15FinalProgram(program, intake); // SAVE-BOUNDARY-FINAL-QA
+    } catch (finalErr) {
+      if (!lastQaSalvage) throw finalErr;
+      const extra = (Array.isArray(finalErr?.flags) ? finalErr.flags : [])
+        .map((f) => f && f.code).filter(Boolean);
+      lastQaSalvage.codes = [...new Set([...lastQaSalvage.codes, ...extra])];
+      console.warn("Phase15 save boundary: delivering a salvaged program with unresolved rules:",
+        JSON.stringify(lastQaSalvage.codes));
+    }
     validateClientOutputCleanliness(program); // SAVE-BOUNDARY-CLIENT-CLEANLINESS
     const generationAndQaMs = Date.now() - generationStarted;
-    await progress("finalizing", 0, "saving program");
+    await progress("finalizing", Number(buildUsage?.calls || 0), `saving program after ${Number(buildUsage?.calls || 0)} model call(s)`);
     const saveStarted = Date.now();
     const now = Date.now();
     const intakeJSON = JSON.stringify(intake);
     await store.upsertClient(token, intakeJSON, program, now);
+    if (lastQaSalvage) {
+      console.warn("Phase15 build delivered with unresolved rules:", JSON.stringify(lastQaSalvage));
+      await progress("finalizing", Number(buildUsage?.calls || 0), "delivered with unresolved rules: " + lastQaSalvage.codes.join("+"));
+    }
     await store.finishJob(jobId, "done", program, null, Date.now());
     const saveToVisibleMs = Date.now() - saveStarted;
-    lastBuildTiming = { total_ms: Date.now() - buildStarted, pre_persist_ms: persistMs, generation_and_qa_ms: generationAndQaMs, openai_ms: lastAIUsage?.elapsed_ms || null, save_to_visible_ms: saveToVisibleMs };
+    lastBuildTiming = { total_ms: Date.now() - buildStarted, pre_persist_ms: persistMs, generation_and_qa_ms: generationAndQaMs, openai_ms: lastAIUsage?.elapsed_ms || null, save_to_visible_ms: saveToVisibleMs, usage: buildUsage ? { ...buildUsage } : null };
     console.log("Phase15 build timing:", JSON.stringify(lastBuildTiming));
     Promise.allSettled([
       store.addHistory(token, "build", intakeJSON, program, Date.now()),
@@ -2274,7 +2541,11 @@ async function runBuildJob(jobId, token, intake, isNewToken = false) {
     ].map((code) => String(code || '')).filter((code) => /^[A-Z0-9_]+$/.test(code)))].slice(0, 8) : [];
     const baseError = e?.message || e?.code || "Engine error.";
     const jobError = qaCodes.length ? `${baseError} [QA:${qaCodes.join("+")}]` : baseError;
-    await store.finishJob(jobId, "error", null, jobError, Date.now());
+    // A storage failure here must not escape: an unhandled rejection from a
+    // background job takes down the whole process, and with it every unrelated
+    // build in flight.
+    try { await store.finishJob(jobId, "error", null, jobError, Date.now()); }
+    catch (storeErr) { console.error("could not record job failure:", storeErr && storeErr.message); }
   }
 }
 
@@ -2315,7 +2586,7 @@ app.post("/api/build", async (req, res) => {
     const jobId = crypto.randomBytes(16).toString("hex");
     await store.createJob(jobId, token, "build", Date.now());
     // fire-and-forget; do not await
-    runBuildJob(jobId, token, intake, !req.body?.token);
+    runBuildJob(jobId, token, intake, !req.body?.token).catch((err) => failJobSafely(jobId, err, "build"));
     res.status(202).json({ job_id: jobId, token, status: "pending" });
   } catch (e) {
     console.error("build error:", e);
@@ -2389,7 +2660,7 @@ app.post("/api/set-language", async (req, res) => {
 
     const jobId = crypto.randomBytes(16).toString("hex");
     await store.createJob(jobId, token, "adjust", Date.now());
-    runSetLanguageJob(jobId, token, language);
+    runSetLanguageJob(jobId, token, language).catch((err) => failJobSafely(jobId, err, "set-language"));
     res.status(202).json({ job_id: jobId, token, status: "pending", language });
   } catch (e) {
     console.error("set-language error:", e);
@@ -2416,7 +2687,7 @@ app.post("/api/adjust", async (req, res) => {
 
     const jobId = crypto.randomBytes(16).toString("hex");
     await store.createJob(jobId, token, "adjust", Date.now());
-    runAdjustJob(jobId, token, changeRequest);
+    runAdjustJob(jobId, token, changeRequest).catch((err) => failJobSafely(jobId, err, "adjust"));
     res.status(202).json({ job_id: jobId, token, status: "pending" });
   } catch (e) {
     console.error("adjust error:", e);
@@ -2477,6 +2748,26 @@ const httpServer = app.listen(PORT, () => {
     console.warn("GEMINI_API_KEY is not configured; /api/health will report not ready.");
   }
 });
+
+// Losing the process loses every in-flight build and all their job state, so a
+// stray fault in one background task must not be allowed to kill the others.
+// Node's default is to terminate on an unhandled rejection, which for this
+// service means three concurrent builds vanish because one of them failed to
+// write a row. Both handlers therefore log and keep serving; any job actually
+// left behind is picked up by the reaper and reported to its caller.
+process.on("unhandledRejection", (reason) => {
+  console.error("unhandled rejection (process kept alive):", reason && (reason.stack || reason.message || reason));
+});
+process.on("uncaughtException", (err) => {
+  console.error("uncaught exception (process kept alive):", err && (err.stack || err.message || err));
+});
+
+reapInterruptedJobs().catch((e) => console.warn("job reaper failed:", e && e.message));
+const jobReaper = setInterval(
+  () => reapInterruptedJobs().catch((e) => console.warn("job reaper failed:", e && e.message)),
+  5 * 60 * 1000,
+);
+jobReaper.unref?.();
 
 function shutdown(signal) {
   console.log(`${signal} received; closing HTTP server...`);
