@@ -247,9 +247,22 @@ const GOAL_MOVEMENTS = [
   { goal: /\bdips?\b/i, family: /\bdip\b/i },
 ];
 
+// A goal phrased as a hold is not an improvement goal, whichever tier it sits
+// in. "Keep front squat strength while sharpening the lifts" is a secondary
+// goal asking for maintenance, and reading it as improvement made four squat
+// variations into defects for not progressing -- which is the opposite of what
+// that athlete was asked for.
+const HOLD_PHRASING = /\b(?:keep|maintain|maintaining|hold|holding|preserve|preserving|retain|retaining|maintenance|without losing|stay(?:ing)? (?:strong|athletic))\b/i;
+
 export function goalFamilies(intake = {}, tiers = ['primary', 'secondary']) {
-  const text = tiers.map((t) => arr(intake[`${t}_goals`]).join(' ')).join(' ');
-  return GOAL_MOVEMENTS.filter((g) => g.goal.test(text)).map((g) => g.family);
+  const goals = tiers.flatMap((t) => arr(intake[`${t}_goals`]).map(String));
+  const improving = goals.filter((g) => !HOLD_PHRASING.test(g));
+  const families = [];
+  for (const g of GOAL_MOVEMENTS) {
+    if (!improving.some((text) => g.goal.test(text))) continue;
+    families.push(g.family);
+  }
+  return families;
 }
 
 export function improvementGoalFlat(program, intake = {}) {

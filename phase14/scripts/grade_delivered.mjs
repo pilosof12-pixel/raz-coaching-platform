@@ -1,0 +1,132 @@
+// What would the coach find in everything we have already delivered?
+//
+// Until now the only way to know was to send him a program and wait. The
+// encoded half of his standard reproduces fifteen of the eighteen findings he
+// made on the three he scored, so it is worth pointing at the rest of the
+// corpus -- which costs nothing and needs no credits.
+//
+// This reports findings and severity, NOT a score. A score needs dimension
+// scores, and turning a finding into a dimension score is the judgement step
+// this deliberately does not fake. Severity is the sum of his own deduction
+// table for what was found, which says how much is wrong, not what it rates.
+//
+//   node scripts/grade_delivered.mjs            summary
+//   node scripts/grade_delivered.mjs --detail   every finding
+
+import fs from 'node:fs';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+
+import { gradeProgram } from '../engine/coach_rules.js';
+import { collectClaimIntegrityFlags } from '../engine/v93_claim_integrity.js';
+import { collectSportStateFlags } from '../engine/v78_sport_taper.js';
+import { DEDUCTIONS, selectProgramType } from '../engine/coach_standard.js';
+
+const root = path.dirname(fileURLToPath(import.meta.url));
+const fx = (f) => fs.readFileSync(path.join(root, '..', 'test', 'fixtures', f), 'utf8');
+const json = (f) => JSON.parse(fx(f));
+const detail = process.argv.includes('--detail');
+
+const A = json('acceptance_intakes.json');
+const C = json('competition_avatars.json');
+const H = json('hard_avatars.json');
+const day = 86400000;
+const saturday = (w) => {
+  const d = new Date(Date.now() + w * 7 * day);
+  d.setUTCDate(d.getUTCDate() + ((6 - d.getUTCDay() + 7) % 7));
+  return d.toISOString().slice(0, 10);
+};
+
+// Which deduction each rule corresponds to, so severity is his arithmetic and
+// not ours.
+const COST = {
+  BENCHMARK_UNEXPOSED: 'BENCHMARKED_MOVEMENT_UNEXPOSED',
+  INTENSIFICATION_BAND_NOT_REACHED: 'PROGRESSION_SHORT_OF_REQUIRED_INTENSITY',
+  GOAL_SPEED_NOT_APPROACHED: 'PROGRESSION_SHORT_OF_REQUIRED_INTENSITY',
+  STATED_PROGRESSION_ABSENT: 'TOLERATED_BASELINE_NOT_REBUILT',
+  GOAL_DISTANCE_BELOW_TOLERANCE: 'GOAL_DISTANCE_REDUCED_DESPITE_TOLERANCE',
+  CONSECUTIVE_TRAINING_DAYS: 'AVOIDABLE_CONSECUTIVE_DAY_CLUSTERING',
+  CONSECUTIVE_LOWER_LEG_DAYS: 'AVOIDABLE_CONSECUTIVE_DAY_CLUSTERING',
+  CONTINGENCY_CREATES_ADJACENT_DUPLICATE: 'CONTINGENCY_CREATES_DUPLICATE',
+  SPORT_STATE_MISDESCRIBED: 'TEXT_CONTRADICTS_TABLE',
+  UNSUPPORTED_ATHLETE_FACT: 'UNSUPPORTED_ATHLETE_FACT',
+  IMPROVEMENT_GOAL_FLAT: 'IMPROVEMENT_GOAL_UNCHANGED_ALL_BLOCK',
+  TRAINING_DAYS_VS_INTAKE: 'INTAKE_INTERPRETATION_UNSTATED',
+  DAY_MINUS_ONE_STACKED: 'REDUNDANT_COMPETITION_WEEK_EXPOSURE',
+  SPORT_SCHEDULE_CHANGED_SILENTLY: 'SPORT_SCHEDULE_SILENTLY_CHANGED',
+};
+
+const LIFTER = { ...C.weightlifter_peak, competition_date: saturday(8), event_type: 'strength_meet', event_priority: 'A' };
+const MEET = { ...C.weightlifter_meet_week, competition_date: saturday(1) };
+const FIGHTER = { ...C.mma_fight_camp, competition_date: saturday(3) };
+
+// Coach-scored programs first, so the known answers sit at the top of the report.
+const CORPUS = [
+  ['run101_weightlifter_peak.txt', LIFTER, 8.2],
+  ['run81_tactical_3k.txt', A.tactical_3k, 7.6],
+  ['run113_mma_camp_delivered.txt', FIGHTER, 8.9],
+  ['run81_advanced_hybrid.txt', A.advanced_hybrid, 7.9],
+  ['advanced_hybrid-program.txt', A.advanced_hybrid, null],
+  ['run88_advanced_hybrid.txt', A.advanced_hybrid, null],
+  ['run77_advanced_hybrid_defective.txt', A.advanced_hybrid, null],
+  ['tactical_3k-program.txt', A.tactical_3k, null],
+  ['run84_tactical_3k.txt', A.tactical_3k, null],
+  ['weightlifter_peak-program.txt', LIFTER, null],
+  ['run92_weightlifter_flat.txt', LIFTER, null],
+  ['run96_weightlifter_intensification.txt', LIFTER, null],
+  ['run101_weightlifter_peak.txt', LIFTER, 8.2],
+  ['weightlifter_meet_week-program.txt', MEET, null],
+  ['mma_fight_camp-program.txt', FIGHTER, null],
+  ['run97_mma_camp_delivered.txt', FIGHTER, null],
+  ['run92_mma_fight_camp_pre_rules.txt', FIGHTER, null],
+  ['inseason_footballer-program.txt', H.inseason_footballer, null],
+  ['run100_inseason_footballer.txt', H.inseason_footballer, null],
+  ['run101_inseason_footballer.txt', H.inseason_footballer, null],
+  ['masters_return-program.txt', H.masters_return, null],
+  ['run100_masters_return.txt', H.masters_return, null],
+  ['run101_masters_return.txt', H.masters_return, null],
+];
+
+const seenFile = new Set();
+const results = [];
+
+for (const [file, intake, scored] of CORPUS) {
+  if (seenFile.has(file)) continue;
+  seenFile.add(file);
+  let program;
+  try { program = fx(file); } catch { continue; }
+  if (!/START_WEEK1_TSV/i.test(program)) continue;
+
+  const raw = [
+    ...gradeProgram(program, intake),
+    ...collectClaimIntegrityFlags(program, intake).map((f) => ({ rule: 'STATED_PROGRESSION_ABSENT', movement: f.subject, detail: f.detail })),
+    ...collectSportStateFlags(program, intake).map((f) => ({ rule: 'SPORT_STATE_MISDESCRIBED', movement: f.day, detail: f.detail })),
+  ];
+  // One issue, not one per week: a rule firing on four weeks is one finding.
+  const distinct = new Map();
+  for (const f of raw) {
+    const key = `${f.rule}|${f.movement || ''}`;
+    if (!distinct.has(key)) distinct.set(key, f);
+  }
+  const findings = [...distinct.values()];
+  const severity = findings.reduce((n, f) => n + (DEDUCTIONS[COST[f.rule]]?.typical ?? 0), 0);
+  results.push({ file, type: selectProgramType(intake), scored, findings, severity });
+}
+
+results.sort((a, b) => b.severity - a.severity);
+
+console.log('\nGRADED OFFLINE AGAINST THE COACH\'S STANDARD');
+console.log('severity is the sum of his deduction table for what was found. It is not a score.\n');
+console.log(`  ${'severity'.padStart(8)}  ${'found'.padStart(5)}  ${'coach'.padStart(5)}  program`);
+for (const r of results) {
+  console.log(`  ${r.severity.toFixed(2).padStart(8)}  ${String(r.findings.length).padStart(5)}  ${(r.scored == null ? '-' : r.scored.toFixed(1)).padStart(5)}  ${r.file}`);
+  if (detail) for (const f of r.findings) console.log(`              [${f.rule}] ${String(f.detail).slice(0, 150)}`);
+}
+
+const byRule = new Map();
+for (const r of results) for (const f of r.findings) byRule.set(f.rule, (byRule.get(f.rule) || 0) + 1);
+console.log('\nMOST COMMON DEFECTS ACROSS THE CORPUS');
+for (const [rule, n] of [...byRule].sort((a, b) => b[1] - a[1])) {
+  console.log(`  ${String(n).padStart(3)}  ${rule}`);
+}
+console.log(`\n${results.length} programs, ${[...byRule.values()].reduce((a, b) => a + b, 0)} findings.\n`);

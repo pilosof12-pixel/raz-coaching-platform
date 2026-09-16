@@ -158,6 +158,21 @@ test('a goal matches its own movement family, not every word it shares', () => {
   assert.ok(!families[0].test('Dumbbell Bench Press'));
 });
 
+// A goal phrased as a hold is not an improvement goal, whichever tier it sits
+// in. "Keep front squat strength while sharpening the lifts" is a secondary
+// goal asking for maintenance; reading it as improvement turned four squat
+// variations into defects for doing exactly what was asked.
+test('a secondary goal phrased as a hold is not an improvement goal', () => {
+  assert.deepEqual(goalFamilies({ secondary_goals: ['Keep front squat strength while sharpening the lifts'] }), []);
+  assert.equal(goalFamilies({ secondary_goals: ['Improve strict pull-ups from 14 toward 18-20'] }).length, 1);
+  const lifter = { ...C.weightlifter_peak, competition_date: saturday(8), event_type: 'strength_meet' };
+  assert.deepEqual(improvementGoalFlat(read('run92_weightlifter_flat.txt'), lifter).map((f) => f.movement), []);
+  // The competition lifts themselves are a different matter: RPE-selected load
+  // at 5x2 and 6x1, identical in all four weeks, against a 120 kg snatch goal.
+  const flat = improvementGoalFlat(read('run96_weightlifter_intensification.txt'), lifter).map((f) => f.movement);
+  assert.deepEqual(flat.sort(), ['Clean and Jerk', 'Snatch']);
+});
+
 // --- the calibration itself ---------------------------------------------------
 //
 // Fifteen of the coach's eighteen findings, 3.75 of his 4.20 of severity, and
