@@ -3489,6 +3489,22 @@
     "killedLive": ""
   },
   {
+    "code": "V93_STATED_PROGRESSION_ABSENT",
+    "modules": [
+      "engine/v93_claim_integrity.js"
+    ],
+    "owners": [
+      "collectClaimIntegrityFlags"
+    ],
+    "advisory": false,
+    "reachable": false,
+    "repairs": [],
+    "wired": [],
+    "tested": true,
+    "stressed": false,
+    "killedLive": ""
+  },
+  {
     "code": "WEEKLY_MRV_EXCEEDED",
     "modules": [
       "engine/exercise_dictionary.js",
