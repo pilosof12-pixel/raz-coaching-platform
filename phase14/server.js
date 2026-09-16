@@ -1015,13 +1015,30 @@ function stripForbiddenColumns(md) {
 //   - hyphenated words: pull-up, push-up, one-arm, 90-degree, Zone 2-5
 //   - numeric ranges: 8-12 reps, 60-90s, RPE 7-8
 // It only rewrites em/en dashes and a spaced hyphen used as a sentence connector.
+// The prose substitutions themselves, so a table row can apply them per cell
+// without re-implementing them.
+function prose(l) {
+  return l
+    .replace(/\s+[\u2014\u2013]\s+/g, ", ")
+    .replace(/([A-Za-z0-9])[\u2014\u2013]([A-Za-z0-9])/g, "$1, $2")
+    .replace(/\s+-\s+/g, ", ")
+    .replace(/[\u2014\u2013]/g, ", ")
+    .replace(/,\s*,/g, ",").replace(/,\s*\./g, ".").replace(/\(\s*,\s*/g, "(").replace(/\s+,/g, ",");
+}
+
 function dehyphenateProse(s) {
   if (!s) return s;
   return s.split("\n").map((line) => {
     // Never touch a markdown table separator row (e.g. |---|:--:|---|).
     if (/^\s*\|[\s:|-]+\|\s*$/.test(line)) return line;
-    // Inside table rows, only the dashes WITHIN cell text matter; the same
-    // word-boundary rules below are safe there too, so we treat all lines alike.
+    // Inside a table row, a cell that is nothing but a dash is not prose: it is
+    // the calendar saying there is no training that day. Rule 3 below rewrote
+    // it to a comma, so the delivered fight camp showed "FIGHT DAY |, |" on the
+    // Sunday after the fight. Cells are treated one at a time, and a cell that
+    // is only a dash is left exactly as it is.
+    if ((line.match(/\|/g) || []).length >= 2) {
+      return line.split('|').map((cell) => (cell.trim() === '-' ? cell : prose(cell))).join('|');
+    }
     let l = line;
     // 1) Em/en dash used as a parenthetical or clause break, with spaces around it:
     //    "squats — they build..."  ->  "squats, they build..."

@@ -15,6 +15,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import { validateLaunchIntake } from '../intake_validation.js';
+import { detectIntakeClarifications, addOptionalQuestions, requiredClarifications } from '../intake_clarification.js';
 import { computeEffectiveEquipment } from '../engine/exercise_dictionary.js';
 import { stateForWeek, weeksOut, hasEvent, STATE } from '../engine/v68_competition_state.js';
 
@@ -60,11 +61,33 @@ function avatars() {
       } catch { continue; }
     }
     if (!intake) continue;
-    // Event fields live in the first Object.assign argument, before the literal.
+    // Everything in the first Object.assign argument, not only the two fields I
+    // happened to look for. The fight camp answers its own weight-class
+    // question there -- weight_class_status and weight_vs_class -- and reading
+    // just competition_date and event_type made pre-flight declare an avatar
+    // unbuildable that builds perfectly. A false alarm costs as much as a false
+    // pass: one stops a good run, the other spends on a doomed one.
     const head = tail.slice(0, literal.index);
+    const open = head.indexOf('{', head.indexOf('Object.assign('));
+    let extra = {};
+    if (open >= 0) {
+      let depth = 0;
+      let end = -1;
+      for (let i = open; i < head.length; i += 1) {
+        if (head[i] === '{') depth += 1;
+        else if (head[i] === '}') { depth -= 1; if (depth === 0) { end = i; break; } }
+      }
+      if (end > open) {
+        try {
+          // eslint-disable-next-line no-new-func
+          extra = new Function('FIGHT_DAY', 'daysBefore', 'weeksFromNow', 'weeksFromNowOnSaturday',
+            `return (${head.slice(open, end + 1)});`)(FIGHT_DAY, daysBefore, weeksFromNow, onSaturday) || {};
+        } catch { extra = {}; }
+      }
+    }
     const dated = head.match(/competition_date\s*:\s*([A-Za-z_0-9]+(?:\([^)]*\))?)/);
     const type = head.match(/event_type\s*:\s*'([a-z_]+)'/);
-    out.push({ varName: m[1], id: m[2], intake, dateExpr: dated?.[1] || null, eventType: type?.[1] || null });
+    out.push({ varName: m[1], id: m[2], intake: { ...intake, ...extra }, dateExpr: dated?.[1] || null, eventType: type?.[1] || null });
   }
   return out;
 }
@@ -90,6 +113,15 @@ const weeksFromNow = (n) => new Date(Date.now() + n * 7 * day).toISOString().sli
 const onSaturday = (n) => {
   const d = new Date(Date.now() + n * 7 * day);
   d.setUTCDate(d.getUTCDate() - ((d.getUTCDay() - 6 + 7) % 7));
+  return d.toISOString().slice(0, 10);
+};
+
+// The same names the workflow's own script uses, so the Object.assign head can
+// be evaluated exactly as the run evaluates it.
+const FIGHT_DAY = onSaturday(4);
+const daysBefore = (iso, n) => {
+  const d = new Date(`${iso}T00:00:00Z`);
+  d.setUTCDate(d.getUTCDate() - n);
   return d.toISOString().slice(0, 10);
 };
 
@@ -132,14 +164,28 @@ for (const a of selected) {
   if (rejection) fail(`intake rejected before generation: "${rejection}"`);
   else ok('intake accepted by the launch validator');
 
-  // 2. Can the athlete train with anything? An empty kit means every session
+  // 2. Would the service stop and ask a question first? This gate runs BEFORE
+  //    the pass guard and before any model call, and an unanswered required
+  //    clarification returns 422 without ever reaching the engine. Pre-flight
+  //    did not model it, so it reported PASS for the advanced hybrid and the
+  //    run spent a slot discovering that an MMA athlete with an event is asked
+  //    about his weight class -- a question no acceptance run can answer.
+  const clarifications = addOptionalQuestions(detectIntakeClarifications(intake), intake);
+  const blocking = requiredClarifications(clarifications);
+  if (blocking.length) {
+    fail(`the build stops for ${blocking.length} required clarification(s) before generation: `
+      + blocking.map((q) => q.id).join(', ')
+      + '. An acceptance run has nobody to answer them, so this avatar can never build.');
+  } else ok('no clarification blocks the build');
+
+  // 3. Can the athlete train with anything? An empty kit means every session
   //    the model writes will be refused by the equipment gate.
   const kit = [...computeEffectiveEquipment(intake)];
   if (!kit.length && intake.training_location !== 'home_bodyweight') {
     fail(`no effective equipment at training_location="${intake.training_location}" -- every prescribed movement will be rejected`);
   } else ok(`${kit.length} equipment tokens available`);
 
-  // 3. Does the block frame the event the way the avatar intends? A date that
+  // 4. Does the block frame the event the way the avatar intends? A date that
   //    drifts by a weekday turns competition week into a taper.
   if (hasEvent(intake)) {
     const out = weeksOut(intake);
