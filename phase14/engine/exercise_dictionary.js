@@ -1641,6 +1641,36 @@ export function validateSportDayCoupling(program, intake = {}) {
 // session that is not there or delete one the athlete asked for, and a repair
 // that pretends otherwise would hand back a program that satisfies the gate by
 // misrepresenting the week.
+// Work that happens on a road or a trail rather than in a building. Bikes,
+// rowers, sleds and pools are deliberately not here: those need a facility, so
+// a day built on them really does depend on gym access.
+const GYM_FREE_WORK = /^\s*(?:easy |long |tempo |recovery |steady )?(?:run|running|jog|jogging|walk|walking|ruck|rucking|hike|hiking|sprint|sprints|run-?walk)\b/i;
+
+function gymFreeDays(program, intake = {}) {
+  const isHebrew = String(intake.language || "").toLowerCase() === "he";
+  const free = new Set();
+  const notFree = new Set();
+  eachTsvBlock(program, (dataRows, { header }) => {
+    const exIdx = colIdx(header, "exercise");
+    for (const g of groupByDay(dataRows, header)) {
+      const idx = dayIndex(g.day);
+      if (idx < 0) continue;
+      const working = g.rows.filter((cells) => {
+        const raw = cellAt(cells, exIdx);
+        return raw && !isWarmupCell(raw);
+      });
+      if (!working.length) continue;
+      const allOutdoors = working.every((cells) => GYM_FREE_WORK.test(coreExerciseName(cellAt(cells, exIdx), isHebrew))
+        || GYM_FREE_WORK.test(cellAt(cells, exIdx)));
+      if (allOutdoors) free.add(idx); else notFree.add(idx);
+    }
+    return dataRows;
+  });
+  // A day that needs the gym in any week needs it, full stop.
+  for (const i of notFree) free.delete(i);
+  return free;
+}
+
 export function swapSportDayContent(program, intake = {}) {
   const available = Array.isArray(intake.available_gym_days)
     ? [...new Set(intake.available_gym_days.map(dayIndex).filter((i) => i >= 0))].sort((a, b) => a - b)
@@ -1649,8 +1679,15 @@ export function swapSportDayContent(program, intake = {}) {
   const availableSet = new Set(available);
 
   const timeline = buildStrengthTimeline(program, intake);
+  // available_gym_days is about access to a gym, and a run does not need one.
+  // A day carrying nothing but running or rucking is a day the athlete can
+  // train on whether or not the gym is open, so moving it is not a fix -- it is
+  // a worse week. The advanced hybrid had his Thursday run shifted onto Friday
+  // in all four weeks, on top of a hard MMA session, to satisfy a rule about
+  // gym availability that his run was never subject to.
+  const gymFree = gymFreeDays(program, intake);
   const misplaced = timeline
-    .map((type, i) => (type !== "rest" && !availableSet.has(i) ? i : -1))
+    .map((type, i) => (type !== "rest" && !availableSet.has(i) && !gymFree.has(i) ? i : -1))
     .filter((i) => i >= 0);
   if (!misplaced.length) return program;
 

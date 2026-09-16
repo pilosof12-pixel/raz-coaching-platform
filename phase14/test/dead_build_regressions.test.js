@@ -16,7 +16,7 @@ import fs from 'node:fs';
 
 import { collectRepairableValidationFailures } from '../engine/repairable_validation_bundle.js';
 import { parseProgramModel, strengthDaysForWeek } from '../engine/program_model.js';
-import { matchDictionary } from '../engine/exercise_dictionary.js';
+import { matchDictionary, swapSportDayContent } from '../engine/exercise_dictionary.js';
 
 const T = new URL('./fixtures/', import.meta.url);
 const COMP = JSON.parse(fs.readFileSync(new URL('competition_avatars.json', T), 'utf8'));
@@ -207,4 +207,41 @@ test('an empty model response is answered with a different request, not the same
   // on the acceptance side can read.
   assert.match(runtime, /incomplete_details\?\.reason/);
   assert.match(runtime, /JOB_BUDGET_SPENT/);
+});
+
+test('a run is not moved off a day the athlete has no gym on', () => {
+  // available_gym_days is about access to a gym. A run does not need one, and
+  // the repair that moves work off unavailable days was treating a day of pure
+  // running as a scheduling mistake -- the advanced hybrid had his Thursday run
+  // shifted onto Friday in all four weeks, on top of a hard MMA session, to
+  // satisfy a rule his run was never subject to.
+  //
+  // Found by running the chain against a program the service had already
+  // delivered, which is the only way a repair that converges and still makes
+  // the week worse ever shows up.
+  const hybrid = JSON.parse(fs.readFileSync(new URL('./fixtures/acceptance_intakes.json', import.meta.url), 'utf8')).advanced_hybrid;
+  const before = fs.readFileSync(new URL('./fixtures/run81_advanced_hybrid.txt', import.meta.url), 'utf8');
+  const runDay = (program) => {
+    const m = program.match(/START_WEEK1_TSV\s*\n([\s\S]*?)\nEND_WEEK1_TSV/i);
+    const lines = m[1].split('\n').filter((l) => l.includes('\t'));
+    let day = '';
+    for (const line of lines.slice(1)) {
+      const cells = line.split('\t');
+      if (cells[0].trim()) day = cells[0].trim();
+      if (/^run$/i.test(String(cells[1] || '').trim())) return day;
+    }
+    return null;
+  };
+  assert.equal(runDay(before), 'Thu', 'the delivered program ran on Thursday');
+  assert.equal(runDay(swapSportDayContent(before, hybrid)), 'Thu', 'and it still does');
+});
+
+test('strength work on a day the athlete cannot attend is still moved', () => {
+  // The rule keeps its job: a day that needs a gym is a day that needs a gym.
+  const hybrid = JSON.parse(fs.readFileSync(new URL('./fixtures/acceptance_intakes.json', import.meta.url), 'utf8')).advanced_hybrid;
+  const HEAD2 = 'Day\tExercise\tWeight\tSets\tReps\tRest\tTarget RPE\tNotes\tResults';
+  const line = (d, n) => [d, n, '100 kg', '3', '5', '3 min', '8', 'Work sets.', ''].join('\t');
+  const p = `START_WEEK1_TSV\n${HEAD2}\n${line('Mon', 'Back Squat')}\n${line('Thu', 'Bench Press')}\nEND_WEEK1_TSV`;
+  const moved = swapSportDayContent(p, hybrid);
+  assert.ok(!/^Thu\t/m.test(moved), `bench press must leave Thursday:\n${moved}`);
 });
