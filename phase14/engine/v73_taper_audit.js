@@ -184,7 +184,25 @@ export function appendCompetitionBlocks(program, intake = {}, now = Date.now()) 
   const audit = renderTaperAudit(source, intake, now);
   if (!audit) return source;
 
-  let out = source;
-  if (!out.includes('TAPER AUDIT')) out = `${out.replace(/\s*$/, '')}\n\n${audit}\n`;
-  return out;
+  // Written once and never refreshed, the audit described a program that no
+  // longer existed. Every repair after this point -- an MRV trim, a taper
+  // trim, an accessory cut -- changed the set counts and left the table
+  // standing. The weightlifting block delivered a taper audit reading
+  // 69/69/69/50 for a week table that actually ran 69/63/58/49, so the
+  // document told the athlete the volume never came down when in fact it did.
+  // The coach marked the program down for the contradiction, which was fair:
+  // the defect was real, it was just in our reporting rather than the
+  // training. The audit is a view of the program, so it is recomputed from
+  // the program every time.
+  const existing = source.indexOf('TAPER AUDIT');
+  if (existing < 0) return `${source.replace(/\s*$/, '')}\n\n${audit}\n`;
+
+  // The rendered block runs from its heading to the closing summary line.
+  const tail = source.slice(existing);
+  const closing = tail.search(/^Across the block:[^\n]*$/m);
+  const end = closing >= 0
+    ? existing + closing + tail.slice(closing).indexOf('\n') + 1
+    : source.length;
+  const after = end >= source.length ? '' : source.slice(end);
+  return `${source.slice(0, existing)}${audit}\n${after.replace(/^\n+/, '')}`;
 }

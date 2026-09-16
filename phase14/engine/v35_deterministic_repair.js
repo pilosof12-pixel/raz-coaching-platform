@@ -1234,14 +1234,9 @@ export function repairDeterministicContradictions(program, intake = {}) {
 
   // Deliverables, appended once everything else has settled: the audit reports
   // the block that actually shipped, not an intermediate one.
-  const documented = appendCampSchedule(appendCompetitionBlocks(candidate, intake), intake);
-  // Deliberately after the calendar is written: the contradiction this repair
-  // resolves is between the calendar and the week table, so it has to run on
-  // the document that actually ships, not an intermediate one.
-  if (documented !== candidate) {
-    candidate = documented;
-    repairs.push({ type: 'v73_v78_blocks_appended' });
-  }
+  // The audit and the camp schedule are rendered LAST, below, because they
+  // describe the finished program and five row-changing repairs still run
+  // after this point.
 
   const honest = repairPrescriptionIntegrity(candidate, intake);
   if (honest !== candidate) {
@@ -1289,6 +1284,23 @@ export function repairDeterministicContradictions(program, intake = {}) {
   if (cleaned !== candidate) {
     candidate = cleaned;
     repairs.push({ type: 'v58_semantic_cleanup' });
+  }
+
+  // Rendered here, after every repair that can change a row. Appended at the
+  // top of this section instead, the audit reported the program as it stood
+  // before the taper trim, the intensification shaping and the competition-week
+  // trim had run -- so the weightlifting block shipped a table reading
+  // 69/69/69/50 against a week table that ran 69/63/58/49, and reported
+  // competition-lift share flat at 39% when it actually climbs to 47%. The
+  // document made the block look worse than it was, in the section written to
+  // be the trustworthy summary.
+  const documented = appendCampSchedule(appendCompetitionBlocks(candidate, intake), intake);
+  // Deliberately after the calendar is written: the contradiction this repair
+  // resolves is between the calendar and the week table, so it has to run on
+  // the document that actually ships, not an intermediate one.
+  if (documented !== candidate) {
+    candidate = documented;
+    repairs.push({ type: 'v73_v78_blocks_appended' });
   }
 
   return { program: candidate, repaired: repairs.length > 0, repairs };
