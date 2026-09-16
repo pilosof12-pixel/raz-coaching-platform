@@ -82,6 +82,21 @@ test('rest cells are read in seconds however they are written', () => {
   assert.equal(restSecondsOf('2:30'), 150);
   assert.equal(restSecondsOf('3 min'), 180);
   assert.equal(restSecondsOf('N/A'), null);
+  // A compound, not a maximum. Taking the largest number and multiplying by
+  // sixty because the string said "min" made two and a half minutes into half
+  // an hour, and a ninety-second rest into the same.
+  assert.equal(restSecondsOf('2 min 30 s'), 150);
+  assert.equal(restSecondsOf('1 min 30 s'), 90);
+});
+
+// The live footballer block, produced with the briefs in the prompt. Every
+// element of the prediction written before the run, checked against the rows.
+test('the live footballer block meets the repeated-sprint definition', () => {
+  const p = read('run115_inseason_footballer.txt');
+  assert.deepEqual(repeatedSprintExposure(p, FOOTBALLER), [], '45 s recovery, 95% effort, reps under 10 s');
+  assert.deepEqual(sprintSpeedExposure(p, FOOTBALLER), [], 'a real sprint row in every week');
+  assert.deepEqual(sprintDistanceSpecificity(p, FOOTBALLER), [], '24 m by Week 2 against a 30 m benchmark');
+  assert.deepEqual(eccentricHamstringTiming(p, FOOTBALLER), [], 'Nordics on Tuesday, MD-4');
 });
 
 // Tuesday is MD-4 for a Saturday match, which he confirmed is the right home

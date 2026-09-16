@@ -1,0 +1,74 @@
+These two post-football lifts are deliberately small and repeatable around a Saturday match. MD-4 holds the squat, sprint exposure, and the only meaningful eccentric hamstring work; MD-2 stays short and sharp with a small repeat-sprint top-up and low-soreness support. In-season, holding your strength and speed on the same weekly schedule is a win.
+
+Weeks 2-3 only nudge one small lever at a time: Tuesday reaches 24 m from Week 2 and then holds, while Week 3 adds one repeat sprint on Thursday and one extra Nordic rep only if the next-day hamstring feels normal. Week 4 is a consolidation week: the main squat load stays in, but the non-essential sets drop so you finish fresher for the next run of matches.
+
+If the right hamstring shifts from mild awareness to grabbing, sharpness, or clear speed loss, stop the running row immediately. If squat pattern or hamstring tightness changes enough to alter position, keep the day submaximal or swap to Box Squat and Machine Hamstring Curl at RPE 6-7; if symptoms linger into the next day or show up outside training, get it checked.
+
+WEEKLY SCHEDULE
+The sport is the load. The gym is placed around it, and the day before a match is protected.
+
+ | Mon | Tue | Wed | Thu | Fri | Sat | Sun
+Every week | Football light | Football hard + gym | Football moderate | Football hard + gym | rest (protected) | Football MATCH | rest
+
+This repeats for all four weeks: the fixture repeats, so the week does. Progress is measured in what the athlete can do on this schedule, not in load added to it.
+
+START_WEEK1_TSV
+Day	Exercise	Weight	Sets	Reps	Rest	Target RPE	Notes	Results
+Tue	[WARMUP] Run	N/A	1	5 min	N/A	3	MD-4 prep after football: easy jog, dynamic hips, skips, then 2-3 quick ramps into the squat.; Squat-and-reach x 6; Bodyweight squat x 8; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Ramp Back Squat: 45 kg x 5, 67.5 kg x 3, 87.5 kg x 1-2 before 112.5 kg work sets.	
+Tue	Back Squat	112.5 kg	2	2	3 min	6	About 75% of your 150 kg doubles; maintenance dose. 2 sets is the ceiling; if RPE exceeds 8 or position changes, keep the load and cut set 2.	
+Tue	Chest-Supported Row	RPE-selected load	2	8	90 s	7	Horizontal pull support without extra low-back fatigue.	
+Tue	Nordic Hamstring Curl	N/A	2	2	2 min	6-7	Controlled lower, assisted up; main eccentric hamstring dose sits 72 h+ before the match.	
+Tue	Pallof Press	RPE-selected load	2	8/side	60 s	6	Anti-rotation trunk work; optional if the session is running long.	
+Tue	Run	N/A	4	20 m	2 min 30 s	N/A	95-97% effort with full recovery; stop for clear speed drop or more than mild right hamstring awareness.	
+Thu	[WARMUP] Run	N/A	1	4 min	N/A	3	MD-2 prep after football: short reset, dynamic hips, and 2 progressive build-ups before the first work rep.; Easy jog 6-8 min; dynamic running drills; 3 relaxed strides before the hard running work; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Band shoulder pass-through x 10; Wall slide x 8	
+Thu	Overhead Press	RPE-selected load	2	4	2 min 30 s	6-7	Short upper-body strength support; crisp reps only, no grind.	
+Thu	Cable Row	RPE-selected load	2	8	90 s	7	Horizontal pull balance for shoulder and trunk posture.	
+Thu	Hip Thrust	RPE-selected load	2	5	2 min	6-7	Low-soreness hip-dominant support; strong lockout, no grind.	
+Thu	Machine Hamstring Curl	RPE-selected load	2	8	75 s	6	Low-cost hamstring tolerance inside 48 h; first thing to remove if legs feel flat after football.	
+Thu	Run	N/A	4	20 m	45 s	N/A	MD-2 repeat-sprint top-up at 95% effort; each rep stays under 10 s. Stop if pace drops or hamstring tightness rises above normal.	
+END_WEEK1_TSV
+START_WEEK2_TSV
+Day	Exercise	Weight	Sets	Reps	Rest	Target RPE	Notes	Results
+Tue	[WARMUP] Run	N/A	1	5 min	N/A	3	MD-4 prep after football: easy jog, dynamic hips, skips, then 2-3 quick ramps into the squat.; Squat-and-reach x 6; Bodyweight squat x 8; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Ramp Back Squat: 45 kg x 5, 67.5 kg x 3, 87.5 kg x 1-2 before 112.5 kg work sets.	
+Tue	Back Squat	112.5 kg	2	2	3 min	6	About 75% of your 150 kg doubles; same maintenance dose on purpose. 2 sets is the ceiling; if RPE exceeds 8 or position changes, keep the load and hold the set count.	
+Tue	Chest-Supported Row	RPE-selected load	2	8	90 s	7	Same support dose while the sprint distance moves.	
+Tue	Nordic Hamstring Curl	N/A	2	2	2 min	6-7	Hold last week's dose while Tuesday speed distance increases; controlled lower, assisted up.	
+Tue	Pallof Press	RPE-selected load	2	8/side	60 s	6	Anti-rotation trunk work; optional if the session is running long.	
+Tue	Run	N/A	4	24 m	2 min 30 s	N/A	If Week 1 was clean, extend to 24 m at 95-97% effort; otherwise repeat 20 m. Stop for clear speed drop or more than mild right hamstring awareness.	
+Thu	[WARMUP] Run	N/A	1	4 min	N/A	3	MD-2 prep after football: short reset, dynamic hips, and 2 progressive build-ups before the first work rep.; Easy jog 6-8 min; dynamic running drills; 3 relaxed strides before the hard running work; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Band shoulder pass-through x 10; Wall slide x 8	
+Thu	Overhead Press	RPE-selected load	2	4	2 min 30 s	6-7	Short upper-body strength support; crisp reps only, no grind.	
+Thu	Cable Row	RPE-selected load	2	8	90 s	7	Horizontal pull balance for shoulder and trunk posture.	
+Thu	Hip Thrust	RPE-selected load	2	5	2 min	6-7	Low-soreness hip-dominant support; strong lockout, no grind.	
+Thu	Machine Hamstring Curl	RPE-selected load	2	8	75 s	6	Low-cost hamstring tolerance inside 48 h; first thing to remove if legs feel flat after football.	
+Thu	Run	N/A	4	20 m	45 s	N/A	Hold this repeat-sprint dose while Tuesday distance moves; 95% effort and each rep under 10 s. Stop if pace drops or hamstring tightness rises above normal.	
+END_WEEK2_TSV
+START_WEEK3_TSV
+Day	Exercise	Weight	Sets	Reps	Rest	Target RPE	Notes	Results
+Tue	[WARMUP] Run	N/A	1	5 min	N/A	3	MD-4 prep after football: easy jog, dynamic hips, skips, then 2-3 quick ramps into the squat.; Squat-and-reach x 6; Bodyweight squat x 8; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Ramp Back Squat: 45 kg x 5, 67.5 kg x 3, 87.5 kg x 1-2 before 112.5 kg work sets.	
+Tue	Back Squat	112.5 kg	2	2	3 min	6	About 75% of your 150 kg doubles; same maintenance dose on purpose. 2 sets is the ceiling; if RPE exceeds 8 or position changes, keep the load and hold the set count.	
+Tue	Chest-Supported Row	RPE-selected load	2	8	90 s	7	Horizontal pull support without extra low-back fatigue.	
+Tue	Nordic Hamstring Curl	N/A	2	3	2 min	7	Add rep 3 only if Week 2 and the next-day hamstring baseline were normal; otherwise stay at 2 controlled reps.	
+Tue	Pallof Press	RPE-selected load	2	8/side	60 s	6	Anti-rotation trunk work; optional if the session is running long.	
+Tue	Run	N/A	4	24 m	2 min 30 s	N/A	Repeat last week's 24 m at 95-97% effort if Week 2 stayed clean; otherwise go back to 20 m. Stop for clear speed drop or more than mild right hamstring awareness.	
+Thu	[WARMUP] Run	N/A	1	4 min	N/A	3	MD-2 prep after football: short reset, dynamic hips, and 2 progressive build-ups before the first work rep.; Easy jog 6-8 min; dynamic running drills; 3 relaxed strides before the hard running work; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Band shoulder pass-through x 10; Wall slide x 8	
+Thu	Overhead Press	RPE-selected load	2	4	2 min 30 s	6-7	Short upper-body strength support; crisp reps only, no grind.	
+Thu	Cable Row	RPE-selected load	2	8	90 s	7	Horizontal pull balance for shoulder and trunk posture.	
+Thu	Hip Thrust	RPE-selected load	2	5	2 min	6-7	Low-soreness hip-dominant support; strong lockout, no grind.	
+Thu	Machine Hamstring Curl	RPE-selected load	2	8	75 s	6	Low-cost hamstring tolerance inside 48 h; first thing to remove if legs feel flat after football.	
+Thu	Run	N/A	5	20 m	45 s	N/A	Add rep 5 only if Week 2 outputs stayed even and next-day legs were normal; 95% effort and each rep under 10 s. Stop if pace drops or hamstring tightness rises above normal.	
+END_WEEK3_TSV
+START_WEEK4_TSV
+Day	Exercise	Weight	Sets	Reps	Rest	Target RPE	Notes	Results
+Tue	[WARMUP] Run	N/A	1	5 min	N/A	3	MD-4 consolidation prep after football: same short reset and quick ramps, but finish fresher this week.; Easy jog 6-8 min; dynamic running drills; 3 relaxed strides before the hard running work; Squat-and-reach x 6; Bodyweight squat x 8; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Ramp Back Squat: 45 kg x 5, 67.5 kg x 3, 87.5 kg x 1-2 before 112.5 kg work sets.	
+Tue	Back Squat	112.5 kg	2	2	3 min	6	Consolidation keeps the same load and crisp bar speed; 2 sets remains the ceiling. If RPE exceeds 8 or position changes, keep the load and hold the set count.	
+Tue	Chest-Supported Row	RPE-selected load	1	8	90 s	7	One clean support set only this week.	
+Tue	Nordic Hamstring Curl	N/A	1	2	2 min	6-7	One low-fatigue reminder set only; controlled lower, assisted up.	
+Tue	Pallof Press	RPE-selected load	1	8/side	60 s	6	One trunk set only this week.	
+Tue	Run	N/A	3	24 m	2 min 30 s	N/A	Keep 95-97% effort and full recovery; 3 quality reps only this week. Stop for clear speed drop or more than mild right hamstring awareness.	
+Thu	[WARMUP] Run	N/A	1	4 min	N/A	3	MD-2 consolidation prep after football: short and sharp; if needed, stop after the hip thrust row.; Easy jog 6-8 min; dynamic running drills; 3 relaxed strides before the hard running work; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Band shoulder pass-through x 10; Wall slide x 8	
+Thu	Overhead Press	RPE-selected load	2	4	2 min 30 s	6-7	Keep the same crisp strength support; no grind.	
+Thu	Cable Row	RPE-selected load	1	8	90 s	7	One clean horizontal pull set only this week.	
+Thu	Hip Thrust	RPE-selected load	1	5	2 min	6-7	One low-soreness hip-dominant set only this week.	
+Thu	Machine Hamstring Curl	RPE-selected load	1	8	75 s	6	One easy hamstring tolerance set only; first thing to skip if legs feel flat after football.	
+Thu	Run	N/A	4	20 m	45 s	N/A	Keep the same 95% effort and under-10 s reps; trim one rep from Week 3 to arrive fresher. Stop if pace drops or hamstring tightness rises above normal.	
+END_WEEK4_TSV

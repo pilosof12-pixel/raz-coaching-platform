@@ -890,11 +890,16 @@ export function restSecondsOf(text) {
   const s = String(text || '');
   const clock = s.match(/\b(\d{1,2}):(\d{2})\b/);
   if (clock) return Number(clock[1]) * 60 + Number(clock[2]);
+  // "2 min 30 s" is a compound, not a maximum. Taking the largest number and
+  // multiplying it by sixty because the string contained "min" turned two and
+  // a half minutes into half an hour, and a ninety-second rest into the same.
+  const compound = s.match(/(\d+(?:\.\d+)?)\s*min(?:ute)?s?\s*(\d+(?:\.\d+)?)\s*s(?:ec)?/i);
+  if (compound) return Number(compound[1]) * 60 + Number(compound[2]);
+  const mins = s.match(/(\d+(?:\.\d+)?)\s*min/i);
+  if (mins) return Number(mins[1]) * 60;
   const nums = [...s.matchAll(/(\d+(?:\.\d+)?)/g)].map((m) => Number(m[1]));
   if (!nums.length) return null;
-  const top = Math.max(...nums);
-  if (/\bmin\b/i.test(s)) return top * 60;
-  return top;
+  return Math.max(...nums);
 }
 
 const effortPct = (r) => {
