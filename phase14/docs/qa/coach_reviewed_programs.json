@@ -1,5 +1,5 @@
 {
-  "_why": "The three delivered programs the reviewing coach scored in Phase 1, mapped to the committed fixtures that hold them. Derived once by matching audit signatures and opening lines after the scratchpad copies were lost in a container rebuild; recorded here so it never has to be derived again. Dimension scores are the coach's, and reproduce his overall score through engine/coach_standard.js.",
+  "_why": "The three delivered programs the reviewing coach scored in Phase 1, mapped to the committed fixtures that hold them. Derived once by matching audit signatures and opening lines after the scratchpad copies were lost in a container rebuild; recorded here so it never has to be derived again. Dimension scores are the coach's, and reproduce his overall score through engine/coach_standard.js. Football A/B/C were scored after the in-season dimension set was defined; its weights reproduce all three, as the first three types did.",
   "programs": [
     {
       "id": "program-1",
@@ -15,13 +15,34 @@
         "execution_rules": 8.8
       },
       "findings": [
-        { "cost": 0.55, "what": "Snatch Pull 130 kg x 3 is a named maintenance benchmark with no direct pulling exposure anywhere" },
-        { "cost": 0.35, "what": "intensity never reaches the 89-90% intensification band" },
-        { "cost": 0.20, "what": "five consecutive training days despite flexible availability" },
-        { "cost": 0.20, "what": "accessory redundancy: four rowing exposures" },
-        { "cost": 0.15, "what": "contingency creates an adjacent duplicate squat" },
-        { "cost": 0.10, "what": "audit reports 69 sets in Weeks 1 and 2 while the text says volume comes down" },
-        { "cost": 0.10, "what": "asserts a 'routine 4 kg cut' with no support in the intake" }
+        {
+          "cost": 0.55,
+          "what": "Snatch Pull 130 kg x 3 is a named maintenance benchmark with no direct pulling exposure anywhere"
+        },
+        {
+          "cost": 0.35,
+          "what": "intensity never reaches the 89-90% intensification band"
+        },
+        {
+          "cost": 0.2,
+          "what": "five consecutive training days despite flexible availability"
+        },
+        {
+          "cost": 0.2,
+          "what": "accessory redundancy: four rowing exposures"
+        },
+        {
+          "cost": 0.15,
+          "what": "contingency creates an adjacent duplicate squat"
+        },
+        {
+          "cost": 0.1,
+          "what": "audit reports 69 sets in Weeks 1 and 2 while the text says volume comes down"
+        },
+        {
+          "cost": 0.1,
+          "what": "asserts a 'routine 4 kg cut' with no support in the intake"
+        }
       ]
     },
     {
@@ -39,12 +60,30 @@
         "execution_rules": 8.6
       },
       "findings": [
-        { "cost": 0.50, "what": "promises to rebuild toward 18-20 km/week, leaves both easy runs at 25 min for four weeks" },
-        { "cost": 0.40, "what": "interval progression stays ~4:08-4:12/km through Week 4 against a 4:00/km goal pace" },
-        { "cost": 0.25, "what": "ruck cut to ~6.3-6.5 km when the athlete tolerates 8-10 km and the goal is 10 km" },
-        { "cost": 0.20, "what": "three consecutive lower-body days (Sat ruck, Sun lunge + run, Mon squat + run)" },
-        { "cost": 0.15, "what": "weighted pull-up fixed at +22.5 kg 3x4 for four weeks against a demonstrated +30 kg x 5" },
-        { "cost": 0.10, "what": "days_per_week: 3 against five calendar training days, interpretation never stated" }
+        {
+          "cost": 0.5,
+          "what": "promises to rebuild toward 18-20 km/week, leaves both easy runs at 25 min for four weeks"
+        },
+        {
+          "cost": 0.4,
+          "what": "interval progression stays ~4:08-4:12/km through Week 4 against a 4:00/km goal pace"
+        },
+        {
+          "cost": 0.25,
+          "what": "ruck cut to ~6.3-6.5 km when the athlete tolerates 8-10 km and the goal is 10 km"
+        },
+        {
+          "cost": 0.2,
+          "what": "three consecutive lower-body days (Sat ruck, Sun lunge + run, Mon squat + run)"
+        },
+        {
+          "cost": 0.15,
+          "what": "weighted pull-up fixed at +22.5 kg 3x4 for four weeks against a demonstrated +30 kg x 5"
+        },
+        {
+          "cost": 0.1,
+          "what": "days_per_week: 3 against five calendar training days, interpretation never stated"
+        }
       ]
     },
     {
@@ -62,11 +101,113 @@
         "execution_rules": 9.4
       },
       "findings": [
-        { "cost": 0.40, "what": "hip thrust is the main lower-body lift while Trap Bar Deadlift is pain-free with a 190 kg x 3 benchmark" },
-        { "cost": 0.20, "what": "Day -1 stacks MMA technical work and an optional gym primer after a hard 4 kg cut" },
-        { "cost": 0.15, "what": "accessory marginal return on seven MMA sessions a week" },
-        { "cost": 0.15, "what": "silently changes Friday from the intake's 'hard' to technical" },
-        { "cost": 0.05, "what": "Week 3 Friday note says 'after hard MMA' while the camp schedule says technical" }
+        {
+          "cost": 0.4,
+          "what": "hip thrust is the main lower-body lift while Trap Bar Deadlift is pain-free with a 190 kg x 3 benchmark"
+        },
+        {
+          "cost": 0.2,
+          "what": "Day -1 stacks MMA technical work and an optional gym primer after a hard 4 kg cut"
+        },
+        {
+          "cost": 0.15,
+          "what": "accessory marginal return on seven MMA sessions a week"
+        },
+        {
+          "cost": 0.15,
+          "what": "silently changes Friday from the intake's 'hard' to technical"
+        },
+        {
+          "cost": 0.05,
+          "what": "Week 3 Friday note says 'after hard MMA' while the camp schedule says technical"
+        }
+      ]
+    },
+    {
+      "id": "football-A",
+      "fixture": "test/fixtures/inseason_footballer-program.txt",
+      "type": "in_season_team_sport",
+      "overall": 8.2,
+      "identified_by": "sent to the coach as football-A.txt",
+      "dimensions": {
+        "match_week_integration": 8.8,
+        "strength_and_power_maintenance": 7.2,
+        "fatigue_and_tissue_load": 8.7,
+        "athlete_specific_availability": 9.0,
+        "secondary_quality_support": 6.5,
+        "execution_rules": 8.8
+      },
+      "findings": [
+        {
+          "cost": 0.45,
+          "what": "no prescribed sprint anywhere despite a primary sprint-speed goal and a 30 m benchmark"
+        },
+        {
+          "cost": 0.3,
+          "what": "Thursday shuttle at 90% with 60 s recovery is not repeated-sprint work"
+        },
+        {
+          "cost": 0.05,
+          "what": "the narrative says Week 2 adds one acceleration rep and no acceleration exists"
+        },
+        {
+          "cost": 0.1,
+          "what": "two rowing and two bench press exposures a week while the sprint goal gets none"
+        }
+      ]
+    },
+    {
+      "id": "football-B",
+      "fixture": "test/fixtures/run100_inseason_footballer.txt",
+      "type": "in_season_team_sport",
+      "overall": 8.7,
+      "identified_by": "sent to the coach as football-B.txt",
+      "dimensions": {
+        "match_week_integration": 9.0,
+        "strength_and_power_maintenance": 8.5,
+        "fatigue_and_tissue_load": 8.8,
+        "athlete_specific_availability": 9.1,
+        "secondary_quality_support": 6.8,
+        "execution_rules": 9.0
+      },
+      "findings": [
+        {
+          "cost": 0.35,
+          "what": "Prowler Push at RPE 6 with 60 s recovery is not repeated-sprint work"
+        },
+        {
+          "cost": 0.25,
+          "what": "sprint work never passes 20 m against a 30 m benchmark"
+        },
+        {
+          "cost": 0.05,
+          "what": "a Week 3 note refers to a 'sets of 20 reps progression' that does not exist"
+        }
+      ]
+    },
+    {
+      "id": "football-C",
+      "fixture": "test/fixtures/run101_inseason_footballer.txt",
+      "type": "in_season_team_sport",
+      "overall": 9.0,
+      "identified_by": "sent to the coach as football-C.txt",
+      "dimensions": {
+        "match_week_integration": 9.2,
+        "strength_and_power_maintenance": 9.1,
+        "fatigue_and_tissue_load": 8.8,
+        "athlete_specific_availability": 9.3,
+        "secondary_quality_support": 7.2,
+        "execution_rules": 9.2
+      },
+      "findings": [
+        {
+          "cost": 0.25,
+          "what": "shuttle recovery stays at 65-75 s, too long to be repeated-sprint work"
+        },
+        {
+          "cost": 0.1,
+          "what": "two rowing and two overhead press exposures a week, neither a stated goal"
+        }
       ]
     }
   ]

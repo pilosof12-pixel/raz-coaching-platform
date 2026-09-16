@@ -23,6 +23,12 @@ const arr = (v) => (Array.isArray(v) ? v : v ? [v] : []);
 const isWarmup = (n) => /^\s*\[WARMUP\]/i.test(String(n || ''));
 const num = (s) => { const m = String(s || '').match(/(\d+(?:\.\d+)?)/); return m ? Number(m[1]) : null; };
 
+export function narrativeOf(program) {
+  const s = String(program || '');
+  const at = s.search(/START_WEEK1_TSV/i);
+  return at < 0 ? s : s.slice(0, at);
+}
+
 export function goalText(intake = {}, tiers = ['primary', 'secondary', 'maintenance']) {
   return tiers.map((t) => arr(intake[`${t}_goals`]).join(' ')).join(' ');
 }
@@ -46,6 +52,7 @@ export function rows(program) {
         load: Number.isInteger(parsed.load) ? String(cells[parsed.load] || '') : '',
         sets: num(cells[parsed.sets]),
         reps: String(cells[parsed.reps] || ''),
+        rest: Number.isInteger(parsed.rest) ? String(cells[parsed.rest] || '') : '',
         rpe: Number.isInteger(parsed.rest) ? num(cells[parsed.rest + 1]) : null,
         notes: Number.isInteger(parsed.notes) ? String(cells[parsed.notes] || '') : '',
         cells,
@@ -574,6 +581,11 @@ export const RULES = [
   trainingDaysVsIntake,
   unanchoredPrimaryLoad,
   inSeasonCaps,
+  sprintSpeedExposure,
+  sprintDistanceSpecificity,
+  repeatedSprintExposure,
+  eccentricHamstringTiming,
+  promisedMovementAbsent,
 ];
 
 export function gradeProgram(program, intake = {}) {
@@ -812,6 +824,208 @@ export function inSeasonCaps(program, intake = {}) {
       cap: 6.0,
       detail: `The block schedules ${onMatchDay.length} gym exercise${onMatchDay.length > 1 ? 's' : ''} on ${md.toUpperCase()}, which the intake gives as match day, and never mentions the match anywhere in the summary.`,
     });
+  }
+  return out;
+}
+
+// --- 15. sprint speed and repeated-sprint ability -----------------------------
+//
+// From his football review. Three delivered programs for the same footballer
+// scored 8.2, 8.7 and 9.0, and the whole spread sat in how they handled speed:
+// one never prescribed a sprint at all, one never got past 20 m against a 30 m
+// benchmark, and all three called a shuttle with a minute of rest "repeated
+// sprint" work.
+
+const SPRINT_NAME = /\bsprint\b|\bacceleration\b|\bflying\b|\bshuttle\b|\brun\b/i;
+// Without the plurals this missed "Fast relaxed accelerations", which is how
+// the best of the three football programs was accused of having no sprint work.
+const SPRINT_INTENT = /\bsprints?\b|\baccelerations?\b|\bmax(?:imal)? speed\b|\bflying\b|\bspeed\b/i;
+
+// Seconds a rest cell expresses: "60 s", "2:30", "20-30 s".
+export function restSecondsOf(text) {
+  const s = String(text || '');
+  const clock = s.match(/\b(\d{1,2}):(\d{2})\b/);
+  if (clock) return Number(clock[1]) * 60 + Number(clock[2]);
+  const nums = [...s.matchAll(/(\d+(?:\.\d+)?)/g)].map((m) => Number(m[1]));
+  if (!nums.length) return null;
+  const top = Math.max(...nums);
+  if (/\bmin\b/i.test(s)) return top * 60;
+  return top;
+}
+
+const effortPct = (r) => {
+  const all = [...String(r.cells.join(' ')).matchAll(/(\d{2,3})\s*%/g)].map((m) => Number(m[1]));
+  return all.length ? Math.max(...all) : null;
+};
+const metres = (r) => {
+  const m = String(r.reps).match(/(\d+(?:\.\d+)?)\s*m\b(?!in)/i);
+  return m ? Number(m[1]) : null;
+};
+
+// The athlete's own sprint benchmark distance, from current_numbers.
+export function sprintBenchmark(intake = {}) {
+  const m = String(intake.current_numbers || '').match(/(\d+(?:\.\d+)?)\s*m\b[^\n]*?(\d+(?:\.\d+)?)\s*s\b/i);
+  return m ? { metres: Number(m[1]), seconds: Number(m[2]) } : null;
+}
+
+// A row that is actually a sprint: named as one, with a distance and a rep
+// count. His rule for Program A -- a warm-up with two build-ups does not count,
+// because neither intensity, distance nor rep quality is prescribed.
+function sprintRows(program) {
+  return rows(program).filter((r) => SPRINT_NAME.test(r.name)
+    && SPRINT_INTENT.test(`${r.name} ${r.load} ${r.notes}`)
+    && metres(r) != null && (r.sets ?? 0) >= 1);
+}
+
+export function sprintSpeedExposure(program, intake = {}) {
+  const primary = arr(intake.primary_goals).join(' ');
+  if (!/\bsprint\b|\bspeed\b/i.test(primary)) return [];
+  // A sport session explicitly marked as speed work satisfies it.
+  if (arr(intake.sport_schedule).some((s) => /sprint|speed/i.test(String((s && s.intensity) || '')))) return [];
+  const byWeek = new Map();
+  for (const r of sprintRows(program)) byWeek.set(r.week, true);
+  const missing = [1, 2, 3, 4].filter((w) => parseWeek(program, w) && !byWeek.has(w));
+  if (!missing.length) return [];
+  const bench = sprintBenchmark(intake);
+  return [{
+    rule: 'SPRINT_SPEED_EXPOSURE_MISSING',
+    weeks: missing,
+    detail: `Holding sprint speed is a primary goal${bench ? ` and the intake benchmarks it at ${bench.metres} m in ${bench.seconds} s` : ''}, and week${missing.length > 1 ? 's' : ''} ${missing.join(', ')} contain${missing.length > 1 ? '' : 's'} no prescribed sprint: no distance, no rep count, no intended speed. Build-ups inside a warm-up do not count, because nothing about their quality is prescribed.`,
+  }];
+}
+
+// By Week 3, one speed session should reach the benchmark distance or 75% of
+// it at 95% or more. Derived from the difference he scored between B, which
+// stayed at 20 m against a 30 m benchmark, and C, which reached 30 m.
+export function sprintDistanceSpecificity(program, intake = {}) {
+  const primary = arr(intake.primary_goals).join(' ');
+  if (!/\bsprint\b|\bspeed\b/i.test(primary)) return [];
+  const bench = sprintBenchmark(intake);
+  if (!bench) return [];
+  const need = bench.metres * 0.75;
+  const qualifying = sprintRows(program).filter((r) => r.week <= 3 && (metres(r) ?? 0) >= need && (effortPct(r) ?? 100) >= 95);
+  if (qualifying.length) return [];
+  const best = Math.max(0, ...sprintRows(program).filter((r) => r.week <= 3).map((r) => metres(r) ?? 0));
+  if (!best) return [];
+  return [{
+    rule: 'SPRINT_DISTANCE_BELOW_BENCHMARK',
+    detail: `The sprint benchmark is ${bench.metres} m and the longest sprint prescribed by Week 3 is ${best} m, short of the ${Math.round(need)} m that 75% of the benchmark asks for. The athlete is never exposed to the later part of the distance the goal is measured over.`,
+  }];
+}
+
+// His machine-usable definition: more than two repetitions, each 10 s or less,
+// intended effort 95% or more, recovery under 60 s and deliberately incomplete.
+const RSA_GOAL = /repeat(?:ed)?[- ]sprint|repeat(?:ed)? effort|repeat sprint|late[- ]match sprint/i;
+
+export function repeatedSprintExposure(program, intake = {}) {
+  const goals = `${arr(intake.secondary_goals).join(' ')} ${arr(intake.primary_goals).join(' ')}`;
+  if (!RSA_GOAL.test(goals)) return [];
+  if (arr(intake.sport_schedule).some((s) => RSA_GOAL.test(String((s && s.intensity) || '')))) return [];
+  const qualifying = rows(program).filter((r) => {
+    if (!SPRINT_NAME.test(r.name) && !/prowler|sled/i.test(r.name)) return false;
+    if ((r.sets ?? 0) < 3) return false;
+    const rest = restSecondsOf(r.rest);
+    if (rest == null || rest >= 60) return false;
+    const effort = effortPct(r);
+    if (effort != null && effort < 95) return false;
+    return true;
+  });
+  if (qualifying.length) return [];
+  const candidates = rows(program).filter((r) => SPRINT_NAME.test(r.name) || /prowler|sled/i.test(r.name));
+  const shown = candidates.slice(0, 1).map((r) => `${r.name} ${r.sets}x${r.reps}, ${r.rest} recovery${effortPct(r) ? `, ${effortPct(r)}%` : ''}`)[0];
+  return [{
+    rule: 'REPEATED_SPRINT_EXPOSURE_MISSING',
+    detail: `Improving repeated-sprint ability is a stated goal, and no week contains an exposure that meets the definition: more than two repetitions, each 10 s or less, at 95% effort or above, with under 60 s of deliberately incomplete recovery.${shown ? ` The nearest thing present is ${shown}, which is quality work with near-full recovery rather than repeatability work.` : ''}`,
+  }];
+}
+
+// --- 16. eccentric hamstring exposure and the match ---------------------------
+//
+// For an athlete with recent hamstring strain history, the main eccentric dose
+// belongs at least 72 hours before the match where the schedule permits, and
+// lower-soreness work inside 48 hours.
+
+const ECCENTRIC_HAMSTRING = /\bnordic\b|\brazor curl\b|\bglute[- ]ham raise\b|\bghr\b|\beccentric[^.]{0,20}hamstring\b/i;
+const HAMSTRING_HISTORY = /hamstring|biceps femoris/i;
+
+export function eccentricHamstringTiming(program, intake = {}) {
+  const history = `${intake.injuries || ''} ${JSON.stringify(intake.pain || {})}`;
+  if (!HAMSTRING_HISTORY.test(history)) return [];
+  const md = matchDay(intake);
+  if (!md) return [];
+  const mdIndex = WEEK_ORDER.indexOf(md);
+  const hoursBefore = (day) => {
+    const i = WEEK_ORDER.indexOf(day);
+    if (i < 0) return null;
+    return ((mdIndex - i + 7) % 7) * 24;
+  };
+  const out = [];
+  const seen = new Set();
+  for (const r of rows(program)) {
+    if (!ECCENTRIC_HAMSTRING.test(r.name)) continue;
+    const h = hoursBefore(r.day);
+    if (h == null || h >= 72) continue;
+    if (seen.has(r.day)) continue;
+    seen.add(r.day);
+    out.push({
+      rule: 'ECCENTRIC_HAMSTRING_TOO_CLOSE_TO_MATCH',
+      day: r.day,
+      detail: `${r.name} is prescribed on ${r.day.toUpperCase()}, ${h} hours before the ${md.toUpperCase()} match, for an athlete with recent hamstring strain history. The main eccentric dose belongs at least 72 hours out; inside 48 hours use lower-soreness hamstring work instead.`,
+    });
+  }
+  return out;
+}
+
+// --- 17. the narrative promises a movement the block never prescribes --------
+//
+// His criticism of our claims rule, and he was right: it compares a claim about
+// a subject against that subject's numbers, so it can only see claims about
+// things the block actually contains. A football program said "Week 2 adds one
+// acceleration rep" and contained no acceleration anywhere. Nothing looked,
+// because there was nothing to look at.
+
+const ADD_VERB = /\b(?:adds?|adding|introduc\w+|includes?|bring\w* in|steps? up to|progress(?:es|ing)? to)\b/i;
+// "clean" is deliberately absent: in these programs it is almost always an
+// adjective -- "if Week 1 stayed clean" -- and reading it as the lift accused a
+// football block of promising power cleans. The olympic lifts are reachable
+// through "snatch" and "jerk".
+//
+// Each entry carries the words that count as training it, because a Prowler
+// Push is a sled and a row named "Run" can still prescribe accelerations.
+const MOVEMENT_TERMS = [
+  ['acceleration', /accelerat/i], ['sprint', /sprint/i], ['shuttle', /shuttle/i],
+  ['squat', /squat/i], ['deadlift', /deadlift/i], ['nordic', /nordic/i],
+  ['hip thrust', /hip thrust/i], ['pull-up', /pull[- ]?up/i], ['chin-up', /chin[- ]?up/i],
+  ['row', /\brow\b/i], ['press', /press/i], ['dip', /\bdip\b/i],
+  ['push-up', /push[- ]?up/i], ['sled', /sled|prowler/i], ['prowler', /sled|prowler/i],
+  ['ruck', /ruck|backpack carry/i], ['jump', /jump|hop\b|bound/i], ['throw', /throw/i],
+  ['snatch', /snatch/i], ['jerk', /jerk/i], ['lunge', /lunge|split squat/i],
+];
+
+export function promisedMovementAbsent(program) {
+  const src = String(program || '');
+  const head = narrativeOf(src);
+  // The whole row, not only its name: a row called "Run" whose note reads
+  // "90-92% relaxed accelerations" does prescribe accelerations.
+  const trained = rows(src).map((r) => r.cells.join(' ').toLowerCase()).join(' | ');
+  const out = [];
+  const seen = new Set();
+  for (const sentence of head.split(/(?<=[.;])\s+/)) {
+    if (!ADD_VERB.test(sentence)) continue;
+    for (const clause of sentence.split(/\s*;\s*/)) {
+      if (!ADD_VERB.test(clause)) continue;
+      for (const [term, trains] of MOVEMENT_TERMS) {
+        if (!new RegExp(`\\b${term}s?\\b`, 'i').test(clause)) continue;
+        if (trains.test(trained)) continue;
+        if (seen.has(term)) continue;
+        seen.add(term);
+        out.push({
+          rule: 'PROMISED_MOVEMENT_ABSENT',
+          movement: term,
+          detail: `The block says it will add ${term} work -- "${clause.trim().slice(0, 140)}" -- and no exercise in any week is a ${term}. The athlete is told about a progression in something they are never prescribed.`,
+        });
+      }
+    }
   }
   return out;
 }

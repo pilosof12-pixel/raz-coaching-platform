@@ -69,10 +69,20 @@ test('a cap applies after the weighted score and overrides it', () => {
 // The three delivered footballer programs pass all three caps. That is only
 // worth stating because the caps above are shown to fire on constructed cases:
 // a rule that never fires is indistinguishable from a broken one.
+//
+// They do not pass everything. When this test was first written the grader had
+// no in-season rules at all and returned nothing on all three, which is what
+// the coach was asked about; his answers produced the sprint rules, and those
+// findings are the reason A, B and C scored 8.2, 8.7 and 9.0.
 test('the three delivered footballer programs trip none of the caps', () => {
-  for (const f of ['inseason_footballer-program.txt', 'run100_inseason_footballer.txt', 'run101_inseason_footballer.txt']) {
-    assert.deepEqual(inSeasonCaps(read(f), FOOTBALLER), [], f);
-    assert.deepEqual(gradeProgram(read(f), FOOTBALLER), [], `${f}: nothing else fires either`);
+  const expected = {
+    'inseason_footballer-program.txt': ['SPRINT_SPEED_EXPOSURE_MISSING', 'REPEATED_SPRINT_EXPOSURE_MISSING', 'PROMISED_MOVEMENT_ABSENT'],
+    'run100_inseason_footballer.txt': ['SPRINT_DISTANCE_BELOW_BENCHMARK', 'REPEATED_SPRINT_EXPOSURE_MISSING'],
+    'run101_inseason_footballer.txt': ['REPEATED_SPRINT_EXPOSURE_MISSING'],
+  };
+  for (const [f, rules] of Object.entries(expected)) {
+    assert.deepEqual(inSeasonCaps(read(f), FOOTBALLER), [], `${f}: no cap`);
+    assert.deepEqual(gradeProgram(read(f), FOOTBALLER).map((x) => x.rule).sort(), [...rules].sort(), f);
   }
 });
 

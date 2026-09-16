@@ -177,13 +177,17 @@ test('a secondary goal phrased as a hold is not an improvement goal', () => {
 
 // --- the calibration itself ---------------------------------------------------
 //
-// Fifteen of the coach's eighteen findings, 3.75 of his 4.20 of severity, and
-// one thing he did not raise. Program 2 is complete: six of six.
+// Across six programs and four program types the coach has now made 27
+// findings. The encoded rules reproduce 21, worth 5.40 of his 6.10 of severity,
+// and raise nothing he did not.
 //
-// The three misses are the ceiling, not a gap to close. Two are accessory
-// marginal return, which he filed under "Judgement, not rules" himself. The
-// third is a stale audit table the engine already fixes -- the fixture predates
-// the fix.
+// The six misses are close to the ceiling rather than a backlog: four are
+// accessory marginal return, which he filed under "Judgement, not rules"
+// himself; one is a stale audit table the engine already fixes, in a fixture
+// that predates the fix; one is a garbled sentence in a Week 3 note.
+//
+// This test covers the first three programs; the football three are in
+// test/coach_sprint_rules.test.js.
 
 test('the encoded rules reproduce fifteen of the coach eighteen findings', () => {
   const expect = {

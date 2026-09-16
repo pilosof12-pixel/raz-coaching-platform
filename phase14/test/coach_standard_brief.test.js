@@ -4,7 +4,7 @@ import fs from 'node:fs';
 
 import {
   requiredMovements, buildBenchmarkExposureBrief, buildProgressionBrief,
-  buildSchedulingBrief, buildCoachStandardBrief,
+  buildSchedulingBrief, buildSpeedBrief, buildCoachStandardBrief,
 } from '../engine/coach_standard_brief.js';
 
 const T = new URL('./fixtures/', import.meta.url);
@@ -48,6 +48,18 @@ test('the scheduling brief only speaks when the calendar is a choice', () => {
   assert.equal(buildSchedulingBrief(C.mma_fight_camp), '');
   // No impact history, no lower-leg clause.
   assert.doesNotMatch(buildSchedulingBrief({ gym_availability_mode: 'flexible' }), /lower-leg/);
+});
+
+// Three football programs scored 8.2, 8.7 and 9.0 almost entirely on speed.
+test('the speed brief gives the athlete their own numbers', () => {
+  const brief = buildSpeedBrief(H.inseason_footballer);
+  assert.match(brief, /benchmark is 30 m in 4\.05 s/);
+  assert.match(brief, /at least 23 m at 95%/, '75% of the benchmark distance');
+  assert.match(brief, /under 60 seconds of deliberately incomplete recovery/);
+  assert.match(brief, /at least 72 hours before the match/, 'the hamstring history');
+  // No sprint goal, nothing to say.
+  assert.equal(buildSpeedBrief(A.tactical_3k), '');
+  assert.equal(buildSpeedBrief({}), '');
 });
 
 test('an intake with nothing to say produces no brief', () => {

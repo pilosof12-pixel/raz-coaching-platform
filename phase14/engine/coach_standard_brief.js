@@ -21,7 +21,7 @@
 // Deadlift is benchmarked at 190 kg x 3 and explicitly pain free, and must
 // appear" names the row that was missing from the program he marked down.
 
-import { benchmarks, goalFamilies, goalText, toleratedFor } from './coach_rules.js';
+import { benchmarks, goalFamilies, goalText, toleratedFor, sprintBenchmark, matchDay } from './coach_rules.js';
 import { THRESHOLDS } from './coach_standard.js';
 
 const arr = (v) => (Array.isArray(v) ? v : v ? [v] : []);
@@ -107,10 +107,37 @@ export function buildSchedulingBrief(intake = {}) {
   return lines.join('\n');
 }
 
+// Speed is its own quality, and three football programs scored 8.2, 8.7 and 9.0
+// almost entirely on how they handled it: one prescribed no sprint at all, one
+// never passed 20 m against a 30 m benchmark, and all three called a shuttle
+// with a minute of rest "repeated sprint" work.
+export function buildSpeedBrief(intake = {}) {
+  const goals = goalText(intake);
+  const wantsSpeed = /\bsprint\b|\bspeed\b/i.test(`${arr(intake.primary_goals).join(' ')}`);
+  const wantsRsa = /repeat(?:ed)?[- ]sprint|repeat(?:ed)? effort|late[- ]match sprint/i.test(goals);
+  if (!wantsSpeed && !wantsRsa) return '';
+  const lines = ['* SPEED IS PRESCRIBED, NOT IMPLIED.'];
+  if (wantsSpeed) {
+    const b = sprintBenchmark(intake);
+    lines.push('  Holding sprint speed is a stated goal, so every week needs a real sprint row: a distance, a number of repetitions, an intended effort and a stop rule. Build-ups inside a warm-up do not count, because nothing about their quality is prescribed.');
+    if (b) lines.push(`  The benchmark is ${b.metres} m in ${b.seconds} s. By Week 3 one session should reach at least ${Math.round(b.metres * 0.75)} m at 95% or more, so the athlete is exposed to the later part of the distance the goal is measured over. Full recovery between repetitions.`);
+  }
+  if (wantsRsa) {
+    lines.push('  Repeated-sprint ability is a different quality from speed, and has a definition: more than two repetitions, each 10 seconds or less, at 95% effort or above, with under 60 seconds of deliberately incomplete recovery. A shuttle at 90% with a minute of rest is quality change-of-direction work, not repeatability work -- it may be worth doing, but do not label it as the repeated-sprint exposure.');
+    lines.push('  Progress one variable by Week 3: one more repetition, 10% more distance, 10% less recovery, or better output at the same work-to-rest. Week 4 may consolidate.');
+  }
+  const md = matchDay(intake);
+  if (md && /hamstring|biceps femoris/i.test(`${intake.injuries || ''} ${JSON.stringify(intake.pain || {})}`)) {
+    lines.push(`  This athlete has recent hamstring history and a ${md.toUpperCase()} match. Put the main eccentric hamstring dose at least 72 hours before the match; inside 48 hours use lower-soreness hamstring work instead.`);
+  }
+  return lines.join('\n');
+}
+
 export function buildCoachStandardBrief(intake = {}) {
   return [
     buildBenchmarkExposureBrief(intake),
     buildProgressionBrief(intake),
+    buildSpeedBrief(intake),
     buildSchedulingBrief(intake),
   ].filter(Boolean).join('\n');
 }
