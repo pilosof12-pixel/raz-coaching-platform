@@ -86,10 +86,16 @@ test('an improvement goal held identical for the whole block is found', () => {
   assert.ok(flags.some((f) => /Weighted Pull-up/i.test(f.movement)), 'the +22.5 kg that never moved');
 });
 
-test('the intensification band is measured against the stated percentages', () => {
+// Computed from the kilos on the bar, not read out of the prose. A live
+// program that prescribed 95 kg and 99 kg against a 112 kg snatch stated no
+// percentage anywhere, and the first version of this rule reported nothing --
+// silence that looked exactly like a clean program.
+test('the intensification band is computed from the load and the benchmark', () => {
   const flags = intensificationBand(P1(), LIFTER);
-  assert.equal(flags.length, 1);
-  assert.match(flags[0].detail, /87% of current max, and the standard asks for at least 88%/);
+  assert.equal(flags.length, 1, 'one finding, however many lifts fall short');
+  assert.deepEqual(flags[0].lifts, ['Snatch', 'Clean and Jerk']);
+  assert.match(flags[0].detail, /Snatch tops at 86\.0% of the demonstrated 112 kg max against 88%/);
+  assert.match(flags[0].detail, /Clean and Jerk tops at 87\.0% of the demonstrated 141 kg max against 89%/);
 });
 
 test('a weight cut the intake never mentions is found', () => {

@@ -438,27 +438,53 @@ export function improvementGoalFlat(program, intake = {}) {
 
 // --- 5. weightlifting intensification band ------------------------------------
 
-export function intensificationBand(program, intake = {}) {
-  const pct = [];
-  for (const r of rows(program)) {
-    for (const m of String(r.cells.join(' ')).matchAll(/(\d{2,3})\s*%\s*of\s*(?:current\s*)?max/gi)) {
-      pct.push({ week: r.week, name: r.name, pct: Number(m[1]) });
-    }
+// The athlete's demonstrated max for a named lift, from current_numbers.
+export function benchmarkMax(intake = {}, pattern) {
+  for (const line of String(intake.current_numbers || '').split('\n')) {
+    if (!pattern.test(line)) continue;
+    const all = [...line.matchAll(/(\d+(?:\.\d+)?)\s*kg/gi)].map((m) => Number(m[1]));
+    if (all.length) return Math.max(...all);
   }
-  if (!pct.length) return [];
-  const isOly = /snatch|clean|jerk/i;
-  const lifts = pct.filter((p) => isOly.test(p.name));
-  if (!lifts.length) return [];
-  const byWeek3 = lifts.filter((p) => p.week >= 3);
-  if (!byWeek3.length) return [];
-  const [lo] = THRESHOLDS.OLY_WEEK3_SNATCH_INTENSITY_BAND;
-  const top = Math.max(...byWeek3.map((p) => p.pct));
-  if (top >= lo * 100) return [];
+  return null;
+}
+
+// Intensity as a fraction of demonstrated max, computed from the kilos on the
+// bar rather than read out of the prose. The first version only understood
+// "88% of current max" written in a cell, so a live program that prescribed
+// 95 kg and 99 kg against a 112 kg snatch -- and did reach the band -- had no
+// percentage anywhere and the rule reported nothing at all.
+export function intensificationBand(program, intake = {}) {
+  const LIFTS = [
+    { name: 'Snatch', row: /^snatch$/i, bench: /snatch/i, band: THRESHOLDS.OLY_WEEK3_SNATCH_INTENSITY_BAND },
+    { name: 'Clean and Jerk', row: /^clean and jerk$/i, bench: /clean and jerk/i, band: THRESHOLDS.OLY_WEEK3_CJ_INTENSITY_BAND },
+  ];
+  const all = rows(program);
+  const out = [];
+  for (const lift of LIFTS) {
+    const max = benchmarkMax(intake, lift.bench);
+    const lifted = all.filter((r) => lift.row.test(r.name.trim()));
+    if (!lifted.length) continue;
+    const pctOf = (r) => {
+      const stated = [...String(r.cells.join(' ')).matchAll(/(\d{2,3})\s*%\s*of\s*(?:current\s*)?max/gi)].map((m) => Number(m[1]) / 100);
+      if (stated.length) return Math.max(...stated);
+      const kg = (String(r.load).match(/(\d+(?:\.\d+)?)\s*kg/i) || [])[1];
+      return max && kg ? Number(kg) / max : null;
+    };
+    const byWeek3 = lifted.filter((r) => r.week >= 3).map(pctOf).filter(Number.isFinite);
+    if (!byWeek3.length) continue;
+    const top = Math.max(...byWeek3);
+    if (top >= lift.band[0]) continue;
+    out.push({ name: lift.name, top, max, need: lift.band[0] });
+  }
+  if (!out.length) return [];
+  // One finding, however many lifts fall short. The coach wrote "intensity
+  // never reaches the 89-90% intensification band" once for a block where both
+  // competition lifts were under it, and splitting it in two made the grader
+  // look like it disagreed with him when it agreed.
   return [{
     rule: 'INTENSIFICATION_BAND_NOT_REACHED',
-    peak: top,
-    required: lo * 100,
-    detail: `By Week 3 the heaviest competition-lift exposure is ${top}% of current max, and the standard asks for at least ${lo * 100}%. Peak across the block: ${Math.max(...lifts.map((p) => p.pct))}%.`,
+    lifts: out.map((x) => x.name),
+    detail: `By Week 3 no competition lift reaches its intensification band: ${out.map((x) => `${x.name} tops at ${(x.top * 100).toFixed(1)}% of the demonstrated ${x.max ? `${x.max} kg ` : ''}max against ${(x.need * 100).toFixed(0)}%`).join('; ')}.`,
   }];
 }
 
@@ -487,15 +513,29 @@ export function goalSpeedProgression(program, intake = {}) {
   for (const r of rows(program)) {
     if (!RUN.test(r.name)) continue;
     const dist = String(r.reps).match(/(\d+(?:\.\d+)?)\s*(m|km)\b/i);
-    const pace = String(r.cells.join(' ')).match(/(\d{1,2}:\d{2})\s*\/\s*(\d+)\s*m\b/i)
-      || String(r.cells.join(' ')).match(/(\d{1,2}:\d{2})\s*\/\s*km/i);
-    let secPerKm = null;
-    if (pace && pace[2]) secPerKm = secs(pace[1]) / (Number(pace[2]) / 1000);
-    else if (pace) secPerKm = secs(pace[1]);
-    else if (dist && /interval|repeat/i.test(`${r.notes} ${r.load}`)) continue;
+    // "1:44-1:45 per 400 m" and "1:42 / 400 m" are the same prescription. The
+    // rule only understood the slash, so when a live run wrote "per" it stopped
+    // seeing any pace at all and reported the defect as fixed. The program was
+    // at 90.6% of goal speed in Week 3 against a 95% threshold.
+    const text = String(r.cells.join(' '));
+    const cands = [
+      ...[...text.matchAll(/(\d{1,2}:\d{2})\s*(?:\/|per)\s*(\d+)\s*m\b(?!in)/gi)]
+        .map((m) => secs(m[1]) / (Number(m[2]) / 1000)),
+      ...[...text.matchAll(/(\d{1,2}:\d{2})\s*(?:\/|per)\s*km/gi)].map((m) => secs(m[1])),
+    ].filter((x) => Number.isFinite(x) && x > 0);
+    // The fastest end of a band is the exposure the athlete actually gets.
+    let secPerKm = cands.length ? Math.min(...cands) : null;
+    if (secPerKm == null && dist && /interval|repeat/i.test(`${r.notes} ${r.load}`)) continue;
     if (secPerKm == null) continue;
-    // Quality work only: an easy run is not an attempt at goal pace.
-    if (/easy|conversational|zone ?2|recovery|cool/i.test(r.cells.join(' '))) continue;
+    // Quality work only, decided structurally rather than by vocabulary. Asking
+    // whether the row mentions "easy" anywhere excluded every interval session
+    // in a live program, because each one ends "Do 10 min easy cooldown after
+    // the last rep" -- so the rule reported a block at 90.6% of goal speed as
+    // having nothing wrong with it. A quality rep is prescribed as a distance;
+    // an easy run is prescribed as a duration.
+    const repDistance = /(\d+(?:\.\d+)?)\s*(?:m|km)\b(?!in)/i.test(String(r.reps));
+    const named = /interval|repeat|\bx\s*\d+/i.test(`${r.name} ${r.load}`);
+    if (!repDistance && !named) continue;
     const frac = goalSecPerKm / secPerKm;
     if (!best.has(r.week) || frac > best.get(r.week).frac) best.set(r.week, { frac, secPerKm });
   }
@@ -752,7 +792,11 @@ export function trainingDaysVsIntake(program, intake = {}) {
   const WORDS = ['zero', 'one', 'two', 'three', 'four', 'five', 'six', 'seven'];
   const forms = [String(stated), WORDS[stated]].filter(Boolean).join('|');
   const kinds = '(?:gym|strength|formal|resistance|lifting|barbell)';
-  const explained = new RegExp(`\\b(?:${forms})\\b[^.]{0,80}\\b${kinds}\\b|\\b${kinds}\\b[^.]{0,80}\\b(?:${forms})\\b`, 'i').test(head)
+  // Adjacent, not merely nearby. An 80-character window let the "3" in
+  // "Weeks 2-3 lengthen the quality reps ... while most strength" count as an
+  // explanation of days_per_week, and the rule went quiet on a program that
+  // explains nothing.
+  const explained = new RegExp(`\\b(?:${forms})\\b(?:\\s+\\w+){0,2}\\s+${kinds}\\b|${kinds}\\b(?:\\s+\\w+){0,3}\\s+\\b(?:${forms})\\b`, 'i').test(head)
     || /\bdays_per_week\b/i.test(head);
   if (explained) return [];
   const most = Math.max(...counts);
