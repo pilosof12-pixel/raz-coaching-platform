@@ -1073,3 +1073,100 @@ export function promisedMovementAbsent(program) {
   }
   return out;
 }
+
+// --- coverage: did the rule look, or did it just find nothing to look at? ----
+//
+// Four rules reported defects as fixed on a live program when they had gone
+// blind. Goal-speed could not parse "per 400 m" and then excluded every
+// interval as "easy"; the intensification band wanted a percentage in a cell
+// and got kilos; the training-days rule matched a stray digit. Every one
+// returned an empty array, which is the same thing a clean program returns.
+//
+// An empty result has two meanings and they are not interchangeable. This
+// separates them: a rule that governs, found its inputs and found nothing wrong
+// is a pass. A rule that governs and could not find its inputs is a hole, and
+// saying so out loud is the only thing that would have caught those four
+// without reading the programs by hand.
+
+const has = (v) => (Array.isArray(v) ? v.length > 0 : v != null && v !== '' && v !== false);
+
+export const RULE_INPUTS = {
+  benchmarkExposure: (p, i) => ({
+    governs: /advanced|elite/i.test(String(i.experience || '')) || Number(i.training_years) >= 3,
+    found: has(benchmarks(i)) && has(rows(p)),
+  }),
+  improvementGoalFlat: (p, i) => ({ governs: has(goalFamilyTiers(i)), found: has(rows(p)) }),
+  // The probe has to want what the rule wants. Asking only whether competition
+  // lift rows exist called a block covered when every one of those rows said
+  // "RPE-selected load" and the rule could compute no intensity from any of
+  // them -- the same silence this whole mechanism exists to catch.
+  intensificationBand: (p, i) => ({
+    governs: /snatch|clean and jerk/i.test(goalText(i)),
+    found: has(rows(p).filter((r) => /^(snatch|clean and jerk)$/i.test(r.name.trim())
+      && (/(\d+(?:\.\d+)?)\s*kg/i.test(String(r.load)) || /(\d{2,3})\s*%\s*of\s*(?:current\s*)?max/i.test(r.cells.join(' ')))))
+      && (benchmarkMax(i, /snatch/i) != null || benchmarkMax(i, /clean and jerk/i) != null),
+  }),
+  goalSpeedProgression: (p, i) => {
+    const goal = arr(i.primary_goals).join(' ');
+    const governs = /\d+(?:\.\d+)?\s*km/i.test(goal) && /\d{1,2}:\d{2}/.test(goal);
+    const quality = rows(p).filter((r) => RUN.test(r.name)
+      && (/(\d+(?:\.\d+)?)\s*(?:m|km)\b(?!in)/i.test(String(r.reps)) || /interval|repeat/i.test(`${r.name} ${r.load}`)));
+    const paced = quality.filter((r) => /(\d{1,2}:\d{2})\s*(?:\/|per)\s*(?:\d+\s*m\b|km)/i.test(r.cells.join(' ')));
+    return { governs, found: has(paced) };
+  },
+  ruckDistanceBelowTolerance: (p, i) => ({
+    governs: /ruck/i.test(`${arr(i.secondary_goals).join(' ')} ${arr(i.primary_goals).join(' ')}`),
+    found: toleratedDistance(i, /ruck/i) != null && has(rows(p).filter((r) => RUCK.test(r.name))),
+  }),
+  sprintSpeedExposure: (p, i) => ({
+    governs: /\bsprint\b|\bspeed\b/i.test(arr(i.primary_goals).join(' ')),
+    found: has(rows(p)),
+  }),
+  sprintDistanceSpecificity: (p, i) => ({
+    governs: /\bsprint\b|\bspeed\b/i.test(arr(i.primary_goals).join(' ')) && sprintBenchmark(i) != null,
+    found: has(rows(p).filter((r) => SPRINT_NAME.test(r.name))),
+  }),
+  repeatedSprintExposure: (p, i) => ({
+    governs: RSA_GOAL.test(`${arr(i.secondary_goals).join(' ')} ${arr(i.primary_goals).join(' ')}`),
+    found: has(rows(p)),
+  }),
+  unanchoredPrimaryLoad: (p, i) => ({
+    governs: has(goalFamilyTiers(i, ['primary']).filter((g) => /\d+\s*(?:kg|km|m\b)|\d{1,2}:\d{2}/i.test(g.goal))),
+    found: has(rows(p)),
+  }),
+  consecutiveTrainingDays: (p, i) => ({
+    governs: String(i.gym_availability_mode || '').toLowerCase() === 'flexible',
+    found: has(rows(p).filter((r) => r.day)),
+  }),
+  consecutiveLowerLegDays: (p, i) => ({
+    governs: /\bshin\b|\bstress fracture\b|\btibial\b|\bimpact\b/i.test(`${i.injuries || ''} ${JSON.stringify(i.pain || {})}`)
+      && String(i.gym_availability_mode || '').toLowerCase() === 'flexible',
+    found: has(rows(p).filter((r) => r.day)),
+  }),
+  eccentricHamstringTiming: (p, i) => ({
+    governs: /hamstring|biceps femoris/i.test(`${i.injuries || ''} ${JSON.stringify(i.pain || {})}`) && matchDay(i) != null,
+    found: has(rows(p).filter((r) => r.day)),
+  }),
+  inSeasonCaps: (p, i) => ({ governs: matchDay(i) != null, found: has(rows(p)) }),
+  trainingDaysVsIntake: (p, i) => ({ governs: Number.isFinite(Number(i.days_per_week)), found: has(rows(p).filter((r) => r.day)) }),
+};
+
+// Rules whose inputs are the program's prose rather than its table, and which
+// cannot go blind in the same way.
+const ALWAYS_COVERED = new Set(['unsupportedAthleteFact', 'contingencyCreatesAdjacentDuplicate',
+  'promisedMovementAbsent', 'dayMinusOneStacked', 'sportScheduleChangedSilently']);
+
+export function gradeWithCoverage(program, intake = {}) {
+  const findings = gradeProgram(program, intake);
+  const blind = [];
+  for (const fn of RULES) {
+    if (ALWAYS_COVERED.has(fn.name)) continue;
+    const probe = RULE_INPUTS[fn.name];
+    if (!probe) { blind.push({ rule: fn.name, why: 'no coverage probe defined' }); continue; }
+    let r;
+    try { r = probe(program, intake); } catch (e) { blind.push({ rule: fn.name, why: `probe threw: ${e.message}` }); continue; }
+    if (!r.governs) continue;
+    if (!r.found) blind.push({ rule: fn.name, why: 'governs this athlete but found nothing in the program to judge' });
+  }
+  return { findings, blind };
+}

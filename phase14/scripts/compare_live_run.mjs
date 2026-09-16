@@ -12,7 +12,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import { gradeProgram } from '../engine/coach_rules.js';
+import { gradeProgram, gradeWithCoverage } from '../engine/coach_rules.js';
 import { collectClaimIntegrityFlags } from '../engine/v93_claim_integrity.js';
 import { collectSportStateFlags } from '../engine/v78_sport_taper.js';
 
@@ -81,7 +81,13 @@ for (const c of CASES) {
     anyMissing = true;
     continue;
   }
-  const after = grade(fs.readFileSync(newPath, 'utf8'), c.intake);
+  const program = fs.readFileSync(newPath, 'utf8');
+  const after = grade(program, c.intake);
+  // Before reading the counts: did every rule that governs this athlete
+  // actually find something to judge? A rule that went blind reports the same
+  // empty result as a rule that found nothing wrong, and on the first reading
+  // of run #114 four of them did exactly that.
+  const { blind } = gradeWithCoverage(program, c.intake);
   const before = fs.existsSync(c.before) ? grade(fs.readFileSync(c.before, 'utf8'), c.intake) : [];
   const key = (f) => `${f.rule}|${f.movement || ''}`;
   const beforeKeys = new Set(before.map(key));
@@ -91,6 +97,11 @@ for (const c of CASES) {
   const stillThere = after.filter((f) => beforeKeys.has(key(f)));
 
   console.log(`  ${c.id}  (coach scored the previous version ${c.beforeScore})`);
+  if (blind.length) {
+    console.log(`    BLIND: ${blind.length} rule${blind.length > 1 ? 's' : ''} govern this athlete and could not see the program --`);
+    for (const b of blind) console.log(`      ${b.rule}: ${b.why}`);
+    console.log('    Treat the counts below as incomplete until those are fixed.');
+  }
   console.log(`    before ${String(before.length).padStart(2)} findings   after ${String(after.length).padStart(2)} findings`);
   console.log(`    fixed ${fixed.length}, still there ${stillThere.length}, new ${introduced.length}`);
   const predictedGone = c.predicted.filter((r) => !after.some((f) => f.rule === r));
