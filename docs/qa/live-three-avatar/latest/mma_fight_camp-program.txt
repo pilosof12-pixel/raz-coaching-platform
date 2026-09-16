@@ -1,0 +1,88 @@
+This block starts 3.4 weeks out and runs straight into fight week, so it is a late-camp hold/taper block, not a build. The gym work is there to keep strength feel, speed and confidence without stealing recovery from MMA or the cut. Hard sparring should come down across the block: about 2 hard contacts in Week 1, 1 in Week 3, and none in fight week beyond technical/tactical speed work.
+
+Week 2 is mostly a repeat, with only a small Pull-up load nudge if Week 1 stayed crisp. Week 3 cuts volume and keeps speed. Week 4 is a Day -4 touch plus an optional Day -1 neural primer only.
+
+No Back Squat this block. If the right knee ache goes above your usual level or next-day stiffness is worse than normal, keep the throws, Pull-up and Hip Thrust, and drop Dumbbell Bulgarian Split Squat or Prowler Push first. In fight week, if sleep is poor, the cut is biting, or you already feel sharp, skip the Day -1 primer entirely. Weight-cut details themselves are medical/team calls, not something to solve by adding training.
+
+CAMP SCHEDULE
+Sport sessions are load. The gym is built around them, and the contact comes down as the fight approaches.
+
+ | Mon | Tue | Wed | Thu | Fri | Sat | Sun | hard contact
+W1 | MMA hard | MMA moderate + gym | MMA hard | MMA moderate | MMA technical + gym | MMA moderate | MMA light | 2 of 3
+W2 | MMA hard | MMA moderate + gym | MMA hard | MMA moderate | MMA technical + gym | MMA moderate | MMA light | 2 of 3
+W3 | MMA hard | MMA moderate + gym | MMA technical | MMA moderate | MMA technical + gym | MMA moderate | MMA light | 1 of 3
+W4 | D-5 MMA technical | D-4 MMA moderate + gym | D-3 MMA technical | D-2 MMA moderate | D-1 MMA technical + gym | FIGHT DAY |, | 0 of 3
+
+Hard contact falls 2 to 0 across the block. The last hard session sits far enough from Day 0 that soreness, cognitive fatigue and sleep disruption have resolved.
+
+START_WEEK1_TSV
+Day	Exercise	Weight	Sets	Reps	Rest	Target RPE	Notes	Results
+Tue	[WARMUP] Band Pull-Apart Warm-up	Bodyweight	1	15	0:30	3	Post-MMA warm-up only; then do 2 quick ramp sets for Barbell Hip Thrust and Pull-up.; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Band shoulder pass-through x 10; Scapular push-up x 8	
+Tue	Medicine Ball Rotational Throw	Fastest ball that stays crisp	3	3/side	2:00	N/A	Full reset each rep; quality only, stop if snap drops.	
+Tue	Barbell Hip Thrust	RPE-selected load	3	3	2:30	7.5	Main lower strength touch; up to 3 x 3, stop after 2 sets if RPE goes above 8, speed drops, or knee/back feel off.	
+Tue	Pull-up	RPE-selected load	2	2	3:00	7.5	Bodyweight plus added load; use a crisp heavy double that stays clearly under the cap, and stop if rep speed slows.	
+Tue	Ring Push-up	RPE-selected plate/vest load	2	5	2:00	7	Keep the rings stable, body rigid, and stop 1-2 reps before form breaks.	
+Tue	Chest-Supported Row	RPE-selected load	2	5	1:30	7	Horizontal pull balance; no heaving.	
+Fri	[WARMUP] Band Pull-Apart Warm-up	Bodyweight	1	15	0:30	3	Deliberately low-cost after hard MMA; if the mat session ran hard, keep the ballistic work and one clean set of the strength work, then leave.; Squat-and-reach x 6; Bodyweight squat x 8; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Band shoulder pass-through x 10; Scapular push-up x 8	
+Fri	Medicine Ball Scoop Throw	Fastest ball that stays crisp	3	3	2:00	N/A	Full reset each rep; violent hips, not fatigue.	
+Fri	Explosive Push-up	Bodyweight	2	3	1:30	N/A	Fast hands and fast floor leave; stop before height drops.	
+Fri	Dumbbell Bulgarian Split Squat	RPE-selected load	2	3/side	1:30	6.5	Knee-friendly unilateral touch; smooth descent, no grind, cut a set if knee ache rises above normal.	
+Fri	Pallof Press	RPE-selected load	2	8/side	0:45	6	Trunk stiffness for striking and grappling; this is the first thing to remove if recovery is poor.	
+Fri	Prowler Push	Moderate load that stays fast	3	15 m	2:30	N/A	Alactic only; every effort fast, not conditioning.	
+END_WEEK1_TSV
+
+START_WEEK2_TSV
+Day	Exercise	Weight	Sets	Reps	Rest	Target RPE	Notes	Results
+Tue	[WARMUP] Band Pull-Apart Warm-up	Bodyweight	1	15	0:30	3	Post-MMA warm-up only; then do 2 quick ramp sets for Barbell Hip Thrust and Pull-up.; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Band shoulder pass-through x 10; Scapular push-up x 8	
+Tue	Medicine Ball Rotational Throw	Fastest ball that stays crisp	3	3/side	2:00	N/A	Match or beat Week 1 sharpness, not volume.	
+Tue	Barbell Hip Thrust	RPE-selected load	3	3	2:30	7.5	Same lower-body maintenance dose; start with last week’s load and only add if Week 1 stayed clearly under the cap.	
+Tue	Pull-up	RPE-selected load	2	2	3:00	8	Bodyweight plus added load; if Week 1 stayed clearly under the cap, take a small load nudge for the same crisp doubles. If Week 1 overshot, repeat last week's load instead and do not turn it into a test.	
+Tue	Ring Push-up	RPE-selected plate/vest load	2	5	2:00	7	Keep the rings stable, body rigid, and stop 1-2 reps before form breaks.	
+Tue	Chest-Supported Row	RPE-selected load	2	5	1:30	7	Same horizontal pull dose; clean reps only.	
+Fri	[WARMUP] Band Pull-Apart Warm-up	Bodyweight	1	15	0:30	3	Deliberately low-cost after hard MMA; if the mat session ran hard, keep the ballistic work and one clean set of the strength work, then leave.; Squat-and-reach x 6; Bodyweight squat x 8; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Band shoulder pass-through x 10; Scapular push-up x 8	
+Fri	Medicine Ball Scoop Throw	Fastest ball that stays crisp	3	3	2:00	N/A	Same dose; quality and snap only.	
+Fri	Explosive Push-up	Bodyweight	2	3	1:30	N/A	Same dose; stop before height drops.	
+Fri	Dumbbell Bulgarian Split Squat	RPE-selected load	2	3/side	1:30	6.5	Same knee-friendly strength touch; no grinders.	
+Fri	Pallof Press	RPE-selected load	2	8/side	0:45	6	Same trunk dose; this is still the first thing to remove if recovery is poor.	
+Fri	Prowler Push	Moderate load that stays fast	3	15 m	2:30	N/A	Alactic only; every effort fast, not conditioning.	
+END_WEEK2_TSV
+
+START_WEEK3_TSV
+Day	Exercise	Weight	Sets	Reps	Rest	Target RPE	Notes	Results
+Tue	[WARMUP] Band Pull-Apart Warm-up	Bodyweight	1	15	0:30	3	Taper week: short warm-up, then 1-2 quick ramp sets; if speed is dull or sleep was poor, stop at the first clean top sets.; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Band shoulder pass-through x 10; Scapular push-up x 8	
+Tue	Medicine Ball Rotational Throw	Fastest ball that stays crisp	2	3/side	2:00	N/A	Taper week: one set less, same snap. Session trimmed for camp: what remains is here because it keeps strength, speed or tissue readiness, not because it is easy.	
+Tue	Barbell Hip Thrust	RPE-selected load	2	3	2:30	7	Taper week: same feel, one set less; stop as soon as speed softens.	
+Tue	Pull-up	RPE-selected load	2	1	3:00	7	Singles only to keep the pattern sharp; if Week 2 overshot, use the same clean load as the last successful week instead.	
+Tue	Ring Push-up	RPE-selected plate/vest load	2	4	2:00	7	Keep the rings stable, body rigid, and stop 1-2 reps before form breaks.	
+Fri	[WARMUP] Band Pull-Apart Warm-up	Bodyweight	1	15	0:30	3	Low-cost taper session after hard MMA; leave fresher than you arrived.; Squat-and-reach x 6; Bodyweight squat x 8; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Band shoulder pass-through x 10; Scapular push-up x 8	
+Fri	Medicine Ball Scoop Throw	Fastest ball that stays crisp	2	3	2:00	N/A	Taper week: one set less, same violence.	
+Fri	Explosive Push-up	Bodyweight	2	2	1:30	N/A	Keep height and speed high; stop early if pop is down.	
+Fri	Dumbbell Bulgarian Split Squat	RPE-selected load	1	3/side	1:30	6	One clean set only; skip if the knee feels loaded from the mat.	
+Fri	Pallof Press	RPE-selected load	1	8/side	0:45	6	sets of 8 reps, trunk touch only.	
+Fri	Prowler Push	Moderate load that stays fast	2	15 m	2:30	N/A	Two fast efforts only; stop if legs feel heavy.	
+END_WEEK3_TSV
+
+START_WEEK4_TSV
+Day	Exercise	Weight	Sets	Reps	Rest	Target RPE	Notes	Results
+Tue	[WARMUP] Band Pull-Apart Warm-up	Bodyweight	1	12	0:30	2	Competition-prep touch only. Row and trunk are pulled this week on purpose to protect freshness during the cut; add 1 quick ramp set for Pull-up only.; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12	
+Tue	Medicine Ball Rotational Throw	Fastest ball that stays crisp	2	2/side	2:00	N/A	Day -4: Snap only; stop if speed drops.	
+Tue	Pull-up	RPE-selected load	2	1	2:30	6	Day -4: Bodyweight plus added load; technical touch only, not a test. Skip the second single if it is anything but crisp.	
+Tue	Prowler Push	Moderate load that stays fast	2	10 m	2:30	N/A	Day -4: Very short alactic accelerations; skip if the cut or sleep is poor.	
+Fri	[WARMUP] Band Pull-Apart Warm-up	Bodyweight	1	10	0:30	2	Optional neural primer after weigh-in and some rehydration; skip entirely if already sharp, flat from the cut, or travelling.; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Band shoulder pass-through x 10; Scapular push-up x 8	
+Fri	Medicine Ball Scoop Throw	Fastest ball that stays crisp	2	2	2:00	N/A	Day -1: Weigh-in today. Competition-prep microdose: leave feeling quicker than you started. Competition prep: this session is deliberately short because the week is a descent into the event.	
+Fri	Explosive Push-up	Bodyweight	2	2	1:30	N/A	Day -1: Weigh-in today. Two-exercise primer on purpose; crisp only, no fatigue allowed.	
+END_WEEK4_TSV
+
+TAPER AUDIT
+Event: combat, priority A, about 3.4 weeks out.
+This block runs into the event: the final week is competition week.
+Sport sessions counted as load: 7 per week.
+WEEK PHASES: 1=late_camp 2=late_camp 3=taper 4=competition_week EVENT=combat
+
+    phase             sets  exercises  competition lift  power sets  peak RPE  peak % max
+W1  late camp         24    10         -                 8           7.5       -
+W2  late camp         24    10         -                 8           8         -
+W3  taper             16    9          -                 6           7         -
+W4  competition week  10    5          -                 6           6         -
+
+Across the block: volume -14 sets, exercises -5, competition-lift share unchanged, peak effort -1.5 RPE, accessory volume -6 sets.

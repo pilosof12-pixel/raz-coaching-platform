@@ -1,37 +1,43 @@
 {
-  "timestamp": "2026-09-12T12:42:27.734Z",
+  "timestamp": "2026-09-16T10:04:19.887Z",
   "base": "https://raz-coaching-platform.onrender.com",
-  "head_sha": "5fa60bfcabd8e4f083b56665b7b2846f7ce9ed51",
-  "runtime": "live48 2026-09-12T12:41:50Z",
+  "head_sha": "79e4ba7237e6fec458797c1f6c716b83a445806a",
+  "runtime": "live49 2026-09-16T10:03:30Z",
   "results": [
     {
-      "id": "mma_fight_camp",
-      "job_id": "872edbe305eebf2ff3757421c76e8af2",
+      "id": "advanced_hybrid",
       "ok": false,
-      "status": "error",
-      "stage": "refining",
-      "attempt": 4,
-      "detail": "internal repair: V82_POWER_EXPOSURE_DUPLICATED",
-      "last_seen_status": "error",
-      "error": "Internal coaching QA could not repair the candidate program after multiple passes. No client-facing program was saved. Please retry the build. QA trace: A1:SPORT_DAY_COUPLING_VIOLATION+V91_TIMELINE_VIEWS_DISAGREE -> A2:TSV_ROW_COLUMN_COUNT_MISMATCH+TSV_ROW_COLUMN_COUNT_MISMATCH+TSV_ROW_COLUMN_COUNT_MISMATCH+TSV_ROW_COLUMN_COUNT_MISMATCH+TSV_ROW_COLUMN_COUNT_MISMATCH+TSV_ROW_COLUMN_COUNT_MISMATCH+TSV_ROW_COLUMN_COUNT_MISMATCH+TSV_ROW_COLUMN_COUNT_MISMATCH+TSV_ROW_COLUMN_COUNT_MISMATCH+TSV_ROW_COLUMN_COUNT_MISMATCH+TSV_ROW_COLUMN_COUNT_MISMATCH+TSV_ROW_COLUMN_COUNT_MISMATCH+TSV_ROW_COLUMN_COUNT_MISMATCH+TSV_ROW_COLUMN_COUNT_MISMATCH+TSV_ROW_COLUMN_COUNT_MISMATCH+TSV_ROW_COLUMN_COUNT_MISMATCH+TSV_ROW_COLUMN_COUNT_MISMATCH+TSV_ROW_COLUMN_COUNT_MISMATCH+TSV_ROW_COLUMN_COUNT_MISMATCH+TSV_ROW_COLUMN_COUNT_MISMATCH+TSV_ROW_COLUMN_COUNT_MISMATCH+TSV_ROW_COLUMN_COUNT_MISMATCH+TSV_ROW_COLUMN_COUNT_MISMATCH+TSV_ROW_COLUMN_COUNT_MISMATCH+TSV_ROW_COLUMN_COUNT_MISMATCH+TSV_ROW_COLUMN_COUNT_MISMATCH+TSV_ROW_COLUMN_COUNT_MISMATCH+TSV_ROW_COLUMN_COUNT_MISMATCH+TSV_ROW_COLUMN_COUNT_MISMATCH+TSV_ROW_COLUMN_COUNT_MISMATCH+TSV_ROW_COLUMN_COUNT_MISMATCH+TSV_ROW_COLUMN_COUNT_MISMATCH+TSV_ROW_COLUMN_COUNT_MISMATCH+TSV_ROW_COLUMN_COUNT_MISMATCH+TSV_ROW_COLUMN_COUNT_MISMATCH+TSV_ROW_COLUMN_COUNT_MISMATCH+TSV_ROW_COLUMN_COUNT_MISMATCH+TSV_ROW_COLUMN_COUNT_MISMATCH+TSV_ROW_COLUMN_COUNT_MISMATCH+TSV_ROW_COLUMN_COUNT_MISMATCH+TSV_ROW_COLUMN_COUNT_MISMATCH+TSV_ROW_COLUMN_COUNT_MISMATCH+TSV_ROW_COLUMN_COUNT_MISMATCH+TSV_ROW_COLUMN_COUNT_MISMATCH+TSV_ROW_COLUMN_COUNT_MISMATCH+TSV_ROW_COLUMN_COUNT_MISMATCH -> A4:V82_POWER_EXPOSURE_DUPLICATED. Last failure detail: Week 4 runs Medicine Ball Scoop Throw on both Day -4 (Tue) and Day -1 (Fri). Two doses of one movement is not two exposures -- it is the same stimulus twice, and this close to the fight one of those slots should buy something the block does not already have. Rotational throwing trains the plane the sport is fought in and nothing else here covers it. The calendar and the week table disagree about fight week: the calendar shows a gym session on Tue, Fri that the week table does not contain. An athlete reading the two cannot tell which is the program. They have to name the same days. [QA:INTERNAL_QA_REPAIR_EXHAUSTED]",
-      "program_chars": 0,
-      "seconds": 669
+      "error": "build not accepted 422 {\"error\":\"A few details are needed before I can build this accurately.\",\"clarification_required\":true,\"clarifications\":[{\"answer_type\":\"text\",\"required\":true,\"id\":\"weight_class_plan\",\"prompt\":\"Are you making weight for this, and if so what is your weight now against the class limit?\",\"help\":\"Also sa"
+    },
+    {
+      "id": "mma_fight_camp",
+      "job_id": "0921a2593fc601df20f0e747c742df9d",
+      "ok": true,
+      "status": "done",
+      "stage": "finalizing",
+      "attempt": 2,
+      "detail": "saving program after 2 model call(s)",
+      "last_seen_status": "done",
+      "error": null,
+      "program_chars": 10084,
+      "seconds": 318
     },
     {
       "id": "dual_event_hyrox",
-      "job_id": "4c4fff319f0ff5b45b05a6df05bae894",
+      "job_id": "7aad620b25c1f8c097421ba99f72ff0d",
       "ok": false,
-      "status": "error",
+      "status": "timeout",
       "stage": "generating",
       "attempt": 1,
       "detail": "initial generation",
-      "last_seen_status": "error",
-      "error": "OpenAI returned no output_text content. [QA:OPENAI_EMPTY_OUTPUT]",
+      "last_seen_status": "pending",
+      "error": null,
       "program_chars": 0,
-      "seconds": 1037
+      "seconds": 1927
     }
   ],
   "selection": [
+    "advanced_hybrid",
     "mma_fight_camp",
     "dual_event_hyrox"
   ],
