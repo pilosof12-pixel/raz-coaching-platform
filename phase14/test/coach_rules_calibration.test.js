@@ -5,7 +5,9 @@ import fs from 'node:fs';
 import {
   gradeProgram, consecutiveTrainingDays, consecutiveLowerLegDays,
   benchmarkExposure, improvementGoalFlat, intensificationBand,
-  goalSpeedProgression, unsupportedAthleteFact,
+  goalSpeedProgression, unsupportedAthleteFact, ruckDistanceBelowTolerance,
+  dayMinusOneStacked, sportScheduleChangedSilently,
+  contingencyCreatesAdjacentDuplicate, trainingDaysVsIntake, goalFamilies,
 } from '../engine/coach_rules.js';
 import { collectClaimIntegrityFlags } from '../engine/v93_claim_integrity.js';
 import { collectSportStateFlags } from '../engine/v78_sport_taper.js';
@@ -96,17 +98,84 @@ test('a weight cut the intake never mentions is found', () => {
   assert.deepEqual(unsupportedAthleteFact(P3(), FIGHTER), []);
 });
 
+// --- the five rules added after the first calibration ------------------------
+
+test('a ruck below the distance the athlete already tolerates is found', () => {
+  const flags = ruckDistanceBelowTolerance(P2(), TACTICAL);
+  assert.equal(flags.length, 4, 'all four weeks');
+  assert.match(flags[0].detail, /about 6\.[0-9] km/);
+  assert.match(flags[0].detail, /8-10 km with the same load is already tolerated/);
+  // No tolerated distance in the intake means nothing to measure against.
+  assert.deepEqual(ruckDistanceBelowTolerance(P2(), { ...TACTICAL, pain: {}, notes: '' }), []);
+});
+
+test('two primers on the day before the fight are found', () => {
+  const flags = dayMinusOneStacked(P3(), FIGHTER);
+  assert.equal(flags.length, 1);
+  assert.equal(flags[0].day, 'fri');
+  assert.match(flags[0].detail, /both an MMA technical session and/);
+  // An explicit either/or is the fix, and clears it.
+  const fixed = `If the technical session already includes fast pad work, that session is the primer.\n${P3()}`;
+  assert.deepEqual(dayMinusOneStacked(fixed, FIGHTER), []);
+});
+
+test('rewriting the athlete sport week without owning it is found', () => {
+  const flags = sportScheduleChangedSilently(P3(), FIGHTER);
+  assert.equal(flags.length, 1);
+  assert.match(flags[0].detail, /reduces mon, wed, fri from the intake's hard session/);
+  const owned = `This program assumes your MMA coach reduces Friday to technical work from Week 1. If Friday remains a hard session, Friday gym becomes two throws and one clean set.\n${P3()}`;
+  assert.deepEqual(sportScheduleChangedSilently(owned, FIGHTER), []);
+});
+
+test('a contingency that stacks the same lift on consecutive days is found', () => {
+  const flags = contingencyCreatesAdjacentDuplicate(P1());
+  assert.ok(flags.length >= 1);
+  assert.match(flags[0].detail, /two consecutive days/);
+  assert.match(flags[0].movement, /Back Squat/i);
+});
+
+test('a training-day count the intake does not explain is found', () => {
+  const flags = trainingDaysVsIntake(P2(), TACTICAL);
+  assert.equal(flags.length, 1);
+  assert.match(flags[0].detail, /days_per_week: 3 and the block trains on 5 calendar days/);
+  // Saying which reading governs resolves it.
+  const said = `Your intake lists three formal strength sessions per week across five calendar days.\n${P2()}`;
+  assert.deepEqual(trainingDaysVsIntake(said, TACTICAL), []);
+  // And a program that matches its own intake says nothing.
+  assert.deepEqual(trainingDaysVsIntake(P1(), LIFTER), []);
+});
+
+// A goal names a movement; a shared word does not. Matching the token "press"
+// from a 100 kg overhead press goal pulled in Pallof Press and Leg Press
+// Machine, neither of which is that goal.
+test('a goal matches its own movement family, not every word it shares', () => {
+  const families = goalFamilies({ secondary_goals: ['100kg overhead press'] });
+  assert.equal(families.length, 1);
+  assert.ok(families[0].test('Overhead Press'));
+  assert.ok(families[0].test('Push Press'));
+  assert.ok(!families[0].test('Pallof Press'));
+  assert.ok(!families[0].test('Leg Press Machine'));
+  assert.ok(!families[0].test('Dumbbell Bench Press'));
+});
+
 // --- the calibration itself ---------------------------------------------------
 //
-// Ten of the coach's eighteen findings, 2.90 of his 4.20 of severity, and one
-// thing he did not raise. The eight misses are all rules that were never
-// encoded, not rules that ran and failed. This is the number to beat.
+// Fifteen of the coach's eighteen findings, 3.75 of his 4.20 of severity, and
+// one thing he did not raise. Program 2 is complete: six of six.
+//
+// The three misses are the ceiling, not a gap to close. Two are accessory
+// marginal return, which he filed under "Judgement, not rules" himself. The
+// third is a stale audit table the engine already fixes -- the fixture predates
+// the fix.
 
-test('the encoded rules reproduce ten of the coach eighteen findings', () => {
+test('the encoded rules reproduce fifteen of the coach eighteen findings', () => {
   const expect = {
-    'program-1': ['BENCHMARK_UNEXPOSED', 'INTENSIFICATION_BAND_NOT_REACHED', 'CONSECUTIVE_TRAINING_DAYS', 'UNSUPPORTED_ATHLETE_FACT'],
-    'program-2': ['STATED_PROGRESSION_ABSENT', 'GOAL_SPEED_NOT_APPROACHED', 'CONSECUTIVE_LOWER_LEG_DAYS', 'IMPROVEMENT_GOAL_FLAT'],
-    'program-3': ['BENCHMARK_UNEXPOSED', 'SPORT_STATE_MISDESCRIBED'],
+    'program-1': ['BENCHMARK_UNEXPOSED', 'INTENSIFICATION_BAND_NOT_REACHED', 'CONSECUTIVE_TRAINING_DAYS',
+      'UNSUPPORTED_ATHLETE_FACT', 'CONTINGENCY_CREATES_ADJACENT_DUPLICATE'],
+    'program-2': ['STATED_PROGRESSION_ABSENT', 'GOAL_SPEED_NOT_APPROACHED', 'CONSECUTIVE_LOWER_LEG_DAYS',
+      'IMPROVEMENT_GOAL_FLAT', 'GOAL_DISTANCE_BELOW_TOLERANCE', 'TRAINING_DAYS_VS_INTAKE'],
+    'program-3': ['BENCHMARK_UNEXPOSED', 'SPORT_STATE_MISDESCRIBED', 'DAY_MINUS_ONE_STACKED',
+      'SPORT_SCHEDULE_CHANGED_SILENTLY'],
   };
   const got = {
     'program-1': rulesOf(gradeProgram(P1(), LIFTER)),
@@ -122,7 +191,7 @@ test('the encoded rules reproduce ten of the coach eighteen findings', () => {
       total += 1;
     }
   }
-  assert.equal(total, 10);
+  assert.equal(total, 15);
 });
 
 // The one disagreement, kept visible rather than tuned away. Bench Press is

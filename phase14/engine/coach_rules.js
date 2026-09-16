@@ -16,6 +16,7 @@
 import { parseWeek } from './v34_workload_accounting.js';
 import { weekdayKey } from './weekday.js';
 import { THRESHOLDS } from './coach_standard.js';
+import { campPlanByWeek } from './v78_sport_taper.js';
 
 const WEEK_ORDER = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'];
 const arr = (v) => (Array.isArray(v) ? v : v ? [v] : []);
@@ -225,14 +226,39 @@ export function benchmarkExposure(program, intake = {}) {
 
 // --- 4. an improvement goal held flat for the whole block ---------------------
 
+// A goal names a movement; a shared word does not. Matching on the token
+// "press" from a 100 kg overhead press goal pulled in Pallof Press and Leg
+// Press Machine, neither of which has anything to do with it. This is a
+// vocabulary of goals we have actually seen, not an equivalence table between
+// exercises -- the coach was explicit that the second cannot be built from
+// three reviews.
+const GOAL_MOVEMENTS = [
+  { goal: /overhead press|\bohp\b|shoulder press/i, family: /overhead press|\bohp\b|push press|strict press|military press/i },
+  { goal: /bench press/i, family: /bench press/i },
+  { goal: /pull[- ]?ups?\b/i, family: /pull[- ]?up|chin[- ]?up/i },
+  { goal: /muscle[- ]?ups?\b/i, family: /muscle[- ]?up/i },
+  { goal: /back squat|front squat|\bsquat\b/i, family: /\bsquat\b/i },
+  { goal: /deadlift/i, family: /deadlift/i },
+  { goal: /snatch/i, family: /snatch/i },
+  { goal: /clean and jerk|clean & jerk/i, family: /\bclean\b|\bjerk\b/i },
+  { goal: /\bruck\b/i, family: /ruck|backpack carry|loaded carry/i },
+  { goal: /marathon|\d+\s*km|\brun\b/i, family: /\brun(?:ning)?\b|\bjog\b/i },
+  { goal: /\brows?\b|\berg\b/i, family: /\brow\b|\berg\b/i },
+  { goal: /\bdips?\b/i, family: /\bdip\b/i },
+];
+
+export function goalFamilies(intake = {}, tiers = ['primary', 'secondary']) {
+  const text = tiers.map((t) => arr(intake[`${t}_goals`]).join(' ')).join(' ');
+  return GOAL_MOVEMENTS.filter((g) => g.goal.test(text)).map((g) => g.family);
+}
+
 export function improvementGoalFlat(program, intake = {}) {
-  const improve = `${arr(intake.primary_goals).join(' ')} ${arr(intake.secondary_goals).join(' ')}`;
-  const toks = tokensOf(improve);
-  if (!toks.length) return [];
+  const families = goalFamilies(intake);
+  if (!families.length) return [];
   const byName = new Map();
   for (const r of rows(program)) {
-    const n = r.name.toLowerCase();
-    if (!toks.some((t) => n.includes(t))) continue;
+    const n = r.name;
+    if (!families.some((f) => f.test(n))) continue;
     if (!byName.has(r.name)) byName.set(r.name, []);
     byName.get(r.name).push(r);
   }
@@ -368,10 +394,183 @@ export const RULES = [
   intensificationBand,
   goalSpeedProgression,
   unsupportedAthleteFact,
+  ruckDistanceBelowTolerance,
+  dayMinusOneStacked,
+  sportScheduleChangedSilently,
+  contingencyCreatesAdjacentDuplicate,
+  trainingDaysVsIntake,
 ];
 
 export function gradeProgram(program, intake = {}) {
   return RULES.flatMap((fn) => {
     try { return fn(program, intake); } catch (e) { return [{ rule: 'RULE_THREW', detail: `${fn.name}: ${e.message}` }]; }
   });
+}
+
+// --- 8. a goal-specific distance cut below what the athlete already tolerates -
+
+const paceMinPerKm = (text) => {
+  const all = [...String(text).matchAll(/(\d{1,2}):(\d{2})\s*(?:[-–]\s*\d{1,2}:\d{2}\s*)?\/\s*km/gi)]
+    .map((m) => Number(m[1]) + Number(m[2]) / 60);
+  return all.length ? Math.max(...all) : null;
+};
+
+export function toleratedDistance(intake = {}, pattern) {
+  const text = `${intake.pain?.tolerated_movements || ''} ${intake.notes || ''}`;
+  // The window after the range must not run past the next number, or
+  // "Current 18-20 km/week running and one 8-10 km ruck" lets the running
+  // baseline claim the word "ruck" and answer as though it were the ruck's.
+  for (const m of text.matchAll(/(\d+(?:\.\d+)?)\s*(?:to|[-–])\s*(\d+(?:\.\d+)?)\s*km[^.\d]{0,24}/gi)) {
+    if (pattern.test(m[0])) return { low: Number(m[1]), high: Number(m[2]) };
+  }
+  return null;
+}
+
+export function ruckDistanceBelowTolerance(program, intake = {}) {
+  const goal = `${arr(intake.secondary_goals).join(' ')} ${arr(intake.primary_goals).join(' ')}`;
+  if (!RUCK.test(goal) && !/ruck/i.test(goal)) return [];
+  const tol = toleratedDistance(intake, /ruck/i);
+  if (!tol) return [];
+  const out = [];
+  const seen = new Set();
+  for (const r of rows(program)) {
+    if (!RUCK.test(r.name)) continue;
+    const explicit = (String(r.reps).match(/(\d+(?:\.\d+)?)\s*km\b/i) || [])[1];
+    let km = explicit ? Number(explicit) : null;
+    if (km == null) {
+      const mins = (String(r.reps).match(/(\d+(?:\.\d+)?)\s*min/i) || [])[1];
+      const pace = paceMinPerKm(r.cells.join(' '));
+      if (mins && pace) km = Number(mins) / pace;
+    }
+    if (km == null || km >= tol.low) continue;
+    if (seen.has(r.week)) continue;
+    seen.add(r.week);
+    out.push({
+      rule: 'GOAL_DISTANCE_BELOW_TOLERANCE',
+      week: r.week,
+      detail: `Week ${r.week}'s ruck covers about ${km.toFixed(1)} km, and the intake says ${tol.low}-${tol.high} km with the same load is already tolerated without symptoms. The goal is a ruck distance, so the block is training below the athlete's established distance.`,
+    });
+  }
+  return out;
+}
+
+// --- 9. the day before the event carries two primers -------------------------
+
+export function dayMinusOneStacked(program, intake = {}, now = Date.now()) {
+  let plan = null;
+  try { plan = campPlanByWeek(intake, now); } catch { return []; }
+  if (!plan) return [];
+  const weeks = [...plan.keys()];
+  const final = plan.get(weeks[weeks.length - 1]);
+  if (!final) return [];
+  const order = WEEK_ORDER;
+  const eventIdx = order.findIndex((d) => final.days.get(d)?.event);
+  if (eventIdx <= 0) return [];
+  const dayBefore = order[eventIdx - 1];
+  const cell = final.days.get(dayBefore);
+  if (!cell || !cell.sport) return [];
+  const gym = rows(program).filter((r) => r.week === final.week && r.day === dayBefore);
+  if (!gym.length) return [];
+  // An explicit either/or resolves it.
+  const src = String(program || '');
+  if (/\b(?:not both|either[^.]{0,80}\bor\b[^.]{0,60}\bnot\b|one or the other|that session is the primer|skip the gym primer)\b/i.test(src)) return [];
+  return [{
+    rule: 'DAY_MINUS_ONE_STACKED',
+    day: dayBefore,
+    detail: `Day -1 carries both an MMA ${cell.sport} session and ${gym.length} gym exercise${gym.length > 1 ? 's' : ''} (${[...new Set(gym.map((r) => r.name))].join(', ')}), and nothing says they are alternatives. Either may be trivial on its own; the block should state that one supplies the primer and the other is not also performed.`,
+  }];
+}
+
+// --- 10. the block rewrites the athlete's sport week without saying so --------
+
+export function sportScheduleChangedSilently(program, intake = {}, now = Date.now()) {
+  let plan = null;
+  try { plan = campPlanByWeek(intake, now); } catch { return []; }
+  if (!plan) return [];
+  const stated = new Map(arr(intake.sport_schedule)
+    .map((s) => [weekdayKey(s && s.day), String((s && s.intensity) || '').toLowerCase()]).filter(([d]) => d));
+  const demoted = [];
+  for (const [week, p] of plan) {
+    for (const [day, cell] of p.days) {
+      const was = stated.get(day);
+      if (!was || !cell.sport) continue;
+      if (/hard|spar|live/.test(was) && cell.sport !== 'hard') demoted.push({ week, day });
+    }
+  }
+  if (!demoted.length) return [];
+  const src = String(program || '');
+  // The change is fine when the block owns it as a recommendation and says what
+  // happens if the sport coach does not make it.
+  const owned = /\b(?:this (?:program|block) assumes|required camp (?:modification|recommendation)|ask your (?:MMA |sport |head )?coach|recommend(?:ed|ation)? (?:that )?(?:your )?(?:MMA |sport )?coach)\b/i.test(src);
+  const fallback = /\bif (?:friday|saturday|sunday|monday|tuesday|wednesday|thursday|the (?:session|sport session|mat session)) (?:remains|stays|is still)\b/i.test(src);
+  if (owned && fallback) return [];
+  const days = WEEK_ORDER.filter((d) => demoted.some((x) => x.day === d)).join(', ');
+  return [{
+    rule: 'SPORT_SCHEDULE_CHANGED_SILENTLY',
+    detail: `The camp schedule reduces ${days} from the intake's hard session to lighter work in ${demoted.length} week-days, and presents it as what the athlete's week already is. ${owned ? 'It is named as a recommendation but' : 'It is not named as a recommendation, and'} ${fallback ? '' : 'the block does not say what the gym becomes if the sport coach keeps the session hard'}.`.trim(),
+  }];
+}
+
+// --- 11. a contingency that puts the same main lift on consecutive days -------
+
+const SUB_RULE = /\buse (?:the )?([A-Z][A-Za-z ]{2,30}?)(?:\s+maintenance dose)?\s+(?:instead of|in place of)\s+(?:same-day\s+)?([A-Z][A-Za-z ]{2,30}?)\b/g;
+
+export function contingencyCreatesAdjacentDuplicate(program) {
+  const src = String(program || '');
+  const all = rows(src);
+  const dayIndex = (d) => WEEK_ORDER.indexOf(d);
+  const out = [];
+  const seen = new Set();
+  for (const m of src.matchAll(SUB_RULE)) {
+    const replacement = m[1].trim();
+    const replaced = m[2].trim();
+    if (!replacement || !replaced) continue;
+    const hostDays = new Set(all.filter((r) => r.name.toLowerCase().includes(replaced.toLowerCase())).map((r) => r.day));
+    const already = new Set(all.filter((r) => r.name.toLowerCase().includes(replacement.toLowerCase())).map((r) => r.day));
+    for (const host of hostDays) {
+      if (!host || already.has(host)) continue;
+      const i = dayIndex(host);
+      const neighbours = [WEEK_ORDER[(i + 6) % 7], WEEK_ORDER[(i + 1) % 7]].filter((d) => already.has(d));
+      if (!neighbours.length) continue;
+      const key = `${replacement}|${host}`;
+      if (seen.has(key)) continue;
+      seen.add(key);
+      out.push({
+        rule: 'CONTINGENCY_CREATES_ADJACENT_DUPLICATE',
+        movement: replacement,
+        detail: `A contingency swaps ${replaced} on ${host} for ${replacement}, which is already prescribed on ${neighbours.join(' and ')}. Taking the substitution puts ${replacement} on two consecutive days, which was not the plan the athlete was given.`,
+      });
+    }
+  }
+  return out;
+}
+
+// --- 12. the number of training days does not match the intake field ---------
+
+export function trainingDaysVsIntake(program, intake = {}) {
+  const stated = Number(intake.days_per_week);
+  if (!Number.isFinite(stated) || stated <= 0) return [];
+  const byWeek = new Map();
+  for (const r of rows(program)) {
+    if (!r.day) continue;
+    if (!byWeek.has(r.week)) byWeek.set(r.week, new Set());
+    byWeek.get(r.week).add(r.day);
+  }
+  const counts = [...byWeek.values()].map((s) => s.size);
+  if (!counts.length || counts.every((c) => c === stated)) return [];
+  const head = String(program || '').split(/START_WEEK1_TSV/i)[0];
+  // Saying which reading governs resolves it.
+  // Programs write "three formal strength sessions", not "3". Matching only the
+  // digit meant a block that did explain itself was flagged anyway.
+  const WORDS = ['zero', 'one', 'two', 'three', 'four', 'five', 'six', 'seven'];
+  const forms = [String(stated), WORDS[stated]].filter(Boolean).join('|');
+  const kinds = '(?:gym|strength|formal|resistance|lifting|barbell)';
+  const explained = new RegExp(`\\b(?:${forms})\\b[^.]{0,80}\\b${kinds}\\b|\\b${kinds}\\b[^.]{0,80}\\b(?:${forms})\\b`, 'i').test(head)
+    || /\bdays_per_week\b/i.test(head);
+  if (explained) return [];
+  const most = Math.max(...counts);
+  return [{
+    rule: 'TRAINING_DAYS_VS_INTAKE',
+    detail: `The intake says days_per_week: ${stated} and the block trains on ${most} calendar days, without saying which reading governs. ${stated} formal strength sessions spread across ${most} calendar days may be exactly right; the athlete cannot tell that from what they were sent.`,
+  }];
 }
