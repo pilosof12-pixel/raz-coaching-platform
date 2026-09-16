@@ -573,6 +573,7 @@ export const RULES = [
   contingencyCreatesAdjacentDuplicate,
   trainingDaysVsIntake,
   unanchoredPrimaryLoad,
+  inSeasonCaps,
 ];
 
 export function gradeProgram(program, intake = {}) {
@@ -747,4 +748,70 @@ export function trainingDaysVsIntake(program, intake = {}) {
     rule: 'TRAINING_DAYS_VS_INTAKE',
     detail: `The intake says days_per_week: ${stated} and the block trains on ${most} calendar days, without saying which reading governs. ${stated} formal strength sessions spread across ${most} calendar days may be exactly right; the athlete cannot tell that from what they were sent.`,
   }];
+}
+
+// --- 14. in-season team sport: the three caps the coach specified ------------
+//
+// He gave operational definitions for these, which is the only reason they are
+// encoded ahead of him scoring an in-season program. Everything else about the
+// type stays unwritten until those programs come back with scores; his
+// instruction, and the right one -- otherwise we are theorising ahead of
+// calibration again.
+
+const MATCH = /\bmatch\b|\bgame\b|\bfixture\b/i;
+const STRENGTH_OR_POWER = /\bsquat\b|\bdeadlift\b|\bpress\b|\bpull[- ]?up\b|\brow\b|\bhip thrust\b|\bnordic\b|\bhamstring curl\b|\bjump\b|\bthrow\b|\bsprint\b|\bsled\b|\bprowler\b|\bclean\b|\bsnatch\b/i;
+
+export function matchDay(intake = {}) {
+  for (const s of arr(intake.sport_schedule)) {
+    if (MATCH.test(String((s && s.intensity) || ''))) return weekdayKey(s && s.day);
+  }
+  return null;
+}
+
+const dayBefore = (d) => WEEK_ORDER[(WEEK_ORDER.indexOf(d) + 6) % 7];
+
+export function inSeasonCaps(program, intake = {}) {
+  const md = matchDay(intake);
+  if (!md) return [];
+  const out = [];
+  const all = rows(program);
+
+  // Heavy lower body on MD-1: his definition is a squat, deadlift, split squat
+  // or comparable lift at RPE 7 or above for two or more work sets, on the day
+  // before a match.
+  const mdMinusOne = dayBefore(md);
+  const heavy = all.filter((r) => r.day === mdMinusOne
+    && LOWER_BODY_LIFT.test(r.name)
+    && (r.sets ?? 0) >= 2
+    && (num(String(r.cells.join(' ')).match(/RPE\s*([\d.]+)/i)?.[1]) ?? 0) >= 7);
+  if (heavy.length) {
+    out.push({
+      rule: 'HEAVY_LOWER_BODY_ON_MD_MINUS_ONE',
+      cap: 6.5,
+      detail: `${[...new Set(heavy.map((r) => r.name))].join(', ')} is prescribed on ${mdMinusOne.toUpperCase()}, the day before the ${md.toUpperCase()} match, at RPE 7 or above for two or more work sets. That is a hard cap on the whole program.`,
+    });
+  }
+
+  // No direct strength or power exposure at all, despite maintenance goals.
+  const wantsStrength = /\b(?:strength|power|speed|sprint)\b/i.test(goalText(intake));
+  const anyStrength = all.some((r) => STRENGTH_OR_POWER.test(r.name));
+  if (wantsStrength && all.length && !anyStrength) {
+    out.push({
+      rule: 'NO_STRENGTH_EXPOSURE_IN_SEASON',
+      cap: 7.0,
+      detail: 'The athlete asks to hold strength, power or speed through the season and the block contains no direct strength or power exposure anywhere in four weeks.',
+    });
+  }
+
+  // Training scheduled as though no match exists.
+  const onMatchDay = all.filter((r) => r.day === md);
+  const mentionsMatch = MATCH.test(String(program || '').split(/START_WEEK1_TSV/i)[0]);
+  if (onMatchDay.length && !mentionsMatch) {
+    out.push({
+      rule: 'FIXTURE_IGNORED',
+      cap: 6.0,
+      detail: `The block schedules ${onMatchDay.length} gym exercise${onMatchDay.length > 1 ? 's' : ''} on ${md.toUpperCase()}, which the intake gives as match day, and never mentions the match anywhere in the summary.`,
+    });
+  }
+  return out;
 }
