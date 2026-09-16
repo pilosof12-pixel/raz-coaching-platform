@@ -1,0 +1,377 @@
+// engine/coach_rules.js
+//
+// The checkable half of the coach's standard, run against a delivered program.
+//
+// This is a grader, not a gate. Nothing here refuses a build. Its job is to
+// answer one question we have never been able to answer offline: would the
+// coach have found something here? Every rule below targets a finding he
+// actually made, so the grader can be measured against his eighteen rather than
+// believed.
+//
+// Rules he filed under "Judgement, not rules" are absent on purpose. Whether an
+// accessory earns its recovery cost, and whether one exercise is mechanically
+// close enough to another, are the two he was clearest about not being able to
+// reduce -- and they are exactly the two that would be easiest to fake.
+
+import { parseWeek } from './v34_workload_accounting.js';
+import { weekdayKey } from './weekday.js';
+import { THRESHOLDS } from './coach_standard.js';
+
+const WEEK_ORDER = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'];
+const arr = (v) => (Array.isArray(v) ? v : v ? [v] : []);
+const isWarmup = (n) => /^\s*\[WARMUP\]/i.test(String(n || ''));
+const num = (s) => { const m = String(s || '').match(/(\d+(?:\.\d+)?)/); return m ? Number(m[1]) : null; };
+
+export function goalText(intake = {}, tiers = ['primary', 'secondary', 'maintenance']) {
+  return tiers.map((t) => arr(intake[`${t}_goals`]).join(' ')).join(' ');
+}
+
+// Every working row of every week, with the day it belongs to carried forward.
+export function rows(program) {
+  const out = [];
+  for (let week = 1; week <= 4; week += 1) {
+    const parsed = parseWeek(program, week);
+    if (!parsed) continue;
+    let lastDay = '';
+    parsed.rows.forEach((cells) => {
+      const raw = String(cells[parsed.day] || '').trim();
+      if (raw) lastDay = raw;
+      const name = String(cells[parsed.exercise] || '').trim();
+      if (!name || isWarmup(name)) return;
+      out.push({
+        week,
+        day: weekdayKey(lastDay) || '',
+        name,
+        load: Number.isInteger(parsed.load) ? String(cells[parsed.load] || '') : '',
+        sets: num(cells[parsed.sets]),
+        reps: String(cells[parsed.reps] || ''),
+        rpe: Number.isInteger(parsed.rest) ? num(cells[parsed.rest + 1]) : null,
+        notes: Number.isInteger(parsed.notes) ? String(cells[parsed.notes] || '') : '',
+        cells,
+      });
+    });
+  }
+  return out;
+}
+
+// The week wraps. Saturday, Sunday and Monday are three consecutive training
+// days, and reading the calendar left to right scored them as two -- which is
+// how the coach's three-consecutive-lower-body-days finding stayed invisible on
+// a program whose three days were exactly Sat, Sun, Mon.
+const longestRun = (days) => {
+  const present = WEEK_ORDER.map((d) => days.has(d));
+  if (present.every(Boolean)) return 7;
+  let best = 0;
+  let run = 0;
+  for (let i = 0; i < 14; i += 1) {
+    if (present[i % 7]) { run += 1; if (run > best) best = run; } else run = 0;
+  }
+  return Math.min(best, 7);
+};
+
+// --- 1. consecutive training days, flexible availability ----------------------
+
+export function consecutiveTrainingDays(program, intake = {}) {
+  if (String(intake.gym_availability_mode || '').toLowerCase() !== 'flexible') return [];
+  const limit = THRESHOLDS.MAX_CONSECUTIVE_LIFTING_DAYS;
+  const byWeek = new Map();
+  for (const r of rows(program)) {
+    if (!r.day) continue;
+    if (!byWeek.has(r.week)) byWeek.set(r.week, new Set());
+    byWeek.get(r.week).add(r.day);
+  }
+  const out = [];
+  for (const [week, days] of byWeek) {
+    const run = longestRun(days);
+    if (run > limit) {
+      out.push({
+        rule: 'CONSECUTIVE_TRAINING_DAYS',
+        week,
+        detail: `Week ${week} trains ${run} days in a row (${[...days].join(', ')}) against a limit of ${limit} when availability is flexible.`,
+      });
+    }
+  }
+  return out;
+}
+
+// --- 2. consecutive lower-leg loading days ------------------------------------
+//
+// His definition, not ours: a day counts when it carries a run of 20 minutes or
+// more, running intervals, a ruck of 45 minutes or more, or lower-body
+// resistance with a working set at RPE 6.5 or higher.
+
+const LOWER_BODY_LIFT = /\bsquat\b|\bdeadlift\b|\blunge\b|\bstep[- ]?up\b|\bhip thrust\b|\bleg press\b|\bsplit squat\b|\bhamstring\b|\bcalf\b/i;
+const RUN = /\brun(?:ning)?\b|\bjog\b/i;
+const RUCK = /\bruck\b|\bbackpack carry\b|\bloaded carry\b/i;
+
+export function lowerLegLoadingDay(r) {
+  const minutes = (String(r.reps).match(/(\d+(?:\.\d+)?)\s*min/i) || [])[1];
+  if (RUN.test(r.name)) {
+    if (minutes && Number(minutes) >= THRESHOLDS.LOWER_LEG_LOADING_RUN_MINUTES) return 'run >= 20 min';
+    if (/interval|repeat|\bx\s*\d+\s*m\b|\d+\s*m\b/i.test(`${r.reps} ${r.load} ${r.notes}`)) return 'running intervals';
+  }
+  if (RUCK.test(r.name) && minutes && Number(minutes) >= THRESHOLDS.LOWER_LEG_LOADING_RUCK_MINUTES) return 'ruck >= 45 min';
+  if (LOWER_BODY_LIFT.test(r.name)) {
+    const rpe = num(String(r.cells.join(' ')).match(/RPE\s*([\d.]+)/i)?.[1]) ?? r.rpe;
+    if (rpe != null && rpe >= THRESHOLDS.LOWER_LEG_LOADING_MIN_RPE) return `lower-body lift at RPE ${rpe}`;
+  }
+  return null;
+}
+
+// Only for an athlete the intake says has a history here; he was explicit that
+// this is tied to the shin history and is not a universal rule.
+const IMPACT_HISTORY = /\bshin\b|\bstress fracture\b|\bstress reaction\b|\btibial\b|\bimpact\b/i;
+
+export function consecutiveLowerLegDays(program, intake = {}) {
+  const history = `${intake.injuries || ''} ${JSON.stringify(intake.pain || {})}`;
+  if (!IMPACT_HISTORY.test(history)) return [];
+  if (String(intake.gym_availability_mode || '').toLowerCase() !== 'flexible') return [];
+  const limit = THRESHOLDS.MAX_CONSECUTIVE_LOWER_LEG_LOADING_DAYS;
+  const byWeek = new Map();
+  for (const r of rows(program)) {
+    if (!r.day) continue;
+    const why = lowerLegLoadingDay(r);
+    if (!why) continue;
+    if (!byWeek.has(r.week)) byWeek.set(r.week, new Map());
+    if (!byWeek.get(r.week).has(r.day)) byWeek.get(r.week).set(r.day, why);
+  }
+  const out = [];
+  for (const [week, days] of byWeek) {
+    const run = longestRun(new Set(days.keys()));
+    if (run > limit) {
+      out.push({
+        rule: 'CONSECUTIVE_LOWER_LEG_DAYS',
+        week,
+        detail: `Week ${week} loads the lower leg on ${run} consecutive days against a limit of ${limit} for an athlete with impact history: ${[...days].map(([d, w]) => `${d} (${w})`).join(', ')}.`,
+      });
+    }
+  }
+  return out;
+}
+
+// --- 3. a benchmarked movement that serves a goal and is never trained --------
+
+export function benchmarks(intake = {}) {
+  const out = [];
+  for (const line of String(intake.current_numbers || '').split('\n')) {
+    const m = line.match(/^\s*([A-Za-z][A-Za-z '()\-\/]*?)\s*:\s*(.+)$/);
+    if (!m) continue;
+    const name = m[1].trim();
+    if (!name || /^current/i.test(name)) continue;
+    out.push({ name, value: m[2].trim(), kg: num((m[2].match(/([\d.]+)\s*kg/i) || [])[1]) });
+  }
+  return out;
+}
+
+const TOKENS = /\b(snatch|clean|jerk|squat|deadlift|press|bench|pull|row|dip|push|run|ruck|carry)\b/gi;
+const tokensOf = (s) => [...new Set(String(s).toLowerCase().match(TOKENS) || [])];
+
+// A goal that names no movement but asks for strength or power to be kept
+// covers every benchmarked resistance movement the athlete tolerates. Without
+// this, "Maintain the strength and power I already have" matched nothing, and
+// the trap bar deadlift -- his largest Program 3 finding -- stayed invisible.
+const GENERIC_STRENGTH_GOAL = /maintain[^.]*\b(strength|power)\b/i;
+
+const NOT_A_LIFT = /\b(\d+\s*km|3\s*km|reps|min|sessions?)\b/i;
+
+export function benchmarkExposure(program, intake = {}) {
+  const experience = String(intake.experience || '').toLowerCase();
+  const advanced = /advanced|elite/.test(experience) || Number(intake.training_years) >= 3;
+  if (!advanced) return [];
+
+  const goals = goalText(intake);
+  // "Maintain useful squat and deadlift strength" names its movements, so it
+  // does not licence every benchmark in the intake. Reading it as generic made
+  // an untrained push-up benchmark look like a missing maintenance quality.
+  const generic = GENERIC_STRENGTH_GOAL.test(goals) && !tokensOf(goals).some((t) => /squat|deadlift|press|bench|snatch|clean|jerk|pull|row|dip/.test(t));
+  const tolerated = String(intake.pain?.tolerated_movements || '').toLowerCase();
+  const painful = String(intake.pain?.description || '').toLowerCase();
+  const painActive = intake.pain?.active === true;
+
+  const trained = rows(program).map((r) => r.name.toLowerCase());
+  const out = [];
+
+  for (const b of benchmarks(intake)) {
+    const toks = tokensOf(b.name);
+    if (!toks.length || NOT_A_LIFT.test(b.name)) continue;
+
+    // Does it serve a stated goal?
+    const named = toks.some((t) => new RegExp(`\\b${t}`, 'i').test(goals));
+    if (!named && !generic) continue;
+
+    // Is it tolerated? An active symptom that names this movement removes the
+    // requirement -- that is the coach's first conflict-resolution rule.
+    if (painActive && toks.some((t) => painful.includes(t)) && !tolerated.includes(b.name.toLowerCase())) continue;
+
+    // Is it trained? Family match: every significant token of the benchmark
+    // must appear in one exercise name.
+    const exposed = trained.some((n) => toks.every((t) => n.includes(t)));
+    if (exposed) continue;
+
+    // Is a tolerated close variation trained instead? Same last token -- "Trap
+    // Bar Deadlift" against "Deadlift", "Snatch Pull" against "Clean Pull".
+    const head = toks[toks.length - 1];
+    const cousin = trained.find((n) => n.includes(head));
+    out.push({
+      rule: 'BENCHMARK_UNEXPOSED',
+      movement: b.name,
+      benchmark: b.value,
+      nearest: cousin || null,
+      detail: `${b.name} is benchmarked at ${b.value}, serves a stated goal${generic && !named ? ' (maintain existing strength)' : ''}, and is not symptom-limited, but no exercise in the block trains it${cousin ? `. The nearest thing present is "${cousin}"` : ' and nothing in its family appears at all'}.`,
+    });
+  }
+  return out;
+}
+
+// --- 4. an improvement goal held flat for the whole block ---------------------
+
+export function improvementGoalFlat(program, intake = {}) {
+  const improve = `${arr(intake.primary_goals).join(' ')} ${arr(intake.secondary_goals).join(' ')}`;
+  const toks = tokensOf(improve);
+  if (!toks.length) return [];
+  const byName = new Map();
+  for (const r of rows(program)) {
+    const n = r.name.toLowerCase();
+    if (!toks.some((t) => n.includes(t))) continue;
+    if (!byName.has(r.name)) byName.set(r.name, []);
+    byName.get(r.name).push(r);
+  }
+  const out = [];
+  for (const [name, list] of byName) {
+    const weeks = [...new Set(list.map((r) => r.week))];
+    if (weeks.length < THRESHOLDS.IDENTICAL_WEEKS_DEFECT_AFTER) continue;
+    const sig = (w) => list.filter((r) => r.week === w)
+      .map((r) => `${r.sets}|${r.reps}|${r.load}`.toLowerCase()).sort().join('~');
+    const first = sig(weeks[0]);
+    if (!weeks.every((w) => sig(w) === first)) continue;
+    // Held is fine when the block says it is held.
+    const said = list.some((r) => /maintain|maintenance|held|hold|unchanged|submaximal support/i.test(r.notes));
+    out.push({
+      rule: 'IMPROVEMENT_GOAL_FLAT',
+      movement: name,
+      weeks: weeks.length,
+      explained: said,
+      detail: `${name} is identical in all ${weeks.length} weeks (${first.split('~')[0]}) while it serves a stated improvement goal${said ? ', and the note calls it support rather than saying the block deliberately holds it' : ' and nothing says the dose is deliberately held'}.`,
+    });
+  }
+  return out;
+}
+
+// --- 5. weightlifting intensification band ------------------------------------
+
+export function intensificationBand(program, intake = {}) {
+  const pct = [];
+  for (const r of rows(program)) {
+    for (const m of String(r.cells.join(' ')).matchAll(/(\d{2,3})\s*%\s*of\s*(?:current\s*)?max/gi)) {
+      pct.push({ week: r.week, name: r.name, pct: Number(m[1]) });
+    }
+  }
+  if (!pct.length) return [];
+  const isOly = /snatch|clean|jerk/i;
+  const lifts = pct.filter((p) => isOly.test(p.name));
+  if (!lifts.length) return [];
+  const byWeek3 = lifts.filter((p) => p.week >= 3);
+  if (!byWeek3.length) return [];
+  const [lo] = THRESHOLDS.OLY_WEEK3_SNATCH_INTENSITY_BAND;
+  const top = Math.max(...byWeek3.map((p) => p.pct));
+  if (top >= lo * 100) return [];
+  return [{
+    rule: 'INTENSIFICATION_BAND_NOT_REACHED',
+    peak: top,
+    required: lo * 100,
+    detail: `By Week 3 the heaviest competition-lift exposure is ${top}% of current max, and the standard asks for at least ${lo * 100}%. Peak across the block: ${Math.max(...lifts.map((p) => p.pct))}%.`,
+  }];
+}
+
+// --- 6. running goal-speed progression ----------------------------------------
+
+const secs = (s) => {
+  const m = String(s).match(/(\d{1,2}):(\d{2})/);
+  return m ? Number(m[1]) * 60 + Number(m[2]) : null;
+};
+
+export function goalSpeedProgression(program, intake = {}) {
+  const goal = arr(intake.primary_goals).join(' ');
+  const g = goal.match(/(\d+(?:\.\d+)?)\s*km/i);
+  if (!g) return [];
+  const km = Number(g[1]);
+  // "Improve 3 km from 13:30 to sub-12:00" states where the athlete is and
+  // where they are going, in that order. Taking the first time made the goal
+  // the athlete's current time, so a block that never moved scored as already
+  // faster than target.
+  const times = [...goal.matchAll(/(\d{1,2}:\d{2})/g)].map((m) => secs(m[1])).filter(Boolean);
+  const target = times.length ? Math.min(...times) : null;
+  if (!km || !target) return [];
+  const goalSecPerKm = target / km;
+
+  const best = new Map();
+  for (const r of rows(program)) {
+    if (!RUN.test(r.name)) continue;
+    const dist = String(r.reps).match(/(\d+(?:\.\d+)?)\s*(m|km)\b/i);
+    const pace = String(r.cells.join(' ')).match(/(\d{1,2}:\d{2})\s*\/\s*(\d+)\s*m\b/i)
+      || String(r.cells.join(' ')).match(/(\d{1,2}:\d{2})\s*\/\s*km/i);
+    let secPerKm = null;
+    if (pace && pace[2]) secPerKm = secs(pace[1]) / (Number(pace[2]) / 1000);
+    else if (pace) secPerKm = secs(pace[1]);
+    else if (dist && /interval|repeat/i.test(`${r.notes} ${r.load}`)) continue;
+    if (secPerKm == null) continue;
+    // Quality work only: an easy run is not an attempt at goal pace.
+    if (/easy|conversational|zone ?2|recovery|cool/i.test(r.cells.join(' '))) continue;
+    const frac = goalSecPerKm / secPerKm;
+    if (!best.has(r.week) || frac > best.get(r.week).frac) best.set(r.week, { frac, secPerKm });
+  }
+  const out = [];
+  for (const [week, need] of [[3, THRESHOLDS.RUN_WEEK3_MIN_FRACTION_OF_GOAL_SPEED],
+    [4, THRESHOLDS.RUN_WEEK4_MIN_FRACTION_OF_GOAL_SPEED]]) {
+    const got = best.get(week);
+    if (!got) continue;
+    if (got.frac >= need) continue;
+    out.push({
+      rule: 'GOAL_SPEED_NOT_APPROACHED',
+      week,
+      detail: `Week ${week}'s fastest quality running is ${(got.frac * 100).toFixed(1)}% of goal speed (${Math.round(got.secPerKm)} s/km against a goal of ${Math.round(goalSecPerKm)} s/km); the standard asks for at least ${(need * 100).toFixed(0)}%.`,
+    });
+  }
+  return out;
+}
+
+// --- 7. an athlete fact the intake does not contain ---------------------------
+
+const ASSERTED_CUT = /\b(?:routine|usual|standard|typical|his|her|your)\s+(\d+(?:\.\d+)?)\s*kg\s*(?:weight\s*)?cut\b|\b(\d+(?:\.\d+)?)\s*kg\s*cut\b/i;
+
+export function unsupportedAthleteFact(program, intake = {}) {
+  const src = String(program || '');
+  const head = src.split(/START_WEEK1_TSV/i)[0];
+  const intakeText = JSON.stringify(intake).toLowerCase();
+  const out = [];
+  const m = head.match(ASSERTED_CUT);
+  if (m) {
+    const stated = /weight_cut|weight_class_status|weigh_in|\bcut\b/.test(intakeText);
+    if (!stated) {
+      out.push({
+        rule: 'UNSUPPORTED_ATHLETE_FACT',
+        claim: m[0].trim(),
+        detail: `The block states "${m[0].trim()}" as an established fact about the athlete, and the intake contains no weight cut at all.`,
+      });
+    }
+  }
+  return out;
+}
+
+// --- all of it ----------------------------------------------------------------
+
+export const RULES = [
+  consecutiveTrainingDays,
+  consecutiveLowerLegDays,
+  benchmarkExposure,
+  improvementGoalFlat,
+  intensificationBand,
+  goalSpeedProgression,
+  unsupportedAthleteFact,
+];
+
+export function gradeProgram(program, intake = {}) {
+  return RULES.flatMap((fn) => {
+    try { return fn(program, intake); } catch (e) { return [{ rule: 'RULE_THREW', detail: `${fn.name}: ${e.message}` }]; }
+  });
+}
