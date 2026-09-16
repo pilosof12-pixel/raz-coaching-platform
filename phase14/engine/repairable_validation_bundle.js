@@ -55,7 +55,7 @@ import { collectAuditFlags } from './v73_taper_audit.js'; // V73-TAPER-AUDIT-WIR
 import { collectWeightCutFlags } from './v75_weight_cut.js'; // V75-WEIGHT-CUT-WIRED
 import { collectConditioningFlags } from './v76_conditioning_gap.js'; // V76-CONDITIONING-GAP-WIRED
 import { collectFightWeekClockFlags } from './v77_fight_week_clock.js'; // V77-FIGHT-WEEK-CLOCK-WIRED
-import { collectSportTaperFlags } from './v78_sport_taper.js'; // V78-SPORT-TAPER-WIRED
+import { collectSportTaperFlags, collectSportStateFlags } from './v78_sport_taper.js'; // V78-SPORT-TAPER-WIRED
 import { collectBallisticShareFlags } from './v79_ballistic_share.js'; // V79-BALLISTIC-SHARE-WIRED
 import { collectClusterFlags } from './v81_cluster_notation.js'; // V81-CLUSTER-NOTATION-WIRED
 import { collectCampSharpeningFlags } from './v82_camp_sharpening.js'; // V82-CAMP-SHARPENING-WIRED
@@ -729,7 +729,8 @@ export function collectRepairableValidationFailures(program, intake = {}, option
     const lean = [...collectEconomyFlags(candidate, intake), ...collectNoveltyFlags(candidate, intake),
       ...collectAuditFlags(candidate, intake), ...collectWeightCutFlags(candidate, intake),
       ...collectConditioningFlags(candidate, intake), ...collectFightWeekClockFlags(candidate, intake),
-      ...collectSportTaperFlags(candidate, intake), ...collectBallisticShareFlags(candidate, intake),
+      ...collectSportTaperFlags(candidate, intake), ...collectSportStateFlags(candidate, intake),
+      ...collectBallisticShareFlags(candidate, intake),
       ...collectClusterFlags(candidate, intake),
       ...collectCampSharpeningFlags(candidate, intake),
       ...collectPainToleranceFlags(candidate, intake),

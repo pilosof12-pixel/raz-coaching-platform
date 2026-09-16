@@ -307,6 +307,20 @@ const PERTURBATIONS = [
     }).join('\n')),
   },
   {
+    id: 'sport-state-misdescribed', seen: 'run #113 MMA camp, coach review finding 5',
+    code: 'V78_SPORT_STATE_MISDESCRIBED',
+    applies: ['mma_fight_camp'],
+    // Every gym row claims it follows hard mat work. The camp schedule in the
+    // same document demotes those days to technical to hit its hard-contact
+    // target, so the note describes a session the athlete is not being sent to.
+    apply: (p) => p.replace(/(START_WEEK\d_TSV[\s\S]*?END_WEEK\d_TSV)/g, (block) => block.split('\n').map((l) => {
+      if (/^(?:START|END)_WEEK/.test(l) || /^Day\t/i.test(l)) return l;
+      const c = l.split('\t');
+      if (c.length > 8 && c[1]) c[7] = `Deliberately low-cost after hard MMA. ${c[7] || ''}`.trim();
+      return c.join('\t');
+    }).join('\n')),
+  },
+  {
     id: 'match-day-labels-stripped', seen: 'coach instruction 2, in-season microcycle',
     applies: ['inseason_footballer'],
     apply: (p) => p.replace(/MD[-+]\d/g, 'Session'),
@@ -382,6 +396,11 @@ for (const [id, intake] of Object.entries(INTAKES)) {
   for (const perturbation of cases) {
     const damaged = perturbation.apply(base);
     const changed = damaged !== base;
+    // What the damage actually raises, before anything repairs it. This is the
+    // evidence the ledger's "stressed" column needs: until now it asked whether
+    // this file's source text happened to contain the code's name, which no
+    // perturbation had ever written down, so the column was false for all 186
+    // codes while still counting toward "proven".
     const repaired = repairDeterministicContradictions(damaged, intake);
     const verdict = releasable(repaired.program, intake);
     const findings = allFindings(repaired.program, intake, id);
@@ -395,6 +414,8 @@ for (const [id, intake] of Object.entries(INTAKES)) {
       residual: verdict.codes,
       overall: score.overall,
       meets9: Boolean(score.meetsNinePlus),
+      declares: perturbation.code || null,
+      repairsFired: repaired.repairs.map((x) => x.type),
     });
   }
 }
@@ -412,6 +433,36 @@ if (!quiet) {
     }
   }
 }
+
+// Which codes this suite actually exercises, written from the run rather than
+// guessed from source text. The ledger's "stressed" column used to ask whether
+// this file contained the code's name; no perturbation had ever written one
+// down, so it was false for all 186 codes while still counting toward "proven".
+//
+// Two kinds of entry, and they are not equally strong:
+//   residual  -- the code survived the repair chain on a damaged program. Hard
+//                evidence, and a standing dead-build risk.
+//   declared  -- the perturbation names the code it reproduces, and the run
+//                confirms the perturbation changed the program and converged.
+//                That is a verified claim about a real run, not a proof that
+//                this particular code was the one raised.
+const coverage = {};
+const note = (code, kind, r) => {
+  const e = (coverage[code] ||= { evidence: [], perturbations: [], avatars: [] });
+  if (!e.evidence.includes(kind)) e.evidence.push(kind);
+  if (!e.perturbations.includes(r.perturbation)) e.perturbations.push(r.perturbation);
+  if (!e.avatars.includes(r.avatar)) e.avatars.push(r.avatar);
+};
+for (const r of results) {
+  if (!r.applied || r.perturbation === 'undamaged') continue;
+  for (const code of r.residual || []) note(code, 'residual', r);
+  if (r.declares) note(r.declares, 'declared', r);
+}
+fs.writeFileSync(new URL('../docs/qa/stress_coverage.json', import.meta.url),
+  `${JSON.stringify({
+    _why: 'Written by scripts/stress_test_convergence.mjs on every run. "residual" means the code survived the repair chain on a damaged program; "declared" means a perturbation names this code and the run confirms that perturbation changed the program. The gate/repair ledger reads this file for its "stressed" column instead of scanning the suite for code names, which never once matched.',
+    codes: Object.fromEntries(Object.entries(coverage).sort(([a], [b]) => a.localeCompare(b))),
+  }, null, 2)}\n`);
 
 const applied = results.filter((r) => r.applied);
 const per = (a) => {

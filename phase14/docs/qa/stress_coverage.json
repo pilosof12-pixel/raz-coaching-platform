@@ -1,0 +1,16 @@
+{
+  "_why": "Written by scripts/stress_test_convergence.mjs on every run. \"residual\" means the code survived the repair chain on a damaged program; \"declared\" means a perturbation names this code and the run confirms that perturbation changed the program. The gate/repair ledger reads this file for its \"stressed\" column instead of scanning the suite for code names, which never once matched.",
+  "codes": {
+    "V78_SPORT_STATE_MISDESCRIBED": {
+      "evidence": [
+        "declared"
+      ],
+      "perturbations": [
+        "sport-state-misdescribed"
+      ],
+      "avatars": [
+        "mma_fight_camp"
+      ]
+    }
+  }
+}

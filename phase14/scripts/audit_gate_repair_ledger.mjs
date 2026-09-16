@@ -218,6 +218,15 @@ function advisoryOnly(code) {
   return seen;
 }
 
+// Read from the suite's own run rather than its source text: asking whether
+// this file mentioned a code name was false for all 186 of them.
+const stressCoverage = (() => {
+  try {
+    const raw = JSON.parse(fs.readFileSync(new URL('../docs/qa/stress_coverage.json', import.meta.url), 'utf8'));
+    return new Set(Object.keys(raw.codes || {}));
+  } catch { return new Set(); }
+})();
+
 const ledger = [];
 for (const [code, files] of [...raisedIn].sort()) {
   const modules = [...files];
@@ -238,7 +247,7 @@ for (const [code, files] of [...raisedIn].sort()) {
     repairs: repairsNearby,
     wired,
     tested: testText.includes(code),
-    stressed: stressText.includes(code),
+    stressed: stressCoverage.has(code),
     killedLive: LIVE_KILLERS.get(code) || '',
   });
 }

@@ -42,7 +42,7 @@ import { repairCompetitionWeek } from './v90_competition_week.js';
 import { repairTimelineIntegrity } from './v91_timeline_integrity.js';
 import { repairPrescriptionIntegrity } from './v92_prescription_integrity.js';
 import { appendCompetitionBlocks } from './v73_taper_audit.js';
-import { appendCampSchedule } from './v78_sport_taper.js';
+import { appendCampSchedule, repairSportStateLanguage } from './v78_sport_taper.js';
 import { classifyExercise, dayGap, stressSignature, dayKey as dayKeyOf } from './v38_movement_taxonomy.js';
 import { auditCircularScheduling } from './v38_structural_audit.js';
 
@@ -1301,6 +1301,16 @@ export function repairDeterministicContradictions(program, intake = {}) {
   if (documented !== candidate) {
     candidate = documented;
     repairs.push({ type: 'v73_v78_blocks_appended' });
+  }
+
+  // Last, because it reads the same computation the calendar was rendered from.
+  // A note calling Friday's mat session hard when the block demoted it to
+  // technical is the calendar and the row disagreeing about the day the athlete
+  // is standing in.
+  const described = repairSportStateLanguage(candidate, intake);
+  if (described.changed) {
+    candidate = described.program;
+    repairs.push({ type: 'v78_sport_state_language' });
   }
 
   return { program: candidate, repaired: repairs.length > 0, repairs };

@@ -58,10 +58,15 @@ export function sportTaperPlan(intake = {}, now = Date.now()) {
   });
 }
 
-// The camp the athlete actually trains, rendered so the taper is visible.
-export function renderCampSchedule(intake = {}, now = Date.now(), options = {}) {
+// What the camp actually is, week by week and day by day. Rendering used to
+// compute this inline, which meant anything else wanting to know whether a
+// given Friday was hard had to work it out again -- and the row notes did
+// exactly that, from the intake, while the schedule demoted the same Friday to
+// technical to hit its hard-contact target. Two derivations, one truth, and the
+// athlete read both. So the table is now a view of this, and so is every check.
+export function campPlanByWeek(intake = {}, now = Date.now(), options = {}) {
   const plan = sportTaperPlan(intake, now);
-  if (!plan) return '';
+  if (!plan) return null;
   const week = sportWeek(intake);
   const planned = arr(intake.available_gym_days).map(dayKey).filter(Boolean);
   const actual = options.workingDays instanceof Map ? options.workingDays : null;
@@ -69,47 +74,56 @@ export function renderCampSchedule(intake = {}, now = Date.now(), options = {}) 
     const days = actual?.get(weekNumber);
     return days && days.size ? [...days] : planned;
   };
-
-  const dayCell = (day, hardTarget, hardBaseline, gym) => {
-    const s = week.find((x) => x.day === day);
-    const parts = [];
-    if (s) {
-      // Hard days beyond the week's target become technical work.
-      const demoted = isHard(s.intensity) && hardTarget < hardBaseline;
-      parts.push(isHard(s.intensity) && !demoted ? 'MMA hard'
-        : isHard(s.intensity) ? 'MMA technical'
-          : isLight(s.intensity) ? 'MMA light' : 'MMA moderate');
-    }
-    if (gym.includes(day)) parts.push('gym');
-    return parts.join(' + ') || 'rest';
-  };
-
-  const lines = ['CAMP SCHEDULE', 'Sport sessions are load. The gym is built around them, and the contact comes down as the fight approaches.', ''];
-  const head = ['', ...WEEKDAYS.map((d) => LABEL[d]), 'hard contact'];
   const eventDay = eventWeekday(intake);
   const eventIndex = eventDay ? WEEKDAYS.indexOf(eventDay) : -1;
   const finalWeek = plan[plan.length - 1]?.week;
 
-  const rows = plan.map((p) => {
+  const out = new Map();
+  for (const p of plan) {
     const gym = gymFor(p.week);
     let remaining = p.hardTarget;
     const isEventWeek = eventIndex >= 0 && p.week === finalWeek && p.state === STATE.COMPETITION_WEEK;
-    const cells = WEEKDAYS.map((d, i) => {
-      // The week that contains Day 0 stops at Day 0. Nothing is scheduled on
-      // the fight itself, and nothing beyond it belongs to this block at all.
-      if (isEventWeek && i === eventIndex) return 'FIGHT DAY';
-      if (isEventWeek && i > eventIndex) return '-';
+    const days = new Map();
+    WEEKDAYS.forEach((d, i) => {
+      if (isEventWeek && i === eventIndex) return days.set(d, { event: true, sport: null, gym: false, clock: '' });
+      if (isEventWeek && i > eventIndex) return days.set(d, { after: true, sport: null, gym: false, clock: '' });
       const clock = isEventWeek ? `D-${eventIndex - i} ` : '';
       const s = week.find((x) => x.day === d);
+      let sport = null;
       if (s && isHard(s.intensity)) {
+        // Hard days beyond the week's target become technical work.
         const keep = remaining > 0;
         if (keep) remaining -= 1;
-        return clock + (keep ? 'MMA hard' : 'MMA technical') + (gym.includes(d) ? ' + gym' : '');
+        sport = keep ? 'hard' : 'technical';
+      } else if (s) {
+        sport = isLight(s.intensity) ? 'light' : 'moderate';
       }
-      return clock + dayCell(d, p.hardTarget, p.hardBaseline, gym);
+      return days.set(d, { sport, gym: gym.includes(d), clock });
     });
-    return [`W${p.week}`, ...cells, `${p.hardTarget} of ${p.hardBaseline}`];
-  });
+    out.set(p.week, { ...p, days });
+  }
+  return out;
+}
+
+const cellText = (d) => {
+  if (d.event) return 'FIGHT DAY';
+  if (d.after) return '-';
+  const parts = [];
+  if (d.sport) parts.push(`MMA ${d.sport}`);
+  if (d.gym) parts.push('gym');
+  return d.clock + (parts.join(' + ') || 'rest');
+};
+
+// The camp the athlete actually trains, rendered so the taper is visible.
+export function renderCampSchedule(intake = {}, now = Date.now(), options = {}) {
+  const byWeek = campPlanByWeek(intake, now, options);
+  if (!byWeek) return '';
+  const plan = [...byWeek.values()];
+
+  const lines = ['CAMP SCHEDULE', 'Sport sessions are load. The gym is built around them, and the contact comes down as the fight approaches.', ''];
+  const head = ['', ...WEEKDAYS.map((d) => LABEL[d]), 'hard contact'];
+
+  const rows = plan.map((p) => [`W${p.week}`, ...WEEKDAYS.map((d) => cellText(p.days.get(d))), `${p.hardTarget} of ${p.hardBaseline}`]);
 
   // Pipes, not padding. This block sits ahead of the week tables so the
   // sport-taper rule can see it, and a normalizer in that region collapses runs
@@ -184,4 +198,88 @@ export function appendCampSchedule(program, intake = {}, now = Date.now()) {
   if (!m) return `${source.replace(/\s*$/, '')}\n\n${schedule}\n`;
   const at = source.indexOf(m[0]);
   return `${source.slice(0, at).replace(/\s*$/, '')}\n\n${schedule}\n${source.slice(at)}`;
+}
+
+// --- the rows must describe the camp the schedule shows ----------------------
+//
+// A delivered fight camp told the athlete every Friday that the gym session was
+// "deliberately low-cost after hard MMA". The camp schedule two hundred lines
+// above said Friday was MMA technical, in all four weeks. Both were written by
+// this engine: the schedule demoted Friday to hit its hard-contact target, and
+// the notes were written from the intake, which still called Friday hard.
+//
+// The athlete reads the note at the top of the session he is about to do. If it
+// tells him he has just done hard sparring when he has not, the entire premise
+// of that session's dose is wrong -- and in a taper week that is the difference
+// between recovering and under-training.
+
+const SPORT_STATE = /\b(?:after|following)\s+(?:a\s+|the\s+)?(hard|technical|moderate|light|easy)\s+(?:MMA|mat|sport|sparring|session|training)\b/gi;
+const NORMALISE = { hard: 'hard', technical: 'technical', moderate: 'moderate', light: 'light', easy: 'light' };
+
+// Walk each week's rows with the day they belong to, carrying the last named
+// day forward the way the tables themselves do. The collector and the repair
+// both go through here, so neither can develop its own opinion about which
+// Friday it is looking at.
+function eachSportRow(program, intake, now, visit) {
+  const byWeek = campPlanByWeek(intake, now);
+  if (!byWeek) return null;
+  const source = String(program || '');
+  let out = source;
+  for (const [week, plan] of byWeek) {
+    const parsed = parseWeek(out, week);
+    if (!parsed) continue;
+    let lastDay = '';
+    let touched = false;
+    const rows = parsed.rows.map((cells) => {
+      const raw = String(cells[parsed.day] || '').trim();
+      if (raw) lastDay = raw;
+      const key = dayKey(lastDay);
+      const day = key && plan.days.get(key);
+      if (!day || !day.sport) return cells;
+      const next = visit({ week, day: key, sport: day.sport, cells });
+      if (next && next !== cells) touched = true;
+      return next || cells;
+    });
+    if (!touched) continue;
+    const body = [parsed.header.join('\t'), ...rows.map((c) => c.join('\t'))].join('\n');
+    out = out.replace(parsed.re, `$1${body}$3`);
+  }
+  return out;
+}
+
+function sportStateMismatches(program, intake, now) {
+  const found = [];
+  eachSportRow(program, intake, now, ({ week, day, sport, cells }) => {
+    for (const m of cells.join(' ').matchAll(SPORT_STATE)) {
+      const said = NORMALISE[m[1].toLowerCase()];
+      if (said !== sport) found.push({ week, day, said, actual: sport, phrase: m[0] });
+    }
+    return cells;
+  });
+  return found;
+}
+
+export function collectSportStateFlags(program, intake = {}, now = Date.now()) {
+  return sportStateMismatches(program, intake, now).map((m) => ({
+    code: 'V78_SPORT_STATE_MISDESCRIBED',
+    week: m.week,
+    day: m.day,
+    detail: `Week ${m.week} ${LABEL[m.day]} tells the athlete the session comes "${m.phrase}", and the camp schedule for that day says MMA ${m.actual}. The schedule is what the block tapered to; the note is describing the camp the athlete was doing before this program changed it. Describe the sport session the athlete is actually being sent to.`,
+  }));
+}
+
+// Rewritten cell by cell, never document-wide. Replacing the matched phrase
+// across the whole program looked simpler and was wrong: "after hard MMA"
+// appears on Tuesday, where the answer is moderate, and on Friday, where it is
+// technical, so fixing Tuesday silently made Friday wrong in a new way. The
+// stress suite caught it; the unit tests, which only ever damaged one day, did
+// not.
+export function repairSportStateLanguage(program, intake = {}, now = Date.now()) {
+  const source = String(program || '');
+  const out = eachSportRow(source, intake, now, ({ sport, cells }) => {
+    const next = cells.map((cell) => String(cell).replace(SPORT_STATE, (phrase) => phrase.replace(/\b(hard|technical|moderate|light|easy)\b/i, sport)));
+    return next.some((c, i) => c !== cells[i]) ? next : cells;
+  });
+  if (out == null || out === source) return { program: source, changed: false };
+  return { program: out, changed: true };
 }

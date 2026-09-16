@@ -2866,6 +2866,27 @@
     "killedLive": "2026-09-04 mma, 2026-09-05 meet_week"
   },
   {
+    "code": "V78_SPORT_STATE_MISDESCRIBED",
+    "modules": [
+      "engine/v78_sport_taper.js",
+      "scripts/stress_test_convergence.mjs"
+    ],
+    "owners": [
+      "collectSportStateFlags"
+    ],
+    "advisory": false,
+    "reachable": true,
+    "repairs": [
+      "repairSportStateLanguage"
+    ],
+    "wired": [
+      "repairSportStateLanguage"
+    ],
+    "tested": true,
+    "stressed": true,
+    "killedLive": ""
+  },
+  {
     "code": "V78_SPORT_TAPER_NOT_ADDRESSED",
     "modules": [
       "engine/v78_sport_taper.js"
@@ -2875,8 +2896,12 @@
     ],
     "advisory": false,
     "reachable": true,
-    "repairs": [],
-    "wired": [],
+    "repairs": [
+      "repairSportStateLanguage"
+    ],
+    "wired": [
+      "repairSportStateLanguage"
+    ],
     "tested": true,
     "stressed": false,
     "killedLive": ""
