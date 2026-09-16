@@ -82,7 +82,11 @@ export function buildProgressionBrief(intake = {}) {
   const improving = ['primary', 'secondary']
     .flatMap((t) => arr(intake[`${t}_goals`]).map(String))
     .filter((g) => !/\b(?:keep|maintain|hold|preserve|retain|maintenance)\b/i.test(g));
-  if (!improving.length || !goalFamilies(intake).length) return '';
+  // Gated on the goals, not on whether our movement vocabulary recognises them.
+  // Requiring a family match made this silent for the footballer, whose stated
+  // improvement goal is repeated-sprint ability -- a goal the vocabulary has no
+  // entry for, and exactly the gap the coach pointed at.
+  if (!improving.length) return '';
   return [
     '* AN IMPROVEMENT GOAL MOVES, OR THE BLOCK SAYS WHY IT DOES NOT.',
     `  These are the goals the athlete asked to improve: ${improving.map((g) => `"${g}"`).join('; ')}.`,
