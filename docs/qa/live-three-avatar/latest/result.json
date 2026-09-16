@@ -1,45 +1,25 @@
 {
-  "timestamp": "2026-09-16T10:04:19.887Z",
+  "timestamp": "2026-09-16T17:20:30.286Z",
   "base": "https://raz-coaching-platform.onrender.com",
-  "head_sha": "79e4ba7237e6fec458797c1f6c716b83a445806a",
-  "runtime": "live49 2026-09-16T10:03:30Z",
+  "head_sha": "b7f432f14c061d56fff57352b093f9b4c04cf0e9",
+  "runtime": "live51 2026-09-16T17:19:36Z",
   "results": [
     {
-      "id": "advanced_hybrid",
-      "ok": false,
-      "error": "build not accepted 422 {\"error\":\"A few details are needed before I can build this accurately.\",\"clarification_required\":true,\"clarifications\":[{\"answer_type\":\"text\",\"required\":true,\"id\":\"weight_class_plan\",\"prompt\":\"Are you making weight for this, and if so what is your weight now against the class limit?\",\"help\":\"Also sa"
-    },
-    {
-      "id": "mma_fight_camp",
-      "job_id": "0921a2593fc601df20f0e747c742df9d",
+      "id": "inseason_footballer",
+      "job_id": "14f5d5a6a7e06d5f5c7f1cba2dfe214d",
       "ok": true,
       "status": "done",
       "stage": "finalizing",
-      "attempt": 2,
-      "detail": "saving program after 2 model call(s)",
+      "attempt": 1,
+      "detail": "saving program after 1 model call(s)",
       "last_seen_status": "done",
       "error": null,
-      "program_chars": 10084,
-      "seconds": 318
-    },
-    {
-      "id": "dual_event_hyrox",
-      "job_id": "7aad620b25c1f8c097421ba99f72ff0d",
-      "ok": false,
-      "status": "timeout",
-      "stage": "generating",
-      "attempt": 1,
-      "detail": "initial generation",
-      "last_seen_status": "pending",
-      "error": null,
-      "program_chars": 0,
-      "seconds": 1927
+      "program_chars": 10043,
+      "seconds": 222
     }
   ],
   "selection": [
-    "advanced_hybrid",
-    "mma_fight_camp",
-    "dual_event_hyrox"
+    "inseason_footballer"
   ],
-  "ok": false
+  "ok": true
 }
