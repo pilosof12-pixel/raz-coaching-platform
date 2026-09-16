@@ -26,12 +26,40 @@ const src = fs.readFileSync(WORKFLOW, 'utf8');
 // cannot pass a definition of the athlete the run will not use.
 function avatars() {
   const out = [];
-  const re = /const\s+(\w+)\s*=\s*\{\s*id:\s*'([a-z_0-9]+)'\s*,\s*intake:\s*Object\.assign\(/g;
+  // Both shapes the workflow uses. Avatars without an event are declared as a
+  // plain object literal, and matching only the Object.assign form meant the
+  // three oldest avatars -- including the most complex intake in the set --
+  // were silently skipped by the tool whose entire job is checking before we
+  // spend. A pre-flight that quietly covers half the run is worse than none,
+  // because it reports PASS either way.
+  const re = /const\s+(\w+)\s*=\s*\{\s*id:\s*'([a-z_0-9]+)'\s*,\s*intake:\s*(?:Object\.assign\(|\{)/g;
   for (const m of src.matchAll(re)) {
     const tail = src.slice(m.index);
+    // The event-bearing avatars carry a JSON literal; the plain ones are
+    // hand-written JS, so read them by balancing braces from the intake.
     const literal = tail.match(/\{"age"[\s\S]*?"qa_diagnostics":\s*true\}/);
-    if (!literal) continue;
-    const intake = JSON.parse(literal[0]);
+    let intake = null;
+    if (literal && literal.index < 400) {
+      intake = JSON.parse(literal[0]);
+    } else {
+      const open = tail.indexOf('intake:');
+      const braceAt = tail.indexOf('{', open);
+      let depth = 0;
+      let end = -1;
+      for (let i = braceAt; i < tail.length; i += 1) {
+        if (tail[i] === '{') depth += 1;
+        else if (tail[i] === '}') { depth -= 1; if (depth === 0) { end = i; break; } }
+      }
+      if (end < 0) continue;
+      const body = tail.slice(braceAt, end + 1)
+        .replace(/consent\(\)/g, '{"accepted":true}')
+        .replace(/\bnow\(\)/g, '""');
+      try {
+        // eslint-disable-next-line no-new-func
+        intake = new Function(`return (${body});`)();
+      } catch { continue; }
+    }
+    if (!intake) continue;
     // Event fields live in the first Object.assign argument, before the literal.
     const head = tail.slice(0, literal.index);
     const dated = head.match(/competition_date\s*:\s*([A-Za-z_0-9]+(?:\([^)]*\))?)/);
