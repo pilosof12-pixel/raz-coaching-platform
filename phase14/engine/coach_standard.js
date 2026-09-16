@@ -24,6 +24,7 @@ export const PROGRAM_TYPE = {
   WEIGHTLIFTING: 'weightlifting',
   TACTICAL_ENDURANCE: 'tactical_endurance',
   COMBAT_CAMP: 'combat_camp',
+  IN_SEASON_TEAM_SPORT: 'in_season_team_sport',
   UNCLASSIFIED: 'unclassified',
 };
 
@@ -54,6 +55,18 @@ export const DIMENSIONS = {
     ['taper_and_competition_week', 0.12],
     ['execution_rules', 0.08],
   ],
+  // Added after the first calibration found three in-season footballer programs
+  // returning zero findings, which meant "no rule looked", not "nothing wrong".
+  // The central problem here is neither building one timed outcome nor tapering
+  // into one event: it is holding qualities around a repeating match cycle.
+  [PROGRAM_TYPE.IN_SEASON_TEAM_SPORT]: [
+    ['match_week_integration', 0.30],
+    ['strength_and_power_maintenance', 0.25],
+    ['fatigue_and_tissue_load', 0.20],
+    ['athlete_specific_availability', 0.10],
+    ['secondary_quality_support', 0.07],
+    ['execution_rules', 0.08],
+  ],
 };
 
 const OLY = /\bsnatch\b|\bclean and jerk\b|\bclean & jerk\b|\bc&j\b/i;
@@ -74,6 +87,13 @@ export function selectProgramType(intake = {}, options = {}) {
     return PROGRAM_TYPE.COMBAT_CAMP;
   }
 
+  // A repeating fixture with no A-priority event to taper into.
+  const fixtures = /\bmd\s*[-+]?\s*\d|\bmatch day\b|\bmatchday\b|\bfixture\b|\bmatch\b|\bgame day\b/i;
+  const inSeason = /in[- ]season/i.test(`${sport} ${String(intake.season_phase || '')} ${primary} ${secondary}`)
+    || fixtures.test(`${String(intake.notes || '')} ${String(intake.sport_schedule ? JSON.stringify(intake.sport_schedule) : '')}`);
+  const tapering = Number.isFinite(options.weeksToEvent) && options.weeksToEvent <= 4;
+  if (inSeason && !tapering && !OLY.test(primary)) return PROGRAM_TYPE.IN_SEASON_TEAM_SPORT;
+
   if (/weightlifting/.test(sport) || OLY.test(primary)) return PROGRAM_TYPE.WEIGHTLIFTING;
 
   if (TIMED_RUN.test(primary) && /ruck|pull[- ]?up|strength|tactical/i.test(secondary)
@@ -91,6 +111,10 @@ export const CAPS = {
   COMPETITION_WEEK_IS_A_BUILD_WEEK: 7.0,
   COMPETITION_WEEK_BUILD_WITH_HARD_CONTACT: 6.5,
   AVAILABLE_DAY_VIOLATION: 7.0,
+  // In-season team sport.
+  HEAVY_LOWER_BODY_ON_MD_MINUS_ONE: 6.5,
+  NO_STRENGTH_EXPOSURE_IN_SEASON: 7.0,
+  FIXTURE_IGNORED: 6.0,
 };
 
 export function weightedScore(type, dimensionScores = {}) {
@@ -185,7 +209,13 @@ export const DEDUCTIONS = {
   CONTINGENCY_CREATES_DUPLICATE: { typical: 0.15, range: [0.15, 0.15] },
   TEXT_CONTRADICTS_TABLE: { typical: 0.08, range: [0.05, 0.10] },
   UNSUPPORTED_ATHLETE_FACT: { typical: 0.10, range: [0.10, 0.10] },
+  // Tiered on the coach's revision: the 0.15 was right for a secondary goal
+  // while the primary was still progressing. A primary goal flat for four weeks
+  // is a materially larger defect, and one with no load anchor at all costs
+  // another 0.15 on top, because nobody can verify what was even prescribed.
   IMPROVEMENT_GOAL_UNCHANGED_ALL_BLOCK: { typical: 0.15, range: [0.15, 0.15] },
+  PRIMARY_GOAL_UNCHANGED_ALL_BLOCK: { typical: 0.35, range: [0.35, 0.35] },
+  LOADING_PRESCRIPTION_UNANCHORED: { typical: 0.15, range: [0.15, 0.15] },
   INTAKE_INTERPRETATION_UNSTATED: { typical: 0.10, range: [0.10, 0.10] },
   REDUNDANT_COMPETITION_WEEK_EXPOSURE: { typical: 0.20, range: [0.20, 0.20] },
   SPORT_SCHEDULE_SILENTLY_CHANGED: { typical: 0.15, range: [0.15, 0.15] },

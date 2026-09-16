@@ -51,6 +51,7 @@ const COST = {
   SPORT_STATE_MISDESCRIBED: 'TEXT_CONTRADICTS_TABLE',
   UNSUPPORTED_ATHLETE_FACT: 'UNSUPPORTED_ATHLETE_FACT',
   IMPROVEMENT_GOAL_FLAT: 'IMPROVEMENT_GOAL_UNCHANGED_ALL_BLOCK',
+  PRIMARY_LOAD_UNANCHORED: 'LOADING_PRESCRIPTION_UNANCHORED',
   TRAINING_DAYS_VS_INTAKE: 'INTAKE_INTERPRETATION_UNSTATED',
   DAY_MINUS_ONE_STACKED: 'REDUNDANT_COMPETITION_WEEK_EXPOSURE',
   SPORT_SCHEDULE_CHANGED_SILENTLY: 'SPORT_SCHEDULE_SILENTLY_CHANGED',
@@ -109,7 +110,18 @@ for (const [file, intake, scored] of CORPUS) {
     if (!distinct.has(key)) distinct.set(key, f);
   }
   const findings = [...distinct.values()];
-  const severity = findings.reduce((n, f) => n + (DEDUCTIONS[COST[f.rule]]?.typical ?? 0), 0);
+  // One defect, however many movements carry it. The coach was explicit that a
+  // flat, unanchored primary progression is 0.50 for the block and not 0.50 per
+  // lift, so these two are charged once each however many rows show them.
+  const ONCE = new Set(['IMPROVEMENT_GOAL_FLAT', 'PRIMARY_LOAD_UNANCHORED']);
+  const charged = new Set();
+  let severity = 0;
+  for (const f of findings) {
+    const key = ONCE.has(f.rule) ? `${f.rule}|${f.tier || ''}` : `${f.rule}|${f.movement || ''}`;
+    if (charged.has(key)) continue;
+    charged.add(key);
+    severity += f.cost ?? DEDUCTIONS[COST[f.rule]]?.typical ?? 0;
+  }
   results.push({ file, type: selectProgramType(intake), scored, findings, severity });
 }
 

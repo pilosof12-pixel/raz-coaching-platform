@@ -164,6 +164,100 @@ export function benchmarks(intake = {}) {
   return out;
 }
 
+
+// "Trap bar deadlift, split squats, sled pushes, hip thrusts and all upper body
+// are comfortable. Heavy back squat is not."
+//
+// A substring search over that field reports back squat as tolerated, because
+// the sentence saying it is not contains its name. The athlete's most dangerous
+// lift read as their safest one, and the brief built from it would have told
+// the model to prescribe the movement the coach capped programs at 6.0 for.
+const NEGATED_CLAUSE = /\b(?:is not|are not|not tolerated|avoid|cannot|can't|no longer|except|but not|other than)\b/i;
+
+export function toleratedFor(name, text) {
+  const needle = String(name || '').toLowerCase().trim();
+  if (!needle) return false;
+  let found = false;
+  for (const clause of String(text || '').split(/(?<=[.;])\s+/)) {
+    if (!clause.toLowerCase().includes(needle)) continue;
+    if (NEGATED_CLAUSE.test(clause)) return false;
+    found = true;
+  }
+  return found;
+}
+
+// Words that say how a movement is loaded, not which movement it is. A weighted
+// pull-up and a pull-up are the same movement at two loads; a snatch pull and a
+// snatch are not the same movement at two loads.
+// Also form words. "Strict Pull-ups" and "Pull-up" are the same movement
+// written twice, and requiring "strict" to appear in the exercise name turned
+// the athlete's own pull-up benchmark into a movement the block had skipped.
+const NOT_THE_MOVEMENT = /^(?:weighted|heavy|light|barbell|dumbbell|db|kettlebell|kb|machine|cable|banded|band|assisted|trap|bar|safety|goblet|strict|pronated|supinated|paused|tempo|controlled)$/i;
+
+// Plurals are the same movement too: pull-ups is pull-up, squats is squat.
+// "Press" must survive, so a word ending in a double s is left alone.
+export function singular(w) {
+  if (/ss$/i.test(w)) return w;
+  if (/es$/i.test(w) && w.length > 4) return w.slice(0, -2);
+  if (/s$/i.test(w) && w.length > 3) return w.slice(0, -1);
+  return w;
+}
+
+export function movementWords(name) {
+  return String(name || '').toLowerCase()
+    .replace(/[^a-z0-9\s-]/g, ' ')
+    .split(/\s+/)
+    .filter((w) => w && !NOT_THE_MOVEMENT.test(w))
+    .map(singular);
+}
+
+// The coach's discriminator for when a substitute covers a benchmarked
+// movement: it must preserve the same primary force action and prime-mover
+// pattern, and be loadable in the same general strength range. Dip and a loaded
+// ring push-up cover Bench Press maintenance on that test. Hip Thrust does not
+// cover Trap Bar Deadlift, because it keeps hip extension and drops the heavy
+// standing pull, the bracing, the grip and the coordinated whole-body force.
+//
+// This is a map of movement FUNCTIONS, not of equivalent exercises. He was
+// explicit that a general equivalence table cannot be built from three reviews,
+// and these eight buckets are the coarsest thing that answers his rule.
+export const MOVEMENT_FUNCTION = [
+  // The competition lifts are their own function. A snatch at 85% is not a
+  // substitute for a snatch pull, which is why the missing pull was his
+  // largest Program 1 finding while the block was full of snatches.
+  ['olympic_lift', /\b(?:snatch|clean and jerk|power clean|hang clean|\bjerk\b)\b/i, /\bpull\b/i],
+  ['loaded_standing_pull', /\b(?:deadlift|snatch pull|clean pull|high pull|rdl|romanian)\b/i, null],
+  ['knee_dominant_squat', /\bsquat\b|\bleg press\b|\bbulgarian\b|\blunge\b|\bstep[- ]?up\b/i, null],
+  ['hip_extension', /\bhip thrust\b|\bglute bridge\b|\bback extension\b|\bgood ?morning\b/i, null],
+  ['horizontal_press', /\bbench press\b|\bdip\b|\bpush[- ]?up\b|\bfloor press\b|\bchest press\b/i, null],
+  ['vertical_press', /\boverhead press\b|\bohp\b|\bpush press\b|\bmilitary press\b|\bshoulder press\b|\bstrict press\b/i, null],
+  ['vertical_pull', /\bpull[- ]?up\b|\bchin[- ]?up\b|\blat pulldown\b|\bmuscle[- ]?up\b/i, null],
+  ['horizontal_pull', /\brow\b|\bface pull\b/i, null],
+];
+
+export function movementFunction(name) {
+  const n = String(name || '');
+  for (const [fn, re, veto] of MOVEMENT_FUNCTION) {
+    if (!re.test(n)) continue;
+    if (veto && veto.test(n)) continue;
+    return fn;
+  }
+  return null;
+}
+
+// Exposed when every word that identifies the movement appears in the exercise.
+// Matching on a single shared token let a Dumbbell Bulgarian Split Squat count
+// as training a Back Squat, which is how a missing benchmark and a mis-read
+// pain field cancelled each other out and produced the right answer by luck.
+export function movementExposed(benchmarkName, exerciseNames) {
+  const words = movementWords(benchmarkName);
+  if (!words.length) return null;
+  return exerciseNames.find((n) => {
+    const hay = String(n).toLowerCase().replace(/[^a-z0-9\s-]/g, ' ').split(/\s+/).map(singular).join(' ');
+    return words.every((w) => hay.includes(w));
+  }) || null;
+}
+
 const TOKENS = /\b(snatch|clean|jerk|squat|deadlift|press|bench|pull|row|dip|push|run|ruck|carry)\b/gi;
 const tokensOf = (s) => [...new Set(String(s).toLowerCase().match(TOKENS) || [])];
 
@@ -201,18 +295,23 @@ export function benchmarkExposure(program, intake = {}) {
     if (!named && !generic) continue;
 
     // Is it tolerated? An active symptom that names this movement removes the
-    // requirement -- that is the coach's first conflict-resolution rule.
-    if (painActive && toks.some((t) => painful.includes(t)) && !tolerated.includes(b.name.toLowerCase())) continue;
+    // requirement -- that is the coach's first conflict-resolution rule. The
+    // tolerated list is read clause by clause, because it also records what the
+    // athlete cannot do.
+    if (painActive && toks.some((t) => painful.includes(t)) && !toleratedFor(b.name, tolerated)) continue;
 
-    // Is it trained? Family match: every significant token of the benchmark
-    // must appear in one exercise name.
-    const exposed = trained.some((n) => toks.every((t) => n.includes(t)));
-    if (exposed) continue;
+    if (movementExposed(b.name, trained)) continue;
 
-    // Is a tolerated close variation trained instead? Same last token -- "Trap
-    // Bar Deadlift" against "Deadlift", "Snatch Pull" against "Clean Pull".
-    const head = toks[toks.length - 1];
-    const cousin = trained.find((n) => n.includes(head));
+    // A substitute preserving the same movement function satisfies a
+    // maintenance requirement. This is the coach's own answer on Bench Press:
+    // Dip and a loaded ring push-up cover it, and he would add no finding.
+    const fn = movementFunction(b.name);
+    const substitute = fn ? trained.find((n) => movementFunction(n) === fn) : null;
+    if (substitute) continue;
+
+    // What stands nearest: something sharing the movement's head word.
+    const head = movementWords(b.name).slice(-1)[0];
+    const cousin = head ? trained.find((n) => n.includes(head)) : null;
     out.push({
       rule: 'BENCHMARK_UNEXPOSED',
       movement: b.name,
@@ -255,23 +354,47 @@ const GOAL_MOVEMENTS = [
 const HOLD_PHRASING = /\b(?:keep|maintain|maintaining|hold|holding|preserve|preserving|retain|retaining|maintenance|without losing|stay(?:ing)? (?:strong|athletic))\b/i;
 
 export function goalFamilies(intake = {}, tiers = ['primary', 'secondary']) {
-  const goals = tiers.flatMap((t) => arr(intake[`${t}_goals`]).map(String));
-  const improving = goals.filter((g) => !HOLD_PHRASING.test(g));
-  const families = [];
-  for (const g of GOAL_MOVEMENTS) {
-    if (!improving.some((text) => g.goal.test(text))) continue;
-    families.push(g.family);
+  return goalFamilyTiers(intake, tiers).map((g) => g.family);
+}
+
+// Which tier a goal sits in decides what a flat block costs: the coach revised
+// his own 0.15 upward for a primary goal, because that 0.15 was set on a
+// secondary pull-up while the athlete's primary 3 km work was still moving.
+export function goalFamilyTiers(intake = {}, tiers = ['primary', 'secondary']) {
+  const out = [];
+  for (const tier of tiers) {
+    for (const text of arr(intake[`${tier}_goals`]).map(String)) {
+      if (HOLD_PHRASING.test(text)) continue;
+      for (const g of GOAL_MOVEMENTS) {
+        if (!g.goal.test(text)) continue;
+        if (out.some((x) => x.family === g.family)) continue;
+        out.push({ family: g.family, tier, goal: text });
+      }
+    }
   }
-  return families;
+  return out;
+}
+
+// A load the athlete can act on: kilos, a percentage of a max, or a pace. "RPE
+// 7" alone is a cap on a load, not a load. The coach's own carve-out: an
+// RPE-selected prescription bounded by checkable intensity rules -- "Week 1 use
+// 80-82% at RPE 7" -- is anchored, because the percentage is the anchor.
+export function loadAnchored(r) {
+  const text = String(r.cells.join(' '));
+  return /\d+(?:\.\d+)?\s*kg\b/i.test(text)
+    || /\d{2,3}\s*%/.test(text)
+    || /\d{1,2}:\d{2}\s*\/?\s*(?:km|mi|\d+\s*m)\b/i.test(text)
+    || /\bbodyweight\b|\bband\b|\bsled\b/i.test(text);
 }
 
 export function improvementGoalFlat(program, intake = {}) {
-  const families = goalFamilies(intake);
-  if (!families.length) return [];
+  const tiered = goalFamilyTiers(intake);
+  if (!tiered.length) return [];
+  const tierOf = (name) => (tiered.find((g) => g.family.test(name)) || {}).tier;
   const byName = new Map();
   for (const r of rows(program)) {
     const n = r.name;
-    if (!families.some((f) => f.test(n))) continue;
+    if (!tierOf(n)) continue;
     if (!byName.has(r.name)) byName.set(r.name, []);
     byName.get(r.name).push(r);
   }
@@ -285,12 +408,22 @@ export function improvementGoalFlat(program, intake = {}) {
     if (!weeks.every((w) => sig(w) === first)) continue;
     // Held is fine when the block says it is held.
     const said = list.some((r) => /maintain|maintenance|held|hold|unchanged|submaximal support/i.test(r.notes));
+    const tier = tierOf(name);
+    const anchored = list.some(loadAnchored);
+    // His decomposition, kept as two parts so they cannot be summed twice:
+    // flat primary progression is 0.35, and the missing load anchor is a
+    // separate 0.15 raised by unanchoredPrimaryLoad. Together they are the 0.50
+    // he quoted, and he was explicit it is 0.50 for the defect, not per lift.
+    const cost = tier === 'primary' ? 0.35 : 0.15;
     out.push({
       rule: 'IMPROVEMENT_GOAL_FLAT',
       movement: name,
       weeks: weeks.length,
+      tier,
+      anchored,
+      cost,
       explained: said,
-      detail: `${name} is identical in all ${weeks.length} weeks (${first.split('~')[0]}) while it serves a stated improvement goal${said ? ', and the note calls it support rather than saying the block deliberately holds it' : ' and nothing says the dose is deliberately held'}.`,
+      detail: `${name} is identical in all ${weeks.length} weeks (${first.split('~')[0]}) while it serves a stated ${tier} improvement goal${said ? ', and the note calls it support rather than saying the block deliberately holds it' : ' and nothing says the dose is deliberately held'}${tier === 'primary' && !anchored ? '. No kilo, percentage or pace appears anywhere in those rows, so neither the athlete nor a grader can tell what was prescribed, let alone whether it progressed' : ''}.`,
     });
   }
   return out;
@@ -399,6 +532,33 @@ export function unsupportedAthleteFact(program, intake = {}) {
 
 // --- all of it ----------------------------------------------------------------
 
+// --- 13. a primary goal in kilos or minutes, prescribed without a number ------
+
+export function unanchoredPrimaryLoad(program, intake = {}) {
+  const tiered = goalFamilyTiers(intake, ['primary']);
+  if (!tiered.length) return [];
+  // Only where the goal itself is a number the athlete is chasing.
+  const targeted = tiered.filter((g) => /\d+\s*(?:kg|km|m\b)|\d{1,2}:\d{2}/i.test(g.goal));
+  if (!targeted.length) return [];
+  const byName = new Map();
+  for (const r of rows(program)) {
+    if (!targeted.some((g) => g.family.test(r.name))) continue;
+    if (!byName.has(r.name)) byName.set(r.name, []);
+    byName.get(r.name).push(r);
+  }
+  const out = [];
+  for (const [name, list] of byName) {
+    if (list.some(loadAnchored)) continue;
+    const goal = targeted.find((g) => g.family.test(name));
+    out.push({
+      rule: 'PRIMARY_LOAD_UNANCHORED',
+      movement: name,
+      detail: `${name} serves the primary goal "${goal.goal}" and is prescribed without a single kilo, percentage or pace in any week. The athlete cannot tell whether Week 1 is 70% or 92%, and nothing in the block lets them or anyone else verify progression toward a target stated as a number.`,
+    });
+  }
+  return out;
+}
+
 export const RULES = [
   consecutiveTrainingDays,
   consecutiveLowerLegDays,
@@ -412,6 +572,7 @@ export const RULES = [
   sportScheduleChangedSilently,
   contingencyCreatesAdjacentDuplicate,
   trainingDaysVsIntake,
+  unanchoredPrimaryLoad,
 ];
 
 export function gradeProgram(program, intake = {}) {

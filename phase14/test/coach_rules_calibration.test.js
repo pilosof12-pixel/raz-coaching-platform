@@ -3,6 +3,8 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 
 import {
+  movementFunction, movementExposed, toleratedFor, goalFamilyTiers,
+  loadAnchored, unanchoredPrimaryLoad,
   gradeProgram, consecutiveTrainingDays, consecutiveLowerLegDays,
   benchmarkExposure, improvementGoalFlat, intensificationBand,
   goalSpeedProgression, unsupportedAthleteFact, ruckDistanceBelowTolerance,
@@ -209,15 +211,77 @@ test('the encoded rules reproduce fifteen of the coach eighteen findings', () =>
   assert.equal(total, 15);
 });
 
-// The one disagreement, kept visible rather than tuned away. Bench Press is
-// benchmarked at 110 kg x 3 and the intake calls all upper body comfortable, so
-// his own exposure rule demands it; the block trains Dip, Ring Push-up and
-// Prowler Push instead. That is the same shape as his 0.40 trap bar finding,
-// applied to the upper body, and he did not make it. Either he missed it or his
-// family-substitution clause covers it -- a question for him, not something to
-// silence here.
-test('the one finding we raise and the coach did not is still raised', () => {
+// He answered the Bench Press question: Dip and a loaded ring push-up cover
+// pressing maintenance here, and he would add no finding. The discriminator is
+// whether the substitute keeps the same primary force action and prime movers
+// and can be loaded in the same range -- and, crucially, whether a benchmarked
+// tolerated exercise preserves MORE of the pattern at acceptable cost. Hip
+// Thrust fails that second half against the trap bar; Dip passes it against the
+// bench.
+test('a substitute with the same movement function covers a maintenance benchmark', () => {
   const camp = benchmarkExposure(P3(), FIGHTER).map((f) => f.movement);
-  assert.ok(camp.includes('Bench Press'));
-  assert.equal(camp.length, 2, 'exactly two, so a third would be a new disagreement');
+  assert.deepEqual(camp, ['Trap Bar Deadlift'], 'the trap bar stands alone now');
+  assert.equal(movementFunction('Bench Press'), movementFunction('Dip'));
+  assert.equal(movementFunction('Bench Press'), movementFunction('Ring Push-up'));
+  assert.notEqual(movementFunction('Trap Bar Deadlift'), movementFunction('Barbell Hip Thrust'));
+  // A snatch is not a substitute for a snatch pull, which is why a block full
+  // of snatches still earned his largest Program 1 finding.
+  assert.notEqual(movementFunction('Snatch Pull'), movementFunction('Snatch'));
+  assert.equal(movementFunction('Pallof Press'), null, 'not every press is a press');
+});
+
+// The tolerated field records what the athlete cannot do as well as what they
+// can. A substring search over "...are comfortable. Heavy back squat is not."
+// reported the athlete's most provocative lift as their safest.
+test('a negated clause in the tolerated list is not an endorsement', () => {
+  const text = FIGHTER.pain.tolerated_movements;
+  assert.equal(toleratedFor('Back Squat', text), false);
+  assert.equal(toleratedFor('Trap bar deadlift', text), true);
+});
+
+// Matching on one shared token let a Dumbbell Bulgarian Split Squat count as
+// training a Back Squat. That, together with the negation bug above, produced
+// the right answer for Program 3 by two mistakes cancelling.
+test('a movement is exposed only when every identifying word is present', () => {
+  assert.equal(movementExposed('Back Squat', ['dumbbell bulgarian split squat']), null);
+  assert.equal(movementExposed('Snatch Pull', ['snatch', 'clean and jerk']), null);
+  // Load and form words do not identify a movement, and plurals are the same.
+  assert.ok(movementExposed('Weighted Pull-up', ['pull-up']));
+  assert.ok(movementExposed('Strict Pull-ups', ['pull-up']));
+  assert.ok(movementExposed('Deadlift', ['deadlift']));
+});
+
+// His revision: 0.15 was set on a secondary pull-up while the primary work was
+// still moving. A flat primary goal costs 0.35, and a primary goal with no load
+// anchor at all costs another 0.15 -- 0.50 for the defect, not per lift.
+test('a flat primary goal costs more than a flat secondary one', () => {
+  const lifter = { ...C.weightlifter_peak, event_type: 'strength_meet' };
+  const flat = improvementGoalFlat(read('run96_weightlifter_intensification.txt'), lifter);
+  assert.equal(flat.length, 2);
+  for (const f of flat) {
+    assert.equal(f.tier, 'primary');
+    assert.equal(f.cost, 0.35);
+    assert.equal(f.anchored, false);
+  }
+  const secondary = improvementGoalFlat(P2(), TACTICAL);
+  assert.equal(secondary[0].tier, 'secondary');
+  assert.equal(secondary[0].cost, 0.15);
+});
+
+test('a primary goal stated in kilos prescribed without a number is found', () => {
+  const lifter = { ...C.weightlifter_peak, event_type: 'strength_meet' };
+  const flags = unanchoredPrimaryLoad(read('run96_weightlifter_intensification.txt'), lifter);
+  assert.deepEqual(flags.map((f) => f.movement).sort(), ['Clean and Jerk', 'Snatch']);
+  // A percentage is an anchor, which is his own carve-out for RPE-selected work
+  // bounded by checkable intensity rules.
+  assert.equal(loadAnchored({ cells: ['Mon', 'Snatch', 'RPE-selected load', '5', '2', '3 min', '8', '82-85% of current max'] }), true);
+  assert.equal(loadAnchored({ cells: ['Mon', 'Snatch', 'RPE-selected load', '5', '2', '3 min', '8', 'crisp doubles'] }), false);
+  // The block he scored 8.2 prescribes kilos, so it raises nothing here.
+  assert.deepEqual(unanchoredPrimaryLoad(P1(), LIFTER), []);
+});
+
+test('a goal knows which tier it came from', () => {
+  const tiers = goalFamilyTiers(TACTICAL);
+  assert.equal(tiers.find((t) => t.family.test('Run')).tier, 'primary');
+  assert.equal(tiers.find((t) => t.family.test('Pull-up')).tier, 'secondary');
 });

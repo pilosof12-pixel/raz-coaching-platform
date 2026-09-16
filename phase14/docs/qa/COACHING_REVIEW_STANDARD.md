@@ -11,6 +11,32 @@ Subtracting the finding costs from 10 does not (error 0.15 / 0.80 / 0.15). The
 weighted dimension model is the scoring method; finding costs are severity
 markers that set a dimension's score, and must not be subtracted again.
 
+## Revisions after the first calibration
+
+Three questions were put back to the coach after encoding this file and grading
+the 22 programs delivered so far. His answers are folded into the sections
+below and recorded here so the change is traceable.
+
+**Bench Press in the fight camp — his answer: the substitute covers it.** Dip
+and a loaded ring push-up satisfy pressing maintenance; no finding is added. The
+discriminator, now encoded as `MOVEMENT_FUNCTION` in `engine/coach_rules.js`: a
+substitute covers a benchmarked movement when it preserves the same primary
+force action and prime-mover pattern, can be loaded in the same general strength
+range, and reduces recovery cost. But where a benchmarked tolerated exercise
+preserves *more* of the original force pattern at acceptable cost, it is
+preferred. Hip Thrust keeps hip extension and drops the heavy standing pull, the
+bracing, the grip and the coordinated whole-body force, so it may not leapfrog a
+tolerated Trap Bar Deadlift. Dip is not leapfrogging anything.
+
+**In-season team sport — his answer: it needs a fourth dimension set.** Added
+below. Forcing a footballer into tactical endurance or combat camp distorts the
+scoring, because the problem is neither building one timed outcome nor tapering
+into one event.
+
+**A flat primary goal — his answer: it costs materially more than 0.15.** The
+0.15 was set on Program 2's secondary weighted pull-up while the primary 3 km
+work was still progressing. Revised scale below.
+
 ## Dimensions
 
 The program type selects the dimension set. Do not use all dimensions for every
@@ -75,6 +101,39 @@ than building new gym qualities.
 SOFT. Phase 1 evidence: Program 3. Source hierarchy: Articles 52-102 (combat
 stress cost, competition week, readiness layers), then Mujika for taper logic,
 then Articles 1-52 for general strength maintenance.
+
+### In-season team sport program
+
+Use when all are true: the athlete has at least one competitive fixture per week
+or a repeating match cycle; the block contains MD, MD-minus or MD-plus structure
+or equivalent fixture-relative scheduling; there is no single A-priority event
+inside the four weeks requiring a taper; and gym work exists mainly to maintain
+strength, power, robustness or availability around fixtures.
+
+| Dimension | Weight | Definition |
+|---|---:|---|
+| Match week integration and day placement | 30% | Whether high neural, high eccentric and high lower-body gym stress is positioned relative to MD, MD-1 and MD+1 without compromising match readiness. |
+| Strength and power maintenance | 25% | Whether benchmarked strength and explosive qualities receive direct low-volume exposure instead of disappearing during the season. |
+| Fatigue and tissue load management | 20% | Whether field training, match load and gym work are treated as one recovery budget rather than independent sessions. |
+| Athlete specific modification and availability | 10% | Whether injury history, minutes played, fixture congestion and actual available gym days alter the plan. |
+| Secondary physical quality support | 7% | Whether sprint exposure, posterior chain or upper-body strength are retained without competing with match preparation. |
+| Execution rules and autoregulation | 8% | The universal definition. |
+
+SOFT. Source: Articles 1-52, where sport volume rises and redundant gym volume
+is cut first while key strength exposures are preserved.
+
+Caps for this type:
+
+| Cap | Trigger | Value |
+|---|---|---:|
+| Mandatory heavy lower body on MD-1 — HARD | Any squat, deadlift, split squat or comparable lower-body lift at RPE 7 or above for 2 or more work sets on the day before a match. | 6.5 |
+| No direct strength or power exposure anywhere in a four-week in-season block despite maintenance goals — HARD | | 7.0 |
+| Program ignores a stated weekly fixture and schedules as though no match exists — HARD | | 6.0 |
+| Same gym loading regardless of minutes played — SOFT | **Not yet observed**; no fixed deduction until the football programs are scored. | — |
+
+He was explicit that no further in-season detail should be encoded until those
+programs are actually scored, "otherwise we are back to theorising before
+calibration."
 
 ### Universal dimension
 
@@ -271,9 +330,27 @@ RPE cap; the block is not intended to improve that quality.
 A defect when ALL: the quality is a primary or secondary improvement goal; the
 athlete completes the work below the RPE cap; no symptom, taper or schedule
 limitation is given; and load, reps, sets, duration and density all remain
-unchanged for at least three consecutive weeks. Typical cost 0.15. Phase 1
-basis: Program 2's Weighted Pull up, +22.5 kg 3x4 for four weeks against a +30
-kg x 5 benchmark and a stated pull up goal.
+unchanged for at least three consecutive weeks.
+
+Cost depends on the tier, revised after the first calibration:
+
+| Situation | Cost |
+|---|---:|
+| Secondary improvement goal flat for four weeks | 0.15 |
+| Primary improvement goal flat for four weeks, load objectively prescribed | 0.35 |
+| Primary improvement goal flat with load only "RPE-selected" against a named target | 0.50 total (0.35 + 0.15) |
+
+The 0.50 is for the defect, **not per lift**. A block prescribing Snatch and
+Clean and Jerk both at RPE-selected load, identical in all four weeks, against
+primary goals of 120 kg and 150 kg, is 0.50 in total.
+
+"RPE-selected" is not itself a defect when the load is bounded by checkable
+intensity rules -- "Week 1 use 80-82% at RPE 7, Week 2 83-85% at RPE 7.5" -- 
+because the percentage is the anchor. What fails is a prescription from which
+neither the athlete nor a grader can determine whether Week 1 was 70% or 92%.
+
+Phase 1 basis: Program 2's Weighted Pull up, +22.5 kg 3x4 for four weeks against
+a +30 kg x 5 benchmark, which is the 0.15 case.
 
 **Session duration capped but ruck distance cannot grow.** If ruck load is goal
 specific and already tolerated, duration is fixed, and more distance would
