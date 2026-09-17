@@ -5,6 +5,7 @@ import fs from 'node:fs';
 import {
   sprintSpeedExposure, sprintDistanceSpecificity, repeatedSprintExposure,
   eccentricHamstringTiming, promisedMovementAbsent, sprintBenchmark, restSecondsOf,
+  repeatedSprintProgression,
 } from '../engine/coach_rules.js';
 import { overallScore, PROGRAM_TYPE } from '../engine/coach_standard.js';
 
@@ -130,5 +131,43 @@ test('the promised-movement rule stays quiet on the other five programs', () => 
     'run81_tactical_3k.txt', 'run113_mma_camp_delivered.txt', 'run101_weightlifter_peak.txt',
     'run81_advanced_hybrid.txt', 'weightlifter_peak-program.txt']) {
     assert.deepEqual(promisedMovementAbsent(read(f)), [], f);
+  }
+});
+
+// His answer on repeated-sprint ability came in two halves and only the first
+// was encoded. A block can contain a qualifying exposure and still repeat it
+// unchanged for four weeks, which is the same defect as any other flat
+// improvement goal.
+const HEAD2 = 'Day\tExercise\tWeight\tSets\tReps\tRest\tTarget RPE\tNotes\tResults';
+const rsaBlock = (perWeek) => ['A block.', '',
+  ...[1, 2, 3, 4].map((w) => [`START_WEEK${w}_TSV`, HEAD2, perWeek(w), `END_WEEK${w}_TSV`, ''].join('\n'))].join('\n');
+
+test('a repeated-sprint exposure that never moves is a defect', () => {
+  const flat = rsaBlock(() => 'Thu\tRepeated Sprint\t95%\t4\t20 m\t30 s\t9\tIncomplete recovery.\t');
+  const flags = repeatedSprintProgression(flat, FOOTBALLER);
+  assert.equal(flags.length, 1);
+  assert.match(flags[0].detail, /nothing about the exposure moves by Week 3/);
+});
+
+// Any one of his three checkable variables is enough. The other two he listed
+// -- average sprint time, and decrement while peak holds -- need timed results
+// a program cannot contain, so their absence is not read as a failure.
+test('one variable moving by Week 3 is enough', () => {
+  const byReps = rsaBlock((w) => `Thu\tRepeated Sprint\t95%\t${w < 3 ? 4 : 5}\t20 m\t30 s\t9\tIncomplete recovery.\t`);
+  const byRest = rsaBlock((w) => `Thu\tRepeated Sprint\t95%\t4\t20 m\t${w < 3 ? 30 : 26} s\t9\tIncomplete recovery.\t`);
+  const byDistance = rsaBlock((w) => `Thu\tRepeated Sprint\t95%\t4\t${w < 3 ? 20 : 23} m\t30 s\t9\tIncomplete recovery.\t`);
+  for (const [name, p] of [['reps', byReps], ['recovery', byRest], ['distance', byDistance]]) {
+    assert.deepEqual(repeatedSprintProgression(p, FOOTBALLER), [], name);
+  }
+});
+
+// All four delivered footballer blocks progress something, which matches his
+// own reading: A "barely progresses", B's prowler volume moves, C moves
+// recovery, and the live block adds a repetition. What separates them is the
+// exposure definition, not the progression.
+test('every delivered footballer block progresses its repeated-sprint work', () => {
+  for (const f of ['inseason_footballer-program.txt', 'run100_inseason_footballer.txt',
+    'run101_inseason_footballer.txt', 'run115_inseason_footballer.txt']) {
+    assert.deepEqual(repeatedSprintProgression(read(f), FOOTBALLER), [], f);
   }
 });

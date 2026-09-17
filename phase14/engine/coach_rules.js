@@ -626,6 +626,7 @@ export const RULES = [
   repeatedSprintExposure,
   eccentricHamstringTiming,
   promisedMovementAbsent,
+  repeatedSprintProgression,
 ];
 
 export function gradeProgram(program, intake = {}) {
@@ -1135,6 +1136,10 @@ export const RULE_INPUTS = {
     governs: RSA_GOAL.test(`${arr(i.secondary_goals).join(' ')} ${arr(i.primary_goals).join(' ')}`),
     found: has(rows(p)),
   }),
+  repeatedSprintProgression: (p, i) => ({
+    governs: RSA_GOAL.test(`${arr(i.secondary_goals).join(' ')} ${arr(i.primary_goals).join(' ')}`),
+    found: has(rows(p).filter((r) => (SPRINT_NAME.test(r.name) || /prowler|sled/i.test(r.name)) && restSecondsOf(r.rest) != null)),
+  }),
   unanchoredPrimaryLoad: (p, i) => ({
     governs: has(goalFamilyTiers(i, ['primary']).filter((g) => /\d+\s*(?:kg|km|m\b)|\d{1,2}:\d{2}/i.test(g.goal))),
     found: has(rows(p)),
@@ -1174,4 +1179,46 @@ export function gradeWithCoverage(program, intake = {}) {
     if (!r.found) blind.push({ rule: fn.name, why: 'governs this athlete but found nothing in the program to judge' });
   }
   return { findings, blind };
+}
+
+// --- 18. repeated-sprint work has to move, not only exist --------------------
+//
+// His answer came in two halves and only the first was encoded. A block can
+// contain a qualifying repeated-sprint exposure and still repeat it unchanged
+// for four weeks, which is the same defect as any other flat improvement goal.
+//
+// By Week 3 one variable must improve: one more repetition, 10% more distance,
+// or 10% less recovery. Week 4 may consolidate. The other two he listed --
+// average sprint time, and decrement while peak is held -- need timed results
+// the program cannot contain, so they are not encoded and their absence is not
+// read as a failure.
+
+export function repeatedSprintProgression(program, intake = {}) {
+  const goals = `${arr(intake.secondary_goals).join(' ')} ${arr(intake.primary_goals).join(' ')}`;
+  if (!RSA_GOAL.test(goals)) return [];
+  const candidates = rows(program).filter((r) => {
+    if (!SPRINT_NAME.test(r.name) && !/prowler|sled/i.test(r.name)) return false;
+    const rest = restSecondsOf(r.rest);
+    return rest != null && rest < 90 && (r.sets ?? 0) >= 3;
+  });
+  const byWeek = new Map();
+  for (const r of candidates) {
+    const m = (String(r.reps).match(/(\d+(?:\.\d+)?)\s*m\b(?!in)/i) || [])[1];
+    const cur = { reps: r.sets ?? 0, metres: m ? Number(m) : null, rest: restSecondsOf(r.rest) };
+    const best = byWeek.get(r.week);
+    // One exposure per week: the densest one is the block's answer.
+    if (!best || cur.reps > best.reps || (cur.rest != null && best.rest != null && cur.rest < best.rest)) byWeek.set(r.week, cur);
+  }
+  const w1 = byWeek.get(1);
+  const upTo3 = [2, 3].map((w) => byWeek.get(w)).filter(Boolean);
+  if (!w1 || !upTo3.length) return [];
+  const improved = upTo3.some((w) => w.reps >= w1.reps + 1
+    || (w.metres != null && w1.metres != null && w.metres >= w1.metres * 1.10)
+    || (w.rest != null && w1.rest != null && w.rest <= w1.rest * 0.90));
+  if (improved) return [];
+  const show = (w) => (w ? `${w.reps} x ${w.metres ?? '?'} m / ${w.rest ?? '?'} s` : '-');
+  return [{
+    rule: 'REPEATED_SPRINT_NOT_PROGRESSING',
+    detail: `Improving repeated-sprint ability is a stated goal and nothing about the exposure moves by Week 3: ${[1, 2, 3].map((w) => `W${w} ${show(byWeek.get(w))}`).join(', ')}. One variable is enough -- a repetition, 10% more distance, or 10% less recovery -- and Week 4 may consolidate.`,
+  }];
 }
