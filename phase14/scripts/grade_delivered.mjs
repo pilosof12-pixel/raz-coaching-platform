@@ -23,6 +23,7 @@ import { collectClaimIntegrityFlags } from '../engine/v93_claim_integrity.js';
 import { collectSportStateFlags } from '../engine/v78_sport_taper.js';
 import { DEDUCTIONS, selectProgramType } from '../engine/coach_standard.js';
 import { CORPUS, readFixture } from './corpus.mjs';
+import { RACE_BLOCK_RULES } from '../engine/coach_race_block_rules.js';
 
 const root = path.dirname(fileURLToPath(import.meta.url));
 const fx = readFixture;
@@ -46,6 +47,9 @@ const COST = {
   TRAINING_DAYS_VS_INTAKE: 'INTAKE_INTERPRETATION_UNSTATED',
   DAY_MINUS_ONE_STACKED: 'REDUNDANT_COMPETITION_WEEK_EXPOSURE',
   SPORT_SCHEDULE_CHANGED_SILENTLY: 'SPORT_SCHEDULE_SILENTLY_CHANGED',
+  TAPER_INTRODUCES_POWER_VOLUME: 'TAPER_INTRODUCES_NEW_EMPHASIS',
+  BORROWED_SPORT_LANGUAGE: 'COACHING_LANGUAGE_FROM_ANOTHER_SPORT',
+  MODALITY_SUBSTITUTION_KEEPS_THE_NUMBER: 'PRESCRIPTION_SURVIVES_MODALITY_CHANGE',
 };
 
 const seenFile = new Set();
@@ -64,7 +68,7 @@ for (const [file, intake, scored] of CORPUS) {
     SOURCE.recoveryDayLock, SOURCE.pullingVolumeCap, SOURCE.overheadPressCutoff,
     SOURCE.competitionWeekIntensityCap, SOURCE.footworkPlyoInterlock,
     SOURCE.speedSessionPlyoLockout, SOURCE.speedSessionSeparation,
-    SOURCE.mileageTier, SOURCE.wrestlingLowBackLoad];
+    SOURCE.mileageTier, SOURCE.wrestlingLowBackLoad, ...RACE_BLOCK_RULES];
   const raw = [
     ...gradeProgram(program, intake),
     ...sourceRules.flatMap((fn) => { try { return fn(program, intake); } catch { return []; } }),

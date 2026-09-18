@@ -91,18 +91,50 @@ const longestRun = (days) => longestRunDays(days).length;
 
 // --- 1. consecutive training days, flexible availability ----------------------
 
+// Competition week is counted from the event, so its rows are labelled "Day -4"
+// rather than "Thu" and weekdayKey correctly returns nothing for them. That made
+// this rule blind to exactly the week where stacking days matters most: the
+// Hyrox block trained Day -4, -3, -2 and -1 back to back and the rule reported
+// nothing, because as far as it could see competition week had no days at all.
+// The coach charged it 0.25.
+const COUNTDOWN = /^\s*day\s*-\s*(\d+)\s*$/i;
+function countdownRun(labels) {
+  const n = [...new Set(labels.map((l) => Number((COUNTDOWN.exec(String(l || '')) || [])[1]))
+    .filter(Number.isFinite))].sort((a, b) => b - a);
+  if (!n.length) return [];
+  let best = [n[0]];
+  let run = [n[0]];
+  for (let i = 1; i < n.length; i += 1) {
+    if (n[i - 1] - n[i] === 1) run.push(n[i]);
+    else run = [n[i]];
+    if (run.length > best.length) best = [...run];
+  }
+  return best.map((x) => `day -${x}`);
+}
+
 export function consecutiveTrainingDays(program, intake = {}) {
   if (String(intake.gym_availability_mode || '').toLowerCase() !== 'flexible') return [];
   const limit = THRESHOLDS.MAX_CONSECUTIVE_LIFTING_DAYS;
   const byWeek = new Map();
+  const labelsByWeek = new Map();
   for (const r of rows(program)) {
+    if (!labelsByWeek.has(r.week)) labelsByWeek.set(r.week, []);
+    labelsByWeek.get(r.week).push(r.dayLabel);
     if (!r.day) continue;
     if (!byWeek.has(r.week)) byWeek.set(r.week, new Set());
     byWeek.get(r.week).add(r.day);
   }
+  // A week whose rows carry no weekday at all is a countdown week; read its run
+  // from the countdown instead.
+  for (const [week, labels] of labelsByWeek) {
+    if (byWeek.has(week)) continue;
+    const run = countdownRun(labels);
+    if (run.length) byWeek.set(week, new Set(run));
+  }
   const out = [];
   for (const [week, days] of byWeek) {
-    const streak = longestRunDays(days);
+    const countdown = [...days].every((d) => /^day -\d+$/.test(d));
+    const streak = countdown ? [...days] : longestRunDays(days);
     if (streak.length > limit) {
       out.push({
         rule: 'CONSECUTIVE_TRAINING_DAYS',

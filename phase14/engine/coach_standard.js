@@ -204,7 +204,10 @@ export const DEDUCTIONS = {
   PROGRESSION_SHORT_OF_REQUIRED_INTENSITY: { typical: 0.38, range: [0.25, 0.40] },
   TOLERATED_BASELINE_NOT_REBUILT: { typical: 0.50, range: [0.40, 0.50] },
   GOAL_DISTANCE_REDUCED_DESPITE_TOLERANCE: { typical: 0.25, range: [0.25, 0.25] },
-  AVOIDABLE_CONSECUTIVE_DAY_CLUSTERING: { typical: 0.20, range: [0.10, 0.20] },
+  // The ceiling moved from 0.20 to 0.25 when he charged four consecutive days
+  // in competition week on run #116 -- the same defect, costing more when it
+  // lands in the week that matters most.
+  AVOIDABLE_CONSECUTIVE_DAY_CLUSTERING: { typical: 0.20, range: [0.10, 0.25] },
   ACCESSORY_LOW_MARGINAL_RETURN: { typical: 0.18, range: [0.15, 0.20] },
   CONTINGENCY_CREATES_DUPLICATE: { typical: 0.15, range: [0.15, 0.15] },
   TEXT_CONTRADICTS_TABLE: { typical: 0.08, range: [0.05, 0.10] },
@@ -219,6 +222,12 @@ export const DEDUCTIONS = {
   INTAKE_INTERPRETATION_UNSTATED: { typical: 0.10, range: [0.10, 0.10] },
   REDUNDANT_COMPETITION_WEEK_EXPOSURE: { typical: 0.20, range: [0.20, 0.20] },
   SPORT_SCHEDULE_SILENTLY_CHANGED: { typical: 0.15, range: [0.15, 0.15] },
+  // From his review of run #116, the first program he scored that none of the
+  // above was written from. His words on the first of these: "Going from 2 to
+  // 17 power sets is not preservation. It is a new training emphasis."
+  TAPER_INTRODUCES_NEW_EMPHASIS: { typical: 0.45, range: [0.45, 0.45] },
+  COACHING_LANGUAGE_FROM_ANOTHER_SPORT: { typical: 0.10, range: [0.10, 0.10] },
+  PRESCRIPTION_SURVIVES_MODALITY_CHANGE: { typical: 0.20, range: [0.20, 0.20] },
 };
 
 // What a finding actually costs the published score, which is the thing worth
