@@ -97,6 +97,14 @@ const DICTIONARY_LIST = [
   "Close-Grip Bench Press", "Overhead Press", "Standing Barbell Overhead Press",
   "Push Press", "Push Jerk", "Split Jerk", "Barbell Row", "Pendlay Row",
   "Bent-Over Row", "Power Clean", "Hang Clean", "Clean", "Snatch",
+  // The Olympic pulls. Their absence was not a style choice: a weightlifter
+  // whose intake benchmarks a 130 kg Snatch Pull could not be prescribed one,
+  // because the name was not in the engine's vocabulary and every attempt to
+  // write it was rejected as a hallucinated exercise. That is the likeliest
+  // reason the coach's most expensive finding -- a benchmarked movement
+  // trained nowhere in the block -- kept recurring on weightlifting programs.
+  "Snatch Pull", "Clean Pull", "Snatch High Pull", "Clean High Pull",
+  "Snatch Deadlift", "Clean Deadlift", "Power Snatch", "Hang Snatch",
   "Power Snatch", "Hang Snatch", "Clean and Jerk", "Clean and Press",
   "Hip Thrust", "Barbell Hip Thrust", "Good Morning", "Front Rack Lunge",
   "Zercher Squat", "Barbell Curl", "Landmine Press", "Landmine Row",
@@ -347,6 +355,10 @@ const EQUIP_LIST = [
   ["Push Jerk", BARBELL_NORACK], ["Barbell Row", BARBELL_NORACK],
   ["Pendlay Row", BARBELL_NORACK], ["Bent-Over Row", BARBELL_NORACK],
   ["Power Clean", BARBELL_NORACK], ["Clean", BARBELL_NORACK], ["Snatch", BARBELL_NORACK],
+  ["Snatch Pull", BARBELL_NORACK], ["Clean Pull", BARBELL_NORACK],
+  ["Snatch High Pull", BARBELL_NORACK], ["Clean High Pull", BARBELL_NORACK],
+  ["Snatch Deadlift", BARBELL_NORACK], ["Clean Deadlift", BARBELL_NORACK],
+  ["Power Snatch", BARBELL_NORACK], ["Hang Snatch", BARBELL_NORACK],
   ["Clean and Jerk", BARBELL_NORACK], ["Hip Thrust", ["barbell", "plates", "bench"]],
   ["Barbell Hip Thrust", ["barbell", "plates", "bench"]], ["Good Morning", BARBELL_NORACK],
   ["Barbell Lunge", BARBELL_NORACK], ["Barbell Curl", ["barbell", "plates"]],

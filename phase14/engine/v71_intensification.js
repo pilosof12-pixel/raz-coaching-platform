@@ -15,9 +15,9 @@
 // never snatch or clean and jerk frequency.
 
 import { parseWeek } from './v34_workload_accounting.js';
+import { isClassicLift } from './classic_lifts.js';
 import { STATE, stateForWeek, competitionProfile } from './v68_competition_state.js';
 
-const CLASSIC = /\b(?:snatch|clean and jerk|clean & jerk|power clean|power snatch|hang (?:snatch|clean)|jerk|clean)\b/i;
 // Trimmed before the competition lifts, in this order.
 // Secondary pressing and squat support were structurally immune to the trim:
 // neither appears below, and the block-level volume target is always met by
@@ -89,7 +89,7 @@ function weekFacts(program, week) {
     if (!name || isWarmup(name)) return;
     const n = firstInt(cells[parsed.sets]) || 0;
     sets += n;
-    const classic = CLASSIC.test(name);
+    const classic = isClassicLift(name);
     if (classic) classicSets += n;
     rows.push({ index, name, sets: n, classic });
   });
@@ -190,7 +190,7 @@ export function repairIntensification(program, intake = {}, now = Date.now()) {
       let changed = false;
       for (const cells of rows) {
         const name = String(cells[parsed.exercise] || '').trim();
-        if (!name || isWarmup(name) || !CLASSIC.test(name)) continue;
+        if (!name || isWarmup(name) || !isClassicLift(name)) continue;
         const max = maxFor(name, maxes);
         if (!max) continue;
         const load = String(cells[parsed.load] || '');

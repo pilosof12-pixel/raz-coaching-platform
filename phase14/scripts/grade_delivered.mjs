@@ -22,21 +22,11 @@ import * as SOURCE from '../engine/source_generator_rules.js';
 import { collectClaimIntegrityFlags } from '../engine/v93_claim_integrity.js';
 import { collectSportStateFlags } from '../engine/v78_sport_taper.js';
 import { DEDUCTIONS, selectProgramType } from '../engine/coach_standard.js';
+import { CORPUS, readFixture } from './corpus.mjs';
 
 const root = path.dirname(fileURLToPath(import.meta.url));
-const fx = (f) => fs.readFileSync(path.join(root, '..', 'test', 'fixtures', f), 'utf8');
-const json = (f) => JSON.parse(fx(f));
+const fx = readFixture;
 const detail = process.argv.includes('--detail');
-
-const A = json('acceptance_intakes.json');
-const C = json('competition_avatars.json');
-const H = json('hard_avatars.json');
-const day = 86400000;
-const saturday = (w) => {
-  const d = new Date(Date.now() + w * 7 * day);
-  d.setUTCDate(d.getUTCDate() + ((6 - d.getUTCDay() + 7) % 7));
-  return d.toISOString().slice(0, 10);
-};
 
 // Which deduction each rule corresponds to, so severity is his arithmetic and
 // not ours.
@@ -57,37 +47,6 @@ const COST = {
   DAY_MINUS_ONE_STACKED: 'REDUNDANT_COMPETITION_WEEK_EXPOSURE',
   SPORT_SCHEDULE_CHANGED_SILENTLY: 'SPORT_SCHEDULE_SILENTLY_CHANGED',
 };
-
-const LIFTER = { ...C.weightlifter_peak, competition_date: saturday(8), event_type: 'strength_meet', event_priority: 'A' };
-const MEET = { ...C.weightlifter_meet_week, competition_date: saturday(1) };
-const FIGHTER = { ...C.mma_fight_camp, competition_date: saturday(3) };
-
-// Coach-scored programs first, so the known answers sit at the top of the report.
-const CORPUS = [
-  ['run101_weightlifter_peak.txt', LIFTER, 8.2],
-  ['run81_tactical_3k.txt', A.tactical_3k, 7.6],
-  ['run113_mma_camp_delivered.txt', FIGHTER, 8.9],
-  ['run81_advanced_hybrid.txt', A.advanced_hybrid, 7.9],
-  ['advanced_hybrid-program.txt', A.advanced_hybrid, null],
-  ['run88_advanced_hybrid.txt', A.advanced_hybrid, null],
-  ['run77_advanced_hybrid_defective.txt', A.advanced_hybrid, null],
-  ['tactical_3k-program.txt', A.tactical_3k, null],
-  ['run84_tactical_3k.txt', A.tactical_3k, null],
-  ['weightlifter_peak-program.txt', LIFTER, null],
-  ['run92_weightlifter_flat.txt', LIFTER, null],
-  ['run96_weightlifter_intensification.txt', LIFTER, null],
-  ['run101_weightlifter_peak.txt', LIFTER, 8.2],
-  ['weightlifter_meet_week-program.txt', MEET, null],
-  ['mma_fight_camp-program.txt', FIGHTER, null],
-  ['run97_mma_camp_delivered.txt', FIGHTER, null],
-  ['run92_mma_fight_camp_pre_rules.txt', FIGHTER, null],
-  ['inseason_footballer-program.txt', H.inseason_footballer, null],
-  ['run100_inseason_footballer.txt', H.inseason_footballer, null],
-  ['run101_inseason_footballer.txt', H.inseason_footballer, null],
-  ['masters_return-program.txt', H.masters_return, null],
-  ['run100_masters_return.txt', H.masters_return, null],
-  ['run101_masters_return.txt', H.masters_return, null],
-];
 
 const seenFile = new Set();
 const results = [];

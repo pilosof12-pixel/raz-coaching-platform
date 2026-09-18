@@ -38,7 +38,7 @@ const root = path.dirname(fileURLToPath(import.meta.url));
 const fixture = (n) => fs.readFileSync(path.join(root, '..', 'test', 'fixtures', `${n}-program.txt`), 'utf8');
 const quiet = process.argv.includes('--quiet');
 
-const INTAKES = {
+export const INTAKES = {
   advanced_hybrid: {
     age: 30, language: 'en',
     primary_goals: ['220kg back squat', '4 One arm pullups'],

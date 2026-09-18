@@ -12,11 +12,11 @@
 // program it describes.
 
 import { parseWeek } from './v34_workload_accounting.js';
+import { isClassicLift } from './classic_lifts.js';
 import { classifyExercise } from './v38_movement_taxonomy.js';
 import { competitionProfile, STATE, sportSessionsPerWeek } from './v68_competition_state.js';
 import { currentMaxes, maxFor } from './v71_intensification.js';
 
-const CLASSIC = /\b(?:snatch|clean and jerk|clean & jerk|power clean|power snatch|hang (?:snatch|clean)|jerk|clean)\b/i;
 const SQUAT = /\bsquat\b/i;
 
 function isWarmup(n) { return /^\s*\[WARMUP\]/i.test(String(n || '')); }
@@ -45,7 +45,7 @@ export function auditWeek(program, week, intake = {}) {
     sets += n;
 
     const { category, role } = classifyExercise(name);
-    if (CLASSIC.test(name)) classic += n;
+    if (isClassicLift(name)) classic += n;
     if (SQUAT.test(name)) squat += n;
     if (category === 'power') power += n;
     if (role === 'accessory' || category === 'trunk') accessory += n;

@@ -38,6 +38,7 @@ import { repairInSeason, appendTrainingWeek } from './v83_in_season.js';
 import { repairClockStatement } from './v86_training_clock.js';
 import { repairDayZeroClaims, repairMatchDayPlacement, repairAllocationShift, repairSportFrequency } from './v89_block_architecture.js';
 import { repairBallisticShare } from './v79_ballistic_share.js';
+import { repairBenchmarkExposure } from './benchmark_exposure_repair.js';
 import { repairCompetitionWeek } from './v90_competition_week.js';
 import { repairTimelineIntegrity } from './v91_timeline_integrity.js';
 import { repairPrescriptionIntegrity } from './v92_prescription_integrity.js';
@@ -964,7 +965,28 @@ export function repairDeterministicContradictions(program, intake = {}) {
   let candidate = String(program || '');
   const repairs = [];
 
-  // Accessory holds first: they change set counts that later note repairs cite.
+  // Put back a benchmarked movement the block never trains. It prefers to spend
+  // a redundant slot, so most of the time this changes what a session contains
+  // rather than how much of it there is -- but when nothing is redundant it has
+  // to add sets, and everything that reacts to a row has to run downstream of
+  // that. It sat later twice and both placements were wrong: after the camp
+  // economy trim an added row was a seventh exercise nothing could cut, and
+  // after the warm-up and heavy-ramp regeneration the second pass discovered
+  // the new row and wrote it a ramp the first pass had not, which is a repair
+  // chain that does not settle. It is the first content repair for that reason:
+  // a row that appears after the things that react to rows have already run is
+  // a row the program was never really built around.
+  const exposed = repairBenchmarkExposure(candidate, intake);
+  if (exposed.changed) {
+    candidate = exposed.program;
+    repairs.push({
+      type: 'benchmarked_movement_exposed',
+      swapped: exposed.swaps.map((x) => `w${x.week} ${x.from} -> ${x.to}`),
+      inserted: exposed.inserts.map((x) => `w${x.week} ${x.day} + ${x.movement}`),
+    });
+  }
+
+  // Accessory holds next: they change set counts that later note repairs cite.
   candidate = repairAccessoryCreep(candidate, intake, repairs);
   candidate = repairMaintenanceDrift(candidate, intake, repairs);
   candidate = repairSkillCeilings(candidate, intake, repairs);

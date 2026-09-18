@@ -100,7 +100,7 @@ function dayNotes(parsed, dayLabel) {
   return out.join(' ');
 }
 
-function competitionWeek(intake, now) {
+export function competitionWeek(intake, now = Date.now()) {
   if (!competitionProfile(intake, now)) return 0;
   for (let week = 1; week <= 4; week += 1) {
     if (stateForWeek(intake, week, now) === STATE.COMPETITION_WEEK) return week;

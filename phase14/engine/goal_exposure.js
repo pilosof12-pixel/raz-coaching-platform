@@ -18,33 +18,13 @@
 import { parseWeek } from './v34_workload_accounting.js';
 import { matchDictionary } from './exercise_dictionary.js';
 import { specificModalityRequirement, hasSpecificModalityExposure } from './phase15_program_qa.js';
+import { rebuild, newRow } from './tsv_rows.js';
 
 const isWarmup = (n) => /^\s*\[WARMUP\]/i.test(String(n || ''));
 const goalText = (intake, key) => {
   const v = intake?.[key];
   return (Array.isArray(v) ? v : [v]).map((x) => String(x || '')).join(' | ');
 };
-
-function rebuild(program, parsed, cells) {
-  const rebuilt = [parsed.header.join('\t'), ...cells.map((c) => c.join('\t'))].join('\n');
-  return program.replace(parsed.re, `$1${rebuilt}$3`);
-}
-
-// A row shaped like the ones around it, so an added exposure reads as part of
-// the session rather than an appendix to it.
-function newRow(parsed, { day, name, load, sets, reps, rest, rpe, note }) {
-  const row = new Array(parsed.header.length).fill('');
-  row[parsed.day] = day || '';
-  row[parsed.exercise] = name;
-  if (Number.isInteger(parsed.load)) row[parsed.load] = load;
-  row[parsed.sets] = String(sets);
-  row[parsed.reps] = reps;
-  if (Number.isInteger(parsed.rest)) row[parsed.rest] = rest;
-  const rpeCol = parsed.header.findIndex((h) => /target rpe|effort/i.test(String(h || '')));
-  if (rpeCol >= 0) row[rpeCol] = String(rpe);
-  if (Number.isInteger(parsed.notes)) row[parsed.notes] = note;
-  return row;
-}
 
 // --- 1. The narrative does not contradict the goal ---------------------------
 
