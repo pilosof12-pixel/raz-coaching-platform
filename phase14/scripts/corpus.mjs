@@ -18,6 +18,22 @@ export const readFixture = (f) => fs.readFileSync(fixturePath(f), 'utf8');
 const json = (f) => JSON.parse(readFixture(f));
 
 const A = json('acceptance_intakes.json');
+// The Hyrox racer, first generated in run #116. His intake lives in the live
+// acceptance workflow rather than a fixture file, so it is written out here to
+// keep the corpus sweep and the workflow describing the same athlete.
+export const HYROX = {
+  age: 33, language: 'en', experience: 'Advanced (3+ years)', bodyweight: '76 kg',
+  primary_goals: ['Podium in my age group at the Hyrox race in 4 weeks'],
+  secondary_goals: ['Run a half marathon two weeks after Hyrox without wrecking myself for it'],
+  maintenance_goals: ['Hold my squat and pulling strength through both'],
+  goal_priority_model: 'tiered', days_per_week: 4, session_duration_minutes: 75,
+  gym_availability_mode: 'flexible', available_gym_days: [], training_location: 'commercial_gym',
+  sport: 'Hyrox', sport_sessions_per_week: 2, sport_schedule: [],
+  current_numbers: 'Back Squat: 150 kg x 1\nDeadlift: 190 kg x 1\n5 km run: 19:40\nHalf marathon PB: 1:28 (two years ago)\n1 km ski erg: 3:38',
+  performance_markers: ['5 km: 19:40', 'Half marathon: 1:28'],
+  injuries: 'Left achilles grumbles after back-to-back running days; settles with a day off.',
+  pain: { active: false }, event_type: 'hybrid_race', event_priority: 'A',
+};
 const C = json('competition_avatars.json');
 const H = json('hard_avatars.json');
 const day = 86400000;
@@ -56,6 +72,7 @@ export const CORPUS = [
   ['run101_inseason_footballer.txt', H.inseason_footballer, null],
   ['run115_inseason_footballer.txt', H.inseason_footballer, null],
   ['masters_return-program.txt', H.masters_return, null],
+  ['run116_dual_event_hyrox.txt', { ...HYROX, competition_date: saturday(4) }, null],
   ['run100_masters_return.txt', H.masters_return, null],
   ['run101_masters_return.txt', H.masters_return, null],
 ];
