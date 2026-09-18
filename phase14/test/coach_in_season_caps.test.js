@@ -76,9 +76,12 @@ test('a cap applies after the weighted score and overrides it', () => {
 // findings are the reason A, B and C scored 8.2, 8.7 and 9.0.
 test('the three delivered footballer programs trip none of the caps', () => {
   const expected = {
-    'inseason_footballer-program.txt': ['SPRINT_SPEED_EXPOSURE_MISSING', 'REPEATED_SPRINT_EXPOSURE_MISSING', 'PROMISED_MOVEMENT_ABSENT'],
-    'run100_inseason_footballer.txt': ['SPRINT_DISTANCE_BELOW_BENCHMARK', 'REPEATED_SPRINT_EXPOSURE_MISSING'],
-    'run101_inseason_footballer.txt': ['REPEATED_SPRINT_EXPOSURE_MISSING'],
+    // ACCESSORY_REDUNDANCY joined these once the checkable half of his
+    // accessory finding was encoded: Chest-Supported Row plus a second row,
+    // which he charged 0.10 for on the first and third of them.
+    'inseason_footballer-program.txt': ['SPRINT_SPEED_EXPOSURE_MISSING', 'REPEATED_SPRINT_EXPOSURE_MISSING', 'PROMISED_MOVEMENT_ABSENT', 'ACCESSORY_REDUNDANCY'],
+    'run100_inseason_footballer.txt': ['SPRINT_DISTANCE_BELOW_BENCHMARK', 'REPEATED_SPRINT_EXPOSURE_MISSING', 'ACCESSORY_REDUNDANCY'],
+    'run101_inseason_footballer.txt': ['REPEATED_SPRINT_EXPOSURE_MISSING', 'ACCESSORY_REDUNDANCY'],
   };
   for (const [f, rules] of Object.entries(expected)) {
     assert.deepEqual(inSeasonCaps(read(f), FOOTBALLER), [], `${f}: no cap`);

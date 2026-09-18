@@ -364,6 +364,16 @@ export function goalFamilies(intake = {}, tiers = ['primary', 'secondary']) {
   return goalFamilyTiers(intake, tiers).map((g) => g.family);
 }
 
+// Every movement family the athlete asked for anything about, improvement or
+// maintenance. goalFamilies drops goals phrased as a hold, which is right for
+// "must this progress" and exactly wrong for "does this serve a stated goal":
+// it made "Maintain the squat and hamstring strength I have" mean the athlete
+// had asked for nothing, so a block full of squats read as pure redundancy.
+export function statedGoalFamilies(intake = {}) {
+  const text = ['primary', 'secondary', 'maintenance'].flatMap((t) => arr(intake[`${t}_goals`]).map(String)).join(' ');
+  return GOAL_MOVEMENTS.filter((g) => g.goal.test(text)).map((g) => g.family);
+}
+
 // Which tier a goal sits in decides what a flat block costs: the coach revised
 // his own 0.15 upward for a primary goal, because that 0.15 was set on a
 // secondary pull-up while the athlete's primary 3 km work was still moving.
@@ -627,6 +637,7 @@ export const RULES = [
   eccentricHamstringTiming,
   promisedMovementAbsent,
   repeatedSprintProgression,
+  accessoryRedundancy,
 ];
 
 export function gradeProgram(program, intake = {}) {
@@ -1136,6 +1147,10 @@ export const RULE_INPUTS = {
     governs: RSA_GOAL.test(`${arr(i.secondary_goals).join(' ')} ${arr(i.primary_goals).join(' ')}`),
     found: has(rows(p)),
   }),
+  accessoryRedundancy: (p, i) => ({
+    governs: has(statedGoalFamilies(i)),
+    found: has(rows(p).filter((r) => movementFunction(r.name))),
+  }),
   repeatedSprintProgression: (p, i) => ({
     governs: RSA_GOAL.test(`${arr(i.secondary_goals).join(' ')} ${arr(i.primary_goals).join(' ')}`),
     found: has(rows(p).filter((r) => (SPRINT_NAME.test(r.name) || /prowler|sled/i.test(r.name)) && restSecondsOf(r.rest) != null)),
@@ -1220,5 +1235,63 @@ export function repeatedSprintProgression(program, intake = {}) {
   return [{
     rule: 'REPEATED_SPRINT_NOT_PROGRESSING',
     detail: `Improving repeated-sprint ability is a stated goal and nothing about the exposure moves by Week 3: ${[1, 2, 3].map((w) => `W${w} ${show(byWeek.get(w))}`).join(', ')}. One variable is enough -- a repetition, 10% more distance, or 10% less recovery -- and Week 4 may consolidate.`,
+  }];
+}
+
+// --- 19. accessory redundancy, the checkable half ----------------------------
+//
+// He filed accessory value under "Judgement, not rules" and was exact about
+// where the line falls: "The checkable part is redundancy and goal relevance.
+// The final marginal value judgement remains coaching judgement."
+//
+// So this asks only the checkable question -- does one movement function get
+// several slots a week while serving nothing the athlete asked for -- and never
+// the other one, which is whether a given exercise earns its recovery cost.
+//
+// Three of his four accessory findings are this exact shape: four rowing
+// exposures for a weightlifter, two rows and two bench presses for a
+// footballer, two rows and two overhead presses for the same footballer. The
+// fourth is not, and stays unencoded: a single row and a single Pallof Press in
+// a late fight camp, which is a marginal-return call and not a duplication.
+
+export function accessoryRedundancy(program, intake = {}) {
+  // A goal that names no movement makes every function goal-relevant, and there
+  // is nothing to measure. That is the fight camp, and he raised a different
+  // kind of finding there.
+  const families = statedGoalFamilies(intake);
+  if (!families.length) return [];
+  const benched = benchmarks(intake).map((b) => b.name);
+
+  const serves = (fn, names) => names.some((n) => families.some((f) => f.test(n))
+    || benched.some((b) => movementFunction(b) === fn && families.some((f) => f.test(b))));
+
+  const byWeek = new Map();
+  for (const r of rows(program)) {
+    const fn = movementFunction(r.name);
+    if (!fn) continue;
+    if (!byWeek.has(r.week)) byWeek.set(r.week, new Map());
+    const m = byWeek.get(r.week);
+    if (!m.has(fn)) m.set(fn, []);
+    m.get(fn).push(r.name);
+  }
+  const offending = new Map();
+  for (const [, m] of byWeek) {
+    for (const [fn, names] of m) {
+      // Two different exercises, not the same one done twice. A lift repeated
+      // across the week is frequency; two movements filling one slot is the
+      // duplication he charged for.
+      const distinct = [...new Set(names)];
+      if (distinct.length < 2) continue;
+      if (serves(fn, distinct)) continue;
+      if (!offending.has(fn)) offending.set(fn, new Set());
+      for (const n of distinct) offending.get(fn).add(n);
+    }
+  }
+  if (!offending.size) return [];
+  const shown = [...offending].map(([fn, names]) => `${fn.replace(/_/g, ' ')} (${[...names].join(', ')})`);
+  return [{
+    rule: 'ACCESSORY_REDUNDANCY',
+    functions: [...offending.keys()],
+    detail: `The block spends more than one slot a week on the same movement function while that function serves none of the athlete's stated goals: ${shown.join('; ')}. Whether any single one of these earns its place is a coaching call, but the duplication is time and recovery that the stated goals are not getting.`,
   }];
 }
