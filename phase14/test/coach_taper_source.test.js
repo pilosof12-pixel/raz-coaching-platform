@@ -20,15 +20,19 @@ const week = (w, days, sets) => ['START_WEEK' + w + '_TSV', HEAD,
   ...days.map((d) => `${d}\tSnatch\t100 kg\t${sets}\t2\t3 min\t8\tnote\t`), 'END_WEEK' + w + '_TSV', ''].join('\n');
 const COUNTDOWN = ['Day -5', 'Day -4', 'Day -3', 'Day -2', 'Day -1'];
 const WEEKDAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri'];
-const block = (finalDays, finalSets) => ['A block.', '',
-  week(1, WEEKDAYS, 4), week(2, WEEKDAYS, 4), week(3, WEEKDAYS, 4), week(4, finalDays, finalSets)].join('\n');
+// Week 3 is staged by default, because a block holding weeks 1-3 flat and
+// emptying week 4 is itself a finding -- a taper compressed into seven days --
+// and these fixtures are for isolating the other taper rules.
+const block = (finalDays, finalSets, thirdSets = 2.8) => ['A block.', '',
+  week(1, WEEKDAYS, 4), week(2, WEEKDAYS, 4), week(3, WEEKDAYS, thirdSets), week(4, finalDays, finalSets)].join('\n');
 
 // Mujika, as the cluster summarises him: volume is the fatigue lever and a
 // 41-60% reduction is the strongest general starting point.
 test('a competition week that barely reduces volume is found', () => {
   const flags = taperAgainstSource(block(COUNTDOWN, 3.6), LIFTER);
   assert.deepEqual(flags.map((f) => f.rule), ['TAPER_VOLUME_NOT_REDUCED']);
-  assert.match(flags[0].detail, /reduction of 10%/);
+  assert.match(flags[0].detail, /a reduction of \d+%/);
+  assert.match(flags[0].detail, /41-60% off pre-taper volume/);
 });
 
 // Frequency is held through a taper more than volume is: the sessions get
@@ -49,6 +53,30 @@ test('competition week counts its sessions from the labels it actually uses', ()
   const onCountdown = taperAgainstSource(block(COUNTDOWN, 2), LIFTER);
   const onWeekdays = taperAgainstSource(block(WEEKDAYS, 2), LIFTER);
   assert.deepEqual(onCountdown, onWeekdays, 'the label style must not change the verdict');
+});
+
+// "8 to 14 days is a defensible general starting window." In a block whose
+// final week is the event, that window opens in the week before it, so the
+// reduction has to have started by then.
+test('a taper compressed into the final week is found', () => {
+  const flat = ['b', '', week(1, WEEKDAYS, 4), week(2, WEEKDAYS, 4), week(3, WEEKDAYS, 4), week(4, COUNTDOWN, 1.8)].join('\n');
+  const flags = taperAgainstSource(flat, LIFTER);
+  assert.deepEqual(flags.map((f) => f.rule), ['TAPER_COMPRESSED_INTO_FINAL_WEEK']);
+  assert.match(flags[0].detail, /8 to 14 days/);
+  // Beginning the descent a week earlier clears it.
+  const staged = ['b', '', week(1, WEEKDAYS, 4), week(2, WEEKDAYS, 4), week(3, WEEKDAYS, 2.8), week(4, COUNTDOWN, 1.8)].join('\n');
+  assert.deepEqual(taperAgainstSource(staged, LIFTER), []);
+});
+
+// Every competition program we hold begins the descent at 27-33% in that week,
+// so the 10% floor catches a block that has not begun rather than one that
+// begins gently.
+test('every delivered competition block already opens its taper in time', () => {
+  const fighter = { ...C.mma_fight_camp, competition_date: saturday(3), event_type: 'combat' };
+  for (const [f, intake] of [['run113_mma_camp_delivered.txt', fighter], ['run97_mma_camp_delivered.txt', fighter],
+    ['mma_fight_camp-program.txt', fighter], ['weightlifter_meet_week-program.txt', LIFTER]]) {
+    assert.deepEqual(taperAgainstSource(read(f), intake), [], f);
+  }
 });
 
 // The delivered fight camp the coach praised for its taper: 24 sets to 24 to
@@ -76,7 +104,7 @@ test('no intensity threshold is invented where the source gives none', () => {
   // "can still touch meaningful loads" -- so this must produce nothing. An
   // earlier version invented an 85% floor and flagged a real meet week at 82%.
   const light = ['A block.', '',
-    week(1, WEEKDAYS, 4), week(2, WEEKDAYS, 4), week(3, WEEKDAYS, 4),
+    week(1, WEEKDAYS, 4), week(2, WEEKDAYS, 4), week(3, WEEKDAYS, 2.8),
     ['START_WEEK4_TSV', HEAD,
       ...COUNTDOWN.map((d) => `${d}\tSnatch\t55 kg\t2\t2\t3 min\t6\tmuch lighter\t`),
       'END_WEEK4_TSV', ''].join('\n')].join('\n');

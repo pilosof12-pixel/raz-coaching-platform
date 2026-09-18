@@ -1,7 +1,7 @@
 
 SOURCE COVERAGE: what the engine checks, what it only says, what it never mentions
 
-CHECKED  (17/22)
+CHECKED  (18/22)
   A85.2   Pulling volume capped at 6 working sets when mat hours >= 10  [source_generator_rules.js]
   A85.3   Grip fatigue >= 7 forces the >=10 mat-hour protocol  [source_generator_rules.js]
   A85.4   Competition week: no strength above 70% 1RM  [source_generator_rules.js]
@@ -17,15 +17,15 @@ CHECKED  (17/22)
   A88.5   Mileage tiers at 40 and 70 km/week change gym lower-body volume  [source_generator_rules.js]
   A89.5   Minimum 2 complete recovery days per 7-day microcycle  [source_generator_rules.js]
   TAP.1   Taper reduces volume by 41-60% of pretaper  [coach_rules.js]
+  TAP.2   Taper duration 8-14 days is the default window  [coach_rules.js]
   TAP.3   Frequency held at 30-50% of pretaper, not cut with volume  [coach_rules.js]
   TAP.4   Remove volume selectively: conditioning and redundant patterns first  [coach_rules.js]
 
-TOLD ONLY  (5/22)
+TOLD ONLY  (4/22)
   A86.2   Pressing <= 60% of base volume, <= 35% in sparring weeks
   A87.5   No session longer than 45 minutes during a weight cut
   A89.3   Same-day strength and endurance applies a +15% next-day fatigue cost
   A89.4   Caloric deficit > 500 kcal with high load reduces volume
-  TAP.2   Taper duration 8-14 days is the default window
 
 ABSENT  (0/22)
 

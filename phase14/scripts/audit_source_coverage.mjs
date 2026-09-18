@@ -68,7 +68,7 @@ const RULES = [
   { id: 'A89.4', rule: 'Caloric deficit > 500 kcal with high load reduces volume', told: /500 ?kcal/i, checks: /kcal|calorieDeficit/i },
   // --- Peaking and tapering cluster -----------------------------------------
   { id: 'TAP.1', rule: 'Taper reduces volume by 41-60% of pretaper', told: /41 to 60/i, checks: /TAPER_VOLUME_BAND|TAPER_VOLUME_NOT_REDUCED/ },
-  { id: 'TAP.2', rule: 'Taper duration 8-14 days is the default window', told: /8 to 14|8-14/i, checks: /taperDays|TAPER_WINDOW|8\s*,\s*14/ },
+  { id: 'TAP.2', rule: 'Taper duration 8-14 days is the default window', told: /8 to 14|8-14/i, checks: /TAPER_COMPRESSED_INTO_FINAL_WEEK/ },
   { id: 'TAP.3', rule: 'Frequency held at 30-50% of pretaper, not cut with volume', told: /30 to 50|30-50/i, checks: /FREQUENCY_FLOOR|TAPER_CUTS_FREQUENCY_NOT_VOLUME/ },
   { id: 'TAP.4', rule: 'Remove volume selectively: conditioning and redundant patterns first', told: /redundant[^.]{0,40}pattern|selectiv/i, checks: /accessoryRedundancy|mrv_support_trim|trimOrder/i },
 ];

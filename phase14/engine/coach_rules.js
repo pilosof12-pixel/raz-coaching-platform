@@ -1376,6 +1376,28 @@ export function taperAgainstSource(program, intake = {}, now = Date.now()) {
     });
   }
 
+  // Duration. "8 to 14 days is a defensible general starting window when no
+  // individual taper history exists." In a block whose final week is the event,
+  // the 8-14 day window opens in the week before it -- so the reduction has to
+  // have started by then. A block that holds volume flat and empties it only in
+  // the last seven days has tapered for half the window.
+  //
+  // The threshold is deliberately loose. Every competition program we have
+  // begins the descent at 27-33% by that week, so 10% is a floor that catches a
+  // block which has not begun rather than one that begins gently.
+  const preTaperWeek = load.get(compWeek - 1);
+  if (preTaperWeek && pre.length >= 2) {
+    const earlier = pre.filter((w) => w !== preTaperWeek);
+    const earlyBase = earlier.length ? earlier.reduce((n, w) => n + w.sets, 0) / earlier.length : 0;
+    const begun = earlyBase ? 1 - preTaperWeek.sets / earlyBase : 0;
+    if (earlyBase && begun < 0.10 && cut >= TAPER_MIN_REDUCTION) {
+      out.push({
+        rule: 'TAPER_COMPRESSED_INTO_FINAL_WEEK',
+        detail: `The whole reduction lands in competition week: week ${compWeek - 1} carries ${preTaperWeek.sets} working sets against ${earlyBase.toFixed(0)} earlier, ${begun <= 0 ? 'no reduction at all' : `only ${(begun * 100).toFixed(0)}% down`}, and then week ${compWeek} drops ${(cut * 100).toFixed(0)}%. The general starting window is 8 to 14 days, which opens in week ${compWeek - 1}; a taper confined to the last seven days is half of it.`,
+      });
+    }
+  }
+
   // Frequency is not the lever. Sessions get shorter, not fewer.
   if (baseDays && taper.days.size / baseDays < FREQUENCY_FLOOR && cut >= TAPER_MIN_REDUCTION) {
     out.push({
