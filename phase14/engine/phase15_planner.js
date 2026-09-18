@@ -35,6 +35,8 @@ import { buildClockBrief } from './v86_training_clock.js';
 import { buildEarnedClaimsBrief } from './v87_earned_claims.js';
 import { buildClaimIntegrityBrief } from './v93_claim_integrity.js';
 import { buildCoachStandardBrief } from './coach_standard_brief.js';
+import { buildEnduranceSourceBrief, buildTaperSourceBrief } from './source_cluster_brief.js';
+import { STATE as CLUSTER_STATE, stateForWeek as clusterStateForWeek } from './v68_competition_state.js';
 import { buildGoalPaceBrief } from './v88_goal_pace.js';
 import { buildBlockArchitectureBrief } from './v89_block_architecture.js';
 import { buildCompetitionWeekBrief } from './v90_competition_week.js';
@@ -314,6 +316,12 @@ export function buildDeterministicBrief(intake = {}) {
     buildEarnedClaimsBrief(intake),
     buildClaimIntegrityBrief(intake),
     buildCoachStandardBrief(intake),
+    buildEnduranceSourceBrief(intake),
+    // The taper prescriptions only mean anything for a block that reaches its
+    // event; eight weeks out they would tell the model to taper a build block.
+    buildTaperSourceBrief(intake, [1, 2, 3, 4].some((w) => {
+      try { return clusterStateForWeek(intake, w) === CLUSTER_STATE.COMPETITION_WEEK; } catch { return false; }
+    })),
     buildGoalPaceBrief(intake),
     buildBlockArchitectureBrief(intake),
     buildCompetitionWeekBrief(intake),
