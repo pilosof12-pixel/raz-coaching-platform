@@ -48,6 +48,7 @@ export function rows(program) {
       out.push({
         week,
         day: weekdayKey(lastDay) || '',
+        dayLabel: String(lastDay || '').trim(),
         name,
         load: Number.isInteger(parsed.load) ? String(cells[parsed.load] || '') : '',
         sets: num(cells[parsed.sets]),
@@ -638,6 +639,7 @@ export const RULES = [
   promisedMovementAbsent,
   repeatedSprintProgression,
   accessoryRedundancy,
+  taperAgainstSource,
 ];
 
 export function gradeProgram(program, intake = {}) {
@@ -1147,6 +1149,10 @@ export const RULE_INPUTS = {
     governs: RSA_GOAL.test(`${arr(i.secondary_goals).join(' ')} ${arr(i.primary_goals).join(' ')}`),
     found: has(rows(p)),
   }),
+  taperAgainstSource: (p, i) => ({
+    governs: hasEvent(i),
+    found: has(rows(p).filter((r) => (r.sets ?? 0) > 0)),
+  }),
   accessoryRedundancy: (p, i) => ({
     governs: has(statedGoalFamilies(i)),
     found: has(rows(p).filter((r) => movementFunction(r.name))),
@@ -1294,4 +1300,89 @@ export function accessoryRedundancy(program, intake = {}) {
     functions: [...offending.keys()],
     detail: `The block spends more than one slot a week on the same movement function while that function serves none of the athlete's stated goals: ${shown.join('; ')}. Whether any single one of these earns its place is a coaching call, but the duplication is time and recovery that the stated goals are not getting.`,
   }];
+}
+
+// --- 20. the taper, against the numbers the source actually gives ------------
+//
+// The Competition Preparation / Peaking / Tapering cluster is one of the four
+// documents the generator's knowledge is built on, and none of it had ever
+// reached the engine: "pretaper", "taper duration" and "Mujika" appear zero
+// times in engine_instructions.txt. Every taper rule the engine had came
+// second-hand, through a coach reading a delivered program.
+//
+// Mujika's meta-analysis, as the cluster summarises it:
+//
+//   Volume     reduced 41-60% of pretaper is the strongest general starting
+//              point, and is the primary fatigue-reduction lever
+//   Intensity  maintained -- keep competition-relevant load, pace or intent
+//              while sharply reducing repetitions
+//   Frequency  held more than volume; sessions become shorter, not fewer
+//
+// The cluster states its own evidence boundary, so this is written as a band
+// with a wide tolerance rather than a target: it flags a taper that barely
+// reduces volume, one that cuts frequency as hard as volume, and one that
+// throws the intensity away with the work.
+
+import { STATE as COMP_STATE, stateForWeek, hasEvent } from './v68_competition_state.js';
+
+const TAPER_VOLUME_BAND = [0.41, 0.60];
+const TAPER_MIN_REDUCTION = 0.25;      // below this the week is not a taper at all
+const FREQUENCY_FLOOR = 0.70;          // sessions stay; they get shorter
+//
+// No intensity threshold is encoded. The cluster is explicit that intensity is
+// maintained and gives numbers for volume, duration and frequency -- and none
+// for intensity, saying only that the athlete "can still touch meaningful
+// loads". A first version invented an 85% floor and flagged a meet week at 82%
+// of its pre-taper top load, which is a number the source does not support.
+
+function weekLoad(program) {
+  const out = new Map();
+  for (const r of rows(program)) {
+    if (!out.has(r.week)) out.set(r.week, { sets: 0, days: new Set(), topKg: 0 });
+    const w = out.get(r.week);
+    w.sets += r.sets ?? 0;
+    // The day LABEL, not a weekday key. Competition week is written on a
+    // countdown -- "Day -5" to "Day -1" -- which weekdayKey correctly refuses
+    // to resolve, so counting keys reported a five-session week as zero
+    // sessions and called a sound taper a frequency collapse.
+    if (r.dayLabel) w.days.add(r.dayLabel);
+    const kg = Number((String(r.load).match(/(\d+(?:\.\d+)?)\s*kg/i) || [])[1]);
+    if (Number.isFinite(kg) && kg > w.topKg) w.topKg = kg;
+  }
+  return out;
+}
+
+export function taperAgainstSource(program, intake = {}, now = Date.now()) {
+  if (!hasEvent(intake)) return [];
+  const weeks = [1, 2, 3, 4].filter((w) => parseWeek(program, w));
+  const compWeek = weeks.find((w) => stateForWeek(intake, w, now) === COMP_STATE.COMPETITION_WEEK);
+  if (!compWeek || compWeek === 1) return [];
+  const load = weekLoad(program);
+  const taper = load.get(compWeek);
+  const pre = weeks.filter((w) => w < compWeek).map((w) => load.get(w)).filter(Boolean);
+  if (!taper || pre.length < 2) return [];
+
+  const baseSets = pre.reduce((n, w) => n + w.sets, 0) / pre.length;
+  const baseDays = pre.reduce((n, w) => n + w.days.size, 0) / pre.length;
+  if (!baseSets) return [];
+
+  const cut = 1 - taper.sets / baseSets;
+  const out = [];
+
+  if (cut < TAPER_MIN_REDUCTION) {
+    out.push({
+      rule: 'TAPER_VOLUME_NOT_REDUCED',
+      detail: `Week ${compWeek} is competition week and carries ${taper.sets} working sets against a pre-taper average of ${baseSets.toFixed(0)} -- a reduction of ${(cut * 100).toFixed(0)}%. The strongest general starting point is ${TAPER_VOLUME_BAND[0] * 100}-${TAPER_VOLUME_BAND[1] * 100}% off pre-taper volume, and volume is the lever that sheds fatigue.`,
+    });
+  }
+
+  // Frequency is not the lever. Sessions get shorter, not fewer.
+  if (baseDays && taper.days.size / baseDays < FREQUENCY_FLOOR && cut >= TAPER_MIN_REDUCTION) {
+    out.push({
+      rule: 'TAPER_CUTS_FREQUENCY_NOT_VOLUME',
+      detail: `Competition week drops from ${baseDays.toFixed(1)} training days to ${taper.days.size} while cutting ${(cut * 100).toFixed(0)}% of volume. Frequency is held through a taper more than volume is -- the athlete keeps turning up, and the sessions get shorter.`,
+    });
+  }
+
+  return out;
 }
