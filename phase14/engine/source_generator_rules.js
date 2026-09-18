@@ -229,3 +229,156 @@ export function competitionWeekIntensityCap(program, intake = {}, now = Date.now
   }
   return out;
 }
+
+// --- shared vocabulary -------------------------------------------------------
+
+const PLYO = /\bplyo\w*\b|\bdepth jump\b|\bbox jump\b|\bdrop jump\b|\bbound\w*\b|\bhop\b|\bjump squat\b|\bbroad jump\b|\btuck jump\b/i;
+const HEAVY_LOWER = /\bsquat\b|\bdeadlift\b|\blunge\b|\bstep[- ]?up\b|\bhip thrust\b|\bleg press\b|\bgood ?morning\b/i;
+const WEEK_ORDER = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'];
+const dayKey = (d) => String(d || '').slice(0, 3).toLowerCase();
+
+function sportDaysMatching(intake, re) {
+  return arr(intake.sport_schedule)
+    .filter((s) => re.test(String((s && s.intensity) || '')))
+    .map((s) => dayKey(s && s.day))
+    .filter((d) => WEEK_ORDER.includes(d));
+}
+
+// --- A86.4 Plyometric Interlock ---------------------------------------------
+// "When footwork sessions >= 4/week, all plyometric lower body exercises are
+// blocked from generation."
+
+export function footworkPlyoInterlock(program, intake = {}) {
+  const text = `${intake.notes || ''} ${intake.sport || ''}`;
+  const m = text.match(/(\d{1,2})\s*(?:footwork|striking|boxing|pad)\s*sessions?/i)
+    || text.match(/footwork[^0-9]{0,20}(\d{1,2})\s*(?:a|per|\/)\s*week/i);
+  const sessions = m ? Number(m[1]) : null;
+  if (sessions == null || sessions < 4) return [];
+  const found = [...new Set(rows(program).filter((r) => PLYO.test(r.name) && HEAVY_LOWER.test(`${r.name} lower`) === false && /jump|bound|hop|plyo/i.test(r.name)).map((r) => r.name))];
+  if (!found.length) return [];
+  return [{
+    rule: 'PLYO_AGAINST_FOOTWORK_LOAD',
+    detail: `The athlete does ${sessions} footwork sessions a week and the block prescribes ${found.join(', ')}. At four or more footwork sessions, lower-body plyometrics are blocked: the feet are already taking that load.`,
+  }];
+}
+
+// --- A88.3 Plyometric Lockout ------------------------------------------------
+// "On any week with speed sessions >= 2, plyometric gym volume is automatically
+// reduced or eliminated."
+
+export function speedSessionPlyoLockout(program, intake = {}) {
+  const speedDays = sportDaysMatching(intake, /speed|sprint/i);
+  const text = `${intake.notes || ''}`;
+  const declared = Number((text.match(/(\d{1,2})\s*(?:speed|sprint)\s*sessions?/i) || [])[1]);
+  // The block's own sprint days count. An in-season footballer's sport schedule
+  // says "hard" and "match", never "speed", so counting only what the intake
+  // labels left this rule unable to fire for the athlete it was written for --
+  // and a rule that cannot fire is indistinguishable from one that is broken.
+  const prescribed = new Set(rows(program)
+    .filter((r) => /\bsprint\b|\bacceleration/i.test(`${r.name} ${r.load} ${r.notes}`)
+      && /(\d+(?:\.\d+)?)\s*m\b(?!in)/i.test(String(r.reps)))
+    .map((r) => r.day).filter(Boolean));
+  const count = Math.max(speedDays.length, Number.isFinite(declared) ? declared : 0, prescribed.size);
+  if (count < 2) return [];
+  const found = [...new Set(rows(program).filter((r) => PLYO.test(r.name)).map((r) => r.name))];
+  if (!found.length) return [];
+  return [{
+    rule: 'PLYO_AGAINST_SPEED_SESSIONS',
+    detail: `The athlete has ${count} speed sessions a week and the block still prescribes ${found.join(', ')}. At two or more speed sessions plyometric gym volume is reduced or removed -- the sprinting is the plyometric stimulus.`,
+  }];
+}
+
+// --- A88.1 48-Hour Separation Rule -------------------------------------------
+// "Enforces >= 48 hours between heavy gym lower body sessions and sport
+// speed/sprint sessions. If scheduling conflict exists, gym session is moved."
+
+export function speedSessionSeparation(program, intake = {}) {
+  const speedDays = sportDaysMatching(intake, /speed|sprint|hard/i);
+  if (!speedDays.length) return [];
+  const gap = (a, b) => {
+    const i = WEEK_ORDER.indexOf(a);
+    const j = WEEK_ORDER.indexOf(b);
+    if (i < 0 || j < 0) return null;
+    return Math.min((i - j + 7) % 7, (j - i + 7) % 7) * 24;
+  };
+  const out = [];
+  const seen = new Set();
+  for (const r of rows(program)) {
+    if (!r.day || !HEAVY_LOWER.test(r.name)) continue;
+    const rpe = Number((String(r.cells.join(' ')).match(/RPE\s*([\d.]+)/i) || [])[1]);
+    if (!Number.isFinite(rpe) || rpe < 7) continue;
+    const close = speedDays.filter((d) => { const h = gap(r.day, d); return h != null && h < 48; });
+    if (!close.length) continue;
+    const key = `${r.day}|${r.name}`;
+    if (seen.has(key)) continue;
+    seen.add(key);
+    out.push({
+      rule: 'HEAVY_LOWER_WITHIN_48H_OF_SPEED',
+      detail: `${r.name} sits on ${r.day.toUpperCase()} at RPE ${rpe}, within 48 hours of the ${close.map((d) => d.toUpperCase()).join(' and ')} speed session. Heavy gym lower body stays at least 48 hours from sport speed work, and it is the gym session that moves.`,
+    });
+  }
+  return out;
+}
+
+// --- A88.5 Mileage Tier System -----------------------------------------------
+// "< 40 km/week (standard gym), 40-69 km/week (reduced lower body), >= 70
+// km/week (maintenance gym only)."
+
+export function weeklyRunningKm(intake = {}) {
+  const text = `${intake.notes || ''} ${intake.current_numbers || ''} ${JSON.stringify(intake.pain || {})}`;
+  const range = text.match(/(\d{1,3})\s*(?:to|[-–])\s*(\d{1,3})\s*km\s*(?:a|per|\/)\s*week/i);
+  if (range) return Number(range[2]);
+  const one = text.match(/(\d{1,3})\s*km\s*(?:a|per|\/)\s*week/i) || text.match(/(\d{1,3})\s*km\/week/i);
+  return one ? Number(one[1]) : null;
+}
+
+export function mileageTier(program, intake = {}) {
+  const km = weeklyRunningKm(intake);
+  if (km == null || km < 40) return [];
+  const byWeek = new Map();
+  for (const r of rows(program)) {
+    if (!HEAVY_LOWER.test(r.name)) continue;
+    if (!byWeek.has(r.week)) byWeek.set(r.week, new Set());
+    byWeek.get(r.week).add(r.day || r.name);
+  }
+  const limit = km >= 70 ? 1 : 2;
+  const out = [];
+  for (const [week, sessions] of byWeek) {
+    if (sessions.size <= limit) continue;
+    out.push({
+      rule: 'LOWER_BODY_ABOVE_MILEAGE_TIER',
+      week,
+      detail: `Week ${week} carries lower-body gym work on ${sessions.size} days against ${km} km of running a week. ${km >= 70 ? 'At 70 km or more the gym is maintenance only: one lower-body session.' : 'Between 40 and 69 km, two lower-body sessions is the ceiling.'}`,
+    });
+  }
+  return out;
+}
+
+// --- A87.2 Wrestling Adder ---------------------------------------------------
+// "Each wrestling/clinch session adds +1 lower back fatigue unit. At >= 3
+// units, lower back load reduction protocol activates."
+
+const LOW_BACK_HEAVY = /\bdeadlift\b|\bgood ?morning\b|\bback extension\b|\bbent[- ]over row\b|\bpendlay\b|\bback squat\b|\brack pull\b/i;
+
+export function wrestlingLowBackLoad(program, intake = {}) {
+  const text = `${intake.notes || ''} ${intake.sport || ''} ${JSON.stringify(intake.sport_schedule || [])}`;
+  const declared = Number((text.match(/(\d{1,2})\s*(?:wrestling|clinch|grappling)\s*sessions?/i) || [])[1]);
+  const scheduled = arr(intake.sport_schedule).filter((s) => /wrestl|clinch|grappl/i.test(String((s && s.intensity) || '') + String((s && s.focus) || ''))).length;
+  const units = Math.max(Number.isFinite(declared) ? declared : 0, scheduled);
+  if (units < 3) return [];
+  const out = [];
+  const byWeek = new Map();
+  for (const r of rows(program)) {
+    if (!LOW_BACK_HEAVY.test(r.name)) continue;
+    byWeek.set(r.week, (byWeek.get(r.week) || 0) + (r.sets ?? 0));
+  }
+  for (const [week, sets] of byWeek) {
+    if (sets <= 6) continue;
+    out.push({
+      rule: 'LOW_BACK_LOAD_AGAINST_WRESTLING',
+      week,
+      detail: `Week ${week} prescribes ${sets} working sets of axial lower-back loading against ${units} wrestling or clinch sessions a week. Each of those adds a lower-back fatigue unit, and at three the load reduction protocol applies.`,
+    });
+  }
+  return out;
+}

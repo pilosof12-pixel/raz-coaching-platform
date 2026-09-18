@@ -45,23 +45,23 @@ const code = fs.readdirSync(engine).filter((f) => f.endsWith('.js'))
 const RULES = [
   // --- Article 85, grappling -------------------------------------------------
   { id: 'A85.2', rule: 'Pulling volume capped at 6 working sets when mat hours >= 10', told: /pulling[^.]{0,40}(cap|6 (working )?sets)/i, checks: /pullingVolumeCap|PULLING_VOLUME_ABOVE_MAT_CAP/ },
-  { id: 'A85.3', rule: 'Grip fatigue >= 7 forces the >=10 mat-hour protocol', told: /grip[_ ]fatigue/i, checks: /grip_?fatigue|gripFatigue/i },
+  { id: 'A85.3', rule: 'Grip fatigue >= 7 forces the >=10 mat-hour protocol', told: /grip[_ ]fatigue/i, checks: /PULLING_VOLUME_ABOVE_MAT_CAP/ },
   { id: 'A85.4', rule: 'Competition week: no strength above 70% 1RM', told: /70%[^.]{0,30}1RM/i, checks: /competitionWeekIntensityCap|COMPETITION_WEEK_ABOVE_SEVENTY_PERCENT/ },
   { id: 'A85.5', rule: 'Neck pain >= 3/10 locks out axial loading', told: /neck pain/i, checks: /neckAxialLockout|NECK_PAIN_AXIAL_LOADING/ },
   // --- Article 86, striking --------------------------------------------------
   { id: 'A86.2', rule: 'Pressing <= 60% of base volume, <= 35% in sparring weeks', told: /pressing[^.]{0,40}(60|35)\s?%/i, checks: /pressingCeiling|pressingCap|PRESSING_/i },
-  { id: 'A86.4', rule: 'Footwork sessions >= 4/week blocks lower-body plyometrics', told: /footwork/i, checks: /footwork/i },
+  { id: 'A86.4', rule: 'Footwork sessions >= 4/week blocks lower-body plyometrics', told: /footwork/i, checks: /PLYO_AGAINST_FOOTWORK_LOAD/ },
   { id: 'A86.5', rule: 'Concussion or head impact generates zero gym work', told: /concussion|head impact/i, checks: /headImpactLockout|HEAD_IMPACT_GYM_NOT_WITHHELD/ },
   { id: 'A86.6', rule: 'Overhead pressing eliminated from T-3 weeks to fight week', told: /overhead[^.]{0,60}(T-3|fight week)/i, checks: /overheadPressCutoff|OVERHEAD_PRESS_INSIDE_COMPETITION_CUTOFF/ },
   // --- Article 87, MMA -------------------------------------------------------
-  { id: 'A87.2', rule: 'Each wrestling session adds a low-back fatigue unit; >=3 reduces load', told: /wrestling[^.]{0,40}(adder|fatigue unit)/i, checks: /wrestlingAdder|lowBackUnits|LOW_BACK_/i },
+  { id: 'A87.2', rule: 'Each wrestling session adds a low-back fatigue unit; >=3 reduces load', told: /wrestling[^.]{0,40}(adder|fatigue unit)/i, checks: /LOW_BACK_LOAD_AGAINST_WRESTLING/ },
   { id: 'A87.5', rule: 'No session longer than 45 minutes during a weight cut', told: /45 min/i, checks: /45\s*\*?\s*60|sessionCapDuringCut|CUT_SESSION/i },
   { id: 'A87.6', rule: 'Progressive overload suspended while the weight-cut flag is active', told: /weight[- ]cut[^.]{0,60}(suspend|block|overload)/i, checks: /V75_|weightCut/i },
   // --- Article 88, running and field sport -----------------------------------
-  { id: 'A88.1', rule: '>= 48 hours between heavy gym lower body and sport speed work', told: /48[- ]?hour/i, checks: /speedSessionSeparation|SPEED_SESSION_TOO_CLOSE/ },
-  { id: 'A88.3', rule: 'Plyometric lockout when speed sessions >= 2 per week', told: /plyometric/i, checks: /plyoLockout|PLYO_[A-Z]*LOCK|plyometricLockout/i },
+  { id: 'A88.1', rule: '>= 48 hours between heavy gym lower body and sport speed work', told: /48[- ]?hour/i, checks: /HEAVY_LOWER_WITHIN_48H_OF_SPEED/ },
+  { id: 'A88.3', rule: 'Plyometric lockout when speed sessions >= 2 per week', told: /plyometric/i, checks: /PLYO_AGAINST_SPEED_SESSIONS/ },
   { id: 'A88.4', rule: 'Tendon pain >= 3/10 removes eccentric and plyo, substitutes isometrics', told: /tendon pain/i, checks: /tendonPainOverride|TENDON_PAIN_ECCENTRIC_OR_PLYO/ },
-  { id: 'A88.5', rule: 'Mileage tiers at 40 and 70 km/week change gym lower-body volume', told: /70 ?km|mileage tier/i, checks: /mileageTier|MILEAGE_TIER|kmTier/ },
+  { id: 'A88.5', rule: 'Mileage tiers at 40 and 70 km/week change gym lower-body volume', told: /70 ?km|mileage tier/i, checks: /LOWER_BODY_ABOVE_MILEAGE_TIER/ },
   // --- Article 89, hybrid ----------------------------------------------------
   { id: 'A89.3', rule: 'Same-day strength and endurance applies a +15% next-day fatigue cost', told: /fatigue multiplier|15\s?%/i, checks: /fatigueMultiplier|sameDayFatigue|CONCURRENT_FATIGUE/ },
   { id: 'A89.5', rule: 'Minimum 2 complete recovery days per 7-day microcycle', told: /recovery day/i, checks: /recoveryDayLock|RECOVERY_DAYS_BELOW_MINIMUM/ },

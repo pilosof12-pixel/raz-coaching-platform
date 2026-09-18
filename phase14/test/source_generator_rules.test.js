@@ -5,7 +5,8 @@ import fs from 'node:fs';
 import {
   neckAxialLockout, tendonPainOverride, headImpactLockout, recoveryDayLock,
   pullingVolumeCap, overheadPressCutoff, painSeverity, matHours,
-  competitionWeekIntensityCap,
+  competitionWeekIntensityCap, footworkPlyoInterlock, speedSessionPlyoLockout,
+  speedSessionSeparation, mileageTier, wrestlingLowBackLoad, weeklyRunningKm,
 } from '../engine/source_generator_rules.js';
 
 const T = new URL('./fixtures/', import.meta.url);
@@ -122,6 +123,69 @@ test('the delivered programs the coach scored trip none of these', () => {
     for (const fn of [neckAxialLockout, tendonPainOverride, headImpactLockout, recoveryDayLock,
       pullingVolumeCap, overheadPressCutoff, competitionWeekIntensityCap]) {
       assert.deepEqual(fn(p, intake), [], `${f} / ${fn.name}`);
+    }
+  }
+});
+
+// --- the second batch --------------------------------------------------------
+
+test('lower-body plyometrics are blocked at four or more footwork sessions', () => {
+  const jump = ['Tue\tBox Jump\tBW\t3\t5\t2 min\t7\tnote\t'];
+  assert.ok(footworkPlyoInterlock(block(jump), { notes: '5 footwork sessions a week' }).length);
+  assert.deepEqual(footworkPlyoInterlock(block(jump), { notes: '2 footwork sessions a week' }), []);
+});
+
+// An in-season footballer's sport schedule says "hard" and "match", never
+// "speed", so counting only what the intake labels left this rule unable to
+// fire for the athlete it was written for. The block's own sprint days count.
+test('the plyo lockout counts the sprints the block itself prescribes', () => {
+  const sprintTue = 'Tue\tRun\tN/A\t4\t20 m\t2 min\t9\t95% accelerations\t';
+  const sprintThu = 'Thu\tRun\tN/A\t4\t20 m\t45 s\t9\t95% sprint\t';
+  const plyo = 'Tue\tDepth Jump\tBW\t3\t5\t2 min\t8\tnote\t';
+  assert.ok(speedSessionPlyoLockout(block([sprintTue, sprintThu, plyo]), H.inseason_footballer).length);
+  assert.deepEqual(speedSessionPlyoLockout(block([sprintTue, plyo]), H.inseason_footballer), [], 'one speed day');
+  assert.deepEqual(speedSessionPlyoLockout(block([sprintTue, sprintThu]), H.inseason_footballer), [], 'no plyometrics');
+});
+
+// "Heavy" is the word that matters. The live footballer block puts lower body
+// on the same days as hard football and passes, because it keeps it at RPE 6.
+test('heavy lower body stays 48 hours from sport speed work', () => {
+  const heavy = ['Tue\tBack Squat\t140 kg\t3\t5\t3 min\tRPE 8\tnote\t'];
+  const light = ['Tue\tBack Squat\t100 kg\t3\t5\t3 min\tRPE 6\tnote\t'];
+  const away = ['Sun\tBack Squat\t140 kg\t3\t5\t3 min\tRPE 8\tnote\t'];
+  assert.ok(speedSessionSeparation(block(heavy), H.inseason_footballer).length);
+  assert.deepEqual(speedSessionSeparation(block(light), H.inseason_footballer), []);
+  assert.deepEqual(speedSessionSeparation(block(away), H.inseason_footballer), []);
+  assert.deepEqual(speedSessionSeparation(read('run115_inseason_footballer.txt'), H.inseason_footballer), [],
+    'lower body deliberately held at RPE 6 on the speed days');
+});
+
+// "< 40 km/week standard gym, 40-69 reduced lower body, >= 70 maintenance only."
+test('lower-body sessions are capped by weekly running volume', () => {
+  const two = ['Mon\tBack Squat\t100 kg\t3\t5\t3 min\t7\tn\t', 'Thu\tDeadlift\t120 kg\t3\t3\t3 min\t7\tn\t'];
+  const three = [...two, 'Sat\tLunge\tBW\t3\t10\t90 s\t7\tn\t'];
+  assert.ok(mileageTier(block(two), { notes: 'Runs about 75 km per week' }).length, '70+ allows one');
+  assert.deepEqual(mileageTier(block(two), { notes: 'Runs about 45 km per week' }), [], '40-69 allows two');
+  assert.ok(mileageTier(block(three), { notes: 'Runs about 45 km per week' }).length);
+  assert.deepEqual(mileageTier(block(three), { notes: 'Runs about 20 km per week' }), [], 'under 40 is standard');
+});
+
+test('lower-back loading is reduced against wrestling volume', () => {
+  const pulls = ['Tue\tDeadlift\t150 kg\t9\t3\t3 min\t8\tn\t'];
+  assert.ok(wrestlingLowBackLoad(block(pulls), { notes: '4 wrestling sessions per week' }).length);
+  assert.deepEqual(wrestlingLowBackLoad(block(pulls), { notes: '2 wrestling sessions per week' }), []);
+});
+
+test('the second batch is quiet on every program the coach scored', () => {
+  const cases = [
+    ['run101_weightlifter_peak.txt', { ...C.weightlifter_peak, competition_date: saturday(8), event_type: 'strength_meet' }],
+    ['run81_tactical_3k.txt', A.tactical_3k],
+    ['run113_mma_camp_delivered.txt', { ...C.mma_fight_camp, competition_date: saturday(3), event_type: 'combat' }],
+    ['run115_inseason_footballer.txt', H.inseason_footballer],
+  ];
+  for (const [f, intake] of cases) {
+    for (const fn of [footworkPlyoInterlock, speedSessionPlyoLockout, speedSessionSeparation, mileageTier, wrestlingLowBackLoad]) {
+      assert.deepEqual(fn(read(f), intake), [], `${f} / ${fn.name}`);
     }
   }
 });

@@ -103,7 +103,9 @@ for (const [file, intake, scored] of CORPUS) {
   // cycle, so the grader composes both.
   const sourceRules = [SOURCE.neckAxialLockout, SOURCE.tendonPainOverride, SOURCE.headImpactLockout,
     SOURCE.recoveryDayLock, SOURCE.pullingVolumeCap, SOURCE.overheadPressCutoff,
-    SOURCE.competitionWeekIntensityCap];
+    SOURCE.competitionWeekIntensityCap, SOURCE.footworkPlyoInterlock,
+    SOURCE.speedSessionPlyoLockout, SOURCE.speedSessionSeparation,
+    SOURCE.mileageTier, SOURCE.wrestlingLowBackLoad];
   const raw = [
     ...gradeProgram(program, intake),
     ...sourceRules.flatMap((fn) => { try { return fn(program, intake); } catch { return []; } }),
