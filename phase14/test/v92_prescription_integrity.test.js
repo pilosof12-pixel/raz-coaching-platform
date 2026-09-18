@@ -14,7 +14,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 
 import {
-  collectPrescriptionIntegrityFlags, repairPrescriptionIntegrity, buildPrescriptionIntegrityBrief,
+  collectPrescriptionIntegrityFlags as prescriptionFlagsAt, repairPrescriptionIntegrity, buildPrescriptionIntegrityBrief,
 } from '../engine/v92_prescription_integrity.js';
 
 const T = new URL('./fixtures/', import.meta.url);
@@ -23,8 +23,14 @@ const CORE = JSON.parse(read('acceptance_intakes.json'));
 const COMP = JSON.parse(read('competition_avatars.json'));
 
 const DAY = 86400000;
+// Pinned clock. Which block week an event falls in is computed from the HOURS
+// to the event, not the calendar date, so a fixed competition date slides from
+// week 4 into week 3 as an ordinary afternoon passes -- which is how this test
+// went from passing to failing over lunch with no source change.
+const NOW = Date.parse('2026-06-15T12:00:00Z');
+const collectPrescriptionIntegrityFlags = (p, i) => prescriptionFlagsAt(p, i, NOW);
 const onSaturday = (w) => {
-  const d = new Date(Date.now() + w * 7 * DAY);
+  const d = new Date(NOW + w * 7 * DAY);
   d.setUTCDate(d.getUTCDate() - ((d.getUTCDay() - 6 + 7) % 7));
   return d.toISOString().slice(0, 10);
 };

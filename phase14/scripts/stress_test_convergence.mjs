@@ -97,9 +97,21 @@ function workflowIntake(constName) {
   return JSON.parse(literal[0]);
 }
 const inWeeks = (w) => new Date(Date.now() + w * 7 * 86400000).toISOString().slice(0, 10);
-const onSaturday = (w) => {
-  const d = new Date(Date.now() + w * 7 * 86400000);
-  d.setUTCDate(d.getUTCDate() - ((d.getUTCDay() - 6 + 7) % 7));
+// The event has to sit clear of a week boundary, not merely on a Saturday.
+//
+// Which block week an event falls in is computed from the HOURS to the event,
+// so a date 22 days out is in week 4 at midnight and in week 3 by late
+// afternoon. This suite pinned the fight to "the Saturday four weeks out",
+// landed on day 22, and began failing every fight-camp perturbation at 15:30
+// with no source change behind it.
+//
+// The repair chain reads Date.now() itself and takes no clock, so the date has
+// to stay relative to real time. The fix is margin: take the first Saturday at
+// least 23 days out, which is inside week 4 at every hour of the day.
+const WEEK4_SAFE_DAYS = 23;
+const onSaturday = () => {
+  const d = new Date(Date.now() + WEEK4_SAFE_DAYS * 86400000);
+  d.setUTCDate(d.getUTCDate() + ((6 - d.getUTCDay() + 7) % 7));
   return d.toISOString().slice(0, 10);
 };
 const dayBefore = (iso) => {
@@ -107,7 +119,7 @@ const dayBefore = (iso) => {
   d.setUTCDate(d.getUTCDate() - 1);
   return d.toISOString().slice(0, 10);
 };
-const FIGHT_DAY = onSaturday(4);
+const FIGHT_DAY = onSaturday();
 
 Object.assign(INTAKES, {
   weightlifter_peak: {

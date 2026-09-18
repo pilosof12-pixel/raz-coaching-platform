@@ -22,8 +22,14 @@ const fx = (f) => fs.readFileSync(path.join(root, 'fixtures', f), 'utf8');
 const json = (f) => JSON.parse(fx(f));
 const C = json('competition_avatars.json');
 const day = 86400000;
+// Pinned, for the same reason the taper suite is: the block week an event falls
+// in is computed from the hours to the event, so "the Saturday three weeks out"
+// is week 4 in the morning and week 3 in the afternoon. The competition-week
+// assertion below started failing at 15:30 on the day it was written, having
+// passed all morning, with no source change behind it.
+const NOW = Date.parse('2026-06-15T12:00:00Z');
 const saturday = (w) => {
-  const d = new Date(Date.now() + w * 7 * day);
+  const d = new Date(NOW + w * 7 * day);
   d.setUTCDate(d.getUTCDate() + ((6 - d.getUTCDay() + 7) % 7));
   return d.toISOString().slice(0, 10);
 };
@@ -100,14 +106,14 @@ test('with nothing redundant to spend, the movement is added instead', () => {
 test('an inserted row carries its day, or the calendar counts it as a new session', () => {
   // A blank day cell became a third "unknown" gym day for an athlete who asked
   // for two, and the frequency gate refused the whole program over it.
-  const r = repairBenchmarkExposure(fx('run113_mma_camp_delivered.txt'), FIGHTER);
+  const r = repairBenchmarkExposure(fx('run113_mma_camp_delivered.txt'), FIGHTER, NOW);
   for (const row of named(r.program, /trap bar deadlift/i)) {
     assert.notEqual(row.day, '', `an inserted row has no day: ${JSON.stringify(row)}`);
   }
 });
 
 test('nothing is added to competition week', () => {
-  const r = repairBenchmarkExposure(fx('run113_mma_camp_delivered.txt'), FIGHTER);
+  const r = repairBenchmarkExposure(fx('run113_mma_camp_delivered.txt'), FIGHTER, NOW);
   assert.ok(r.inserts.every((i) => i.week !== 4), `fight week was touched: ${JSON.stringify(r.inserts)}`);
 });
 
@@ -115,7 +121,7 @@ test('only a name the engine\'s own vocabulary accepts is ever written', () => {
   // Writing "Snatch Pull" while it was absent from the dictionary turned a
   // fixable finding into a build that asked the model to try again.
   for (const [program, intake] of [[fx('run101_weightlifter_peak.txt'), LIFTER], [fx('run113_mma_camp_delivered.txt'), FIGHTER]]) {
-    const r = repairBenchmarkExposure(program, intake);
+    const r = repairBenchmarkExposure(program, intake, NOW);
     for (const name of [...r.swaps.map((s) => s.to), ...r.inserts.map((i) => i.movement)]) {
       assert.equal(matchDictionary(name)?.status, 'hit', `${name} is not in the dictionary`);
     }
@@ -130,7 +136,7 @@ test('the Olympic pulls are in the dictionary at all', () => {
 
 test('it converges: running it on its own output changes nothing', () => {
   for (const [program, intake] of [[fx('run101_weightlifter_peak.txt'), LIFTER], [fx('run113_mma_camp_delivered.txt'), FIGHTER]]) {
-    const once = repairBenchmarkExposure(program, intake);
+    const once = repairBenchmarkExposure(program, intake, NOW);
     assert.equal(repairBenchmarkExposure(once.program, intake).changed, false);
   }
 });
@@ -139,7 +145,7 @@ test('a program with nothing missing is left exactly as it was', () => {
   const program = fx('run115_inseason_footballer.txt');
   const intake = json('hard_avatars.json').inseason_footballer;
   assert.equal(benchmarkExposure(program, intake).length, 0);
-  const r = repairBenchmarkExposure(program, intake);
+  const r = repairBenchmarkExposure(program, intake, NOW);
   assert.equal(r.changed, false);
   assert.equal(r.program, program);
 });
@@ -147,13 +153,13 @@ test('a program with nothing missing is left exactly as it was', () => {
 test('neither repair touches race week, at every distance that has one', () => {
   // dual_event_hyrox races exactly four weeks out, so week 4 IS race week --
   // the case where a repair adding load would do the most damage.
-  const day = (n) => new Date(Date.now() + n * 86400000).toISOString().slice(0, 10);
+  const dayAt = (n) => new Date(NOW + n * 86400000).toISOString().slice(0, 10);
   const program = fx('run114_weightlifter_peak.txt');
   for (const [offset, expected] of [[7, 1], [14, 2], [21, 3], [28, 4]]) {
-    const intake = { ...C.weightlifter_peak, competition_date: day(offset), event_type: 'strength_meet', event_priority: 'A' };
-    assert.equal(competitionWeek(intake), expected, `event at +${offset}d should be week ${expected}`);
-    const b = repairBenchmarkExposure(program, intake);
-    const c = repairConsecutiveTrainingDays(program, intake);
+    const intake = { ...C.weightlifter_peak, competition_date: dayAt(offset), event_type: 'strength_meet', event_priority: 'A' };
+    assert.equal(competitionWeek(intake, NOW), expected, `event at +${offset}d should be week ${expected}`);
+    const b = repairBenchmarkExposure(program, intake, NOW);
+    const c = repairConsecutiveTrainingDays(program, intake, NOW);
     const touched = [...b.swaps, ...b.inserts].map((x) => x.week).concat(c.moves.map((m) => m.week));
     assert.ok(!touched.includes(expected), `race week ${expected} was touched: ${JSON.stringify(touched)}`);
   }

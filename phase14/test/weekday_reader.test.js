@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 
 import { weekdayKey, weekdayIndex } from '../engine/weekday.js';
-import { collectTimelineIntegrityFlags, repairTimelineIntegrity, workingDaysOf } from '../engine/v91_timeline_integrity.js';
+import { collectTimelineIntegrityFlags as timelineFlagsAt, repairTimelineIntegrity as repairTimelineAt, workingDaysOf } from '../engine/v91_timeline_integrity.js';
 import { buildTimelineIntegrityBrief } from '../engine/v91_timeline_integrity.js';
 import { renderCampSchedule, workingDaysByWeek } from '../engine/v78_sport_taper.js';
 
@@ -31,8 +31,15 @@ test('a cell that names no day answers none', () => {
 // The defect this exists to prevent: the engine asked for a label it could not
 // read, so a program whose two views agreed perfectly was failed for
 // disagreeing, and the repair found nothing to move.
+// Pinned clock. Which block week an event falls in is computed from the HOURS
+// to the event, not the calendar date, so a fixed competition date slides from
+// week 4 into week 3 as an ordinary afternoon passes -- which is how this test
+// went from passing to failing over lunch with no source change.
+const NOW = Date.parse('2026-06-15T12:00:00Z');
+const collectTimelineIntegrityFlags = (p, i) => timelineFlagsAt(p, i, NOW);
+const repairTimelineIntegrity = (p, i) => repairTimelineAt(p, i, NOW);
 const weeksOnSaturday = (n) => {
-  const d = new Date(Date.now() + n * 7 * 86400000);
+  const d = new Date(NOW + n * 7 * 86400000);
   d.setUTCDate(d.getUTCDate() - ((d.getUTCDay() - 6 + 7) % 7));
   return d.toISOString().slice(0, 10);
 };
@@ -59,7 +66,7 @@ function campProgram(week4Rows) {
     wk(3, [row('Tue', 'Trap Bar Deadlift', 2, 3), row('Fri', 'Bench Press', 2, 3)]),
     wk(4, week4Rows),
   ].join('\n\n');
-  return `${renderCampSchedule(CAMP, Date.now(), { workingDays: workingDaysByWeek(base) })}\n\n${base}`;
+  return `${renderCampSchedule(CAMP, NOW, { workingDays: workingDaysByWeek(base) })}\n\n${base}`;
 }
 
 test('the week table is read when it is labelled the way the brief asks', () => {
@@ -73,7 +80,7 @@ test('the week table is read when it is labelled the way the brief asks', () => 
 });
 
 test('the brief still asks for the labels the reader now understands', () => {
-  const brief = buildTimelineIntegrityBrief(CAMP);
+  const brief = buildTimelineIntegrityBrief(CAMP, NOW);
   assert.match(brief, /Tue = Day -4/);
   assert.match(brief, /Fri = Day -1/);
   assert.match(brief, /THIS DOES NOT ADD SESSIONS/);

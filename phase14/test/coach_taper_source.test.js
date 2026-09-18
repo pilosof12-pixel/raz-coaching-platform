@@ -2,13 +2,26 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 
-import { taperAgainstSource, gradeWithCoverage } from '../engine/coach_rules.js';
+import { taperAgainstSource as taperAt, gradeWithCoverage } from '../engine/coach_rules.js';
 
 const T = new URL('./fixtures/', import.meta.url);
 const read = (f) => fs.readFileSync(new URL(f, T), 'utf8');
 const C = JSON.parse(read('competition_avatars.json'));
+// The clock is pinned, and that is the whole point of this block.
+//
+// Which block week an event falls in is computed from the HOURS between now and
+// the event, not from the calendar date. So a fixed competition date slides
+// from week 4 into week 3 as an ordinary afternoon passes: competitionWeek for
+// 2026-10-10 read 4 at 15:22Z and 3 at 16:37Z on the same day. Seven tests in
+// this file, and four more elsewhere, went from passing to failing over lunch
+// without a line of source changing.
+//
+// Every rule here already takes `now`. Pinning it is what makes these tests
+// mean the same thing tomorrow as they did when they were written.
+const NOW = Date.parse('2026-06-15T12:00:00Z');
+const taperAgainstSource = (program, intake) => taperAt(program, intake, NOW);
 const saturday = (w) => {
-  const d = new Date(Date.now() + w * 7 * 86400000);
+  const d = new Date(NOW + w * 7 * 86400000);
   d.setUTCDate(d.getUTCDate() + ((6 - d.getUTCDay() + 7) % 7));
   return d.toISOString().slice(0, 10);
 };

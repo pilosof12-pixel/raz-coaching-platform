@@ -13,7 +13,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 
 import {
-  collectTimelineIntegrityFlags, repairTimelineIntegrity,
+  collectTimelineIntegrityFlags as timelineFlagsAt, repairTimelineIntegrity as repairTimelineAt,
   campScheduleFinalWeek, workingDaysOf, buildTimelineIntegrityBrief,
 } from '../engine/v91_timeline_integrity.js';
 import { renderCampSchedule, workingDaysByWeek } from '../engine/v78_sport_taper.js';
@@ -24,10 +24,16 @@ const CORE = JSON.parse(read('acceptance_intakes.json'));
 const COMP = JSON.parse(read('competition_avatars.json'));
 
 const DAY = 86400000;
-// Pin the fight to a Saturday inside the four-week window, so the block still
-// reaches Day 0 in week 4 whatever day this suite runs.
+// Pin the clock, not just the weekday. Pinning the fight to a Saturday was not
+// enough and the comment here used to claim it was: which block week an event
+// falls in is computed from the HOURS to the event, so a fixed Saturday slides
+// from week 4 into week 3 as an ordinary afternoon passes, and this suite went
+// from passing to failing at 15:30 with no source change behind it.
+const NOW = Date.parse('2026-06-15T12:00:00Z');
+const collectTimelineIntegrityFlags = (p, i) => timelineFlagsAt(p, i, NOW);
+const repairTimelineIntegrity = (p, i) => repairTimelineAt(p, i, NOW);
 const onSaturday = (w) => {
-  const d = new Date(Date.now() + w * 7 * DAY);
+  const d = new Date(NOW + w * 7 * DAY);
   d.setUTCDate(d.getUTCDate() - ((d.getUTCDay() - 6 + 7) % 7));
   return d.toISOString().slice(0, 10);
 };
@@ -111,7 +117,7 @@ test('an athlete with no event is left entirely alone', () => {
 });
 
 test('the brief tells the model the week stops at Day 0', () => {
-  const brief = buildTimelineIntegrityBrief(FIGHTER);
+  const brief = buildTimelineIntegrityBrief(FIGHTER, NOW);
   assert.match(brief, /MAY NOT CONTRADICT ITSELF/);
   assert.match(brief, /NOTHING IS SCHEDULED ON DAY 0/);
   assert.match(brief, /two views of one week/);
@@ -143,7 +149,7 @@ test('a block that continues past the event is not read as ramping into it', () 
       ...COMP.mma_fight_camp, competition_date: onSaturday(weeksOut),
       event_type: 'combat', event_priority: 'A',
     };
-    const program = `${renderCampSchedule(intake, Date.now(), { workingDays: workingDaysByWeek(base) })}\n\n${base}`;
+    const program = `${renderCampSchedule(intake, NOW, { workingDays: workingDaysByWeek(base) })}\n\n${base}`;
     const combat = collectTimelineIntegrityFlags(program, intake)
       .filter((f) => f.code === 'V91_COMBAT_LOAD_NOT_DECREASING');
     assert.deepEqual(combat.map((f) => f.code), [],
