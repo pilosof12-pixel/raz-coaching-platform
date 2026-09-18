@@ -18,6 +18,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import { gradeProgram } from '../engine/coach_rules.js';
+import * as SOURCE from '../engine/source_generator_rules.js';
 import { collectClaimIntegrityFlags } from '../engine/v93_claim_integrity.js';
 import { collectSportStateFlags } from '../engine/v78_sport_taper.js';
 import { DEDUCTIONS, selectProgramType } from '../engine/coach_standard.js';
@@ -98,8 +99,14 @@ for (const [file, intake, scored] of CORPUS) {
   try { program = fx(file); } catch { continue; }
   if (!/START_WEEK1_TSV/i.test(program)) continue;
 
+  // The source Generator Rules live in their own module to avoid an import
+  // cycle, so the grader composes both.
+  const sourceRules = [SOURCE.neckAxialLockout, SOURCE.tendonPainOverride, SOURCE.headImpactLockout,
+    SOURCE.recoveryDayLock, SOURCE.pullingVolumeCap, SOURCE.overheadPressCutoff,
+    SOURCE.competitionWeekIntensityCap];
   const raw = [
     ...gradeProgram(program, intake),
+    ...sourceRules.flatMap((fn) => { try { return fn(program, intake); } catch { return []; } }),
     ...collectClaimIntegrityFlags(program, intake).map((f) => ({ rule: 'STATED_PROGRESSION_ABSENT', movement: f.subject, detail: f.detail })),
     ...collectSportStateFlags(program, intake).map((f) => ({ rule: 'SPORT_STATE_MISDESCRIBED', movement: f.day, detail: f.detail })),
   ];
