@@ -14,6 +14,8 @@ import { repairBenchmarkExposure, maintenanceDose } from '../engine/benchmark_ex
 import { benchmarkExposure, accessoryRedundancy } from '../engine/coach_rules.js';
 import { matchDictionary } from '../engine/exercise_dictionary.js';
 import { parseWeek } from '../engine/v34_workload_accounting.js';
+import { competitionWeek } from '../engine/v90_competition_week.js';
+import { repairConsecutiveTrainingDays } from '../engine/consecutive_day_repair.js';
 
 const root = path.dirname(fileURLToPath(import.meta.url));
 const fx = (f) => fs.readFileSync(path.join(root, 'fixtures', f), 'utf8');
@@ -140,4 +142,19 @@ test('a program with nothing missing is left exactly as it was', () => {
   const r = repairBenchmarkExposure(program, intake);
   assert.equal(r.changed, false);
   assert.equal(r.program, program);
+});
+
+test('neither repair touches race week, at every distance that has one', () => {
+  // dual_event_hyrox races exactly four weeks out, so week 4 IS race week --
+  // the case where a repair adding load would do the most damage.
+  const day = (n) => new Date(Date.now() + n * 86400000).toISOString().slice(0, 10);
+  const program = fx('run114_weightlifter_peak.txt');
+  for (const [offset, expected] of [[7, 1], [14, 2], [21, 3], [28, 4]]) {
+    const intake = { ...C.weightlifter_peak, competition_date: day(offset), event_type: 'strength_meet', event_priority: 'A' };
+    assert.equal(competitionWeek(intake), expected, `event at +${offset}d should be week ${expected}`);
+    const b = repairBenchmarkExposure(program, intake);
+    const c = repairConsecutiveTrainingDays(program, intake);
+    const touched = [...b.swaps, ...b.inserts].map((x) => x.week).concat(c.moves.map((m) => m.week));
+    assert.ok(!touched.includes(expected), `race week ${expected} was touched: ${JSON.stringify(touched)}`);
+  }
 });
