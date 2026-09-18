@@ -1,0 +1,34 @@
+
+SOURCE COVERAGE: what the engine checks, what it only says, what it never mentions
+
+CHECKED  (2/22)
+  A87.6   Progressive overload suspended while the weight-cut flag is active  [repairable_validation_bundle.js]
+  TAP.4   Remove volume selectively: conditioning and redundant patterns first  [coach_rules.js]
+
+TOLD ONLY  (19/22)
+  A85.2   Pulling volume capped at 6 working sets when mat hours >= 10
+  A85.3   Grip fatigue >= 7 forces the >=10 mat-hour protocol
+  A85.4   Competition week: no strength above 70% 1RM
+  A85.5   Neck pain >= 3/10 locks out axial loading
+  A86.2   Pressing <= 60% of base volume, <= 35% in sparring weeks
+  A86.4   Footwork sessions >= 4/week blocks lower-body plyometrics
+  A86.5   Concussion or head impact generates zero gym work
+  A86.6   Overhead pressing eliminated from T-3 weeks to fight week
+  A87.2   Each wrestling session adds a low-back fatigue unit; >=3 reduces load
+  A87.5   No session longer than 45 minutes during a weight cut
+  A88.1   >= 48 hours between heavy gym lower body and sport speed work
+  A88.3   Plyometric lockout when speed sessions >= 2 per week
+  A88.4   Tendon pain >= 3/10 removes eccentric and plyo, substitutes isometrics
+  A88.5   Mileage tiers at 40 and 70 km/week change gym lower-body volume
+  A89.3   Same-day strength and endurance applies a +15% next-day fatigue cost
+  A89.5   Minimum 2 complete recovery days per 7-day microcycle
+  A89.4   Caloric deficit > 500 kcal with high load reduces volume
+  TAP.2   Taper duration 8-14 days is the default window
+  TAP.3   Frequency held at 30-50% of pretaper, not cut with volume
+
+ABSENT  (1/22)
+  TAP.1   Taper reduces volume by 41-60% of pretaper
+
+A rule in TOLD ONLY reaches the model and nothing verifies the output against it.
+That is where a deduction comes from: the instruction was given and not followed.
+

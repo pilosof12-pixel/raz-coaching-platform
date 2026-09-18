@@ -1,0 +1,781 @@
+
+COMPETITION PREPARATION /
+PEAKING / TAPERING
+KNOWLEDGE CLUSTER
+Physiology to Prescription for Fight Camps, Strength Meets, Mock Meets, and Competition Week
+Source grounded master document
+Built from Mujika, Kenney et al., McArdle et al., Laursen & Buchheit, and the project coaching layer
+Prepared for editorial QA and coaching engine use
+
+How to Use This Cluster
+This document is not a collection of fixed fight-week or meet-week templates. It is a reasoning system for moving an athlete from productive training into competition readiness. The central problem is not simply how to reduce work. It is how to remove enough fatigue to reveal fitness while preserving the physical, technical, tactical, and psychological qualities that competition requires.
+Source rule: The current version uses the supplied project sources as its authority base. It does not silently invent universal timing rules for combat sports, strength sports, or mock meets where the sources do not support them. Practical templates are labeled as source synthesis, coaching inference, or project heuristic rather than being presented as scientific laws.
+Evidence and traceability labels
+Direct source support: a statement or recommendation explicitly present in one or more supplied books.
+Source synthesis: a practical framework produced by combining compatible statements from the supplied sources.
+Coaching inference: a conservative practical implication that follows from the evidence but is not stated as a universal rule by the books.
+Project heuristic: an internal coaching rule from the Raz Strength Program Coaching Engine. It can be operationally useful but is not treated as a validated physiological measurement.
+Unresolved source gap: an area that needs a firmer sport-specific source before the engine should encode a universal rule.
+Citation key
+[MJ] Inigo Mujika, Tapering and Peaking for Optimal Performance.
+[K7] Kenney, Wilmore, and Costill, Physiology of Sport and Exercise, 7th edition.
+[M8] McArdle, Katch, and Katch, Exercise Physiology: Nutrition, Energy, and Human Performance, 8th edition.
+[LB] Laursen and Buchheit, Science and Application of High-Intensity Interval Training, supplied in the project as Practical HIIT & Cardio Programming.
+[NUT] Taylor, ed., Nutritional Guidelines for Athletic Performance: The Training Table.
+[ADV] Raz Pilosof Strength Program Coaching Engine, Advanced Layer Articles 52 to 102. Internal coaching framework; heuristic where not independently sourced.
+Contents
+Article 1. Peaking, Tapering, Fitness, Fatigue, and Readiness
+Article 2. Designing the Taper: Intensity, Volume, Frequency, Duration, and Taper Shape
+Article 3. Residual Fatigue and Exercise Cost: Damage, Eccentrics, Novelty, and Interference
+Article 4. What Recovers During a Taper: Neuromuscular, Metabolic, and Psychological Readiness
+Article 5. Building the Peak: Development, Specificity, Realization, and Expression
+Article 6. Combat Sport Competition Camp: Integrating Skill, Sparring, Strength, and Conditioning
+Article 7. Fight Week and Combat Competition Week
+Article 8. Strength Meets and Mock Meets: Peaking, Testing, and Attempt Planning
+Article 9. Conditioning During the Taper: Aerobic Work, Intervals, and Repeated High-Intensity Readiness
+Article 10. Nutrition, Weight Class, Glycogen, Hydration, and Travel During Competition Preparation
+Article 11. Monitoring, Taper Adjustment, Competition-Day Readiness, and Post-Competition Transition
+Appendix. Engine-Wide Competition Preparation Decision System and Source Gaps
+ARTICLE 1
+Peaking, Tapering, Fitness, Fatigue, and Readiness
+A taper is not a rest week and a peak is not a last-minute trick. Competition preparation works when accumulated fitness is retained while residual fatigue falls enough for the athlete to express what training has already built.
+Coaching objective: Convert this topic into decisions about what to preserve, what to reduce, when to reduce it, and what to monitor as competition approaches. The article is written for both human coaches and an AI coaching engine.
+1. Definitions that must remain separate
+Term
+Primary purpose
+Typical time horizon
+What success looks like
+Training block
+Create adaptation
+Weeks to months
+Fitness qualities improve
+Deload
+Reduce fatigue enough to resume productive training
+Several days to about a week, context dependent
+Training quality and tolerance recover
+Peak
+Organize multiple blocks so relevant qualities converge on a target date
+Usually several weeks or longer
+Competition-specific ability is highest when it matters
+Taper
+Reduce training load before a target event while retaining important adaptations
+Commonly days to a few weeks
+Fatigue falls faster than fitness, allowing readiness to rise
+Primer / activation
+Create short-lived readiness without meaningful fatigue
+Hours to a few days
+Movement feels fast, familiar, and confident
+
+Mujika describes tapering as a specialized precompetition reduction in training load designed to reduce accumulated physiological and psychological stress while preserving or enhancing performance. The key model is that training has both positive and negative effects: adaptation raises future performance potential, while fatigue temporarily suppresses the athlete's ability to express it. When training load falls, fatigue can dissipate more quickly than adaptation, so performance can improve even though the athlete is doing less training. [MJ, Chs. 1 and 7]
+Direct source principle: A taper should be judged by competition readiness, not by whether the athlete is still accumulating a large training load. The athlete is allowed to feel unusually good. That is often the intended outcome, not unused training capacity.
+2. Fitness is not the same as current performance
+A poor session late in a heavy block can reflect accumulated fatigue rather than a true loss of fitness. Conversely, a good session during a taper can reflect successful fatigue dissipation rather than a sudden new adaptation. This distinction prevents two common errors: panicking after a fatigue-suppressed performance and adding workload when the athlete begins to feel fresh.
+A useful coaching abstraction is: readiness equals accumulated fitness minus residual fatigue, then modified by technical, tactical, nutritional, environmental, and psychological state. This is not a literal biological equation and should not be calculated as one. It is a decision model that keeps the coach from confusing what the athlete has built with what the athlete can express today. [MJ, Ch. 7]
+3. Why tapering can improve performance without building much new fitness
+Muscle damage and soreness can decline as high-volume and damaging work is removed.
+Neuromuscular force and power can rebound when chronic training stress is reduced.
+Muscle glycogen can rise as training expenditure falls and carbohydrate availability is maintained.
+Mood, perceived effort, sleep quality, and subjective recovery can improve.
+Technical execution can feel sharper when fatigue no longer degrades coordination, timing, and force expression.
+Some delayed adaptation to previous training may continue to appear during the taper, so the process is not purely passive.
+Mujika reports that taper-associated performance gains can occur with or without large changes in VO2max, cardiac function, hormones, or other isolated laboratory markers. The practical implication is important: the coach should not demand that a single biomarker prove the taper is working. Performance readiness is the integrated outcome. [MJ, Chs. 2, 3, 6, and 7]
+4. Taper versus deload
+A deload is organized around recovery from training so the next training phase can be productive. A taper is organized backward from a fixed performance date. The same reduction in volume can therefore be correct in one context and wrong in another. During a deload the coach may deliberately reduce specificity and psychological arousal. During a taper the coach often preserves competition-relevant intensity, skill frequency, speed, and routine because these qualities must still be expressed at the end of the week.
+5. Peaking versus tapering
+Peaking is the larger architecture. It decides which qualities are developed early, which become more specific later, which are maintained, and which are allowed to decay because they no longer justify their fatigue cost. The taper is the terminal portion of that architecture. A good taper cannot rescue a badly designed peak, and a good peak can be obscured by a poor taper.
+6. Practical decision rules
+IF the competition date is not fixed and the athlete only needs recovery, THEN use deload logic rather than competition taper logic.
+IF the athlete is objectively improving and feels increasingly fresh during the taper, THEN do not add training merely because extra capacity appears available.
+IF a performance test is poor after a heavy training period but recovery signals are also poor, THEN first consider fatigue suppression before concluding that fitness was lost.
+IF the athlete entered the final period undertrained rather than overreached, THEN a large taper may remove too much useful stimulus; use a smaller readiness-prime approach.
+IF competition requires skill, speed, and decision making as well as physical output, THEN readiness must include all of those domains rather than a gym-only score.
+Source traceability
+Direct source support: [MJ] Chs. 1, 2, 3, 4, 6, and 7 for taper aims, physiological and psychological changes, and fitness-fatigue modeling.
+Source synthesis: The distinction between training fitness, current expression, peak, taper, deload, and primer combines Mujika's taper model with the project's state-based coaching logic.
+Unresolved source gap: No source provides a single validated readiness equation that converts all physical, technical, and psychological states into one number. The engine should use converging signals rather than false precision.
+ARTICLE 2
+Designing the Taper: Intensity, Volume, Frequency, Duration, and Taper Shape
+The strongest source-grounded taper rule is not simply "do less." Reduce training load mainly through volume, preserve enough relevant intensity to retain performance qualities, and individualize frequency and duration according to training status, sport, and the fatigue accumulated before the taper.
+Coaching objective: Convert this topic into decisions about what to preserve, what to reduce, when to reduce it, and what to monitor as competition approaches. The article is written for both human coaches and an AI coaching engine.
+1. The four variables are independent
+Training load is created by the interaction of intensity, volume, frequency, and the stress produced by the exercise mode. A taper can therefore reduce total load without reducing every variable equally. Mujika treats intensity, volume, frequency, and taper duration separately because they have different effects on retention, fatigue, and the athlete's feel for the event. [MJ, Ch. 5]
+Variable
+Evidence-grounded direction
+Practical default when history is unknown
+Important caveat
+Volume
+Reduce substantially
+A reduction around 41 to 60% of pretaper volume is the strongest general starting point in Mujika's cited meta-analysis
+Evidence is dominated by swimming, running, and cycling; multi-component combat volume should not be cut uniformly
+Intensity
+Maintain important performance intensity
+Keep competition-relevant load, pace, speed, or intent while sharply reducing repetitions and exposure
+For combat, do not interpret "maintain intensity" as preserving damaging contact or exhaustive sparring
+Frequency
+Often maintain more than volume
+Highly trained and technique-dependent athletes commonly benefit from retaining most session frequency while making sessions shorter
+Moderately trained athletes can often reduce frequency more aggressively
+Duration
+Individualize
+8 to 14 days is a defensible general starting window when no individual taper history exists
+Longer tapers may be needed after overload; shorter tapers may suit lower prior load or faster fatigue dissipation
+Taper shape
+Progressive reduction often favored
+Progressive or fast-decay exponential reduction is a sensible default
+Step tapers can still work; athlete history overrides a generic model
+
+Important evidence boundary: The 41 to 60% volume reduction and 8 to 14 day duration are population-level findings from sports such as swimming, running, and cycling. They are starting priors, not universal laws for MMA, BJJ, powerlifting, or every individual.
+2. Intensity: preserve the signal, not the fatigue
+Mujika's chapter summary is unusually clear: maintaining training intensity is necessary to retain and enhance training-induced adaptations during tapering, while reductions in other variables provide recovery. McArdle similarly emphasizes that maintenance of aerobic capacity is especially sensitive to intensity and describes successful tapers that reduce volume while retaining intensity. [MJ, Ch. 5; M8, Ch. 21]
+For strength and power work, this means the athlete can still touch meaningful loads or perform explosive actions, but with very little total work and no need to approach failure. External intensity and effort must therefore be stored separately in the engine. A heavy single that is technically clean and far from a grinder may be less fatiguing than multiple moderate-load sets taken close to failure.
+For combat sports, the word intensity needs to be decomposed. Competition-speed movement, tactical urgency, and technical intent may be preserved. Heavy contact, exhaustive live rounds, and repeated glycolytic suffering are different stressors and may need to fall. Blindly carrying the endurance rule "maintain intensity" into hard sparring is a category error.
+3. Volume: the primary fatigue-reduction lever
+The meta-analysis summarized by Mujika found the largest overall effect when pretaper training volume was reduced by 41 to 60%, with benefits also possible outside this band. The practical lesson is not to force every athlete to exactly 50%. It is that meaningful volume reduction is usually required; cutting only trivial accessory work while leaving the rest of the week unchanged may not dissipate enough fatigue. [MJ, Ch. 5]
+In multi-quality sports, remove volume selectively. General conditioning, hypertrophy-only accessories, redundant strength patterns, extra drilling, and high-damage work usually disappear before competition-specific skill and brief high-quality exposures. A 50% reduction in total minutes that accidentally removes the most specific practice while preserving junk volume is poor taper design.
+4. Frequency: protect rhythm and technical feel
+Mujika reports that moderately trained individuals can maintain adaptations with frequencies around 30 to 50% of pretaper values, whereas highly trained athletes are generally advised to retain much higher frequencies, often above 80%, particularly in technique-dependent sports. A key concern is "loss of feel." [MJ, Ch. 5]
+This maps well to combat and strength skill. The athlete may still enter the gym, mat, ring, or platform area frequently, but sessions become shorter, more predictable, and less costly. Frequency can preserve routine, timing, confidence, and technical fluency without requiring normal training volume.
+5. Duration: start from prior fatigue, not from event length
+The taper duration literature spans roughly 4 to 28 days, with the cited meta-analysis showing the largest average effect in the 8 to 14 day category. Mujika also emphasizes large interindividual variation and notes that pretaper overload can extend the recovery time required. The athlete who accumulated more fatigue often needs a longer taper, not necessarily a more extreme single-day reduction. [MJ, Chs. 5 and 7]
+A practical starting hierarchy is therefore: low prior fatigue or undertraining may require only a short readiness prime; normal competition preparation may fit roughly one to two weeks; deliberate overload or unusually high camp fatigue may justify a longer taper. The engine should learn from the athlete's previous competition response and progressively replace generic defaults with individual history.
+6. Taper shape
+Linear taper: training load decreases systematically in a roughly linear fashion.
+Exponential taper: training load decreases rapidly at first and then the rate of reduction slows. Mujika describes fast-decay and slow-decay versions.
+Step taper: training load is reduced abruptly and then held at the lower level.
+Two-phase or alternative taper: an early reduction may be followed by a small later increase or primer, but the evidence for these strategies is less complete.
+Progressive tapering generally performed better than step tapering in the meta-analysis summarized by Mujika, especially in swimming and running, while sport-specific uncertainty remained. A progressive taper is therefore a reasonable default when there is no personal taper history, but not an absolute rule. [MJ, Ch. 1]
+7. Practical construction sequence
+1. Set Day 0: the competition, fight, test, or high-fidelity mock meet.
+2. Estimate the athlete's fatigue entering the taper from the previous 1 to 3 weeks, not from one readiness score.
+3. Choose a provisional taper duration.
+4. Identify the competition qualities that must remain sharp: force, speed, skill, pacing, tactical timing, repeatability, or a combination.
+5. Reduce volume first, preferentially from non-specific and high-cost work.
+6. Retain enough intensity and frequency to preserve those competition qualities.
+7. Track whether the athlete becomes fresher without becoming flat or technically disconnected.
+8. Modify the taper from the smallest effective variable rather than redesigning the entire week after one noisy signal.
+Source traceability
+Direct source support: [MJ] Chs. 1 and 5 for taper models, intensity, volume, frequency, duration, and the cited Bosquet meta-analysis; [M8] Ch. 21 for maintenance and taper concepts.
+Source synthesis: The table converts population evidence into a default hierarchy: volume is the main lever, relevant intensity is preserved, frequency is retained more strongly in highly trained skill-dependent athletes, and duration is adjusted to prior fatigue.
+Unresolved source gap: Exact percentage reductions for combat sport training minutes, hard sparring, strength sets, and mixed-modality sessions are not established by the current source base. A future combat-specific source should refine those allocations.
+ARTICLE 3
+Residual Fatigue and Exercise Cost: Damage, Eccentrics, Novelty, and Interference
+Competition-week exercise selection should be based on the ratio of useful performance signal to residual fatigue cost. Load percentage alone cannot tell the coach how expensive an exercise will be.
+Coaching objective: Convert this topic into decisions about what to preserve, what to reduce, when to reduce it, and what to monitor as competition approaches. The article is written for both human coaches and an AI coaching engine.
+1. Training intensity is not training cost
+Two exercises at the same RPE or percentage of maximum can produce very different residual fatigue. Cost depends on total repetitions, eccentric strain, local tissue loading, novelty, skill demand, metabolic stress, collision or contact, exercise mode, and the tissues that must perform in the upcoming event. This is why a taper needs an exercise-cost layer rather than a single intensity score.
+2. Muscle damage and eccentric loading
+Kenney describes delayed-onset muscle soreness and loss of force after unaccustomed or intense eccentric exercise. Structural disruption, excitation-contraction coupling failure, inflammation, edema, and contractile changes can reduce maximal force for several days; the source specifically notes that excitation-contraction coupling failure is important during the first several days after damaging work. Muscle glycogen restoration can also be impaired in damaged muscle. [K7, Ch. 5]
+The taper implication is straightforward: there is little reason to create a large muscle-damage signal immediately before a competition where the adaptation cannot mature in time but the performance cost can still be present.
+Direct source principle: DOMS is not merely discomfort. When it reflects exercise-induced muscle damage, force generation and range of motion can be impaired. Therefore "I can tolerate soreness" is not the same as "soreness is performance neutral." [K7, Ch. 5]
+3. Novelty and the repeated-bout effect
+Unaccustomed eccentric work generally produces more damage and soreness than familiar repeated exposure. The repeated-bout effect means a trained athlete often tolerates familiar work better than a novel variation. This makes novelty a distinct taper cost. A new exercise can be mechanically moderate and still be a poor competition-week choice because the athlete has no reliable history of soreness, coordination demand, or recovery time. [K7, Ch. 5; M8, Ch. 22]
+4. A practical exercise-cost matrix
+Cost dimension
+What raises it
+Why it matters near competition
+Taper response
+Eccentric / damage
+High strain lengthening work, unaccustomed ROM, large lowering volume
+Can reduce force and create soreness for days
+Remove or sharply reduce high-damage exposures; favor familiar low-volume work
+Local tissue
+High repetitions or concentrated loading to a competition-relevant region
+Local fatigue can outlast systemic freshness
+Reduce the exact region that must perform, not necessarily the whole session
+Metabolic
+Long hard intervals, circuits, repeated near-failure sets
+Consumes glycogen and can suppress later quality
+Remove redundant hard conditioning first
+Neuromuscular intent
+Maximal or ballistic intent, high-threshold force
+Useful for readiness but expensive if volume is high
+Keep brief, crisp exposures; stop before quality drops
+Skill / coordination
+New or highly complex movement
+Uses learning bandwidth and can destabilize automatic technique
+Keep familiar competition-relevant patterns
+Grip / axial / contact
+Carries, heavy pulling, axial loading, grappling grip, striking contact
+May directly overlap with the tissues or neural demands of the event
+Reduce according to sport overlap and individual recovery
+Psychological arousal
+Max tests, hard sparring, emotionally intense sessions
+Can alter sleep, tension, confidence, or readiness
+Use only when it serves competition preparation rather than proving fitness
+
+5. Remove training components according to cost and specificity
+Usually removed earlier
+Often retained longer
+Reason
+Hypertrophy-only accessory volume
+Competition movement or sport skill
+Accessory adaptation has little time to mature; specific skill must remain fluent
+Novel exercises and new ROM exposures
+Familiar patterns
+Novelty creates unpredictable soreness and coordination cost
+High eccentric overload
+Brief familiar strength exposure
+Damage can linger while low-volume strength can preserve force familiarity
+Redundant glycolytic conditioning
+Short event-relevant pace or speed touches
+General fatigue is less valuable than specific readiness
+Hard nonessential recreational activity
+Routine warm-up and activation
+Risk and fatigue without a competition-specific return
+Near-failure lifting volume
+Low-rep technically clean lifting
+Failure adds fatigue without being required to retain strength
+
+6. Project stress-cost layer: useful but not validated physiology
+The existing Advanced Layer scores spinal, CNS, local, grip, skill, soreness, sport interference, and other costs. This is useful for organizing decisions, especially in combat athletes, but its numerical thresholds and recovery windows are internal heuristics rather than validated biological measurements. The new competition cluster should preserve the dimensions while removing false certainty. [ADV, Cluster F]
+The engine should therefore store costs as structured descriptors and athlete-specific history. For example, "heavy belt squat, familiar, low soreness history, 36 hours until sparring" is more informative than a single total cost number. A high score can flag review, but should not overrule actual performance and recovery data.
+7. Practical decision rules
+IF an exercise is novel and competition is close, THEN substitute a familiar pattern unless the new movement is essential to the event itself.
+IF an exercise produces DOMS or measurable force loss that regularly persists into the next key session, THEN remove it early enough that its residual cost is gone before Day 0.
+IF a heavy exposure is familiar, technically clean, very low volume, and does not create soreness, THEN do not reject it solely because the load is heavy.
+IF a moderate-load session requires many hard sets or near-failure work, THEN treat it as potentially high cost despite the lower percentage.
+IF sport practice already taxes grip, trunk, adductors, neck, or another region heavily, THEN count that local cost before adding gym work to the same tissues.
+Source traceability
+Direct source support: [K7] Ch. 5 and [M8] Ch. 22 for eccentric muscle damage, DOMS, impaired force, and repeated-bout effects.
+Source synthesis: The residual-fatigue matrix integrates exercise physiology with the project stress-cost framework and competition specificity.
+Project heuristic: The [ADV] stress-cost dimensions are retained as project heuristics. Their numeric scoring and recovery thresholds should not be presented as validated physiology.
+Unresolved source gap: The current books do not provide universal recovery times for every lift, combat drill, or tissue. Individual recovery history and event overlap should override generic time tables.
+ARTICLE 4
+What Recovers During a Taper: Neuromuscular, Metabolic, and Psychological Readiness
+The taper can improve performance through several overlapping pathways. The coach does not need every pathway to improve, but should understand what can change and why a single biomarker cannot define readiness.
+Coaching objective: Convert this topic into decisions about what to preserve, what to reduce, when to reduce it, and what to monitor as competition approaches. The article is written for both human coaches and an AI coaching engine.
+1. Neuromuscular recovery
+Mujika summarizes repeated observations of improved strength and power after reduced training. Examples include increased swim power after two-week tapers, improved voluntary strength in strength-trained subjects after a ten-day taper, and modest 1RM improvements after a longer taper. These are protocol-specific studies, not guarantees, but they support the general principle that chronic intensive training can suppress force and power expression and that reduced load can reveal it. [MJ, Ch. 3]
+Potential mechanisms include recovery of contractile function, reduced muscle damage, changes in neural activation, and improved force or power characteristics of muscle. The practical lesson is not to chase a specific mechanism during fight week. It is to avoid doing enough work to recreate the fatigue that the taper is trying to remove.
+2. Metabolic and cardiorespiratory readiness
+VO2max may increase, remain stable, or be unrelated to the final performance gain. Economy can improve in some athletes. Muscle glycogen commonly increases during tapering when training volume falls and carbohydrate availability remains adequate. Higher glycogen availability is particularly relevant to events requiring repeated or sustained high-intensity work. [MJ, Ch. 2]
+The endurance cluster adds an important integration rule: maintaining a conditioning quality usually requires less work than developing it, while severe sport practice must be counted as conditioning load. Therefore the final phase should usually protect useful aerobic and event-specific intensity with much less total conditioning volume rather than attempting to create a new aerobic base in the last week. [M8, Ch. 21; LB, Chs. 8 and 9]
+3. Muscle damage and biochemical recovery
+Creatine kinase and other markers of training stress often move toward baseline during tapering, but the relationship between any one marker and performance is inconsistent. The same is true for testosterone, cortisol, and testosterone-to-cortisol ratios. Performance can improve with stable hormones, and hormonal changes can occur without directly tracking performance. [MJ, Ch. 3]
+Monitoring rule: Hormones, CK, HRV, resting heart rate, or any other single marker can support a decision, but should not be treated as a truth machine. Competition performance is multifactorial and readiness signals are noisy.
+4. Psychological recovery
+Mujika reports that intensive training can worsen mood and increase fatigue, confusion, and stress, while tapering can improve mood, relaxation, recovery, perceived effort, and sleep quality. Psychological readiness is therefore part of the taper outcome rather than decoration around the physiology. [MJ, Ch. 4]
+A combat athlete can be physically fresh but mentally flat or over-aroused. A strength athlete can be physically ready but anxious about attempt selection. The engine should separate physical readiness from arousal, confidence, and tactical clarity rather than averaging them into one score.
+5. Freshness is an active training objective
+Physical freshness: low residual soreness, low local fatigue, normal movement comfort, stable body mass and hydration for the event context.
+Neuromuscular freshness: force and speed are available without repeated warm-up sets, grinding, or excessive arousal.
+Technical freshness: timing, coordination, and competition patterns feel automatic rather than consciously forced.
+Metabolic freshness: repeated efforts recover normally and the athlete is not carrying unnecessary conditioning fatigue or depleted glycogen.
+Psychological freshness: the athlete is motivated and confident without excessive tension, panic, or the urge to prove fitness in training.
+6. The "flat" athlete is not one problem
+Feeling flat late in a taper can mean several different things: residual fatigue has not cleared, training frequency fell too far and the athlete lost rhythm, carbohydrate availability is poor, sleep or travel disrupted arousal, a weight cut is suppressing output, or the athlete is simply psychologically under-stimulated. The correct response depends on the cause. Adding a hard workout is only one possible intervention and often the wrong one.
+7. Practical decision rules
+IF strength or speed improves while total training falls, THEN treat this as a normal taper response rather than evidence that the athlete needs more volume.
+IF the athlete feels flat but is not sore, sleep is good, body mass and fueling are stable, and brief warm-up efforts are fast, THEN consider a small familiar primer rather than a full workout.
+IF the athlete feels flat and performance, sleep, mood, and soreness are all poor, THEN treat residual fatigue or recovery failure as more likely than under-stimulation.
+IF a biomarker conflicts with good sport performance, normal mood, and normal recovery, THEN monitor rather than automatically changing the taper.
+IF a weight cut or travel disruption is present, THEN interpret every readiness signal in that context before changing training.
+Source traceability
+Direct source support: [MJ] Chs. 2, 3, and 4 for cardiorespiratory, metabolic, neuromuscular, biochemical, hormonal, mood, RPE, and sleep responses.
+Source synthesis: The five-domain freshness model organizes the source mechanisms into a field-coaching framework suitable for strength and combat sport.
+Unresolved source gap: The source base does not establish one best biomarker or a validated algorithm for diagnosing why an athlete feels flat. Use multiple converging indicators and conservative interventions.
+ARTICLE 5
+Building the Peak: Development, Specificity, Realization, and Expression
+The taper only works well when the preceding weeks place the right fitness in the athlete. A peak progressively shifts the training question from "what can we build?" to "what must we preserve and express on Day 0?"
+Coaching objective: Convert this topic into decisions about what to preserve, what to reduce, when to reduce it, and what to monitor as competition approaches. The article is written for both human coaches and an AI coaching engine.
+1. The competition clock changes training value
+Far from competition, the athlete can tolerate training that produces soreness, large volume, technical experimentation, and delayed adaptation because there is time for the benefits to mature. As competition approaches, the value of new general adaptation falls and the cost of residual fatigue rises. Specificity therefore increases while nonessential volume falls. This is consistent with the periodization principles in Kenney and the competition-preparation logic in Mujika. [K7, Ch. 14; MJ, Chs. 5 and 6]
+2. Four functional phases
+Phase
+Primary question
+Training emphasis
+What should start disappearing
+Development
+What qualities are limiting the athlete?
+Build strength, aerobic capacity, hypertrophy, tissue tolerance, technical options, and other identified needs
+Nothing solely because competition exists in the distant future
+Specificity
+Which built qualities transfer most directly to the event?
+More event-relevant lifts, pace, skill sequences, tactical scenarios, and modality
+Low-value variety and redundant general work
+Realization
+Can the athlete express the required qualities under event-like constraints?
+High-quality specific exposures, controlled simulations, reduced general volume
+Failure training, excessive accessories, redundant conditioning, novelty
+Taper / expression
+Can fatigue fall without losing feel, speed, or confidence?
+Very low volume, preserved relevant intensity and frequency, familiar primers and routines
+Anything that creates residual fatigue without improving Day 0 expression
+
+These are functional phases, not mandatory calendar blocks. An athlete may move through them quickly or slowly depending on training age, event date, prior preparation, injury, and whether the sport itself supplies the specific exposure. The engine should not force a 12-week peak when only six weeks exist, or invent a peak when the event is merely a low-priority mock meet.
+3. Specificity must be sport-specific, not just "harder"
+For a strength meet, specificity usually means the competition lifts, competition standards, heavy but technically clean singles or low-rep work, commands, warm-up sequencing, and attempt strategy. For combat sport, specificity means tactical and technical execution against realistic resistance, pace changes, round structure, decision making, and maintaining strength or power as support qualities. The closer the event, the less reason there is for nonessential gym complexity.
+4. Development and maintenance are different doses
+The athlete generally needs more volume and repeated exposure to build a quality than to retain it over a short taper or competition period. McArdle describes maintenance of aerobic adaptations with lower frequency or duration when intensity is retained; the Advanced Layer makes the same practical assumption for strength. This allows the program to create space for sport practice without pretending that every quality must keep progressing simultaneously. [M8, Ch. 21; ADV, Clusters F and G]
+5. Overload before taper: useful but not mandatory
+Mujika's modeling work shows that heavier pretaper loading can create more fatigue and may require a longer taper. This does not mean every athlete should deliberately overreach before competition. Overload is only useful if the athlete can absorb it, if the event date permits recovery, and if the added adaptation is worth the risk. A poorly recovered athlete does not need a harder final block simply because a taper is coming. [MJ, Chs. 5 and 7]
+6. Competition priority determines how aggressive the peak should be
+A-priority competition: build the macrocycle around the event and use the athlete's best-known taper strategy.
+B-priority competition: reduce fatigue enough to perform well but do not destroy a larger training block for a minor event.
+C-priority event or technical mock meet: use the event as training information; only a small reduction may be needed.
+High-fidelity mock meet or formal testing day: treat the day as a performance event if the result is intended to estimate true current capacity.
+7. Practical decision rules
+IF a quality will not meaningfully adapt before competition, THEN stop trying to develop it and decide whether to maintain it or remove it.
+IF sport-specific work increases, THEN reduce general work before allowing total load to rise automatically.
+IF the athlete has no history of successful precompetition overload, THEN do not manufacture overreaching simply because taper research includes overload models.
+IF the competition is low priority, THEN preserve the long-term block and use a smaller taper rather than peaking aggressively for every event.
+IF an athlete competes frequently, THEN repeated full peaks are usually impossible; alternate build periods, maintenance, and smaller tapers according to event priority.
+Source traceability
+Direct source support: [K7] Ch. 14 for periodization and specificity; [MJ] Chs. 5 to 7 for taper design, individual response, and pretaper load.
+Source synthesis: The development to specificity to realization to expression sequence is a source synthesis that translates periodization and taper principles into one competition clock.
+Unresolved source gap: The sources do not prescribe one universal peak length for strength meets or combat camps. The existing project ranges are useful planning heuristics but should not be encoded as physiological laws.
+ARTICLE 6
+Combat Sport Competition Camp: Integrating Skill, Sparring, Strength, and Conditioning
+In combat sport, the gym is support work. As the fight or tournament approaches, technical and tactical specificity should occupy the cleanest recovery budget while strength and conditioning move from development toward maintenance and expression.
+Coaching objective: Convert this topic into decisions about what to preserve, what to reduce, when to reduce it, and what to monitor as competition approaches. The article is written for both human coaches and an AI coaching engine.
+1. The priority hierarchy
+Combat performance is not a gym total. It requires technical execution, tactical decisions, repeated high-intensity actions, aerobic recovery between actions, force and power, emotional regulation, and the ability to perform under an opponent-imposed workload. The endurance cluster therefore treats sport practice as the primary specific conditioning stimulus and supplemental work as a way to fill identifiable gaps. [LB, Ch. 11; K7, Ch. 14]
+Combat camp rule: As hard and specific sport practice rises, the gym and generic conditioning contribution should usually fall. The coach should not keep off-season strength volume flat while adding fight-camp sparring on top.
+2. Count the mat, ring, and cage before writing the gym
+Hard sparring counts as high-intensity conditioning, technical fatigue, local tissue loading, and psychological stress.
+Positional or scenario rounds can be metabolically hard even when total session duration is short.
+Gi grappling adds grip and forearm load; wrestling and takedown work add trunk, neck, hip, and eccentric demands; striking adds impact and high-speed repetition.
+A strength session that is reasonable in isolation can become excessive when it loads the same tissues shortly before or after hard sport practice.
+The existing Advanced Layer captures this with a multi-channel stress-cost system. The dimensions are useful, but the numerical scores and fixed recovery windows are project heuristics. The engine should use them as prompts for reasoning, then verify them against the athlete's actual sparring quality, soreness, force or speed, and recovery history. [ADV, Cluster F]
+3. Camp phasing: practical source synthesis
+Camp phase
+Sport emphasis
+Strength role
+Conditioning role
+Main coaching question
+Early camp
+Build technical volume; meaningful live work begins
+Can still develop or consolidate strength if recovery permits
+Fill identified aerobic or repeat-effort gaps
+What qualities still need building?
+Middle camp
+More specific live scenarios and tactical work
+Shift toward maintenance; fewer hard sets and less novelty
+Hard supplemental work becomes selective because sport supplies more severe exposure
+Is supplemental work still solving a real deficit?
+Late camp
+Competition-specific sharpness, reduced unnecessary contact
+Minimal effective dose; familiar, low-soreness, technically clean work
+Remove redundant severe intervals; preserve easy aerobic work or brief specific touches if useful
+What can be removed without losing readiness?
+Taper / fight week
+Technical feel, tactical confidence, movement speed, recovery
+Priming or no lifting depending athlete history
+No fitness cramming; only low-cost maintenance or activation
+Will this session improve Day 0 or merely create fatigue?
+
+Evidence label: This camp table is source synthesis and coaching inference. Mujika provides taper physiology and team-sport principles; LB provides combat conditioning and load-surveillance principles; the current library does not yet contain the dedicated combat S&C source planned for a later revision.
+4. Strength training in camp
+Strength work should preserve force qualities with less volume as sport stress rises. Familiar movements, low set counts, high technical quality, and low soreness are favored. High-repetition hypertrophy work, new exercises, large eccentric doses, and grinders offer little late-camp return. This does not require replacing every free-weight exercise with a machine; it requires choosing the exercise that gives the needed force signal at acceptable cost for that athlete.
+A combat athlete does not need a strength-sport realization phase. Near-maximal gym performance is not the competition demand. If heavy exposure is retained, it should be because it preserves force familiarity efficiently, not because the coach wants proof of strength.
+5. Sparring progression and withdrawal
+The sport-specific source gap is greatest here. The current books do not justify one universal date for the final hard sparring session. A practical rule is to schedule the last truly damaging or high-risk live exposure early enough that soreness, local tissue irritation, cognitive fatigue, and sleep disruption have resolved before competition, then retain shorter technical and tactical exposures closer to the event. The exact timing should be learned from sport type, contact severity, athlete history, and the weight-management plan.
+For striking sports, heavy head contact has additional health risk that should not be treated as merely another fatigue variable. Medical or governing-body guidance takes priority over performance programming.
+6. Conditioning in camp
+The endurance cluster is explicit that hard sparring already supplies repeated severe efforts. Adding brutal circuits after hard live work because the athlete "needs cardio" can duplicate the same stress while degrading technical quality. Supplemental conditioning should target the missing quality: aerobic base, repeat-effort recovery, high aerobic power, or a specific pacing limitation. [LB, Chs. 8, 9, and 11]
+7. Weight-class interaction
+As energy availability and body mass are manipulated, the recovery margin narrows. A cut can alter glycogen, mood, sleep, hydration, and training quality. Therefore the final strength and conditioning dose should become more conservative as the athlete approaches a difficult cut. The taper and weight plan must be designed together rather than allowing one to sabotage the other. [MJ, Ch. 2; NUT; ADV, Art. 76]
+8. Practical decision rules
+IF hard sparring quality is dropping while gym performance is still good, THEN reduce gym or supplemental conditioning stress before concluding that the athlete needs more sport work.
+IF sport practice already supplies repeated severe metabolic exposure, THEN do not add hard intervals unless a specific conditioning deficit remains.
+IF a strength exercise regularly compromises the next key mat session, THEN reduce its volume, change its placement, or substitute a lower-cost pattern.
+IF competition-specific practice rises, THEN remove generic conditioning and hypertrophy work before reducing valuable technical frequency.
+IF a weight cut becomes more demanding, THEN lower nonessential training cost and interpret poor readiness through the nutrition and hydration context.
+IF the athlete is fresh late in camp, THEN protect sharpness rather than converting freshness into another hard sparring session.
+Source traceability
+Direct source support: [LB] Ch. 11 and the Endurance Cluster combat article for sport-practice-first conditioning logic; [K7] Ch. 14 for specificity; [MJ] for taper and team-sport principles.
+Source synthesis: The camp architecture integrates sport specificity, taper physiology, and the project combat stress-cost layer.
+Project heuristic: [ADV] Articles 53 to 60 and 85 to 90 provide useful internal routing rules, but numerical CNS/spinal scores and fixed recovery times remain heuristics.
+Unresolved source gap: Exact combat-sport sparring volumes, contact withdrawal dates, and week-by-week S&C doses remain incomplete until a dedicated combat S&C source is added.
+ARTICLE 7
+Fight Week and Combat Competition Week
+Fight week is a distinct microcycle. The goal is not to gain fitness. It is to preserve technical feel, speed, confidence, and enough physiological readiness while eliminating avoidable fatigue and risk.
+Coaching objective: Convert this topic into decisions about what to preserve, what to reduce, when to reduce it, and what to monitor as competition approaches. The article is written for both human coaches and an AI coaching engine.
+1. Build backward from Day 0
+Competition day is Day 0. Every session in the final week should have a clear answer to one question: what useful state will this create on Day 0, and what residual cost might remain? This prevents the common habit of programming a normal week and simply deleting the final session.
+2. What usually stays
+Frequent but short technical touches when they help the athlete retain feel and confidence.
+Competition-specific movement speed and tactical rehearsal without exhaustive rounds.
+A familiar warm-up and arousal routine.
+Very low-volume strength or power priming if the athlete has a known positive response.
+Easy aerobic movement when it helps routine, circulation, recovery, or mood without creating local fatigue.
+Normal familiar nutrition and hydration behavior unless a planned weight-class procedure requires specialist adjustment.
+3. What usually leaves
+Hypertrophy-only volume and failure training.
+Novel lifts, novel drills, or major technical reconstructions.
+High-damage eccentric work and large volumes of loaded lower-body work.
+Redundant high-intensity conditioning and hard circuits.
+Unnecessary heavy contact and hard sparring close enough to threaten recovery or injury risk.
+Unplanned recreational activity, testing, or "confidence workouts" that are actually fitness tests.
+4. Example fight-week structure
+This is a practical starting template, not a universal combat-sport rule. Shift sessions earlier for athletes who recover slowly, after a very hard camp, during a difficult weight cut, or when contact risk is high. Shift slightly later only when the athlete has a demonstrated history of responding well.
+Day
+Primary goal
+Example content
+Stop condition
+Day -7 to -6
+Final meaningful training exposure
+Short specific live or high-quality sport work; optional low-volume strength maintenance
+Stop before residual soreness, technical breakdown, or a second hard stimulus is needed
+Day -5 to -4
+Reduce cost, retain speed and feel
+Technical scenarios, pads or drilling, brief competition-speed actions, low-cost strength/power if historically useful
+No grinding, no exhaustion, no new soreness
+Day -3
+Freshness dominates
+Short technical touch or easy aerobic movement; tactical review
+Athlete finishes better than they started
+Day -2
+Routine and confidence
+Very short skill rehearsal, warm-up rehearsal, mobility or easy movement as familiar
+No session that requires recovery
+Day -1
+Activation or rest
+Brief familiar movement and mental routine, or full rest if athlete performs better that way
+No fatigue, no novelty, no testing
+Day 0
+Compete
+Use rehearsed warm-up, pacing, tactical, and fueling plan
+Do not improvise because precompetition arousal is high
+
+5. Strength priming in fight week
+A primer should create readiness, not adaptation. If used, it should employ familiar movements, very low set and rep counts, generous rest, fast concentric intent, and clear termination before velocity or technique deteriorates. The exact load is athlete-specific. A primer can be moderate or relatively heavy; its defining feature is low residual fatigue, not a fixed percentage.
+Athletes who reliably feel better with complete rest should not be forced into a primer because a template says so. Likewise, an athlete who becomes flat after several days of inactivity may benefit from preserving frequency with very short sessions. Mujika's frequency findings support this individualization, especially in highly trained, technique-dependent athletes. [MJ, Ch. 5]
+6. Technical work and contact
+Maintain skill frequency more readily than hard contact. Technical drilling, pad work, controlled positional work, or competition-speed rehearsal can preserve timing with much less residual cost than unrestricted hard sparring. The engine should store "technical intensity" and "contact intensity" separately so that the instruction to preserve intensity does not accidentally preserve damage.
+7. Psychological week
+Reduce unnecessary uncertainty. Rehearse warm-up, corner communication, equipment, arrival time, rules, first-minute tactical priorities, and a simple arousal routine. Mujika's psychological chapter supports monitoring mood, perceived effort, recovery-stress, and sleep rather than assuming that physical rest automatically produces mental readiness. [MJ, Ch. 4]
+8. Fight-week failure modes
+The athlete feels amazing on Day -4 and adds hard rounds.
+The coach removes all training and the athlete loses technical rhythm or becomes psychologically flat.
+A final brutal conditioning session is used to "top up cardio."
+The final strength session becomes a confidence test or PR attempt.
+Weight-cut fatigue is mistaken for lack of fitness and answered with more training.
+A new recovery method, supplement, food, sleep intervention, or warm-up is introduced in the final days.
+9. Decision rules
+IF the athlete finishes a fight-week session more fatigued, sore, or technically worse than before it, THEN the dose was too high for the purpose.
+IF technical feel deteriorates after excessive rest but physical recovery is good, THEN restore a short familiar technical touch rather than a hard session.
+IF contact or sparring has a meaningful chance of leaving soreness, injury, headache, or sleep disruption into Day 0, THEN move it earlier or remove it.
+IF a difficult cut is underway, THEN prioritize safe weight management and technical freshness over maintaining normal gym volume.
+IF the athlete has a proven personal fight-week routine that repeatedly produces good performance, THEN individual history should outrank generic templates unless a clear risk or new constraint appears.
+Source traceability
+Direct source support: [MJ] Chs. 4 and 5 for frequency, psychological readiness, and load reduction; [LB] for combat conditioning and sport-specific load logic.
+Source synthesis: The fight-week template applies Mujika's taper principles to a skill-plus-contact sport by preserving technical frequency and performance speed while reducing damaging contact and volume.
+Unresolved source gap: The current source base does not justify one mandatory final hard-sparring date or one universal strength-primer load for MMA, boxing, wrestling, or BJJ. These remain individualized until the combat-specific source is added.
+ARTICLE 8
+Strength Meets and Mock Meets: Peaking, Testing, and Attempt Planning
+A strength meet is a performance event. A mock meet can be a performance event, a calibration test, or a technical rehearsal. The taper should match the purpose rather than automatically treating every heavy test day like a championship.
+Coaching objective: Convert this topic into decisions about what to preserve, what to reduce, when to reduce it, and what to monitor as competition approaches. The article is written for both human coaches and an AI coaching engine.
+1. Strength meet priorities
+For a maximal-strength event, the performance target is high force expression under specific rules. Late preparation therefore becomes more specific: competition movements and standards dominate, volume falls, meaningful load is retained, and unnecessary accessory or damaging work is removed. The new cluster does not need a snatch-by-snatch or deadlift-by-deadlift peak; it needs this general logic.
+2. External intensity versus effort
+Near competition, relatively heavy loads can remain useful while total work and proximity to failure fall. A technically clean single at a high percentage is not the same stress as repeated grinders. The engine should store load, reps, velocity or technical quality, and effort separately. "Heavy" is a property of external load; "fatiguing" is an outcome of the whole dose.
+3. Mock meets have different jobs
+Mock meet type
+Purpose
+Taper need
+How to interpret the result
+High-fidelity performance mock
+Estimate true current competition capacity and rehearse the full day
+Use a real short taper or the athlete's usual meet taper if the result matters
+Treat result as close to a competition test, including warm-up and attempt-day fatigue
+Calibration mock
+Check readiness and refine estimated maxes without full cost
+Small volume reduction; avoid a full peak unless needed
+Use as one data point, not proof of absolute maximum
+Technical rehearsal
+Practice commands, standards, setup, equipment, and pacing
+Little or no taper beyond protecting the session
+Score technical consistency more than total load
+Exposure / confidence day
+Practice heavy but submaximal singles
+Minimal taper; keep large reserve from failure
+Use confidence and execution, not PRs, as success criteria
+
+4. Attempt planning
+The current source set does not establish one universal attempt percentage. The Advanced Layer contains specific opener percentages, but those should be treated as project heuristics rather than scientific rules. A safer engine principle is that the opener should have very high expected success based on recent specific training and competition standards; the second attempt should secure the primary performance objective; and the third should be selected from the first two attempts and the day's actual readiness rather than precompetition emotion. [ADV, Art. 94]
+Attempt selection should be written before the event with clear adjustment rules. The athlete should know what changes after an unexpectedly easy opener, unexpectedly hard opener, technical error, or rule issue. This reduces emotional loading decisions when arousal is high.
+5. Last heavy exposure
+There is no universal last-heavy-day rule in the supplied taper evidence. Timing depends on the athlete's recovery from heavy singles, competition movement, total volume, body size, training age, and whether the exposure causes local soreness or psychological fatigue. The correct question is not "what day does every lifter lift heavy?" but "how long does this athlete need for a heavy, low-volume exposure to improve readiness rather than suppress it?"
+The same logic governs mock meets. If the goal is to measure true capacity, reduce fatigue enough to make the test valid. If the goal is only technical practice, do not waste two weeks of productive training to manufacture a test-day PR.
+6. Strength competition taper structure
+Reduce total lifting volume substantially as the meet approaches.
+Keep the competition lifts or highly specific variants as the main patterns.
+Preserve meaningful load exposure while reducing repetitions, accessory work, and failure risk.
+Remove high-soreness eccentric accessories and novel variations.
+Maintain enough lift frequency for technical feel when the athlete benefits from it.
+Rehearse equipment, commands, warm-up jumps, timing, and attempt-decision rules before meet day.
+7. Mock meet data quality
+A fatigued mock meet underestimates fitness; a heavily tapered mock meet may overestimate what the athlete can repeat during normal training. Both results can be useful if the context is recorded. The engine should therefore store the taper applied before the test, sleep, body mass, recent heavy volume, warm-up, RPE or bar-speed notes, and rule standard. A number without the testing context is weak programming data.
+8. Practical decision rules
+IF the mock meet is intended to estimate true competition performance, THEN taper enough to remove major training fatigue and standardize the test day.
+IF the mock meet is primarily technical, THEN preserve the training block and keep attempts submaximal enough that the day does not require a major recovery period.
+IF a heavy single becomes a grinder in the final phase, THEN reduce subsequent volume or load rather than forcing the planned progression.
+IF the athlete misses training before the meet, THEN do not compress the missed volume into the final week.
+IF the athlete feels exceptionally strong mid-taper, THEN keep the planned peak exposures rather than testing the goal early.
+IF an attempt plan changes, THEN change it because of objective execution and competition context, not because adrenaline increased.
+Source traceability
+Direct source support: [MJ] Chs. 3 and 5 for strength/power recovery and taper variables; [K7] for strength physiology and specificity; [ADV] Arts. 94 and 95 for existing testing and peak structure.
+Source synthesis: The meet and mock-meet framework generalizes taper physiology to maximal-strength expression without requiring lift-specific peaking detail.
+Project heuristic: Existing [ADV] attempt percentages are retained only as internal historical heuristics and should not be elevated to evidence-based universal rules.
+Unresolved source gap: The supplied books do not provide validated universal opener percentages, last-heavy-session dates, or mock-meet taper durations. The engine should use athlete history and event purpose rather than false precision.
+ARTICLE 9
+Conditioning During the Taper: Aerobic Work, Intervals, and Repeated High-Intensity Readiness
+Conditioning late in competition preparation should maintain the performance qualities already built and preserve recovery between high-intensity actions. It should not become a last chance to create fitness.
+Coaching objective: Convert this topic into decisions about what to preserve, what to reduce, when to reduce it, and what to monitor as competition approaches. The article is written for both human coaches and an AI coaching engine.
+1. Maintenance is cheaper than development
+McArdle describes maintenance of aerobic adaptation with lower training frequency or duration when intensity is retained, while reducing intensity too much can reduce aerobic capacity. Mujika likewise supports preserving training intensity as volume falls. This allows a taper to keep the relevant conditioning signal with far less total work. [M8, Ch. 21; MJ, Ch. 5]
+2. Combat athletes already perform conditioning
+The endurance cluster treats hard sparring and sport practice as part of the high-intensity conditioning budget. In combat sports, short explosive exchanges use rapid ATP pathways, while oxidative metabolism contributes to recovery between repeated actions. Therefore the athlete needs both action quality and the aerobic support that restores repeatability, but supplementary intervals are only justified when they address a specific deficit. [K7, Ch. 5; LB, Chs. 3 to 5 and 11]
+3. What changes as competition approaches
+Far from competition
+Closer to competition
+Final taper
+Build identified aerobic, threshold, VO2max, repeat-effort, or sprint qualities with enough dose to adapt
+Shift toward event-specific pacing and reduce redundant general high-intensity work
+Maintain only the smallest useful dose; no fitness cramming
+Low-intensity volume can accumulate broadly if recovery allows
+Easy aerobic work may stay because cost is low and recovery benefit/routine can be useful
+Short easy sessions or walks/spins only if they improve readiness and do not create local fatigue
+Hard intervals can be progressed when they solve the current limiter
+Hard sport practice may replace formal intervals
+Severe conditioning disappears before competition unless the event itself requires a final specific exposure and the athlete has a proven response
+
+4. Low-intensity aerobic work
+Easy aerobic work is often a useful taper tool because it can preserve routine and oxidative activity with relatively low mechanical and metabolic cost. But "easy" is not automatically free. A long bike session can fatigue the quadriceps; running adds eccentric impact; rowing can tax the back and grip. The mode and duration must be selected according to the competition tissues and the athlete's response. [LB, Ch. 6]
+5. High-intensity intervals
+The closer competition gets, the stronger the justification required for a hard interval session. If the athlete already receives competition-specific severe exposure through sparring or event rehearsal, another hard interval session is often redundant. When some high-intensity work remains, reduce the repetitions and preserve output quality rather than chasing exhaustion or lactate.
+6. Repeated sprint and alactic work
+Brief explosive work can preserve speed or power when volume is tiny and recovery is long enough that each effort remains high quality. Do not convert a primer into conditioning by shortening rest. A session intended to retain peak speed should end before speed drops materially.
+7. Practical decision rules
+IF hard sport practice already supplies the severe-domain stimulus, THEN remove redundant formal HIIT before cutting valuable skill work.
+IF easy aerobic work causes local leg, back, shoulder, or grip fatigue that affects the event, THEN reduce duration or change mode.
+IF the athlete is one week from competition, THEN the burden of proof is on any hard conditioning session: it must clearly improve event readiness more than it threatens recovery.
+IF the athlete feels flat after several low-load days, THEN a brief familiar pace or speed primer may be preferable to a long hard workout.
+IF conditioning quality was not built earlier in the camp, THEN accept the limitation; do not attempt to repair weeks of undertraining in the final days.
+Source traceability
+Direct source support: [M8] Ch. 21 and [MJ] Ch. 5 for maintenance with retained intensity and reduced volume; [LB] for HIIT prescription, combat demands, modality, and load surveillance.
+Source synthesis: The taper-conditioning hierarchy extends the Endurance Cluster rule that sport practice is counted first and supplemental conditioning fills a gap.
+Unresolved source gap: There is no source-supported universal final-HIIT day for combat, hybrid, or strength athletes. Timing must reflect mode, residual fatigue, and event demands.
+ARTICLE 10
+Nutrition, Weight Class, Glycogen, Hydration, and Travel During Competition Preparation
+A taper changes energy expenditure, glycogen restoration, body-mass management, and travel demands. Nutrition and weight strategy must support freshness rather than creating a second fatigue problem while training stress is being reduced.
+Coaching objective: Convert this topic into decisions about what to preserve, what to reduce, when to reduce it, and what to monitor as competition approaches. The article is written for both human coaches and an AI coaching engine.
+1. Reduced training changes energy demand
+Mujika notes that reduced training load lowers daily energy expenditure and that athletes should pay attention to energy intake so undesirable energy imbalance and body-composition changes do not occur. This does not mean automatically cutting calories aggressively during the taper. The appropriate intake depends on event demands, body mass goals, and whether the athlete is making weight. [MJ, Ch. 2]
+2. Glycogen is part of readiness
+Muscle glycogen has been shown to increase during tapering, especially when training volume falls and carbohydrate intake is adequate. High-intensity and repeated-effort performance relies heavily on carbohydrate. Therefore an athlete who is not constrained by a weight class should generally avoid creating unnecessary carbohydrate depletion during the final days. [MJ, Ch. 2; NUT]
+3. Weight-class athletes
+Weight making changes the taper problem. The athlete is trying to reduce fatigue while potentially reducing body mass, energy availability, gut content, or body water. These goals can conflict. The more aggressive the cut, the less tolerance there is for nonessential training stress. The existing Advanced Layer correctly flags aggressive acute dehydration as a higher-risk process that should not be casually generated by a training engine. [ADV, Art. 76]
+Safety rule: The cluster can organize training around a planned weight-class strategy, but should not generate aggressive dehydration, diuretic, or medically risky weight-cut protocols. Significant acute weight manipulation should be managed with appropriately qualified professional oversight and the rules of the sport.
+4. Weigh-in timing changes the performance problem
+A same-day weigh-in leaves little recovery time for fluid, electrolyte, carbohydrate, and gastrointestinal restoration. A longer interval between weigh-in and competition permits more recovery but does not guarantee complete restoration after a large cut. The engine should therefore collect weigh-in timing before prescribing competition-week training or nutrition. The current source base does not justify one universal safe percentage of acute body-mass loss for all athletes and contexts.
+5. Final-week food strategy
+Favor familiar foods and routines. Do not introduce major dietary experiments in the final days.
+Maintain protein intake and adequate total energy unless a defined weight strategy requires a controlled deficit.
+Preserve carbohydrate availability for high-intensity sport and competition, especially once training volume has fallen enough to allow glycogen restoration.
+Match fiber, meal size, and gastrointestinal load to the athlete's event timing and known tolerance rather than making abrupt changes without a reason.
+Hydration should be normal and deliberate unless an expert-supervised weight-class plan temporarily changes it.
+6. Supplements and stimulants
+Competition week is a poor time to test a new supplement, pre-workout, sleep aid, or recovery protocol. In tested sport, contamination and banned-substance risk must also be considered. The Advanced Layer recommends third-party certification and conservative supplement use; this is a sensible project rule even though supplementation is not the core of the taper. [ADV, Art. 75]
+7. Travel and jet lag
+Mujika distinguishes short-lived travel fatigue from jet lag after crossing multiple time zones. Jet lag can impair strength, reaction time, and arousal. The source advises against training hard immediately before departure merely because the athlete will rest on the plane and recommends integrating reduced training load with the taper rather than allowing travel to become an extra stressor. [MJ, Ch. 5]
+The engine should collect destination, travel duration, time-zone change, arrival date, event date, sleep opportunity, and equipment access. If travel creates a major circadian disruption, the taper should protect recovery and sport-specific feel rather than chasing normal training volume.
+8. Practical decision rules
+IF training volume falls and the athlete is not making weight, THEN do not automatically slash carbohydrate; allow glycogen restoration to support competition readiness.
+IF a weight cut is suppressing mood, power, sleep, or technical quality, THEN reduce nonessential training before adding more work to compensate.
+IF weigh-in is close to competition, THEN be more conservative with any acute body-mass strategy because recovery time is limited.
+IF travel crosses multiple time zones, THEN build arrival and acclimation into the taper rather than treating travel as a neutral rest day.
+IF a food, supplement, stimulant, recovery method, or sleep aid is unfamiliar, THEN do not introduce it merely because competition is important.
+Source traceability
+Direct source support: [MJ] Chs. 2 and 5 for energy expenditure, glycogen, travel, and jet lag; [NUT] for sports nutrition foundations; [ADV] Arts. 75 and 76 for project supplement and weight-class safety routing.
+Source synthesis: The competition nutrition framework keeps the taper and weight strategy inside one readiness problem rather than treating them as independent plans.
+Unresolved source gap: The current source set is not sufficient to encode universal acute weight-cut percentages or rehydration protocols for every combat sport and weigh-in window. A dedicated combat nutrition source would strengthen this layer.
+ARTICLE 11
+Monitoring, Taper Adjustment, Competition-Day Readiness, and Post-Competition Transition
+The best taper is individualized through repeated observation. Monitor output, internal cost, recovery, skill quality, body-mass context, and athlete history, then make the smallest change that solves the actual problem.
+Coaching objective: Convert this topic into decisions about what to preserve, what to reduce, when to reduce it, and what to monitor as competition approaches. The article is written for both human coaches and an AI coaching engine.
+1. Monitoring hierarchy
+Signal family
+Examples
+What it tells the coach
+How to use it
+External performance
+Bar speed, jump, pace, technical execution, repeatability, sparring sharpness
+What the athlete can currently produce
+Highest practical decision weight when the test is relevant and standardized
+Internal response
+RPE, heart rate, breathing, perceived effort
+What the work costs
+Compare with the same external task across time
+Recovery / symptoms
+Soreness, sleep, mood, appetite, fatigue, local discomfort
+Why performance may be suppressed or unstable
+Use trends and context rather than a single morning
+Context
+Weight cut, travel, illness, work stress, menstrual cycle where relevant, environment
+What may distort other signals
+Do not interpret readiness without it
+History
+Previous successful taper length, flatness after rest, recovery from heavy work
+The athlete's personal response model
+Gradually replace generic defaults with repeated individual evidence
+
+The Endurance Cluster expresses the same principle as: external performance is what the athlete produced; internal response is what it cost; recovery data help explain why. Mujika's psychological chapter supports simple mood, fatigue, RPE, and sleep monitoring during tapering. [MJ, Ch. 4; LB, Chs. 8 and 9]
+2. Do not average conflicting signals blindly
+One poor HRV value, one bad night of sleep, or one unusually good warm-up should not automatically rewrite the taper. Look for convergence. A meaningful performance drop plus high soreness plus poor sleep is different from a low HRV reading with fast movement and normal mood. The Advanced Layer contains precise readiness thresholds, but those cut points should remain project heuristics rather than scientific truth. [ADV, Cluster M]
+3. Taper adjustment matrix
+Observed state
+Most likely categories to check
+First adjustment
+What not to do
+Very fresh, fast, motivated
+Taper working as intended
+Keep plan; perhaps trim even more if residual cost remains elsewhere
+Add volume because the athlete "has energy"
+Flat but not sore
+Too little frequency, low arousal, low glycogen, travel, psychological state
+Brief familiar primer or technical touch after context check
+Prescribe a full hard workout by default
+Flat and sore
+Residual fatigue, muscle damage, excessive recent load
+Remove high-cost work; extend recovery window
+Test strength to see "where the athlete is"
+Good gym output, poor sport sharpness
+Sport-specific fatigue, local grip/neck/hip load, technical overload
+Reduce gym/general conditioning and protect skill quality
+Increase strength because gym numbers look good
+Poor sleep only
+Acute sleep loss, travel, arousal
+Monitor, protect next session; reduce complexity if needed
+Assume fitness has disappeared after one night
+Weight cut deterioration
+Energy/glycogen/hydration strain
+Reduce nonessential load; coordinate nutrition and weigh-in plan
+Add conditioning to "make weight" without considering performance cost
+Missed training late in peak
+Schedule disruption
+Resume current taper state; preserve key exposure only if still useful
+Compress missed sets into remaining days
+
+4. Competition-day readiness
+Competition day should use rehearsed systems. The warm-up should raise temperature, mobility, technical readiness, and arousal without becoming another workout. The athlete should know equipment, timing, first technical priorities, attempt logic or tactical plan, and fueling. Competition is not the day to solve every uncertainty that training failed to solve.
+5. If the taper seems to have failed
+Check whether fatigue was actually reduced enough. The athlete may simply have needed a longer taper after a harder pretaper block.
+Check whether intensity or frequency was reduced too far and the athlete lost feel, rhythm, or high-output readiness.
+Check whether weight cutting, travel, illness, sleep, or psychological stress masked the taper response.
+Check whether the competition task was poorly simulated or the wrong physical quality was prioritized during the peak.
+Do not conclude from one event that the entire taper model is invalid. Record the response and adjust one major variable next time.
+6. Post-competition transition
+Competition can leave local tissue stress, sleep disruption, emotional fatigue, travel fatigue, and in combat sport substantial contact damage. The next phase should begin with assessment, not an automatic return to full training. The Advanced Layer proposes a restoration and rebuild phase; the exact day counts are useful planning heuristics but should be individualized rather than treated as fixed physiology. [ADV, Art. 96]
+First assess physical status, soreness, pain or injury flags, sleep, body mass and refeeding if applicable, and psychological state.
+Use light movement or rest until normal function and motivation begin to return. Medical assessment takes priority when injury is suspected.
+Reintroduce training volume progressively rather than jumping immediately to pretaper workload.
+Debrief the event while details are fresh: what failed, what worked, whether the limiter was physical, technical, tactical, pacing, nutrition, or decision making.
+Select the next block from what the competition revealed and the date and priority of the next event.
+7. Learning the athlete's taper fingerprint
+After each meaningful competition, save: pretaper training load, taper duration, volume reduction, intensity exposure, frequency, final hard sessions, weight status, travel, sleep, subjective freshness, competition performance, and the athlete's comments about feeling sharp or flat. Over several events this becomes far more valuable than generic percentage tables because it estimates the individual balance between fatigue dissipation and loss of feel.
+8. Final decision rules
+IF multiple recovery signals improve and competition-specific output improves, THEN do not change the taper merely to satisfy a predetermined workload target.
+IF the athlete feels fresh earlier than expected, THEN preserve freshness; do not treat it as a problem unless technical feel or arousal clearly deteriorates.
+IF the athlete remains fatigued close to Day 0, THEN remove nonessential load immediately and accept that late fitness cannot be rescued by more training.
+IF one metric is abnormal but sport-specific performance and the broader context are good, THEN monitor rather than automatically intervening.
+IF the competition reveals a clear limiter, THEN the next training block should address that limiter rather than repeating the same peak with more effort.
+Source traceability
+Direct source support: [MJ] Chs. 4, 5, 6, and 7 for monitoring, individual variability, psychological readiness, and fatigue-adaptation modeling; [LB] Chs. 8 and 9 for external/internal load and recovery surveillance.
+Source synthesis: The monitoring matrix integrates source-supported monitoring principles with the project's ongoing coaching and postcompetition logic.
+Project heuristic: [ADV] readiness thresholds and fixed restoration windows are useful project heuristics but should be subordinate to relevant performance, trend data, and clinical referral when appropriate.
+Unresolved source gap: No single readiness score or biomarker is validated as a universal taper controller. Postcompetition restoration length also varies substantially by event damage, travel, weight cut, and athlete history.
+Appendix: Engine-Wide Competition Preparation Decision System
+The engine should construct the correct competition-preparation shape from the athlete and event rather than generate a normal training plan and then patch it with last-week prohibitions.
+A. Core reasoning pipeline
+1. Define the event and Day 0: fight, BJJ tournament, strength meet, high-fidelity mock meet, technical mock meet, hybrid event, or other competition.
+2. Set event priority: A, B, or C priority. The importance of the event determines how much long-term training is sacrificed for short-term readiness.
+3. Define performance demands: maximal force, power, technical skill, tactical decision making, repeated high-intensity work, aerobic support, pacing, weight class, rules, and event duration.
+4. Audit current fitness and likely limiter. Do not peak every quality equally.
+5. Audit the previous 1 to 3 weeks of fatigue: volume, hard sport sessions, local soreness, sleep, travel, weight manipulation, and performance trends.
+6. Choose a peak state: development, specificity, realization, taper, competition week, or postcompetition transition.
+7. Choose a provisional taper duration from athlete history. If history is absent, use source-grounded population defaults conservatively.
+8. Reduce training load mainly by cutting nonessential volume and high-cost work while preserving relevant intensity, frequency, and technical feel.
+9. Protect against residual fatigue: novelty, eccentric damage, contact, near-failure work, redundant conditioning, and unplanned tests.
+10. Integrate nutrition, weight-class strategy, travel, sleep, and psychological readiness.
+11. Monitor performance plus internal cost and recovery. Make the smallest change that solves the actual problem.
+12. Compete using rehearsed warm-up, tactical or attempt logic, and fueling.
+13. Record the taper response and use it to improve the next competition cycle.
+B. Minimum engine inputs
+Input
+Examples / allowed values
+Why required
+event_type
+combat, strength meet, high-fidelity mock, technical mock, hybrid
+Determines the competition demand
+competition_date
+Day 0
+Allows backward planning
+event_priority
+A / B / C
+Determines taper aggressiveness and long-term tradeoff
+weeks_out / days_out
+calculated
+Routes peak state
+pretaper_load
+sport sessions, strength sets, conditioning minutes, recent overload
+Estimates fatigue that must dissipate
+taper_history
+previous duration, volume reduction, flat/fresh response
+Best individual prior
+specificity_requirements
+competition lifts, rules, tactical scenarios, round format
+Determines what must be retained
+weight_class_status
+none, routine, difficult, weigh-in timing
+Modifies recovery and nutrition
+travel_context
+time zones, arrival date, transit
+Modifies sleep and taper load
+readiness_signals
+sport performance, bar speed, RPE, soreness, sleep, mood
+Controls adjustment
+exercise_cost_profile
+eccentric, local, grip, contact, skill, soreness history
+Prevents high residual-fatigue choices
+
+C. New progression and taper states
+progression_shape = volume_down_intensity_maintained
+progression_shape = volume_down_frequency_mostly_maintained
+taper_state = normal_training | prepeak_specificity | realization | taper | competition_week | postcompetition
+freshness_priority = low | medium | high | maximal
+external_intensity and effort_proximity stored separately
+exercise_cost dimensions stored separately rather than collapsed into one mandatory score
+contact_intensity stored separately from technical_speed for combat sport
+mock_meet_type = high_fidelity | calibration | technical | exposure
+D. Constructive program-generation brief
+Example engine instruction: "The athlete is 9 days from an A-priority BJJ tournament after a high-load camp. Shift the goal from adaptation toward freshness and expression. Preserve technical frequency and competition-speed movement, remove redundant severe conditioning, cut gym volume substantially while retaining only familiar low-cost strength exposures, avoid novel and high-soreness work, integrate the weight-class plan, and reassess sport sharpness, soreness, sleep, and body mass each day. Do not add workload because the athlete begins to feel fresh."
+E. Hard rules versus defaults
+Category
+Can be encoded strongly
+Should remain a default / adjustable rule
+Evidence supported
+Volume should be meaningfully reduced; relevant intensity is generally preserved; taper is individualized; frequency matters for highly trained skill athletes
+Exact volume percentage and taper duration for a specific combat athlete
+Exercise cost
+Avoid creating unnecessary residual fatigue, especially novel damaging eccentric work close to competition
+Exact number of days each exercise must be removed
+Combat
+Sport practice is priority and must be counted as load; generic conditioning should not duplicate hard sparring
+Exact final hard-sparring day for every combat sport
+Strength meet
+Specific competition patterns and load exposure should be retained while volume falls
+Universal opener percentage or universal final heavy day
+Monitoring
+Use multiple converging signals and athlete history
+One automatic HRV, readiness, or bar-speed threshold that overrides all context
+
+F. Unresolved source gaps for the next revision
+Dedicated combat S&C source: exact camp sequencing, sparring withdrawal, strength maintenance dose, and fight-week practices by combat sport.
+Combat weight-cut source: evidence-based acute weight management and rehydration by weigh-in window, with explicit medical and safety boundaries.
+Strength-sport peaking source: if future versions need lift-specific realization, attempt selection, and fatigue timelines. This is optional for the current conceptual scope.
+More current taper meta-analysis: Mujika is foundational but the book was published in 2009. A later update could refine effect sizes and sport-specific conclusions.
+Individual taper-response model: the engine should eventually learn from repeated athlete competitions rather than relying mainly on population priors.
+G. Cluster-wide summary
+The final coaching principle is simple but demanding: build fitness early, increase specificity as competition approaches, reduce training load mainly by removing volume and high residual-fatigue work, preserve the intensity and frequency needed to retain force, speed, skill, and feel, integrate nutrition and travel, monitor the athlete rather than one metric, and arrive at Day 0 with nothing important left to recover from.
