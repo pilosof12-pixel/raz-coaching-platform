@@ -1,0 +1,110 @@
+This is your 4-week arrival block into Friday’s Hyrox, starting 3.9 weeks out: Weeks 1-2 sharpen race-relevant pace and station feel, Week 3 tapers volume, and Week 4 is competition week. Squat and pulling are held at minimum-effective maintenance on purpose. The half marathon is not being peaked here; the two weeks after Hyrox should rebuild easy running first, then add one controlled longer run and one light pace touch.
+
+Weeks 2-4: only take the Week 2 run extensions if Week 1 pace and next-morning Achilles response were clean. Week 3 keeps the same key loads and pace bands but removes volume. Week 4 keeps the Mon-Fri rhythm as Day -4 to Day -1: one squat touch, one easy run, one short race-feel sharpener, and one optional primer; the Friday sharpener keeps a tiny upper-body strength touch so all four gym days stay true strength sessions.
+
+If the left Achilles grumbles, change the run that most likely caused it. If it shows up after the Friday quality work, keep the easy run and swap the next Friday run row to the Rower at the same work/rest. If it shows up after the longer easy run, cut the next Tuesday duration by 10-15 minutes or use the Rower there, and do not stack make-up running on Wednesday.
+
+START_WEEK1_TSV
+Day	Exercise	Weight	Sets	Reps	Rest	Target RPE	Notes	Results
+Mon	[WARMUP] Run	Bodyweight	1	5 min	N/A	N/A	Easy jog, then 2-3 ramp sets to the first lift.; Squat-and-reach x 6; Bodyweight squat x 8; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Band shoulder pass-through x 10; Scapular push-up x 8; Ramp Back Squat: 45 kg x 5, 70 kg x 3, 90 kg x 1-2 before 115 kg work sets.	
+Mon	Back Squat	115 kg	2	2	3 min	7	About 77% of your 150 kg 1RM. Maintenance on purpose; if set 1 is already above RPE 8 or bar speed drops, keep 115 and stop after 2 sets.	
+Mon	Dumbbell Bench Press	RPE-selected load	3	6	2 min	7	Use last week's clean load as the start and leave 2-3 reps in reserve.	
+Mon	Seated Cable Row	RPE-selected load	3	8	90 sec	7	Full reach and hard pause to cover weekly row work without extra fatigue.	
+Mon	Seated Calf Raise	RPE-selected load	2	12	60 sec	7	Achilles tissue-capacity work; controlled down, smooth up.	
+Mon	Pallof Press	RPE-selected load	2	10/side	45 sec	6	Brace and stay square; trunk work that should not add soreness.	
+Tue	[WARMUP] Band Pull-Apart Warm-up	Light band	1	15	N/A	N/A	Quick shoulder prep before the support lifts.; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Band shoulder pass-through x 10; Wall slide x 8	
+Tue	Dumbbell Shoulder Press	RPE-selected load	2	8	90 sec	6.5	Low-cost upper support; stop with 2-3 reps in reserve.	
+Tue	Chest-Supported Row	RPE-selected load	2	8	90 sec	6.5	Keep it smooth; this is support, not a test.	
+Tue	Run	5:00-5:20/km	1	45 min	N/A	4	Conversational aerobic bridge for the post-Hyrox half. If the left Achilles grumbles, cut 10-15 minutes rather than forcing the full duration.	
+Wed	[WARMUP] Run	Bodyweight	1	5 min	N/A	N/A	Easy jog, then 2-3 ramp sets.; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Band shoulder pass-through x 10; Scapular push-up x 8	
+Wed	Explosive Push-up	Bodyweight	2	3	60 sec	6	Fast only; stop before speed drops.	
+Wed	Barbell Hip Thrust	RPE-selected load	3	6	2 min	7	Posterior-chain support. Use last week's clean load as the start and hold it if lockout speed slows.	
+Wed	Chin-up	RPE-selected load	3	4	2 min	7	Pulling maintenance; add load only if bodyweight alone is below target effort.	
+Wed	Machine Hamstring Curl	RPE-selected load	2	10	75 sec	7	Controlled squeeze; keep 1-2 reps in reserve.	
+Wed	Plank	Bodyweight	2	40 sec	45 sec	6	Brace hard without breath-holding.	
+Fri	[WARMUP] Run	Bodyweight	1	8 min	N/A	N/A	Easy jog into drills; primary quality starts after this.; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Band shoulder pass-through x 10; Scapular push-up x 8; Wall slide x 8; Fast only; low-cost neural primer before the primary race work.	
+Fri	Dumbbell Shoulder Press	RPE-selected load	2	6	75 sec	6.5	Low-cost upper-body strength support so Friday stays a true gym-strength session; stop with 3 reps in reserve.	
+Fri	Prowler Push	RPE-selected load	4	20 m	90 sec	7	Strong smooth steps, no grind; stop if speed clearly drops.	
+Fri	Run	4:02-4:05/km	3	1000 m	2 min walk/jog	7.5	Primary Hyrox pace work. If rep 1 is already above RPE 8 or the Achilles tightens, keep the pace band and cut 1 rep.	
+Fri	Rower	1:51-1:50/500 m split	4	200 m	75 sec	7	Prefer the ski erg if it is open; the listed split is the point. If output drifts on rep 2, hold the split band and cut the last rep.	
+Fri	Sandbag Carry	RPE-selected load	3	40 m	90 sec	7	Race posture and breathing; trunk/grip support without chasing fatigue.	
+END_WEEK1_TSV
+START_WEEK2_TSV
+Day	Exercise	Weight	Sets	Reps	Rest	Target RPE	Notes	Results
+Mon	[WARMUP] Run	Bodyweight	1	5 min	N/A	N/A	Easy jog, then 2-3 ramp sets to the first lift.; Squat-and-reach x 6; Bodyweight squat x 8; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Band shoulder pass-through x 10; Scapular push-up x 8; Ramp Back Squat: 45 kg x 5, 70 kg x 3, 90 kg x 1-2 before 115 kg work sets.	
+Mon	Back Squat	115 kg	2	2	3 min	7	About 77% of your 150 kg 1RM. Hold this maintenance dose unless last week was clearly easier than target and bar speed stayed crisp.	
+Mon	Dumbbell Bench Press	RPE-selected load	3	6	2 min	7	Repeat the same successful loading strategy as Week 1.	
+Mon	Seated Cable Row	RPE-selected load	3	8	90 sec	7	Repeat cleanly; this stays support, not a fatigue chase.	
+Mon	Seated Calf Raise	RPE-selected load	2	12	60 sec	7	Same tendon-capacity dose on purpose.	
+Mon	Pallof Press	RPE-selected load	2	10/side	45 sec	6	Stay square and controlled.	
+Tue	[WARMUP] Band Pull-Apart Warm-up	Light band	1	15	N/A	N/A	Quick shoulder prep before the support lifts.; Easy jog 6-8 min; dynamic running drills; 3 relaxed strides before the hard running work; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Band shoulder pass-through x 10; Wall slide x 8	
+Tue	Dumbbell Shoulder Press	RPE-selected load	2	8	90 sec	6.5	Same low-cost support dose.	
+Tue	Chest-Supported Row	RPE-selected load	2	8	90 sec	6.5	Same smooth support dose.	
+Tue	Run	5:00-5:20/km	1	50 min	N/A	4	Only take the extra 5 minutes if Week 1 stayed conversational and the Achilles was quiet the next morning; otherwise repeat 45 minutes.	
+Wed	[WARMUP] Run	Bodyweight	1	5 min	N/A	N/A	Easy jog, then 2-3 ramp sets.; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Band shoulder pass-through x 10; Scapular push-up x 8	
+Wed	Explosive Push-up	Bodyweight	2	3	60 sec	6	Fast only; stop before speed drops.	
+Wed	Barbell Hip Thrust	RPE-selected load	3	6	2 min	7	Hold the same effort ceiling as Week 1.	
+Wed	Chin-up	RPE-selected load	3	4	2 min	7	Hold the maintenance dose; do not turn this into a hard pull day.	
+Wed	Machine Hamstring Curl	RPE-selected load	2	10	75 sec	7	Controlled squeeze; same support dose.	
+Wed	Plank	Bodyweight	2	40 sec	45 sec	6	Same brace quality as Week 1.	
+Fri	[WARMUP] Run	Bodyweight	1	8 min	N/A	N/A	Easy jog into drills; primary quality starts after this.; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Band shoulder pass-through x 10; Scapular push-up x 8; Wall slide x 8; Fast only; low-cost neural primer before the primary race work.	
+Fri	Dumbbell Shoulder Press	RPE-selected load	2	6	75 sec	6.5	Low-cost upper-body strength support so Friday stays a true gym-strength session; stop with 3 reps in reserve.	
+Fri	Prowler Push	RPE-selected load	4	20 m	90 sec	7	Same smooth strong dose; keep it submaximal.	
+Fri	Run	4:02-4:06/km	3	1200 m	2 min walk/jog	7.5	Extend the rep length only if Week 1 pace and Achilles response were clean; otherwise repeat 1000 m at the same pace band.	
+Fri	Rower	1:50-1:49/500 m split	4	200 m	75 sec	7	Prefer the ski erg if it is open; only tighten the split if all 4 reps last week stayed smooth.	
+Fri	Sandbag Carry	RPE-selected load	3	40 m	90 sec	7	Same familiar carry dose; no racing the clock.	
+END_WEEK2_TSV
+START_WEEK3_TSV
+Day	Exercise	Weight	Sets	Reps	Rest	Target RPE	Notes	Results
+Mon	[WARMUP] Run	Bodyweight	1	5 min	N/A	N/A	Easy jog, then 2-3 ramp sets to the first lift.; Squat-and-reach x 6; Bodyweight squat x 8; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Band shoulder pass-through x 10; Scapular push-up x 8; Ramp Back Squat: 45 kg x 5, 70 kg x 3, 90 kg x 1-2 before 115 kg work sets.	
+Mon	Back Squat	115 kg	2	2	3 min	7	About 77% of your 150 kg 1RM. Keep the same load to preserve feel while the rest of the week trims volume. Session trimmed for camp: what remains is here because it keeps strength, speed or tissue readiness, not because it is easy.	
+Mon	Explosive Push-up	Light, speed-first load	2	3	60 sec	6	Same exposure as earlier in the block, kept short and sharp. Speed is the point; stop the moment it drops. Replaces Dumbbell Bench Press: closer to the event this buys more than another accessory set.	
+Mon	Box Jump	Light, speed-first load	3	3	2 min	6-7	Step down between reps: the jump is the exposure, the landing is not. Low volume, full recovery. Replaces Seated Cable Row: closer to the event this buys more than another accessory set.	
+Mon	Pallof Press	RPE-selected load	2	8/side	45 sec	6	Shorter trunk dose on purpose.	
+Tue	[WARMUP] Band Pull-Apart Warm-up	Light band	1	15	N/A	N/A	Quick shoulder prep before the support lifts.; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Band shoulder pass-through x 10; Wall slide x 8	
+Tue	Broad Jump	Light, speed-first load	3	3	2 min	6-7	Horizontal power for level changes and takedown entries. Three hard jumps, walk back between each. Replaces Dumbbell Shoulder Press: closer to the event this buys more than another accessory set.	
+Tue	Explosive Push-up	Light, speed-first load	2	3	60 sec	6	Same exposure as earlier in the block, kept short and sharp. Speed is the point; stop the moment it drops. Replaces Chest-Supported Row: closer to the event this buys more than another accessory set.	
+Tue	Run	5:00-5:20/km	1	40 min	N/A	4	Volume comes down here. Keep it conversational; if travel or fatigue is high, 35 minutes is enough and do not make it up later.	
+Wed	[WARMUP] Run	Bodyweight	1	5 min	N/A	N/A	Easy jog, then 2-3 ramp sets.; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Band shoulder pass-through x 10; Scapular push-up x 8	
+Wed	Explosive Push-up	Bodyweight	2	3	60 sec	6	Fast only; stop before speed drops.	
+Wed	Barbell Hip Thrust	RPE-selected load	2	6	2 min	7	One set off for taper; keep the same clean effort cap.	
+Wed	Chin-up	RPE-selected load	2	4	2 min	7	One set off to preserve pulling feel without extra fatigue.	
+Wed	Box Jump	Light, speed-first load	3	3	2 min	6-7	Step down between reps: the jump is the exposure, the landing is not. Low volume, full recovery. Replaces Plank: closer to the event this buys more than another accessory set.	
+Fri	[WARMUP] Run	Bodyweight	1	8 min	N/A	N/A	Easy jog into drills; quality stays, volume drops.; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Band shoulder pass-through x 10; Scapular push-up x 8; Wall slide x 8; Fast only; low-cost neural primer before the primary race work.	
+Fri	Explosive Push-up	Light, speed-first load	2	3	60 sec	6	Same exposure as earlier in the block, kept short and sharp. Speed is the point; stop the moment it drops. Replaces Dumbbell Shoulder Press: closer to the event this buys more than another accessory set.	
+Fri	Prowler Push	RPE-selected load	3	20 m	90 sec	6.5	Shorter taper dose; stop at the first obvious loss of snap.	
+Fri	Run	4:02-4:05/km	2	1000 m	2 min walk/jog	7	Keep the same race-relevant pace feel with fewer reps. If rep 1 already feels heavy or the Achilles talks, stop at 1 rep.	
+Fri	Rower	1:50-1:49/500 m split	3	200 m	75 sec	7	Prefer the ski erg if it is open; same split reminder, just less total work.	
+END_WEEK3_TSV
+START_WEEK4_TSV
+Day	Exercise	Weight	Sets	Reps	Rest	Target RPE	Notes	Results
+Day -4	[WARMUP] Run	Bodyweight	1	5 min	N/A	N/A	Easy jog, then ramp to the first single.; Squat-and-reach x 6; Bodyweight squat x 8; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Ramp Back Squat: 45 kg x 5, 70 kg x 3, 90 kg x 1-2 before 115 kg work sets.	
+Day -4	Back Squat	115 kg	2	1	3 min	6	About 77% of your 150 kg 1RM. Technical touch only; if warm-ups feel slow, do 1 single and leave. Session trimmed for camp: what remains is here because it keeps strength, speed or tissue readiness, not because it is easy.	
+Day -4	Chin-up	RPE-selected load	2	3	2 min	6.5	Easy pulling feel only; stop well before any grind.	
+Day -4	Run	5:05-5:25/km	1	15 min	N/A	3.5	Easy circulation run. Keep it relaxed; if anything in the Achilles feels sticky, stop early and walk it out.	
+Day -3	[WARMUP] Band Pull-Apart Warm-up	Light band	1	15	N/A	N/A	Quick prep only.; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Band shoulder pass-through x 10; Wall slide x 8	
+Day -3	Explosive Push-up	Light, speed-first load	2	3	60 sec	6	Same exposure as earlier in the block, kept short and sharp. Speed is the point; stop the moment it drops. Replaces Dumbbell Shoulder Press: closer to the event this buys more than another accessory set. Competition prep: this session is deliberately short because the week is a descent into the event.	
+Day -3	Box Jump	Light, speed-first load	3	3	2 min	6-7	Same exposure as earlier in the block, kept short and sharp. Speed is the point; stop the moment it drops. Replaces Chest-Supported Row: closer to the event this buys more than another accessory set.	
+Day -2	[WARMUP] Run	Bodyweight	1	6 min	N/A	N/A	Easy jog into the same drills you will use on race day.; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Band shoulder pass-through x 10; Scapular push-up x 8; Wall slide x 8; Fast only; this is a neural touch, not extra work.	
+Day -2	Broad Jump	Light, speed-first load	1	3	2 min	6-7	Same exposure as earlier in the block, kept short and sharp. Speed is the point; stop the moment it drops. Replaces Dumbbell Shoulder Press: closer to the event this buys more than another accessory set. Trimmed so the week keeps descending into the event.	
+Day -2	Prowler Push	RPE-selected load	2	15 m	90 sec	6	Crisp accelerations only; no heavy grind.	
+Day -2	Run	3:58-4:02/km	2	400 m	2 min walk	6.5	Short race-feel touch only. Stop immediately if stride feels sticky or the Achilles talks.	
+Day -1	[WARMUP] Band Pull-Apart Warm-up	Light band	1	12	N/A	N/A	Optional quick prep only if you want the primer.; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Band shoulder pass-through x 10; Scapular push-up x 8	
+Day -1	Explosive Push-up	Bodyweight	2	3	60 sec	5.5	Conditional primer: do this only if you want a feel-of-speed touch; skip the whole session if you already feel sharp, tired, or are travelling.	
+Day -1	Prowler Push	RPE-selected load	2	10 m	90 sec	5.5	Very light and fast; stop before any strain.	
+Day -1	Sandbag Carry	RPE-selected load	1	15 m	90 sec	5	One easy familiar pickup, then leave the gym feeling better than you walked in.	
+END_WEEK4_TSV
+
+TAPER AUDIT
+Event: hybrid race, priority A, about 3.9 weeks out.
+This block runs into the event: the final week is competition week.
+Sport sessions counted as load: 2 per week.
+WEEK PHASES: 1=realization 2=realization 3=taper 4=competition_week EVENT=hybrid_race
+
+    phase             sets  exercises  competition lift  power sets  peak RPE  peak % max
+W1  realization       45    16         -                 2           7.5       -
+W2  realization       45    16         -                 2           7.5       -
+W3  taper             34    10         -                 17          7         -
+W4  competition week  20    8          -                 8           7         -
+
+Across the block: volume -25 sets, exercises -8, competition-lift share unchanged, peak effort -0.5 RPE, accessory volume -15 sets.

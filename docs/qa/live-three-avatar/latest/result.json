@@ -1,25 +1,25 @@
 {
-  "timestamp": "2026-09-16T17:20:30.286Z",
+  "timestamp": "2026-09-18T12:34:42.216Z",
   "base": "https://raz-coaching-platform.onrender.com",
-  "head_sha": "b7f432f14c061d56fff57352b093f9b4c04cf0e9",
-  "runtime": "live51 2026-09-16T17:19:36Z",
+  "head_sha": "3e3315286d467b4423aed692cdbfdd246055e1e0",
+  "runtime": "live52 2026-09-18T12:33:24Z",
   "results": [
     {
-      "id": "inseason_footballer",
-      "job_id": "14f5d5a6a7e06d5f5c7f1cba2dfe214d",
+      "id": "dual_event_hyrox",
+      "job_id": "f23572df4ab6f2282d74365205b1a016",
       "ok": true,
       "status": "done",
       "stage": "finalizing",
-      "attempt": 1,
-      "detail": "saving program after 1 model call(s)",
+      "attempt": 3,
+      "detail": "saving program after 3 model call(s)",
       "last_seen_status": "done",
       "error": null,
-      "program_chars": 10043,
-      "seconds": 222
+      "program_chars": 15669,
+      "seconds": 1367
     }
   ],
   "selection": [
-    "inseason_footballer"
+    "dual_event_hyrox"
   ],
   "ok": true
 }
