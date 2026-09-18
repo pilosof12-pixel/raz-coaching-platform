@@ -39,6 +39,7 @@ import { repairClockStatement } from './v86_training_clock.js';
 import { repairDayZeroClaims, repairMatchDayPlacement, repairAllocationShift, repairSportFrequency } from './v89_block_architecture.js';
 import { repairBallisticShare } from './v79_ballistic_share.js';
 import { repairBenchmarkExposure } from './benchmark_exposure_repair.js';
+import { repairConsecutiveTrainingDays } from './consecutive_day_repair.js';
 import { repairCompetitionWeek } from './v90_competition_week.js';
 import { repairTimelineIntegrity } from './v91_timeline_integrity.js';
 import { repairPrescriptionIntegrity } from './v92_prescription_integrity.js';
@@ -964,6 +965,21 @@ function repairConsecutivePullStacking(program, intake, repairs) {
 export function repairDeterministicContradictions(program, intake = {}) {
   let candidate = String(program || '');
   const repairs = [];
+
+  // Spread the week before anything decides what goes on which day. An athlete
+  // with no sport schedule and no fixed gym days was training Monday to Friday
+  // with the weekend empty, which the coach charges as avoidable clustering --
+  // avoidable being the word that matters, since nothing in the intake asked
+  // for it. Sessions keep their order and their contents; only the weekday
+  // label moves, so a week cannot get harder or easier by being spread out.
+  const spread = repairConsecutiveTrainingDays(candidate, intake);
+  if (spread.changed) {
+    candidate = spread.program;
+    repairs.push({
+      type: 'consecutive_training_days_spread',
+      moved: spread.moves.map((m) => `w${m.week} ${m.from.join('/')} -> ${m.to.join('/')}`),
+    });
+  }
 
   // Put back a benchmarked movement the block never trains. It prefers to spend
   // a redundant slot, so most of the time this changes what a session contains

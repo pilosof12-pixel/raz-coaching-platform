@@ -67,16 +67,27 @@ export function rows(program) {
 // days, and reading the calendar left to right scored them as two -- which is
 // how the coach's three-consecutive-lower-body-days finding stayed invisible on
 // a program whose three days were exactly Sat, Sun, Mon.
-const longestRun = (days) => {
+// The longest run, and which days are in it. The finding used to report the
+// run length beside the whole training set, so a tactical week read "trains 4
+// days in a row (mon, wed, thu, fri, sat)" -- five days, one of them not
+// adjacent to the rest. The count was right and the evidence beside it was
+// not, which is the kind of thing that costs a tool its credibility with the
+// person reading it.
+export const longestRunDays = (days) => {
   const present = WEEK_ORDER.map((d) => days.has(d));
-  if (present.every(Boolean)) return 7;
-  let best = 0;
-  let run = 0;
+  if (present.every(Boolean)) return [...WEEK_ORDER];
+  let best = [];
+  let run = [];
   for (let i = 0; i < 14; i += 1) {
-    if (present[i % 7]) { run += 1; if (run > best) best = run; } else run = 0;
+    if (present[i % 7]) {
+      run.push(WEEK_ORDER[i % 7]);
+      if (run.length > best.length) best = [...run];
+    } else run = [];
   }
-  return Math.min(best, 7);
+  return best.slice(0, 7);
 };
+
+const longestRun = (days) => longestRunDays(days).length;
 
 // --- 1. consecutive training days, flexible availability ----------------------
 
@@ -91,12 +102,14 @@ export function consecutiveTrainingDays(program, intake = {}) {
   }
   const out = [];
   for (const [week, days] of byWeek) {
-    const run = longestRun(days);
-    if (run > limit) {
+    const streak = longestRunDays(days);
+    if (streak.length > limit) {
       out.push({
         rule: 'CONSECUTIVE_TRAINING_DAYS',
         week,
-        detail: `Week ${week} trains ${run} days in a row (${[...days].join(', ')}) against a limit of ${limit} when availability is flexible.`,
+        days: [...days],
+        streak,
+        detail: `Week ${week} trains ${streak.length} days in a row (${streak.join(', ')}) against a limit of ${limit} when availability is flexible.`,
       });
     }
   }
