@@ -73,3 +73,34 @@ If the answer is "these are HYROX numbers, do not generalise them", say so and I
 will scope them to HYROX and leave other events uncovered until you define them.
 That is a worse outcome for coverage and a better one for honesty, and it is
 your call rather than mine.
+
+---
+
+## 3. Four findings with no price on them
+
+An audit of the deduction table against the rules that actually fire found six
+rules charging nothing. Two of them were yours already and had simply never been
+wired up: accessory redundancy, which fires more often than any other finding we
+record, maps onto your ACCESSORY_LOW_MARGINAL_RETURN at 0.18, and an unanchored
+load on an event component is the same defect as an unanchored primary load at
+0.15. Those are connected now.
+
+The remaining four have no line in your table at all, and I would rather ask than
+invent a number. For each: is it worth a deduction, and if so how much?
+
+- **The taper is compressed into the final week.** Fires on 4 of 26 programs. The
+  block cuts volume, but only in the last week, so there is no progressive
+  unloading. Distinct from a taper that introduces a new emphasis, which you have
+  at 0.45.
+- **Recovery days below the minimum for the athlete.** Fires on 4 of 26. Related
+  to your avoidable consecutive-day clustering at 0.20, but not the same defect:
+  a week can have enough spacing between sessions and still leave too few full
+  rest days.
+- **A movement promised in the prose that never appears in the table.** Fires
+  once. Arguably your text-contradicts-table at 0.08, but a broken promise about
+  what the athlete will train may be worth more to you than a wording slip.
+- **Heavy lower-body work within 48 hours of a speed session.** Fires once. An
+  interference defect with no current line.
+
+If any of these should not carry a deduction at all, say so and it will be
+recorded as detection-only rather than left looking like an oversight.

@@ -54,6 +54,14 @@ const COST = {
   UNSUPPORTED_ATHLETE_FACT: 'UNSUPPORTED_ATHLETE_FACT',
   IMPROVEMENT_GOAL_FLAT: 'IMPROVEMENT_GOAL_UNCHANGED_ALL_BLOCK',
   PRIMARY_LOAD_UNANCHORED: 'LOADING_PRESCRIPTION_UNANCHORED',
+  // His own deduction for this, which had no rule pointing at it. The finding
+  // fired seventeen times across the corpus -- the single most common defect we
+  // record -- and cost nothing, so a program could carry all seventeen and still
+  // measure clean. Same failure as the footballer's sprint findings: the defect
+  // was detected, reported and charged at zero.
+  ACCESSORY_REDUNDANCY: 'ACCESSORY_LOW_MARGINAL_RETURN',
+  // The event-component form of the unanchored load already mapped just above.
+  COMPONENT_LOAD_UNANCHORED: 'LOADING_PRESCRIPTION_UNANCHORED',
   TRAINING_DAYS_VS_INTAKE: 'INTAKE_INTERPRETATION_UNSTATED',
   DAY_MINUS_ONE_STACKED: 'REDUNDANT_COMPETITION_WEEK_EXPOSURE',
   SPORT_SCHEDULE_CHANGED_SILENTLY: 'SPORT_SCHEDULE_SILENTLY_CHANGED',

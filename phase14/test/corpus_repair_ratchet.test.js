@@ -18,16 +18,23 @@ import { sweep } from '../scripts/grade_delivered.mjs';
 const total = (rows) => rows.reduce((n, r) => n + r.severity, 0);
 const findings = (rows) => rows.reduce((n, r) => n + r.findings.length, 0);
 
-test('the repair chain takes the delivered corpus from 21.35 severity to 4.40', () => {
+// Re-baselined once, when ACCESSORY_REDUNDANCY and COMPONENT_LOAD_UNANCHORED
+// were connected to the coach's own deduction lines. Both fired and cost zero:
+// the first seventeen times across the corpus, which made it the most common
+// defect we record and the cheapest. Nothing about the programs changed on the
+// day these numbers moved -- 21.35 to 24.56 delivered, 4.40 to 5.45 repaired,
+// and seventeen clean programs to fourteen. The three that stopped being clean
+// were carrying a defect the whole time that was being charged nothing.
+test('the repair chain takes the delivered corpus from 24.56 severity to 5.45', () => {
   const before = sweep({ repaired: false });
   const after = sweep({ repaired: true });
 
   assert.equal(before.length, 26, 'corpus size changed; re-baseline deliberately');
   assert.equal(after.length, 26);
 
-  assert.equal(Number(total(before).toFixed(2)), 21.35);
-  assert.ok(total(after) <= 4.40 + 1e-9,
-    `residual severity ${total(after).toFixed(2)} above the 4.40 ceiling`);
+  assert.equal(Number(total(before).toFixed(2)), 24.56);
+  assert.ok(total(after) <= 5.45 + 1e-9,
+    `residual severity ${total(after).toFixed(2)} above the 5.45 ceiling`);
 });
 
 test('no delivered program gets worse for being repaired', () => {
@@ -41,9 +48,9 @@ test('no delivered program gets worse for being repaired', () => {
   }
 });
 
-test('seventeen of the twenty-six repair to zero severity', () => {
+test('fourteen of the twenty-six repair to zero severity', () => {
   const clean = sweep({ repaired: true }).filter((r) => r.severity === 0).length;
-  assert.ok(clean >= 17, `only ${clean} programs at zero severity, was 17`);
+  assert.ok(clean >= 14, `only ${clean} programs at zero severity, was 14`);
 });
 
 test('the residual is 29 findings and every one of them is known', () => {
