@@ -319,8 +319,19 @@ export function repairUnanchoredCompetitionLoad(program, intake = {}) {
 
 export const ENDURANCE_REPAIRS = [
   repairRuckDistance, repairGoalSpeed, repairUnanchoredCompetitionLoad, repairImprovementGoalFlat,
-  repairTaperPowerSpike, repairRepeatedSprintRecovery, repairSprintDistance, repairRepeatedSprintProgression, repairTaperOpening,
+  repairRepeatedSprintRecovery, repairSprintDistance, repairRepeatedSprintProgression, repairTaperOpening,
 ];
+
+// repairTaperPowerSpike is deliberately NOT in the list above. It caps the power
+// volume a tapering week may carry, and three repairs that run later in the v35
+// chain can all put power work back into that week -- the ballistic swap most of
+// all, which exists to buy ballistic exposure near an event and does not know a
+// taper from a build. Run here it was measuring a week that had not finished
+// being written: live run #119 delivered a week 3 trimmed to seven power sets
+// and then refilled to eighteen, and the coach's 0.45 for a taper that
+// multiplies a quality was charged on the delivered program. It is now invoked
+// next to the competition-week budget, for the reason already written there:
+// that is the first point at which the week's real volume can be judged.
 
 
 

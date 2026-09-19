@@ -10,8 +10,15 @@
 // this deliberately does not fake. Severity is the sum of his own deduction
 // table for what was found, which says how much is wrong, not what it rates.
 //
-//   node scripts/grade_delivered.mjs            summary
-//   node scripts/grade_delivered.mjs --detail   every finding
+//   node scripts/grade_delivered.mjs              summary, as delivered
+//   node scripts/grade_delivered.mjs --detail     every finding
+//   node scripts/grade_delivered.mjs --repaired   after the repair chain
+//
+// --repaired is the one that answers "did the repairs work". It runs each
+// delivered program through repairDeterministicContradictions first and grades
+// what comes out, so the difference between the two modes is exactly what the
+// deterministic chain fixes. Without it that number lived only in a terminal
+// scrollback and nobody else could check it.
 
 import fs from 'node:fs';
 import path from 'node:path';
@@ -25,10 +32,12 @@ import { DEDUCTIONS, selectProgramType } from '../engine/coach_standard.js';
 import { CORPUS, readFixture } from './corpus.mjs';
 import { RACE_BLOCK_RULES } from '../engine/coach_race_block_rules.js';
 import { EVENT_COMPONENT_RULES } from '../engine/event_component_rules.js';
+import { repairDeterministicContradictions } from '../engine/v35_deterministic_repair.js';
 
 const root = path.dirname(fileURLToPath(import.meta.url));
 const fx = readFixture;
 const detail = process.argv.includes('--detail');
+const repaired = process.argv.includes('--repaired');
 
 // Which deduction each rule corresponds to, so severity is his arithmetic and
 // not ours.
@@ -63,6 +72,9 @@ const COST = {
   RACE_REHEARSAL_MISSING: 'COMPROMISED_WORK_MISSING',
 };
 
+// Exported so the ratchet test can call it. The report below is the same data
+// printed; there is no second implementation to drift.
+export function sweep({ repaired = false } = {}) {
 const seenFile = new Set();
 const results = [];
 
@@ -72,6 +84,14 @@ for (const [file, intake, scored] of CORPUS) {
   let program;
   try { program = fx(file); } catch { continue; }
   if (!/START_WEEK1_TSV/i.test(program)) continue;
+
+  // A repair that throws leaves the program as delivered rather than dropping
+  // it from the report: a crash should show as findings not going away, not as
+  // a row quietly disappearing from the corpus.
+  if (repaired) {
+    try { program = repairDeterministicContradictions(program, intake).program || program; }
+    catch (e) { console.error(`  repair threw on ${file}: ${e?.message || e}`); }
+  }
 
   // The source Generator Rules live in their own module to avoid an import
   // cycle, so the grader composes both.
@@ -109,8 +129,15 @@ for (const [file, intake, scored] of CORPUS) {
 }
 
 results.sort((a, b) => b.severity - a.severity);
+return results;
+}
 
-console.log('\nGRADED OFFLINE AGAINST THE COACH\'S STANDARD');
+// Only report when run as a script; importing must not print.
+const RUN_AS_SCRIPT = process.argv[1] && fileURLToPath(import.meta.url) === path.resolve(process.argv[1]);
+if (RUN_AS_SCRIPT) {
+const results = sweep({ repaired });
+
+console.log(`\nGRADED OFFLINE AGAINST THE COACH'S STANDARD (${repaired ? 'after the repair chain' : 'as delivered'})`);
 console.log('severity is the sum of his deduction table for what was found. It is not a score.\n');
 console.log(`  ${'severity'.padStart(8)}  ${'found'.padStart(5)}  ${'coach'.padStart(5)}  program`);
 for (const r of results) {
@@ -124,4 +151,6 @@ console.log('\nMOST COMMON DEFECTS ACROSS THE CORPUS');
 for (const [rule, n] of [...byRule].sort((a, b) => b[1] - a[1])) {
   console.log(`  ${String(n).padStart(3)}  ${rule}`);
 }
-console.log(`\n${results.length} programs, ${[...byRule.values()].reduce((a, b) => a + b, 0)} findings.\n`);
+const clean = results.filter((r) => r.severity === 0).length;
+console.log(`\n${results.length} programs, ${[...byRule.values()].reduce((a, b) => a + b, 0)} findings, ${clean} of them at zero severity.\n`);
+}

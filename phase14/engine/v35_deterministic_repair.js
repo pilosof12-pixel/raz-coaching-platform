@@ -40,7 +40,7 @@ import { repairDayZeroClaims, repairMatchDayPlacement, repairAllocationShift, re
 import { repairBallisticShare } from './v79_ballistic_share.js';
 import { repairBenchmarkExposure } from './benchmark_exposure_repair.js';
 import { repairEventComponentCoverage } from './event_component_repair.js';
-import { ENDURANCE_REPAIRS, repairAccessoryRedundancy } from './endurance_block_repair.js';
+import { ENDURANCE_REPAIRS, repairAccessoryRedundancy, repairTaperPowerSpike } from './endurance_block_repair.js';
 import { STATEMENT_REPAIRS } from './program_statement_repair.js';
 import { repairConsecutiveTrainingDays } from './consecutive_day_repair.js';
 import { repairCompetitionWeek } from './v90_competition_week.js';
@@ -1292,6 +1292,19 @@ export function repairDeterministicContradictions(program, intake = {}) {
   if (ballistic !== candidate) {
     candidate = ballistic;
     repairs.push({ type: 'v79_ballistic_swapped' });
+  }
+
+  // The tapering week gets its volume judged here for the same reason the
+  // competition week does, one step below: the ballistic swap has just finished
+  // deciding what the sessions are made of. Earlier in the chain this repair
+  // trimmed week 3 to seven power sets and the swap then refilled it to
+  // eighteen, which is the finding the coach charges 0.45 for. It trims sets
+  // and never deletes a movement, so the exposure the swap just bought survives
+  // at a dose a taper can carry.
+  const capped = repairTaperPowerSpike(candidate, intake);
+  if (capped.changed) {
+    candidate = capped.program;
+    repairs.push({ type: 'repairTaperPowerSpike', moves: capped.moves.length });
   }
 
   // Competition week last of the content repairs: the ballistic swap has
