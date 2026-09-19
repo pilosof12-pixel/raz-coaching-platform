@@ -32,7 +32,6 @@ import { collectAllV34ConsistencyFlags } from '../engine/v34_prescription_consis
 import { collectCoachingStandardFlags } from '../engine/v35_coaching_standards.js';
 import { collectLanguageAccuracyFlags } from '../engine/v46_language_accuracy.js';
 import { collectSpecGapFlags } from '../engine/v49_spec_gap_rules.js';
-import { scoreProgram, formatScorecard } from '../engine/v39_coaching_rubric.js';
 import { gradeProgram } from '../engine/coach_rules.js';
 import { RACE_BLOCK_RULES } from '../engine/coach_race_block_rules.js';
 import { EVENT_COMPONENT_RULES } from '../engine/event_component_rules.js';
@@ -469,8 +468,13 @@ for (const [id, intake] of Object.entries(INTAKES)) {
     // codes while still counting toward "proven".
     const repaired = repairDeterministicContradictions(damaged, intake);
     const verdict = releasable(repaired.program, intake);
+    // Every collector still runs on every perturbed program, which is why this
+    // call stays: a collector that throws on damaged input is worth catching
+    // here. What used to follow it was scoreProgram(findings), whose number was
+    // printed as the verdict for each row. That number is 9.8 for every program
+    // it has ever been shown, so the row now reports the finding count and the
+    // coach severity instead -- two numbers that actually move.
     const findings = allFindings(repaired.program, intake, id);
-    const score = scoreProgram(findings, { intake, program: repaired.program });
     const severity = coachSeverity(repaired.program, intake);
     results.push({
       avatar: id,
@@ -480,8 +484,7 @@ for (const [id, intake] of Object.entries(INTAKES)) {
       converged: verdict.ok,
       severity,
       residual: verdict.codes,
-      overall: score.overall,
-      meets9: Boolean(score.meetsNinePlus),
+      findingCount: findings.length,
       declares: perturbation.code || null,
       repairsFired: repaired.repairs.map((x) => x.type),
     });
@@ -496,7 +499,7 @@ if (!quiet) {
     console.log(`\n${avatar.toUpperCase()}`);
     for (const r of rows) {
       const state = !r.applied ? 'n/a  ' : r.converged ? 'PASS ' : 'ASKS ';
-      const detail = r.converged ? `rubric ${r.overall}${r.meets9 ? ' 9+' : ''}` : r.residual.slice(0, 2).join(', ');
+      const detail = r.converged ? `severity ${r.severity.toFixed(2)}  findings ${r.findingCount}` : r.residual.slice(0, 2).join(', ');
       console.log(`  ${state} ${r.perturbation.padEnd(34)} ${detail}`);
     }
   }
@@ -540,7 +543,6 @@ const per = (a) => {
     total: rows.length,
     converged: converged.length,
     rate: rows.length ? Math.round((converged.length / rows.length) * 100) : 0,
-    nine: converged.filter((r) => r.meets9).length,
     worstSeverity: converged.length ? Math.max(...converged.map((r) => r.severity ?? 0)) : 0,
   };
 };
@@ -556,8 +558,8 @@ for (const name of Object.keys(INTAKES)) {
 }
 
 // Acceptance criteria, stated so the verdict is not a matter of opinion.
-//   Youth and Tactical: every defect repaired, and every repaired program at 9+
-//     on the engine's own rubric. These two are expected to hold a standard.
+//   Youth and Tactical: every defect repaired, and no regression against the
+//     coach's deduction table. These two are expected to hold a standard.
 //   Hybrid: must reach a releasable program. Its rating is the coach's to give;
 //     the bar here is that it stops failing to produce anything at all.
 const checks = [
@@ -578,10 +580,15 @@ const checks = [
       // 0.00 while carrying his single most expensive finding, and the ceiling
       // of 0.48 was set against a measurement that could not see it. The
       // programs did not get worse; the instrument started counting.
+      // Tightened to what each avatar actually costs today. Three carried slack
+      // -- mma_fight_camp 1.44 against 1.59, masters_return 0.80 against 1.25,
+      // postpartum_runner 0.80 against 0.90 -- because repairs landed after the
+      // ceilings were last set. A ratchet with slack in it does not ratchet: it
+      // would have let all three drift back to where they were and passed.
       advanced_hybrid: 1.44, youth_gymnastics: 0.15, tactical_3k: 1.92,
-      weightlifter_peak: 2.40, weightlifter_meet_week: 2.40, mma_fight_camp: 1.59,
-      inseason_footballer: 0.78, masters_return: 1.25, hebrew_lifter: 0.00,
-      postpartum_runner: 0.90,
+      weightlifter_peak: 2.40, weightlifter_meet_week: 2.40, mma_fight_camp: 1.44,
+      inseason_footballer: 0.78, masters_return: 0.80, hebrew_lifter: 0.00,
+      postpartum_runner: 0.80,
     };
     let ok = true;
     for (const [avatar, ceiling] of Object.entries(CEILING)) {
