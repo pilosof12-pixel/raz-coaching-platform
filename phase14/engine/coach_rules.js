@@ -395,7 +395,16 @@ const GOAL_MOVEMENTS = [
   { goal: /clean and jerk|clean & jerk/i, family: /\bclean\b|\bjerk\b/i },
   { goal: /\bruck\b/i, family: /ruck|backpack carry|loaded carry/i },
   { goal: /marathon|\d+\s*km|\brun\b/i, family: /\brun(?:ning)?\b|\bjog\b/i },
-  { goal: /\brows?\b|\berg\b/i, family: /\brow\b|\berg\b/i },
+  // A 2 km erg goal is served by the erg, not by a cable row. This family used
+  // to be /\brow\b|\berg\b/, which matched "Seated Cable Row", "Chest-Supported
+  // Row" and "Cable Row" while missing "Rower" entirely -- no word boundary
+  // falls after "row" in "rower". So for a masters rower returning to a 2 km
+  // erg, three accessories counted as the goal movement and the erg itself was
+  // invisible to every goal rule. The exclusion reads the whole name, because a
+  // negative lookahead placed after the word passes when the excluded term
+  // never follows it.
+  { goal: /\brows?\b|\browing\b|\berg\b/i,
+    family: /^(?!.*(?:cable|chest|barbell|pendlay|seated|bent|dumbbell|machine|inverted|ring|t-?bar|landmine|renegade))(?:.*\brow(?:er|ing)?\b|.*\berg\b)/i },
   { goal: /\bdips?\b/i, family: /\bdip\b/i },
 ];
 

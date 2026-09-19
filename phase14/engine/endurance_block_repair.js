@@ -13,7 +13,7 @@
 // tolerates, the goal pace they stated, the frequency they asked for: these are
 // facts the program contradicted, and putting a fact back is not coaching.
 
-import { rows, toleratedDistance, goalFamilyTiers } from './coach_rules.js';
+import { rows, toleratedDistance, goalFamilyTiers, benchmarks } from './coach_rules.js';
 import { parseWeek } from './v34_workload_accounting.js';
 import { rebuild } from './tsv_rows.js';
 import { THRESHOLDS } from './coach_standard.js';
@@ -213,4 +213,63 @@ export function repairImprovementGoalFlat(program, intake = {}) {
   return { program: out, changed: moves.length > 0, moves };
 }
 
-export const ENDURANCE_REPAIRS = [repairRuckDistance, repairGoalSpeed, repairImprovementGoalFlat];
+
+
+// --- 4. a competition lift with no number on the bar --------------------------
+//
+// "The athlete cannot tell whether Week 1 is 70% or 92%." A lift that serves a
+// goal stated as a number, prescribed across four weeks without a single kilo
+// or percentage, is the one place the coach is unambiguous that RPE alone is
+// not enough -- and it is also the one place a repair has something exact to
+// put there, because the intake carries the max.
+//
+// The week 3 figure is his, not ours: 88-90% for the snatch and 89-90% for the
+// clean and jerk. The other weeks are placed below it so the block arrives
+// there rather than starting there, and week 4 holds week 3 rather than
+// climbing into what may be a competition week.
+
+
+const OLY_WEEK_FRACTION = { 1: 0.82, 2: 0.85, 3: 0.88, 4: 0.88 };
+const round2p5 = (kg) => Math.floor(kg / 2.5) * 2.5;
+
+export function repairUnanchoredCompetitionLoad(program, intake = {}) {
+  const tiered = goalFamilyTiers(intake, ['primary']);
+  const targeted = tiered.filter((g) => /\d+\s*(?:kg|km|m\b)|\d{1,2}:\d{2}/i.test(g.goal));
+  if (!targeted.length) return { program: String(program || ''), changed: false, moves: [] };
+
+  const marks = benchmarks(intake);
+  const maxFor = (name) => {
+    const b = marks.find((x) => new RegExp(String(x.name).replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'i').test(name)
+      || new RegExp(String(name).replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'i').test(x.name));
+    return b && Number.isFinite(b.kg) ? b.kg : null;
+  };
+
+  let out = String(program || '');
+  const moves = [];
+  for (let week = 1; week <= 4; week += 1) {
+    const parsed = parseWeek(out, week);
+    if (!parsed || !Number.isInteger(parsed.load)) continue;
+    const cells = parsed.rows.map((c) => [...c]);
+    let changed = false;
+    cells.forEach((row) => {
+      const name = String(row[parsed.exercise] || '').trim();
+      if (isWarmup(name) || !targeted.some((g) => g.family.test(name))) return;
+      const text = String(row[parsed.load] || '');
+      // Only where there is genuinely no number to read.
+      if (/\d+(?:\.\d+)?\s*(?:kg|%)|\d{1,2}:\d{2}/.test(text)) return;
+      const max = maxFor(name);
+      if (!max) return;
+      const fraction = OLY_WEEK_FRACTION[week];
+      const kg = round2p5(max * fraction);
+      row[parsed.load] = `${kg} kg (${Math.round(fraction * 100)}% of current max)`;
+      moves.push({ week, movement: name, kg, pct: Math.round(fraction * 100) });
+      changed = true;
+    });
+    if (changed) out = rebuild(out, parsed, cells);
+  }
+  return { program: out, changed: moves.length > 0, moves };
+}
+
+export const ENDURANCE_REPAIRS = [
+  repairRuckDistance, repairGoalSpeed, repairUnanchoredCompetitionLoad, repairImprovementGoalFlat,
+];
