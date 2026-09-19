@@ -41,6 +41,7 @@ import { repairBallisticShare } from './v79_ballistic_share.js';
 import { repairBenchmarkExposure } from './benchmark_exposure_repair.js';
 import { repairEventComponentCoverage } from './event_component_repair.js';
 import { ENDURANCE_REPAIRS, repairAccessoryRedundancy } from './endurance_block_repair.js';
+import { STATEMENT_REPAIRS } from './program_statement_repair.js';
 import { repairConsecutiveTrainingDays } from './consecutive_day_repair.js';
 import { repairCompetitionWeek } from './v90_competition_week.js';
 import { repairTimelineIntegrity } from './v91_timeline_integrity.js';
@@ -1387,6 +1388,21 @@ export function repairDeterministicContradictions(program, intake = {}) {
   if (described.changed) {
     candidate = described.program;
     repairs.push({ type: 'v78_sport_state_language' });
+  }
+
+  // Two decisions the block made and did not mention: which reading of
+  // days_per_week governs, and that it quietly rewrote the athlete's sport
+  // week. Neither is a training change and both are answered by saying so.
+  //
+  // They run at the very end, after the calendar and the camp schedule have
+  // been appended, because the sentence has to describe the week that actually
+  // shipped. Placed earlier -- as they were first -- the statement was written
+  // against a program that later repairs then changed underneath it.
+  for (const fn of STATEMENT_REPAIRS) {
+    const r = fn(candidate, intake);
+    if (!r.changed) continue;
+    candidate = r.program;
+    repairs.push({ type: fn.name });
   }
 
   return { program: candidate, repaired: repairs.length > 0, repairs };
