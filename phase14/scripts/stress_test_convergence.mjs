@@ -33,6 +33,56 @@ import { collectCoachingStandardFlags } from '../engine/v35_coaching_standards.j
 import { collectLanguageAccuracyFlags } from '../engine/v46_language_accuracy.js';
 import { collectSpecGapFlags } from '../engine/v49_spec_gap_rules.js';
 import { scoreProgram, formatScorecard } from '../engine/v39_coaching_rubric.js';
+import { gradeProgram } from '../engine/coach_rules.js';
+import { RACE_BLOCK_RULES } from '../engine/coach_race_block_rules.js';
+import { EVENT_COMPONENT_RULES } from '../engine/event_component_rules.js';
+import { DEDUCTIONS } from '../engine/coach_standard.js';
+
+// What the coach would charge, rather than what the engine thinks of itself.
+//
+// The rubric this suite reported as its quality gate answers 9.8 for every
+// program it has ever been shown, including the one the coach scored 7.6 and
+// including a copy of that program with every load and pace stripped out. A
+// gate that cannot fail is not a gate, and "holds 9+" passing on all four
+// avatars was the reason nobody looked.
+//
+// Severity is his own deduction table summed over what the graders find. It is
+// not a score -- turning findings into a score needs dimension judgement, which
+// is the step this deliberately does not fake -- but it moves when a program
+// gets worse, which is the entire job of a regression gate.
+const COACH_COST = {
+  BENCHMARK_UNEXPOSED: 'BENCHMARKED_MOVEMENT_UNEXPOSED',
+  INTENSIFICATION_BAND_NOT_REACHED: 'PROGRESSION_SHORT_OF_REQUIRED_INTENSITY',
+  GOAL_SPEED_NOT_APPROACHED: 'PROGRESSION_SHORT_OF_REQUIRED_INTENSITY',
+  STATED_PROGRESSION_ABSENT: 'TOLERATED_BASELINE_NOT_REBUILT',
+  GOAL_DISTANCE_BELOW_TOLERANCE: 'GOAL_DISTANCE_REDUCED_DESPITE_TOLERANCE',
+  CONSECUTIVE_TRAINING_DAYS: 'AVOIDABLE_CONSECUTIVE_DAY_CLUSTERING',
+  CONSECUTIVE_LOWER_LEG_DAYS: 'AVOIDABLE_CONSECUTIVE_DAY_CLUSTERING',
+  CONTINGENCY_CREATES_ADJACENT_DUPLICATE: 'CONTINGENCY_CREATES_DUPLICATE',
+  SPORT_STATE_MISDESCRIBED: 'TEXT_CONTRADICTS_TABLE',
+  UNSUPPORTED_ATHLETE_FACT: 'UNSUPPORTED_ATHLETE_FACT',
+  IMPROVEMENT_GOAL_FLAT: 'IMPROVEMENT_GOAL_UNCHANGED_ALL_BLOCK',
+  PRIMARY_LOAD_UNANCHORED: 'LOADING_PRESCRIPTION_UNANCHORED',
+  TRAINING_DAYS_VS_INTAKE: 'INTAKE_INTERPRETATION_UNSTATED',
+  DAY_MINUS_ONE_STACKED: 'REDUNDANT_COMPETITION_WEEK_EXPOSURE',
+  SPORT_SCHEDULE_CHANGED_SILENTLY: 'SPORT_SCHEDULE_SILENTLY_CHANGED',
+  TAPER_INTRODUCES_POWER_VOLUME: 'TAPER_INTRODUCES_NEW_EMPHASIS',
+  BORROWED_SPORT_LANGUAGE: 'COACHING_LANGUAGE_FROM_ANOTHER_SPORT',
+  MODALITY_SUBSTITUTION_KEEPS_THE_NUMBER: 'PRESCRIPTION_SURVIVES_MODALITY_CHANGE',
+  EVENT_COMPONENT_COVERAGE_WEEK1: 'EVENT_COMPONENT_COVERAGE_INCOMPLETE',
+  EVENT_COMPONENT_NEVER_TRAINED: 'EVENT_COMPONENT_COVERAGE_INCOMPLETE',
+  BENCHMARKED_COMPONENT_NEGLECTED: 'EVENT_COMPONENT_COVERAGE_INCOMPLETE',
+  COMPROMISED_RUNNING_MISSING: 'COMPROMISED_WORK_MISSING',
+  RACE_REHEARSAL_MISSING: 'COMPROMISED_WORK_MISSING',
+  ACCESSORY_REDUNDANCY: 'ACCESSORY_REDUNDANCY',
+};
+function coachSeverity(program, intake) {
+  const found = [...gradeProgram(program, intake)];
+  for (const fn of [...RACE_BLOCK_RULES, ...EVENT_COMPONENT_RULES]) {
+    try { found.push(...(fn(program, intake) || [])); } catch { /* a rule that throws is not a verdict */ }
+  }
+  return found.reduce((n, f) => n + (DEDUCTIONS[COACH_COST[f.rule || f.code]]?.typical ?? 0), 0);
+}
 
 const root = path.dirname(fileURLToPath(import.meta.url));
 const fixture = (n) => fs.readFileSync(path.join(root, '..', 'test', 'fixtures', `${n}-program.txt`), 'utf8');
@@ -417,12 +467,14 @@ for (const [id, intake] of Object.entries(INTAKES)) {
     const verdict = releasable(repaired.program, intake);
     const findings = allFindings(repaired.program, intake, id);
     const score = scoreProgram(findings, { intake, program: repaired.program });
+    const severity = coachSeverity(repaired.program, intake);
     results.push({
       avatar: id,
       perturbation: perturbation.id,
       seen: perturbation.seen,
       applied: changed || perturbation.id === 'undamaged',
       converged: verdict.ok,
+      severity,
       residual: verdict.codes,
       overall: score.overall,
       meets9: Boolean(score.meetsNinePlus),
@@ -485,6 +537,7 @@ const per = (a) => {
     converged: converged.length,
     rate: rows.length ? Math.round((converged.length / rows.length) * 100) : 0,
     nine: converged.filter((r) => r.meets9).length,
+    worstSeverity: converged.length ? Math.max(...converged.map((r) => r.severity ?? 0)) : 0,
   };
 };
 
@@ -495,7 +548,7 @@ const hybrid = per('advanced_hybrid');
 console.log('\n--- convergence: defects repaired without asking the model again ---');
 for (const name of Object.keys(INTAKES)) {
   const st = per(name);
-  console.log(`  ${name.padEnd(24)} ${st.converged}/${st.total} (${st.rate}%)   rubric 9+: ${st.nine}/${st.converged}`);
+  console.log(`  ${name.padEnd(24)} ${st.converged}/${st.total} (${st.rate}%)   worst coach severity: ${st.worstSeverity.toFixed(2)}`);
 }
 
 // Acceptance criteria, stated so the verdict is not a matter of opinion.
@@ -505,9 +558,32 @@ for (const name of Object.keys(INTAKES)) {
 //     the bar here is that it stops failing to produce anything at all.
 const checks = [
   ['Youth converges on every defect', youth.converged === youth.total],
-  ['Youth holds 9+ on every converged program', youth.nine === youth.converged && youth.converged > 0],
+  // Replaced the two "holds 9+ on the engine's own rubric" checks. That rubric
+  // answers 9.8 for every program it has ever been shown -- including the one
+  // the coach scored 7.6, and including that same program with every load and
+  // pace stripped out -- so both checks passed unconditionally and measured
+  // nothing. These ceilings are what each avatar's worst converged program
+  // actually costs on the coach's deduction table today. They are a ratchet:
+  // the suite fails if any avatar gets worse, which is the job the old checks
+  // were supposed to be doing.
+  ['no avatar regresses against the coach\'s standard', (() => {
+    const CEILING = {
+      advanced_hybrid: 1.44, youth_gymnastics: 0.15, tactical_3k: 1.92,
+      weightlifter_peak: 2.40, weightlifter_meet_week: 2.40, mma_fight_camp: 1.59,
+      inseason_footballer: 0.48, masters_return: 1.25, hebrew_lifter: 0.00,
+      postpartum_runner: 0.90,
+    };
+    let ok = true;
+    for (const [avatar, ceiling] of Object.entries(CEILING)) {
+      const worst = per(avatar).worstSeverity;
+      if (worst > ceiling + 1e-9) {
+        console.log(`  REGRESSION  ${avatar}: ${worst.toFixed(2)} against a ceiling of ${ceiling.toFixed(2)}`);
+        ok = false;
+      }
+    }
+    return ok;
+  })()],
   ['Tactical converges on every defect', tactical.converged === tactical.total],
-  ['Tactical holds 9+ on every converged program', tactical.nine === tactical.converged && tactical.converged > 0],
   ['Hybrid produces a releasable program', hybrid.converged > 0],
   ...Object.keys(INTAKES).map((name) => {
     const st = per(name);
