@@ -9,14 +9,25 @@ import {
 const T = new URL('./fixtures/', import.meta.url);
 const read = (f) => fs.readFileSync(new URL(f, T), 'utf8');
 
-const saturday = (weeks) => {
-  const d = new Date(Date.now() + weeks * 7 * 86400000);
+// The event needs margin from a week boundary, not just a fixed weekday.
+//
+// Which block week an event falls in is computed from the HOURS to the event,
+// so "the Saturday three weeks out" lands on day 21-27 depending on what day
+// this runs, and an offset of 21 or 22 crosses from week 4 into week 3 partway
+// through an ordinary afternoon. That is how these tests went from passing to
+// failing overnight with no source change. gradeProgram takes no clock, so the
+// date has to stay relative to real time and gain margin instead: the first
+// Saturday at least 23 days out is inside week 4 at every hour of every day.
+const WEEK4_SAFE_DAYS = 23;
+const eventSaturday = () => {
+  const d = new Date(Date.now() + WEEK4_SAFE_DAYS * 86400000);
   d.setUTCDate(d.getUTCDate() + ((6 - d.getUTCDay() + 7) % 7));
   return d.toISOString().slice(0, 10);
 };
+
 const FIGHTER = {
   event_type: 'combat',
-  competition_date: saturday(3),
+  competition_date: eventSaturday(),
   available_gym_days: ['Tue', 'Fri'],
   sport_schedule: [
     { day: 'Mon', intensity: 'hard' }, { day: 'Tue', intensity: 'moderate' },

@@ -153,6 +153,14 @@ const DICTIONARY_LIST = [
   // --- Conditioning / location-specific ---
   "Hill Sprint", "Hill Sprints", "Sprint", "Sprint Intervals",
   "Weighted Vest Hill Sprint", "Sled Push", "Sled Drag", "Prowler Push",
+  // The Hyrox stations. Five of the eight were absent, which is the same defect
+  // the Olympic pulls had: an athlete whose race is built from these movements
+  // could not be prescribed them, because the names were not in the engine's
+  // vocabulary and any attempt to write one was rejected as a hallucinated
+  // exercise. Run #117 shows the model working around it -- asked for wall
+  // balls, it wrote "Medicine Ball Scoop Throw", which the dictionary accepts.
+  "Sled Pull", "Wall Ball", "Sandbag Lunge", "Burpee Broad Jump",
+  "Sandbag Carry", "Sandbag Clean",
   "Stair Sprint", "Jump Rope", "Skipping", "Shuttle Run", "Bear Hug Carry",
   "Burpee EMOM", "Sandbag Carry", "Backpack Carry",
   "Run", "Bike", "Swim", "Rowing Ergometer",
@@ -185,6 +193,16 @@ export const EXERCISE_DICTIONARY = new Set(DICTIONARY_LIST); // ENDURANCE-MODALI
 //    dictionary entry's normalized value (acronyms, reorderings, brand words).
 // ---------------------------------------------------------------------------
 const ALIAS_LIST = [
+  // The race names people actually write. A Hyrox athlete's own vocabulary is
+  // "SkiErg" and "farmers carry"; the dictionary's canonical forms are spaced
+  // and singular, and without these the two never meet.
+  ["SkiErg", "Ski Erg"], ["Ski-Erg", "Ski Erg"], ["Ski Ergometer", "Ski Erg"],
+  ["Farmers Carry", "Farmer Carry"], ["Farmer's Carry", "Farmer Carry"],
+  ["Farmers Walk", "Farmer Carry"], ["Farmer's Walk", "Farmer Carry"],
+  ["Wall Balls", "Wall Ball"], ["Wall Ball Shot", "Wall Ball"],
+  ["Sandbag Lunges", "Sandbag Lunge"], ["Sandbag Walking Lunge", "Sandbag Lunge"],
+  ["Burpee Broad Jumps", "Burpee Broad Jump"], ["Burpee Long Jump", "Burpee Broad Jump"],
+  ["Rope Pull", "Sled Pull"], ["Sled Rope Pull", "Sled Pull"],
   // Tactical loaded-locomotion terminology
   ["Ruck", "Backpack Carry"],
   ["Rucking", "Backpack Carry"],
@@ -400,6 +418,8 @@ const EQUIP_LIST = [
   ["Bike", ["bike"]], ["Swim", ["pool"]], ["Rowing Ergometer", ["rower"]],
   // sled / conditioning gear
   ["Sled Push", ["sled"]], ["Sled Drag", ["sled"]], ["Prowler Push", ["sled"]],
+  ["Sled Pull", ["sled"]], ["Wall Ball", ["wall ball"]],
+  ["Sandbag Lunge", ["sandbag"]], ["Sandbag Carry", ["sandbag"]], ["Sandbag Clean", ["sandbag"]],
   ["Weighted Vest Hill Sprint", ["weighted_vest", "hill"]],
   ["Weighted Pistol Squat", []], // load can be vest/backpack/bw — do not hard-require
   // pull/dip apparatus
