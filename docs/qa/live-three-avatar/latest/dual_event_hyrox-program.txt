@@ -1,118 +1,99 @@
-This block runs into the event, now about 4 weeks away: the final week is competition week, not another training week. This is your final 4-week run-in to Saturday Hyrox: Weeks 1-2 realize race qualities, Week 3 tapers, Week 4 is arrival week. The block peaks Hyrox only; the two weeks after it should pivot back to easy run frequency plus one longer easy run so the half marathon is supported without trying to peak twice now.
+This is your last 4-week runway into Hyrox: Weeks 1-2 are realization with specific transitions and one real rehearsal, Week 3 cuts volume while keeping race feel, and Week 4 is pure freshness for Day 0. Squat and pulling stay on minimum reliable maintenance; the half-marathon is only protected here, then the 2 weeks after Hyrox need one longer easy run plus one steady run to reopen half-marathon tolerance.
 
-Week 2 extends the race-order run/station work and the easy run only a little. Week 3 cuts volume but keeps race pace, race loads, and your squat feel. Week 4 is just sharpness and confidence.
+Week 2 flips one transition direction and carries the only real race rehearsal. Week 3 keeps the pace and station feel but trims the total work hard. Week 4 descends into short touches and an optional Day -2 primer so you arrive sharp, not tired.
 
-If the left Achilles grumbles after the Monday run-station session, change Friday’s run first: cut 10-15 minutes or replace it with the ski erg or rower for the same duration. Do not stack a makeup run the next day; if symptoms rise above 2/10 or last into the next morning, remove burpee broad jumps before cutting squat or calf capacity work.
+If the left Achilles grumbles, change the run most likely to have caused it: replace the next fast transition run with the same structure on the rower, keep the easy run only if symptoms stay quiet during and the next morning, and do not add a second back-to-back running day.
 
 START_WEEK1_TSV
 Day	Exercise	Weight	Sets	Reps	Rest	Target RPE	Notes	Results
-Mon	[WARMUP] Run	N/A	1	8 min	N/A	2-3	Easy jog + 3 x 20 s build; prep race-pace running and transitions.; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12	
-Mon	Chest-Supported Row	RPE-selected load	2	8	90 s	7	Horizontal pull support. If session runs long, cut 1 set here before touching primary work.	
-Mon	Seated Calf Raise	RPE-selected load	3	12	60 s	7	Achilles tissue capacity; 2 s pause in the stretch and at the top.	
-Mon	Prowler Push	90-95% competition load	1	25 m	3:00 after pair	7	Hyrox sled-push feel. Smooth drive, no grind.	
-Mon	Prowler Push	90-95% competition load	1	25 m	3:00 after pair	7	Perform Hyrox sled pull here. Stay tall and keep steps short.	
-Mon	Shuttle Run	Bodyweight	1	20 m	2:30	7	Perform Hyrox burpee broad jump here. Quarter-dose exposure only; crisp rhythm, no redline breathing.	
-Mon	Run	4:10-4:15/km	4	800 m	3:00 after each pair	7	Competition-order rehearsal. Rep 1 into ski erg, rep 2 into Prowler Push, rep 3 into sled pull, rep 4 into burpee broad jump. Stop after 3 pairs if pace slips slower than 4:18/km or Achilles rises above 2/10.	
-Mon	Rower	1:50-1:51/500 m	1	500 m	3:00 after pair	7	Use SkiErg here; near goal split without forcing. If split drifts by more than 2 s/500 m, stop at 400 m.	
-Tue	[WARMUP] Rowing Ergometer	N/A	1	6 min	N/A	2-3	Easy flush, then shoulder and thoracic prep.; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12	
-Tue	Rowing Ergometer	RPE-selected split	3	250 m	2:00	7.5	Hyrox row exposure. Keep all 3 reps within a tight split band; if technique fades, stop at 2 reps.	
-Tue	Medicine Ball Scoop Throw	competition ball	2	25 reps	2:00	7	Perform Hyrox wall ball shots here. Quarter-dose exposure. Settle breathing between sets and keep catches clean.	
-Tue	Pull-up	RPE-selected added load	3	4	2:00	7	Pull strength maintenance; keep 2 reps in reserve and no sloppy last rep.	
-Tue	Pallof Press	RPE-selected load	2	12/side	45 s	6	Low-fatigue trunk work for run-to-station bracing.	
-Wed	[WARMUP] Run	N/A	1	6 min	N/A	2-3	Easy jog + squat ramp; arrive warm, not tired.; Squat-and-reach x 6; Bodyweight squat x 8; Ramp Back Squat: 47.5 kg x 5, 70 kg x 3, 92.5 kg x 1-2 before 117.5 kg work sets.	
-Wed	Back Squat	117.5 kg	2	2	3:00	6.5-7	About 78% of your 150 kg max. Squat maintenance is held on purpose through the Hyrox peak. If this reaches RPE 8 or bar speed drops, do 1 set only.	
-Wed	Machine Hamstring Curl	RPE-selected load	3	8	75 s	7	Posterior-chain support without extra axial fatigue.	
-Wed	Front Rack Lunge	90-100% competition load	2	25 m	2:00	7	Perform Hyrox sandbag lunge here. Quarter-dose exposure. Smooth steps; cut to 1 set if squat felt heavier than planned.	
-Wed	Calf Raise	RPE-selected load	3	12	60 s	7	Slow eccentric for lower-leg capacity.	
-Wed	Farmer Carry	90-100% competition load	2	50 m	2:00	7	Hyrox carry exposure. Crisp posture; no max-grip grind.	
-Fri	[WARMUP] Run	N/A	1	8 min	N/A	2-3	Easy jog + ankle drills; keep this genuinely easy.; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12	
-Fri	Chest-Supported Row	RPE-selected load	2	8	90 s	7	Pull maintenance without extra grip fatigue.	
-Fri	Pull-up	RPE-selected added load	2	4	90 s	6.5	Easy pull-strength touch; leave 3 reps in reserve.	
-Fri	Seated Calf Raise	RPE-selected load	3	12	60 s	7	Achilles-friendly lower-leg volume.	
-Fri	Pallof Press	RPE-selected load	2	12/side	45 s	6	Trunk stiffness with low fatigue.	
-Fri	Run	5:00-5:20/km	1	40 min	N/A	3-4	Secondary half-marathon support run. Easy aerobic only; if Achilles reacts from Wednesday, switch this to ski erg or Rowing Ergometer for the same duration.	
+Mon	[WARMUP]	N/A	1	8 min	N/A	3	Squat-and-reach x 6; Bodyweight squat x 8; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Ramp Back Squat: 45 kg x 5, 70 kg x 3, 90 kg x 1-2 before 115 kg work sets.	
+Mon	Back Squat	115 kg	2	2	3:00	7	About 77% of your 150 kg max; squat maintenance. If this reaches over RPE 8, hold 112.5-115 kg and keep it at 2 sets.	
+Mon	Chest-Supported Row	RPE-selected load	3	8	1:30	7	Pulling maintenance; keep the last rep clean, and hold the load if the chest comes off the pad.	
+Mon	Barbell Hip Thrust	RPE-selected load	3	6	2:00	7.5	Posterior-chain support with low soreness; if lockout slows or hamstrings cramp, hold the load and finish the sets crisp.	
+Mon	Pallof Press	RPE-selected load	2	10/side	0:45	6	Trunk brace only; first thing to remove if the session is running long.	
+Tue	[WARMUP]	N/A	1	10 min	N/A	3	Easy jog 6-8 min; dynamic running drills; 3 relaxed strides before the hard running work; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12	
+Tue	Rower	1:49-1:51/500 m	3	500 m	0:00	7.5	Station-to-run pair. Use the ski erg for this slot if it is open; otherwise row at the same effort cap.	
+Tue	Run	4:12-4:16/km	3	800 m	3:00	7.5	Leave the machine and settle straight into race rhythm; stop at 2 clean rounds if Achilles talks or pace drifts.	
+Tue	Prowler Push	90-95% competition load	4	25 m	1:30	7	25 m push out; if you normally set the rope, drag it back as the return. Crisp steps, no grind.	
+Wed	Explosive Push-up	Bodyweight	3	3	1:00	6	Fast hands and fast floor contact; low-cost burpee pop touch only, stop if speed drops.	
+Wed	Chin-up	RPE-selected load	3	5	2:00	7	Pulling maintenance; if elbows feel sticky, keep it bodyweight and stay crisp.	
+Wed	Machine Hamstring Curl	RPE-selected load	3	8	1:30	7	Posterior-chain support without axial fatigue; if hamstrings threaten to cramp, hold the load and finish smooth.	
+Wed	Farmer Carry	90-95% competition load	4	50 m	1:30	7	Tall posture and quick feet; if grip goes early, cut the last trip.	
+Wed	Air Squat	Bodyweight	2	25	1:00	5	Use this as a calm wall-ball rhythm touch if your usual setup is open; stop well before burn.	
+Thu	Run	4:45-5:05/km	1	40 min	N/A	4.5	Half-marathon durability anchor. Easy conversational effort; if Achilles complains during or next morning, hold this duration next week rather than adding.	
+Thu	Sandbag Lunge	90-95% competition load	4	25 m	1:30	7	Race posture and clean turns; stop a set early if trunk or stride quality breaks.	
+Thu	Farmer Carry	90-95% competition load	4	50 m	1:30	7	Competition feel, not a grip test; if hands are already cooked from Wednesday, cut 1 trip.	
+Thu	Calf Raise	RPE-selected load	3	15	1:00	7	Lower-leg tissue capacity; smooth full range and no bouncing.	
 END_WEEK1_TSV
+
 START_WEEK2_TSV
 Day	Exercise	Weight	Sets	Reps	Rest	Target RPE	Notes	Results
-Mon	[WARMUP] Run	N/A	1	8 min	N/A	2-3	Same warm-up as Week 1; rehearse what you will actually use on race day.; Easy jog 6-8 min; dynamic running drills; 3 relaxed strides before the hard running work; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12	
-Mon	Chest-Supported Row	RPE-selected load	2	8	90 s	7	Support work held steady because Monday primary work is what progressed this week.	
-Mon	Seated Calf Raise	RPE-selected load	3	12	60 s	7	Same tissue-capacity dose; keep it smooth, not fatiguing.	
-Mon	Prowler Push	90-95% competition load	1	25 m	3:00 after pair	7	Hyrox sled-push feel. Same distance and load, smoother execution.	
-Mon	Prowler Push	90-95% competition load	1	25 m	3:00 after pair	7	Perform Hyrox sled pull here. Keep rope rhythm and posture tidy.	
-Mon	Shuttle Run	Bodyweight	1	20 m	2:30	7	Perform Hyrox burpee broad jump here. Quarter-dose exposure only; stop before pace turns into slogging.	
-Mon	Run	4:10-4:15/km	4	1000 m	3:00 after each pair	7.5	Same 4-station rehearsal, now with full 1 km runs for more race-specific continuity. Stop after 3 pairs if pace slips slower than 4:18/km or Achilles rises above 2/10.	
-Mon	Rower	1:49-1:50/500 m	1	500 m	3:00 after pair	7.5	Use SkiErg here; touch goal pace cleanly, not desperately.	
-Tue	[WARMUP] Rowing Ergometer	N/A	1	6 min	N/A	2-3	Easy flush, then shoulder and thoracic prep.; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12	
-Tue	Rowing Ergometer	RPE-selected split	3	250 m	2:00	7.5	Hyrox row exposure held steady on purpose while Monday carried the build.	
-Tue	Medicine Ball Scoop Throw	competition ball	2	25 reps	2:00	7	Perform Hyrox wall ball shots here. Same quarter-dose; efficient breathing and clean catches.	
-Tue	Pull-up	RPE-selected added load	3	4	2:00	7	Pull strength maintenance held steady on purpose.	
-Tue	Pallof Press	RPE-selected load	2	12/side	45 s	6	Low-fatigue trunk work for bracing and transfer.	
-Wed	[WARMUP] Run	N/A	1	6 min	N/A	2-3	Easy jog + squat ramp; arrive warm, not tired.; Squat-and-reach x 6; Bodyweight squat x 8; Ramp Back Squat: 47.5 kg x 5, 70 kg x 3, 92.5 kg x 1-2 before 117.5 kg work sets.	
-Wed	Back Squat	117.5 kg	2	2	3:00	6.5-7	Held exactly on purpose at about 78% of 150 kg. Monday progressed; squat stays maintenance. If this reaches RPE 8, do 1 set only.	
-Wed	Machine Hamstring Curl	RPE-selected load	3	8	75 s	7	Posterior-chain support without extra axial fatigue.	
-Wed	Front Rack Lunge	90-100% competition load	2	25 m	2:00	7	Perform Hyrox sandbag lunge here. Same dose, clean steps.	
-Wed	Calf Raise	RPE-selected load	3	12	60 s	7	Slow eccentric for lower-leg capacity.	
-Wed	Farmer Carry	90-100% competition load	2	50 m	2:00	7	Second direct carry exposure. Same dose, cleaner posture.	
-Fri	[WARMUP] Run	N/A	1	8 min	N/A	2-3	Easy jog + ankle drills; keep it conversational.; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12	
-Fri	Chest-Supported Row	RPE-selected load	2	8	90 s	7	Pull maintenance without extra grip fatigue.	
-Fri	Pull-up	RPE-selected added load	2	4	90 s	6.5	Easy pull-strength touch; leave 3 reps in reserve.	
-Fri	Seated Calf Raise	RPE-selected load	3	12	60 s	7	Achilles-friendly hold the total work.	
-Fri	Pallof Press	RPE-selected load	2	12/side	45 s	6	Trunk stiffness with low fatigue.	
-Fri	Run	5:00-5:20/km	1	45 min	N/A	3-4	Only duration rises this week; pace stays easy. If Monday left the Achilles touchy the next morning, keep this at 40 min instead.	
+Mon	[WARMUP]	N/A	1	8 min	N/A	3	Squat-and-reach x 6; Bodyweight squat x 8; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Ramp Back Squat: 45 kg x 5, 70 kg x 3, 90 kg x 1-2 before 115 kg work sets.	
+Mon	Back Squat	115 kg	2	2	3:00	7	About 77% of your 150 kg max; same maintenance dose on purpose. If this reaches over RPE 8, hold 112.5-115 kg and keep it at 2 sets.	
+Mon	Chest-Supported Row	RPE-selected load	3	8	1:30	7	Pulling maintenance; keep the last rep clean, and hold the load if the chest comes off the pad.	
+Mon	Barbell Hip Thrust	RPE-selected load	3	6	2:00	7.5	Posterior-chain support with low soreness; if lockout slows or hamstrings cramp, hold the load and finish the sets crisp.	
+Mon	Pallof Press	RPE-selected load	2	10/side	0:45	6	Trunk brace only; first thing to remove if the session is running long.	
+Tue	[WARMUP]	N/A	1	10 min	N/A	3	Easy jog 6-8 min; dynamic running drills; 3 relaxed strides before the hard running work; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12	
+Tue	Run	4:12-4:16/km	3	800 m	0:00	7.5	This week flips the pair: run into the machine. Pace holds on purpose while Thursday carries the bigger specific load.	
+Tue	Rower	1:49-1:51/500 m	3	500 m	2:30	7.5	Complete the run-to-station pair; use ski erg here if open and keep the same split touch.	
+Tue	Prowler Push	90-95% competition load	4	25 m	1:30	7	Same dose by design; keep the return controlled if you drag it back.	
+Wed	Explosive Push-up	Bodyweight	3	3	1:00	6	Fast hands and fast floor contact; same low-cost burpee pop touch, stop if speed drops.	
+Wed	Chin-up	RPE-selected load	3	5	2:00	7	Pulling maintenance; if elbows feel sticky, keep it bodyweight and stay crisp.	
+Wed	Machine Hamstring Curl	RPE-selected load	3	8	1:30	7	Posterior-chain support without axial fatigue; if hamstrings threaten to cramp, hold the load and finish smooth.	
+Wed	Farmer Carry	90-95% competition load	4	50 m	1:30	7	Tall posture and quick feet; if grip goes early, cut the last trip.	
+Wed	Air Squat	Bodyweight	2	25	1:00	5	Use this as a calm wall-ball rhythm touch if your usual setup is open; stop well before burn.	
+Thu	[WARMUP]	N/A	1	10 min	N/A	3	Easy jog 6-8 min; dynamic running drills; 3 relaxed strides before the hard running work; Squat-and-reach x 6; Bodyweight squat x 8; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12	
+Thu	Run	4:14-4:18/km	2	800 m	0:00	7.5	Round start; go straight into Prowler Push. This is the only real rehearsal, so keep transitions honest.	
+Thu	Prowler Push	95-100% competition load	2	25 m	0:00	8	Push out; drag back on the return if that is your normal sled-pull setup. Straight into the second 800 m run.	
+Thu	Run	4:14-4:18/km	2	800 m	0:00	7.5	Straight into Rower; if pace slips, do not chase it.	
+Thu	Rower	1:49-1:51/500 m	2	500 m	0:00	7.5	Use ski erg here if open for your pace touch; otherwise row at the same effort and go straight into the 400 m run.	
+Thu	Run	4:14-4:18/km	2	400 m	0:00	7.5	Straight into Farmer Carry.	
+Thu	Farmer Carry	90-100% competition load	2	100 m	0:00	8	Competition posture and turns; straight into the second 400 m run.	
+Thu	Run	4:18-4:22/km	2	400 m	0:00	7.5	Straight into Sandbag Lunge; stay under control late.	
+Thu	Sandbag Lunge	90-100% competition load	2	50 m	3:00	8	Genuine rehearsal at roughly 30% plus race duration. End after 2 rounds if mechanics, grip or pace fall away.	
+Thu	Air Squat	Bodyweight	2	25	1:00	5	If your usual wall-ball lane is free, make these a relaxed rhythm touch instead; still stop well before burn.	
 END_WEEK2_TSV
+
 START_WEEK3_TSV
 Day	Exercise	Weight	Sets	Reps	Rest	Target RPE	Notes	Results
-Mon	[WARMUP] Run	N/A	1	8 min	N/A	2-3	Same race-week style warm-up; taper starts by trimming volume, not dulling speed.; Easy jog 6-8 min; dynamic running drills; 3 relaxed strides before the hard running work; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12	
-Mon	Chest-Supported Row	RPE-selected load	2	6	75 s	6.5	Support trimmed for taper; keep quality high. Session trimmed for camp: what remains is here because it keeps strength, speed or tissue readiness, not because it is easy.	
-Mon	Prowler Push	90-95% competition load	1	25 m	3:00 after pair	7	One clean race-feel exposure.	
-Mon	Prowler Push	90-95% competition load	1	25 m	3:00 after pair	7	Perform Hyrox sled pull here. One clean race-feel exposure.	
-Mon	Run	4:10-4:15/km	3	800 m	3:00 after each pair	7	Taper touch. Rep 1 into Prowler Push, rep 2 into sled pull, rep 3 standalone race-pace touch. Stop immediately if pace or mechanics drift.	
-Tue	[WARMUP] Rowing Ergometer	N/A	1	5 min	N/A	2-3	Easy flush, then shoulder and thoracic prep.; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12	
-Tue	Rowing Ergometer	RPE-selected split	2	250 m	2:00	7	Taper dose; keep both reps at the same split.	
-Tue	Medicine Ball Scoop Throw	competition ball	2	20 reps	2:00	7	Perform Hyrox wall ball shots here. Rhythm touch only; leave reps in reserve.	
-Tue	Pull-up	RPE-selected added load	2	4	2:00	6.5	Trimmed volume, same clean standard.	
-Tue	Pallof Press	RPE-selected load	2	10/side	45 s	6	Low-fatigue trunk work.	
-Wed	[WARMUP] Run	N/A	1	6 min	N/A	2-3	Easy jog + squat ramp; arrive warm, not tired.; Squat-and-reach x 6; Bodyweight squat x 8; Ramp Back Squat: 47.5 kg x 5, 70 kg x 3, 92.5 kg x 1-2 before 117.5 kg work sets.	
-Wed	Back Squat	117.5 kg	2	2	3:00	6.5-7	Held exactly on purpose. Taper comes from less support volume, not a softer bar. If this reaches RPE 8, do 1 set only.	
-Wed	Front Rack Lunge	90-95% competition load	1	25 m	2:00	6.5	Perform Hyrox sandbag lunge here. One smooth quarter-dose; stop if the Achilles feels loaded.	
-Wed	Medicine Ball Scoop Throw	Light, speed-first load	2	25 reps	2:00	7	Same exposure as earlier in the block, kept short and sharp. Speed is the point; stop the moment it drops. Replaces Calf Raise: closer to the event this buys more than another accessory set.	
-Wed	Farmer Carry	90-95% competition load	1	50 m	2:00	6.5	One clean race-feel set only.	
-Fri	[WARMUP] Run	N/A	1	8 min	N/A	2-3	Easy jog + ankle drills; keep breathing quiet.; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12	
-Fri	Explosive Push-up	Light, speed-first load	3	3	90 sec	7	Upper-body ballistic work at almost no cost. Leave the floor, land soft, stop while every rep is sharp. Replaces Chest-Supported Row: closer to the event this buys more than another accessory set.	
-Fri	Pull-up	RPE-selected added load	2	4	90 s	6.5	Easy pull-strength touch; no grinding.	
-Fri	Pallof Press	RPE-selected load	2	10/side	45 s	6	Low-fatigue trunk stiffness.	
-Fri	Run	5:00-5:20/km	1	30 min	N/A	3-4	Easy only; frequency stays, volume drops for taper. If Achilles is touchy, switch to ski erg or Rowing Ergometer for the same duration.	
+Mon	[WARMUP]	N/A	1	8 min	N/A	3	Squat-and-reach x 6; Bodyweight squat x 8; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Ramp Back Squat: 45 kg x 5, 70 kg x 3, 90 kg x 1-2 before 115 kg work sets.	
+Mon	Back Squat	115 kg	2	2	3:00	7	About 77% of your 150 kg max; keep the load, keep the dose minimal, and leave fresh. If this reaches over RPE 8, stop after 1 set.	
+Mon	Chest-Supported Row	RPE-selected load	2	8	1:30	6.5	Taper week: same movement, one set less, no grinding.	
+Mon	Barbell Hip Thrust	RPE-selected load	2	6	2:00	7	Taper week: enough posterior-chain tension to hold feel, not enough to leave soreness.	
+Mon	Pallof Press	RPE-selected load	2	8/side	0:45	6	Short trunk touch only; remove if recovery feels anything but green.	
+Tue	[WARMUP]	N/A	1	10 min	N/A	3	Easy jog 6-8 min; dynamic running drills; 3 relaxed strides before the hard running work; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12	
+Tue	Rower	1:49-1:51/500 m	2	500 m	0:00	7	Weekly pace touch at reduced volume; use ski erg here if open and keep it crisp.	
+Tue	Run	4:12-4:16/km	2	800 m	3:00	7.5	Reduced-volume station-to-run pair; stop after 1 clean round if Achilles or rhythm is off.	
+Tue	Prowler Push	90-95% competition load	2	25 m	1:30	6.5	Same load feel, half the work; no grinding.	
+Wed	Explosive Push-up	Bodyweight	2	3	1:00	5.5	Keep the same fast burpee-pop feel; shut it down the moment speed fades.	
+Wed	Chin-up	RPE-selected load	2	5	2:00	7	Small pulling touch only; same load if it stayed crisp last week.	
+Wed	Machine Hamstring Curl	RPE-selected load	2	8	1:30	6.5	Enough posterior-chain work to hold feel without soreness.	
+Wed	Farmer Carry	90-95% competition load	3	50 m	1:30	6.5	Tall and quick; cut the last trip if grip feels flat.	
+Wed	Air Squat	Bodyweight	1	20	1:00	4	Easy wall-ball rhythm touch only if it feels restorative.	
+Thu	Run	4:45-5:05/km	1	35 min	N/A	4	Easy run held for durability while tapering Hyrox fatigue; if Achilles is even mildly grumbly, cap it at 25 min.	
+Thu	Sandbag Lunge	90-95% competition load	3	25 m	1:30	6.5	Keep the same movement quality with less total work.	
+Thu	Farmer Carry	90-95% competition load	2	50 m	1:30	6.5	Short competition-feel touch, not a grind.	
+Thu	Calf Raise	RPE-selected load	2	12	1:00	6	Lower-leg tissue check-in; leave the gym feeling better than you arrived.	
 END_WEEK3_TSV
+
 START_WEEK4_TSV
 Day	Exercise	Weight	Sets	Reps	Rest	Target RPE	Notes	Results
-Day -5	[WARMUP] Run	N/A	1	6 min	N/A	2-3	Rehearse your race-day warm-up and finish feeling better than you started.; Easy jog 6-8 min; dynamic running drills; 3 relaxed strides before the hard running work; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12	
-Day -5	Prowler Push	90% competition load	1	12.5 m	2:00	6	One clean start and drive only. Session trimmed for camp: what remains is here because it keeps strength, speed or tissue readiness, not because it is easy. Stop the session early if bar speed drops, soreness is climbing, the cut is going badly or sleep was poor.	
-Day -5	Run	4:10-4:15/km	2	600 m	3:00 after each pair	6.5	Rep 1 into ski erg, rep 2 into Prowler Push. Finish wanting more; if legs feel flat, do 1 pair only.	
-Day -5	Rower	1:48-1:49/500 m	1	250 m	3:00 after pair	7	Use SkiErg here. Goal-split touch, not a test.	
-Day -4	[WARMUP] Rowing Ergometer	N/A	1	5 min	N/A	2-3	Easy flush and reset.; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12	
-Day -4	Medicine Ball Scoop Throw	Light, speed-first load	2	25 reps	2:00	7	Same exposure as earlier in the block, kept short and sharp. Speed is the point; stop the moment it drops. Replaces Chest-Supported Row: closer to the event this buys more than another accessory set.	
-Day -4	Pallof Press	RPE-selected load	1	12/side	45 s	6	Low-cost brace reminder.	
-Day -4	Farmer Carry	90% competition load	1	50 m	2:00	6	One feel set only; posture first.	
-Day -3	[WARMUP] Run	N/A	1	5 min	N/A	2-3	Easy jog + squat ramp.; Squat-and-reach x 6; Bodyweight squat x 8; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Ramp Back Squat: 45 kg x 5, 70 kg x 3, 90 kg x 1-2 before 115 kg work sets.	
-Day -3	Back Squat	115 kg	2	1	3:00	6	About 77% of 150 kg. Crisp singles only; if bar speed is not snappy, do 1 single and leave.	
-Day -3	Pull-up	RPE-selected added load	1	3	90 s	6	Pull strength touch; stay well away from strain. Trimmed so the week keeps descending into the event.	
-Day -3	Explosive Push-up	Light, speed-first load	1	3	90 sec	7	Same exposure as earlier in the block, kept short and sharp. Speed is the point; stop the moment it drops. Replaces Plank: closer to the event this buys more than another accessory set. Trimmed so the week keeps descending into the event.	
-Day -2	[WARMUP] Run	N/A	1	5 min	N/A	2-3	Optional primer day: do this only if you want to feel sharp; skip the whole session if already springy, tired, or travelling.; Easy jog 6-8 min; dynamic running drills; 3 relaxed strides before the hard running work; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12	
-Day -2	Medicine Ball Scoop Throw	competition ball	1	10 reps	90 s	6	Perform Hyrox wall ball shots here. Smooth mechanics, no burn.	
-Day -2	Shuttle Run	Bodyweight	1	10 m	2:00	N/A	Perform Hyrox burpee broad jump here. Fast crisp contacts only; stop before breathing spikes.	
-Day -2	Run	4:08-4:12/km	1	400 m	N/A	6	One relaxed race-pace touch.	
+Day -5	[WARMUP]	N/A	1	8 min	N/A	3	Squat-and-reach x 6; Bodyweight squat x 8; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Ramp Back Squat: 47.5 kg x 5, 70 kg x 3, 92.5 kg x 1-2 before 117.5 kg work sets.	
+Day -5	Back Squat	117.5 kg	2	1	3:00	6.5	About 78% of your 150 kg max. Crisp singles only; if bar speed is off, do 1 single and leave.	
+Day -5	Prowler Push	95% competition load	2	20 m	2:00	6	Last meaningful heavy-feel station touch. Fast feet, full reset, no grinding.	
+Day -5	Chin-up	Bodyweight or RPE-selected load	2	3	1:30	6	Small pulling touch only; leave plenty in reserve.	
+Day -5	Air Squat	Bodyweight	1	20	0:45	4	If your usual wall-ball lane is open, make this one calm rhythm set and shut it down.	
+Day -4	Run	4:50-5:10/km	1	25 min	N/A	4	Circulation only. If Achilles grumbles, replace this with 20 min easy on the rower and keep Day -2 tiny.	
+Day -4	Rower	1:49-1:51/500 m	2	250 m	2:00	6	Pace touch only; ski erg can take this slot if that is your normal feel anchor.	
+Day -4	Sandbag Lunge	90% competition load	2	20 m	1:30	6	Smooth turns and easy breathing; leave fresh.	
+Day -4	Explosive Push-up	Bodyweight	2	3	1:00	5	Fast and crisp; stop before any fatigue.	
+Day -3	Prowler Push	90% competition load	2	15 m	2:00	5	Short neural touch only; skip the second rep if the first feels flat.	
+Day -3	Farmer Carry	90% competition load	2	30 m	1:30	5	Tall posture, quick feet, no grind.	
+Day -3	Rower	1:49-1:51/500 m	1	250 m	2:00	5	One clean pace reminder, then done.	
+Day -3	Air Squat	Bodyweight	1	15	0:30	3	Optional wall-ball rhythm touch only if it feels calming, not fatiguing.	
+Day -2	[WARMUP]	N/A	1	10 min	N/A	3	Easy jog 6-8 min; dynamic running drills; 3 relaxed strides before the hard running work; Squat-and-reach x 6; Bodyweight squat x 8; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Band shoulder pass-through x 10; Scapular push-up x 8	
+Day -2	Explosive Push-up	Bodyweight	2	3	1:00	4	Optional primer. Do it only if you want to feel snappy; skip the whole session if travel, fatigue or nerves say leave it.	
+Day -2	Prowler Push	85-90% competition load	2	15 m	2:00	4	Optional primer. Smooth and fast; end it the second it stops feeling effortless.	
+Day -2	Run	4:12-4:16/km	2	200 m	2:00	5	Optional primer. Finish wanting one more; stop immediately if Achilles or breathing feels off.	
+Day -2	Air Squat	Bodyweight	1	10	0:30	3	Optional wall-ball rhythm touch only if it always makes you feel better.	
 END_WEEK4_TSV
-
-TAPER AUDIT
-Event: hybrid race, priority A, about 4 weeks out.
-This block runs into the event: the final week is competition week.
-Sport sessions counted as load: 2 per week.
-WEEK PHASES: 1=realization 2=realization 3=taper 4=competition_week EVENT=hybrid_race
-
-    phase             sets  exercises  competition lift  power sets  peak RPE  peak % max
-W1  realization       45    15         -                 2           7.5       -
-W2  realization       45    15         -                 2           7.5       -
-W3  taper             29    11         -                 7           7         -
-W4  competition week  15    10         -                 4           7         -
-
-Across the block: volume -30 sets, exercises -5, competition-lift share unchanged, peak effort -0.5 RPE, accessory volume -18 sets.
