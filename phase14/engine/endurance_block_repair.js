@@ -13,7 +13,7 @@
 // tolerates, the goal pace they stated, the frequency they asked for: these are
 // facts the program contradicted, and putting a fact back is not coaching.
 
-import { rows, toleratedDistance, goalFamilyTiers, benchmarks, accessoryRedundancy, repeatedSprintExposure, sprintDistanceSpecificity, taperAgainstSource } from './coach_rules.js';
+import { rows, toleratedDistance, goalFamilyTiers, benchmarks, accessoryRedundancy, repeatedSprintExposure, sprintDistanceSpecificity, taperAgainstSource, repeatedSprintProgression } from './coach_rules.js';
 import { parseWeek } from './v34_workload_accounting.js';
 import { auditProgramStructure } from './v38_structural_audit.js';
 import { statedGoalFamilies } from './coach_rules.js';
@@ -319,8 +319,10 @@ export function repairUnanchoredCompetitionLoad(program, intake = {}) {
 
 export const ENDURANCE_REPAIRS = [
   repairRuckDistance, repairGoalSpeed, repairUnanchoredCompetitionLoad, repairImprovementGoalFlat,
-  repairTaperPowerSpike, repairRepeatedSprintRecovery, repairSprintDistance, repairTaperOpening,
+  repairTaperPowerSpike, repairRepeatedSprintRecovery, repairSprintDistance, repairRepeatedSprintProgression, repairTaperOpening,
 ];
+
+
 
 // Deliberately not in the list above. This one deletes rows, and the repairs
 // that want a slot -- a missing benchmarked movement, an untrained race
@@ -634,21 +636,43 @@ export function repairSprintDistance(program, intake = {}) {
 // a taper is protecting.
 
 const TAPER_OPENING_FLOOR = 0.10;
+const TAPER_COMPETITION_FLOOR = 0.41;
 const LEAST_SPECIFIC = /plank|pallof|dead bug|calf|curl|raise|fly|extension|band|face pull|shrug/i;
 
 export function repairTaperOpening(program, intake = {}) {
-  const findings = (taperAgainstSource(program, intake) || []).filter((f) => f.rule === 'TAPER_COMPRESSED_INTO_FINAL_WEEK');
-  if (!findings.length) return { program: String(program || ''), changed: false, moves: [] };
-
   let out = String(program || '');
   const moves = [];
-  for (const f of findings) {
-    const carried = Number((String(f.detail).match(/week (\d+) carries (\d+)/i) || [])[2]);
-    const earlier = Number((String(f.detail).match(/against (\d+) earlier/i) || [])[1]);
-    const week = Number((String(f.detail).match(/week (\d+) carries/i) || [])[1]);
+
+  // Iterate, because these two findings uncover each other. Trimming the week
+  // before competition fixes the compressed taper and changes the pre-taper
+  // average the competition week is measured against, so the insufficient
+  // reduction only becomes visible once the first is answered. Computing the
+  // findings once left the second one standing.
+  for (let pass = 0; pass < 4; pass += 1) {
+    // The week BEFORE competition only. Trimming competition week itself was
+    // tried and does two things wrong at once: it collides with the freshness
+    // budget that owns those days (V90_SESSION_GROWS_INTO_DAY_ZERO), and it
+    // chases a moving target, because trimming the pre-taper week lowers the
+    // average competition week is measured against. His two taper rules can
+    // genuinely conflict on a three-week camp, and resolving both means
+    // redesigning the block's volume profile rather than shaving sets -- a
+    // coaching decision, so the remaining finding is reported rather than
+    // forced.
+    const findings = (taperAgainstSource(out, intake) || [])
+      .filter((f) => f.rule === 'TAPER_COMPRESSED_INTO_FINAL_WEEK');
+    if (!findings.length) break;
+    const before = out;
+    for (const f of findings) {
+    // Same machinery, two different floors. The week before competition has to
+    // BEGIN the descent -- 10% is enough. Competition week itself has to finish
+    // it, and his band is 41-60% off the pre-taper average.
+    const isCompWeek = f.rule === 'TAPER_VOLUME_NOT_REDUCED';
+    const carried = Number((String(f.detail).match(isCompWeek ? /carries (\d+) working sets/i : /week (\d+) carries (\d+)/i) || [])[isCompWeek ? 1 : 2]);
+    const earlier = Number((String(f.detail).match(isCompWeek ? /average of (\d+)/i : /against (\d+) earlier/i) || [])[1]);
+    const week = Number((String(f.detail).match(/[Ww]eek (\d+) (?:carries|is competition)/i) || [])[1]);
     if (![carried, earlier, week].every(Number.isFinite)) continue;
 
-    const target = Math.floor(earlier * (1 - TAPER_OPENING_FLOOR));
+    const target = Math.floor(earlier * (1 - (isCompWeek ? TAPER_COMPETITION_FLOOR : TAPER_OPENING_FLOOR)));
     if (carried <= target) continue;
     const parsed = parseWeek(out, week);
     if (!parsed) continue;
@@ -687,6 +711,47 @@ export function repairTaperOpening(program, intake = {}) {
     if (brokeSomething(out, candidate, intake)) continue;
     out = candidate;
     moves.push({ week, from: carried, to: total(), target });
+    }
+    if (out === before) break;
+  }
+  return { program: out, changed: moves.length > 0, moves };
+}
+
+// --- 10. a repeated-sprint exposure that never gets harder -------------------
+//
+// "Improving repeated-sprint ability is a stated goal and nothing about the
+// exposure moves by Week 3: W1 4 x 20 m / 45 s, W2 4 x 20 m / 45 s, W3 the
+// same." Partly our doing: the recovery repair above sets every week to the
+// same 45 s, which fixes the definition and flattens the progression.
+//
+// Repeatability improves by doing more reps at the same quality, not by running
+// them further or resting less, so the rep count is the lever. One rep a week,
+// which is the smallest change that makes the block progress at all.
+
+export function repairRepeatedSprintProgression(program, intake = {}) {
+  const findings = repeatedSprintProgression(program, intake);
+  if (!findings.length) return { program: String(program || ''), changed: false, moves: [] };
+
+  let out = String(program || '');
+  const moves = [];
+  for (const week of [2, 3]) {
+    const parsed = parseWeek(out, week);
+    if (!parsed) continue;
+    const cells = parsed.rows.map((c) => [...c]);
+    let changed = false;
+    cells.forEach((row) => {
+      const name = String(row[parsed.exercise] || '').trim();
+      if (isWarmup(name) || !SPRINTABLE.test(name)) return;
+      const sets = Number(row[parsed.sets]) || 0;
+      if (sets < 3) return;
+      row[parsed.sets] = String(sets + (week - 1));
+      if (Number.isInteger(parsed.notes)) {
+        row[parsed.notes] = `${String(row[parsed.notes] || '').trim()} One more rep than last week, same distance and same short recovery: repeatability improves by holding the quality over more efforts, not by running further.`.trim();
+      }
+      moves.push({ week, movement: name, from: sets, to: sets + (week - 1) });
+      changed = true;
+    });
+    if (changed) out = rebuild(out, parsed, cells);
   }
   return { program: out, changed: moves.length > 0, moves };
 }

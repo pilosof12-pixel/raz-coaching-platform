@@ -9,7 +9,8 @@
 // days may be exactly right; the athlete cannot tell that from what they were
 // sent."
 
-import { rows, trainingDaysVsIntake, sportScheduleChangedSilently, unsupportedAthleteFact, contingencyCreatesAdjacentDuplicate } from './coach_rules.js';
+import { borrowedSportLanguage } from './coach_race_block_rules.js';
+import { rows, trainingDaysVsIntake, sportScheduleChangedSilently, unsupportedAthleteFact, contingencyCreatesAdjacentDuplicate, promisedMovementAbsent } from './coach_rules.js';
 
 const WORDS = ['zero', 'one', 'two', 'three', 'four', 'five', 'six', 'seven'];
 const START = /START_WEEK1_TSV/i;
@@ -77,6 +78,7 @@ export function repairSportScheduleStatement(program, intake = {}) {
 export const STATEMENT_REPAIRS = [
   repairTrainingDaysStatement, repairSportScheduleStatement,
   repairUnsupportedFact, repairContingencyDuplicate,
+  repairBorrowedLanguage, repairBrokenPromise,
 ];
 
 // --- 3. a fact about the athlete that the intake does not contain -------------
@@ -185,4 +187,73 @@ export function repairContingencyDuplicate(program, intake = {}) {
     + `Keep the day as written and drop the load instead -- the point of the swap is to protect the week, and two heavy days back to back is the thing it was protecting you from.`;
   out = addToSummary(out, sentence);
   return { program: out, changed: true, notes };
+}
+
+// --- 5. coaching language carried over from another athlete -------------------
+//
+// "Horizontal power for level changes and takedown entries" in a Hyrox block.
+// He charged 0.10, and his reading was exactly right: the justification was
+// inherited from a combat athlete rather than written for this event. The fix
+// is to say why the movement is there for THIS race, which the row already
+// knows -- it is a broad jump in a block whose event contains a burpee broad
+// jump.
+
+const BORROWED_CLAUSE = /\b(?:for|to (?:help|support|train))?\s*(?:level changes?|takedown entries|takedowns?|clinch work|shot entries)\b[^.]*\./i;
+
+export function repairBorrowedLanguage(program, intake = {}) {
+  const findings = borrowedSportLanguage(program, intake);
+  if (!findings.length) return { program: String(program || ''), changed: false, rewritten: [] };
+
+  const sport = String(intake.sport || 'this event').trim();
+  let out = String(program || '');
+  const rewritten = [];
+  for (const f of findings) {
+    const phrase = (String(f.detail).match(/^"([^"]+)"/) || [])[1];
+    if (!phrase) continue;
+    // Replace the sentence the borrowed phrase sits in, not the whole note: the
+    // rest of the row is real coaching about how to perform the movement.
+    const re = new RegExp(`[^.\\t]*\\b${phrase.replace(/[.*+?^${}()|[\\]\\\\]/g, '\\\\$&')}\\b[^.\\t]*\\.`, 'i');
+    if (!re.test(out)) continue;
+    out = out.replace(re, `Horizontal power for ${sport}.`);
+    rewritten.push(phrase);
+  }
+  return { program: out, changed: rewritten.length > 0, rewritten };
+}
+
+// --- 6. a progression the block promised and never made ----------------------
+//
+// "Week 2 adds one acceleration rep if Week 1 stayed crisp" -- and no exercise
+// in any week is an acceleration. The athlete is told about a progression in
+// something they were never given.
+//
+// Two ways to resolve it and only one is honest here. Adding acceleration work
+// to a footballer playing five times a week and a match is a fatigue decision.
+// Removing a promise the block cannot keep is not: the sentence was describing
+// training that does not exist.
+
+export function repairBrokenPromise(program, intake = {}) {
+  const findings = promisedMovementAbsent(program, intake);
+  if (!findings.length) return { program: String(program || ''), changed: false, removed: [] };
+
+  let out = String(program || '');
+  const removed = [];
+  const tablesAt = out.search(START);
+  const limit = tablesAt < 0 ? out.length : tablesAt;
+  for (const f of findings) {
+    const quoted = (String(f.detail).match(/--\s*"([^"]+)"/) || [])[1];
+    if (!quoted) continue;
+    const at = out.indexOf(quoted.slice(0, 60));
+    if (at < 0 || at >= limit) continue;
+    let start = out.lastIndexOf('.', at);
+    start = start < 0 ? 0 : start + 1;
+    let end = out.indexOf('.', at + Math.min(quoted.length, 60));
+    end = end < 0 || end > limit ? limit : end + 1;
+    out = out.slice(0, start) + out.slice(end);
+    removed.push(quoted.slice(0, 60));
+  }
+  const cut = out.search(START);
+  if (cut > 0) out = out.slice(0, cut).replace(/\s+([.,;])/g, '$1').replace(/[ \t]{2,}/g, ' ') + out.slice(cut);
+  const tail = (t) => { const i = t.search(START); return i < 0 ? '' : t.slice(i); };
+  if (tail(out) !== tail(String(program || ''))) return { program: String(program || ''), changed: false, removed: [] };
+  return { program: out, changed: removed.length > 0, removed };
 }
