@@ -1,21 +1,21 @@
 {
-  "timestamp": "2026-09-18T12:34:42.216Z",
+  "timestamp": "2026-09-19T07:54:36.041Z",
   "base": "https://raz-coaching-platform.onrender.com",
-  "head_sha": "3e3315286d467b4423aed692cdbfdd246055e1e0",
-  "runtime": "live52 2026-09-18T12:33:24Z",
+  "head_sha": "b8df5ab7b390ec962b26d0c09abd7fd2293a73ac",
+  "runtime": "live53 2026-09-19T07:53:49Z",
   "results": [
     {
       "id": "dual_event_hyrox",
-      "job_id": "f23572df4ab6f2282d74365205b1a016",
+      "job_id": "e288389ec7ee5da7633631905dcb36bb",
       "ok": true,
       "status": "done",
       "stage": "finalizing",
-      "attempt": 3,
-      "detail": "saving program after 3 model call(s)",
+      "attempt": 4,
+      "detail": "saving program after 4 model call(s)",
       "last_seen_status": "done",
       "error": null,
-      "program_chars": 15669,
-      "seconds": 1367
+      "program_chars": 15015,
+      "seconds": 1237
     }
   ],
   "selection": [
