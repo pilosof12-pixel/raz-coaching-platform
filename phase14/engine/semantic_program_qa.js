@@ -24,6 +24,27 @@ function availableStrengthDays(intake = {}) {
   return new Set(intake.available_gym_days.map(normalizeDay));
 }
 
+// Competition week does not owe the athlete their usual number of sessions.
+//
+// This gate was demanding exactly what the coach charges a deduction for. He
+// reviewed a Hyrox block that kept all four gym visits through race week and
+// took 0.25 off for it: "There is no obvious need to preserve four separate gym
+// visits. That is an organizational constraint, not a performance requirement."
+// The next block dropped to three and this rule rejected it four times, at a
+// full regeneration each -- five minutes and a paid model call apiece -- and
+// then shipped the program anyway with the violation unresolved.
+//
+// So the rule was costing twenty minutes a build to push programs back toward
+// the version the standard scores lower. days_per_week is what the athlete can
+// train in an ordinary week; a taper is the week where that stops applying.
+// The parser normalises "Day -4" to "day 4", so the minus sign cannot be
+// required here -- requiring it made this exemption silently never apply.
+const COUNTDOWN_DAY = /^\s*day\s*-?\s*\d+/i;
+function isCountdownWeek(model, weekNumber) {
+  const days = strengthDaysForWeek(model, weekNumber) || [];
+  return days.length > 0 && days.every((d) => COUNTDOWN_DAY.test(String(d?.day || d?.label || '')));
+}
+
 export function strengthFrequencyViolations(model, intake = {}) {
   const requested = requestedStrengthSessions(intake);
   const available = availableStrengthDays(intake);
@@ -43,7 +64,10 @@ export function strengthFrequencyViolations(model, intake = {}) {
         }
       }
     }
-    if (requested && strengthDays.length !== requested) {
+    // A week counted from the event is a taper, and a taper is allowed to hold
+    // fewer sessions than the athlete's ordinary week. Too MANY still counts.
+    const taperWeek = isCountdownWeek(model, week.week);
+    if (requested && (taperWeek ? strengthDays.length > requested : strengthDays.length !== requested)) {
       violations.push({
         type: 'gym_day_count_mismatch',
         week: week.week,
