@@ -16,6 +16,7 @@
 import { rows, toleratedDistance, goalFamilyTiers, benchmarks, accessoryRedundancy } from './coach_rules.js';
 import { parseWeek } from './v34_workload_accounting.js';
 import { auditProgramStructure } from './v38_structural_audit.js';
+import { taperPowerSpike } from './coach_race_block_rules.js';
 import { rebuild } from './tsv_rows.js';
 import { THRESHOLDS } from './coach_standard.js';
 
@@ -282,6 +283,7 @@ export function repairUnanchoredCompetitionLoad(program, intake = {}) {
 
 export const ENDURANCE_REPAIRS = [
   repairRuckDistance, repairGoalSpeed, repairUnanchoredCompetitionLoad, repairImprovementGoalFlat,
+  repairTaperPowerSpike,
 ];
 
 // Deliberately not in the list above. This one deletes rows, and the repairs
@@ -324,7 +326,7 @@ const specificityOf = (name) => (SPECIFICITY.find(([re]) => re.test(name)) || [n
 const TRIMMABLE_FUNCTIONS = new Set(['horizontal_pull', 'horizontal_press']);
 
 // Did removing those rows raise anything that was not there before?
-function brokeSomething(before, after, intake) {
+function brokeSomething(before, after, intake, ignore = []) {
   const count = (program) => {
     try {
       return auditProgramStructure(program, intake).map((f) => f.code || f.rule).filter(Boolean);
@@ -336,7 +338,7 @@ function brokeSomething(before, after, intake) {
   const tally = (list) => list.reduce((m, c) => ({ ...m, [c]: (m[c] || 0) + 1 }), {});
   const ta = tally(a);
   const tb = tally(b);
-  return Object.keys(tb).some((code) => (tb[code] || 0) > (ta[code] || 0));
+  return Object.keys(tb).some((code) => !ignore.includes(code) && (tb[code] || 0) > (ta[code] || 0));
 }
 
 export function repairAccessoryRedundancy(program, intake = {}) {
@@ -387,6 +389,82 @@ export function repairAccessoryRedundancy(program, intake = {}) {
     if (brokeSomething(out, candidate, intake)) continue;
     out = candidate;
     moves.push({ week, kept: keep.name, dropped: present.filter((r) => drop.has(r.index)).map((r) => r.name) });
+  }
+  return { program: out, changed: moves.length > 0, moves };
+}
+
+// --- 6. a taper that takes up jumping ----------------------------------------
+//
+// "Going from 2 to 17 power sets is not preservation. It is a new training
+// emphasis." A week that cuts total volume and simultaneously multiplies a
+// quality is introducing it, and the coach charged 0.45 for doing that to an
+// athlete whose stated injury is an achilles that flares.
+//
+// His prescription is exact, so this follows it rather than inventing a taper:
+// keep four to six low-volume power sets across the whole week, using exercises
+// the athlete was already doing, and do not introduce anything new. So the
+// repair drops the unfamiliar movements first -- a broad jump that appears for
+// the first time in week 3 is the clearest case of a new emphasis -- and then
+// trims sets off what remains until the week is inside his cap.
+
+const TAPER_POWER_SET_CAP = 6;
+const TAPER_POWER_FLOOR = 4;
+const POWER_MOVEMENT = /explosive|plyo|box jump|broad jump|depth jump|bound|jump squat|hop|med(?:icine)? ball|throw|snap down/i;
+
+export function repairTaperPowerSpike(program, intake = {}) {
+  const spikes = taperPowerSpike(program, intake);
+  if (!spikes.length) return { program: String(program || ''), changed: false, moves: [] };
+
+  // What the athlete was already doing, from the weeks that were still building.
+  const familiar = new Set();
+  const spikeWeeks = new Set(spikes.map((s) => s.week));
+  for (const r of rows(program)) {
+    if (spikeWeeks.has(r.week) || isWarmup(r.name)) continue;
+    if (POWER_MOVEMENT.test(r.name)) familiar.add(r.name.toLowerCase());
+  }
+
+  let out = String(program || '');
+  const moves = [];
+  for (const spike of spikes) {
+    const parsed = parseWeek(out, spike.week);
+    if (!parsed) continue;
+    let cells = parsed.rows.map((c) => [...c]);
+
+    const powerRows = () => cells
+      .map((c, index) => ({ index, name: String(c[parsed.exercise] || '').trim() }))
+      .filter((r) => r.name && !isWarmup(r.name) && POWER_MOVEMENT.test(r.name));
+    const total = () => powerRows().reduce((n, r) => n + (Number(cells[r.index][parsed.sets]) || 0), 0);
+
+    // Reduce the volume; do not delete the movement.
+    //
+    // Two earlier versions dropped whole exercises and both were refused by the
+    // session audit, correctly: taking the jumps out emptied a Tuesday in one
+    // block and a competition-week day in another. It was also unnecessary. The
+    // finding is about a quality being MULTIPLIED in a week that is cutting
+    // volume, so bringing the volume back down answers it -- week 3 of the
+    // Hyrox goes from seventeen power sets to seven without losing a single
+    // movement, and the athlete keeps the exposure at a dose a taper can carry.
+    const dropped = [];
+    const trimmed = [];
+    let guard = 0;
+    while (total() > TAPER_POWER_SET_CAP && guard < 60) {
+      guard += 1;
+      const setsOf = (r) => Number(cells[r.index][parsed.sets]) || 0;
+      const biggest = powerRows().sort((a, b) => setsOf(b) - setsOf(a))[0];
+      if (!biggest || setsOf(biggest) <= 1) break;
+      cells[biggest.index][parsed.sets] = String(setsOf(biggest) - 1);
+      trimmed.push(biggest.name);
+    }
+
+    if (!dropped.length && !trimmed.length) continue;
+    const candidate = rebuild(out, parsed, cells);
+    // A taper sheds work on purpose, so losing a movement category in the week
+    // being tapered is the intended outcome rather than damage. The coach's own
+    // instruction here was to take the broad jumps out; a guard that refuses
+    // because the week now trains one fewer pattern is refusing the fix.
+    if (brokeSomething(out, candidate, intake, ['V38_MISSING_MOVEMENT_CATEGORY'])) continue;
+    out = candidate;
+    moves.push({ week: spike.week, from: spike.power, to: total(), dropped: [...new Set(dropped)] });
   }
   return { program: out, changed: moves.length > 0, moves };
 }
