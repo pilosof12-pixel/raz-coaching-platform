@@ -830,6 +830,17 @@ export function contingencyCreatesAdjacentDuplicate(program) {
       const key = `${replacement}|${host}`;
       if (seen.has(key)) continue;
       seen.add(key);
+      // A contingency that forbids its own bad outcome is not this defect.
+      //
+      // His objection is that TAKING the substitution puts the lift on two
+      // consecutive days "which was not the plan the athlete was given" -- so a
+      // block that names the movement and says not to take it when that would
+      // happen has answered him. The sport-schedule rule already carries the
+      // same shape of escape for the same reason: a decision the program owns
+      // out loud is a different thing from one it makes silently.
+      const guarded = new RegExp(`${replacement.replace(/[.*+?^${}()|[\\]\\\\]/g, '\\\\$&')}[^.]{0,120}\\b(?:two days in a row|consecutive days|back to back)\\b`, 'i');
+      const refuses = /\b(?:do not take it|don't take it|do not make the swap|skip the substitution|keep the day as written)\b/i;
+      if (guarded.test(src) && refuses.test(src)) continue;
       out.push({
         rule: 'CONTINGENCY_CREATES_ADJACENT_DUPLICATE',
         movement: replacement,
