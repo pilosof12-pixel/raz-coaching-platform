@@ -558,6 +558,12 @@ export function normalizeEquipmentTokens(equipment) {
     if (/reverse hyper/.test(s)) add("reverse_hyper");
     if (/machine/.test(s)) add("machine");
     if (/\bsled\b|prowler/.test(s)) add("sled");
+    // The race kit. Without these, an athlete whose intake literally reads
+    // "sled, ski erg, rower, wall ball, sandbags" was told they do not own a
+    // wall ball, and every program that prescribed one failed the equipment
+    // gate and was regenerated.
+    if (/wall ?ball/.test(s)) add("wall ball");
+    if (/sand ?bag/.test(s)) add("sandbag");
     if (/assault bike|air bike|echo bike|fan bike/.test(s)) add("assault_bike");
     if (/\brower\b|row erg|concept ?2/.test(s)) add("rower");
     if (/treadmill/.test(s)) add("treadmill");

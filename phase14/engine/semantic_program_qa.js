@@ -9,6 +9,7 @@ import {
   parseProgramModel,
   strengthDaysForWeek,
 } from './program_model.js';
+import { namedComponentsFor } from './coach_standard.js';
 import {
   applyDirectGoalSemantics,
   directGoalExposureViolations,
@@ -45,13 +46,32 @@ function isCountdownWeek(model, weekNumber) {
   return days.length > 0 && days.every((d) => COUNTDOWN_DAY.test(String(d?.day || d?.label || '')));
 }
 
+// For an athlete whose event is made of named parts, a day of sled and erg work
+// IS a training day. The classifier counts a day toward frequency only when it
+// holds something it calls strength or skill, so a Hyrox week of Mon barbell,
+// Tue sled-and-rower, Wed mixed, Thu sandbag-and-run counted as three sessions
+// against the four the athlete asked for -- and the build was regenerated over
+// it, five times, because the athlete's own sport does not look like strength.
+function racePartDays(model, weekNumber, components) {
+  if (components.length < 2) return [];
+  const week = model?.weeks?.find((w) => w.week === weekNumber);
+  if (!week) return [];
+  const names = components.map((c) => new RegExp(String(c).replace(/[.*+?^${}()|[\]\\]/g, '\\$&').replace(/s$/i, 's?'), 'i'));
+  return week.days.filter((day) => (day.exercises || [])
+    .some((x) => names.some((re) => re.test(String(x?.display_name || x?.raw_display_name || '')))));
+}
+
 export function strengthFrequencyViolations(model, intake = {}) {
   const requested = requestedStrengthSessions(intake);
   const available = availableStrengthDays(intake);
+  const components = namedComponentsFor(intake);
   const violations = [];
 
   for (const week of model?.weeks || []) {
-    const strengthDays = strengthDaysForWeek(model, week.week);
+    const counted = new Map();
+    for (const d of strengthDaysForWeek(model, week.week)) counted.set(d.day, d);
+    for (const d of racePartDays(model, week.week, components)) counted.set(d.day, d);
+    const strengthDays = [...counted.values()];
     if (available) {
       for (const day of strengthDays) {
         if (!available.has(day.day)) {
