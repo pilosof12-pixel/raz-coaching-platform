@@ -148,11 +148,20 @@ const mmss = (s) => { const t = Math.floor(s); return `${Math.floor(t / 60)}:${S
 export function repairImprovementGoalFlat(program, intake = {}) {
   const tiered = goalFamilyTiers(intake);
   if (!tiered.length) return { program: String(program || ''), changed: false, moves: [] };
-  // Primary goals only. Raising a secondary or accessory dose collides with the
-  // rule that holds accessory volume while a primary quality advances -- the
-  // first version of this ramp broke that test, which is the engine correctly
-  // refusing to let two repairs disagree about the same rows.
-  const serves = (name) => tiered.some((g) => g.family.test(name) && g.tier === 'primary');
+  // Primary and secondary both, but only ever through the load.
+  //
+  // The first version raised sets as well and broke the rule that holds
+  // accessory volume while a primary quality advances -- correctly, because
+  // that rule is about VOLUME. Restricting to primary goals made it pass and
+  // left five real findings unrepaired: a weighted pull-up sat at +22.5 kg for
+  // four weeks against a goal of going from 14 strict reps to 18-20.
+  //
+  // Adding weight to a bar while the set count stays exactly where it was does
+  // not raise accessory volume, so the two rules do not actually disagree. The
+  // reps path is gone for the same reason it was removed before: a rep is
+  // volume, and a rep added to an assisted one-arm pull-up is a training
+  // decision rather than a restored fact.
+  const serves = (name) => tiered.some((g) => g.family.test(name));
 
   // Which named movements are identical in every week they appear.
   const byName = new Map();
