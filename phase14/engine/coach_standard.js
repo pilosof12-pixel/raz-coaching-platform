@@ -297,6 +297,12 @@ export const DEDUCTIONS = {
   // block that trains running only from a clean state.
   EVENT_COMPONENT_COVERAGE_INCOMPLETE: { typical: 0.60, range: [0.40, 0.60] },
   COMPROMISED_WORK_MISSING: { typical: 0.45, range: [0.30, 0.45] },
+  // The footballer's sprint findings, which he charged on all three versions at
+  // 0.45, 0.35, 0.30 and 0.25 and which had no cost mapped at all -- so that
+  // athlete measured 0.00 severity while carrying his single most expensive
+  // finding.
+  SPRINT_GOAL_UNTRAINED: { typical: 0.45, range: [0.25, 0.45] },
+  REPEATED_SPRINT_DEFINITION_UNMET: { typical: 0.30, range: [0.25, 0.35] },
 };
 
 // What a finding actually costs the published score, which is the thing worth

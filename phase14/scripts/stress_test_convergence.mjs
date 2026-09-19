@@ -75,6 +75,10 @@ const COACH_COST = {
   COMPROMISED_RUNNING_MISSING: 'COMPROMISED_WORK_MISSING',
   RACE_REHEARSAL_MISSING: 'COMPROMISED_WORK_MISSING',
   ACCESSORY_REDUNDANCY: 'ACCESSORY_REDUNDANCY',
+  REPEATED_SPRINT_EXPOSURE_MISSING: 'REPEATED_SPRINT_DEFINITION_UNMET',
+  SPRINT_SPEED_EXPOSURE_MISSING: 'SPRINT_GOAL_UNTRAINED',
+  SPRINT_DISTANCE_BELOW_BENCHMARK: 'SPRINT_GOAL_UNTRAINED',
+  REPEATED_SPRINT_PROGRESSION_ABSENT: 'REPEATED_SPRINT_DEFINITION_UNMET',
 };
 function coachSeverity(program, intake) {
   const found = [...gradeProgram(program, intake)];
@@ -568,9 +572,15 @@ const checks = [
   // were supposed to be doing.
   ['no avatar regresses against the coach\'s standard', (() => {
     const CEILING = {
+      // Re-baselined once, when the footballer's sprint findings were given the
+      // costs the coach actually charges for them (0.45, 0.35, 0.30, 0.25 across
+      // three reviews). They had no cost mapped at all, so that athlete measured
+      // 0.00 while carrying his single most expensive finding, and the ceiling
+      // of 0.48 was set against a measurement that could not see it. The
+      // programs did not get worse; the instrument started counting.
       advanced_hybrid: 1.44, youth_gymnastics: 0.15, tactical_3k: 1.92,
       weightlifter_peak: 2.40, weightlifter_meet_week: 2.40, mma_fight_camp: 1.59,
-      inseason_footballer: 0.48, masters_return: 1.25, hebrew_lifter: 0.00,
+      inseason_footballer: 0.78, masters_return: 1.25, hebrew_lifter: 0.00,
       postpartum_runner: 0.90,
     };
     let ok = true;

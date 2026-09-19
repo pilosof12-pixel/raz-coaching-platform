@@ -13,7 +13,7 @@
 // tolerates, the goal pace they stated, the frequency they asked for: these are
 // facts the program contradicted, and putting a fact back is not coaching.
 
-import { rows, toleratedDistance, goalFamilyTiers, benchmarks, accessoryRedundancy } from './coach_rules.js';
+import { rows, toleratedDistance, goalFamilyTiers, benchmarks, accessoryRedundancy, repeatedSprintExposure } from './coach_rules.js';
 import { parseWeek } from './v34_workload_accounting.js';
 import { auditProgramStructure } from './v38_structural_audit.js';
 import { taperPowerSpike } from './coach_race_block_rules.js';
@@ -318,7 +318,7 @@ export function repairUnanchoredCompetitionLoad(program, intake = {}) {
 
 export const ENDURANCE_REPAIRS = [
   repairRuckDistance, repairGoalSpeed, repairUnanchoredCompetitionLoad, repairImprovementGoalFlat,
-  repairTaperPowerSpike,
+  repairTaperPowerSpike, repairRepeatedSprintRecovery,
 ];
 
 // Deliberately not in the list above. This one deletes rows, and the repairs
@@ -500,6 +500,69 @@ export function repairTaperPowerSpike(program, intake = {}) {
     if (brokeSomething(out, candidate, intake, ['V38_MISSING_MOVEMENT_CATEGORY'])) continue;
     out = candidate;
     moves.push({ week: spike.week, from: spike.power, to: total(), dropped: [...new Set(dropped)] });
+  }
+  return { program: out, changed: moves.length > 0, moves };
+}
+
+// --- 7. a shuttle that is quality work wearing repeatability's name ----------
+//
+// "Thursday shuttle at 90% with 60 s recovery is not repeated-sprint work."
+// "Shuttle recovery stays at 65-75 s, too long to be repeated-sprint work."
+// He charged this on all three versions of the footballer, at 0.45, 0.35, 0.30
+// and 0.25, and it is the single most expensive thing he found on that athlete.
+//
+// The work is already in the block. What makes it repeatability work rather
+// than speed work is the recovery being deliberately incomplete, and the number
+// that decides it is his: under 60 seconds. So this changes a rest cell rather
+// than adding a session to a footballer who already plays five times a week and
+// a match -- which would be a fatigue decision, and is not what the finding is
+// about.
+
+const RSA_REST_SECONDS = 45;
+const RSA_MIN_EFFORT = 95;
+const SPRINTABLE = /sprint|shuttle|accel|flying|prowler|sled/i;
+
+export function repairRepeatedSprintRecovery(program, intake = {}) {
+  const findings = repeatedSprintExposure(program, intake);
+  if (!findings.length) return { program: String(program || ''), changed: false, moves: [] };
+
+  let out = String(program || '');
+  const moves = [];
+  for (let week = 1; week <= 4; week += 1) {
+    const parsed = parseWeek(out, week);
+    if (!parsed || !Number.isInteger(parsed.rest)) continue;
+    const cells = parsed.rows.map((c) => [...c]);
+    let changed = false;
+    cells.forEach((row) => {
+      const name = String(row[parsed.exercise] || '').trim();
+      if (isWarmup(name) || !SPRINTABLE.test(name)) return;
+      if ((Number(row[parsed.sets]) || 0) < 3) return;
+      const rest = String(row[parsed.rest] || '');
+      const secs = /(\d+):(\d{2})/.test(rest)
+        ? Number(RegExp.$1) * 60 + Number(RegExp.$2)
+        : Number((rest.match(/(\d+)\s*s/i) || [])[1]) || null;
+      // Effort as well as recovery. His words on one of these: "Thursday
+      // shuttle at 90% with 60 s recovery is not repeated-sprint work" -- both
+      // halves have to be true, and a block that fixes only the clock still
+      // fails the definition.
+      let raisedEffort = null;
+      const pcts = [...String(row.join(' ')).matchAll(/(\d{2,3})\s*%/g)].map((m) => Number(m[1]));
+      if (pcts.length && Math.max(...pcts) < RSA_MIN_EFFORT) {
+        raisedEffort = Math.max(...pcts);
+        row.forEach((cell, ci) => {
+          if (typeof cell !== 'string') return;
+          row[ci] = cell.replace(/(\d{2,3})\s*%/g, (m, n) => (Number(n) < RSA_MIN_EFFORT ? `${RSA_MIN_EFFORT}%` : m));
+        });
+      }
+      if (secs == null || (secs < 60 && raisedEffort === null)) return;
+      if (secs != null && secs >= 60) row[parsed.rest] = `${RSA_REST_SECONDS} sec`;
+      if (Number.isInteger(parsed.notes)) {
+        row[parsed.notes] = `${String(row[parsed.notes] || '').trim()} Recovery is short on purpose: this is repeated-sprint work, so you should start each rep before you feel ready. If the last rep is more than a stride slower than the first, stop the set.`.trim();
+      }
+      moves.push({ week, movement: name, from: secs, to: RSA_REST_SECONDS, effort: raisedEffort });
+      changed = true;
+    });
+    if (changed) out = rebuild(out, parsed, cells);
   }
   return { program: out, changed: moves.length > 0, moves };
 }
