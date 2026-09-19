@@ -13,9 +13,10 @@
 // tolerates, the goal pace they stated, the frequency they asked for: these are
 // facts the program contradicted, and putting a fact back is not coaching.
 
-import { rows, toleratedDistance, goalFamilyTiers, benchmarks, accessoryRedundancy, repeatedSprintExposure } from './coach_rules.js';
+import { rows, toleratedDistance, goalFamilyTiers, benchmarks, accessoryRedundancy, repeatedSprintExposure, sprintDistanceSpecificity, taperAgainstSource } from './coach_rules.js';
 import { parseWeek } from './v34_workload_accounting.js';
 import { auditProgramStructure } from './v38_structural_audit.js';
+import { statedGoalFamilies } from './coach_rules.js';
 import { taperPowerSpike } from './coach_race_block_rules.js';
 import { rebuild } from './tsv_rows.js';
 import { THRESHOLDS } from './coach_standard.js';
@@ -318,7 +319,7 @@ export function repairUnanchoredCompetitionLoad(program, intake = {}) {
 
 export const ENDURANCE_REPAIRS = [
   repairRuckDistance, repairGoalSpeed, repairUnanchoredCompetitionLoad, repairImprovementGoalFlat,
-  repairTaperPowerSpike, repairRepeatedSprintRecovery,
+  repairTaperPowerSpike, repairRepeatedSprintRecovery, repairSprintDistance, repairTaperOpening,
 ];
 
 // Deliberately not in the list above. This one deletes rows, and the repairs
@@ -563,6 +564,129 @@ export function repairRepeatedSprintRecovery(program, intake = {}) {
       changed = true;
     });
     if (changed) out = rebuild(out, parsed, cells);
+  }
+  return { program: out, changed: moves.length > 0, moves };
+}
+
+// --- 8. a sprint that stops before the part the goal is measured over --------
+//
+// "Sprint work never passes 20 m against a 30 m benchmark." The athlete's goal
+// is a 30 m time and the block never exposes them to the last third of it,
+// which is the part that separates the acceleration they already have from the
+// speed they are chasing.
+//
+// The number is the benchmark's, not ours: 75% of the distance the goal is
+// measured over, by week 3.
+
+export function repairSprintDistance(program, intake = {}) {
+  const findings = sprintDistanceSpecificity(program, intake);
+  if (!findings.length) return { program: String(program || ''), changed: false, moves: [] };
+  const need = Number((String(findings[0].detail).match(/short of the (\d+)\s*m/i) || [])[1]);
+  const bench = Number((String(findings[0].detail).match(/benchmark is (\d+)\s*m/i) || [])[1]);
+  if (!Number.isFinite(need) || !Number.isFinite(bench)) return { program: String(program || ''), changed: false, moves: [] };
+
+  let out = String(program || '');
+  const moves = [];
+  // Weeks 2 and 3, not week 1. The block is allowed to open at the distance the
+  // athlete is already doing and arrive at the benchmark, which is the same
+  // shape every other progression repair here uses.
+  for (const week of [2, 3]) {
+    const parsed = parseWeek(out, week);
+    if (!parsed) continue;
+    const cells = parsed.rows.map((c) => [...c]);
+    let changed = false;
+    cells.forEach((row) => {
+      const name = String(row[parsed.exercise] || '').trim();
+      // The row is often just called "Run". The rule's own matcher includes it,
+      // and a narrower one here found nothing to repair on the only program that
+      // has the finding -- the sprint rows were named Run, 20 m.
+      if (isWarmup(name) || !/\bsprint\b|\bacceleration\b|\bflying\b|\bshuttle\b|\brun\b/i.test(name)) return;
+      const reps = String(row[parsed.reps] || '');
+      // Only a short rep is a sprint. A 40-minute easy run is also called Run.
+      if (/min\b/i.test(reps)) return;
+      const m = Number((reps.match(/(\d+(?:\.\d+)?)\s*m\b(?!in)/i) || [])[1]);
+      if (!Number.isFinite(m) || m >= need) return;
+      const target = week === 3 ? bench : Math.ceil(need);
+      row[parsed.reps] = reps.replace(/(\d+(?:\.\d+)?)\s*m\b(?!in)/i, `${target} m`);
+      if (Number.isInteger(parsed.notes)) {
+        row[parsed.notes] = `${String(row[parsed.notes] || '').trim()} Out to ${target} m, because the last part of the ${bench} m is the part your time is won in and the block never took you there.`.trim();
+      }
+      moves.push({ week, movement: name, from: m, to: target });
+      changed = true;
+    });
+    if (changed) out = rebuild(out, parsed, cells);
+  }
+  return { program: out, changed: moves.length > 0, moves };
+}
+
+// --- 9. a taper that waits until the last week to start ----------------------
+//
+// "The general starting window is 8 to 14 days, which opens in the week before
+// competition week; a taper confined to the last seven days is half of it." The
+// block holds volume flat and then drops 39% in one week, so the athlete
+// arrives at the event having shed fatigue for seven days instead of ten to
+// fourteen.
+//
+// The descent has to begin in the week before, and the rule names the floor:
+// 10% down on the weeks that came before it. So this takes sets off the least
+// specific work in that week until the number is met -- never off a competition
+// lift, a sport session or the athlete's primary quality, which are the things
+// a taper is protecting.
+
+const TAPER_OPENING_FLOOR = 0.10;
+const LEAST_SPECIFIC = /plank|pallof|dead bug|calf|curl|raise|fly|extension|band|face pull|shrug/i;
+
+export function repairTaperOpening(program, intake = {}) {
+  const findings = (taperAgainstSource(program, intake) || []).filter((f) => f.rule === 'TAPER_COMPRESSED_INTO_FINAL_WEEK');
+  if (!findings.length) return { program: String(program || ''), changed: false, moves: [] };
+
+  let out = String(program || '');
+  const moves = [];
+  for (const f of findings) {
+    const carried = Number((String(f.detail).match(/week (\d+) carries (\d+)/i) || [])[2]);
+    const earlier = Number((String(f.detail).match(/against (\d+) earlier/i) || [])[1]);
+    const week = Number((String(f.detail).match(/week (\d+) carries/i) || [])[1]);
+    if (![carried, earlier, week].every(Number.isFinite)) continue;
+
+    const target = Math.floor(earlier * (1 - TAPER_OPENING_FLOOR));
+    if (carried <= target) continue;
+    const parsed = parseWeek(out, week);
+    if (!parsed) continue;
+
+    const cells = parsed.rows.map((c) => [...c]);
+    const setsAt = (i) => Number(cells[i][parsed.sets]) || 0;
+    // Working sets, the way the rule counts them. Including warm-up rows made
+    // the before and after numbers disagree with the finding they were meant to
+    // answer -- it reported a week going from 24 sets to 25 while removing work.
+    const total = () => cells.reduce((n, c, i) =>
+      (isWarmup(String(c[parsed.exercise] || '')) ? n : n + setsAt(i)), 0);
+    let guard = 0;
+    const trimmed = [];
+    while (total() > target && guard < 80) {
+      guard += 1;
+      // Isolation work first, then anything else that serves no stated goal. A
+      // fight camp carries almost no curls and planks, so a trim restricted to
+      // those reached one set of the three it needed and stopped. What a taper
+      // must not touch is the competition work and the athlete's own goals, not
+      // everything that happens to be compound.
+      const goals = statedGoalFamilies(intake);
+      const spendable = cells
+        .map((c, index) => ({ index, name: String(c[parsed.exercise] || '').trim() }))
+        .filter((r) => r.name && !isWarmup(r.name) && setsAt(r.index) > 1)
+        .filter((r) => !goals.some((g) => g.test && g.test(r.name)));
+      const candidates = spendable.sort((a, b) =>
+        (Number(LEAST_SPECIFIC.test(b.name)) - Number(LEAST_SPECIFIC.test(a.name)))
+        || (setsAt(b.index) - setsAt(a.index)));
+      if (!candidates.length) break;
+      const victim = candidates[0];
+      cells[victim.index][parsed.sets] = String(setsAt(victim.index) - 1);
+      trimmed.push(victim.name);
+    }
+    if (!trimmed.length) continue;
+    const candidate = rebuild(out, parsed, cells);
+    if (brokeSomething(out, candidate, intake)) continue;
+    out = candidate;
+    moves.push({ week, from: carried, to: total(), target });
   }
   return { program: out, changed: moves.length > 0, moves };
 }
