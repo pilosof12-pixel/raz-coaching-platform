@@ -311,3 +311,71 @@ export const EVENT_COMPONENT_RULES = [
   eventComponentCoverage, benchmarkedComponentNeglected, compromisedWorkMissing, raceRehearsalMissing,
   componentLoadUnanchored,
 ];
+
+// --- the brief ----------------------------------------------------------------
+//
+// This is the half that actually raises a score, and its absence is why the
+// first Hyrox block came back at 7.3.
+//
+// The engine's own grader found two problems with that program. The coach found
+// seven. The 31,742-character brief that produced it never contained the words
+// "wall ball", "sandbag" or "burpee", never said "compromised", and never said
+// "race pace". The model wrote a competent general hybrid block because that is
+// exactly what it was asked for. Checking for the missing stations afterwards
+// finds the defect; naming them beforehand prevents it.
+
+const RACE_TEXT = {
+  'SkiErg': '1000 m',
+  'Sled Push': '50 m at competition load',
+  'Sled Pull': '50 m at competition load',
+  'Burpee Broad Jump': '80 m',
+  'Row': '1000 m',
+  'Farmers Carry': '200 m at competition load',
+  'Sandbag Lunge': '100 m at competition load',
+  'Wall Ball': '100 reps',
+};
+
+export function buildEventComponentBrief(intake = {}) {
+  const components = namedComponentsFor(intake);
+  if (components.length < 2) return '';
+  const ordered = eventIsOrdered(intake);
+  const numbers = `${String(intake.current_numbers || '')} ${JSON.stringify(intake.performance_markers || [])}`;
+  const benchmarked = components.filter((c) => matcherFor(c).test(numbers));
+  const week1Floor = Math.ceil(components.length * COVERAGE_WEEK1);
+  const rehearsalFloor = Math.ceil(components.length * REHEARSAL_COMPONENT_SHARE);
+
+  const lines = [
+    '* TRAIN THE EVENT, NOT THE FITNESS THE EVENT HAPPENS TO NEED.',
+    `  This athlete's race is made of ${components.length} named parts, and every one of them is a skill with a technique and a pace of its own. A block that builds general strength and general running is not a block that prepares for this race.`,
+    '',
+    `  The parts: ${components.map((c) => (RACE_TEXT[c] ? `${c} (${RACE_TEXT[c]})` : c)).join(', ')}.`,
+    '',
+    `  - Week 1 must give a direct exposure to at least ${week1Floor} of the ${components.length}.`,
+    `  - By the end of Week 2 all ${components.length} must have appeared at least once.`,
+    '  - Each one needs at least two direct exposures across Weeks 1 to 3.',
+    '  - An exposure counts when it reaches about a quarter of the race dose at race execution: a quarter of the distance, a quarter of the reps, or a quarter of the duration at a stated race-relevant intensity. Loaded parts use at least 90% of competition load. One token set does not count.',
+    '  - Competition week is exempt. Keep only what serves race feel and readiness.',
+  ];
+
+  if (benchmarked.length) {
+    lines.push('',
+      `  ${benchmarked.join(' and ')} carr${benchmarked.length === 1 ? 'ies' : 'y'} a number the athlete gave us, so ${benchmarked.length === 1 ? 'it' : 'they'} must appear in Week 1, again in Week 2, and be prescribed against that number rather than left to feel.`);
+  }
+
+  lines.push('',
+    '* THE RACE IS RUN TIRED, SO TRAIN IT TIRED.',
+    '  Running from a clean start is not the demand. The athlete has to pick the pace back up immediately after a station, and a kilometre off a sled is a different task from the same kilometre fresh.',
+    '',
+    '  - Week 1: at least one pair of a station followed straight into a run.',
+    '  - Week 2: at least two such pairs.',
+    '  - Week 3: at least one, at reduced volume.',
+    '  - Across Weeks 1 and 2, train both directions: a station into a run, and a run into a station. They are different qualities.',
+    '  - Hold the run in these pairs at 95-102% of planned race pace. If pace or technique falls away, end the session rather than grinding it out.',
+    '',
+    '* ONE SESSION THAT LOOKS LIKE THE RACE.',
+    `  Weeks 1 or 2 must contain a genuine rehearsal: at least ${rehearsalFloor} of the ${components.length} parts in a single session${ordered ? ', in competition order' : ''}, at least three transitions between them, loaded parts at 90-100% of competition load, running at 95-102% of race pace, and at least 30% of expected race duration.`,
+    '  Isolated intervals with full recovery between every part are not a rehearsal.',
+    '  Do not place a full rehearsal inside the last seven days; the final one belongs at least eight days out.');
+
+  return lines.join('\n');
+}

@@ -35,6 +35,7 @@ import { buildClockBrief } from './v86_training_clock.js';
 import { buildEarnedClaimsBrief } from './v87_earned_claims.js';
 import { buildClaimIntegrityBrief } from './v93_claim_integrity.js';
 import { buildCoachStandardBrief } from './coach_standard_brief.js';
+import { buildEventComponentBrief } from './event_component_rules.js';
 import { buildEnduranceSourceBrief, buildTaperSourceBrief } from './source_cluster_brief.js';
 import { STATE as CLUSTER_STATE, stateForWeek as clusterStateForWeek } from './v68_competition_state.js';
 import { buildGoalPaceBrief } from './v88_goal_pace.js';
@@ -316,6 +317,10 @@ export function buildDeterministicBrief(intake = {}) {
     buildEarnedClaimsBrief(intake),
     buildClaimIntegrityBrief(intake),
     buildCoachStandardBrief(intake),
+    // What the race is actually made of. Its absence is why the first
+    // multi-component block trained four of eight stations: the brief that
+    // produced it never contained the words "wall ball" or "sandbag".
+    buildEventComponentBrief(intake),
     buildEnduranceSourceBrief(intake),
     // The taper prescriptions only mean anything for a block that reaches its
     // event; eight weeks out they would tell the model to taper a build block.
