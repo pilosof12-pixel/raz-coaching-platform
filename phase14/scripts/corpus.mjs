@@ -44,7 +44,22 @@ export const saturday = (w) => {
 };
 
 export const LIFTER = { ...C.weightlifter_peak, competition_date: saturday(8), event_type: 'strength_meet', event_priority: 'A' };
-export const MEET = { ...C.weightlifter_meet_week, competition_date: saturday(1) };
+// Four weeks out, not one. The avatar's own definition says "the national
+// qualifier is in 4 weeks, so this block runs into the meet: Week 4 IS
+// competition week", and the fixture renders week 4 as Day -5 to Day -1. Pinned
+// at one week out, competitionWeek answered 1, so every rule that treats the
+// competition week differently was reading this program against the wrong week
+// -- and the day-spread repair skipped week 1 as a taper while leaving the real
+// taper in week 4 untouched.
+//
+// The margin matters as much as the number: an event exactly 28 days out slides
+// between weeks as the day passes, so this takes the first Saturday at least 23
+// days away, which is inside week 4 at every hour.
+export const MEET = { ...C.weightlifter_meet_week, competition_date: (() => {
+  const d = new Date(Date.now() + 23 * day);
+  d.setUTCDate(d.getUTCDate() + ((6 - d.getUTCDay() + 7) % 7));
+  return d.toISOString().slice(0, 10);
+})() };
 export const FIGHTER = { ...C.mma_fight_camp, competition_date: saturday(3) };
 
 // Coach-scored programs first, so the known answers sit at the top of a report.

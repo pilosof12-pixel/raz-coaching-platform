@@ -241,6 +241,9 @@ export function repairImprovementGoalFlat(program, intake = {}) {
 
 
 const OLY_WEEK_FRACTION = { 1: 0.82, 2: 0.85, 3: 0.88, 4: 0.88 };
+// His bands are not the same for the two lifts: 88-90% on the snatch and 89-90%
+// on the clean and jerk.
+const bandFor = (name, week) => (week >= 3 && /clean|jerk/i.test(name) ? 0.89 : OLY_WEEK_FRACTION[week]);
 const round2p5 = (kg) => Math.floor(kg / 2.5) * 2.5;
 
 export function repairUnanchoredCompetitionLoad(program, intake = {}) {
@@ -262,18 +265,50 @@ export function repairUnanchoredCompetitionLoad(program, intake = {}) {
     if (!parsed || !Number.isInteger(parsed.load)) continue;
     const cells = parsed.rows.map((c) => [...c]);
     let changed = false;
-    cells.forEach((row) => {
+
+    // Only the heaviest set of each lift moves. A block has heavy singles and
+    // lighter technique work in the same week, and the first version raised
+    // every row of the movement to the band -- which turns a speed day into a
+    // second heavy day and introduced an intensification finding on a program
+    // that did not have one.
+    const topRowFor = new Map();
+    cells.forEach((row, index) => {
+      const name = String(row[parsed.exercise] || '').trim();
+      if (isWarmup(name) || !targeted.some((g) => g.family.test(name))) return;
+      const kgHere = Number((String(row[parsed.load] || '').match(/(\d+(?:\.\d+)?)\s*kg/i) || [])[1]) || 0;
+      const best = topRowFor.get(name);
+      if (!best || kgHere > best.kg) topRowFor.set(name, { index, kg: kgHere });
+    });
+
+    cells.forEach((row, rowIndex) => {
       const name = String(row[parsed.exercise] || '').trim();
       if (isWarmup(name) || !targeted.some((g) => g.family.test(name))) return;
       const text = String(row[parsed.load] || '');
-      // Only where there is genuinely no number to read.
-      if (/\d+(?:\.\d+)?\s*(?:kg|%)|\d{1,2}:\d{2}/.test(text)) return;
       const max = maxFor(name);
       if (!max) return;
-      const fraction = OLY_WEEK_FRACTION[week];
+      const fraction = bandFor(name, week);
       const kg = round2p5(max * fraction);
-      row[parsed.load] = `${kg} kg (${Math.round(fraction * 100)}% of current max)`;
-      moves.push({ week, movement: name, kg, pct: Math.round(fraction * 100) });
+      const written = Number((text.match(/(\d+(?:\.\d+)?)\s*kg/i) || [])[1]);
+
+      // Nothing to read: write the number.
+      if (!/\d+(?:\.\d+)?\s*(?:kg|%)|\d{1,2}:\d{2}/.test(text)) {
+        row[parsed.load] = `${kg} kg (${Math.round(fraction * 100)}% of current max)`;
+        moves.push({ week, movement: name, kg, pct: Math.round(fraction * 100) });
+        changed = true;
+        return;
+      }
+
+      // A number that is there but short of the band the coach named. His
+      // figure for week 3 is 88-90% on the snatch and 89-90% on the jerk, and a
+      // block that tops out at 86% has not peaked -- which is the whole point
+      // of the last heavy week. Raising it is the same arithmetic as writing it
+      // in the first place, so it was strange to do one and not the other.
+      if (week < 3 || !Number.isFinite(written) || written >= kg) return;
+      if (topRowFor.get(name)?.index !== rowIndex) return;
+      row[parsed.load] = text.replace(/(\d+(?:\.\d+)?)\s*kg/i, `${kg} kg`)
+        .replace(/\(\s*\d+(?:\.\d+)?\s*%[^)]*\)/i, `(${Math.round(fraction * 100)}% of current max)`);
+      if (!/%/.test(row[parsed.load])) row[parsed.load] = `${row[parsed.load]} (${Math.round(fraction * 100)}% of current max)`;
+      moves.push({ week, movement: name, from: written, kg, pct: Math.round(fraction * 100) });
       changed = true;
     });
     if (changed) out = rebuild(out, parsed, cells);
