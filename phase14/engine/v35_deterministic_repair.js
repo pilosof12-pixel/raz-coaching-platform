@@ -40,6 +40,7 @@ import { repairDayZeroClaims, repairMatchDayPlacement, repairAllocationShift, re
 import { repairBallisticShare } from './v79_ballistic_share.js';
 import { repairBenchmarkExposure } from './benchmark_exposure_repair.js';
 import { repairEventComponentCoverage } from './event_component_repair.js';
+import { ENDURANCE_REPAIRS } from './endurance_block_repair.js';
 import { repairConsecutiveTrainingDays } from './consecutive_day_repair.js';
 import { repairCompetitionWeek } from './v90_competition_week.js';
 import { repairTimelineIntegrity } from './v91_timeline_integrity.js';
@@ -980,6 +981,19 @@ export function repairDeterministicContradictions(program, intake = {}) {
       type: 'consecutive_training_days_spread',
       moved: spread.moves.map((m) => `w${m.week} ${m.from.join('/')} -> ${m.to.join('/')}`),
     });
+  }
+
+  // Facts from the intake that the program contradicted: a ruck shorter than
+  // the distance the athlete already covers, quality running that never
+  // approaches the pace they named, a movement serving an improvement goal that
+  // never moves. The tactical runner is the worst program the coach has scored
+  // and the chain applied nothing at all to it, because every one of its
+  // findings was detection-only.
+  for (const fn of ENDURANCE_REPAIRS) {
+    const r = fn(candidate, intake);
+    if (!r.changed) continue;
+    candidate = r.program;
+    repairs.push({ type: fn.name, moves: r.moves.length });
   }
 
   // Put the race back into a race block. The brief names every station with its

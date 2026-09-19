@@ -104,8 +104,17 @@ test('[D6] accessory volume is held when the primary quality advances, never rai
   const out = repairDeterministicContradictions(p, TACTICAL);
   assert.match(out.program, /Fri\tPull-up\tBodyweight\t4\t8\t/, 'pull-up held at the Week 2 set count');
   assert.match(out.program, /Fri\tReverse Lunge\tRPE-selected\t2\t8 per leg\t/, 'lunge held at the Week 2 set count');
-  // The primary quality progression is never touched.
-  assert.match(out.program, /Tue\tRun\t2:34 per 600 m\t4\t600 m\t/);
+  // The primary quality progression is never touched BY THE VOLUME HOLD -- its
+  // shape is the assertion, not its pace. The pace moved here after the goal
+  // speed repair landed: this fixture's Week 3 runs at 93.5% of the athlete's
+  // stated goal speed and the coach's standard asks for 95% by Week 3, so a
+  // second repair now corrects it on purpose. Pinning the literal pace string
+  // was incidental to what this test is about, and keeping it would have meant
+  // asserting that a defect stays put.
+  assert.match(out.program, /Tue\tRun\t[^\t]+\t4\t600 m\t/, 'the run keeps its sets and distance');
+  const week3Pace = /Tue\tRun\t(\d+):(\d+) per 600 m/.exec(out.program);
+  assert.ok(week3Pace, 'the run still carries a pace per 600 m');
+  assert.ok((Number(week3Pace[1]) * 60 + Number(week3Pace[2])) <= 154, 'the pace may tighten toward goal speed, never slacken');
   assert.deepEqual(collectCoachingStandardFlags(out.program, TACTICAL).filter((f) => f.code === 'V35_SECONDARY_VOLUME_CREEP'), []);
 });
 
