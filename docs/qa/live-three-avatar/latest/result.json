@@ -1,21 +1,21 @@
 {
-  "timestamp": "2026-09-19T10:38:27.285Z",
+  "timestamp": "2026-09-19T15:14:54.549Z",
   "base": "https://raz-coaching-platform.onrender.com",
-  "head_sha": "b1edc67bc9110ec79b4763cb8906280483856552",
-  "runtime": "live54 2026-09-19T10:37:19Z",
+  "head_sha": "33ef3b7966283ad6662342b2c4ed67a45ad5fde6",
+  "runtime": "live55 2026-09-19T15:14:08Z",
   "results": [
     {
       "id": "dual_event_hyrox",
-      "job_id": "87d15f481a2779627eff4c8c66ff4996",
+      "job_id": "a7cf5f61b6e29ade7a0b437fdde41596",
       "ok": true,
       "status": "done",
       "stage": "finalizing",
-      "attempt": 5,
-      "detail": "delivered with unresolved rules: EQUIPMENT_VIOLATION+SPORT_DAY_COUPLING_VIOLATION+V74_CAMP_SESSION_TOO_BUSY",
+      "attempt": 3,
+      "detail": "saving program after 3 model call(s)",
       "last_seen_status": "done",
       "error": null,
-      "program_chars": 12198,
-      "seconds": 1759
+      "program_chars": 13250,
+      "seconds": 638
     }
   ],
   "selection": [
