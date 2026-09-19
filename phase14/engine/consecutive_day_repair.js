@@ -25,7 +25,7 @@
 //   from the calendar, and spreading them out moves the taper.
 
 import { parseWeek } from './v34_workload_accounting.js';
-import { consecutiveTrainingDays, longestRunDays, movementFunction } from './coach_rules.js';
+import { consecutiveTrainingDays, consecutiveLowerLegDays, lowerLegLoadingDay, rows as allRows, longestRunDays, movementFunction } from './coach_rules.js';
 import { competitionWeek } from './v90_competition_week.js';
 import { THRESHOLDS } from './coach_standard.js';
 import { rebuild } from './tsv_rows.js';
@@ -64,14 +64,24 @@ const adjacent = (a, b) => { const d = Math.abs(a - b); return d === 1 || d === 
 // It is deliberately about shared patterns rather than all geometry. Protecting
 // every gap left the same block with no legal spread at all, which trades the
 // coach's finding for nothing.
-export function spreadDays(current, limit = THRESHOLDS.MAX_CONSECUTIVE_LIFTING_DAYS, shared = () => false) {
+// `subset` is a second, stricter run limit applied to some of the days rather
+// than all of them: an athlete with impact history may train four days in a row
+// but must not LOAD THE LOWER LEG on more than two, and those are different
+// questions about the same week. Passing the subset in keeps one solver rather
+// than two that would drift.
+export function spreadDays(current, limit = THRESHOLDS.MAX_CONSECUTIVE_LIFTING_DAYS, shared = () => false, subset = null) {
   const have = current.map((d) => ORDER.indexOf(d)).filter((i) => i >= 0).sort((a, b) => a - b);
   if (!have.length) return null;
-  if (longestRunDays(new Set(have.map((i) => ORDER[i]))).length <= limit) return null;
+  const subsetIdx = subset ? have.map((i, n) => (subset.has(ORDER[i]) ? n : -1)).filter((n) => n >= 0) : [];
+  const subsetRun = (combo) => longestRunDays(new Set(subsetIdx.map((n) => ORDER[combo[n]]))).length;
+  const alreadyFine = longestRunDays(new Set(have.map((i) => ORDER[i]))).length <= limit
+    && (!subset || subsetRun(have) <= (subset.limit ?? THRESHOLDS.MAX_CONSECUTIVE_LOWER_LEG_LOADING_DAYS));
+  if (alreadyFine) return null;
 
   let best = null;
   for (const combo of combinations(7, have.length)) {
     if (longestRunDays(new Set(combo.map((i) => ORDER[i]))).length > limit) continue;
+    if (subset && subsetRun(combo) > (subset.limit ?? THRESHOLDS.MAX_CONSECUTIVE_LOWER_LEG_LOADING_DAYS)) continue;
     let separationKept = true;
     for (let a = 0; a < have.length && separationKept; a += 1) {
       for (let b = a + 1; b < have.length; b += 1) {
@@ -109,8 +119,17 @@ function renameInProse(text, map) {
 }
 
 export function repairConsecutiveTrainingDays(program, intake = {}, now = Date.now()) {
-  const flagged = consecutiveTrainingDays(program, intake);
-  if (!flagged.length) return { program: String(program || ''), changed: false, moves: [] };
+  // Two findings, one calendar. Training days stacked beyond three, and -- for
+  // an athlete with impact history -- the lower leg loaded on more than two in
+  // a row. A week can satisfy the first and fail the second, so both are solved
+  // in the same pass rather than by two repairs taking turns undoing each other.
+  const legFlags = consecutiveLowerLegDays(program, intake);
+  const weeks = [...new Set([
+    ...consecutiveTrainingDays(program, intake).map((f) => f.week),
+    ...legFlags.map((f) => f.week),
+  ])].sort((a, b) => a - b);
+  if (!weeks.length) return { program: String(program || ''), changed: false, moves: [] };
+  const flagged = weeks.map((week) => ({ week }));
 
   const compWeek = competitionWeek(intake, now);
   let out = String(program || '');
@@ -152,7 +171,15 @@ export function repairConsecutiveTrainingDays(program, intake = {}, now = Date.n
       return false;
     };
 
-    const map = spreadDays(ordered, THRESHOLDS.MAX_CONSECUTIVE_LIFTING_DAYS, shared);
+    // Which of this week's days load the lower leg, so the solver can hold them
+    // to their own tighter limit.
+    const legDays = new Set(allRows(out)
+      .filter((r) => r.week === week && r.day && lowerLegLoadingDay(r))
+      .map((r) => r.day));
+    const subset = legFlags.some((f) => f.week === week) ? legDays : null;
+    if (subset) subset.limit = THRESHOLDS.MAX_CONSECUTIVE_LOWER_LEG_LOADING_DAYS;
+
+    const map = spreadDays(ordered, THRESHOLDS.MAX_CONSECUTIVE_LIFTING_DAYS, shared, subset);
     if (!map) continue;
 
     const cells = parsed.rows.map((c) => {
