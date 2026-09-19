@@ -24,6 +24,7 @@ import { collectSportStateFlags } from '../engine/v78_sport_taper.js';
 import { DEDUCTIONS, selectProgramType } from '../engine/coach_standard.js';
 import { CORPUS, readFixture } from './corpus.mjs';
 import { RACE_BLOCK_RULES } from '../engine/coach_race_block_rules.js';
+import { EVENT_COMPONENT_RULES } from '../engine/event_component_rules.js';
 
 const root = path.dirname(fileURLToPath(import.meta.url));
 const fx = readFixture;
@@ -50,6 +51,12 @@ const COST = {
   TAPER_INTRODUCES_POWER_VOLUME: 'TAPER_INTRODUCES_NEW_EMPHASIS',
   BORROWED_SPORT_LANGUAGE: 'COACHING_LANGUAGE_FROM_ANOTHER_SPORT',
   MODALITY_SUBSTITUTION_KEEPS_THE_NUMBER: 'PRESCRIPTION_SURVIVES_MODALITY_CHANGE',
+  EVENT_COMPONENT_COVERAGE_WEEK1: 'EVENT_COMPONENT_COVERAGE_INCOMPLETE',
+  EVENT_COMPONENT_NEVER_TRAINED: 'EVENT_COMPONENT_COVERAGE_INCOMPLETE',
+  BENCHMARKED_COMPONENT_NEGLECTED: 'EVENT_COMPONENT_COVERAGE_INCOMPLETE',
+  COMPROMISED_RUNNING_MISSING: 'COMPROMISED_WORK_MISSING',
+  TRANSITION_DIRECTION_MISSING: 'COMPROMISED_WORK_MISSING',
+  RACE_REHEARSAL_MISSING: 'COMPROMISED_WORK_MISSING',
 };
 
 const seenFile = new Set();
@@ -68,7 +75,7 @@ for (const [file, intake, scored] of CORPUS) {
     SOURCE.recoveryDayLock, SOURCE.pullingVolumeCap, SOURCE.overheadPressCutoff,
     SOURCE.competitionWeekIntensityCap, SOURCE.footworkPlyoInterlock,
     SOURCE.speedSessionPlyoLockout, SOURCE.speedSessionSeparation,
-    SOURCE.mileageTier, SOURCE.wrestlingLowBackLoad, ...RACE_BLOCK_RULES];
+    SOURCE.mileageTier, SOURCE.wrestlingLowBackLoad, ...RACE_BLOCK_RULES, ...EVENT_COMPONENT_RULES];
   const raw = [
     ...gradeProgram(program, intake),
     ...sourceRules.flatMap((fn) => { try { return fn(program, intake); } catch { return []; } }),

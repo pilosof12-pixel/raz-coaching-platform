@@ -25,6 +25,11 @@ export const PROGRAM_TYPE = {
   TACTICAL_ENDURANCE: 'tactical_endurance',
   COMBAT_CAMP: 'combat_camp',
   IN_SEASON_TEAM_SPORT: 'in_season_team_sport',
+  // An event made of two or more named components known before the day: a
+  // Hyrox, a triathlon, a strongman card, a defined selection test. Added after
+  // the first Hyrox block came back `unclassified` and had to be scored on
+  // borrowed tactical-endurance weights.
+  HYBRID_MULTI_COMPONENT_EVENT: 'hybrid_multi_component_event',
   UNCLASSIFIED: 'unclassified',
 };
 
@@ -32,6 +37,25 @@ export const PROGRAM_TYPE = {
 // interchangeable: the combat set puts 35% on strength maintenance, which is
 // why one exercise choice moved Program 3 by 0.4.
 export const DIMENSIONS = {
+  // His weights for a multi-component event. Event specificity carries the most
+  // because the largest defect he found on the first such program was
+  // incomplete component coverage, charged at 0.60, and the next was compromised
+  // running at 0.45.
+  //
+  // Unlike the four sets above, these have not been shown to reproduce his own
+  // published score: his six dimension scores against these weights give 7.4650
+  // and he published 7.3. The other four sets reproduce his scores to four
+  // decimal places. The gap is recorded rather than tuned away, because fitting
+  // six weights to one observation would make the model agree with him once and
+  // mean nothing afterwards.
+  [PROGRAM_TYPE.HYBRID_MULTI_COMPONENT_EVENT]: [
+    ['event_specificity_and_component_coverage', 0.30],
+    ['conditioning_progression_and_race_preparation', 0.20],
+    ['strength_maintenance_and_interference', 0.15],
+    ['taper_and_competition_week', 0.15],
+    ['athlete_specific_constraints', 0.10],
+    ['execution_rules_and_autoregulation', 0.10],
+  ],
   [PROGRAM_TYPE.WEIGHTLIFTING]: [
     ['competition_lift_specificity', 0.30],
     ['loading_progression', 0.25],
@@ -72,6 +96,37 @@ export const DIMENSIONS = {
 const OLY = /\bsnatch\b|\bclean and jerk\b|\bclean & jerk\b|\bc&j\b/i;
 const TIMED_RUN = /\b\d+(?:\.\d+)?\s*k(?:m)?\b|\bmarathon\b|\bhalf\b|\bmile\b/i;
 
+// The events whose components are known before the day. Running is a repeated
+// component of a Hyrox rather than one of the eight stations, and is listed
+// separately because the compromised-work rules pair it with the others.
+export const EVENT_COMPONENTS = {
+  hyrox: {
+    ordered: true,
+    components: ['SkiErg', 'Sled Push', 'Sled Pull', 'Burpee Broad Jump', 'Row',
+      'Farmers Carry', 'Sandbag Lunge', 'Wall Ball'],
+    cyclic: 'Run',
+  },
+  triathlon: { ordered: true, components: ['Swim', 'Bike', 'Run'], cyclic: null },
+  duathlon: { ordered: true, components: ['Run', 'Bike'], cyclic: null },
+};
+
+// What this athlete's event is made of, if anything knows.
+export function namedComponentsFor(intake = {}) {
+  const hay = `${String(intake.sport || '')} ${String(intake.event_type || '')} ${JSON.stringify(intake.primary_goals || intake.primary_goal || '')}`.toLowerCase();
+  if (Array.isArray(intake.event_components) && intake.event_components.length) return [...intake.event_components];
+  for (const [name, spec] of Object.entries(EVENT_COMPONENTS)) {
+    if (hay.includes(name)) return [...spec.components];
+  }
+  return [];
+}
+
+export function eventIsOrdered(intake = {}) {
+  const hay = `${String(intake.sport || '')} ${String(intake.event_type || '')}`.toLowerCase();
+  if (typeof intake.ordered_components === 'boolean') return intake.ordered_components;
+  for (const [name, spec] of Object.entries(EVENT_COMPONENTS)) if (hay.includes(name)) return spec.ordered;
+  return false;
+}
+
 export function selectProgramType(intake = {}, options = {}) {
   const primary = goals(intake, 'primary');
   const secondary = `${goals(intake, 'secondary')} ${goals(intake, 'maintenance')}`;
@@ -98,6 +153,15 @@ export function selectProgramType(intake = {}, options = {}) {
 
   if (TIMED_RUN.test(primary) && /ruck|pull[- ]?up|strength|tactical/i.test(secondary)
     && !/squat|deadlift|press/i.test(primary)) return PROGRAM_TYPE.TACTICAL_ENDURANCE;
+
+  // Multi-component events come last of the typed branches, deliberately. His
+  // routing is: a specific sport model wins if one exists, then an event with
+  // two or more known required components, then a single-task event, then
+  // category coverage when the components are not knowable. A powerlifting meet
+  // has three named lifts and would satisfy the component test, but the
+  // weightlifting branch above already holds better lift-specific rules and
+  // must not be overwritten by a more general one.
+  if (namedComponentsFor(intake).length >= 2) return PROGRAM_TYPE.HYBRID_MULTI_COMPONENT_EVENT;
 
   return PROGRAM_TYPE.UNCLASSIFIED;
 }
@@ -228,6 +292,11 @@ export const DEDUCTIONS = {
   TAPER_INTRODUCES_NEW_EMPHASIS: { typical: 0.45, range: [0.45, 0.45] },
   COACHING_LANGUAGE_FROM_ANOTHER_SPORT: { typical: 0.10, range: [0.10, 0.10] },
   PRESCRIPTION_SURVIVES_MODALITY_CHANGE: { typical: 0.20, range: [0.20, 0.20] },
+  // The two he charged on the first multi-component block, and the costs he
+  // gave for them: incomplete coverage of the event's named components, and a
+  // block that trains running only from a clean state.
+  EVENT_COMPONENT_COVERAGE_INCOMPLETE: { typical: 0.60, range: [0.40, 0.60] },
+  COMPROMISED_WORK_MISSING: { typical: 0.45, range: [0.30, 0.45] },
 };
 
 // What a finding actually costs the published score, which is the thing worth
