@@ -27,10 +27,28 @@ import { ENDURANCE_REPAIRS } from '../engine/endurance_block_repair.js';
 const here = path.dirname(fileURLToPath(import.meta.url));
 const PROGRAM = fs.readFileSync(path.join(here, 'fixtures', 'run119_taper_ballistic-program.txt'), 'utf8');
 
-// The live intake, with the event on the date the run used.
+// The live intake, with the event a fixed number of days from whenever this
+// runs rather than on the date run #119 happened to use.
+//
+// Block week comes from the hours remaining to the event, so a written-down date
+// walks backwards through the block as real time passes. That is not a
+// hypothetical: v77_fight_week_clock.test.js pinned a date and started failing
+// the day the fight fell inside week 1, and it would have been this file's turn
+// three weeks from now.
+//
+// Measured band for this fixture: at 30 days and beyond the ballistic swap stops
+// firing, which would make the first test below pass vacuously -- the exact hole
+// it exists to close. Twenty-four days sits in the middle of 18..29.
+const daysOut = (n) => {
+  const d = new Date();
+  d.setUTCHours(0, 0, 0, 0);
+  d.setUTCDate(d.getUTCDate() + n);
+  return d.toISOString().slice(0, 10);
+};
+
 const INTAKE = {
   age: 33, language: 'en', experience: 'Advanced (3+ years)', bodyweight: '76 kg',
-  competition_date: '2026-10-17', event_type: 'hybrid_race', event_priority: 'A',
+  competition_date: daysOut(24), event_type: 'hybrid_race', event_priority: 'A',
   primary_goals: ['Podium in my age group at the Hyrox race in 4 weeks'],
   secondary_goals: ['Run a half marathon two weeks after Hyrox without wrecking myself for it'],
   maintenance_goals: ['Hold my squat and pulling strength through both'],
