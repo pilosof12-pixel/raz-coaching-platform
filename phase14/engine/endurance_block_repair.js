@@ -13,8 +13,9 @@
 // tolerates, the goal pace they stated, the frequency they asked for: these are
 // facts the program contradicted, and putting a fact back is not coaching.
 
-import { rows, toleratedDistance, goalFamilyTiers, benchmarks } from './coach_rules.js';
+import { rows, toleratedDistance, goalFamilyTiers, benchmarks, accessoryRedundancy } from './coach_rules.js';
 import { parseWeek } from './v34_workload_accounting.js';
+import { auditProgramStructure } from './v38_structural_audit.js';
 import { rebuild } from './tsv_rows.js';
 import { THRESHOLDS } from './coach_standard.js';
 
@@ -273,3 +274,110 @@ export function repairUnanchoredCompetitionLoad(program, intake = {}) {
 export const ENDURANCE_REPAIRS = [
   repairRuckDistance, repairGoalSpeed, repairUnanchoredCompetitionLoad, repairImprovementGoalFlat,
 ];
+
+// Deliberately not in the list above. This one deletes rows, and the repairs
+// that want a slot -- a missing benchmarked movement, an untrained race
+// component -- must get first claim on them by converting them into something
+// that serves a goal. Run before those, it would throw away the very rows they
+// were about to put to use.
+
+// --- 5. the same job done twice ----------------------------------------------
+//
+// Two or three rowing variations in one week, none of them serving anything the
+// athlete asked for. The coach charges this on almost every block we have and
+// his prescription is not to redistribute the volume but to stop doing it:
+// "Use the saved volume for direct work or leave it as recovery."
+//
+// So this removes rather than reshuffles, and it runs late on purpose. The
+// repairs that want a slot -- a missing benchmarked movement, an untrained race
+// component -- have already had first claim on these rows by converting them
+// into something that serves a goal. What reaches here is what nothing needed.
+//
+// It keeps the most specific variant of the function and drops the rest. A
+// barbell row is a more trainable thing than a cable row, so where both exist
+// the machine goes first.
+
+const SPECIFICITY = [
+  [/barbell row|pendlay|bent-?over/i, 3],
+  [/chest-?supported|t-?bar|landmine/i, 2],
+  [/dumbbell|single-?arm|one-?arm/i, 1],
+  [/cable|machine|seated|pec deck|fly/i, 0],
+];
+const specificityOf = (name) => (SPECIFICITY.find(([re]) => re.test(name)) || [null, 2])[1];
+
+// Only the upper-body accessory duplication the coach actually charges. The
+// first version trimmed any redundant function and took the foundation work out
+// from under the gymnast's skills -- V38_SKILL_WITHOUT_FOUNDATION on every
+// youth program, and the same on the masters return and the postpartum block,
+// where the "redundant" squat pattern is the rebuild. A row serving no stated
+// GOAL is not a row serving nothing, and deleting lower-body or skill-support
+// work on that reasoning is how a trim becomes an injury.
+const TRIMMABLE_FUNCTIONS = new Set(['horizontal_pull', 'horizontal_press']);
+
+// Did removing those rows raise anything that was not there before?
+function brokeSomething(before, after, intake) {
+  const count = (program) => {
+    try {
+      return auditProgramStructure(program, intake).map((f) => f.code || f.rule).filter(Boolean);
+    } catch { return null; }
+  };
+  const a = count(before);
+  const b = count(after);
+  if (!a || !b) return true; // cannot tell, so do not risk it
+  const tally = (list) => list.reduce((m, c) => ({ ...m, [c]: (m[c] || 0) + 1 }), {});
+  const ta = tally(a);
+  const tb = tally(b);
+  return Object.keys(tb).some((code) => (tb[code] || 0) > (ta[code] || 0));
+}
+
+export function repairAccessoryRedundancy(program, intake = {}) {
+  const findings = accessoryRedundancy(program, intake)
+    .filter((f) => String(f.functions || '').split(',').every((fn) => TRIMMABLE_FUNCTIONS.has(fn.trim())));
+  if (!findings.length) return { program: String(program || ''), changed: false, moves: [] };
+
+  // Every exercise the rule named as surplus, per week.
+  const surplus = new Map();
+  for (const f of findings) {
+    for (const m of String(f.detail).matchAll(/\(([^)]+)\)/g)) {
+      for (const name of m[1].split(',').map((x) => x.trim()).filter(Boolean)) {
+        const key = f.week ?? 'all';
+        if (!surplus.has(key)) surplus.set(key, new Set());
+        surplus.get(key).add(name.toLowerCase());
+      }
+    }
+  }
+
+  let out = String(program || '');
+  const moves = [];
+  for (let week = 1; week <= 4; week += 1) {
+    const names = surplus.get(week) || surplus.get('all');
+    if (!names || names.size < 2) continue;
+    const parsed = parseWeek(out, week);
+    if (!parsed) continue;
+
+    const present = parsed.rows
+      .map((cells, index) => ({ index, name: String(cells[parsed.exercise] || '').trim() }))
+      .filter((r) => r.name && !isWarmup(r.name) && names.has(r.name.toLowerCase()));
+    if (present.length < 2) continue;
+
+    // Keep one -- the most specific, earliest on a tie -- and drop the others.
+    const keep = present.slice().sort((a, b) => specificityOf(b.name) - specificityOf(a.name) || a.index - b.index)[0];
+    const drop = new Set(present.filter((r) => r.index !== keep.index).map((r) => r.index));
+    if (!drop.size) continue;
+
+    const cells = parsed.rows.filter((_, i) => !drop.has(i));
+    const candidate = rebuild(out, parsed, cells);
+
+    // Put it back if it broke something. A row can serve no stated goal and
+    // still be the foundation a skill stands on: the gymnast's Ring Push-up
+    // reads as duplicate horizontal pressing beside a Ring Dip, and removing it
+    // raised V38_SKILL_WITHOUT_FOUNDATION on every youth program in the suite.
+    // Enumerating every such dependency would mean modelling the skill graph
+    // here and being wrong about it later, so the repair checks its own work
+    // instead and declines when the answer is worse.
+    if (brokeSomething(out, candidate, intake)) continue;
+    out = candidate;
+    moves.push({ week, kept: keep.name, dropped: present.filter((r) => drop.has(r.index)).map((r) => r.name) });
+  }
+  return { program: out, changed: moves.length > 0, moves };
+}

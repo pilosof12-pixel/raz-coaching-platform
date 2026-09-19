@@ -40,7 +40,7 @@ import { repairDayZeroClaims, repairMatchDayPlacement, repairAllocationShift, re
 import { repairBallisticShare } from './v79_ballistic_share.js';
 import { repairBenchmarkExposure } from './benchmark_exposure_repair.js';
 import { repairEventComponentCoverage } from './event_component_repair.js';
-import { ENDURANCE_REPAIRS } from './endurance_block_repair.js';
+import { ENDURANCE_REPAIRS, repairAccessoryRedundancy } from './endurance_block_repair.js';
 import { repairConsecutiveTrainingDays } from './consecutive_day_repair.js';
 import { repairCompetitionWeek } from './v90_competition_week.js';
 import { repairTimelineIntegrity } from './v91_timeline_integrity.js';
@@ -1030,6 +1030,14 @@ export function repairDeterministicContradictions(program, intake = {}) {
       swapped: exposed.swaps.map((x) => `w${x.week} ${x.from} -> ${x.to}`),
       inserted: exposed.inserts.map((x) => `w${x.week} ${x.day} + ${x.movement}`),
     });
+  }
+
+  // Last claim on a surplus slot. Everything above that wanted one has taken it
+  // by now, so what is still doing the same job twice is doing it for nobody.
+  const trimmed = repairAccessoryRedundancy(candidate, intake);
+  if (trimmed.changed) {
+    candidate = trimmed.program;
+    repairs.push({ type: 'accessory_redundancy_trimmed', moves: trimmed.moves.length });
   }
 
   // Accessory holds next: they change set counts that later note repairs cite.
