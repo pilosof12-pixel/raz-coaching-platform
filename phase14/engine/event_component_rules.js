@@ -15,6 +15,7 @@
 
 import { rows } from './coach_rules.js';
 import { namedComponentsFor, eventIsOrdered } from './coach_standard.js';
+import { statedGoalFamilies } from './coach_rules.js';
 
 const isWarmup = (n) => /^\s*\[WARMUP\]/i.test(String(n || ''));
 
@@ -378,4 +379,42 @@ export function buildEventComponentBrief(intake = {}) {
     '  Do not place a full rehearsal inside the last seven days; the final one belongs at least eight days out.');
 
   return lines.join('\n');
+}
+
+// --- what a repair needs to know ----------------------------------------------
+
+// A quarter of the race dose, which is the floor the coach set for an exposure
+// to count, at competition load where the station is defined by load.
+export function componentRaceDose(component) {
+  const spec = COMPONENT_SPEC[component];
+  const loaded = /sled|carry|lunge|wall ball/i.test(component);
+  const load = loaded ? '90-100% of competition load' : 'Race-effort pace';
+  const note = `Race station at a quarter of the race dose. Execute it the way the race demands it, not as general conditioning; stop the set if technique or speed falls away.`;
+  if (spec?.race?.reps) {
+    return { sets: '1', reps: `${Math.round(spec.race.reps * DOSE_FRACTION)}`, load, rest: '2-3 min', rpe: '7', note };
+  }
+  const metres = spec?.race?.metres ? Math.round(spec.race.metres * DOSE_FRACTION) : 200;
+  return { sets: '1', reps: `${metres} m`, load, rest: '2-3 min', rpe: '7', note };
+}
+
+// Rows a race block can afford to spend: work that is neither part of the event
+// nor serving something the athlete asked for. His words on the accessory block
+// he charged: "Those exercises are not inherently bad. Their opportunity cost is
+// the problem this close to the race."
+export function spendableRowsFor(parsed, intake, components) {
+  const goals = statedGoalFamilies(intake);
+  const isComponent = (name) => components.some((c) => matcherFor(c).test(name));
+  const out = [];
+  parsed.rows.forEach((cells, index) => {
+    const name = String(cells[parsed.exercise] || '').trim();
+    if (!name || isWarmup(name) || isComponent(name)) return;
+    if (goals.some((g) => g.test && g.test(name))) return;
+    if (/\brun\b|\brunning\b|treadmill/i.test(name)) return; // running is the race's connective tissue
+    out.push({ index, name });
+  });
+  // Spend the least specific first: trunk and isolation before anything
+  // compound, so a squat is the last thing traded for a station.
+  const rank = (n) => (/plank|pallof|dead bug|calf|curl|raise|fly|extension/i.test(n) ? 0
+    : /row|press|pull-?up|chin-?up|push-?up/i.test(n) ? 1 : 2);
+  return out.sort((a, b) => rank(a.name) - rank(b.name));
 }

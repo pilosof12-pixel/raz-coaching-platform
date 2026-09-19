@@ -39,6 +39,7 @@ import { repairClockStatement } from './v86_training_clock.js';
 import { repairDayZeroClaims, repairMatchDayPlacement, repairAllocationShift, repairSportFrequency } from './v89_block_architecture.js';
 import { repairBallisticShare } from './v79_ballistic_share.js';
 import { repairBenchmarkExposure } from './benchmark_exposure_repair.js';
+import { repairEventComponentCoverage } from './event_component_repair.js';
 import { repairConsecutiveTrainingDays } from './consecutive_day_repair.js';
 import { repairCompetitionWeek } from './v90_competition_week.js';
 import { repairTimelineIntegrity } from './v91_timeline_integrity.js';
@@ -978,6 +979,21 @@ export function repairDeterministicContradictions(program, intake = {}) {
     repairs.push({
       type: 'consecutive_training_days_spread',
       moved: spread.moves.map((m) => `w${m.week} ${m.from.join('/')} -> ${m.to.join('/')}`),
+    });
+  }
+
+  // Put the race back into a race block. The brief names every station with its
+  // race dose and the model still trained three of eight, which is the second
+  // time an instruction has arrived in full and not come back in the program.
+  // It spends a slot rather than adding one, on the coach's reasoning about the
+  // generic work he charged: those exercises are not bad, their opportunity cost
+  // four weeks out is.
+  const raced = repairEventComponentCoverage(candidate, intake);
+  if (raced.changed) {
+    candidate = raced.program;
+    repairs.push({
+      type: 'event_components_exposed',
+      swapped: raced.swaps.map((x) => `w${x.week} ${x.from} -> ${x.to}`),
     });
   }
 
