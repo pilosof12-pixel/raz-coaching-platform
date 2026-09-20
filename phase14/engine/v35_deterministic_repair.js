@@ -40,6 +40,7 @@ import { repairDayZeroClaims, repairMatchDayPlacement, repairAllocationShift, re
 import { repairBallisticShare } from './v79_ballistic_share.js';
 import { repairBenchmarkExposure } from './benchmark_exposure_repair.js';
 import { repairEventComponentCoverage } from './event_component_repair.js';
+import { repairCompromisedRunning } from './compromised_work_repair.js';
 import { ENDURANCE_REPAIRS, repairAccessoryRedundancy, repairTaperPowerSpike } from './endurance_block_repair.js';
 import { STATEMENT_REPAIRS } from './program_statement_repair.js';
 import { repairConsecutiveTrainingDays } from './consecutive_day_repair.js';
@@ -1009,6 +1010,20 @@ export function repairDeterministicContradictions(program, intake = {}) {
     repairs.push({
       type: 'event_components_exposed',
       swapped: raced.swaps.map((x) => `w${x.week} ${x.from} -> ${x.to}`),
+    });
+  }
+
+  // Immediately after the stations exist, because a run can only be run off a
+  // station the program actually contains. This one moves an existing run row
+  // behind an existing station on the same day: no set is added, no load
+  // changes, no session is invented. Where a day has no run or no station it
+  // does nothing, which is the case that really would be composition.
+  const compromised = repairCompromisedRunning(candidate, intake);
+  if (compromised.changed) {
+    candidate = compromised.program;
+    repairs.push({
+      type: 'compromised_running_paired',
+      moves: compromised.moves.map((m) => `w${m.week} ${m.day} after ${m.after}`),
     });
   }
 
