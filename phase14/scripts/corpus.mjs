@@ -37,27 +37,35 @@ export const HYROX = {
 const C = json('competition_avatars.json');
 const H = json('hard_avatars.json');
 const day = 86400000;
-// The Saturday inside week w, not the first Saturday after it.
+// A constant number of days out, not "the next Saturday after week w".
 //
-// This used to step forward w*7 days and then on to the next Saturday, which
-// lands anywhere in w*7 .. w*7+6 -- for w=4, 28 to 34 days, or 4.00 to 4.86
-// weeks. Block week comes from the hours remaining to the event, so above 28
-// days the event falls OUTSIDE a four-week block and every competition-week and
-// taper rule reads a different week. The same static fixture therefore graded
-// differently depending on which weekday the suite ran on: between 19 and 20
-// September the corpus moved from 24.56 severity to 25.36, from 17 clean
-// programs to 10, and nothing about any program had changed.
+// Quantising to a weekday is what made this unstable, and moving the band did
+// not fix it. Any weekday rule gives a seven-day-wide band, because the Saturday
+// that is "about three weeks away" is anywhere from fifteen to twenty-one days
+// away depending on what day you ask. The findings track the exact offset, not
+// the weekday: sweeping the fight camp one day at a time, sixteen through
+// twenty-two days is a flat plateau and the answer changes at fifteen and at
+// twenty-three. A seven-day band straddles those edges, so the corpus graded
+// differently on Saturdays even after the band was moved -- four MMA programs
+// swung by 1.08 severity between 25 and 26 September.
 //
-// Starting six days earlier puts the band at w*7-6 .. w*7 -- 22 to 28 days for
-// w=4 -- so the event is always inside week w. Exactly one Saturday falls in any
-// seven-day window, so there is always precisely one answer.
-export const saturday = (w, now = Date.now()) => {
+// There is no arrangement that holds BOTH the offset and the weekday constant
+// against a moving clock; one of them has to give. The offset is what the rules
+// actually read, so the offset is what is held. Each number below sits in the
+// middle of a measured plateau for that avatar, and the weekday is allowed to
+// drift because nothing measures it.
+export const CORPUS_NOW = process.env.CORPUS_NOW ? Date.parse(process.env.CORPUS_NOW) : null;
+const clock = () => CORPUS_NOW ?? Date.now();
+export const daysOut = (n, now = clock()) => new Date(now + n * day).toISOString().slice(0, 10);
+
+// Kept for callers outside the corpus; the corpus itself no longer uses it.
+export const saturday = (w, now = clock()) => {
   const d = new Date(now + (w * 7 - 6) * day);
   d.setUTCDate(d.getUTCDate() + ((6 - d.getUTCDay() + 7) % 7));
   return d.toISOString().slice(0, 10);
 };
 
-export const LIFTER = { ...C.weightlifter_peak, competition_date: saturday(8), event_type: 'strength_meet', event_priority: 'A' };
+export const LIFTER = { ...C.weightlifter_peak, competition_date: daysOut(53), event_type: 'strength_meet', event_priority: 'A' };
 // Four weeks out, not one. The avatar's own definition says "the national
 // qualifier is in 4 weeks, so this block runs into the meet: Week 4 IS
 // competition week", and the fixture renders week 4 as Day -5 to Day -1. Pinned
@@ -71,8 +79,8 @@ export const LIFTER = { ...C.weightlifter_peak, competition_date: saturday(8), e
 // least 23 days away", which is a 23..29 day band and spills past 28 into week 5
 // for one weekday in seven -- the same straddle the helper above now avoids. It
 // is just saturday(4).
-export const MEET = { ...C.weightlifter_meet_week, competition_date: saturday(4) };
-export const FIGHTER = { ...C.mma_fight_camp, competition_date: saturday(3) };
+export const MEET = { ...C.weightlifter_meet_week, competition_date: daysOut(25) };
+export const FIGHTER = { ...C.mma_fight_camp, competition_date: daysOut(19) };
 
 // Coach-scored programs first, so the known answers sit at the top of a report.
 export const CORPUS = [
@@ -99,7 +107,7 @@ export const CORPUS = [
   ['run101_inseason_footballer.txt', H.inseason_footballer, null],
   ['run115_inseason_footballer.txt', H.inseason_footballer, null],
   ['masters_return-program.txt', H.masters_return, null],
-  ['run116_dual_event_hyrox.txt', { ...HYROX, competition_date: saturday(4) }, null],
+  ['run116_dual_event_hyrox.txt', { ...HYROX, competition_date: daysOut(25) }, null],
   ['run100_masters_return.txt', H.masters_return, null],
   ['run101_masters_return.txt', H.masters_return, null],
 ];

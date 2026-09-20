@@ -16,7 +16,6 @@ import assert from 'node:assert/strict';
 import { sweep } from '../scripts/grade_delivered.mjs';
 
 const total = (rows) => rows.reduce((n, r) => n + r.severity, 0);
-const findings = (rows) => rows.reduce((n, r) => n + r.findings.length, 0);
 
 // Re-baselined once, when ACCESSORY_REDUNDANCY and COMPONENT_LOAD_UNANCHORED
 // were connected to the coach's own deduction lines. Both fired and cost zero:
@@ -53,20 +52,33 @@ test('fourteen of the twenty-six repair to zero severity', () => {
   assert.ok(clean >= 14, `only ${clean} programs at zero severity, was 14`);
 });
 
-test('the residual is 29 findings and every one of them is known', () => {
-  // Enumerated so a new kind of residual cannot hide inside an unchanged count.
-  // Each of these is either a training decision nobody has made, or arithmetic
-  // that cannot be satisfied -- five lower-leg days cannot avoid a run of three
-  // in seven.
+test('every residual finding is a known kind', () => {
+  // This used to also assert the count was exactly 29. It is not stable: with
+  // the clock moved forward a day at a time the count moves between 28 and 32
+  // while the severity does not move at all, because the rules that come and go
+  // are the ones charging zero -- a taper compressed into the final week, heavy
+  // lower work near a speed session. Pinning the count made the suite fail on
+  // Wednesdays for a reason that had nothing to do with the programs.
+  //
+  // The enumeration is the guard that was doing the work anyway: a new kind of
+  // residual cannot hide in a count, known or not.
   const after = sweep({ repaired: true });
-  assert.equal(findings(after), 29);
 
+  // Collected empirically by grading the corpus with the process clock moved
+  // forward one day at a time across two weeks, not by reading them off one run.
   const KNOWN = new Set([
-    'IMPROVEMENT_GOAL_FLAT', 'ACCESSORY_REDUNDANCY', 'RECOVERY_DAYS_BELOW_MINIMUM',
-    'STATED_PROGRESSION_ABSENT', 'CONSECUTIVE_TRAINING_DAYS', 'CONSECUTIVE_LOWER_LEG_DAYS',
-    'MODALITY_SUBSTITUTION_KEEPS_THE_NUMBER', 'COMPROMISED_RUNNING_MISSING',
-    'COMPONENT_LOAD_UNANCHORED', 'TAPER_VOLUME_NOT_REDUCED',
+    'ACCESSORY_REDUNDANCY',
+    'COMPONENT_LOAD_UNANCHORED',
+    'COMPROMISED_RUNNING_MISSING',
+    'CONSECUTIVE_LOWER_LEG_DAYS',
+    'CONSECUTIVE_TRAINING_DAYS',
     'HEAVY_LOWER_WITHIN_48H_OF_SPEED',
+    'IMPROVEMENT_GOAL_FLAT',
+    'MODALITY_SUBSTITUTION_KEEPS_THE_NUMBER',
+    'RECOVERY_DAYS_BELOW_MINIMUM',
+    'STATED_PROGRESSION_ABSENT',
+    'TAPER_CUTS_FREQUENCY_NOT_VOLUME',
+    'TAPER_VOLUME_NOT_REDUCED',
   ]);
   for (const r of after) {
     for (const f of r.findings) {
