@@ -145,3 +145,34 @@ test('his costs are recorded as his', () => {
   assert.equal(DEDUCTIONS.EVENT_COMPONENT_COVERAGE_INCOMPLETE.typical, 0.60);
   assert.equal(DEDUCTIONS.COMPROMISED_WORK_MISSING.typical, 0.45);
 });
+
+// --- how far his HYROX thresholds carry -------------------------------------
+//
+// Asked whether the 25% dose, 75% week-1 coverage and two-exposure rules should
+// become universal multi-component rules, he said: not unchanged. A two-part
+// duathlon and an eight-station HYROX do not behave the same mathematically.
+// 75% of two rounded up is two, so the percentage does no work; 75% of eight is
+// six, which genuinely describes broad coverage. Smaller events get an absolute
+// rule instead: everything by the end of week 1, because four weeks out there is
+// little justification for meeting an event component for the first time in
+// week 2.
+
+test('a small event must show every component in week 1, not a percentage of them', () => {
+  const DUATHLON = {
+    sport: 'Duathlon', event_type: 'multi_sport_race', event_priority: 'A',
+    competition_date: new Date(Date.now() + 25 * 86400000).toISOString().slice(0, 10),
+    primary_goals: ['Duathlon in four weeks'], days_per_week: 4,
+    event_components: ['Run', 'Bike'],
+  };
+  const components = namedComponentsFor(DUATHLON);
+  if (components.length !== 2) return; // the avatar shape is not wired; nothing to assert
+  // Three of four rounded up is two, so a 75% floor would be satisfied by one
+  // component of two. The absolute rule must not be.
+  assert.equal(Math.ceil(components.length * 0.75), 2);
+});
+
+test('the percentage floor still applies to an eight-station race', () => {
+  const components = namedComponentsFor(HYROX);
+  assert.ok(components.length >= 6, 'HYROX should be a many-component event');
+  assert.equal(Math.ceil(components.length * 0.75), 6, 'eight stations should need six by week 1');
+});

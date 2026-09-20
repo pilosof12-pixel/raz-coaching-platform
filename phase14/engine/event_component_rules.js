@@ -47,6 +47,26 @@ const DOSE_FRACTION = 0.25;          // "at least 25% of race distance / reps / 
 const COVERAGE_WEEK1 = 0.75;         // "Week 1: at least 75% of named components"
 const MIN_EXPOSURES_W1_W3 = 2;       // "at least 2 total direct exposures across the three weeks"
 
+// The percentage rules are HYROX-shaped, and he scoped them deliberately when
+// asked whether they generalise: "not unchanged".
+//
+// A two-component duathlon and an eight-station HYROX do not behave the same
+// mathematically. For two components, 75% rounded up means both immediately, so
+// the percentage is doing no useful work; for eight it means six, which really
+// does describe broad event coverage. So the percentage form applies only to
+// events built from many components repeatedly sequenced inside one continuous
+// race, and smaller events get an absolute rule instead.
+const MANY_COMPONENT_FLOOR = 6;
+
+// Below the floor, every required component must appear by the end of week 1.
+// His reasoning: four weeks out there is little justification for discovering an
+// event component for the first time in week 2. Two-component duathlon -> 2 of
+// 2; three-event strongman -> 3 of 3; five-component medley -> 5 of 5.
+function usesPercentageCoverage(intake, components) {
+  if (/hyrox/i.test(String(intake?.sport || '') + ' ' + String(intake?.event_type || ''))) return true;
+  return components.length >= MANY_COMPONENT_FLOOR;
+}
+
 const matcherFor = (name) => {
   const spec = COMPONENT_SPEC[name];
   const re = spec?.match || new RegExp(String(name).replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'i');
@@ -99,13 +119,19 @@ export function eventComponentCoverage(program, intake = {}) {
   const missingIn = (week) => components.filter((c) => !trainedIn(week, c));
   const seenBy = (week) => components.filter((c) => [1, 2, 3, 4].slice(0, week).some((w) => trainedIn(w, c)));
 
-  // Week 1: at least 75% of named components have a direct exposure.
+  // Week 1 coverage. Many-component races take the 75% floor; a small event has
+  // to show all of its components, because a percentage of three is not a
+  // meaningful instruction.
   const week1 = components.length - missingIn(1).length;
-  if (week1 < Math.ceil(components.length * COVERAGE_WEEK1)) {
+  const percentage = usesPercentageCoverage(intake, components);
+  const floor1 = percentage ? Math.ceil(components.length * COVERAGE_WEEK1) : components.length;
+  if (week1 < floor1) {
     out.push({
       rule: 'EVENT_COMPONENT_COVERAGE_WEEK1',
       week: 1,
-      detail: `Week 1 trains ${week1} of ${components.length} named race components against a floor of ${Math.ceil(components.length * COVERAGE_WEEK1)} (75%). Absent: ${missingIn(1).join(', ')}.`,
+      detail: percentage
+        ? `Week 1 trains ${week1} of ${components.length} named race components against a floor of ${floor1} (75%). Absent: ${missingIn(1).join(', ')}.`
+        : `Week 1 trains ${week1} of ${components.length} named race components. An event with ${components.length} components has no percentage floor: all of them must appear by the end of week 1. Absent: ${missingIn(1).join(', ')}.`,
     });
   }
 

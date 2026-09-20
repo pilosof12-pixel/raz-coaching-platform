@@ -93,5 +93,17 @@ if (!s.includes('QA-TRACE-DIAGNOSTICS-DETAIL')) {
   s = s.replace(progressOld, progressNew);
 }
 
+// 4. The salvage path writes a LATER detail than the one above, so on exactly
+//    the builds worth diagnosing -- the slow ones that exhausted their attempts
+//    -- it overwrote the trace and result.json lost it. Run #122 spent five
+//    model calls and the trace never reached the evidence; the cause was only
+//    recoverable because the unresolved rule happened to name it.
+const salvageDetailOld = 'await progress("finalizing", Number(buildUsage?.calls || 0), "delivered with unresolved rules: " + lastQaSalvage.codes.join("+"));';
+const salvageDetailNew = 'await progress("finalizing", Number(buildUsage?.calls || 0), "delivered with unresolved rules: " + lastQaSalvage.codes.join("+") + qaTraceSuffix);';
+if (!s.includes(salvageDetailNew)) {
+  if (!s.includes(salvageDetailOld)) throw new Error('salvage-detail anchor missing (apply qa salvage delivery first)');
+  s = s.replace(salvageDetailOld, salvageDetailNew);
+}
+
 if (s !== before) fs.writeFileSync(target, s);
 console.log('QA trace diagnostics applied');

@@ -43,3 +43,16 @@ test('it cannot change a delivered program', () => {
   assert.ok(!/\bprogram\s*=/.test(patch.replace(/^\s*\/\/.*$/gm, '')),
     'the patch assigns to program; it is only allowed to record what happened');
 });
+
+test('the salvage path does not overwrite the trace', () => {
+  // The salvage detail is written AFTER the one carrying the trace, so on the
+  // builds actually worth diagnosing -- the ones that exhausted their attempts
+  // -- result.json lost it. Run #122 spent five model calls and its trace never
+  // reached the evidence; the cause was recoverable only because the unresolved
+  // rule happened to name it.
+  // Match the progress() call specifically: a console.warn a couple of lines
+  // above carries the same words and would satisfy a looser search.
+  const line = runtime.split('\n').find((l) => l.includes('delivered with unresolved rules') && l.includes('progress('));
+  assert.ok(line && line.includes('qaTraceSuffix'),
+    'the salvage detail drops the trace on exactly the builds that need it');
+});
