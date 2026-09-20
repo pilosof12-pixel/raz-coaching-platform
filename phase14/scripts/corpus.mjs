@@ -37,8 +37,22 @@ export const HYROX = {
 const C = json('competition_avatars.json');
 const H = json('hard_avatars.json');
 const day = 86400000;
-export const saturday = (w) => {
-  const d = new Date(Date.now() + w * 7 * day);
+// The Saturday inside week w, not the first Saturday after it.
+//
+// This used to step forward w*7 days and then on to the next Saturday, which
+// lands anywhere in w*7 .. w*7+6 -- for w=4, 28 to 34 days, or 4.00 to 4.86
+// weeks. Block week comes from the hours remaining to the event, so above 28
+// days the event falls OUTSIDE a four-week block and every competition-week and
+// taper rule reads a different week. The same static fixture therefore graded
+// differently depending on which weekday the suite ran on: between 19 and 20
+// September the corpus moved from 24.56 severity to 25.36, from 17 clean
+// programs to 10, and nothing about any program had changed.
+//
+// Starting six days earlier puts the band at w*7-6 .. w*7 -- 22 to 28 days for
+// w=4 -- so the event is always inside week w. Exactly one Saturday falls in any
+// seven-day window, so there is always precisely one answer.
+export const saturday = (w, now = Date.now()) => {
+  const d = new Date(now + (w * 7 - 6) * day);
   d.setUTCDate(d.getUTCDate() + ((6 - d.getUTCDay() + 7) % 7));
   return d.toISOString().slice(0, 10);
 };
@@ -53,13 +67,11 @@ export const LIFTER = { ...C.weightlifter_peak, competition_date: saturday(8), e
 // taper in week 4 untouched.
 //
 // The margin matters as much as the number: an event exactly 28 days out slides
-// between weeks as the day passes, so this takes the first Saturday at least 23
-// days away, which is inside week 4 at every hour.
-export const MEET = { ...C.weightlifter_meet_week, competition_date: (() => {
-  const d = new Date(Date.now() + 23 * day);
-  d.setUTCDate(d.getUTCDate() + ((6 - d.getUTCDay() + 7) % 7));
-  return d.toISOString().slice(0, 10);
-})() };
+// between weeks as the day passes. This used to hand-roll "the first Saturday at
+// least 23 days away", which is a 23..29 day band and spills past 28 into week 5
+// for one weekday in seven -- the same straddle the helper above now avoids. It
+// is just saturday(4).
+export const MEET = { ...C.weightlifter_meet_week, competition_date: saturday(4) };
 export const FIGHTER = { ...C.mma_fight_camp, competition_date: saturday(3) };
 
 // Coach-scored programs first, so the known answers sit at the top of a report.
