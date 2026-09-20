@@ -41,6 +41,7 @@ import { repairBallisticShare } from './v79_ballistic_share.js';
 import { repairBenchmarkExposure } from './benchmark_exposure_repair.js';
 import { repairEventComponentCoverage } from './event_component_repair.js';
 import { repairCompromisedRunning } from './compromised_work_repair.js';
+import { repairRaceRehearsal } from './race_rehearsal_repair.js';
 import { ENDURANCE_REPAIRS, repairAccessoryRedundancy, repairTaperPowerSpike } from './endurance_block_repair.js';
 import { STATEMENT_REPAIRS } from './program_statement_repair.js';
 import { repairConsecutiveTrainingDays } from './consecutive_day_repair.js';
@@ -1024,6 +1025,21 @@ export function repairDeterministicContradictions(program, intake = {}) {
     repairs.push({
       type: 'compromised_running_paired',
       moves: compromised.moves.map((m) => `w${m.week} ${m.day} after ${m.after}`),
+    });
+  }
+
+  // The most invasive repair in the chain, and the only one that changes what two
+  // sessions contain rather than their order. It gathers a race rehearsal by
+  // moving component rows onto the day already closest to being one, within the
+  // same week so the week's coverage is untouched. Every move is checked against
+  // the structural audit and abandoned if anything gets worse -- moving work into
+  // a day can push it past its time budget, and that is a code the audit counts.
+  const rehearsed = repairRaceRehearsal(candidate, intake);
+  if (rehearsed.changed) {
+    candidate = rehearsed.program;
+    repairs.push({
+      type: 'race_rehearsal_gathered',
+      moves: rehearsed.moves.map((m) => `w${m.week} ${m.component} -> ${m.day}`),
     });
   }
 

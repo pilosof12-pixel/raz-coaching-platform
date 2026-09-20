@@ -67,7 +67,7 @@ function usesPercentageCoverage(intake, components) {
   return components.length >= MANY_COMPONENT_FLOOR;
 }
 
-const matcherFor = (name) => {
+export const matcherFor = (name) => {
   const spec = COMPONENT_SPEC[name];
   const re = spec?.match || new RegExp(String(name).replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'i');
   const not = spec?.not;
