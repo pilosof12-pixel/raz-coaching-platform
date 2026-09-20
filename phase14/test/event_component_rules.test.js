@@ -58,10 +58,13 @@ test('his weights are recorded as given, and sum to one', () => {
   assert.deepEqual(dims.map(([, w]) => w), [0.30, 0.20, 0.15, 0.15, 0.10, 0.10]);
 });
 
-test('his dimension scores against his weights give 7.465, not the 7.3 he published', () => {
-  // Recorded rather than tuned away. The other four weight sets reproduce his
-  // published scores to four decimals; this one is newly codified and does not,
-  // and fitting six weights to one observation would mean nothing afterwards.
+test('his weights give 7.465 for that profile, and that is the right answer', () => {
+  // This was recorded as an unresolved discrepancy against his published 7.3.
+  // He has since said which is authoritative: the 7.3 was a holistic judgement
+  // made first, with the six dimension scores reconstructed afterwards. So there
+  // is no hidden 0.165 correction to encode, and the weights are explicitly not
+  // to be tuned to reproduce it. The formula is the weighted sum and nothing
+  // subtracted after it.
   const { score } = weightedScore(PROGRAM_TYPE.HYBRID_MULTI_COMPONENT_EVENT, {
     event_specificity_and_component_coverage: 6.4,
     conditioning_progression_and_race_preparation: 7.1,
@@ -71,6 +74,8 @@ test('his dimension scores against his weights give 7.465, not the 7.3 he publis
     execution_rules_and_autoregulation: 8.7,
   });
   assert.equal(Number(score.toFixed(4)), 7.4650);
+  // The 7.3 stays on the record as history, never as a target to fit.
+  assert.ok(Math.abs(score - 7.3) > 0.1, 'the weights look fitted to the published 7.3');
 });
 
 test('his finding 1: the stations the block never trains', () => {

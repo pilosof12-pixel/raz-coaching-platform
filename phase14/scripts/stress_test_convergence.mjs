@@ -100,6 +100,32 @@ const fixture = (n) => fs.readFileSync(path.join(root, '..', 'test', 'fixtures',
 const quiet = process.argv.includes('--quiet');
 
 export const INTAKES = {
+  // The avatar that has caused every latency problem and killed four live
+  // builds was the one avatar this suite did not cover. Ten athletes were
+  // perturbed and checked for convergence; the Hyrox racer was not among them,
+  // so the question this suite exists to answer -- does a defect get repaired,
+  // or does it cost a regeneration -- had never been asked of the athlete that
+  // regenerates. The fixture is run #119's delivered program, which passes the
+  // bundle with zero flags, so the undamaged control starts clean.
+  dual_event_hyrox: {
+    age: 33, language: 'en', experience: 'Advanced (3+ years)', bodyweight: '76 kg',
+    // Twenty-five days: the middle of the measured plateau that keeps the race
+    // inside week 4 whatever day the suite runs on.
+    competition_date: new Date(Date.now() + 25 * 86400000).toISOString().slice(0, 10),
+    event_type: 'hybrid_race', event_priority: 'A',
+    primary_goals: ['Podium in my age group at the Hyrox race in 4 weeks'],
+    secondary_goals: ['Run a half marathon two weeks after Hyrox without wrecking myself for it'],
+    maintenance_goals: ['Hold my squat and pulling strength through both'],
+    goal_priority_model: 'tiered', days_per_week: 4, session_duration_minutes: 75,
+    gym_availability_mode: 'flexible', available_gym_days: [], training_location: 'commercial_gym',
+    equipment: 'Full gym: sled, ski erg, rower, wall ball, sandbags, barbells, dumbbells, kettlebells.',
+    sport: 'Hyrox', sport_sessions_per_week: 2, sport_schedule: [],
+    sleep_hours: '7', recovery_rating: 'Good',
+    current_numbers: 'Back Squat: 150 kg x 1\nDeadlift: 190 kg x 1\n5 km run: 19:40\nHalf marathon PB: 1:28 (two years ago)\n1 km ski erg: 3:38\nCurrently 4 sessions a week plus 2 runs',
+    performance_markers: ['5 km: 19:40', 'Half marathon: 1:28'],
+    injuries: 'Left achilles grumbles after back-to-back running days; settles with a day off.',
+    pain: { active: false }, mobility: { active: false, limitation: '' },
+  },
   advanced_hybrid: {
     age: 30, language: 'en',
     primary_goals: ['220kg back squat', '4 One arm pullups'],
@@ -593,6 +619,12 @@ const checks = [
       // postpartum_runner 0.80 against 0.90 -- because repairs landed after the
       // ceilings were last set. A ratchet with slack in it does not ratchet: it
       // would have let all three drift back to where they were and passed.
+      // The highest worst case of any avatar. It comes from the perturbation
+      // that drops a trailing cell: the structure is repaired and the program
+      // converges, but the row it rebuilds costs more against the coach's table
+      // here than the same damage costs anywhere else. Recorded at what it
+      // measures rather than smoothed, so the number stays visible.
+      dual_event_hyrox: 4.08,
       advanced_hybrid: 1.44, youth_gymnastics: 0.15, tactical_3k: 1.92,
       weightlifter_peak: 2.40, weightlifter_meet_week: 2.40, mma_fight_camp: 1.44,
       inseason_footballer: 0.78, masters_return: 0.80, hebrew_lifter: 0.00,

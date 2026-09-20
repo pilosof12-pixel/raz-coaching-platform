@@ -42,12 +42,21 @@ export const DIMENSIONS = {
   // incomplete component coverage, charged at 0.60, and the next was compromised
   // running at 0.45.
   //
-  // Unlike the four sets above, these have not been shown to reproduce his own
-  // published score: his six dimension scores against these weights give 7.4650
-  // and he published 7.3. The other four sets reproduce his scores to four
-  // decimal places. The gap is recorded rather than tuned away, because fitting
-  // six weights to one observation would make the model agree with him once and
-  // mean nothing afterwards.
+  // Authoritative, on his 2026-09-20 answer. These weights do not reproduce his
+  // published 7.3 for the first such program, and that is expected rather than a
+  // defect: he confirmed the 7.3 was a holistic judgement made first, with the
+  // six dimension scores reconstructed afterwards. There is no hidden 0.165
+  // correction to encode, and the weights must NOT be tuned to chase the 7.3.
+  //
+  //   overall = sum(dimension_score * dimension_weight)
+  //
+  // and nothing subtracted after it. A future engine scoring that same dimension
+  // profile returns 7.465, not 7.3. The 7.3 stays on the record as the published
+  // historical score because he asked that prior programs not be rescored.
+  //
+  // He named this as the same inconsistency already visible in the first three
+  // reviews: the early scores were judgement-led, the later standard makes the
+  // arithmetic explicit.
   [PROGRAM_TYPE.HYBRID_MULTI_COMPONENT_EVENT]: [
     ['event_specificity_and_component_coverage', 0.30],
     ['conditioning_progression_and_race_preparation', 0.20],
@@ -274,6 +283,44 @@ export const DEDUCTIONS = {
   AVOIDABLE_CONSECUTIVE_DAY_CLUSTERING: { typical: 0.20, range: [0.10, 0.25] },
   ACCESSORY_LOW_MARGINAL_RETURN: { typical: 0.18, range: [0.15, 0.20] },
   CONTINGENCY_CREATES_DUPLICATE: { typical: 0.15, range: [0.15, 0.15] },
+
+  // --- priced on his 2026-09-20 answer to the four unpriced findings ----------
+  //
+  // Three of the four he declined to price as stated, and narrowed instead. The
+  // narrowing is the point: each of these fires on a condition the original rule
+  // did not test, so the rule has to be tightened before the number means
+  // anything. A blanket version of any of them would have been wrong.
+
+  // A taper that only drops in the final week is NOT a defect by itself: a
+  // one-week taper is compatible with his hybrid competition model, which places
+  // the hybrid taper around seven days out. It only costs when the athlete comes
+  // into it from 8+ training units per week, where his framework calls for a 10
+  // to 14 day taper instead. Below that, detection only.
+  TAPER_TOO_SHORT_FOR_PRECEDING_LOAD: { typical: 0.20, range: [0.20, 0.20] },
+
+  // Only where the program type establishes a recovery requirement -- the hybrid
+  // framework calls for two dedicated recovery windows a week. Explicitly NOT
+  // universal: a weightlifter or a team-sport athlete trains on consecutive
+  // calendar days at very different session cost. 0.20 when recovery is Fair or
+  // worse, or the work is high-impact and the week could have been redistributed.
+  RECOVERY_WINDOWS_BELOW_TYPE_MINIMUM: { typical: 0.15, range: [0.10, 0.20] },
+
+  // Separated from TEXT_CONTRADICTS_TABLE at his instruction. A narrative that
+  // miscounts its own sets stays at 0.08. Prose that promises training content
+  // which never appears -- "this week includes acceleration work", no
+  // acceleration row -- is a broken promise about what the athlete will do:
+  // 0.10 accessory, 0.15 a stated secondary quality, 0.25 a primary goal
+  // exposure. Not charged when the absence already trips the goal-movement rule
+  // or an automatic cap.
+  PROMISED_EXPOSURE_ABSENT_FROM_TABLE: { typical: 0.15, range: [0.10, 0.25] },
+
+  // His correction to the rule as proposed, not just to its price. A generic
+  // "within 48 hours" penalty would teach the engine that all strength-speed
+  // proximity is interference, which he rejected: speed first and strength after
+  // can consolidate intensity deliberately. Only heavy lower work in the 24
+  // hours BEFORE a priority speed session, and only where the schedule allowed
+  // otherwise. 24 to 48 hours is detection only.
+  HEAVY_LOWER_BEFORE_PRIORITY_SPEED_WITHIN_24H: { typical: 0.15, range: [0.15, 0.15] },
   TEXT_CONTRADICTS_TABLE: { typical: 0.08, range: [0.05, 0.10] },
   UNSUPPORTED_ATHLETE_FACT: { typical: 0.10, range: [0.10, 0.10] },
   // Tiered on the coach's revision: the 0.15 was right for a secondary goal
