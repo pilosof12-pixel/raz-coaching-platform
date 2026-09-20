@@ -1,25 +1,25 @@
 {
-  "timestamp": "2026-09-20T21:18:58.359Z",
+  "timestamp": "2026-09-20T22:54:51.048Z",
   "base": "https://raz-coaching-platform.onrender.com",
-  "head_sha": "2122afdaed3c2337511d06d9bf938c3752b56059",
-  "runtime": "live57 2026-09-20T21:14:41Z",
+  "head_sha": "08861c7f2ccb057c31369c460bbbcc63027f8430",
+  "runtime": "live58 2026-09-20T22:53:58Z",
   "results": [
     {
       "id": "dual_event_hyrox",
-      "job_id": "2a1bea703e8baca8da407950c6893969",
-      "ok": false,
-      "status": "error",
-      "stage": "generating",
-      "attempt": 1,
-      "detail": "initial generation",
-      "last_seen_status": "error",
-      "error": "You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/.",
-      "program_chars": 0,
-      "seconds": 4
+      "job_id": "df859b6346e75d138aa5837cee34fa70",
+      "ok": true,
+      "status": "done",
+      "stage": "finalizing",
+      "attempt": 5,
+      "detail": "delivered with unresolved rules: V74_NOVEL_EXERCISE_NEAR_EVENT",
+      "last_seen_status": "done",
+      "error": null,
+      "program_chars": 13460,
+      "seconds": 658
     }
   ],
   "selection": [
     "dual_event_hyrox"
   ],
-  "ok": false
+  "ok": true
 }
