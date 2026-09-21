@@ -42,7 +42,7 @@ import { repairBenchmarkExposure } from './benchmark_exposure_repair.js';
 import { repairEventComponentCoverage } from './event_component_repair.js';
 import { repairCompromisedRunning } from './compromised_work_repair.js';
 import { repairRaceRehearsal } from './race_rehearsal_repair.js';
-import { repairModalitySubstitution } from './modality_substitution_repair.js';
+import { repairModalitySubstitution, repairNoteNamedMovement } from './modality_substitution_repair.js';
 import { ENDURANCE_REPAIRS, repairAccessoryRedundancy, repairTaperPowerSpike } from './endurance_block_repair.js';
 import { STATEMENT_REPAIRS } from './program_statement_repair.js';
 import { repairConsecutiveTrainingDays } from './consecutive_day_repair.js';
@@ -1041,6 +1041,20 @@ export function repairDeterministicContradictions(program, intake = {}) {
     repairs.push({
       type: 'race_rehearsal_gathered',
       moves: rehearsed.moves.map((m) => `w${m.week} ${m.component} -> ${m.day}`),
+    });
+  }
+
+  // Before anything counts the rows: a note telling the athlete to do a
+  // different movement than the row names means every downstream count records
+  // the work against the wrong exercise. Run #124 had five Goblet Squat rows
+  // whose notes said to do wall balls, so a race station was being tallied as
+  // squat volume.
+  const renamedByNote = repairNoteNamedMovement(candidate, intake);
+  if (renamedByNote.changed) {
+    candidate = renamedByNote.program;
+    repairs.push({
+      type: 'note_named_movement_applied',
+      moves: renamedByNote.moves.map((m) => `w${m.week} ${m.from} -> ${m.to}`),
     });
   }
 

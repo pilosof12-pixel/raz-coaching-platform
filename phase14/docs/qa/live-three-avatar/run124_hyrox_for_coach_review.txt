@@ -21,7 +21,7 @@ Tue	Chest-Supported Row	RPE-selected load	3	6	1:30	7	Pulling maintenance; full r
 Tue	Burpee Broad Jump	Race-effort pace	1	20 m	2-3 min	7	Race station at a quarter of the race dose. Execute it the way the race demands it, not as general conditioning; stop the set if technique or speed falls away.	
 Tue	Wall Ball	90-100% of competition load	1	25	2-3 min	7	Race station at a quarter of the race dose. Execute it the way the race demands it, not as general conditioning; stop the set if technique or speed falls away.	
 Wed	[WARMUP] Run	Easy	1	8 min	N/A	3	Easy jog plus a few drills; finish ready for pace, not sweaty.; Squat-and-reach x 6; Bodyweight squat x 8; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Band shoulder pass-through x 10; Scapular push-up x 8	
-Wed	Goblet Squat	Competition load	2	25 reps	2:00	8	Use Wall Ball here; keep throw rhythm honest and limit breaks to 1.	
+Wed	Wall Ball	Competition load	2	25 reps	2:00	8	keep throw rhythm honest and limit breaks to 1.	
 Wed	Seated Calf Raise	RPE-selected load	2	12	1:00	7	Easy tissue work; no grind.	
 Wed	Pallof Press	RPE-selected load	2	12/side	0:45	6	Anti-rotation brace; smooth reps.	
 Wed	Run	4:08-4:12/km	2	1000 m	2:30 walking	7.5	Each rep flows straight into the sled pull row below; this is run-to-station transition practice; stop if pace or form slips.	
@@ -52,7 +52,7 @@ Tue	Wall Ball	90-100% of competition load	1	25	2-3 min	7	Race station at a quart
 Wed	[WARMUP] Run	Easy	1	8 min	N/A	3	Easy jog plus a few drills; then start the rehearsal.; Squat-and-reach x 6; Bodyweight squat x 8; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Band shoulder pass-through x 10; Scapular push-up x 8	
 Wed	Rowing Ergometer	1:47-1:49/500 m	1	500 m	0:00	7.5	Hold form off the run.	
 Wed	Sandbag Lunge	Competition load	1	50 m	0:00	7.5	Half-race dose; steady cadence.	
-Wed	Goblet Squat	Competition load	1	50 reps	2:00	8	Use Wall Ball here; cap breaks at 2 and keep throw height honest.	
+Wed	Wall Ball	Competition load	1	50 reps	2:00	8	cap breaks at 2 and keep throw height honest.	
 Wed	Seated Calf Raise	RPE-selected load	2	10	1:00	6	Easy downshift so you leave fresh.	
 Wed	Prowler Push	95-100% competition load	1	25 m	0:00	7.5	Move straight to the next station; no extra rest beyond setup.	
 Wed	Rower	1:50-1:52/500 m	1	500 m	0:00	7.5	On a SkiErg, hold RPE 7.5; the two machines do not share a pace. begin one continuous 50% rehearsal in competition order; if split or shoulders blow up early, end the chain there.	
@@ -78,7 +78,7 @@ Tue	Explosive Push-up	Light, speed-first load	3	3	90 sec	7	Upper-body ballistic 
 Tue	Seated Calf Raise	RPE-selected load	2	12	1:00	6.5	Tissue capacity without fatigue.	
 Tue	Sled Pull	90-100% of competition load	1	13 m	2-3 min	6	Race station at a quarter of the race dose. Execute it the way the race demands it, not as general conditioning; stop the set if technique or speed falls away.	
 Wed	[WARMUP] Run	Easy	1	6 min	N/A	3	Short warm-up; this is race-feel, not a workout.; Easy jog 6-8 min; dynamic running drills; 3 relaxed strides before the hard running work; Squat-and-reach x 6; Bodyweight squat x 8; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Band shoulder pass-through x 10; Scapular push-up x 8	
-Wed	Goblet Squat	Competition load	1	25 reps	1:30	7	Use Wall Ball here; one quarter-race touch only.	
+Wed	Wall Ball	Competition load	1	25 reps	1:30	7	one quarter-race touch only.	
 Wed	Prowler Push	95-100% competition load	1	25 m	0:00	7	Move straight on; no extra grinding.	
 Wed	Run	4:08-4:12/km	1	1000 m	0:00	7.5	Station-to-run feel at race pace; if it is not there, end the chain early.	
 Fri	[WARMUP] Air Squat	Bodyweight	1	8	0:30	2	Easy prep only.; Squat-and-reach x 6; Bodyweight squat x 8; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Band shoulder pass-through x 10; Wall slide x 8; Ramp Back Squat: 47.5 kg x 5, 70 kg x 3, 92.5 kg x 1-2 before 117.5 kg work sets.	
@@ -91,13 +91,13 @@ END_WEEK3_TSV
 START_WEEK4_TSV
 Day	Exercise	Weight	Sets	Reps	Rest	Target RPE	Notes	Results
 Day -7	[WARMUP] Run	Easy	1	6 min	N/A	3	Easy jog only; leave the warm-up feeling springy.; Squat-and-reach x 6; Bodyweight squat x 8; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12	
-Day -7	Goblet Squat	Competition load	1	20 reps	2:00	6.5	Use Wall Ball here; just enough to keep rhythm and confidence. Session trimmed for camp: what remains is here because it keeps strength, speed or tissue readiness, not because it is easy. Stop the session early if bar speed drops, soreness is climbing, the cut is going badly or sleep was poor.	
+Day -7	Wall Ball	Competition load	1	20 reps	2:00	6.5	just enough to keep rhythm and confidence. Session trimmed for camp: what remains is here because it keeps strength, speed or tissue readiness, not because it is easy. Stop the session early if bar speed drops, soreness is climbing, the cut is going badly or sleep was poor.	
 Day -7	Prowler Push	90-95% competition load	1	20 m	0:00	6.5	Crisp steps only, then move on.	
 Day -7	Farmer Carry	Competition load	1	80 m	1:30	6.5	Quick feet, relaxed grip.	
 Day -6	[WARMUP] Air Squat	Bodyweight	1	6	0:30	2	Easy prep only.; Squat-and-reach x 6; Bodyweight squat x 8; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Band shoulder pass-through x 10; Scapular push-up x 8; Ramp Back Squat: 47.5 kg x 5, 70 kg x 3, 92.5 kg x 1-2 before 117.5 kg work sets.	
 Day -6	Back Squat	117.5 kg	3	1	2:30	6-6.5	Crisp singles only; if the first single is slower than expected or above RPE 7, stop at 2 singles. Competition prep: this session is deliberately short because the week is a descent into the event.	
 Day -5	[WARMUP] Run	Easy	1	5 min	N/A	3	Easy jog only.; Squat-and-reach x 6; Bodyweight squat x 8; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12	
-Day -5	Goblet Squat	Competition load	1	15 reps	1:30	6	Use Wall Ball here; relaxed rhythm, no burn.	
+Day -5	Wall Ball	Competition load	1	15 reps	1:30	6	relaxed rhythm, no burn.	
 Day -5	Run	4:50-5:10/km	1	15 min	N/A	4	Easy circulation only; if you feel flat, keep this even slower.	
 Day -5	Rower	1:49-1:50/500 m	1	150 m	1:30	6	On a SkiErg, hold RPE 6; the two machines do not share a pace. one clean touch and done.	
 Day -4	[WARMUP] Run	Easy	1	5 min	N/A	3	Skip the whole day if travel, sleep, or legs say no.; Easy jog 6-8 min; dynamic running drills; 3 relaxed strides before the hard running work; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12	
@@ -113,9 +113,9 @@ Sport sessions counted as load: 2 per week.
 WEEK PHASES: 1=realization 2=realization 3=taper 4=competition_week EVENT=hybrid_race
 
     phase             sets  exercises  competition lift  power sets  peak RPE  peak % max
-W1  realization       40    18         -                 1           8         -
-W2  realization       39    18         -                 1           8         -
+W1  realization       40    17         -                 1           8         -
+W2  realization       39    17         -                 1           8         -
 W3  taper             26    13         -                 7           7.5       -
 W4  competition week  12    6          -                 -           6.5       -
 
-Across the block: volume -28 sets, exercises -12, competition-lift share unchanged, peak effort -1.5 RPE, accessory volume -16 sets.
+Across the block: volume -28 sets, exercises -11, competition-lift share unchanged, peak effort -1.5 RPE, accessory volume -16 sets.
