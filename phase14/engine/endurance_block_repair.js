@@ -37,6 +37,19 @@ export function repairRuckDistance(program, intake = {}) {
 
   let out = String(program || '');
   const moves = [];
+  // One duration for the whole block, never a falling one.
+  //
+  // The minutes were computed from each week's own pace against the same target
+  // distance, so as the athlete got faster the same distance took fewer minutes
+  // and the repair wrote 76, 75, 74, 74. Read back, that is a carry whose
+  // duration falls while its pace improves and whose distance never moves --
+  // exactly what V38_CARRY_PACE_ONLY_PROGRESSION exists to catch. The chain was
+  // manufacturing the blocking defect, and on run81 it did so every time.
+  //
+  // Holding the largest requirement fixes it honestly rather than by hiding it:
+  // the duration stays put, and the further distance the athlete covers at a
+  // faster pace is the progression the rule is asking to see.
+  let heldMins = 0;
   for (let week = 1; week <= 4; week += 1) {
     const parsed = parseWeek(out, week);
     if (!parsed) continue;
@@ -58,7 +71,8 @@ export function repairRuckDistance(program, intake = {}) {
         : (Number.isFinite(mins) && paceMin ? mins / paceMin : NaN);
       if (!Number.isFinite(km) || km >= tol.low) return;
       if (!Number.isFinite(explicitKm) && Number.isFinite(mins) && paceMin) {
-        const needMins = Math.ceil(tol.low * paceMin);
+        const needMins = Math.max(Math.ceil(tol.low * paceMin), heldMins);
+        heldMins = needMins;
         row[parsed.reps] = reps.replace(/(\d+(?:\.\d+)?)\s*min/i, `${needMins} min`);
         if (Number.isInteger(parsed.notes)) {
           row[parsed.notes] = `${String(row[parsed.notes] || '').trim()} ${needMins} minutes at this pace is about ${tol.low} km, which is the distance you already ruck with this load without symptoms.`.trim();
