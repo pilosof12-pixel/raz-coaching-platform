@@ -1,39 +1,39 @@
 {
-  "timestamp": "2026-09-21T11:15:07.941Z",
+  "timestamp": "2026-09-21T11:54:48.327Z",
   "base": "https://raz-coaching-platform.onrender.com",
-  "head_sha": "bd3cdc2f7b19b2d783e2e360f82d2c2e09ef1330",
-  "runtime": "live67 2026-09-21T11:14:19Z",
+  "head_sha": "0042539abf80dbf8b1ea883855cff8a257b90afe",
+  "runtime": "live68 2026-09-21T11:53:57Z",
   "results": [
     {
       "id": "dual_event_hyrox",
-      "job_id": "8de224cd1cfc6cc8a7b4f59a67803240",
-      "ok": true,
-      "status": "done",
-      "stage": "finalizing",
+      "job_id": "6d59d66697001a43d1f1ab57e6066456",
+      "ok": false,
+      "status": "error",
+      "stage": "generating",
       "attempt": 1,
-      "detail": "saving program after 1 model call(s)",
-      "last_seen_status": "done",
-      "error": null,
-      "program_chars": 17486,
-      "seconds": 305
+      "detail": "initial generation",
+      "last_seen_status": "error",
+      "error": "This operation was aborted QA trace: T1:request_ceiling -> T2:request_ceiling -> T3:request_ceiling:JOB_BUDGET_SPENT. [QA:20]",
+      "program_chars": 0,
+      "seconds": 1801
     },
     {
       "id": "advanced_calisthenics",
-      "job_id": "1db8cfb00ed0c284656121ee41345054",
-      "ok": true,
-      "status": "done",
-      "stage": "finalizing",
-      "attempt": 4,
-      "detail": "delivered with unresolved rules: V38_SKILL_WITHOUT_FOUNDATION QA trace: A1:EQUIPMENT_VIOLATION+V38_CONSECUTIVE_CONFLICTING_EXPOSURE+V52_KEY_SESSION_CROWDED+UNBENCHMARKED_VARIATION_LOAD_TOO_ASSERTIVE+PRIMARY_EXACT_MOVEMENT_MISSING -> A2:V38_CONSECUTIVE_CONFLICTING_EXPOSURE+V52_KEY_SESSION_CROWDED -> A3:V38_SKILL_WITHOUT_FOUNDATION -> A4:V38_SKILL_WITHOUT_FOUNDATION.",
-      "last_seen_status": "done",
-      "error": null,
-      "program_chars": 22432,
-      "seconds": 649
+      "job_id": "5e53265879fb02efd064c12eaa026455",
+      "ok": false,
+      "status": "error",
+      "stage": "refining",
+      "attempt": 1,
+      "detail": "internal repair: NAMED_GOAL_DIRECT_EXPOSURE_MISSING+V38_CONSECUTIVE_CONFLICTING_EXPOSURE+V52_SECONDARY_BETWEEN_PRIMARIES+UNBENCHMARKED_VARIATION_LOAD_TOO_ASSERTIVE+PRIMARY_EXACT_MOVEMENT_MISSING",
+      "last_seen_status": "error",
+      "error": "Program generation exceeded the safe time limit. Please retry; your intake has been saved. [QA:BUILD_TIMEOUT]",
+      "program_chars": 0,
+      "seconds": 1792
     }
   ],
   "selection": [
     "dual_event_hyrox",
     "advanced_calisthenics"
   ],
-  "ok": true
+  "ok": false
 }
