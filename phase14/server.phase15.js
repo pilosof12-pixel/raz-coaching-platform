@@ -72,21 +72,32 @@ const GEMINI_MODEL = process.env.GEMINI_MODEL || "gemini-2.5-flash";
 const OPENAI_API_KEY = process.env.OPENAI_API_KEY || "";
 const OPENAI_MODEL = process.env.OPENAI_MODEL || "gpt-5.4";
 const OPENAI_REASONING_EFFORT = process.env.OPENAI_REASONING_EFFORT || "high";
-const OPENAI_MAX_OUTPUT_TOKENS = Number(process.env.OPENAI_MAX_OUTPUT_TOKENS || 32000); // QUALITY-PRESERVING-HIGH-REASONING-HEADROOM
-const AI_REQUEST_TIMEOUT_MS = Number(process.env.AI_REQUEST_TIMEOUT_MS || (OPENAI_API_KEY ? 780000 : 110000));
+const OPENAI_MAX_OUTPUT_TOKENS = Number(process.env.OPENAI_MAX_OUTPUT_TOKENS || 48000);
+const AI_REQUEST_TIMEOUT_MS = Number(process.env.AI_REQUEST_TIMEOUT_MS || (OPENAI_API_KEY ? 420000 : 110000));
 const BUILD_JOB_TIMEOUT_MS = Number(process.env.BUILD_JOB_TIMEOUT_MS || (OPENAI_API_KEY ? 1740000 : 210000));
 let lastAIUsage = null;
 // The rules the delivered program still breaks, or null when it breaks none.
 // Read at the save boundary and reported on the job. // QA-SALVAGE-DELIVERY
 let lastQaSalvage = null;
+// The attempt-by-attempt trace of the build that just ran, or null. Written on
+// every exit from generateValidatedProgram, read only when the intake asked for
+// diagnostics. // QA-TRACE-DIAGNOSTICS
+let lastQaTrace = null;
 let lastBuildTiming = null;
 // Per-build token accounting. lastAIUsage only ever held the most recent
 // call, so a build that spent four attempts reported the cost of one. The
 // price of a program is the sum of every attempt it took, and until that is
 // measured nobody can say what a generated program costs.
 let buildUsage = null;
+function recordDiscardedCall(d) {
+  if (!buildUsage) resetBuildUsage();
+  buildUsage.discarded_calls = (buildUsage.discarded_calls || 0) + 1;
+  buildUsage.discarded_ms = (buildUsage.discarded_ms || 0) + Number(d?.elapsed_ms || 0);
+  console.warn("OpenAI generation discarded:", JSON.stringify(d));
+}
 function resetBuildUsage() {
-  lastQaSalvage = null; buildUsage = { calls: 0, input_tokens: 0, cached_input_tokens: 0, output_tokens: 0, reasoning_tokens: 0, openai_ms: 0 }; }
+  lastQaSalvage = null;
+  lastQaTrace = null; buildUsage = { calls: 0, input_tokens: 0, cached_input_tokens: 0, output_tokens: 0, reasoning_tokens: 0, openai_ms: 0, discarded_calls: 0, discarded_ms: 0 }; }
 function recordBuildUsage(u) {
   if (!buildUsage) resetBuildUsage();
   buildUsage.calls += 1;
@@ -132,6 +143,32 @@ async function getGenAI() {
 //  - On ANY cache error (create/expire/reference) we fall back to the inline
 //    systemInstruction path below, which is the exact behaviour we ship today.
 //    The client never receives a different or degraded program because of caching.
+// What every model call cost, so a slow build can explain itself.
+//
+// Run #116 took 22.8 minutes and the only record of why was three progress
+// lines, one of which sat unchanged for eighteen of those minutes. A transient
+// retry decrements the attempt counter and re-emits the same stage and detail,
+// so an aborted seven-minute generation is indistinguishable from a slow one:
+// the system could not say whether it had made one long call or three
+// discarded ones. That question should never need forensics again.
+const callLedger = [];
+function recordModelCall(entry) {
+  callLedger.push(entry);
+  if (callLedger.length > 200) callLedger.shift();
+  console.log(`model call: ${entry.ms}ms via ${entry.path}${entry.outcome === 'ok' ? '' : ` (${entry.outcome})`}`);
+}
+export function summariseCalls(calls) {
+  if (!calls.length) return 'no model calls';
+  const total = calls.reduce((n, c) => n + c.ms, 0);
+  const lost = calls.filter((c) => c.outcome !== 'ok');
+  const lostMs = lost.reduce((n, c) => n + c.ms, 0);
+  const parts = [`${calls.length} model call(s), ${Math.round(total / 1000)}s`];
+  if (lost.length) parts.push(`${lost.length} discarded costing ${Math.round(lostMs / 1000)}s`);
+  const cached = calls.filter((c) => c.path === 'cached').length;
+  parts.push(`${cached}/${calls.length} on a warm engine cache`);
+  return parts.join('; ');
+}
+
 const ENABLE_ENGINE_CACHE = process.env.ENABLE_ENGINE_CACHE === "1";
 const CACHE_TTL_SECONDS = Number(process.env.ENGINE_CACHE_TTL || 1800); // 30 min default
 let cacheState = { name: null, expiresAt: 0 };
@@ -466,6 +503,16 @@ async function runEngineRaw(userContent, engineOptions = {}) {
       }
       return normalizeOpenAIExerciseNames(text, intake);
     } catch (e) {
+      // OPENAI-DISCARDED-CALL-ACCOUNTING: a call that produced nothing still cost
+      // money and still cost the client their wall clock, so it belongs in
+      // the usage record exactly like one that returned a program.
+      recordDiscardedCall({
+        provider: "openai", model: OPENAI_MODEL,
+        outcome: (e?.name === "AbortError" || /aborted/i.test(String(e?.message || "")))
+          ? "aborted_at_request_ceiling" : "failed",
+        ceiling_ms: AI_REQUEST_TIMEOUT_MS,
+        elapsed_ms: Date.now() - started,
+      });
       const providerMessage = String(e?.message || e || '');
       const providerUnavailable = e?.name === 'AbortError' || /(no credits remaining|insufficient[_ -]?quota|quota|rate limit|too many requests|\b429\b|\b5\d\d\b|temporar|timeout|timed out|service unavailable|overloaded)/i.test(providerMessage);
       if (!GEMINI_API_KEY || !providerUnavailable) throw e;
@@ -519,14 +566,17 @@ async function runEngineRaw(userContent, engineOptions = {}) {
   // twice). Same content reaches the model, just billed at the cached rate.
   const cacheName = sourceGroundedGeminiFallback ? null : await getEngineCacheName();
   if (cacheName) {
+    const startedAt = Date.now();
     try {
       const resp = await ai.models.generateContent({
         model: GEMINI_MODEL,
         contents: userContent,
         config: { ...genParams, cachedContent: cacheName },
       });
+      recordModelCall({ ms: Date.now() - startedAt, path: 'cached', outcome: 'ok' });
       return resp.text;
     } catch (e) {
+      recordModelCall({ ms: Date.now() - startedAt, path: 'cached', outcome: e?.name === 'AbortError' ? 'aborted' : 'failed' });
       // Cache may have expired or been evicted server-side between create and use.
       // Invalidate and fall through to the inline path so the request still succeeds
       // with the exact same engine and quality.
@@ -536,12 +586,56 @@ async function runEngineRaw(userContent, engineOptions = {}) {
   }
 
   // INLINE path (today's exact behaviour): send the full engine as systemInstruction.
-  const resp = await ai.models.generateContent({
-    model: GEMINI_MODEL,
-    contents: userContent,
-    config: { ...genParams, systemInstruction: sourceGroundedGeminiFallback ? OPENAI_COMPACT_DEVELOPER : ENGINE },
-  });
-  return resp.text;
+  const inlineStartedAt = Date.now();
+  try {
+    const resp = await ai.models.generateContent({
+      model: GEMINI_MODEL,
+      contents: userContent,
+      config: { ...genParams, systemInstruction: sourceGroundedGeminiFallback ? OPENAI_COMPACT_DEVELOPER : ENGINE },
+    });
+    recordModelCall({ ms: Date.now() - inlineStartedAt, path: 'inline', outcome: 'ok' });
+    return resp.text;
+  } catch (e) {
+    // A discarded call still cost money and still cost the client their time,
+    // so it belongs in the ledger exactly like a successful one.
+    recordModelCall({
+      ms: Date.now() - inlineStartedAt,
+      path: 'inline',
+      outcome: e?.name === 'AbortError' || /operation was aborted/i.test(String(e?.message || '')) ? 'aborted' : 'failed',
+    });
+    throw e;
+  }
+}
+
+// --- Fix 4: the cache is warmed at boot, and kept warm -----------------------
+//
+// cacheState lives in memory with a thirty-minute TTL, so it dies on every
+// deploy and every half hour of quiet. That put the cost of prefilling a
+// 360K-token engine on whichever client happened to arrive first -- the one
+// person who is least able to wait for it. Creating the cache costs the same
+// whenever it happens; the only question is whether a client is watching.
+//
+// Failure here is deliberately silent: a cold cache is slower, not broken, and
+// getEngineCacheName already falls back to the inline path on any error.
+let cacheWarmTimer = null;
+export async function warmEngineCache() {
+  if (!ENABLE_ENGINE_CACHE) return false;
+  try {
+    const name = await getEngineCacheName();
+    if (name) console.log('engine cache warm');
+    return Boolean(name);
+  } catch (e) {
+    console.warn(`engine cache warm failed, first build will pay for it: ${e && e.message}`);
+    return false;
+  }
+}
+
+export function startEngineCacheKeepalive() {
+  if (!ENABLE_ENGINE_CACHE || cacheWarmTimer) return;
+  // Refresh a little before the TTL runs out, so the window never opens.
+  const every = Math.max(60_000, (CACHE_TTL_SECONDS - 120) * 1000);
+  cacheWarmTimer = setInterval(() => { warmEngineCache().catch(() => {}); }, every);
+  if (typeof cacheWarmTimer.unref === 'function') cacheWarmTimer.unref();
 }
 
 // Wrapper: call the engine, validate the result, and retry a couple of times if
@@ -2274,7 +2368,16 @@ async function generateValidatedProgram(intake, onProgress = async () => {}) {
       // being able to say why the dual-event block produced nothing.
       qaTrace.push(`T${transientRetries}:${aborted ? "request_ceiling" : "empty_output"}${e?.incompleteReason ? "(" + e.incompleteReason + ")" : ""}`);
       console.warn(`generateValidatedProgram: ${reason}; transient retry ${transientRetries}/${MAX_TRANSIENT_RETRIES}`);
-      await onProgress("refining", attempt + 1, aborted ? "generation timed out; retrying" : "model returned no content; retrying");
+      // Say which retry this is. Decrementing the attempt counter and re-emitting
+      // the same stage and detail made a discarded seven-minute generation look
+      // identical to a slow one: run #116 showed "generating / attempt 1 /
+      // initial generation" unchanged for eighteen minutes, and neither the
+      // client nor we could tell whether anything was happening.
+      await onProgress(
+        "refining",
+        attempt + 1,
+        `${aborted ? "generation ran past the time limit" : "model returned no content"}; starting over (${transientRetries}/${MAX_TRANSIENT_RETRIES})`,
+      );
       continue;
     }
     if (!isValidProgram(raw)) {
@@ -2295,6 +2398,7 @@ async function generateValidatedProgram(intake, onProgress = async () => {}) {
       program = aggregateValidation.program;
       validateClientOutputCleanliness(program); // CLIENT-OUTPUT-CLEANLINESS-INLOOP              // step 11: variation-aware final QA
       await onProgress("finalizing", attempt, "quality checks passed including Phase 15 v5");
+      lastQaTrace = qaTrace.slice(); // QA-TRACE-DIAGNOSTICS-SUCCESS
       return program;
     } catch (err) {
       const repairable = Boolean(err && (
@@ -2344,6 +2448,7 @@ async function generateValidatedProgram(intake, onProgress = async () => {}) {
               qaTrace.push(`A${attempt}:${repairLabel}->DETERMINISTIC_NOTE_REPAIR`);
               console.warn(`generateValidatedProgram: quality-preserving deterministic note repair passed for ${repairLabel}; avoided full regeneration`);
               await onProgress("finalizing", attempt, "objective wording mismatch repaired without changing prescription");
+              lastQaTrace = qaTrace.slice(); // QA-TRACE-DIAGNOSTICS-FASTPATH
               return repairedProgram;
             } catch (deterministicErr) {
               // Keep the objectively improved candidate, then allow the normal
@@ -2437,6 +2542,7 @@ async function generateValidatedProgram(intake, onProgress = async () => {}) {
     };
     console.warn("generateValidatedProgram: delivering a repaired candidate with unresolved rules:",
       JSON.stringify({ unresolved, trace }));
+    lastQaTrace = qaTrace.slice(); // QA-TRACE-DIAGNOSTICS-SALVAGE
     return reformatWarmupCells(salvaged);
   } // QA-SALVAGE-TAIL
   throw new Error(
@@ -2513,14 +2619,17 @@ async function runBuildJob(jobId, token, intake, isNewToken = false) {
     }
     validateClientOutputCleanliness(program); // SAVE-BOUNDARY-CLIENT-CLEANLINESS
     const generationAndQaMs = Date.now() - generationStarted;
-    await progress("finalizing", Number(buildUsage?.calls || 0), `saving program after ${Number(buildUsage?.calls || 0)} model call(s)`);
+    const qaTraceSuffix = intake && intake.qa_diagnostics === true && Array.isArray(lastQaTrace) && lastQaTrace.length
+      ? ` QA trace: ${lastQaTrace.join(" -> ")}.`
+      : ""; // QA-TRACE-DIAGNOSTICS-DETAIL
+    await progress("finalizing", Number(buildUsage?.calls || 0), `saving program after ${Number(buildUsage?.calls || 0)} model call(s)${qaTraceSuffix}`);
     const saveStarted = Date.now();
     const now = Date.now();
     const intakeJSON = JSON.stringify(intake);
     await store.upsertClient(token, intakeJSON, program, now);
     if (lastQaSalvage) {
       console.warn("Phase15 build delivered with unresolved rules:", JSON.stringify(lastQaSalvage));
-      await progress("finalizing", Number(buildUsage?.calls || 0), "delivered with unresolved rules: " + lastQaSalvage.codes.join("+"));
+      await progress("finalizing", Number(buildUsage?.calls || 0), "delivered with unresolved rules: " + lastQaSalvage.codes.join("+") + qaTraceSuffix);
     }
     await store.finishJob(jobId, "done", program, null, Date.now());
     const saveToVisibleMs = Date.now() - saveStarted;
@@ -2747,6 +2856,11 @@ const httpServer = app.listen(PORT, () => {
   if (!USE_PPLX_PROXY && !GEMINI_API_KEY) {
     console.warn("GEMINI_API_KEY is not configured; /api/health will report not ready.");
   }
+  // Pay for the engine cache here rather than on a client's clock, and keep
+  // paying before it lapses. Neither call is awaited: a cold cache is slower,
+  // not broken, and boot must not wait on the provider.
+  warmEngineCache().catch(() => {});
+  startEngineCacheKeepalive();
 });
 
 // Losing the process loses every in-flight build and all their job state, so a
