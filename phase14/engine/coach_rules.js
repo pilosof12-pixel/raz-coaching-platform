@@ -407,6 +407,27 @@ const GOAL_MOVEMENTS = [
   { goal: /\brows?\b|\browing\b|\berg\b/i,
     family: /^(?!.*(?:cable|chest|barbell|pendlay|seated|bent|dumbbell|machine|inverted|ring|t-?bar|landmine|renegade))(?:.*\brow(?:er|ing)?\b|.*\berg\b)/i },
   { goal: /\bdips?\b/i, family: /\bdip\b/i },
+
+  // Calisthenics skills. Without these the engine could see two of the
+  // calisthenics athlete's five goals: the planche, the front lever and the
+  // freestanding handstand push-up produced no family at all, so every rule
+  // that asks "does this serve a stated goal" answered no for his pressing and
+  // straight-arm work. That is how his handstand push-up progressions -- pike
+  // push-ups and handstand push-up negatives, prescribed for a goal he stated
+  // in those words -- were charged as accessory duplication serving nothing.
+  //
+  // Each family is the progression ladder a coach would actually use for the
+  // skill, because that is what "serves the goal" means for a skill: the
+  // negative and the assisted variant are the work, not accessories beside it.
+  { goal: /handstand push[- ]?ups?\b|\bhspu\b/i,
+    family: /handstand push[- ]?up|pike push[- ]?up|\bhspu\b/i },
+  { goal: /\bplanche\b/i, family: /planche/i },
+  { goal: /front lever/i, family: /front lever/i },
+  { goal: /back lever/i, family: /back lever/i },
+  // The balance skill, not the pressing one. A handstand push-up goal is the
+  // entry above and matches first, so this must not swallow it.
+  { goal: /handstands?\b(?![- ]?push)/i, family: /handstand(?![- ]?push)/i },
+  { goal: /human flag/i, family: /human flag/i },
 ];
 
 // A goal phrased as a hold is not an improvement goal, whichever tier it sits
