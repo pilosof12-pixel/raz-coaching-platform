@@ -43,7 +43,7 @@ import { repairEventComponentCoverage } from './event_component_repair.js';
 import { repairCompromisedRunning } from './compromised_work_repair.js';
 import { repairRaceRehearsal } from './race_rehearsal_repair.js';
 import { repairModalitySubstitution, repairNoteNamedMovement } from './modality_substitution_repair.js';
-import { repairNextRowClaim } from './structural_claim_rules.js';
+import { repairNextRowClaim, repairTransitionClaim } from './structural_claim_rules.js';
 import { ENDURANCE_REPAIRS, repairAccessoryRedundancy, repairTaperPowerSpike } from './endurance_block_repair.js';
 import { STATEMENT_REPAIRS } from './program_statement_repair.js';
 import { repairConsecutiveTrainingDays } from './consecutive_day_repair.js';
@@ -1389,6 +1389,20 @@ export function repairDeterministicContradictions(program, intake = {}) {
   // rather than the wording. Placed here because a claim checked before the
   // rehearsal sequencer or the day spread would be checked against rows that
   // move afterwards.
+  // Transitions stated in either direction, restated once the rows have settled.
+  // "straight off SkiErg" looks backwards, "straight into sled pull" forwards,
+  // and the coach charged 0.25 for notes naming transitions the rows did not
+  // make. Runs after the sequencer for the same reason as the next-row claim: a
+  // claim checked before the rows move is checked against rows that then move.
+  const restatedTransitions = repairTransitionClaim(candidate, intake);
+  if (restatedTransitions.changed) {
+    candidate = restatedTransitions.program;
+    repairs.push({
+      type: 'transition_claim_restated',
+      moves: restatedTransitions.moves.map((m) => `w${m.week} ${m.movement} ${m.word} ${m.from} -> ${m.to || 'removed'}`),
+    });
+  }
+
   const restatedNextRow = repairNextRowClaim(candidate, intake);
   if (restatedNextRow.changed) {
     candidate = restatedNextRow.program;

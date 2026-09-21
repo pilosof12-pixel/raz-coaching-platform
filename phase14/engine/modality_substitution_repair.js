@@ -110,13 +110,21 @@ export function repairModalitySubstitution(program, intake = {}) {
 // naming something the vocabulary does not know is not evidence of intent, it
 // is a hallucination, and renaming a row to it would launder one.
 
-import { matchDictionary } from './exercise_dictionary.js';
+import { matchDictionary, EXERCISE_DICTIONARY } from './exercise_dictionary.js';
 
-// The verb is matched case-insensitively but the movement is not: a capitalised
-// name is what separates "Use Wall Ball here" from "use both reps here". The
-// first version wrote the verb lowercase with no flag and matched nothing at
-// all, because every one of these notes begins the sentence.
-const NAMES_A_MOVEMENT = /\b(?:[Uu]se|[Dd]o|[Pp]erform)\s+([A-Z][A-Za-z'-]*(?:\s+[A-Z][A-Za-z'-]*){0,3})\s+(?:here|instead|for this)\b/;
+// Case-insensitive throughout, with the filler words the model actually uses.
+//
+// This required a capital on the movement, on the reasoning that a capital is
+// what separates "Use Wall Ball here" from "use both reps here". Run #127 wrote
+// "Use actual wall ball here" nine times across four weeks -- lower case, with
+// "actual" wedged in the middle -- and the rule matched none of them. The coach
+// charged 0.15 for exactly those rows.
+//
+// The dictionary check is the real filter and always was: "both reps" and "the
+// same effort" are misses and get dropped there. The capital was buying nothing
+// but a blind spot, which is the third time that particular assumption has cost
+// a finding.
+const NAMES_A_MOVEMENT = /\b(?:use|do|perform)\s+(?:actual\s+|real\s+|an?\s+|the\s+)?([A-Za-z'-]+(?:\s+[A-Za-z'-]+){0,3})\s+(?:here|instead|for this)\b/i;
 
 
 // matchDictionary answers {status:'hit'} for a name that is already canonical
@@ -127,7 +135,18 @@ const NAMES_A_MOVEMENT = /\b(?:[Uu]se|[Dd]o|[Pp]erform)\s+([A-Z][A-Za-z'-]*(?:\s
 function canonicalName(named) {
   const hit = matchDictionary(named);
   if (!hit || hit.status !== 'hit') return null;
-  return hit.canonical || named;
+  if (hit.canonical) return hit.canonical;
+  // matchDictionary accepts a name in any case and reports only that it knows
+  // it, so the note's own casing comes back. Writing "wall ball" into the
+  // Exercise column would answer the coach's finding with a row the dictionary
+  // spells differently everywhere else, so the catalogue's spelling is looked
+  // up rather than the athlete's.
+  // EXERCISE_DICTIONARY is a Set of canonical spellings.
+  const wanted = String(named).toLowerCase();
+  for (const entry of EXERCISE_DICTIONARY) {
+    if (String(entry).toLowerCase() === wanted) return entry;
+  }
+  return named;
 }
 
 export function noteNamesAnotherMovement(program, intake = {}) {
