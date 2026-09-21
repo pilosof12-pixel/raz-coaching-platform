@@ -17,6 +17,8 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
+
+import { BALLISTIC_OPTIONS } from '../engine/v79_ballistic_share.js';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -75,9 +77,33 @@ test('the taper is capped after the swap refills it', () => {
   const { program, repairs } = repairDeterministicContradictions(PROGRAM, INTAKE);
   assert.deepEqual(taperPowerSpike(program, INTAKE), [],
     'the taper carries a power spike the chain did not cap');
-  const order = repairs.map((r) => r.type);
-  assert.ok(order.indexOf('repairTaperPowerSpike') > order.indexOf('v79_ballistic_swapped'),
-    `cap ran before the swap: ${order.join(' -> ')}`);
+  // The ordering itself is checked against the chain rather than against this
+  // fixture's volumes. Asserting it through the repair log only works while the
+  // cap actually fires, and whether it fires depends on how much power volume
+  // the swap happens to add -- so when a later change reduced the number of
+  // swaps, this assertion stopped testing ordering and started testing nothing,
+  // while still passing for the wrong reason until it did not. Source order
+  // cannot go quiet that way.
+  const chain = fs.readFileSync(new URL('../engine/v35_deterministic_repair.js', import.meta.url), 'utf8');
+  const swapAt = chain.indexOf('repairBallisticShare(candidate, intake)');
+  const capAt = chain.indexOf('repairTaperPowerSpike(candidate, intake)');
+  assert.ok(swapAt > -1 && capAt > -1, 'the chain no longer calls both');
+  assert.ok(capAt > swapAt,
+    'the cap is called before the swap again; it cannot see the week the swap builds');
+});
+
+test('every ballistic option is prescribed within the rules that judge it', () => {
+  // The swap introduces alactic work, and V82 governs alactic work. Four
+  // options were written at 90 seconds against a 120-second minimum, so each
+  // session the swap fixed came back refused for V82_ALACTIC_RECOVERY_TOO_SHORT
+  // -- one repair manufacturing the next gate's violation, with the build
+  // refused either way.
+  for (const option of BALLISTIC_OPTIONS) {
+    const seconds = /min/i.test(option.rest)
+      ? Number(option.rest.match(/([\d.]+)/)[1]) * 60
+      : Number(option.rest.match(/([\d.]+)/)[1]);
+    assert.ok(seconds >= 120, `${option.name} rests ${option.rest}, under the alactic minimum`);
+  }
 });
 
 test('the cap is not in the early endurance list any more', () => {

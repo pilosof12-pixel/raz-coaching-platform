@@ -56,3 +56,17 @@ test('the unconverged set is exactly the one we have accounted for', () => {
     'run97_mma_camp_delivered.txt',
   ], 'a new fixture stopped converging, or one started; re-baseline deliberately');
 });
+
+test('the fight-camp cluster is down to one root cause', () => {
+  // It was four different codes across three programs, and each one turned out
+  // to be the ballistic swap prescribing a dose a sibling rule rejects: 90s
+  // rest against a 120s alactic minimum, three sets against a two-set primer
+  // cap, a movement the week already carried, and rows swapped in after the
+  // fight-week clock had already been written. Clearing each revealed the next.
+  //
+  // What is left is one code on all three, which is a different kind of problem
+  // and can be worked as one.
+  const codes = new Set(rows.filter((r) => !r.accepted && /mma|fight_camp/.test(r.file))
+    .flatMap((r) => r.codes));
+  assert.deepEqual([...codes], ['V91_CALENDAR_TRAINS_THROUGH_THE_EVENT']);
+});

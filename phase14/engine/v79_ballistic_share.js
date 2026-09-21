@@ -27,14 +27,22 @@ const SLED = /\b(?:prowler|sled|push drive|acceleration)\b/i;
 const SWAPPABLE = /\b(?:row|pulldown|fly|curl|extension|lateral raise|plank|dead bug|shoulder press|bench|chest press|leg press|calf)\b/i;
 
 // Ordered by how sport-specific they are for a fighter.
+//
+// Every rest here is at least two minutes because V82 requires it of alactic
+// work, and this repair is the thing that introduces alactic work. Four of
+// these were written at 90 seconds, so every session the swap fixed came back
+// carrying V82_ALACTIC_RECOVERY_TOO_SHORT instead -- the repair for one gate
+// manufacturing a violation of the next, and the build refused either way.
+// V82's own reasoning is the reason, not the rule: give the effort two minutes
+// or it stops being speed work.
 export const BALLISTIC_OPTIONS = [
-  { name: 'Medicine Ball Rotational Throw', needs: /med(?:icine)? ?ball/i, sets: '3', reps: '3 per side', rest: '90 sec', rpe: '7',
+  { name: 'Medicine Ball Rotational Throw', needs: /med(?:icine)? ?ball/i, sets: '3', reps: '3 per side', rest: '2 min', rpe: '7',
     note: 'Rotational power for striking and takedown drive. Throw hard, reset fully, stop the moment speed drops.' },
-  { name: 'Medicine Ball Scoop Throw', needs: /med(?:icine)? ?ball/i, sets: '3', reps: '3', rest: '90 sec', rpe: '7',
+  { name: 'Medicine Ball Scoop Throw', needs: /med(?:icine)? ?ball/i, sets: '3', reps: '3', rest: '2 min', rpe: '7',
     note: 'Whole-body extension at speed. Three hard throws, full reset, nothing chased.' },
-  { name: 'Explosive Push-up', needs: null, sets: '3', reps: '3', rest: '90 sec', rpe: '7',
+  { name: 'Explosive Push-up', needs: null, sets: '3', reps: '3', rest: '2 min', rpe: '7',
     note: 'Upper-body ballistic work at almost no cost. Leave the floor, land soft, stop while every rep is sharp.' },
-  { name: 'Medicine Ball Slam', needs: /med(?:icine)? ?ball/i, sets: '3', reps: '3', rest: '90 sec', rpe: '7',
+  { name: 'Medicine Ball Slam', needs: /med(?:icine)? ?ball/i, sets: '3', reps: '3', rest: '2 min', rpe: '7',
     note: 'Overhead-to-floor at full speed, and nothing chased once the speed drops. Cheap, familiar, and it keeps the whole chain firing.' },
   { name: 'Box Jump', needs: null, sets: '3', reps: '3', rest: '2 min', rpe: '6-7',
     note: 'Step down between reps: the jump is the exposure, the landing is not. Low volume, full recovery.' },
@@ -184,7 +192,9 @@ export function repairBallisticShare(program, intake = {}, now = Date.now()) {
     let changed = false;
     const usedThisWeek = new Set();
 
-    for (const [, sessionRows] of data.days) {
+    // Which day is the last gym touch of the week, for the primer cap below.
+    const lastDayKey = [...data.days.keys()].pop() || '';
+    for (const [dayKey, sessionRows] of data.days) {
       if (sessionRows.length < 3) continue;
       // One swap per session does not converge: a session carrying two generic
       // rows is still under the threshold after the first swap, so the flag
@@ -195,7 +205,21 @@ export function repairBallisticShare(program, intake = {}, now = Date.now()) {
 
       while (shareOf(view()) < 0.5) {
         const current = view();
-        const present = new Set(current.filter((r) => isPowerExposure(r.name)).map((r) => r.name));
+        // Exclude every power movement already standing in this week, not just
+        // in this session. V82 forbids the same one twice in a week near the
+        // event, and chooseBallistic falls back to repeating a name when the
+        // athlete's kit leaves nothing else -- so a session-scoped exclude let
+        // the late pass swap in a movement another day already had, and both
+        // fight-camp programs came back refused for V82_POWER_EXPOSURE_
+        // DUPLICATED. Read from the rows this loop mutates, so a swap made a
+        // moment ago is already accounted for.
+        const weekPower = new Set(rows
+          .map((c) => String(c[parsed.exercise] || '').trim())
+          .filter((n) => n && !isWarmup(n) && isPowerExposure(n)));
+        const present = new Set([
+          ...weekPower,
+          ...current.filter((r) => isPowerExposure(r.name)).map((r) => r.name),
+        ]);
         const option = chooseBallistic(intake, present, familiar, usedThisWeek);
         if (!option) break;
 
@@ -207,8 +231,14 @@ export function repairBallisticShare(program, intake = {}, now = Date.now()) {
 
         const cells = rows[target.index];
         cells[parsed.exercise] = option.name;
+        // The last gym touch before the fight is a primer, and V82 caps it at
+        // two sets. The options table prescribes three, so every swap into that
+        // session cleared V79 and came straight back as V82_FINAL_PRIMER_TOO_
+        // LONG. The dose belongs to the session, not to the table.
+        const finalTouch = stateForWeek(intake, week, now) === STATE.COMPETITION_WEEK
+          && dayKey === lastDayKey;
         if (Number.isInteger(parsed.load)) cells[parsed.load] = 'Light, speed-first load';
-        cells[parsed.sets] = option.sets;
+        cells[parsed.sets] = finalTouch ? '2' : option.sets;
         cells[parsed.reps] = option.reps;
         if (Number.isInteger(parsed.rest)) cells[parsed.rest] = option.rest;
         const rpeCol = parsed.header.findIndex((h) => /rpe|effort/i.test(String(h || '')));

@@ -37,7 +37,7 @@ import { repairCampSharpening } from './v82_camp_sharpening.js';
 import { repairInSeason, appendTrainingWeek } from './v83_in_season.js';
 import { repairClockStatement } from './v86_training_clock.js';
 import { repairDayZeroClaims, repairMatchDayPlacement, repairAllocationShift, repairSportFrequency } from './v89_block_architecture.js';
-import { repairBallisticShare } from './v79_ballistic_share.js';
+import { repairBallisticShare, collectBallisticShareFlags } from './v79_ballistic_share.js';
 import { repairBenchmarkExposure } from './benchmark_exposure_repair.js';
 import { repairEventComponentCoverage } from './event_component_repair.js';
 import { repairCompromisedRunning } from './compromised_work_repair.js';
@@ -1575,6 +1575,43 @@ export function repairDeterministicContradictions(program, intake = {}) {
     if (!r.changed) continue;
     candidate = r.program;
     repairs.push({ type: fn.name });
+  }
+
+  // Settle the swap against the trims that follow it.
+  //
+  // The swap converges within a session, but the repairs after it move rows,
+  // and a session that met the share when the swap ran can fall back under it
+  // afterwards. On the fight-camp corpus that left one Week 3 session short --
+  // a single Side Plank -- and the gate refused the build for it, which live is
+  // a regeneration. Re-running the swap once cleared it every time.
+  //
+  // Bounded, and the cap re-runs behind it, because these two have fought
+  // before: the swap once refilled week 3 to eighteen power sets after the cap
+  // had trimmed it to seven, and that is a 0.45 deduction the coach charges by
+  // name. The corpus severity ratchet is what holds that line, so if this ever
+  // starts giving volume back it fails there rather than silently shipping.
+  for (let pass = 0; pass < 2; pass += 1) {
+    if (!collectBallisticShareFlags(candidate, intake).length) break;
+    const again = repairBallisticShare(candidate, intake);
+    if (again === candidate) break;
+    candidate = again;
+    repairs.push({ type: 'v79_ballistic_swapped_after_trim' });
+    const recapped = repairTaperPowerSpike(candidate, intake);
+    if (recapped.changed) {
+      candidate = recapped.program;
+      repairs.push({ type: 'repairTaperPowerSpike', moves: recapped.moves.length });
+    }
+    // A swapped row arrives without the countdown the clock writes into notes,
+    // and the clock has already run by the time we get here. Leaving it is how
+    // clearing V79 traded straight into V77_FIGHT_WEEK_NOT_ON_THE_CLOCK on both
+    // fight-camp programs -- the same build refused for a different reason,
+    // which is no better than the first. The swap site upstream says the clock
+    // must follow the swap; this keeps that true for the late pass too.
+    const reclocked = repairFightWeekClock(candidate, intake);
+    if (reclocked !== candidate) {
+      candidate = reclocked;
+      repairs.push({ type: 'v77_fight_week_clock' });
+    }
   }
 
   return { program: candidate, repaired: repairs.length > 0, repairs };
