@@ -1,39 +1,26 @@
 {
-  "timestamp": "2026-09-21T11:54:48.327Z",
+  "timestamp": "2026-09-21T13:12:53.401Z",
   "base": "https://raz-coaching-platform.onrender.com",
-  "head_sha": "0042539abf80dbf8b1ea883855cff8a257b90afe",
-  "runtime": "live68 2026-09-21T11:53:57Z",
+  "head_sha": "27c69cfd58f531f082befa267a6b263b7ba86756",
+  "runtime": "live69 2026-09-21T13:12:03Z",
   "results": [
     {
       "id": "dual_event_hyrox",
-      "job_id": "6d59d66697001a43d1f1ab57e6066456",
+      "job_id": "2cf2a9b9c95cd85eba176399779689d5",
       "ok": false,
       "status": "error",
       "stage": "generating",
       "attempt": 1,
       "detail": "initial generation",
       "last_seen_status": "error",
-      "error": "This operation was aborted QA trace: T1:request_ceiling -> T2:request_ceiling -> T3:request_ceiling:JOB_BUDGET_SPENT. [QA:20]",
+      "error": "You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/.",
       "program_chars": 0,
-      "seconds": 1801
-    },
-    {
-      "id": "advanced_calisthenics",
-      "job_id": "5e53265879fb02efd064c12eaa026455",
-      "ok": false,
-      "status": "error",
-      "stage": "refining",
-      "attempt": 1,
-      "detail": "internal repair: NAMED_GOAL_DIRECT_EXPOSURE_MISSING+V38_CONSECUTIVE_CONFLICTING_EXPOSURE+V52_SECONDARY_BETWEEN_PRIMARIES+UNBENCHMARKED_VARIATION_LOAD_TOO_ASSERTIVE+PRIMARY_EXACT_MOVEMENT_MISSING",
-      "last_seen_status": "error",
-      "error": "Program generation exceeded the safe time limit. Please retry; your intake has been saved. [QA:BUILD_TIMEOUT]",
-      "program_chars": 0,
-      "seconds": 1792
+      "seconds": 4
     }
   ],
+  "reasoning_effort": "medium",
   "selection": [
-    "dual_event_hyrox",
-    "advanced_calisthenics"
+    "dual_event_hyrox"
   ],
   "ok": false
 }
