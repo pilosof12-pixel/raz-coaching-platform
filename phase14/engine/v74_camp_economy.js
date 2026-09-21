@@ -18,6 +18,8 @@
 import { parseWeek } from './v34_workload_accounting.js';
 import { classifyExercise } from './v38_movement_taxonomy.js';
 import { STATE, stateForWeek, competitionProfile } from './v68_competition_state.js';
+import { namedComponentsFor } from './coach_standard.js';
+import { matcherFor } from './event_component_rules.js';
 import { isPowerExposure } from './v72_combat_power.js';
 
 // The session budget by how close the event is.
@@ -47,6 +49,47 @@ const CUT_ORDER = [
   /\b(?:push-?up|bench|dip|press)\b/i,
   /\b(?:pull-?up|chin-?up|squat|deadlift|trap ?bar)\b/i,
 ];
+
+// The budget counts a gym programme, not a race.
+//
+// These numbers came from a fight-camp review, where a session is strength
+// maintenance plus a little quality and anything else is filler. Applied
+// unchanged to a multi-component race athlete they say something different and
+// wrong: run #124's Day -6 carries Back Squat, Run, Prowler Push and Ski Erg
+// against a budget of three, and three of those four ARE the race. The gate
+// refused, the trim could cut nothing, and the build spent a second model call
+// -- roughly half the athlete's total wait -- regenerating a session that was
+// correct.
+//
+// Teaching surplusInSession that race components earn their place does not help;
+// it makes all four legitimate and the count still exceeds three. The budget
+// itself is the mis-scoped part, in the same way the coach scoped his HYROX
+// coverage thresholds rather than generalising them, and in the same way he
+// refused a blanket strength-near-speed penalty. His own prescription for this
+// athlete describes a session of four-plus components, so a three-item cap in
+// race week contradicts what he asked for.
+//
+// So for an athlete whose event has named components, the budget applies to the
+// work that is NOT the race. Three general lifts in competition week is still a
+// gym programme and still refused; three race stations and a maintenance single
+// is a race week and is not.
+//
+// Flagged for the coach to confirm rather than presented as his rule.
+// The shared matcher, for the fourth time of asking. A naive regex built from
+// the component name reads "Barbell Row" as the rowing erg, which excused four
+// general lifts in competition week from a budget of three and silently turned
+// this gate off. matcherFor carries the exclusions that make Row mean the erg.
+function raceComponentMatchers(intake) {
+  const components = namedComponentsFor(intake) || [];
+  if (components.length < 2) return null;
+  return components.map((c) => matcherFor(c));
+}
+
+function countsAgainstBudget(rows, intake) {
+  const matchers = raceComponentMatchers(intake);
+  if (!matchers) return rows;
+  return rows.filter((r) => !matchers.some((re) => re.test(String(r.name || ''))));
+}
 
 function isWarmup(n) { return /^\s*\[WARMUP\]/i.test(String(n || '')); }
 
@@ -105,7 +148,7 @@ export function collectEconomyFlags(program, intake = {}, now = Date.now()) {
     if (!data) continue;
 
     for (const [day, rows] of data.days) {
-      if (rows.length <= budget) continue;
+      if (countsAgainstBudget(rows, intake).length <= budget) continue;
       const surplusIdx = surplusInSession(rows.map((r) => r.name));
       // The rule is about junk, not arithmetic. A session where every exercise
       // buys strength, speed or tissue readiness is a full session, not a busy
@@ -138,7 +181,7 @@ export function repairCampEconomy(program, intake = {}, now = Date.now()) {
 
     const drop = new Set();
     for (const [, rows] of data.days) {
-      if (rows.length <= budget) continue;
+      if (countsAgainstBudget(rows, intake).length <= budget) continue;
       let over = rows.length - budget;
       // Only ever cut work that does not earn its place, in the stated order.
       const surplusIdx = new Set(surplusInSession(rows.map((r) => r.name)));
