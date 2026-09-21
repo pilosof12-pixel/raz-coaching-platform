@@ -49,6 +49,7 @@ import { ENDURANCE_REPAIRS, repairAccessoryRedundancy, repairTaperPowerSpike } f
 import { STATEMENT_REPAIRS } from './program_statement_repair.js';
 import { repairConsecutiveTrainingDays } from './consecutive_day_repair.js';
 import { repairSessionAdjacency } from './session_order_repair.js';
+import { repairCompetitionWeekConsolidation } from './competition_week_consolidation.js';
 import { repairCompetitionWeek } from './v90_competition_week.js';
 import { repairTimelineIntegrity } from './v91_timeline_integrity.js';
 import { repairPrescriptionIntegrity } from './v92_prescription_integrity.js';
@@ -1434,6 +1435,33 @@ export function repairDeterministicContradictions(program, intake = {}) {
   if (capped.changed) {
     candidate = capped.program;
     repairs.push({ type: 'repairTaperPowerSpike', moves: capped.moves.length });
+  }
+
+  // Competition week may lose a day -- before the freshness budget is judged.
+  //
+  // Placed after repairCompetitionWeek it merged a day on the meet-week
+  // program, made the receiving day too big for the budget, and nothing ran
+  // again to notice: V90_SESSION_GROWS_INTO_DAY_ZERO on a program that had been
+  // converging. Clearing a scheduling finding by overloading the day before the
+  // event is the opposite of the point, so the merge happens first and the
+  // budget judges what it leaves behind.
+  //
+  // The coach charged a HYROX block 0.20 for four straight competition-week
+  // days. The engine could not act on it: its own taper rule held
+  // competition-week frequency at 70% of baseline, and four sessions inside a
+  // Day -7 to Day -4 window are necessarily consecutive, so no legal layout
+  // existed. He scoped that floor to the taper week and named the order of
+  // sacrifice, which ends with frequency rather than beginning there.
+  //
+  // It consolidates rather than spreads, because spreading would move a session
+  // toward Day 0 and he ruled that out by name.
+  const compWeekMerge = repairCompetitionWeekConsolidation(candidate, intake);
+  if (compWeekMerge.changed) {
+    candidate = compWeekMerge.program;
+    repairs.push({
+      type: 'competition_week_consolidated',
+      moved: compWeekMerge.moves.map((m) => `w${m.week} ${m.from} -> ${m.into} (${m.rows} rows)`),
+    });
   }
 
   // Competition week last of the content repairs: the ballistic swap has

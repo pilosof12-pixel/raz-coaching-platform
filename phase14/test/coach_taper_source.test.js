@@ -36,8 +36,8 @@ const WEEKDAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri'];
 // Week 3 is staged by default, because a block holding weeks 1-3 flat and
 // emptying week 4 is itself a finding -- a taper compressed into seven days --
 // and these fixtures are for isolating the other taper rules.
-const block = (finalDays, finalSets, thirdSets = 2.8) => ['A block.', '',
-  week(1, WEEKDAYS, 4), week(2, WEEKDAYS, 4), week(3, WEEKDAYS, thirdSets), week(4, finalDays, finalSets)].join('\n');
+const block = (finalDays, finalSets, thirdSets = 2.8, thirdDays = WEEKDAYS) => ['A block.', '',
+  week(1, WEEKDAYS, 4), week(2, WEEKDAYS, 4), week(3, thirdDays, thirdSets), week(4, finalDays, finalSets)].join('\n');
 
 // Mujika, as the cluster summarises him: volume is the fatigue lever and a
 // 41-60% reduction is the strongest general starting point.
@@ -50,9 +50,25 @@ test('a competition week that barely reduces volume is found', () => {
 
 // Frequency is held through a taper more than volume is: the sessions get
 // shorter, not fewer.
-test('a taper that sheds sessions instead of sets is found', () => {
-  const flags = taperAgainstSource(block(COUNTDOWN.slice(0, 2), 5), LIFTER);
+// The floor governs the taper week, not competition week.
+//
+// It used to be measured against competition week, which put it in direct
+// conflict with the coach's own review: he charged a HYROX block 0.20 for four
+// straight competition-week days, and breaking that run means dropping to
+// three, which this rule then refused. Four sessions into a four-day window are
+// necessarily consecutive, so the two rules together admitted no legal layout.
+// He scoped the floor to the taper week and left competition week free.
+test('a taper week that sheds sessions instead of sets is found', () => {
+  const flags = taperAgainstSource(block(COUNTDOWN, 2, 2.8, WEEKDAYS.slice(0, 2)), LIFTER);
   assert.deepEqual(flags.map((f) => f.rule), ['TAPER_CUTS_FREQUENCY_NOT_VOLUME']);
+});
+
+test('a thin competition week is not a frequency failure on its own', () => {
+  // Three structured sessions between Day -7 and Day -4 are acceptable and
+  // preferable to manufacturing a fourth solely to preserve frequency.
+  const flags = taperAgainstSource(block(COUNTDOWN.slice(0, 3), 2), LIFTER);
+  assert.ok(!flags.some((f) => f.rule === 'TAPER_CUTS_FREQUENCY_NOT_VOLUME'),
+    'competition week is no longer governed by the taper frequency floor');
 });
 
 test('a taper inside the band with its frequency intact is clean', () => {

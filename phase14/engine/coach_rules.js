@@ -1504,11 +1504,26 @@ export function taperAgainstSource(program, intake = {}, now = Date.now()) {
     }
   }
 
-  // Frequency is not the lever. Sessions get shorter, not fewer.
-  if (baseDays && taper.days.size / baseDays < FREQUENCY_FLOOR && cut >= TAPER_MIN_REDUCTION) {
+  // Frequency is not the lever -- through the taper, and not into competition
+  // week.
+  //
+  // This floor was measured against competition week, which put it in direct
+  // conflict with the coach's own review: he charged a HYROX block 0.20 for
+  // four straight competition-week days, and the only way to break the run was
+  // to drop to three, which this rule then refused. Four sessions into a
+  // four-day window are necessarily consecutive, so the two rules together had
+  // no legal layout at all and the engine left the week alone.
+  //
+  // He resolved it by scoping the floor: it governs the taper week before
+  // competition week, where keeping the athlete turning up costs nothing, and
+  // not competition week itself, where a fourth session manufactured only to
+  // preserve frequency is the thing being paid for. Frequency is not an end in
+  // itself -- the taper sheds fatigue by reducing workload while intensity and
+  // quality are held.
+  if (preTaperWeek && baseDays && preTaperWeek.days.size / baseDays < FREQUENCY_FLOOR) {
     out.push({
       rule: 'TAPER_CUTS_FREQUENCY_NOT_VOLUME',
-      detail: `Competition week drops from ${baseDays.toFixed(1)} training days to ${taper.days.size} while cutting ${(cut * 100).toFixed(0)}% of volume. Frequency is held through a taper more than volume is -- the athlete keeps turning up, and the sessions get shorter.`,
+      detail: `Week ${compWeek - 1} is the taper week and drops from ${baseDays.toFixed(1)} training days to ${preTaperWeek.days.size}. Frequency is held through a taper more than volume is -- the athlete keeps turning up, and the sessions get shorter. Competition week itself is not governed by this floor.`,
     });
   }
 
