@@ -745,6 +745,26 @@ export function collectRepairableValidationFailures(program, intake = {}, option
       lean.map((f) => f.detail).join(' '), { flags: lean });
   });
 
+  // Again, immediately before the gate that reads it.
+  //
+  // The first pass runs at line 367, which is before the whole v35 chain. v35
+  // moves rows between days, converts accessories into race stations, deletes
+  // ballistic sets and gathers rehearsals -- any of which can change a week's
+  // running volumes after the marathon repair has already had its look. Run
+  // #125 spent a second model call on A1:MARATHON_STACKED_VOLUME_PROGRESSION,
+  // and the repair for it had run four hundred lines earlier against a program
+  // that no longer existed by the time the gate read it.
+  //
+  // This is the same shape as the taper cap being undone by the ballistic swap:
+  // the fix is not a cleverer repair, it is running it where the evidence is
+  // final. It is idempotent, so a second pass on an already-correct program
+  // costs nothing.
+  const marathonHeldFinal = repairMarathonProgression(candidate, intake);
+  if (marathonHeldFinal !== candidate) {
+    candidate = marathonHeldFinal;
+    deterministic_repairs.push({ type: 'marathon_one_lever_per_transition_final' });
+  }
+
   runRepairable(flags, () => validatePhase15FinalProgram(candidate, intake));
 
   // Contraindicated movements the substitution could not answer. These do not

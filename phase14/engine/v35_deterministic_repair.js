@@ -43,6 +43,7 @@ import { repairEventComponentCoverage } from './event_component_repair.js';
 import { repairCompromisedRunning } from './compromised_work_repair.js';
 import { repairRaceRehearsal } from './race_rehearsal_repair.js';
 import { repairModalitySubstitution, repairNoteNamedMovement } from './modality_substitution_repair.js';
+import { repairNextRowClaim } from './structural_claim_rules.js';
 import { ENDURANCE_REPAIRS, repairAccessoryRedundancy, repairTaperPowerSpike } from './endurance_block_repair.js';
 import { STATEMENT_REPAIRS } from './program_statement_repair.js';
 import { repairConsecutiveTrainingDays } from './consecutive_day_repair.js';
@@ -1379,6 +1380,22 @@ export function repairDeterministicContradictions(program, intake = {}) {
   if (onClock !== candidate) {
     candidate = onClock;
     repairs.push({ type: 'v77_fight_week_clock' });
+  }
+
+  // Prose about the next row, restated once every repair that moves rows has
+  // finished. Run #124 claimed a run flowed into a sled pull row that was
+  // actually a Rower; the coach charged 0.15, and the point of that row is the
+  // transition, so a claimed transition that is not programmed is the defect
+  // rather than the wording. Placed here because a claim checked before the
+  // rehearsal sequencer or the day spread would be checked against rows that
+  // move afterwards.
+  const restatedNextRow = repairNextRowClaim(candidate, intake);
+  if (restatedNextRow.changed) {
+    candidate = restatedNextRow.program;
+    repairs.push({
+      type: 'next_row_claim_restated',
+      moves: restatedNextRow.moves.map((m) => `w${m.week} ${m.movement}: ${m.from} -> ${m.to}`),
+    });
   }
 
   // Deliverables, appended once everything else has settled: the audit reports
