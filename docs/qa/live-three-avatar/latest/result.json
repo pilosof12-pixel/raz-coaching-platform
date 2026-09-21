@@ -1,12 +1,12 @@
 {
-  "timestamp": "2026-09-21T13:12:53.401Z",
+  "timestamp": "2026-09-21T13:28:04.431Z",
   "base": "https://raz-coaching-platform.onrender.com",
-  "head_sha": "27c69cfd58f531f082befa267a6b263b7ba86756",
-  "runtime": "live69 2026-09-21T13:12:03Z",
+  "head_sha": "2738a3cec469754f39da3dd658b3a1480fe04d3f",
+  "runtime": "live70 2026-09-21T13:27:13Z",
   "results": [
     {
       "id": "dual_event_hyrox",
-      "job_id": "2cf2a9b9c95cd85eba176399779689d5",
+      "job_id": "4d5022f9ceb0b810870a244b871f7da6",
       "ok": false,
       "status": "error",
       "stage": "generating",
@@ -15,7 +15,7 @@
       "last_seen_status": "error",
       "error": "You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/.",
       "program_chars": 0,
-      "seconds": 4
+      "seconds": 6
     }
   ],
   "reasoning_effort": "medium",
