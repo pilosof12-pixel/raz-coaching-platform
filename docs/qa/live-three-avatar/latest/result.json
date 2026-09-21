@@ -1,31 +1,39 @@
 {
-  "timestamp": "2026-09-21T07:20:17.700Z",
+  "timestamp": "2026-09-21T07:53:16.008Z",
   "base": "https://raz-coaching-platform.onrender.com",
-  "head_sha": "5cb5cfb44e326696e1b1b9f10418ccf604537ecd",
-  "runtime": "live64 2026-09-21T07:19:25Z",
+  "head_sha": "d1dd79f49c4195830c48987df9d635ce266f1ccf",
+  "runtime": "live65 2026-09-21T07:52:19Z",
   "results": [
     {
       "id": "dual_event_hyrox",
-      "job_id": "92e62e0db1f3ce872e2e7bb8ef4fcc5f",
-      "ok": false,
-      "status": "error",
-      "stage": "generating",
-      "attempt": 1,
-      "detail": "initial generation",
-      "last_seen_status": "error",
-      "error": "Cannot set property message of  which has only a getter",
-      "program_chars": 0,
-      "seconds": 1681
+      "job_id": "dde37369cf881a0f0d9abb8b85b7e100",
+      "ok": true,
+      "status": "done",
+      "stage": "finalizing",
+      "attempt": 4,
+      "detail": "delivered with unresolved rules: V38_INCOMPLETE_SESSION+V90_SESSION_GROWS_INTO_DAY_ZERO QA trace: T1:request_ceiling -> A1:SPORT_DAY_COUPLING_VIOLATION+V74_NOVEL_EXERCISE_NEAR_EVENT -> A2:V38_INCOMPLETE_SESSION+V90_SESSION_GROWS_INTO_DAY_ZERO -> A3:V38_INCOMPLETE_SESSION+V90_SESSION_GROWS_INTO_DAY_ZERO -> A4:V38_INCOMPLETE_SESSION+V90_SESSION_GROWS_INTO_DAY_ZERO.",
+      "last_seen_status": "done",
+      "error": null,
+      "program_chars": 16468,
+      "seconds": 1016
     },
     {
       "id": "advanced_calisthenics",
-      "ok": false,
-      "error": "build not accepted 422 {\"error\":\"A few details are needed before I can build this accurately.\",\"clarification_required\":true,\"clarifications\":[{\"answer_type\":\"text\",\"required\":true,\"id\":\"benchmark_handstand_pushup\",\"prompt\":\"What is your current best recent performance for handstand push-up progression?\",\"help\":\"Give the "
+      "job_id": "0e6728bcfeb70d1ac67a814f76d7d921",
+      "ok": true,
+      "status": "done",
+      "stage": "finalizing",
+      "attempt": 4,
+      "detail": "delivered with unresolved rules: V38_SKILL_WITHOUT_FOUNDATION QA trace: T1:request_ceiling -> A1:NAMED_GOAL_DIRECT_EXPOSURE_MISSING+WEEKLY_MRV_EXCEEDED+V38_SKILL_WITHOUT_FOUNDATION+NAMED_GOAL_DIRECT_EXPOSURE_MISSING+UNBENCHMARKED_VARIATION_LOAD_TOO_ASSERTIVE+PRIMARY_EXACT_MOVEMENT_MISSING -> A2:V38_SKILL_WITHOUT_FOUNDATION+UNBENCHMARKED_VARIATION_LOAD_TOO_ASSERTIVE+PRIMARY_EXACT_MOVEMENT_MISSING -> A3:V38_SKILL_WITHOUT_FOUNDATION -> A4:V38_SKILL_WITHOUT_FOUNDATION.",
+      "last_seen_status": "done",
+      "error": null,
+      "program_chars": 21329,
+      "seconds": 1269
     }
   ],
   "selection": [
     "dual_event_hyrox",
     "advanced_calisthenics"
   ],
-  "ok": false
+  "ok": true
 }
