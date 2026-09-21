@@ -42,6 +42,7 @@ import { repairBenchmarkExposure } from './benchmark_exposure_repair.js';
 import { repairEventComponentCoverage } from './event_component_repair.js';
 import { repairCompromisedRunning } from './compromised_work_repair.js';
 import { repairRaceRehearsal } from './race_rehearsal_repair.js';
+import { repairModalitySubstitution } from './modality_substitution_repair.js';
 import { ENDURANCE_REPAIRS, repairAccessoryRedundancy, repairTaperPowerSpike } from './endurance_block_repair.js';
 import { STATEMENT_REPAIRS } from './program_statement_repair.js';
 import { repairConsecutiveTrainingDays } from './consecutive_day_repair.js';
@@ -1040,6 +1041,18 @@ export function repairDeterministicContradictions(program, intake = {}) {
     repairs.push({
       type: 'race_rehearsal_gathered',
       moves: rehearsed.moves.map((m) => `w${m.week} ${m.component} -> ${m.day}`),
+    });
+  }
+
+  // A split belongs to the machine that produced it. Prose-only: this rewrites
+  // the clause that offers another machine so the alternative carries the RPE
+  // the row already has, instead of inheriting a number never measured on it.
+  const anchoredModality = repairModalitySubstitution(candidate, intake);
+  if (anchoredModality.changed) {
+    candidate = anchoredModality.program;
+    repairs.push({
+      type: 'modality_substitution_anchored',
+      moves: anchoredModality.moves.map((m) => `w${m.week} ${m.movement}/${m.alternative}`),
     });
   }
 
