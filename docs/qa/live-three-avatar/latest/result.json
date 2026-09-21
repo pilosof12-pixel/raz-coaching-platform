@@ -1,25 +1,31 @@
 {
-  "timestamp": "2026-09-21T05:20:50.370Z",
+  "timestamp": "2026-09-21T07:20:17.700Z",
   "base": "https://raz-coaching-platform.onrender.com",
-  "head_sha": "82b7e27b4d8b93e77f9130f40e965c6f1ddfc6b0",
-  "runtime": "live63 2026-09-21T05:19:52Z",
+  "head_sha": "5cb5cfb44e326696e1b1b9f10418ccf604537ecd",
+  "runtime": "live64 2026-09-21T07:19:25Z",
   "results": [
     {
       "id": "dual_event_hyrox",
-      "job_id": "e0dc1e2c1d607942baa6bd6f0775f3fc",
-      "ok": true,
-      "status": "done",
-      "stage": "finalizing",
+      "job_id": "92e62e0db1f3ce872e2e7bb8ef4fcc5f",
+      "ok": false,
+      "status": "error",
+      "stage": "generating",
       "attempt": 1,
-      "detail": "saving program after 1 model call(s)",
-      "last_seen_status": "done",
-      "error": null,
-      "program_chars": 16588,
-      "seconds": 290
+      "detail": "initial generation",
+      "last_seen_status": "error",
+      "error": "Cannot set property message of  which has only a getter",
+      "program_chars": 0,
+      "seconds": 1681
+    },
+    {
+      "id": "advanced_calisthenics",
+      "ok": false,
+      "error": "build not accepted 422 {\"error\":\"A few details are needed before I can build this accurately.\",\"clarification_required\":true,\"clarifications\":[{\"answer_type\":\"text\",\"required\":true,\"id\":\"benchmark_handstand_pushup\",\"prompt\":\"What is your current best recent performance for handstand push-up progression?\",\"help\":\"Give the "
     }
   ],
   "selection": [
-    "dual_event_hyrox"
+    "dual_event_hyrox",
+    "advanced_calisthenics"
   ],
-  "ok": true
+  "ok": false
 }
