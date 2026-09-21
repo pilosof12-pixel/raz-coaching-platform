@@ -1435,6 +1435,26 @@ const TAPER_VOLUME_BAND = [0.41, 0.60];
 const TAPER_MIN_REDUCTION = 0.25;      // below this the week is not a taper at all
 const FREQUENCY_FLOOR = 0.70;          // sessions stay; they get shorter
 //
+// Provenance, because the coach asked that codification stay distinguishable
+// from source derivation.
+//
+// Derived: the cluster's hierarchy. "Reduce training load mainly through
+// volume, preserve enough relevant intensity", and frequency "often maintain
+// more than volume". That is what the floor encodes.
+//
+// Codified, not derived: the 0.70 number itself, and the decision that the
+// floor governs the taper week rather than competition week. The cluster gives
+// no percentage for frequency and never separates the two weeks; the scoping
+// is the coach's ruling on a conflict between two of his own findings.
+//
+// Known coarser than the source: the cluster conditions frequency retention on
+// the athlete -- "highly trained and technique-dependent athletes commonly
+// benefit from retaining most session frequency", while "moderately trained
+// athletes can often reduce frequency more aggressively". One flat floor for
+// every athlete does not carry that distinction. It has not been raised as a
+// finding because no reviewed program has turned on it, but it is the next
+// thing this rule should learn.
+//
 // No intensity threshold is encoded. The cluster is explicit that intensity is
 // maintained and gives numbers for volume, duration and frequency -- and none
 // for intensity, saying only that the athlete "can still touch meaningful

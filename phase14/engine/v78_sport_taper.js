@@ -98,9 +98,9 @@ export function campPlanByWeek(intake = {}, now = Date.now(), options = {}) {
     const isAfterEvent = competitionWeekNumber != null && p.week > competitionWeekNumber;
     const days = new Map();
     WEEKDAYS.forEach((d, i) => {
-      if (isAfterEvent) return days.set(d, { after: true, sport: null, gym: false, clock: '' });
+      if (isAfterEvent) return days.set(d, { after: true, sport: null, gym: gym.includes(d), clock: '' });
       if (isEventWeek && i === eventIndex) return days.set(d, { event: true, sport: null, gym: false, clock: '' });
-      if (isEventWeek && i > eventIndex) return days.set(d, { after: true, sport: null, gym: false, clock: '' });
+      if (isEventWeek && i > eventIndex) return days.set(d, { after: true, sport: null, gym: gym.includes(d), clock: '' });
       const clock = isEventWeek ? `D-${eventIndex - i} ` : '';
       const s = week.find((x) => x.day === d);
       let sport = null;
@@ -121,7 +121,15 @@ export function campPlanByWeek(intake = {}, now = Date.now(), options = {}) {
 
 const cellText = (d) => {
   if (d.event) return 'FIGHT DAY';
-  if (d.after) return '-';
+  // Days past Day 0 are classified, not erased.
+  //
+  // Blanking them made the calendar disagree with a week table that still
+  // trains, and V91 refused the build for the disagreement -- correctly, since
+  // an athlete reading the two cannot tell which is the program. The event ends
+  // the pre-event phase, not necessarily the delivered four weeks, so a session
+  // after it is named as what it is and excluded from taper, competition-week
+  // and hard-contact accounting rather than pretended away.
+  if (d.after) return d.gym ? 'post-event gym' : '-';
   const parts = [];
   if (d.sport) parts.push(`MMA ${d.sport}`);
   if (d.gym) parts.push('gym');

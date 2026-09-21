@@ -21,10 +21,10 @@ import { convergence } from '../scripts/corpus_convergence.mjs';
 
 const rows = convergence();
 
-test('the chain converges on at least 18 of the 26 delivered programs', () => {
+test('the chain converges on at least 20 of the 26 delivered programs', () => {
   assert.equal(rows.length, 26, 'corpus size changed; re-baseline deliberately');
   const accepted = rows.filter((r) => r.accepted).length;
-  assert.ok(accepted >= 18, `only ${accepted} of 26 converge; this number must not fall`);
+  assert.ok(accepted >= 20, `only ${accepted} of 26 converge; this number must not fall`);
 });
 
 test('no fixture is blocked by a defect the chain inflicts on itself', () => {
@@ -47,29 +47,29 @@ test('the unconverged set is exactly the one we have accounted for', () => {
   const blocked = rows.filter((r) => !r.accepted).map((r) => r.file).sort();
   assert.deepEqual(blocked, [
     'mma_fight_camp-program.txt',
-    'run113_mma_camp_delivered.txt',
     'run114_weightlifter_peak.txt',
     'run116_dual_event_hyrox.txt',
     'run84_tactical_3k.txt',
-    'run92_mma_fight_camp_pre_rules.txt',
     'run96_weightlifter_intensification.txt',
     'run97_mma_camp_delivered.txt',
   ], 'a new fixture stopped converging, or one started; re-baseline deliberately');
 });
 
-test('the fight-camp cluster is down to one root cause', () => {
-  // It was five different codes across the fight-camp programs, and each one
-  // was ours: 90s rest against a 120s alactic minimum, three sets against a
-  // two-set primer cap, a movement the week already carried, rows swapped in
-  // after the fight-week clock had been written, and a camp calendar that
-  // prescribed MMA on fight day because it assumed the bout was always in week
-  // 4. Clearing each revealed the next.
+test('the fight-camp calendar no longer blocks its own builds', () => {
+  // Six codes came off these programs in sequence, and every one was ours: a
+  // 90s rest against a 120s alactic minimum, three sets against a two-set
+  // primer cap, a movement the week already carried, rows swapped in after the
+  // fight-week clock was written, a calendar that assumed the bout was always
+  // in week 4, and then a calendar that blanked the days past it while the week
+  // table still trained on them.
   //
-  // What is left is one code on all of them, and it is the honest one: the
-  // calendar now says the block ends at Day 0 while the week-4 table still
-  // prescribes training after the bout. That is a real disagreement about a
-  // real program, not a repair fighting itself.
-  const codes = new Set(rows.filter((r) => !r.accepted && /mma|fight_camp/.test(r.file))
-    .flatMap((r) => r.codes));
-  assert.deepEqual([...codes], ['V91_TIMELINE_VIEWS_DISAGREE']);
+  // The last one was the coach's ruling rather than a bug: Day 0 ends the
+  // pre-event phase, not the delivered four weeks, so days after it are
+  // classified as post-event instead of erased. Two of these programs now
+  // converge outright.
+  const stillBlocked = rows.filter((r) => !r.accepted && /mma|fight_camp/.test(r.file));
+  assert.equal(stillBlocked.length, 2, 'run113 and run92 converge now');
+  const codes = new Set(stillBlocked.flatMap((r) => r.codes));
+  assert.deepEqual([...codes], ['V92_NOVEL_EXERCISE_NEAR_EVENT'],
+    'what is left is a different rule about novelty, not the calendar');
 });

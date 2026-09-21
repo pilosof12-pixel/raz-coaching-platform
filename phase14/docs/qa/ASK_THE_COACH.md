@@ -91,34 +91,23 @@ recorded as such.
 Everything else he has told us is encoded and tested. These are the only places
 where the engine is currently running on a number we invented or a blank.
 
-## A four-week block whose event falls in week 3
+## A four-week block whose event falls in week 3 — ANSWERED
 
-The fight-camp athlete's bout is nineteen days out, so the competition week is
-week 3 and week 4 sits entirely after it.
+He chose option 1: week 4 is a return-to-training week, explicitly separated
+from the competition block, and V91 was too rigid rather than the program being
+wrong.
 
-Two of your rules now disagree about what week 4 is. V91 says "anything after
-the event is not part of this block", so the camp calendar renders week 4 as
-nothing at all. The week table still prescribes five training days in it,
-because the block is four weeks by construction. The gate refuses the build for
-the disagreement, and it is right that they disagree -- I do not know which of
-them should give.
+The rule changes from "anything after the event is not part of this block" to
+"anything after the event is not part of the pre-event phase; if the four-week
+delivery continues beyond Day 0 it must be explicitly classified as
+post-event". Days past Day 0 are now named as post-event in the calendar rather
+than blanked, so the two views agree, and they are excluded from taper volume,
+taper frequency, competition-week frequency, hard-contact targets and pre-event
+progression.
 
-Three readings, and this is a coaching call rather than an engineering one:
+He also declined to encode a mandatory return timeline: for the first 72 hours
+after a fight the program may prescribe recovery, but what the athlete can
+actually do depends on what happened in the fight, and that is judgement rather
+than a universal threshold. Nothing prescribes training into that window.
 
-1. **Week 4 is a return-to-training week.** The athlete has just fought; the
-   week is light, general, and explicitly post-fight. The calendar should say
-   so instead of going blank, and V91 should permit it.
-2. **Week 4 is not part of the block.** A camp ends at Day 0. The table should
-   be emptied and the block delivered as three weeks plus the fight.
-3. **The block should never have been four weeks.** An event nineteen days out
-   gets a three-week camp, and the fourth week is an artefact of assuming every
-   block is four weeks long.
-
-Until you pick one the engine leaves it, which means this athlete's build is
-refused. That is the honest state rather than a guess shipped quietly.
-
-Fixed on the way to finding this, and not in question: the calendar was
-prescribing MMA on fight day and the day after it, and was writing more hard
-contact into fight week than into any other week of the camp -- the contact
-target ran 2, 1, 0, then 3. The generator assumed the bout was always in week 4
-and treated week 3 as an ordinary build week.
+Two of the three fight-camp programs converge outright as a result.

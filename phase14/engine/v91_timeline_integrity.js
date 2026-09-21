@@ -106,7 +106,13 @@ export function collectTimelineIntegrityFlags(program, intake = {}, now = Date.n
   if (schedule) {
     const after = WEEKDAYS
       .map((d, i) => ({ d, i, cell: schedule.byDay.get(d) || '' }))
-      .filter(({ i, cell }) => i >= eventIndex && cell && cell !== '-' && !/fight day|race day|event day/i.test(cell));
+      // A cell explicitly marked post-event is not the calendar training
+      // through the event. Day 0 ends the pre-event phase; it does not
+      // necessarily end a four-week delivery, and a block that continues past
+      // it must say so rather than go blank.
+      .filter(({ i, cell }) => i >= eventIndex && cell && cell !== '-'
+        && !/fight day|race day|event day/i.test(cell)
+        && !/post-event/i.test(cell));
     if (after.length) {
       flags.push({
         code: 'V91_CALENDAR_TRAINS_THROUGH_THE_EVENT',
