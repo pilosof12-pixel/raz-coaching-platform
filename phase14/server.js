@@ -1816,6 +1816,16 @@ async function generateValidatedProgram(intake, onProgress = async () => {}) {
       // it -- and an abort was ending the build outright, leaving the whole
       // remaining build budget unspent. Run #79 lost both avatars that way,
       // each at 422s, with nineteen minutes of budget untouched.
+      // Spend is the one failure that must never be retried. Every other
+      // branch here reasons about whether asking again could help; asking
+      // again after the token ceiling is precisely what the ceiling exists to
+      // stop. Ship whatever already passed validation and end the build.
+      if (e?.code === "BUILD_SPEND_EXCEEDED") {
+        console.warn(`generateValidatedProgram: ${e.message}`);
+        const salvaged = await salvage("token budget reached; shipping the last structurally valid program");
+        if (salvaged) return salvaged;
+        throw e;
+      }
       const aborted = e?.name === "AbortError" || /operation was aborted/i.test(String(e?.message || ""));
       const retriable = e?.code === "OPENAI_EMPTY_OUTPUT" || aborted;
       // The deadline check at the top of the loop still owns the real limit, so
