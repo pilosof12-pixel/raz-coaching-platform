@@ -53,7 +53,7 @@ import { repairTimelineIntegrity } from './v91_timeline_integrity.js';
 import { repairPrescriptionIntegrity } from './v92_prescription_integrity.js';
 import { appendCompetitionBlocks } from './v73_taper_audit.js';
 import { appendCampSchedule, repairSportStateLanguage } from './v78_sport_taper.js';
-import { classifyExercise, dayGap, stressSignature, dayKey as dayKeyOf } from './v38_movement_taxonomy.js';
+import { classifyExercise, dayGap, stressSignature, dayKey as dayKeyOf, isFoundationalStrength, ROLE, CATEGORY } from './v38_movement_taxonomy.js';
 import { auditCircularScheduling } from './v38_structural_audit.js';
 
 function arr(v) { return Array.isArray(v) ? v : v ? [v] : []; }
@@ -951,7 +951,38 @@ function repairConsecutivePullStacking(program, intake, repairs) {
     // Never strip a session below a complete one to satisfy a scheduling rule.
     if (!candidates.length || dayRows.length <= 3) break;
 
-    const drop = candidates[0];
+    // And never take the last foundational pull off a day that carries upper-body
+    // skill work.
+    //
+    // Run #130's calisthenics build is what this is for. The delivered program
+    // had no foundation violations at all; this repair removed Tuesday's
+    // Inverted Row to fix a consecutive-pull clash, and Tuesday is a handstand
+    // and planche day -- so the chain manufactured four V38_SKILL_WITHOUT_-
+    // FOUNDATION findings that the gate then refused, four times, before the
+    // build gave up and shipped them. The foundation repair could not put it
+    // back either, because re-adding recreates the clash this one is removing.
+    //
+    // Spacing pulls across days is a scheduling preference. Strength under a
+    // skill is the thing the skill is built on, so it wins.
+    const skillDay = dayRows.some((c) => {
+      const { category, role } = classifyExercise(String(c[parsed.exercise] || ''));
+      return role === ROLE.SKILL_PRACTICE && category === CATEGORY.SKILL;
+    });
+    const remainingPulls = (dropped) => dayRows.filter((c) => c !== dropped
+      && isFoundationalStrength(String(c[parsed.exercise] || ''))
+      && /pull|row|chin/i.test(String(c[parsed.exercise] || ''))).length;
+    const safe = candidates.filter((c) => !skillDay || remainingPulls(c) > 0);
+
+    // Nothing safe to remove: leave the week alone and let the finding stand.
+    //
+    // De-loading the Tuesday pull was tried and fires without helping, because
+    // the clash is anchored on Monday's Weighted Pull-up -- a primary goal
+    // movement this repair is forbidden to touch. Softening the other side of a
+    // conflict it does not own is motion, not a fix, and a repair that reports
+    // success while the gate still refuses is worse than one that declines.
+    if (!safe.length) break;
+
+    const drop = safe[0];
     const index = parsed.rows.indexOf(drop);
     if (index < 0) break;
     parsed.rows.splice(index, 1);
