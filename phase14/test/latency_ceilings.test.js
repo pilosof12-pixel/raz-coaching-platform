@@ -47,8 +47,13 @@ test('a doomed call is abandoned before it can eat the build', () => {
   const ms = Number(m[1]);
   // Comfortably above the 285s a successful call has ever taken, far below the
   // 780s that one discarded call was allowed to spend in #123.
-  assert.ok(ms >= 360000, `request ceiling ${ms}ms would abort legitimate calls`);
-  assert.ok(ms <= 480000, `request ceiling ${ms}ms lets a stalled call dominate the build again`);
+  // Re-baselined after run #129. 420s was set because no successful call had
+  // ever exceeded 285s -- and then both avatars opened with T1:request_ceiling,
+  // aborting a first call that was still working and throwing away 420 seconds
+  // before retrying. An abort costs the whole ceiling AND a retry, so cutting it
+  // too fine is the more expensive mistake of the two.
+  assert.ok(ms >= 540000, `request ceiling ${ms}ms aborts calls that would have finished`);
+  assert.ok(ms <= 720000, `request ceiling ${ms}ms lets a stalled call dominate the build again`);
 });
 
 test('both remain overridable without a deploy', () => {

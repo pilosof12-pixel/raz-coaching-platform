@@ -44,6 +44,7 @@ import { repairCompromisedRunning } from './compromised_work_repair.js';
 import { repairRaceRehearsal } from './race_rehearsal_repair.js';
 import { repairModalitySubstitution, repairNoteNamedMovement } from './modality_substitution_repair.js';
 import { repairNextRowClaim, repairTransitionClaim } from './structural_claim_rules.js';
+import { repairSkillFoundation } from './skill_foundation_repair.js';
 import { ENDURANCE_REPAIRS, repairAccessoryRedundancy, repairTaperPowerSpike } from './endurance_block_repair.js';
 import { STATEMENT_REPAIRS } from './program_statement_repair.js';
 import { repairConsecutiveTrainingDays } from './consecutive_day_repair.js';
@@ -1344,6 +1345,28 @@ export function repairDeterministicContradictions(program, intake = {}) {
   if (ramped !== candidate) {
     candidate = ramped;
     repairs.push({ type: 'v34_warmup_ramp_target' });
+  }
+
+  // The strength under the skill, late: after the repairs that resolve
+  // conflicting adjacent exposures.
+  //
+  // Placed early it did nothing at all. The delivered program carries eight
+  // conflicting-exposure findings as well as eight missing-foundation ones, and
+  // the chain clears the first set further down -- so a repair that runs before
+  // that is judged against a program still carrying them, every candidate row
+  // looks like it makes things worse, and the guard refuses all of it.
+  // Run #129's calisthenics build spent four model calls on
+  // V38_SKILL_WITHOUT_FOUNDATION and shipped with eight: an entire upper-body
+  // day of handstand work with no pulling or pushing underneath it. The brief
+  // says not to in as many words and the model did it anyway, four times, which
+  // is a gate with no converging repair.
+  const founded = repairSkillFoundation(candidate, intake);
+  if (founded.changed) {
+    candidate = founded.program;
+    repairs.push({
+      type: 'skill_foundation_added',
+      moves: founded.moves.map((m) => `w${m.week} ${m.day} ${m.added} (${m.kind})`),
+    });
   }
 
   // Swap generic accessories for ballistic work before the clock is written,
