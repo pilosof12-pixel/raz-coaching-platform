@@ -58,15 +58,18 @@ test('the unconverged set is exactly the one we have accounted for', () => {
 });
 
 test('the fight-camp cluster is down to one root cause', () => {
-  // It was four different codes across three programs, and each one turned out
-  // to be the ballistic swap prescribing a dose a sibling rule rejects: 90s
-  // rest against a 120s alactic minimum, three sets against a two-set primer
-  // cap, a movement the week already carried, and rows swapped in after the
-  // fight-week clock had already been written. Clearing each revealed the next.
+  // It was five different codes across the fight-camp programs, and each one
+  // was ours: 90s rest against a 120s alactic minimum, three sets against a
+  // two-set primer cap, a movement the week already carried, rows swapped in
+  // after the fight-week clock had been written, and a camp calendar that
+  // prescribed MMA on fight day because it assumed the bout was always in week
+  // 4. Clearing each revealed the next.
   //
-  // What is left is one code on all three, which is a different kind of problem
-  // and can be worked as one.
+  // What is left is one code on all of them, and it is the honest one: the
+  // calendar now says the block ends at Day 0 while the week-4 table still
+  // prescribes training after the bout. That is a real disagreement about a
+  // real program, not a repair fighting itself.
   const codes = new Set(rows.filter((r) => !r.accepted && /mma|fight_camp/.test(r.file))
     .flatMap((r) => r.codes));
-  assert.deepEqual([...codes], ['V91_CALENDAR_TRAINS_THROUGH_THE_EVENT']);
+  assert.deepEqual([...codes], ['V91_TIMELINE_VIEWS_DISAGREE']);
 });

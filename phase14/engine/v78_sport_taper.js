@@ -76,15 +76,29 @@ export function campPlanByWeek(intake = {}, now = Date.now(), options = {}) {
   };
   const eventDay = eventWeekday(intake);
   const eventIndex = eventDay ? WEEKDAYS.indexOf(eventDay) : -1;
-  const finalWeek = plan[plan.length - 1]?.week;
+  // The fight is not always in week 4.
+  //
+  // This asked whether a week was the LAST week of the block, which is only the
+  // same question when the event happens to land there. The fight-camp corpus
+  // has a bout nineteen days out, so the competition week is week 3 -- and week
+  // 4, which is entirely after the fight, was rendered as an ordinary training
+  // week. The calendar then prescribed MMA on fight day and the day after it,
+  // with more hard contact in that week than in any other, and the build was
+  // refused for V91_CALENDAR_TRAINS_THROUGH_THE_EVENT on a program the model
+  // had delivered clean.
+  const competitionWeekNumber = plan.find((p) => p.state === STATE.COMPETITION_WEEK)?.week;
 
   const out = new Map();
   for (const p of plan) {
     const gym = gymFor(p.week);
     let remaining = p.hardTarget;
-    const isEventWeek = eventIndex >= 0 && p.week === finalWeek && p.state === STATE.COMPETITION_WEEK;
+    const isEventWeek = eventIndex >= 0 && p.week === competitionWeekNumber;
+    // Nothing in this block sits after Day 0, so a week past the fight is not a
+    // lighter week, it is not part of the block at all.
+    const isAfterEvent = competitionWeekNumber != null && p.week > competitionWeekNumber;
     const days = new Map();
     WEEKDAYS.forEach((d, i) => {
+      if (isAfterEvent) return days.set(d, { after: true, sport: null, gym: false, clock: '' });
       if (isEventWeek && i === eventIndex) return days.set(d, { event: true, sport: null, gym: false, clock: '' });
       if (isEventWeek && i > eventIndex) return days.set(d, { after: true, sport: null, gym: false, clock: '' });
       const clock = isEventWeek ? `D-${eventIndex - i} ` : '';
@@ -123,7 +137,13 @@ export function renderCampSchedule(intake = {}, now = Date.now(), options = {}) 
   const lines = ['CAMP SCHEDULE', 'Sport sessions are load. The gym is built around them, and the contact comes down as the fight approaches.', ''];
   const head = ['', ...WEEKDAYS.map((d) => LABEL[d]), 'hard contact'];
 
-  const rows = plan.map((p) => [`W${p.week}`, ...WEEKDAYS.map((d) => cellText(p.days.get(d))), `${p.hardTarget} of ${p.hardBaseline}`]);
+  // A week after the fight has no contact target: printing one said "3 of 3"
+  // beside a row of dashes, which is the table disagreeing with itself.
+  const rows = plan.map((p) => {
+    const cells = WEEKDAYS.map((d) => cellText(p.days.get(d)));
+    const afterEvent = cells.every((c) => c === '-');
+    return [`W${p.week}`, ...cells, afterEvent ? '-' : `${p.hardTarget} of ${p.hardBaseline}`];
+  });
 
   // Pipes, not padding. This block sits ahead of the week tables so the
   // sport-taper rule can see it, and a normalizer in that region collapses runs
