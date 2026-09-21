@@ -1,21 +1,21 @@
 {
-  "timestamp": "2026-09-21T00:53:35.555Z",
+  "timestamp": "2026-09-21T01:08:58.758Z",
   "base": "https://raz-coaching-platform.onrender.com",
-  "head_sha": "8e6430dab92f03d9a303512a753454c27c278e01",
-  "runtime": "live61 2026-09-21T00:52:44Z",
+  "head_sha": "4beb79f0a24c4eee5e32311c713c3ae312494917",
+  "runtime": "live62 2026-09-21T01:08:12Z",
   "results": [
     {
       "id": "dual_event_hyrox",
-      "job_id": "26c4275d6d01152c5e9dbfff5e571e37",
+      "job_id": "06d9f3a349ed7b9f75091da72d70d030",
       "ok": true,
       "status": "done",
       "stage": "finalizing",
       "attempt": 2,
-      "detail": "saving program after 2 model call(s) QA trace: A1:MARATHON_STACKED_VOLUME_PROGRESSION.",
+      "detail": "saving program after 2 model call(s) QA trace: A1:EXERCISE_HALLUCINATION+SPORT_DAY_COUPLING_VIOLATION+V38_INCOMPLETE_SESSION+V74_NOVEL_EXERCISE_NEAR_EVENT+REQUESTED_STRENGTH_SESSIONS_UNACCOUNTED[Exercise].",
       "last_seen_status": "done",
       "error": null,
-      "program_chars": 15759,
-      "seconds": 414
+      "program_chars": 16201,
+      "seconds": 321
     }
   ],
   "selection": [
