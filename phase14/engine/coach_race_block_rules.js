@@ -26,7 +26,22 @@ const setsOf = (r) => Number(r.sets) || 0;
 // qualities the block already built. Anything that rises as volume falls is
 // being introduced, not preserved.
 
+import { namedComponentsFor } from './coach_standard.js';
+
+// Eight sets was my number, and it was defended by the fight camp: the combat
+// power repair legitimately puts three ballistic sets into a sharpening week,
+// and flagging that would refuse work the engine itself had just written.
+//
+// For a multi-component race athlete the coach set a different ceiling. Reviewing
+// run #124 he charged 0.30 for a taper carrying seven power sets against one in
+// the building weeks, and said plainly: "keep total added ballistic work to about
+// 2 to 4 sets for the week", because the race-specific sled and transition work
+// already supplies the fast intent. So above four is a spike for that athlete,
+// and eight still stands for everyone else.
 const MEANINGFUL_WEEKLY_POWER_DOSE = 8;
+const RACE_BLOCK_POWER_DOSE = 5;
+const meaningfulPowerDose = (intake) =>
+  ((namedComponentsFor(intake) || []).length >= 2 ? RACE_BLOCK_POWER_DOSE : MEANINGFUL_WEEKLY_POWER_DOSE);
 
 const POWER = /explosive|plyo|box jump|broad jump|depth jump|bound|jump squat|hop|med(?:icine)? ball|throw|snap down/i;
 
@@ -58,7 +73,7 @@ export function taperPowerSpike(program, intake = {}) {
     // sets in its sharpening week is doing the right thing -- the engine's own
     // combat-power repair puts them there. Eight sets in a week is the point
     // where this stops being a sharpener and starts being a block of training.
-    if (w.power < MEANINGFUL_WEEKLY_POWER_DOSE) continue;
+    if (w.power < meaningfulPowerDose(intake)) continue;
     if (w.power < baseline * 1.5 + 2) continue;
     out.push({
       rule: 'TAPER_INTRODUCES_POWER_VOLUME',

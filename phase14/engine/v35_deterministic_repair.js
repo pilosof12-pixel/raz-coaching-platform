@@ -1006,6 +1006,20 @@ export function repairDeterministicContradictions(program, intake = {}) {
   // It spends a slot rather than adding one, on the coach's reasoning about the
   // generic work he charged: those exercises are not bad, their opportunity cost
   // four weeks out is.
+  // Before anything counts the rows: a note telling the athlete to do a
+  // different movement than the row names means every downstream count records
+  // the work against the wrong exercise. Run #124 had five Goblet Squat rows
+  // whose notes said to do wall balls, so a race station was being tallied as
+  // squat volume.
+  const renamedByNote = repairNoteNamedMovement(candidate, intake);
+  if (renamedByNote.changed) {
+    candidate = renamedByNote.program;
+    repairs.push({
+      type: 'note_named_movement_applied',
+      moves: renamedByNote.moves.map((m) => `w${m.week} ${m.from} -> ${m.to}`),
+    });
+  }
+
   const raced = repairEventComponentCoverage(candidate, intake);
   if (raced.changed) {
     candidate = raced.program;
@@ -1044,19 +1058,6 @@ export function repairDeterministicContradictions(program, intake = {}) {
     });
   }
 
-  // Before anything counts the rows: a note telling the athlete to do a
-  // different movement than the row names means every downstream count records
-  // the work against the wrong exercise. Run #124 had five Goblet Squat rows
-  // whose notes said to do wall balls, so a race station was being tallied as
-  // squat volume.
-  const renamedByNote = repairNoteNamedMovement(candidate, intake);
-  if (renamedByNote.changed) {
-    candidate = renamedByNote.program;
-    repairs.push({
-      type: 'note_named_movement_applied',
-      moves: renamedByNote.moves.map((m) => `w${m.week} ${m.from} -> ${m.to}`),
-    });
-  }
 
   // A split belongs to the machine that produced it. Prose-only: this rewrites
   // the clause that offers another machine so the alternative carries the RPE

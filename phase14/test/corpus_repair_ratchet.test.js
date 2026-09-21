@@ -24,7 +24,7 @@ const total = (rows) => rows.reduce((n, r) => n + r.severity, 0);
 // day these numbers moved -- 21.35 to 24.56 delivered, 4.40 to 5.45 repaired,
 // and seventeen clean programs to fourteen. The three that stopped being clean
 // were carrying a defect the whole time that was being charged nothing.
-test('the repair chain takes the delivered corpus from 24.56 severity to 5.45', () => {
+test('the repair chain takes the delivered corpus from 24.56 severity to 5.25', () => {
   const before = sweep({ repaired: false });
   const after = sweep({ repaired: true });
 
@@ -32,8 +32,12 @@ test('the repair chain takes the delivered corpus from 24.56 severity to 5.45', 
   assert.equal(after.length, 26);
 
   assert.equal(Number(total(before).toFixed(2)), 24.56);
-  assert.ok(total(after) <= 5.45 + 1e-9,
-    `residual severity ${total(after).toFixed(2)} above the 5.45 ceiling`);
+  // Tightened from 5.45 after the coach's run #124 review: his taper ballistic
+  // ceiling, the competition-order sequencing and the note-named-movement rename
+  // between them took the corpus down rather than up, and a ratchet left at the
+  // old number would let that be given back.
+  assert.ok(total(after) <= 5.25 + 1e-9,
+    `residual severity ${total(after).toFixed(2)} above the 5.25 ceiling`);
 });
 
 test('no delivered program gets worse for being repaired', () => {

@@ -456,7 +456,11 @@ export function repairAccessoryRedundancy(program, intake = {}) {
 // the first time in week 3 is the clearest case of a new emphasis -- and then
 // trims sets off what remains until the week is inside his cap.
 
-const TAPER_POWER_SET_CAP = 6;
+// His number, from the run #124 review. The cap was 6, which he still charged
+// 0.30 for: "keep total added ballistic work to about 2 to 4 sets for the week",
+// because the race-specific sled and transition work already supplies the fast
+// intent. Six was my reading of "a dose a taper can carry"; four is his.
+const TAPER_POWER_SET_CAP = 4;
 const TAPER_POWER_FLOOR = 4;
 const POWER_MOVEMENT = /explosive|plyo|box jump|broad jump|depth jump|bound|jump squat|hop|med(?:icine)? ball|throw|snap down/i;
 
@@ -500,9 +504,34 @@ export function repairTaperPowerSpike(program, intake = {}) {
       guard += 1;
       const setsOf = (r) => Number(cells[r.index][parsed.sets]) || 0;
       const biggest = powerRows().sort((a, b) => setsOf(b) - setsOf(a))[0];
-      if (!biggest || setsOf(biggest) <= 1) break;
-      cells[biggest.index][parsed.sets] = String(setsOf(biggest) - 1);
-      trimmed.push(biggest.name);
+      if (!biggest) break;
+
+      if (setsOf(biggest) > 1) {
+        cells[biggest.index][parsed.sets] = String(setsOf(biggest) - 1);
+        trimmed.push(biggest.name);
+        continue;
+      }
+
+      // Every power row is down to a single set and the week is still over the
+      // cap, so trimming cannot finish the job. Two earlier versions of this
+      // repair deleted movements and both emptied sessions, which is why it
+      // trims and never deletes -- but that rule leaves seven single-set rows
+      // untouchable, and run116's taper sits at seven against a cap of four for
+      // exactly that reason.
+      //
+      // The coach's own instruction on this finding was to delete: "keep total
+      // added ballistic work to about 2 to 4 sets for the week ... and remove
+      // the Friday Box Jump". So the last resort is removing a whole row, with
+      // the guard the earlier versions lacked: never take a day below two
+      // working rows, so no session can be emptied.
+      const dayOf = (i) => String(cells[i][parsed.day] || '').trim();
+      const workingRowsOn = (day) => cells.filter((c, i) => dayOf(i) === day
+        && String(c[parsed.exercise] || '').trim() && !isWarmup(String(c[parsed.exercise] || ''))).length;
+      const removable = powerRows().filter((r) => workingRowsOn(dayOf(r.index)) > 2);
+      if (!removable.length) break;
+      const victim = removable[removable.length - 1];
+      dropped.push(victim.name);
+      cells.splice(victim.index, 1);
     }
 
     if (!dropped.length && !trimmed.length) continue;
