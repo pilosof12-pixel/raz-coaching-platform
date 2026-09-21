@@ -108,7 +108,7 @@ export function spreadDays(current, limit = THRESHOLDS.MAX_CONSECUTIVE_LIFTING_D
 // This has to reach the note cells as well as the summary. A row moved to
 // Friday was still telling the athlete that "Thursday still sharpens the
 // lifts", which is the table and the text describing different weeks.
-function renameInProse(text, map) {
+export function renameInProse(text, map) {
   const alternatives = [...map.keys()].flatMap((k) => [FULL[k], k[0].toUpperCase() + k.slice(1)]);
   const re = new RegExp(`\\b(${alternatives.join('|')})\\b`, 'g');
   return text.replace(re, (word) => {

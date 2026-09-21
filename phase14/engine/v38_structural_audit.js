@@ -198,50 +198,65 @@ function isHeavy(cells, parsed) {
   return hasExternalLoad && sets >= 3;
 }
 
+// Aggregate one week's stress per weekday.
+//
+// Extracted so the repair that reorders sessions scores a candidate layout with
+// the same function that judges it. A repair carrying its own copy of the
+// weighting drifts from the gate the moment either side is tuned, and then
+// reports a fix the gate still refuses.
+export function dayStressAggregates(parsed) {
+  const byDay = new Map();
+  for (const cells of workRows(parsed.rows, parsed)) {
+    const d = dayKey(cells[parsed.day]);
+    if (!d) continue;
+    const name = String(cells[parsed.exercise]).trim();
+    const sig = stressSignature(name);
+    const heavy = isHeavy(cells, parsed);
+    if (!byDay.has(d)) byDay.set(d, { axial: 0, lower: 0, upperPull: 0, upperPush: 0, neural: 0, items: [] });
+    const acc = byDay.get(d);
+    const weight = heavy ? 1 : 0.5;
+    acc.axial += sig.axial * weight;
+    acc.lower += sig.lower * weight;
+    acc.upperPull += sig.upperPull * weight;
+    acc.upperPush += sig.upperPush * weight;
+    acc.neural += sig.neural * weight;
+    if (heavy && (sig.lower >= 3 || sig.upperPull >= 3 || sig.upperPush >= 3)) acc.items.push(name);
+  }
+  return byDay;
+}
+
+// Check every ordered adjacent pair around the circle.
+export function circularClashes(byDay, week) {
+  const findings = [];
+  for (const [d, acc] of byDay) {
+    for (const [d2, acc2] of byDay) {
+      if (d === d2 || dayGap(d, d2) !== 1) continue;
+      const axialClash = acc.axial >= 3 && acc2.axial >= 3 && acc.lower >= 3 && acc2.lower >= 3;
+      const pullClash = acc.upperPull >= 3 && acc2.upperPull >= 3;
+      if (axialClash || pullClash) {
+        findings.push({
+          code: 'V38_CONSECUTIVE_CONFLICTING_EXPOSURE',
+          severity: 'hard',
+          week,
+          from: d,
+          to: d2,
+          tissue: axialClash ? 'axial/lower-body' : 'vertical pulling',
+          from_items: acc.items,
+          to_items: acc2.items,
+          message: `Week ${week} places substantial ${axialClash ? 'axial/lower-body' : 'vertical pulling'} work on ${d} (${acc.items.join(', ') || 'loaded work'}) immediately before ${d2} (${acc2.items.join(', ') || 'loaded work'}). The week is a continuous cycle, so ${d}->${d2} must be evaluated like any other adjacency. Separate the primary exposure from the secondary one.`,
+        });
+      }
+    }
+  }
+  return findings;
+}
+
 export function auditCircularScheduling(program, intake = {}) {
   const findings = [];
   for (let week = 1; week <= 4; week++) {
     const parsed = parseWeek(program, week);
     if (!parsed) continue;
-    // Aggregate stress per weekday.
-    const byDay = new Map();
-    for (const cells of workRows(parsed.rows, parsed)) {
-      const d = dayKey(cells[parsed.day]);
-      if (!d) continue;
-      const name = String(cells[parsed.exercise]).trim();
-      const sig = stressSignature(name);
-      const heavy = isHeavy(cells, parsed);
-      if (!byDay.has(d)) byDay.set(d, { axial: 0, lower: 0, upperPull: 0, upperPush: 0, neural: 0, items: [] });
-      const acc = byDay.get(d);
-      const weight = heavy ? 1 : 0.5;
-      acc.axial += sig.axial * weight;
-      acc.lower += sig.lower * weight;
-      acc.upperPull += sig.upperPull * weight;
-      acc.upperPush += sig.upperPush * weight;
-      acc.neural += sig.neural * weight;
-      if (heavy && (sig.lower >= 3 || sig.upperPull >= 3 || sig.upperPush >= 3)) acc.items.push(name);
-    }
-    // Check every ordered adjacent pair around the circle.
-    for (const [d, acc] of byDay) {
-      for (const [d2, acc2] of byDay) {
-        if (d === d2 || dayGap(d, d2) !== 1) continue;
-        const axialClash = acc.axial >= 3 && acc2.axial >= 3 && acc.lower >= 3 && acc2.lower >= 3;
-        const pullClash = acc.upperPull >= 3 && acc2.upperPull >= 3;
-        if (axialClash || pullClash) {
-          findings.push({
-            code: 'V38_CONSECUTIVE_CONFLICTING_EXPOSURE',
-            severity: 'hard',
-            week,
-            from: d,
-            to: d2,
-            tissue: axialClash ? 'axial/lower-body' : 'vertical pulling',
-            from_items: acc.items,
-            to_items: acc2.items,
-            message: `Week ${week} places substantial ${axialClash ? 'axial/lower-body' : 'vertical pulling'} work on ${d} (${acc.items.join(', ') || 'loaded work'}) immediately before ${d2} (${acc2.items.join(', ') || 'loaded work'}). The week is a continuous cycle, so ${d}->${d2} must be evaluated like any other adjacency. Separate the primary exposure from the secondary one.`,
-          });
-        }
-      }
-    }
+    findings.push(...circularClashes(dayStressAggregates(parsed), week));
   }
   return findings;
 }

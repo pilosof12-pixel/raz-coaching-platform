@@ -26,7 +26,13 @@ const INTAKE = {
   primary_goals: ['Weighted pull-up with 40 kg for 3', 'Freestanding handstand push-up'],
   secondary_goals: ['Hold a 10 second straddle planche'],
   goal_priority_model: 'tiered_equal_primary', days_per_week: 4, session_duration_minutes: 90,
-  gym_availability_mode: 'flexible', available_gym_days: [], training_location: 'calisthenics_park',
+  // Fixed days on purpose. An athlete with a flexible week has this clash
+  // solved upstream by relabelling the sessions, which is the better answer and
+  // means v50 never runs -- so a flexible fixture here tests nothing and passed
+  // against a deliberately broken guard. This athlete trains when the park is
+  // free to them, nothing can be moved, and v50 is the only repair left.
+  gym_availability_mode: 'fixed', available_gym_days: ['mon', 'tue', 'thu'],
+  training_location: 'calisthenics_park',
   equipment: 'Pull-up bars, dip bars, rings, parallettes, a weight belt, bands.',
   sport: '', sport_schedule: [],
   current_numbers: 'Weighted pull-up: 32 kg x 3\nTuck planche: 15 s',
@@ -74,13 +80,22 @@ const PROGRAM = [1, 2, 3, 4]
 
 test('v50 does not strip the last foundational pull off a skill day', () => {
   const { program } = repairDeterministicContradictions(PROGRAM, INTAKE);
-  const tuesdayPulls = program
-    .split('\n')
-    .filter((line) => /^Tue\t/.test(line) && /Inverted Row/.test(line));
-  assert.equal(
-    tuesdayPulls.length, 4,
-    'Tuesday carries handstand and planche work; its only foundational pull must survive in all four weeks',
+  // The session may be relabelled onto another weekday by the adjacency
+  // repair, which is fine and is the point of it -- what must not happen is
+  // the pull leaving the session it holds up. So ask where the planche is and
+  // require the row to still be beside it.
+  const dayOf = (pattern) => new Set(program.split('\n')
+    .filter((line) => pattern.test(line))
+    .map((line) => line.split('\t')[0]));
+  const skillDays = dayOf(/Advanced Tuck Planche/);
+  const pullDays = dayOf(/Inverted Row/);
+  assert.equal(pullDays.size, 1, 'the Inverted Row must stay on one day across the block');
+  assert.ok(
+    [...pullDays].every((d) => skillDays.has(d)),
+    'the skill day carries handstand and planche work; its only foundational pull must stay with it',
   );
+  const rows = program.split('\n').filter((line) => /Inverted Row/.test(line));
+  assert.equal(rows.length, 4, 'and must survive in all four weeks');
 });
 
 test('v50 declines rather than reporting a thin it could not safely make', () => {

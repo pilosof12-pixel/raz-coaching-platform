@@ -48,6 +48,7 @@ import { repairSkillFoundation } from './skill_foundation_repair.js';
 import { ENDURANCE_REPAIRS, repairAccessoryRedundancy, repairTaperPowerSpike } from './endurance_block_repair.js';
 import { STATEMENT_REPAIRS } from './program_statement_repair.js';
 import { repairConsecutiveTrainingDays } from './consecutive_day_repair.js';
+import { repairSessionAdjacency } from './session_order_repair.js';
 import { repairCompetitionWeek } from './v90_competition_week.js';
 import { repairTimelineIntegrity } from './v91_timeline_integrity.js';
 import { repairPrescriptionIntegrity } from './v92_prescription_integrity.js';
@@ -1017,6 +1018,20 @@ export function repairDeterministicContradictions(program, intake = {}) {
     repairs.push({
       type: 'consecutive_training_days_spread',
       moved: spread.moves.map((m) => `w${m.week} ${m.from.join('/')} -> ${m.to.join('/')}`),
+    });
+  }
+
+  // Then settle which session sits on which of those days. The spread above
+  // chooses the calendar; this chooses the running order, and only the running
+  // order -- no exercise, set, rep or load changes. It runs here, before
+  // anything reasons about content, so the repairs downstream see the week the
+  // athlete will actually train rather than one this pass is about to rearrange.
+  const reordered = repairSessionAdjacency(candidate, intake);
+  if (reordered.changed) {
+    candidate = reordered.program;
+    repairs.push({
+      type: 'session_adjacency_reordered',
+      moved: reordered.moves.map((m) => `${m.from.join('/')} -> ${m.to.join('/')} (${m.clashes_before} -> ${m.clashes_after})`),
     });
   }
 

@@ -2050,7 +2050,7 @@
       "engine/v38_structural_audit.js"
     ],
     "owners": [
-      "auditCircularScheduling"
+      "circularClashes"
     ],
     "advisory": false,
     "reachable": true,
