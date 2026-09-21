@@ -25,16 +25,29 @@ import { parseWeek } from './v34_workload_accounting.js';
 import { namedComponentsFor } from './coach_standard.js';
 import { matcherFor } from './event_component_rules.js';
 import { auditProgramStructure } from './v38_structural_audit.js';
+import { collectEconomyFlags, collectNoveltyFlags } from './v74_camp_economy.js';
 import { rebuild } from './tsv_rows.js';
 
 const REHEARSAL_SHARE = 0.5;
 const REHEARSAL_WEEKS = [1, 2];
 const isWarmup = (s) => /^\s*\[WARMUP\]/i.test(String(s || ''));
 
+// The guard has to watch the gate that would actually refuse this repair.
+//
+// auditProgramStructure alone does not raise the camp-economy codes, and
+// V74_CAMP_SESSION_TOO_BUSY is exactly what a repair that moves rows ONTO a day
+// risks causing -- it is also the single QA rejection in run #123's trace. A
+// guard blind to the one gate its own repair can trip is not a guard; it passed
+// here by luck rather than by design.
 function brokeSomething(before, after, intake) {
   const codes = (program) => {
     try {
-      return auditProgramStructure(program, intake).map((f) => f.code || f.rule).filter(Boolean);
+      const structural = auditProgramStructure(program, intake).map((f) => f.code || f.rule);
+      const economy = [
+        ...(collectEconomyFlags(program, intake) || []),
+        ...(collectNoveltyFlags(program, intake) || []),
+      ].map((f) => f.code || f.rule);
+      return [...structural, ...economy].filter(Boolean);
     } catch { return null; }
   };
   const a = codes(before);

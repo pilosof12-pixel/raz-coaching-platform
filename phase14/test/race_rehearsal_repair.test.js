@@ -80,3 +80,14 @@ test('the whole chain leaves no event-component finding on this program', () => 
   assert.deepEqual(raceRehearsalMissing(program, INTAKE).map((f) => f.rule), []);
   assert.ok(namedComponentsFor(INTAKE).length >= 6);
 });
+
+test('the guard watches the gate this repair can actually trip', () => {
+  // brokeSomething originally consulted auditProgramStructure alone, which does
+  // not raise the camp-economy codes. This repair moves rows ONTO a day, so
+  // V74_CAMP_SESSION_TOO_BUSY is the obvious way for it to do harm -- and it is
+  // the single QA rejection in run #123's trace. The repair passed anyway, by
+  // luck rather than by design, because the count happened not to rise.
+  const src = fs.readFileSync(path.join(here, '..', 'engine', 'race_rehearsal_repair.js'), 'utf8');
+  assert.match(src, /collectEconomyFlags/, 'guard cannot see camp-economy codes');
+  assert.match(src, /collectNoveltyFlags/, 'guard cannot see novelty codes');
+});
