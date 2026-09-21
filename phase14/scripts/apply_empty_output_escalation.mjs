@@ -137,8 +137,28 @@ const exhaustNew = `      if (transientRetries >= MAX_TRANSIENT_RETRIES || Date.
         console.warn(\`generateValidatedProgram: \${reason}, \${outOfTime ? "job budget spent" : "transient budget exhausted"} (\${transientRetries}/\${MAX_TRANSIENT_RETRIES})\`);
         qaTrace.push(\`T\${transientRetries + 1}:\${aborted ? "request_ceiling" : "empty_output"}\${e?.incompleteReason ? "(" + e.incompleteReason + ")" : ""}:\${outOfTime ? "JOB_BUDGET_SPENT" : "TRANSIENT_BUDGET_SPENT"}\`);
         e.qa_trace = qaTrace.slice();
-        e.message = \`\${e.message} QA trace: \${qaTrace.join(" -> ")}.\`;
-        throw e;
+        // An AbortError is a DOMException whose message is a getter with no
+        // setter, so annotating it in place throws "Cannot set property message
+        // of which has only a getter" and destroys the build. Run #128's Hyrox
+        // job died that way after 1681 seconds with no program at all.
+        //
+        // This path only became reachable when the request ceiling dropped from
+        // 780s to 420s: aborts went from rare to routine, and a latent crash in
+        // the abort handler started firing. The annotation is the whole point of
+        // the line -- it is how the trace reaches the operator -- so it is
+        // rebuilt onto a plain Error rather than dropped.
+        const annotated = \`\${e && e.message} QA trace: \${qaTrace.join(" -> ")}.\`;
+        try {
+          e.message = annotated;
+          throw e;
+        } catch (cannotAnnotate) {
+          if (cannotAnnotate === e) throw e;
+          const wrapped = new Error(annotated);
+          wrapped.code = e && e.code;
+          wrapped.qa_trace = qaTrace.slice();
+          wrapped.cause = e;
+          throw wrapped;
+        }
       }`;
 if (!s.includes(exhaustNew)) {
   if (!s.includes(exhaustOld)) throw new Error('transient-exhaust anchor missing');
