@@ -738,8 +738,33 @@ export const RULES = [
 ];
 
 export function gradeProgram(program, intake = {}) {
-  return RULES.flatMap((fn) => {
+  const found = RULES.flatMap((fn) => {
     try { return fn(program, intake); } catch (e) { return [{ rule: 'RULE_THREW', detail: `${fn.name}: ${e.message}` }]; }
+  });
+  return reconcileOverlappingOmissions(found);
+}
+
+// One omission, one deduction.
+//
+// A benchmarked movement that the prose also promises and no row trains fires
+// two rules about the same missing exercise: BENCHMARK_UNEXPOSED, priced 0.48,
+// and PROMISED_MOVEMENT_ABSENT, priced 0.15. The coach's instruction is to take
+// the larger applicable deduction rather than both, because the athlete is
+// short one movement, not two.
+//
+// The match is the promised term's own trains regex against the benchmark's
+// name, which is the same test that decided the movement was absent in the
+// first place -- so the two findings are reconciled on exactly the evidence
+// that produced them, rather than on a second opinion about what counts as the
+// same movement.
+function reconcileOverlappingOmissions(found) {
+  const unexposed = found.filter((f) => f.rule === 'BENCHMARK_UNEXPOSED');
+  if (!unexposed.length) return found;
+  return found.filter((f) => {
+    if (f.rule !== 'PROMISED_MOVEMENT_ABSENT') return true;
+    const trains = (MOVEMENT_TERMS.find(([term]) => term === f.movement) || [])[1];
+    if (!trains) return true;
+    return !unexposed.some((b) => trains.test(String(b.movement || '')));
   });
 }
 

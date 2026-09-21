@@ -23,7 +23,7 @@ const isWarmup = (n) => /^\s*\[WARMUP\]/i.test(String(n || ''));
 // The race figures are the published Hyrox distances, used only to size the
 // coach's 25% dose floor -- they are the event's definition, not a coaching
 // judgement.
-const COMPONENT_SPEC = {
+export const COMPONENT_SPEC = {
   'SkiErg':            { match: /ski ?erg|ski ?machine/i,                               race: { metres: 1000 } },
   'Sled Push':         { match: /sled push|prowler push|sled drive/i,                   race: { metres: 50 } },
   'Sled Pull':         { match: /sled pull|rope pull|sled drag/i,                       race: { metres: 50 } },
@@ -44,6 +44,28 @@ const COMPONENT_SPEC = {
 };
 
 const DOSE_FRACTION = 0.25;          // "at least 25% of race distance / reps / duration"
+//
+// The dominant component is exempt, and is routed through its own progression
+// model instead.
+//
+// The coach: "For a component accounting for >= 50% of expected competition
+// duration, do not use the 25% race-dose rule. Running in a run-dominant hybrid
+// race is the obvious example." A quarter of the running in a HYROX is a
+// training decision about a whole endurance quality, not a station rehearsal,
+// and the rule that governs it is the endurance block's own progression.
+//
+// He also asked that this stay distinguishable: the >= 50% time-share threshold
+// is codification, not a source-derived physiological threshold.
+//
+// How it is approximated, and the limit of that: the engine holds each
+// component's race dose in metres or reps, and holds no expected duration at
+// all, so a literal time share cannot be computed from what it knows. The
+// exemption is carried by modality instead -- Run, Swim and Bike declare
+// `race: null` and take the unknownDose path below, which is every component
+// that could plausibly dominate a hybrid race's clock. That is the right set
+// today. It is an approximation by modality rather than a measured share, and
+// an event whose dominant component is a station rather than a locomotion mode
+// would need the real calculation.
 const COVERAGE_WEEK1 = 0.75;         // "Week 1: at least 75% of named components"
 const MIN_EXPOSURES_W1_W3 = 2;       // "at least 2 total direct exposures across the three weeks"
 
@@ -86,6 +108,8 @@ function exposureOf(row, component) {
   const count = (reps.match(/^(\d+)\b/) || [])[1];
   const done = metres ? sets * Number(metres) : count ? sets * Number(count) : null;
 
+  // No race dose declared is the dominant-component exemption above, not an
+  // oversight: the endurance modalities carry `race: null` deliberately.
   if (!spec?.race || done === null) return { row, sufficient: true, unknownDose: true };
   const need = (spec.race.metres || spec.race.reps) * DOSE_FRACTION;
   return { row, sufficient: done >= need, done, need, unknownDose: false };
