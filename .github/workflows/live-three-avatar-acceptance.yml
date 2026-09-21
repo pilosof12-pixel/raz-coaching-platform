@@ -231,6 +231,18 @@ jobs:
             : selectionRaw.split(',').map(x=>x.trim()).filter(Boolean).map(alias);
           const selected=[hybrid,youth,tactical,weightlifter,mmacamp,footballer,masters,lifterMeet,hebrewLifter,dualEvent,traveller,postpartum,calisthenics].filter(a=>wanted.includes(a.id));
           if(!selected.length) throw new Error('No avatars selected: '+selectionRaw);
+          // Reasoning effort, per run, from an [EFFORT:medium] tag in the commit
+          // message. Run #132 lost both avatars to three consecutive calls at
+          // "high" running past the 600s ceiling and returning nothing, and
+          // whether "medium" costs enough quality to matter can only be settled
+          // by timing and scoring one. Without this the only way to ask was to
+          // redeploy a new default for every athlete at once.
+          const effortTag=(String(process.env.COMMIT_MESSAGE||'').match(/\[EFFORT:(low|medium|high)\]/i)||[])[1];
+          if(effortTag){
+            for(const a of selected) a.intake={...a.intake, qa_diagnostics:true, qa_reasoning_effort:effortTag.toLowerCase()};
+            console.log('Reasoning effort override:', effortTag.toLowerCase());
+            result.reasoning_effort=effortTag.toLowerCase();
+          }
           console.log('Running avatars:', selected.map(a=>a.id).join(', '));
           result.selection=selected.map(a=>a.id);
           // A throw from one avatar used to kill the script before result.json

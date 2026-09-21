@@ -34,7 +34,7 @@ const before = s;
 const sigOld = 'async function runEngineRaw(userContent) {';
 const sigNew = `async function runEngineRaw(userContent, engineOptions = {}) {
   const effectiveMaxOutputTokens = Number(engineOptions?.maxOutputTokens || OPENAI_MAX_OUTPUT_TOKENS);
-  const effectiveReasoningEffort = String(engineOptions?.reasoningEffort || OPENAI_REASONING_EFFORT); // EMPTY-OUTPUT-ESCALATION`;
+  const effectiveReasoningEffort = String(engineOptions?.reasoningEffort || reasoningEffortFor(extractOpenAIIntake(userContent))); // EMPTY-OUTPUT-ESCALATION`;
 if (!s.includes(sigNew)) {
   if (!s.includes(sigOld)) throw new Error('runEngineRaw signature anchor missing');
   s = s.replace(sigOld, sigNew);
