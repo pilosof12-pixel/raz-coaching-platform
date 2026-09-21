@@ -76,6 +76,14 @@ const PATTERNS = [
   [/one[- ]?arm (?:pull|chin)[- ]?up/i, CATEGORY.VERTICAL_PULL, ROLE.PRIMARY],
   [/weighted (?:pull|chin)[- ]?up/i, CATEGORY.VERTICAL_PULL, ROLE.SECONDARY],
   [/lat pulldown|pulldown/i, CATEGORY.VERTICAL_PULL, ROLE.ACCESSORY],
+  // An Australian pull-up is a row: feet on the ground, body under a bar at
+  // hip height. It is the same movement as an inverted row and shares none of
+  // the vertical pull's loading. It has to be named before the generic pull-up
+  // rule below, which matches on the words rather than the pattern and was
+  // classifying it as a vertical pull -- so for the calisthenics athlete it
+  // counted 3 against a day's pulling stress instead of 2, and stood in for a
+  // weighted pull-up goal it cannot serve.
+  [/australian (?:pull|chin)[- ]?up/i, CATEGORY.HORIZONTAL_PULL, ROLE.ACCESSORY],
   [/(?:pull|chin)[- ]?up/i, CATEGORY.VERTICAL_PULL, ROLE.SECONDARY],
 
   // Horizontal pulling.
