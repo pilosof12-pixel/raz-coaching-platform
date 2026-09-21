@@ -1,34 +1,34 @@
 {
-  "timestamp": "2026-09-21T07:53:16.008Z",
+  "timestamp": "2026-09-21T11:15:07.941Z",
   "base": "https://raz-coaching-platform.onrender.com",
-  "head_sha": "d1dd79f49c4195830c48987df9d635ce266f1ccf",
-  "runtime": "live65 2026-09-21T07:52:19Z",
+  "head_sha": "bd3cdc2f7b19b2d783e2e360f82d2c2e09ef1330",
+  "runtime": "live67 2026-09-21T11:14:19Z",
   "results": [
     {
       "id": "dual_event_hyrox",
-      "job_id": "dde37369cf881a0f0d9abb8b85b7e100",
+      "job_id": "8de224cd1cfc6cc8a7b4f59a67803240",
       "ok": true,
       "status": "done",
       "stage": "finalizing",
-      "attempt": 4,
-      "detail": "delivered with unresolved rules: V38_INCOMPLETE_SESSION+V90_SESSION_GROWS_INTO_DAY_ZERO QA trace: T1:request_ceiling -> A1:SPORT_DAY_COUPLING_VIOLATION+V74_NOVEL_EXERCISE_NEAR_EVENT -> A2:V38_INCOMPLETE_SESSION+V90_SESSION_GROWS_INTO_DAY_ZERO -> A3:V38_INCOMPLETE_SESSION+V90_SESSION_GROWS_INTO_DAY_ZERO -> A4:V38_INCOMPLETE_SESSION+V90_SESSION_GROWS_INTO_DAY_ZERO.",
+      "attempt": 1,
+      "detail": "saving program after 1 model call(s)",
       "last_seen_status": "done",
       "error": null,
-      "program_chars": 16468,
-      "seconds": 1016
+      "program_chars": 17486,
+      "seconds": 305
     },
     {
       "id": "advanced_calisthenics",
-      "job_id": "0e6728bcfeb70d1ac67a814f76d7d921",
+      "job_id": "1db8cfb00ed0c284656121ee41345054",
       "ok": true,
       "status": "done",
       "stage": "finalizing",
       "attempt": 4,
-      "detail": "delivered with unresolved rules: V38_SKILL_WITHOUT_FOUNDATION QA trace: T1:request_ceiling -> A1:NAMED_GOAL_DIRECT_EXPOSURE_MISSING+WEEKLY_MRV_EXCEEDED+V38_SKILL_WITHOUT_FOUNDATION+NAMED_GOAL_DIRECT_EXPOSURE_MISSING+UNBENCHMARKED_VARIATION_LOAD_TOO_ASSERTIVE+PRIMARY_EXACT_MOVEMENT_MISSING -> A2:V38_SKILL_WITHOUT_FOUNDATION+UNBENCHMARKED_VARIATION_LOAD_TOO_ASSERTIVE+PRIMARY_EXACT_MOVEMENT_MISSING -> A3:V38_SKILL_WITHOUT_FOUNDATION -> A4:V38_SKILL_WITHOUT_FOUNDATION.",
+      "detail": "delivered with unresolved rules: V38_SKILL_WITHOUT_FOUNDATION QA trace: A1:EQUIPMENT_VIOLATION+V38_CONSECUTIVE_CONFLICTING_EXPOSURE+V52_KEY_SESSION_CROWDED+UNBENCHMARKED_VARIATION_LOAD_TOO_ASSERTIVE+PRIMARY_EXACT_MOVEMENT_MISSING -> A2:V38_CONSECUTIVE_CONFLICTING_EXPOSURE+V52_KEY_SESSION_CROWDED -> A3:V38_SKILL_WITHOUT_FOUNDATION -> A4:V38_SKILL_WITHOUT_FOUNDATION.",
       "last_seen_status": "done",
       "error": null,
-      "program_chars": 21329,
-      "seconds": 1269
+      "program_chars": 22432,
+      "seconds": 649
     }
   ],
   "selection": [
