@@ -1759,13 +1759,39 @@ async function generateValidatedProgram(intake, onProgress = async () => {}) {
   const failCounts = Object.create(null);
   let lastValid = null;
   const deadline = Date.now() + BUILD_JOB_TIMEOUT_MS;
+  // Tell the transport which budget owns its calls, so a request cannot run
+  // past the deadline that is supposed to bound it.
+  if (typeof setBuildDeadline === "function") setBuildDeadline(deadline);
   // Timeouts and empty responses are infrastructure, not quality verdicts, so
   // they retry on their own budget rather than eating the repair attempts.
   let transientRetries = 0;
   const MAX_TRANSIENT_RETRIES = 3;
 
+  // Ship what we have rather than throwing it away.
+  //
+  // This used to raise BUILD_TIMEOUT, which discards `lastValid` -- a program
+  // that already passed structural validation and was waiting for a polish
+  // attempt. The athlete then got an error and a suggestion to retry, and the
+  // credits already spent bought nothing. The salvage path at the bottom of
+  // this function does exactly the right thing in that situation and the
+  // deadline branch simply never reached it.
+  //
+  // Run #132 is what made this urgent: 4 attempts x a 600s request ceiling is
+  // 40 minutes of wall clock, and the only thing standing between a slow build
+  // and a thrown-away program was luck about which check fired first.
+  const outOfTime = () => Date.now() >= deadline;
+  const salvage = async (why) => {
+    if (!lastValid) return null;
+    let program = lastValid;
+    for (const code of Object.keys(failCounts)) program = hardSubstitute(code, program, intake);
+    await onProgress("finalizing", MAX_ATTEMPTS, why);
+    return reformatWarmupCells(program);
+  };
+
   for (let attempt = 1; attempt <= MAX_ATTEMPTS; attempt++) {
-    if (Date.now() >= deadline) {
+    if (outOfTime()) {
+      const salvaged = await salvage("time budget reached; shipping the last structurally valid program");
+      if (salvaged) return salvaged;
       const err = new Error("Program generation exceeded the safe time limit. Please retry; your intake has been saved.");
       err.code = "BUILD_TIMEOUT";
       throw err;
