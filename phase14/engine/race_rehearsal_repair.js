@@ -127,20 +127,35 @@ export function orderIntoCompetitionSequence(program, intake, week, hostDay) {
   // Run, SkiErg, Run, Sled Push, Run, Sled Pull, so alternating is both what the
   // race does and what satisfies the transition rules in either direction: every
   // station has a run behind it and every run has a station behind it.
-  // Station first, then the run that comes off it.
+  // Lead with the run when there are enough runs to alternate all the way.
   //
-  // Leading with the run was tried and is wrong for what the rule measures: the
-  // compromised-work floor counts station-then-run pairs, and a run placed in
-  // front of every station is spent before any station can be followed by one.
-  // Run #124 went from clean to two findings that way. A race alternates either
-  // way round, and putting the run behind the station is also the direction the
-  // coach asks for -- "make at least two different stations feed immediately
-  // into running" -- so this ordering answers the rule and his finding together.
+  // A HYROX race is run, station, run, station, and the coach asked for exactly
+  // that: "start with the 800 m Run, then SkiErg, then Run, Sled Push". The
+  // model had already written it that way on run #129 and this repair reordered
+  // it to station-first, which broke both the race sequence and the note that
+  // said "move straight to SkiErg" -- two of his five findings, 0.35 between
+  // them, and both of them mine.
+  //
+  // Station-first is not simply wrong though, which is why this is a choice
+  // rather than a reversal. The compromised-work floor counts station-then-run
+  // pairs, and when runs are scarce a run in front of every station is spent
+  // before any station can be followed by one: leading with the run took run
+  // #124 from clean to two findings. With at least as many runs as stations,
+  // alternating from the run gives both the race order and a run behind every
+  // station. With fewer, starting from the station is what preserves the pairs.
+  const leadWithRun = runs.length >= comps.length;
   const ordered = [];
   let r = 0;
-  for (const c of comps) {
-    ordered.push(c);
-    if (r < runs.length) { ordered.push(runs[r]); r += 1; }
+  if (leadWithRun) {
+    for (const c of comps) {
+      if (r < runs.length) { ordered.push(runs[r]); r += 1; }
+      ordered.push(c);
+    }
+  } else {
+    for (const c of comps) {
+      ordered.push(c);
+      if (r < runs.length) { ordered.push(runs[r]); r += 1; }
+    }
   }
   while (r < runs.length) { ordered.push(runs[r]); r += 1; }
   if (ordered.length !== slots.length) return program;

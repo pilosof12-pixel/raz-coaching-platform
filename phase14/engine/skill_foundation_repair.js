@@ -132,15 +132,21 @@ export function repairSkillFoundation(program, intake = {}) {
           for (const [donor, kind] of [[pull, 'pulling'], [push, 'pushing']]) {
             if (!donor) continue;
             const [name, dose] = donor;
+            // A maintenance dose, not the development dose the movement carries
+            // where it is the point of the session. This layer exists to put
+            // strength under a skill day, and the coach charged 0.20 on run #129
+            // for cumulative elbow load from exactly this kind of support volume
+            // on a calisthenics athlete. Half the sets, never below one.
+            const sets = Math.max(1, Math.floor((Number(dose.sets) || 1) / 2));
             const row = newRow(parsed, {
               day,
               name,
               load: dose.load,
-              sets: dose.sets,
+              sets: String(sets),
               reps: dose.reps,
               rest: dose.rest,
               rpe: dose.rpe,
-              note: `Foundational ${kind} under the skill work on this day: the skill drill trains the pattern, this trains the strength it needs. Same dose you already carry for it elsewhere in the block.`,
+              note: `Foundational ${kind} under the skill work on this day: the skill drill trains the pattern, this trains the strength it needs. Held at a maintenance dose so it supports the skill rather than competing with it.`,
             });
             const at = trial.map((c, i) => ({ c, i })).filter((x) => String(x.c[parsed.day] || '').trim() === day).pop();
             const insertAt = at ? at.i + 1 : trial.length;

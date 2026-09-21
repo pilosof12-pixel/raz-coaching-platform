@@ -136,7 +136,11 @@ export function competitionOrderClaimUnsupported(program, intake = {}) {
 // by the rehearsal sequencer, and moving them again to satisfy a sentence would
 // let prose drive programming.
 const OFF_CLAIM = /\b(?:straight|directly)?\s*off\s+(?:the\s+)?([A-Za-z'-]+(?:\s+[A-Za-z'-]+){0,3})\b/i;
-const INTO_CLAIM = /\b(?:straight|directly)?\s*(?:into|onto)\s+(?:the\s+)?([A-Za-z'-]+(?:\s+[A-Za-z'-]+){0,3})\b/i;
+// "move straight to SkiErg" is the same promise as "straight into SkiErg", and
+// the coach charged 0.10 for it on run #129 while this rule watched for `into`
+// and `onto` only. A bare "to" needs the straight/directly qualifier in front of
+// it, or the rule would fire on every ordinary sentence containing the word.
+const INTO_CLAIM = /\b(?:(?:straight|directly)\s*(?:into|onto|to)|into|onto)\s+(?:the\s+)?([A-Za-z'-]+(?:\s+[A-Za-z'-]+){0,3})\b/i;
 const TRAILING_NOUN = /\s+(?:row|rep|reps|set|sets)$/i;
 
 const known = (name) => {
