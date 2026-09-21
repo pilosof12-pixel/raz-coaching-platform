@@ -116,7 +116,33 @@ export function orderIntoCompetitionSequence(program, intake, week, hostDay) {
   const runs = movable.filter((m) => m.run);
   const comps = movable.filter((m) => m.component)
     .sort((a, b) => (rank.get(a.component) ?? 99) - (rank.get(b.component) ?? 99));
-  const ordered = [...runs.slice(0, 1), ...comps, ...runs.slice(1)];
+
+  // Interleave, do not front-load.
+  //
+  // This used to emit every run first and then the stations in order, which
+  // quietly undid the compromised-running repair that had just moved a run
+  // behind a station: run #127 came back with the pairing gone in weeks 1 and 2,
+  // because one of these repairs was reordering the other's work. A HYROX race
+  // alternates run and station, his INSTEAD for this finding is written as
+  // Run, SkiErg, Run, Sled Push, Run, Sled Pull, so alternating is both what the
+  // race does and what satisfies the transition rules in either direction: every
+  // station has a run behind it and every run has a station behind it.
+  // Station first, then the run that comes off it.
+  //
+  // Leading with the run was tried and is wrong for what the rule measures: the
+  // compromised-work floor counts station-then-run pairs, and a run placed in
+  // front of every station is spent before any station can be followed by one.
+  // Run #124 went from clean to two findings that way. A race alternates either
+  // way round, and putting the run behind the station is also the direction the
+  // coach asks for -- "make at least two different stations feed immediately
+  // into running" -- so this ordering answers the rule and his finding together.
+  const ordered = [];
+  let r = 0;
+  for (const c of comps) {
+    ordered.push(c);
+    if (r < runs.length) { ordered.push(runs[r]); r += 1; }
+  }
+  while (r < runs.length) { ordered.push(runs[r]); r += 1; }
   if (ordered.length !== slots.length) return program;
 
   slots.forEach((slot, i) => { cells[slot] = ordered[i].row; });
