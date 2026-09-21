@@ -27,6 +27,7 @@ import { repairEnduranceRedundancy } from './phase15_elite_guardrails.js';
 import { repairRunBaseline } from './advanced_hybrid_quality.js';
 import { repairInjuryConstraint, collectInjuryConstraintFlags } from './v84_injury_constraint.js';
 import { repairMarathonProgression } from './marathon_progression.js';
+import { stripRepeatedHeaderRows } from './stray_header_repair.js';
 import { repairPainTolerance, collectPainToleranceFlags } from './pain_tolerance.js';
 import { normalizeWeekTsvShape } from './tsv_shape.js';
 import { repairPhase15Program } from './phase15_program_qa.js';
@@ -448,6 +449,19 @@ export function collectRepairableValidationFailures(program, intake = {}, option
     deterministic_repairs.push({ type: 'tsv_row_shape', rows: shaped.rows });
   }
 
+  // Before the dictionary gate, because that gate is the first thing this bundle
+  // runs and a repeated header row trips it instantly. Run #126's first attempt
+  // raised five codes at once and the unknown-name diagnostic named the
+  // hallucinated exercise as, literally, "Exercise" -- the model had emitted the
+  // header line a second time inside a week block. One stray row, five findings,
+  // and a whole regeneration, with no repair ever getting a look because the
+  // build was already on its way back to the model.
+  const headerStripped = stripRepeatedHeaderRows(candidate);
+  if (headerStripped.changed) {
+    candidate = headerStripped.program;
+    deterministic_repairs.push({ type: 'stray_header_row_dropped', rows: headerStripped.dropped.length });
+  }
+
   // Normalize the model-authored exercise vocabulary first. Deterministic coaching
   // floors are only applied after that initial dictionary pass so they operate on
   // stable movement identity rather than trying to infer intent from a rejected
@@ -463,7 +477,11 @@ export function collectRepairableValidationFailures(program, intake = {}, option
   if (dictionary.ok) {
     const normalized = applyDeterministicCandidateRepairs(candidate, intake);
     candidate = normalized.program;
-    deterministic_repairs = normalized.repairs;
+    // Concat, not assign: this used to replace the array and silently discard
+    // the header-strip and row-shape records written above it. The repairs still
+    // happened, but the build's own account of what it did to the program lost
+    // them, which is the part anyone diagnosing a slow run reads.
+    deterministic_repairs = [...deterministic_repairs, ...normalized.repairs];
 
     // The repair layer inserts only canonical source-authored movements, but run
     // the same dictionary gate again so production never grants itself a bypass.
