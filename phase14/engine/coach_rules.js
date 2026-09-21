@@ -15,6 +15,7 @@
 
 import { parseWeek } from './v34_workload_accounting.js';
 import { weekdayKey } from './weekday.js';
+import { classifyExercise } from './v38_movement_taxonomy.js';
 import { THRESHOLDS } from './coach_standard.js';
 import { campPlanByWeek } from './v78_sport_taper.js';
 
@@ -658,9 +659,28 @@ export function unanchoredPrimaryLoad(program, intake = {}) {
     if (!byName.has(r.name)) byName.set(r.name, []);
     byName.get(r.name).push(r);
   }
+  // Which movement patterns in this family already carry the number. A goal
+  // family matches on words, so "Weighted pull-up with 40 kg for 3" also
+  // catches "Australian Pull-up" -- a bodyweight row that cannot serve a
+  // weighted vertical pulling goal and cannot be prescribed in kilos either.
+  // If another movement in the family does carry the load and is a different
+  // pattern, the unanchored one is not the goal movement and charging it is a
+  // false positive. Where nothing in the family is anchored there is no second
+  // opinion available, and the finding stands -- which is the defect this rule
+  // exists for.
+  const anchoredCategories = new Set();
+  for (const [name, list] of byName) {
+    if (!list.some(loadAnchored)) continue;
+    const { category } = classifyExercise(name);
+    if (category && category !== 'unknown') anchoredCategories.add(category);
+  }
+
   const out = [];
   for (const [name, list] of byName) {
     if (list.some(loadAnchored)) continue;
+    const { category } = classifyExercise(name);
+    if (anchoredCategories.size && category && category !== 'unknown'
+      && !anchoredCategories.has(category)) continue;
     const goal = targeted.find((g) => g.family.test(name));
     out.push({
       rule: 'PRIMARY_LOAD_UNANCHORED',
