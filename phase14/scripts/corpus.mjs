@@ -80,7 +80,13 @@ export const LIFTER = { ...C.weightlifter_peak, competition_date: daysOut(53), e
 // for one weekday in seven -- the same straddle the helper above now avoids. It
 // is just saturday(4).
 export const MEET = { ...C.weightlifter_meet_week, competition_date: daysOut(25) };
-export const FIGHTER = { ...C.mma_fight_camp, competition_date: daysOut(19) };
+// event_type matters as much as the date: without it selectProgramType falls
+// through every branch and answers `unclassified`, so the whole MMA corpus was
+// being graded on no model at all while production -- which does set
+// event_type:'combat' in the intake -- graded the same programs as a combat
+// camp. The offline measurement has to route the way production routes or it is
+// measuring a different engine.
+export const FIGHTER = { ...C.mma_fight_camp, competition_date: daysOut(19), event_type: 'combat' };
 
 // Coach-scored programs first, so the known answers sit at the top of a report.
 export const CORPUS = [
