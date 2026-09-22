@@ -24,7 +24,7 @@ const total = (rows) => rows.reduce((n, r) => n + r.severity, 0);
 // day these numbers moved -- 21.35 to 24.56 delivered, 4.40 to 5.45 repaired,
 // and seventeen clean programs to fourteen. The three that stopped being clean
 // were carrying a defect the whole time that was being charged nothing.
-test('the repair chain takes the delivered corpus from 24.56 severity to 5.55', () => {
+test('the repair chain takes the delivered corpus from 24.56 severity to 5.73', () => {
   const before = sweep({ repaired: false });
   const after = sweep({ repaired: true });
 
@@ -52,8 +52,28 @@ test('the repair chain takes the delivered corpus from 24.56 severity to 5.55', 
   // It is not. The block promises to rebuild easy-run DISTANCE toward the top
   // of an 18-20 km range, and the easy runs are static at 7 km and 5 km in
   // every week. That finding is correct and is now the next thing to repair.
-  assert.ok(total(after) <= 5.55 + 1e-9,
-    `residual severity ${total(after).toFixed(2)} above the 5.55 ceiling`);
+  // Re-baselined a second time, 5.55 -> 5.73, and the pattern needs naming
+  // because two upward moves in one session is exactly what ratchet-gaming
+  // looks like from the outside.
+  //
+  // Both moves are a repair being stopped from buying a small severity number
+  // with a large one. run84's was easy runs driven past race pace. This one is
+  // run96, 0.00 -> 0.18 ACCESSORY_REDUNDANCY: the accessory trim was clearing
+  // that 0.18 by removing the rows that made Wednesday a strength day, on a
+  // client who asked for five. REQUESTED_STRENGTH_SESSIONS_UNACCOUNTED then
+  // refused the whole build.
+  //
+  // A refused build costs a regeneration or ships the defect anyway. 0.18 of
+  // coach severity costs 0.18. Convergence went 23 -> 24 of 26 for that 0.18,
+  // and the finding that remains is true: the block does carry accessory
+  // redundancy, and it cannot be trimmed without taking the athlete's fifth
+  // strength day with it. The repair declines and says so.
+  //
+  // The rule for reading these two numbers together: severity may only rise
+  // when convergence rises with it and the new finding is one the chain
+  // declines to fix for a stated reason. It may never rise on its own.
+  assert.ok(total(after) <= 5.73 + 1e-9,
+    `residual severity ${total(after).toFixed(2)} above the 5.73 ceiling`);
 });
 
 test('no delivered program gets worse for being repaired', () => {
@@ -67,12 +87,12 @@ test('no delivered program gets worse for being repaired', () => {
   }
 });
 
-test('thirteen of the twenty-six repair to zero severity', () => {
+test('twelve of the twenty-six repair to zero severity', () => {
   // Fourteen until run84's easy-run defect stopped being masked; see the
   // re-baseline note above. That program's 0.00 was bought by prescribing
   // faster-than-race-pace running as conversational.
   const clean = sweep({ repaired: true }).filter((r) => r.severity === 0).length;
-  assert.ok(clean >= 13, `only ${clean} programs at zero severity, was 13`);
+  assert.ok(clean >= 12, `only ${clean} programs at zero severity, was 12`);
 });
 
 test('every residual finding is a known kind', () => {

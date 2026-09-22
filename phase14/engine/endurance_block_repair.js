@@ -16,6 +16,7 @@
 import { rows, toleratedDistance, goalFamilyTiers, benchmarks, accessoryRedundancy, repeatedSprintExposure, sprintDistanceSpecificity, taperAgainstSource, repeatedSprintProgression } from './coach_rules.js';
 import { parseWeek } from './v34_workload_accounting.js';
 import { auditProgramStructure } from './v38_structural_audit.js';
+import { strengthSessionAccountingFlags } from './phase15_elite_guardrails.js';
 import { statedGoalFamilies } from './coach_rules.js';
 import { taperPowerSpike } from './coach_race_block_rules.js';
 import { rebuild } from './tsv_rows.js';
@@ -405,8 +406,43 @@ const specificityOf = (name) => (SPECIFICITY.find(([re]) => re.test(name)) || [n
 // work on that reasoning is how a trim becomes an injury.
 const TRIMMABLE_FUNCTIONS = new Set(['horizontal_pull', 'horizontal_press']);
 
+// The client asked for a number of strength days. A trim may not answer that
+// request by quietly turning one of them into a mobility session.
+//
+// run96 asked for five and came back with four: the accessory trim took the
+// rows that made Wednesday a strength day and left Dead Bug, Pallof Press and
+// a carry behind, which is a day the athlete turns up for and does no
+// resistance training. REQUESTED_STRENGTH_SESSIONS_UNACCOUNTED caught it and
+// refused the build, and the structural audit this guard reads does not raise
+// that code -- the third repair this session to clear its own target while
+// breaking a rule the audit cannot see.
+function weekOneShape(program) {
+  const m = String(program || '').match(/START_WEEK1_TSV\s*\n([\s\S]*?)\nEND_WEEK1_TSV/i);
+  if (!m) return null;
+  const lines = m[1].split('\n').filter(Boolean);
+  if (lines.length < 2) return null;
+  const header = lines[0].split('\t').map((x) => x.trim().toLowerCase());
+  return {
+    idx: Object.fromEntries(header.map((x, i) => [x, i])),
+    rows: lines.slice(1).map((x) => ({ cells: x.split('\t') })),
+  };
+}
+function lostARequestedStrengthDay(before, after, intake) {
+  const flagsFor = (program) => {
+    const shape = weekOneShape(program);
+    if (!shape) return null;
+    try { return strengthSessionAccountingFlags(program, intake, shape).length; }
+    catch { return null; }
+  };
+  const a = flagsFor(before);
+  const b = flagsFor(after);
+  if (a === null || b === null) return false;
+  return b > a;
+}
+
 // Did removing those rows raise anything that was not there before?
 function brokeSomething(before, after, intake, ignore = []) {
+  if (lostARequestedStrengthDay(before, after, intake)) return true;
   const count = (program) => {
     try {
       return auditProgramStructure(program, intake).map((f) => f.code || f.rule).filter(Boolean);
