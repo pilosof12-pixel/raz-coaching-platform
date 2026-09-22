@@ -95,7 +95,7 @@ function familiarBallistic(program, week) {
 // rightly: a live build died on exactly that contradiction between these two
 // rules. "Familiar" was in this file's own description of the work and nowhere
 // in the code that chose it.
-function chooseBallistic(intake, exclude = new Set(), familiar = new Map(), used = new Set()) {
+function chooseBallistic(intake, exclude = new Set(), familiar = new Map(), used = new Set(), familiarOnly = false) {
   // Prefer what the athlete has already done: same movement, same dose, nothing
   // to discover. But introducing one is legitimate too. Correctly dosed
   // ballistic work leaves very little soreness and builds almost no mass, so a
@@ -114,6 +114,27 @@ function chooseBallistic(intake, exclude = new Set(), familiar = new Map(), used
       || BALLISTIC_OPTIONS.find((o) => !o.needs && !exclude.has(o.name) && !(skipUsed && used.has(o.name)))
       || null;
   };
+  // In the event week itself, promote or nothing.
+  //
+  // This file's own header says a swap this close must promote something the
+  // athlete already knows, and then the fallback below introduced one anyway --
+  // Box Jump into a fight week on both camp programs, which V92 refuses by
+  // name: nothing new in the last seven to ten days. The argument for
+  // introducing is that correctly dosed ballistic work costs almost no
+  // recovery, and the camp economy rule accepts it on those grounds; V92 is a
+  // different rule and does not. Earlier weeks still allow it, because there
+  // the athlete has time to discover what a new movement costs them.
+  if (familiarOnly) {
+    for (const [name, spec] of familiar) {
+      if (exclude.has(name) || used.has(name)) continue;
+      return spec;
+    }
+    for (const [name, spec] of familiar) {
+      if (exclude.has(name)) continue;
+      return spec;
+    }
+    return null;
+  }
   // Vary it across the block first; fall back to repeating only when the
   // athlete's kit leaves nothing else.
   return pick(true) || pick(false);
@@ -161,8 +182,30 @@ export function collectBallisticShareFlags(program, intake = {}, now = Date.now(
       // anyway spends the attempt budget and kills the build. Deleting rows to
       // force the number would risk taking the last strength-maintenance work
       // with it, so the brief carries this case instead.
-      const present = new Set(rows.filter((r) => isPowerExposure(r.name)).map((r) => r.name));
-      const introducible = BALLISTIC_OPTIONS.filter((o) => !present.has(o.name) && !familiar.has(o.name)).length;
+      // Week-level, because that is the set the repair works against. V82
+      // forbids the same power movement twice in a week, so the repair excludes
+      // anything already standing anywhere in the week -- and this guard was
+      // still counting those as spare. It therefore reported a swap available
+      // that the repair then refused to make, and the flag survived its own
+      // repair on every pass.
+      const weekPower = new Set([...data.days.values()].flat()
+        .filter((r) => isPowerExposure(r.name)).map((r) => r.name));
+      const present = new Set([
+        ...weekPower,
+        ...rows.filter((r) => isPowerExposure(r.name)).map((r) => r.name),
+      ]);
+      // In the event week the repair may only promote what the athlete already
+      // knows, so nothing is introducible there and the rule must not ask for
+      // it. Counting the catalogue regardless is how this flag came to demand a
+      // swap the repair had just been forbidden to make: V92 refused the Box
+      // Jump it introduced, and with that closed off the session fell back
+      // under the share and V79 asked again. A gate that keeps asking for what
+      // its own repair cannot deliver spends the attempt budget and kills the
+      // build, which is the case this file already carries in the brief.
+      const eventWeek = stateForWeek(intake, week, now) === STATE.COMPETITION_WEEK;
+      const introducible = eventWeek
+        ? 0
+        : BALLISTIC_OPTIONS.filter((o) => !present.has(o.name) && !familiar.has(o.name)).length;
       const spare = [...familiar.keys()].filter((n) => !present.has(n)).length + introducible;
       const swappable = Math.min(spare, generic.length);
       const best = (rows.filter((r) => isPowerExposure(r.name) || SLED.test(r.name) || NECK_GRIP.test(r.name)).length + swappable) / rows.length;
@@ -220,7 +263,8 @@ export function repairBallisticShare(program, intake = {}, now = Date.now()) {
           ...weekPower,
           ...current.filter((r) => isPowerExposure(r.name)).map((r) => r.name),
         ]);
-        const option = chooseBallistic(intake, present, familiar, usedThisWeek);
+        const eventWeek = stateForWeek(intake, week, now) === STATE.COMPETITION_WEEK;
+        const option = chooseBallistic(intake, present, familiar, usedThisWeek, eventWeek);
         if (!option) break;
 
         // Swap the most generic row rather than adding to the session.

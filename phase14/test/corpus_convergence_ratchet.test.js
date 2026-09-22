@@ -21,10 +21,10 @@ import { convergence } from '../scripts/corpus_convergence.mjs';
 
 const rows = convergence();
 
-test('the chain converges on at least 20 of the 26 delivered programs', () => {
+test('the chain converges on at least 22 of the 26 delivered programs', () => {
   assert.equal(rows.length, 26, 'corpus size changed; re-baseline deliberately');
   const accepted = rows.filter((r) => r.accepted).length;
-  assert.ok(accepted >= 20, `only ${accepted} of 26 converge; this number must not fall`);
+  assert.ok(accepted >= 22, `only ${accepted} of 26 converge; this number must not fall`);
 });
 
 test('no fixture is blocked by a defect the chain inflicts on itself', () => {
@@ -46,30 +46,26 @@ test('no fixture is blocked by a defect the chain inflicts on itself', () => {
 test('the unconverged set is exactly the one we have accounted for', () => {
   const blocked = rows.filter((r) => !r.accepted).map((r) => r.file).sort();
   assert.deepEqual(blocked, [
-    'mma_fight_camp-program.txt',
     'run114_weightlifter_peak.txt',
     'run116_dual_event_hyrox.txt',
     'run84_tactical_3k.txt',
     'run96_weightlifter_intensification.txt',
-    'run97_mma_camp_delivered.txt',
   ], 'a new fixture stopped converging, or one started; re-baseline deliberately');
 });
 
-test('the fight-camp calendar no longer blocks its own builds', () => {
-  // Six codes came off these programs in sequence, and every one was ours: a
+test('the fight-camp programs converge', () => {
+  // Eight blocking codes came off these in sequence and every one was ours: a
   // 90s rest against a 120s alactic minimum, three sets against a two-set
   // primer cap, a movement the week already carried, rows swapped in after the
-  // fight-week clock was written, a calendar that assumed the bout was always
-  // in week 4, and then a calendar that blanked the days past it while the week
-  // table still trained on them.
+  // fight-week clock was written, a calendar assuming the bout was always in
+  // week 4, a calendar blanking the days past it while the table still trained,
+  // a Box Jump introduced into fight week that V92 refuses by name, and a share
+  // guard counting a swap as available that the repair had been forbidden to
+  // make.
   //
-  // The last one was the coach's ruling rather than a bug: Day 0 ends the
-  // pre-event phase, not the delivered four weeks, so days after it are
-  // classified as post-event instead of erased. Two of these programs now
-  // converge outright.
-  const stillBlocked = rows.filter((r) => !r.accepted && /mma|fight_camp/.test(r.file));
-  assert.equal(stillBlocked.length, 2, 'run113 and run92 converge now');
-  const codes = new Set(stillBlocked.flatMap((r) => r.codes));
-  assert.deepEqual([...codes], ['V92_NOVEL_EXERCISE_NEAR_EVENT'],
-    'what is left is a different rule about novelty, not the calendar');
+  // The last two are the shape worth remembering: a gate whose feasibility
+  // check disagrees with its own repair asks forever, spends the attempt
+  // budget, and kills the build.
+  const blocked = rows.filter((r) => !r.accepted && /mma|fight_camp/.test(r.file));
+  assert.deepEqual(blocked.map((r) => r.file), []);
 });
