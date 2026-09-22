@@ -128,6 +128,23 @@ const mmss = (s) => { const t = Math.floor(s); return `${Math.floor(t / 60)}:${S
       // Only a rep prescribed as a distance is quality work; an easy run by
       // duration is not what this standard is about.
       if (!/\d+\s*(?:m|km)\b/i.test(String(row[parsed.reps] || ''))) return;
+      // And an easy run that says so is not quality work either, whatever its
+      // reps column looks like.
+      //
+      // That duration test was the only thing separating the two, and this
+      // athlete's easy runs are prescribed as "7 km" -- so the repair drove
+      // them to 95% and 97% of 3K goal speed and left the words "Easy
+      // conversational pace" in front of them. Weeks 3 and 4 told a runner
+      // whose 3K pace is 4:30/km to run easy at 4:12 and 4:07. The gate that
+      // caught it looks for exactly these words, so the repair reads them too;
+      // a repair and the rule that judges it must agree about what a row is.
+      // The pace cell only, and "recovery" is not in the list. Reading the note
+      // too caught the interval rows, whose notes say things like "full
+      // recovery between reps" -- so the quality work stopped being repaired
+      // and week 3 came out at 91% of goal speed instead of the 95% it needs.
+      // The label that matters sits where the pace is written.
+      const paceCell = String(row[Number.isInteger(parsed.load) ? parsed.load : 0] || '');
+      if (/\b(?:zone\s*[- ]?2|easy|conversational|low[- ]?intensity)\b/i.test(paceCell)) return;
       const loadCol = Number.isInteger(parsed.load) ? parsed.load : null;
       if (loadCol === null) return;
       const text = String(row[loadCol] || '');
