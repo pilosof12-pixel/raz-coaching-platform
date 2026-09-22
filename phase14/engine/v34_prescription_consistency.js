@@ -17,6 +17,21 @@ function firstNum(raw) {
 }
 function isWarmup(name) { return /^\s*\[WARMUP\]/i.test(String(name || '')); }
 
+// Does this claim sit inside an "if ... then" clause?
+//
+// Scoped to the clause the match actually lands in, not the whole cell: a note
+// can carry a real claim in one sentence and a contingency in the next, and
+// only the contingency is exempt.
+function inConditionalClause(text, match) {
+  const at = match.index ?? text.indexOf(match[0]);
+  if (at < 0) return false;
+  const clauseStart = Math.max(
+    text.lastIndexOf('.', at), text.lastIndexOf(';', at), text.lastIndexOf('|', at),
+  ) + 1;
+  const clause = text.slice(clauseStart, at + match[0].length);
+  return /\b(?:if|unless|should\s+(?:you|it|the)|when\s+(?:you|it|the)|in\s+case)\b/i.test(clause);
+}
+
 function parseWeek(program, week) {
   const re = new RegExp(`(START_WEEK${week}_TSV\\s*\\n)([\\s\\S]*?)(\\nEND_WEEK${week}_TSV)`, 'i');
   const match = String(program || '').match(re);
@@ -256,6 +271,16 @@ export function collectProgressionLanguageFlags(program, intake = {}) {
         if (claimed) break;
         const matchedClaim = claimText.match(claim.re);
         if (!matchedClaim) continue;
+        // A contingency is not a claim about this week's dose.
+        //
+        // "If >RPE 8 or any miss, stay at the last made weight and cut 1 set"
+        // tells the athlete what to do if the session goes badly. It does not
+        // say this week carries less volume than last -- and reading it that
+        // way refused the whole meet-week build, because the sets are
+        // deliberately flat across weeks 1-3 and the note appears in every one
+        // of them. The rule is for a note that contradicts its own row; a
+        // conditional contradicts nothing until its condition is met.
+        if (inConditionalClause(claimText, matchedClaim)) continue;
         if (claim.metric === 'load') {
           if (Number.isFinite(load) && Number.isFinite(prior.load) && load !== prior.load) {
             claimed = true;
