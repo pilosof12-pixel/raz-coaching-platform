@@ -1139,6 +1139,15 @@ const EQUIPMENT_SUBSTITUTIONS = new Map([
   ["Cable Row", { outdoor: "Band Row", default: "Band Row" }],
   ["Seated Cable Row", { outdoor: "Band Row", default: "Band Row" }],
   ["Lat Pulldown", { outdoor: "Pull-up", default: "Band Row" }],
+  // A loaded carry stays a loaded carry. The sled entries below already treat
+  // Heavy Farmer Carry as the in-family answer when there is no sled, and a
+  // sandbag carry is the same movement with a different implement. Without
+  // this the HYROX block was refused outright for three Sandbag Carry rows on
+  // an athlete with no sandbag, and nothing in the chain could mend it: the
+  // validator threw, the repair had no entry, and the build went back to the
+  // model to solve a problem the dictionary already knew the answer to.
+  ["Sandbag Carry", { outdoor: "Farmer Carry", default: "Farmer Carry" }],
+  ["Sandbag Lunge", { outdoor: "Walking Lunge", default: "Dumbbell Walking Lunge" }],
   ["Sled Push", { outdoor: "Weighted Vest Hill Sprint", default: "Heavy Farmer Carry" }],
   ["Sled Drag", { outdoor: "Weighted Vest Hill Sprint", default: "Heavy Farmer Carry" }],
   ["Prowler Push", { outdoor: "Weighted Vest Hill Sprint", default: "Heavy Farmer Carry" }],
@@ -1168,6 +1177,15 @@ export function hardSubstituteEquipment(program, intake = {}) {
     // so the equipment validator/retry loop can request a coherent replacement.
     if (!sub) return null;
     const replacement = isOutdoor ? sub.outdoor : sub.default;
+    if (!replacement) return null;
+    // Never trade one equipment violation for another. A substitute the athlete
+    // also cannot perform leaves the program exactly as refused as it was, with
+    // a note claiming it was fixed.
+    const subMatch = matchDictionary(replacement);
+    const subCanonical = subMatch.status === "alias" ? subMatch.canonical : replacement;
+    const subReq = EXERCISE_EQUIPMENT_REQUIREMENTS.get(subCanonical)
+      || (subMatch.composed ? subMatch.requirements : null);
+    if (subReq && subReq.length && !subReq.every((t) => effective.has(t))) return null;
     cells[ctx.exIdx] = cell.replace(core, replacement);
     const notesIdx = ctx.header.indexOf("notes");
     if (notesIdx >= 0 && notesIdx < cells.length) {

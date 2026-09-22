@@ -154,7 +154,16 @@ export function collectEconomyFlags(program, intake = {}, now = Date.now()) {
       // buys strength, speed or tissue readiness is a full session, not a busy
       // one -- and flagging it would refuse work no repair should remove.
       if (!surplusIdx.length) continue;
-      const surplus = surplusIdx.map((i) => rows[i].name);
+      // Do not ask for a cut the repair cannot make.
+      //
+      // surplusInSession is broader than CUT_ORDER: it names what does not earn
+      // its place, and CUT_ORDER names what may actually be removed. Week 4
+      // Day -3 on the HYROX block had surplus by the first measure and nothing
+      // matching the second, so the gate refused a session the repair then
+      // declined to touch, on every attempt.
+      const cuttable = surplusIdx.filter((i) => CUT_ORDER.some((re) => re.test(rows[i].name)));
+      if (!cuttable.length) continue;
+      const surplus = cuttable.map((i) => rows[i].name);
       flags.push({
         code: 'V74_CAMP_SESSION_TOO_BUSY',
         week, day, count: rows.length, budget,
@@ -182,7 +191,10 @@ export function repairCampEconomy(program, intake = {}, now = Date.now()) {
     const drop = new Set();
     for (const [, rows] of data.days) {
       if (countsAgainstBudget(rows, intake).length <= budget) continue;
-      let over = rows.length - budget;
+      // Count the same way the decision to act was made. Using rows.length here
+      // counted the race components the budget deliberately exempts, so the
+      // repair aimed to cut more than the rule was asking for.
+      let over = countsAgainstBudget(rows, intake).length - budget;
       // Only ever cut work that does not earn its place, in the stated order.
       const surplusIdx = new Set(surplusInSession(rows.map((r) => r.name)));
       const droppable = rows.filter((_, i) => surplusIdx.has(i));

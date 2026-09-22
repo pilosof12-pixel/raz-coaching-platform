@@ -3,6 +3,7 @@ import {
   SkillCalibrationError,
   validateExercisesAgainstDictionary,
   validateEquipmentAgainstLocation,
+  hardSubstituteEquipment,
   enforceUnilateralIntensityFloor,
   enforceIntradayConditioningOrder,
   forceIntradayReorder,
@@ -489,6 +490,19 @@ export function collectRepairableValidationFailures(program, intake = {}, option
     if (repairedDictionary.ok) candidate = repairedDictionary.value.program;
   }
 
+  // Substitute before judging. The dictionary already knows the in-family
+  // answer for an implement the athlete does not have -- a sandbag carry is a
+  // loaded carry -- and hardSubstituteEquipment applies it. It was only ever
+  // reached after the gate had refused the build and the model had spent
+  // attempts on it, so a program the engine could mend deterministically went
+  // back for regeneration instead. The gate still runs immediately after, so
+  // nothing grants itself a bypass: a substitution that does not resolve the
+  // violation is refused exactly as before.
+  const equipmentSubstituted = hardSubstituteEquipment(candidate, intake);
+  if (equipmentSubstituted !== candidate) {
+    candidate = equipmentSubstituted;
+    deterministic_repairs.push({ type: 'equipment_substitution' });
+  }
   runRepairable(flags, () => validateEquipmentAgainstLocation(candidate, intake));
   runRepairable(flags, () => enforceUnilateralIntensityFloor(candidate, intake));
 

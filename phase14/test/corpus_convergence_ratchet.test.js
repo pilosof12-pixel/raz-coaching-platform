@@ -21,10 +21,10 @@ import { convergence } from '../scripts/corpus_convergence.mjs';
 
 const rows = convergence();
 
-test('the chain converges on at least 25 of the 26 delivered programs', () => {
+test('the chain converges on all 26 delivered programs', () => {
   assert.equal(rows.length, 26, 'corpus size changed; re-baseline deliberately');
   const accepted = rows.filter((r) => r.accepted).length;
-  assert.ok(accepted >= 25, `only ${accepted} of 26 converge; this number must not fall`);
+  assert.ok(accepted >= 26, `only ${accepted} of 26 converge; this number must not fall`);
 });
 
 test('no fixture is blocked by a defect the chain inflicts on itself', () => {
@@ -45,9 +45,8 @@ test('no fixture is blocked by a defect the chain inflicts on itself', () => {
 
 test('the unconverged set is exactly the one we have accounted for', () => {
   const blocked = rows.filter((r) => !r.accepted).map((r) => r.file).sort();
-  assert.deepEqual(blocked, [
-    'run116_dual_event_hyrox.txt',
-  ], 'a new fixture stopped converging, or one started; re-baseline deliberately');
+  assert.deepEqual(blocked, [],
+    'a delivered program stopped converging; the chain refuses work it used to accept');
 });
 
 test('the fight-camp programs converge', () => {
