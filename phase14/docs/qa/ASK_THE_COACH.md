@@ -111,3 +111,37 @@ actually do depends on what happened in the fight, and that is judgement rather
 than a universal threshold. Nothing prescribes training into that window.
 
 Two of the three fight-camp programs converge outright as a result.
+
+## How does a bodyweight skill progress when it cannot take load?
+
+The calisthenics athlete's Elevated Pike Push-up is identical in all four weeks
+-- 3 x 4, bodyweight -- while serving his stated secondary goal of a
+freestanding handstand push-up. The engine sees it now (it could not before;
+three of his five goals produced no movement family at all until this week) and
+charges it as a flat improvement goal.
+
+It cannot repair it. repairImprovementGoalFlat progresses a movement by adding
+kilos, and it deliberately refuses to add reps: "a rep is volume, and a rep
+added to an assisted one-arm pull-up is a training decision rather than a
+restored fact." That reasoning is right for a barbell athlete. For this one it
+leaves no mechanism at all, because a pike push-up takes no belt.
+
+The ways a bodyweight skill actually progresses are all training decisions
+rather than restorations, which is why I am asking rather than picking one:
+
+1. **Reps or time under tension.** Simple, measurable, and the thing the module
+   was told not to do.
+2. **Leverage.** Lower the elevation week by week -- the same movement at a
+   steeper angle. Closest to how the skill is really trained, and the engine
+   would have to write a height it was never given.
+3. **Variant progression.** Pike push-up to elevated pike to wall handstand
+   push-up, which is a ladder his intake already describes him climbing.
+4. **Nothing.** A secondary skill held at a stable dose through a block whose
+   primaries are elsewhere is a legitimate choice, and the finding should not
+   fire for a secondary goal at all.
+
+If it is 4, the rule needs scoping to primaries rather than the repair needing
+building. If it is 1, 2 or 3, say which and the repair is straightforward.
+
+Until then the finding stands unrepaired on that athlete, which is 0.15 by your
+own pricing.
