@@ -1,24 +1,23 @@
 {
-  "timestamp": "2026-09-21T13:28:04.431Z",
+  "timestamp": "2026-09-23T03:34:40.613Z",
   "base": "https://raz-coaching-platform.onrender.com",
-  "head_sha": "2738a3cec469754f39da3dd658b3a1480fe04d3f",
-  "runtime": "live70 2026-09-21T13:27:13Z",
+  "head_sha": "af9521fa2fa57172f52273e46ef5695d7910cdf8",
+  "runtime": "live71 2026-09-23T03:33:52Z",
   "results": [
     {
       "id": "dual_event_hyrox",
-      "job_id": "4d5022f9ceb0b810870a244b871f7da6",
+      "job_id": "cede3d5f6f34c1a50ddd4963415e3de7",
       "ok": false,
       "status": "error",
       "stage": "generating",
       "attempt": 1,
       "detail": "initial generation",
       "last_seen_status": "error",
-      "error": "You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/.",
+      "error": "This operation was aborted QA trace: T1:request_ceiling -> T2:request_ceiling:JOB_BUDGET_SPENT. [QA:20]",
       "program_chars": 0,
-      "seconds": 6
+      "seconds": 1202
     }
   ],
-  "reasoning_effort": "medium",
   "selection": [
     "dual_event_hyrox"
   ],
