@@ -1,25 +1,26 @@
 {
-  "timestamp": "2026-09-23T03:34:40.613Z",
+  "timestamp": "2026-09-23T03:57:47.753Z",
   "base": "https://raz-coaching-platform.onrender.com",
-  "head_sha": "af9521fa2fa57172f52273e46ef5695d7910cdf8",
-  "runtime": "live71 2026-09-23T03:33:52Z",
+  "head_sha": "202bcb49f619ab9d2065e4c01aec81ee2c7ca704",
+  "runtime": "live72 2026-09-23T03:57:01Z",
   "results": [
     {
       "id": "dual_event_hyrox",
-      "job_id": "cede3d5f6f34c1a50ddd4963415e3de7",
-      "ok": false,
-      "status": "error",
-      "stage": "generating",
+      "job_id": "120716606f106c8c1431736b04f67ac8",
+      "ok": true,
+      "status": "done",
+      "stage": "finalizing",
       "attempt": 1,
-      "detail": "initial generation",
-      "last_seen_status": "error",
-      "error": "This operation was aborted QA trace: T1:request_ceiling -> T2:request_ceiling:JOB_BUDGET_SPENT. [QA:20]",
-      "program_chars": 0,
-      "seconds": 1202
+      "detail": "saving program after 1 model call(s)",
+      "last_seen_status": "done",
+      "error": null,
+      "program_chars": 14583,
+      "seconds": 188
     }
   ],
+  "reasoning_effort": "medium",
   "selection": [
     "dual_event_hyrox"
   ],
-  "ok": false
+  "ok": true
 }
