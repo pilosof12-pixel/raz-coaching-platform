@@ -46,7 +46,7 @@ import { repairModalitySubstitution, repairNoteNamedMovement } from './modality_
 import { repairNextRowClaim, repairTransitionClaim } from './structural_claim_rules.js';
 import { repairSkillFoundation } from './skill_foundation_repair.js';
 import { canonicaliseDayOrder } from './day_order_canonicalization.js';
-import { repairConsecutiveRepGoal } from './consecutive_rep_goal.js';
+import { repairConsecutiveRepGoal, ladderOf } from './consecutive_rep_goal.js';
 import { repairSupportivePullBudget } from './supportive_pull_budget.js';
 import { ENDURANCE_REPAIRS, repairAccessoryRedundancy, repairTaperPowerSpike } from './endurance_block_repair.js';
 import { STATEMENT_REPAIRS } from './program_statement_repair.js';
@@ -107,7 +107,21 @@ function rebuild(program, parsed) {
 function repCount(raw) {
   const s = String(raw || '').trim();
   if (/\b(?:sec|secs|second|seconds|min|mins|minute|minutes|km)\b/i.test(s)) return null;
+  // A ladder has no single rep count. "3/1/1/1" is a triple and three singles,
+  // and reading the top of it as THE rep count made the note reconciler rewrite
+  // every rep word in the note to match: "stay at a double" became "stay at a
+  // triples", and "keep the back-off singles" became "keep the back-off
+  // triples". Both shipped in run #139 and the coach charged them. A row whose
+  // note legitimately describes several different set lengths must not have
+  // those lengths restated as one.
+  if (ladderOf(s)) return null;
   return firstNum(s);
+}
+
+// The reps a ladder row actually prescribes, so volume claims still reconcile.
+function ladderVolume(raw) {
+  const ladder = ladderOf(raw);
+  return ladder ? ladder.reduce((a, b) => a + b, 0) : null;
 }
 function rowKey(cells, parsed) {
   return `${String(cells[parsed.day] || '').trim().toLowerCase()}|${String(cells[parsed.exercise] || '').trim().toLowerCase()}`;
@@ -1240,7 +1254,8 @@ export function repairDeterministicContradictions(program, intake = {}) {
       const reps = repCount(cells[parsed.reps]);
       const load = Number.isInteger(parsed.load) ? kgOf(cells[parsed.load]) : null;
       const km = kmOf(cells[parsed.reps]);
-      const volume = (Number.isFinite(sets) && Number.isFinite(reps)) ? sets * reps : null;
+      const volume = ladderVolume(cells[parsed.reps])
+        ?? ((Number.isFinite(sets) && Number.isFinite(reps)) ? sets * reps : null);
       thisWeek.set(key, { sets, reps, load, km, volume });
       if (isWarmup(name) || !Number.isInteger(parsed.notes)) return;
 

@@ -76,3 +76,47 @@ test('the detector and the repair agree about fallback rep words', () => {
     .filter((f) => f.code === 'V34_NOTE_REP_WORD_MISMATCH');
   assert.deepEqual(flags, []);
 });
+
+// --- a ladder row has no single rep count ------------------------------------
+//
+// Run #139 shipped "otherwise stay at a triples and keep the back-off triples"
+// and "one extra clean back-off doubles". Neither is something a model writes --
+// they are in-place substitutions. The reconciler restates rep words so they
+// match the row, read the top of the ladder "3/1/1/1" as THE rep count, and
+// rewrote every rep word in the note to it. The back-off descriptions, which are
+// the part of the sentence that says what to do instead, were destroyed.
+
+import { repairDeterministicContradictions } from '../engine/v35_deterministic_repair.js';
+
+const HEAD_L = 'Day\tExercise\tWeight\tSets\tReps\tRest\tTarget RPE\tNotes\tResults';
+const ladderBlock = (note) => [1, 2, 3, 4].map((n) => [
+  `START_WEEK${n}_TSV`, HEAD_L,
+  `Mon\tMuscle-up\tBodyweight\t4\t3/1/1/1\t3 min\t8\t${note}\t`,
+  'Mon\tWeighted Pull-up\t31 kg\t3\t3\t4 min\t8\tPrimary.\t',
+  'Mon\tDip\tRPE-selected load\t2\t5\t3 min\t7.5\tPressing.\t',
+  `END_WEEK${n}_TSV`,
+].join('\n')).join('\n\n');
+
+const noteOf = (program) => program.split('\n').map((l) => l.split('\t'))
+  .find((c) => c.length === 9 && c[1] === 'Muscle-up')[7];
+
+test('a ladder row keeps the rep words its note needs', () => {
+  const note = 'Hardest set-length week; only take the triple if rep 2 is still clean and strict; '
+    + 'otherwise stay at a double and keep the back-off singles.';
+  const { program } = repairDeterministicContradictions(ladderBlock(note), INTAKE);
+  assert.equal(noteOf(program), note, 'a note describing several set lengths must survive intact');
+});
+
+test('a plain row still has its rep words reconciled', () => {
+  // The rewriting is right where there IS one rep count; it was only wrong where
+  // the row prescribes several.
+  const plain = [1, 2, 3, 4].map((n) => [
+    `START_WEEK${n}_TSV`, HEAD_L,
+    'Mon\tMuscle-up\tBodyweight\t4\t2\t3 min\t8\tStrict ring singles only.\t',
+    'Mon\tWeighted Pull-up\t31 kg\t3\t3\t4 min\t8\tPrimary.\t',
+    'Mon\tDip\tRPE-selected load\t2\t5\t3 min\t7.5\tPressing.\t',
+    `END_WEEK${n}_TSV`,
+  ].join('\n')).join('\n\n');
+  const { program } = repairDeterministicContradictions(plain, INTAKE);
+  assert.equal(/\bsingles\b/i.test(noteOf(program)), false, 'a 2-rep row should not say singles');
+});
