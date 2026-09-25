@@ -853,6 +853,24 @@ export function collectRepairableValidationFailures(program, intake = {}, option
 
 export function validateRepairableProgramBundle(program, intake = {}, options = {}) {
   const result = collectRepairableValidationFailures(program, intake, options);
-  if (!result.ok) throw aggregateError(result.flags);
+  if (!result.ok) {
+    // The repaired program travels with the failure.
+    //
+    // Everything above this line repairs the candidate, and until now the throw
+    // discarded all of it: the caller caught a bare error and re-asked the model
+    // from the text it had already written. Run #140 spent four calls and 466
+    // seconds on V34_NOTE_UNDEFINED_LOAD_REFERENCE, and the program that finally
+    // shipped was this one -- produced on the first attempt, thrown away three
+    // times, and then recovered by the fallback path after the loop gave up.
+    //
+    // The fallback's own comment is the argument: the bundle hands back the
+    // improved program whether or not the flags cleared, so it is strictly
+    // better than what the model last wrote. Carrying it on the error lets the
+    // caller start from the improvement instead of from the defect.
+    const err = aggregateError(result.flags);
+    err.repairedProgram = result.program;
+    err.deterministic_repairs = result.deterministic_repairs;
+    throw err;
+  }
   return result;
 }
