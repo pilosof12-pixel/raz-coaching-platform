@@ -11,6 +11,7 @@
 // that context this is ordinary programming and raises nothing.
 
 import { parseWeek } from './v34_workload_accounting.js';
+import { kgOf } from './tsv_rows.js';
 import { elevatedRiskContext } from './v42_weekly_load.js';
 
 export const STRESS_DIMENSIONS = ['load', 'reps', 'sets', 'distance', 'pace', 'assistance'];
@@ -23,10 +24,7 @@ function firstNum(raw) {
   return m ? Number(m[0]) : null;
 }
 function isWarmup(name) { return /^\s*\[WARMUP\]/i.test(String(name || '')); }
-function kgOf(raw) {
-  const m = String(raw || '').match(/\+?\s*(\d+(?:\.\d+)?)\s*kg\b/i);
-  return m ? Number(m[1]) : null;
-}
+// kgOf lives in tsv_rows.js.
 function kmOf(raw) {
   const s = String(raw || '');
   const km = s.match(/(\d+(?:\.\d+)?)\s*km\b/i);

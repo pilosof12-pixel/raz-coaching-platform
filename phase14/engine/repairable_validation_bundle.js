@@ -808,6 +808,20 @@ export function collectRepairableValidationFailures(program, intake = {}, option
     deterministic_repairs.push({ type: 'marathon_one_lever_per_transition_final' });
   }
 
+  // Note coherence again, because it was not actually last. The whole v35 chain
+  // runs after the first pass, and so do the count-claim and marathon repairs --
+  // every one of them can move a set count under a note that had just been
+  // reconciled to the old one. Run #139 shipped "add the 5th single" on a row
+  // trimmed to four sets and "sets of 10 reps" on a row trimmed to one, and the
+  // coach charged both. A note is derived text: it is correct only against the
+  // prescription as it finally stands. This pass is idempotent, so where nothing
+  // moved it costs nothing.
+  const notesAfterEverything = normalizeFinalNoteCoherence(candidate, intake);
+  if (notesAfterEverything.repaired) {
+    candidate = notesAfterEverything.program;
+    deterministic_repairs.push({ type: 'final_note_coherence_after_all_repairs', rows: notesAfterEverything.repairs });
+  }
+
   runRepairable(flags, () => validatePhase15FinalProgram(candidate, intake));
 
   // Contraindicated movements the substitution could not answer. These do not

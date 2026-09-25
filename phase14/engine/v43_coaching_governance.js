@@ -13,6 +13,7 @@
 // length is worse than reporting it.
 
 import { parseWeek, sessionDurations } from './v34_workload_accounting.js';
+import { kgOf } from './tsv_rows.js';
 import { classifyExercise, CATEGORY, ROLE } from './v38_movement_taxonomy.js';
 
 function txt(v) {
@@ -24,10 +25,7 @@ function firstNum(raw) {
   const m = String(raw || '').match(/\d+(?:\.\d+)?/);
   return m ? Number(m[0]) : null;
 }
-function kgOf(raw) {
-  const m = String(raw || '').match(/\+?\s*(\d+(?:\.\d+)?)\s*kg\b/i);
-  return m ? Number(m[1]) : null;
-}
+// kgOf lives in tsv_rows.js.
 function isWarmup(name) { return /^\s*\[WARMUP\]/i.test(String(name || '')); }
 function rowKey(cells, parsed) {
   return `${String(cells[parsed.day] || '').trim().toLowerCase()}|${String(cells[parsed.exercise] || '').trim().toLowerCase()}`;

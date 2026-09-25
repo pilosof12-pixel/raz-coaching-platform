@@ -99,13 +99,48 @@ function repairNote(note, { sets, reps, priorSets }) {
 
   // (c) "add the third rep" when fewer reps than that ordinal are prescribed.
   if (Number.isFinite(reps)) {
-    out = out.replace(/\b(?:if[^.;]{0,60}?,?\s*)?add (?:the|a|an)\s+(second|third|fourth|fifth)\s+rep\b[^.;]{0,40}?[.;]?\s*/gi,
+    out = out.replace(/\b(?:if[^.;]{0,60}?,?\s*)?add (?:the|a|an)\s+(second|third|fourth|fifth|\d+(?:st|nd|rd|th))\s+rep\b[^.;]{0,90}[.;]?\s*/gi,
       (whole, word) => {
-        const ordinal = ORDINALS[String(word).toLowerCase()];
+        const w = String(word).toLowerCase();
+        const ordinal = ORDINALS[w] ?? Number((w.match(/^\d+/) || [])[0]);
         if (!Number.isFinite(ordinal) || ordinal <= reps) return whole;
         changes.push({ kind: 'nonexistent_rep_claim', ordinal, reps });
         return '';
       });
+  }
+
+  // (c2) "add the 5th single only if the first 4 stay clean" on a row that
+  // prescribes four sets. The rep version of this existed; the set version did
+  // not, and run #139 shipped exactly that sentence. An instruction to do a set
+  // the row does not contain is one the athlete cannot follow.
+  if (Number.isFinite(sets)) {
+    // Written either way: "the fifth single" and "the 5th single" are the same
+    // instruction, and run #139 used the numeral.
+    out = out.replace(
+      // Greedy to the end of the clause. A lazy match removed "add the 5th
+      // single" and left "only if the first 4 stay clean" hanging off the
+      // previous sentence -- which is the same clause-ownership bug that
+      // produced "but with one hold the set count".
+      /\b(?:if[^.;]{0,60}?,?\s*)?add (?:the|a|an)\s+(second|third|fourth|fifth|\d+(?:st|nd|rd|th))\s+(?:set|single|double|triple)\b[^.;]{0,90}[.;]?\s*/gi,
+      (whole, word) => {
+        const w = String(word).toLowerCase();
+        const ordinal = ORDINALS[w] ?? Number((w.match(/^\d+/) || [])[0]);
+        if (!Number.isFinite(ordinal) || ordinal <= sets) return whole;
+        changes.push({ kind: 'nonexistent_set_claim', ordinal, sets });
+        return '';
+      },
+    );
+  }
+
+  // (c3) A single set is not "sets". The plural survived a trim down to one set
+  // and told the athlete to do something the row no longer asks for.
+  if (sets === 1) {
+    const before = out;
+    out = out
+      .replace(/\bsets of (\d+)/gi, 'a set of $1')
+      .replace(/\b(?:all|both) sets\b/gi, 'the set')
+      .replace(/\bevery set\b/gi, 'the set');
+    if (out !== before) changes.push({ kind: 'plural_sets_on_single_set', sets });
   }
 
   // (d) "keep 3x2" style scheme claims that disagree with the row's own dose.
@@ -185,7 +220,15 @@ function repairNote(note, { sets, reps, priorSets }) {
       });
   }
 
-  out = out.replace(/\s{2,}/g, ' ').replace(/\s+([.;,])/g, '$1').trim();
+  // Removing a clause can leave the separator that introduced it, so a note ends
+  // "under control;" with nothing after the semicolon. Tidy the seam rather than
+  // leaving punctuation the athlete can see was cut.
+  out = out
+    .replace(/\s{2,}/g, ' ')
+    .replace(/\s+([.;,])/g, '$1')
+    .replace(/[;,]\s*$/, '.')
+    .replace(/;\s*([.;])/g, '$1')
+    .trim();
   // Removing a leading conditional clause can leave the sentence starting
   // lower-case ("otherwise keep ..."); restore sentence case so the client-facing
   // note still reads like written coaching.

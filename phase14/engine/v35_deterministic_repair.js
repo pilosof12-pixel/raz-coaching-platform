@@ -47,7 +47,7 @@ import { repairNextRowClaim, repairTransitionClaim } from './structural_claim_ru
 import { repairSkillFoundation } from './skill_foundation_repair.js';
 import { canonicaliseDayOrder } from './day_order_canonicalization.js';
 import { repairConsecutiveRepGoal } from './consecutive_rep_goal.js';
-import { ladderOf } from './tsv_rows.js';
+import { ladderOf, kgOf } from './tsv_rows.js';
 import { repairSupportivePullBudget } from './supportive_pull_budget.js';
 import { ENDURANCE_REPAIRS, repairAccessoryRedundancy, repairTaperPowerSpike } from './endurance_block_repair.js';
 import { STATEMENT_REPAIRS } from './program_statement_repair.js';
@@ -77,10 +77,7 @@ function firstNum(raw) {
   return m ? Number(m[0]) : null;
 }
 function isWarmup(name) { return /^\s*\[WARMUP\]/i.test(String(name || '')); }
-function kgOf(raw) {
-  const m = String(raw || '').match(/\+?\s*(\d+(?:\.\d+)?)\s*kg\b/i);
-  return m ? Number(m[1]) : null;
-}
+// kgOf lives in tsv_rows.js.
 function kmOf(raw) {
   const m = String(raw || '').match(/(\d+(?:\.\d+)?)\s*km\b/i);
   return m ? Number(m[1]) : null;

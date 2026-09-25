@@ -10,7 +10,7 @@
 // structured fields. Qualitative cues are never inspected.
 
 import { clusterStructure } from './v81_cluster_notation.js';
-import { repCount } from './tsv_rows.js';
+import { repCount, kgOf } from './tsv_rows.js';
 
 function firstNum(raw) {
   const m = String(raw || '').match(/\d+(?:\.\d+)?/);
@@ -182,10 +182,7 @@ const REP_WORDS = { single: 1, singles: 1, double: 2, doubles: 2, triple: 3, tri
 function rowKey(cells, parsed) {
   return `${String(cells[parsed.day] || '').trim().toLowerCase()}|${String(cells[parsed.exercise] || '').trim().toLowerCase()}`;
 }
-function kgOf(raw) {
-  const m = String(raw || '').match(/\+?\s*(\d+(?:\.\d+)?)\s*kg\b/i);
-  return m ? Number(m[1]) : null;
-}
+// kgOf lives in tsv_rows.js.
 // A work row's load is frequently a prescribed range ("122-126 kg"), which is
 // ordinary coaching: the coach names a band and the athlete picks inside it.
 // kgOf keeps only the number glued to the unit -- the top of the band -- so a

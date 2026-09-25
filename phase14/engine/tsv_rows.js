@@ -97,3 +97,20 @@ export function repsInRow(setsCell, repsCell) {
   const reps = Number(String(repsCell || '').match(/\d+(?:\.\d+)?/)?.[0]) || 0;
   return sets * reps;
 }
+
+// --- reading a load cell -----------------------------------------------------
+//
+// Unlike the reps cell, this one has always demanded its unit, which is why it
+// survived the model starting to write "RPE-selected load", "Bodyweight" and
+// "Band assistance that leaves 1-2s in reserve" into it: none of those carry a
+// kg, so none of them read as a weight. "Band tension that makes rep 10
+// challenging" does not become ten kilograms.
+//
+// It existed in four byte-identical copies. They all agreed, so nothing was
+// broken -- but repCount also existed in three copies that all agreed, right up
+// until one of them was fixed and the other two turned into a build that could
+// not converge. One copy, before that happens here too.
+export function kgOf(raw) {
+  const m = String(raw || '').match(/\+?\s*(\d+(?:\.\d+)?)\s*kg\b/i);
+  return m ? Number(m[1]) : null;
+}
