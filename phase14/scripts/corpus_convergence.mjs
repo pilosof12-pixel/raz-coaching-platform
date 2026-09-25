@@ -13,8 +13,30 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { CORPUS } from './corpus.mjs';
-import { validateRepairableProgramBundle } from '../engine/repairable_validation_bundle.js';
+// Pinned, because the number moves with the calendar and not with the engine.
+//
+// The corpus pairs static program text with intakes whose competition_date is a
+// fixed offset from now, so as real days pass the event slides against a block
+// that cannot slide with it, and every competition-week and taper rule reads a
+// different week. Measured on three consecutive days with no code change at
+// all: 25 of 26, then 26, then 22.
+//
+// So this fixes the clock and measures the engine. The variation is a property
+// of how the fixtures are built -- corpus_dates_stable.test.js has the same
+// finding for severity, where a weekday cost seven clean programs -- and it is
+// worth its own repair, but it is not what a convergence ratchet should be
+// reporting.
+//
+// The date is the one this measurement was first taken on. Override with
+// CORPUS_NOW to see how the corpus behaves on another day.
+if (!process.env.CORPUS_NOW) process.env.CORPUS_NOW = '2026-09-23T12:00:00Z';
+
+// Dynamic, because a static import is hoisted above the line that pins the
+// clock and the corpus would be built before the pin existed. The first version
+// of this file set the variable and imported statically, and reported the
+// unpinned number while claiming to be pinned.
+const { CORPUS } = await import('./corpus.mjs');
+const { validateRepairableProgramBundle } = await import('../engine/repairable_validation_bundle.js');
 
 const DIR = path.join(path.dirname(fileURLToPath(import.meta.url)), '..', 'test', 'fixtures');
 

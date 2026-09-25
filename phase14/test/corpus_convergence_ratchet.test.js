@@ -16,9 +16,14 @@
 
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import fs from 'node:fs';
 
 import { convergence } from '../scripts/corpus_convergence.mjs';
 
+// The measurement is clock-pinned inside the script. It has to be: the same
+// engine and the same fixtures gave 25, 26 and 22 on three consecutive days in
+// September, because the corpus pairs static program text with intakes whose
+// event date is an offset from now. The event slides and the block cannot.
 const rows = convergence();
 
 test('the chain converges on all 26 delivered programs', () => {
@@ -64,4 +69,18 @@ test('the fight-camp programs converge', () => {
   // budget, and kills the build.
   const blocked = rows.filter((r) => !r.accepted && /mma|fight_camp/.test(r.file));
   assert.deepEqual(blocked.map((r) => r.file), []);
+});
+
+test('the number measures the engine, not the weekday', () => {
+  // Pinned and unpinned must agree, or this ratchet is reporting the calendar.
+  // The pin lives in corpus_convergence.mjs and a static import would be
+  // hoisted above it, which is how the first version of that file reported an
+  // unpinned number while claiming to be pinned.
+  const src = fs.readFileSync(new URL('../scripts/corpus_convergence.mjs', import.meta.url), 'utf8');
+  assert.match(src, /process\.env\.CORPUS_NOW = '/, 'the clock must be pinned');
+  assert.match(src, /await import\('\.\/corpus\.mjs'\)/, 'and pinned before the corpus is built');
+  assert.ok(
+    src.indexOf("process.env.CORPUS_NOW = '") < src.indexOf("await import('./corpus.mjs')"),
+    'the pin must precede the import it exists to affect',
+  );
 });

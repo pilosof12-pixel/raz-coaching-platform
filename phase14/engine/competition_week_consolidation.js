@@ -87,6 +87,24 @@ export function repairCompetitionWeekConsolidation(program, intake = {}, now = D
   const order = countdownOrder([...byLabel.keys()]);
   if (order.length <= THRESHOLD) return { program: text, changed: false, moves: [] };
 
+  // Only when the days are actually consecutive.
+  //
+  // This fired on day COUNT, and the finding it serves is about CONSECUTIVE
+  // days. Run #136's competition week was Day -7, -6, -5 and -2: four sessions,
+  // but the longest run is three, which is the limit. There was nothing to
+  // repair and it merged anyway -- putting a strength session and a HYROX
+  // session onto one day seven days out, and leaving the athlete four clear
+  // days before an optional primer. A taper cuts volume and holds frequency,
+  // and that did the opposite of both.
+  const numbers = order.map((l) => Number(String(l).match(/-(\d+)/)[1])).sort((a, b) => b - a);
+  let longest = 1;
+  let run = 1;
+  for (let i = 1; i < numbers.length; i += 1) {
+    run = numbers[i - 1] - numbers[i] === 1 ? run + 1 : 1;
+    if (run > longest) longest = run;
+  }
+  if (longest <= THRESHOLD) return { program: text, changed: false, moves: [] };
+
   // Interior days only. The opening day carries the week's remaining load and
   // the last is the primer that sits closest to the event; dissolving either
   // changes what the week is for rather than how it is spread.
