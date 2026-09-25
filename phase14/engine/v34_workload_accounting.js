@@ -7,6 +7,8 @@
 // transparent and conservative rather than precise: they exist to catch clear
 // contradictions, not to pretend to stopwatch accuracy.
 
+import { repsInRow } from './tsv_rows.js';
+
 const WEEKDAYS = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'];
 
 function txt(v) {
@@ -80,7 +82,10 @@ export function estimateSessionMinutes(rows, parsed, { transitionMinutesPerExerc
       ? durationMin * sets
       : (distanceKm != null
         ? distanceKm * sets * workingPaceMinPerKm
-        : (sets * reps * secondsPerRep) / 60);
+        // A ladder is the sum of its rungs. Read as sets times the top rung, a
+        // 4 x 3/1/1/1 muscle-up row costed twelve reps instead of six, and the
+        // session-time trim took sets off the day to pay for reps nobody does.
+        : (repsInRow(cells[parsed.sets], repsCell) * secondsPerRep) / 60);
     const rest = restSeconds(cells[parsed.rest]);
     // Rest happens between sets, not after the last one.
     const restMin = rest ? (rest * Math.max(0, sets - 1)) / 60 : 0;

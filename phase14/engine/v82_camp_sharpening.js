@@ -9,6 +9,7 @@
 // prescription error with a mechanical correction.
 
 import { weekdayKey } from './weekday.js';
+import { ladderOf } from './tsv_rows.js';
 import { parseWeek } from './v34_workload_accounting.js';
 import { STATE, stateForWeek, competitionProfile, eventType } from './v68_competition_state.js';
 import { isPowerExposure } from './v72_combat_power.js';
@@ -171,8 +172,15 @@ export function repairCampSharpening(program, intake = {}, now = Date.now()) {
         const sets = Number(String(cells[parsed.sets] || '').match(/\d+/)?.[0]);
         if (!Number.isFinite(sets) || sets <= PRIMER_MAX_SETS) continue;
         cells[parsed.sets] = String(PRIMER_MAX_SETS);
-        const reps = Number(String(cells[parsed.reps] || '').match(/\d+/)?.[0]);
-        if (Number.isFinite(reps) && reps > 3) cells[parsed.reps] = '3';
+        // Capping a ladder by overwriting the cell with one number would delete
+        // the structure rather than shorten it. Cap the rungs instead.
+        const ladder = ladderOf(cells[parsed.reps]);
+        if (ladder) {
+          if (Math.max(...ladder) > 3) cells[parsed.reps] = ladder.map((n) => Math.min(n, 3)).join('/');
+        } else {
+          const reps = Number(String(cells[parsed.reps] || '').match(/\d+/)?.[0]);
+          if (Number.isFinite(reps) && reps > 3) cells[parsed.reps] = '3';
+        }
         if (Number.isInteger(parsed.notes)) {
           const note = String(cells[parsed.notes] || '');
           const add = 'Last touch before the fight: a primer, not a session. Two crisp sets, stop while every rep is fast.';

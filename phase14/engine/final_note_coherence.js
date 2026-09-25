@@ -13,6 +13,8 @@
 // cues, symptom gating, readiness rules, autoregulation -- is never rewritten.
 // When a claim cannot be verified against structured fields, it is left alone.
 
+import { ladderOf } from './tsv_rows.js';
+
 const WEEKDAYS = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'];
 
 function firstNum(raw) {
@@ -47,9 +49,14 @@ function rebuild(program, parsed) {
 
 // "1 per arm" -> 1, "5-6" -> 5 (the conservative first number, matching how the
 // release validators read a rep cell), "30 sec" -> null (not a rep count).
+// Deliberately not the shared repCount: this one also treats a bare "m" as a
+// distance and makes an exception for per-arm work, and that difference is load
+// bearing here. The ladder rule is the same everywhere -- a row prescribing
+// several different set lengths has no single rep count.
 function repCount(raw) {
   const s = String(raw || '').trim();
   if (/\b(?:sec|secs|second|seconds|min|mins|minute|minutes|km|m)\b/i.test(s) && !/per\s+arm|per\s+side/i.test(s)) return null;
+  if (ladderOf(s)) return null;
   return firstNum(s);
 }
 

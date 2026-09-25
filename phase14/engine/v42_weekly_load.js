@@ -9,6 +9,7 @@
 // live in v42_recovery_budget.js and v42_progression_discipline.js.
 
 import { parseWeek, sessionDurations, runRowKm } from './v34_workload_accounting.js';
+import { repsInRow } from './tsv_rows.js';
 import { classifyExercise, stressSignature, CATEGORY, ROLE, dayKey, WEEKDAYS } from './v38_movement_taxonomy.js';
 
 const TISSUES = ['axial', 'lower', 'upperPull', 'upperPush', 'neural', 'impact', 'elbow'];
@@ -209,8 +210,12 @@ export function weekLoadProfile(program, week, intake = {}) {
 
     totals.setsByCategory[category] = (totals.setsByCategory[category] || 0) + sets;
     totals.intervalQualityMetres += intervalMetres(cells, parsed);
-    if (role === ROLE.SKILL_PRACTICE && Number.isFinite(reps)) totals.skillAttempts += sets * reps;
-    if (isUnilateralPull(name) && Number.isFinite(reps)) totals.unilateralPullReps += sets * reps;
+    // A ladder counts as the sum of its rungs. Read as sets times the top rung, a
+    // muscle-up ladder of 3/1/1/1 reported twelve attempts instead of six and
+    // spent a skill ceiling the athlete never touched.
+    const rowReps = repsInRow(cells[parsed.sets], cells[parsed.reps]);
+    if (role === ROLE.SKILL_PRACTICE && Number.isFinite(reps)) totals.skillAttempts += rowReps;
+    if (isUnilateralPull(name) && Number.isFinite(reps)) totals.unilateralPullReps += rowReps;
   }
 
   // A sport-only day spends recovery even though the plan wrote nothing on it.

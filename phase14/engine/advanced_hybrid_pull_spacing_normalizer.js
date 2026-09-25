@@ -1,4 +1,5 @@
 import { weekdayKey } from './weekday.js';
+import { repsInRow } from './tsv_rows.js';
 import { isHighConcurrencyHybrid } from './advanced_hybrid_concurrency.js';
 
 const WEEKDAYS = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'];
@@ -56,7 +57,11 @@ function rowInfo(parsed, cells, rowIndex) {
   const setCount = firstNum(cells[parsed.sets]);
   const repCount = upperNum(cells[parsed.reps]);
   const effort = Number.isInteger(parsed.effort) ? upperNum(cells[parsed.effort]) : null;
-  const totalReps = Number.isFinite(setCount) && Number.isFinite(repCount) ? setCount * repCount : 0;
+  // A one-arm pull ladder is the sum of its rungs, not its set count times its
+  // longest one -- this athlete's named goal is consecutive one-arm pull-ups, so
+  // a ladder here is exactly what the program should contain.
+  const totalReps = Number.isFinite(setCount) && Number.isFinite(repCount)
+    ? repsInRow(cells[parsed.sets], cells[parsed.reps]) : 0;
   const high = isStrictOap(name) || isAssistedOap(name)
     ? ((effort ?? 0) >= 8 || totalReps >= 4)
     : ((effort ?? 0) >= 8 && (setCount ?? 0) >= 3);

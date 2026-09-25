@@ -16,6 +16,7 @@
 // own text. None depend on avatar names or fixed weekdays.
 
 import { projectedWeeklyRunningKm, statedRunningBaselineKm } from './v34_workload_accounting.js';
+import { repsInRow } from './tsv_rows.js';
 
 function arr(v) { return Array.isArray(v) ? v : v ? [v] : []; }
 function txt(v) {
@@ -160,7 +161,10 @@ function primaryQualityLoad(program, pattern) {
         : null;
       if (kg != null) topKg = Math.max(topKg, Number(kg));
       const reps = firstNum(cells[parsed.reps]);
-      if (Number.isFinite(sets) && Number.isFinite(reps) && m == null) volume += sets * reps;
+      if (Number.isFinite(sets) && Number.isFinite(reps) && m == null) {
+        // The ladder's own sum, not sets times its top rung.
+        volume += repsInRow(cells[parsed.sets], cells[parsed.reps]);
+      }
     }
     out.push({ week, metres, topKg, volume });
   }

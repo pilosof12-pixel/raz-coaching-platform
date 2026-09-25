@@ -15,7 +15,10 @@
 
 import { parseWeek } from './v34_workload_accounting.js';
 import { CATEGORY, ROLE, classifyExercise } from './v38_movement_taxonomy.js';
-import { rebuild, newRow } from './tsv_rows.js';
+import { rebuild, newRow, ladderOf, topSetOf, repsInRow } from './tsv_rows.js';
+
+// Re-exported: reading a reps cell is one job and it lives in tsv_rows.js.
+export { ladderOf, topSetOf };
 
 const isWarmup = (s) => /^\s*\[WARMUP\]/i.test(String(s || ''));
 const arr = (v) => (Array.isArray(v) ? v : v ? [v] : []);
@@ -23,49 +26,7 @@ const loose = (name) => new RegExp(
   String(name).trim().replace(/[.*+?^${}()|[\]\\]/g, '\\$&').replace(/[\s-]+/g, '[\\s-]?'), 'i',
 );
 
-// A reps cell the athlete reads as a ladder: "2/1/1/1", "2-1-1-1", "3 (1+1+1)".
-// The model writes the ladder this way when it writes one itself, and Number()
-// on it is NaN. Run #139 scored that day's whole prescription as zero reps,
-// decided the OTHER session must be the primary one, and built a second ladder
-// there -- so both sessions trained set length when the point of the rule is
-// that one does and the other stays quality volume.
-export function ladderOf(cell) {
-  const text = String(cell || '').trim();
-  if (!text) return null;
-  const inner = (text.match(/\(([^)]*)\)/) || [])[1] || text;
-  const nums = (sep) => {
-    const parts = inner.split(sep).map((x) => Number(String(x).trim()));
-    return parts.every((n) => Number.isFinite(n) && n > 0) ? parts : null;
-  };
-  // Slash and plus mean a ladder at two parts. A hyphen usually means a rep
-  // RANGE -- "8-10" is eight to ten reps, not a ladder of eight then ten -- so it
-  // takes three parts before it reads as one.
-  const slashed = /[/+]/.test(inner) ? nums(/[/+]/) : null;
-  if (slashed && slashed.length >= 2) return slashed;
-  const dashed = /[\u2013\u2014-]/.test(inner) ? nums(/[\u2013\u2014-]/) : null;
-  if (dashed && dashed.length >= 3) return dashed;
-  return null;
-}
 
-// The longest single set a row prescribes, whether written as a number or a ladder.
-export function topSetOf(cell) {
-  const ladder = ladderOf(cell);
-  if (ladder) return Math.max(...ladder);
-  // The first number, not the last: "8-10" is a range whose guaranteed set
-  // length is eight, and reading the top of a range as the set length would let
-  // a range satisfy a rule about how long a set actually is.
-  const m = String(cell || '').match(/\d+(?:\.\d+)?/);
-  return m ? Number(m[0]) : 0;
-}
-
-// The reps a row actually prescribes, given its set count.
-function repsInRow(setsCell, repsCell) {
-  const ladder = ladderOf(repsCell);
-  if (ladder) return ladder.reduce((a, b) => a + b, 0);
-  const sets = Number(setsCell) || 0;
-  const first = String(repsCell || '').match(/\d+(?:\.\d+)?/);
-  return sets * (first ? Number(first[0]) : 0);
-}
 
 // The set lengths one exposure should carry, top first, by week.
 function ladderFor(week, current) {
@@ -218,7 +179,8 @@ export function repairConsecutiveRepGoal(program, intake = {}) {
       if (!planned) continue;
 
       const existing = primary.rows.map((i) => ({
-        sets: Number(cells[i][parsed.sets]) || 0, reps: Number(cells[i][parsed.reps]) || 0,
+        sets: Number(cells[i][parsed.sets]) || 0,
+        reps: ladderOf(cells[i][parsed.reps]) ? 0 : (Number(cells[i][parsed.reps]) || 0),
       }));
       const same = existing.length === planned.length
         && existing.every((e, k) => e.sets === planned[k].sets && e.reps === planned[k].reps);

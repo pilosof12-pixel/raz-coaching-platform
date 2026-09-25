@@ -11,6 +11,7 @@
 // a deterministic rejection.
 
 import { parseWeek } from './v34_workload_accounting.js';
+import { repsInRow } from './tsv_rows.js';
 import { classifyExercise, CATEGORY, ROLE } from './v38_movement_taxonomy.js';
 import { raceProfile } from './v40_tactical_hard_rules.js';
 
@@ -49,7 +50,8 @@ export function collectPowerOutputFlags(program, intake = {}) {
       if (category !== CATEGORY.POWER && role !== ROLE.SKILL_PRACTICE) continue;
       const sets = firstNum(cells[parsed.sets]);
       const reps = firstNum(cells[parsed.reps]);
-      const volume = (Number.isFinite(sets) && Number.isFinite(reps)) ? sets * reps : null;
+      const volume = (Number.isFinite(sets) && Number.isFinite(reps))
+        ? repsInRow(cells[parsed.sets], cells[parsed.reps]) : null;
       const key = rowKey(cells, parsed);
       thisWeek.set(key, { volume });
       if (category !== CATEGORY.POWER) continue;

@@ -27,3 +27,73 @@ export function newRow(parsed, { day, name, load, sets, reps, rest, rpe, note })
   if (Number.isInteger(parsed.notes)) row[parsed.notes] = note;
   return row;
 }
+
+// --- reading a reps cell -----------------------------------------------------
+//
+// A reps cell used to hold one number. The model now writes ladders -- "2/1/1/1"
+// is a double then three singles -- and every reader that took the first number
+// out of the cell read that as four sets of two.
+//
+// It cost two shipped defects before this was centralised. The note reconciler
+// rewrote every rep word in a note to match the top rung, so "keep the back-off
+// singles" became "keep the back-off triples". The session-minute estimate and
+// the skill-attempt count both doubled, which trims sets the athlete should have
+// kept. Three copies of the same repCount existed, and fixing one of them put
+// the repair and the detector into disagreement, which is the shape that kills a
+// build outright.
+//
+// So this is the one place that knows how to read the cell.
+
+// The rungs of a ladder, longest first as written, or null if it is not one.
+export function ladderOf(cell) {
+  const text = String(cell || '').trim();
+  if (!text) return null;
+  // Cluster notation -- "3 (1+1+1)" -- belongs to v81_cluster_notation.js, which
+  // reads it as three singles and has its own rules about labelling it. A ladder
+  // is the whole cell, not a parenthetical gloss on a set count.
+  if (/\(/.test(text)) return null;
+  const inner = text;
+  const nums = (sep) => {
+    const parts = inner.split(sep).map((x) => Number(String(x).trim()));
+    return parts.every((n) => Number.isFinite(n) && n > 0) ? parts : null;
+  };
+  // Slash and plus mean a ladder at two parts. A hyphen usually means a rep
+  // RANGE -- "8-10" is eight to ten reps, not a ladder of eight then ten -- so it
+  // takes three parts before it reads as one.
+  const slashed = /[/+]/.test(inner) ? nums(/[/+]/) : null;
+  if (slashed && slashed.length >= 2) return slashed;
+  const dashed = /[–—-]/.test(inner) ? nums(/[–—-]/) : null;
+  if (dashed && dashed.length >= 3) return dashed;
+  return null;
+}
+
+// The longest single set the row prescribes.
+export function topSetOf(cell) {
+  const ladder = ladderOf(cell);
+  if (ladder) return Math.max(...ladder);
+  // The first number, not the last: "8-10" is a range whose guaranteed set
+  // length is eight, and reading the top of a range as the set length would let
+  // a range satisfy a rule about how long a single set actually is.
+  const m = String(cell || '').match(/\d+(?:\.\d+)?/);
+  return m ? Number(m[0]) : 0;
+}
+
+// The one rep count the row prescribes, or null where there is not one: a
+// duration, a distance, or a ladder of several different lengths.
+export function repCount(cell) {
+  const s = String(cell || '').trim();
+  if (/\b(?:sec|secs|second|seconds|min|mins|minute|minutes|km)\b/i.test(s)) return null;
+  if (ladderOf(s)) return null;
+  const m = s.match(/\d+(?:\.\d+)?/);
+  return m ? Number(m[0]) : null;
+}
+
+// Total reps the row prescribes, counting a ladder as the sum of its rungs
+// rather than its set count times its longest one.
+export function repsInRow(setsCell, repsCell) {
+  const ladder = ladderOf(repsCell);
+  if (ladder) return ladder.reduce((a, b) => a + b, 0);
+  const sets = Number(String(setsCell || '').match(/\d+(?:\.\d+)?/)?.[0]) || 0;
+  const reps = Number(String(repsCell || '').match(/\d+(?:\.\d+)?/)?.[0]) || 0;
+  return sets * reps;
+}

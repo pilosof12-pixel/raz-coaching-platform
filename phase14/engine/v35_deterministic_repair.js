@@ -46,7 +46,8 @@ import { repairModalitySubstitution, repairNoteNamedMovement } from './modality_
 import { repairNextRowClaim, repairTransitionClaim } from './structural_claim_rules.js';
 import { repairSkillFoundation } from './skill_foundation_repair.js';
 import { canonicaliseDayOrder } from './day_order_canonicalization.js';
-import { repairConsecutiveRepGoal, ladderOf } from './consecutive_rep_goal.js';
+import { repairConsecutiveRepGoal } from './consecutive_rep_goal.js';
+import { ladderOf } from './tsv_rows.js';
 import { repairSupportivePullBudget } from './supportive_pull_budget.js';
 import { ENDURANCE_REPAIRS, repairAccessoryRedundancy, repairTaperPowerSpike } from './endurance_block_repair.js';
 import { STATEMENT_REPAIRS } from './program_statement_repair.js';

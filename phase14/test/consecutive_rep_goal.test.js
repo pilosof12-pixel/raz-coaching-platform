@@ -166,7 +166,10 @@ const RUN139 = fs.readFileSync(path.join(here, 'fixtures/run139_advanced_calisth
 test('a ladder the model wrote is read as a ladder', () => {
   assert.deepEqual(ladderOf('2/1/1/1'), [2, 1, 1, 1]);
   assert.deepEqual(ladderOf('2-1-1-1'), [2, 1, 1, 1]);
-  assert.deepEqual(ladderOf('3 (1+1+1)'), [1, 1, 1]);
+  // Cluster notation belongs to v81_cluster_notation.js, which reads '3 (1+1+1)'
+  // as three singles and has its own rules for labelling it. A ladder is the
+  // whole cell, not a parenthetical gloss on a set count.
+  assert.equal(ladderOf('3 (1+1+1)'), null);
   assert.equal(topSetOf('2/1/1/1'), 2);
 });
 

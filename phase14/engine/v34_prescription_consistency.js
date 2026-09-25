@@ -10,6 +10,7 @@
 // structured fields. Qualitative cues are never inspected.
 
 import { clusterStructure } from './v81_cluster_notation.js';
+import { repCount } from './tsv_rows.js';
 
 function firstNum(raw) {
   const m = String(raw || '').match(/\d+(?:\.\d+)?/);
@@ -67,11 +68,10 @@ function parseWeek(program, week) {
 }
 
 // Reps as a countable number; duration cells ("30 sec") are not rep counts.
-function repCount(raw) {
-  const s = String(raw || '').trim();
-  if (/\b(?:sec|secs|second|seconds|min|mins|minute|minutes|km)\b/i.test(s)) return null;
-  return firstNum(s);
-}
+// repCount lives in tsv_rows.js. This file had a byte-identical copy of it, and
+// when the ladder guard was added to the one in the repair, this one went on
+// reading "3/1/1/1" as three reps -- so the repair left a ladder note alone and
+// the detector kept flagging it, which is a build that never converges.
 
 // Language that makes an extra set/rep explicitly optional and earned is valid
 // coaching, not a contradiction.
