@@ -148,38 +148,83 @@ export function auditWeeklyCoverage(program, intake = {}) {
   return findings;
 }
 
-// Rule 2.4: a session may not carry advanced upper-body skill work while
-// containing no foundational pulling or pushing at all.
+// Rule 2.4: advanced upper-body skill work has to sit on real foundational
+// strength -- but the microcycle is what carries that, not each session.
+//
+// This was a same-day hard gate, and it was overfitted. It demanded a
+// foundational pull inside every skill session, so a Friday of planche, front
+// lever and handstand got a token one-set row inserted purely to satisfy it,
+// beside a Monday and a Wednesday that already supplied plenty of pulling. That
+// is validator-generated junk volume on an athlete being managed for medial
+// elbow symptoms, and it is the opposite of what the rule is for.
+//
+// Worse, it could not be satisfied at all. Asking for a pull on a skill day
+// adjacent to a heavy pull day put this rule in direct contradiction with
+// V38_CONSECUTIVE_CONFLICTING_EXPOSURE, and run #138 spent four model calls
+// discovering that no program satisfies both.
+//
+// So the requirement is weekly and the placement is a preference. A week that
+// trains advanced skills and never trains the strength underneath them is still
+// a hard failure. A single skill day without a same-day pull, in a week that has
+// pulling on either side of it, is a note to the coach rather than a blocker.
+const isFoundationalPull = (n) => isFoundationalStrength(n) && /pull|row|chin/i.test(n);
+const isFoundationalPush = (n) => {
+  const { category } = classifyExercise(n);
+  return isFoundationalStrength(n) && (category === CATEGORY.HORIZONTAL_PUSH || category === CATEGORY.VERTICAL_PUSH);
+};
+const carriesUpperSkill = (names) => names.some((n) => {
+  const { category, role } = classifyExercise(n);
+  return role === ROLE.SKILL_PRACTICE && category === CATEGORY.SKILL;
+});
+
 export function auditFoundationalStrength(program, intake = {}) {
+  void intake;
   const findings = [];
   for (let week = 1; week <= 4; week++) {
     const parsed = parseWeek(program, week);
     if (!parsed) continue;
+
+    const sessions = [];
     for (const [label, rows] of sessionsOf(parsed)) {
       const work = workRows(rows, parsed);
       if (!work.length) continue;
-      const names = work.map((c) => String(c[parsed.exercise]).trim());
-      const hasUpperSkill = names.some((n) => {
-        const { category, role } = classifyExercise(n);
-        return role === ROLE.SKILL_PRACTICE && category === CATEGORY.SKILL;
+      sessions.push({ label, names: work.map((c) => String(c[parsed.exercise]).trim()) });
+    }
+    const skillDays = sessions.filter((x) => carriesUpperSkill(x.names));
+    if (!skillDays.length) continue;
+
+    const weekNames = sessions.flatMap((x) => x.names);
+    const weekMissing = [
+      !weekNames.some(isFoundationalPull) && 'foundational pulling',
+      !weekNames.some(isFoundationalPush) && 'foundational pushing',
+    ].filter(Boolean);
+
+    if (weekMissing.length) {
+      findings.push({
+        code: 'V38_SKILL_WITHOUT_FOUNDATION',
+        severity: 'hard',
+        week,
+        missing: weekMissing,
+        message: `Week ${week} programs advanced upper-body skill work but contains no ${weekMissing.join(' and no ')} anywhere in the week. A transition drill or banded muscle-up trains the skill; it does not build the pulling or pressing strength underneath it. The microcycle has to carry that strength somewhere.`,
       });
-      if (!hasUpperSkill) continue;
-      const hasPull = names.some((n) => isFoundationalStrength(n) && /pull|row|chin/i.test(n));
-      const hasPush = names.some((n) => {
-        const { category } = classifyExercise(n);
-        return isFoundationalStrength(n) && (category === CATEGORY.HORIZONTAL_PUSH || category === CATEGORY.VERTICAL_PUSH);
+      continue;
+    }
+
+    for (const day of skillDays) {
+      const missing = [
+        !day.names.some(isFoundationalPull) && 'foundational pulling',
+        !day.names.some(isFoundationalPush) && 'foundational pushing',
+      ].filter(Boolean);
+      if (!missing.length) continue;
+      findings.push({
+        code: 'V38_SKILL_DAY_WITHOUT_SAME_DAY_FOUNDATION',
+        // The week supplies the strength; this is about how it is organised.
+        severity: 'advisory',
+        week,
+        session: day.label,
+        missing,
+        message: `Week ${week} ${day.label} carries advanced upper-body skill work with no same-day ${missing.join(' or ')}. The week supplies it elsewhere, so this is a placement question rather than a missing layer: same-day is preferable where it costs nothing, and not worth a token set where it would crowd an adjacent heavy day.`,
       });
-      const missing = [!hasPull && 'foundational pulling', !hasPush && 'foundational pushing'].filter(Boolean);
-      if (missing.length) {
-        findings.push({
-          code: 'V38_SKILL_WITHOUT_FOUNDATION',
-          severity: 'hard',
-          week,
-          session: label,
-          missing,
-          message: `Week ${week} ${label} programs advanced upper-body skill work but contains no ${missing.join(' and no ')}. A transition drill or banded muscle-up trains the skill; it does not build the pulling or pressing strength underneath it. Both must coexist in the session.`,
-        });
-      }
     }
   }
   return findings;

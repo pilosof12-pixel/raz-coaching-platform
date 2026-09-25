@@ -55,25 +55,25 @@ test('an unrecognised skill keeps the conservative reading', () => {
   assert.deepEqual(skillDemand('Some Novel Ring Skill'), { upperPull: 1, upperPush: 1 });
 });
 
-test("run #138's skill days can be given their foundation instead of regenerating", () => {
-  const before = auditProgramStructure(PROGRAM, INTAKE).filter((f) => f.code === 'V38_SKILL_WITHOUT_FOUNDATION');
-  assert.equal(before.length, 8, 'fixture must reproduce the run #138 gate');
+test("run #138's calisthenics build converges instead of regenerating", async () => {
+  // The build that cost four model calls and 509 seconds. Two hard gates
+  // contradicted each other: the foundation rule demanded a pull on a skill day
+  // and the adjacency rule refused it against the heavy pull day beside it.
+  // The foundation requirement is the microcycle's now, and this athlete's week
+  // trains plenty of pulling, so there is nothing to force onto Friday.
+  const hard = auditProgramStructure(PROGRAM, INTAKE)
+    .filter((f) => f.code === 'V38_SKILL_WITHOUT_FOUNDATION');
+  assert.equal(hard.length, 0, 'a week with this much pulling is not missing a foundation');
 
-  const { changed, program, moves } = repairSkillFoundation(PROGRAM, INTAKE);
-  assert.equal(changed, true);
-
-  const after = auditProgramStructure(program, INTAKE).filter((f) => f.code === 'V38_SKILL_WITHOUT_FOUNDATION');
-  assert.equal(after.length, 0, 'the gate that cost four model calls now converges');
-
-  // Friday is the day the adjacency veto used to block entirely.
-  assert.ok(moves.some((m) => m.day === 'Fri' && m.kind === 'pulling'), 'Friday must receive its foundational pull');
+  const { validateRepairableProgramBundle } = await import('../engine/repairable_validation_bundle.js');
+  const result = validateRepairableProgramBundle(PROGRAM, INTAKE);
+  assert.equal(result.ok, true, "run #138's own output has to be acceptable on the first call");
+  assert.equal((result.errors || []).length, 0);
 });
 
-test('the support layer borrows the cheapest exposure, not the athlete’s maximal lift', () => {
-  const { moves } = repairSkillFoundation(PROGRAM, INTAKE);
-  const friday = moves.filter((m) => m.day === 'Fri' && m.kind === 'pulling').map((m) => m.added);
-  assert.ok(friday.length, 'Friday must receive a pull');
-  for (const added of friday) {
-    assert.equal(/weighted/i.test(added), false, 'a maintenance layer beside a heavy pull day must not be the weighted pull-up');
-  }
+test('no token foundational row is bought for a day that needed nothing', () => {
+  const { changed, moves } = repairSkillFoundation(PROGRAM, INTAKE);
+  assert.equal(changed, false, 'the week supplies the strength; nothing should be added');
+  assert.equal(moves.length, 0);
 });
+

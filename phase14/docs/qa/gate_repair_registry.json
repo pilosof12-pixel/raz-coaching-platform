@@ -62,7 +62,7 @@
       "note": "Duplicated or missing week markers mean the document structure is wrong, not the training. Synthesising a week would be inventing training."
     }
   },
-  "_unenforced_why": "Rules that exist, are tested, and that nothing in production calls. Only their briefs reach the model, so a program that breaks one is never checked. V84_CONTRAINDICATED_MOVEMENT_PRESCRIBED sat here until it was noticed: the athlete's own account of what reproduces their symptoms was validated by nothing at all. Some of these are deliberate -- a rule with no possible repair should teach rather than refuse -- but the list must not grow by accident, so the guard test fails when a rule joins it silently.",
+  "_unenforced_why": "Rules that exist, are tested, and that nothing in production calls. Only their briefs reach the model, so a program that breaks one is never checked. V84_CONTRAINDICATED_MOVEMENT_PRESCRIBED sat here until it was noticed: the athlete's own account of what reproduces their symptoms was validated by nothing at all. Some of these are deliberate -- a rule with no possible repair should teach rather than refuse -- but the list must not grow by accident, so the guard test fails when a rule joins it silently. V38_SKILL_DAY_WITHOUT_SAME_DAY_FOUNDATION is here by design: the hard weekly rule V38_SKILL_WITHOUT_FOUNDATION carries the requirement that the microcycle train the strength under the skills, and this one only reports where in the week that strength sits. It was a same-day hard gate, and as one it demanded a foundational pull on a skill day adjacent to a heavy pull day -- which V38_CONSECUTIVE_CONFLICTING_EXPOSURE then refused, so no program satisfied both and run #138 spent four model calls finding that out. Its repair inserted a token one-set row on a day that needed nothing. The placement question is real and worth reporting, but it should teach rather than refuse, and it should not buy a set of junk volume.",
   "unenforced": [
     "COACH_SPEC_V1_T3K03_QUALITY_VOLUME_LOW",
     "COACH_SPEC_V1_T3K_EVENT_PROGRESSION_INCOHERENT",
@@ -71,6 +71,7 @@
     "COACH_SPEC_V1_T3K_PACE_FROM_GOAL_NOT_CAPACITY",
     "COACH_SPEC_V1_YG_POWER_VOLUME_BEFORE_OUTPUT",
     "V34_RUNNING_VOLUME_ABOVE_BASELINE",
+    "V38_SKILL_DAY_WITHOUT_SAME_DAY_FOUNDATION",
     "V42_MULTIPLE_STRESSORS_RAISED",
     "V53_ACCESSORY_BELOW_DEMONSTRATED_LEVEL",
     "V53_PRESCRIBES_DECLINED_MOVEMENT",

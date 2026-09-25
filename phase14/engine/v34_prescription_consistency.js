@@ -22,6 +22,24 @@ function isWarmup(name) { return /^\s*\[WARMUP\]/i.test(String(name || '')); }
 // Scoped to the clause the match actually lands in, not the whole cell: a note
 // can carry a real claim in one sentence and a contingency in the next, and
 // only the contingency is exempt.
+// Verbs that introduce what to do INSTEAD of the prescription. A rep word after
+// one of these names the fallback dose, not this row's own.
+const FALLBACK_LEAD = /\b(?:switch(?:ing)? to|drop(?:ping)? (?:back )?to|fall(?:ing)? back (?:on|to)|revert(?:ing)? to|reduce(?:d)? to|back (?:down )?to|instead of|rather than|keep (?:it|them|all reps|the reps) as)\s+(?:\w+\s+){0,3}$/i;
+
+// A rep word that describes an alternative dose rather than claiming this row's.
+//
+// The detector and the repair have to agree on this or the build never
+// converges: on run #138 the repair rewrote "if rep 2 would be soft, switch to
+// singles" into "switch to doubles" on a row already prescribed as doubles, and
+// when that rewrite was removed the detector went on flagging the correct note.
+// One predicate, both consumers.
+export function namesAnAlternativeDose(text, match) {
+  if (inConditionalClause(text, match)) return true;
+  const at = match.index ?? text.indexOf(match[0]);
+  if (at < 0) return false;
+  return FALLBACK_LEAD.test(String(text).slice(Math.max(0, at - 48), at));
+}
+
 function inConditionalClause(text, match) {
   const at = match.index ?? text.indexOf(match[0]);
   if (at < 0) return false;
@@ -357,6 +375,7 @@ export function collectRepWordFlags(program) {
       const unit = cluster ? cluster[0] : reps;
       for (const m of (companionRows > 1 ? [] : note.matchAll(/\b(singles?|doubles?|triples?)\b/gi))) {
         const n = REP_WORDS[String(m[1]).toLowerCase()];
+        if (namesAnAlternativeDose(note, m)) continue;
         if (Number.isFinite(n) && n !== unit) {
           flags.push({ code: 'V34_NOTE_REP_WORD_MISMATCH', ...where, note_claim: m[1], prescribed_reps: reps,
             message: cluster

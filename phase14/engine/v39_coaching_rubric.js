@@ -50,6 +50,11 @@ const RULE_REGISTRY = {
   // --- structural architecture (v38) --------------------------------------
   V38_INCOMPLETE_SESSION: { classification: CLASSIFICATION.HARD, dimension: 'exercise_selection' },
   V38_SKILL_WITHOUT_FOUNDATION: { classification: CLASSIFICATION.HARD, dimension: 'exercise_selection' },
+  // Placement, not a missing layer: the week already supplies the strength, so
+  // this reports how the microcycle is organised rather than blocking a release.
+  // Forcing same-day foundation put this rule in direct contradiction with the
+  // adjacency gate and cost run #138 four model calls.
+  V38_SKILL_DAY_WITHOUT_SAME_DAY_FOUNDATION: { classification: CLASSIFICATION.CONTEXT, dimension: 'exercise_selection' },
   V38_CONSECUTIVE_CONFLICTING_EXPOSURE: { classification: CLASSIFICATION.HARD, dimension: 'recovery_management' },
   V38_CARRY_PACE_ONLY_PROGRESSION: { classification: CLASSIFICATION.HARD, dimension: 'progression' },
   V38_MISSING_MOVEMENT_CATEGORY: { classification: CLASSIFICATION.SOFT, dimension: 'exercise_selection' },

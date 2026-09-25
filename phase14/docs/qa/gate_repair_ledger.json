@@ -2050,7 +2050,7 @@
       "engine/v38_structural_audit.js"
     ],
     "owners": [
-      "circularClashes"
+      "auditWeeklyCoverage"
     ],
     "advisory": false,
     "reachable": true,
@@ -2086,6 +2086,22 @@
     ],
     "advisory": false,
     "reachable": true,
+    "repairs": [],
+    "wired": [],
+    "tested": true,
+    "stressed": false,
+    "killedLive": ""
+  },
+  {
+    "code": "V38_SKILL_DAY_WITHOUT_SAME_DAY_FOUNDATION",
+    "modules": [
+      "engine/v38_structural_audit.js"
+    ],
+    "owners": [
+      "auditFoundationalStrength"
+    ],
+    "advisory": true,
+    "reachable": false,
     "repairs": [],
     "wired": [],
     "tested": true,

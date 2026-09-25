@@ -58,19 +58,60 @@ const ROWS = [
   'Thu\tBulgarian Split Squat\tBodyweight\t3\t8\t1:30\t7\tLower.\t',
   'Thu\tHollow Body Hold\tBodyweight\t3\t30s\t1:00\t6\tTrunk.\t',
 ];
-const PROGRAM = [wk(1, ROWS), wk(2, ROWS), wk(3, ROWS), wk(4, ROWS)].join('\n\n');
+// Week 1 is the same microcycle with its pulling taken out: Tuesday still
+// carries the skill work, and now nothing in the week trains pulling at all.
+// That is the failure the rule is for. Weeks 2-4 keep theirs, so the athlete
+// owns a pull the repair can borrow rather than invent.
+const WEEK_ONE_ROWS = ROWS.filter((r) => !/\t(?:Weighted Pull-up|Inverted Row)\t/.test(r));
+
+const PROGRAM = [wk(1, WEEK_ONE_ROWS), wk(2, ROWS), wk(3, ROWS), wk(4, ROWS)].join('\n\n');
+
+// The same block with every week intact. Tuesday has no same-day pull in any
+// week, but Monday and Thursday supply one, so the microcycle carries the
+// strength and there is nothing to add.
+const FOUNDED = [wk(1, ROWS), wk(2, ROWS), wk(3, ROWS), wk(4, ROWS)].join('\n\n');
 
 const count = (p) => auditProgramStructure(p, INTAKE).filter((f) => f.code === 'V38_SKILL_WITHOUT_FOUNDATION').length;
 const rowsOf = (p) => p.split('\n').filter((l) => /\t/.test(l) && !/^Day\t/.test(l));
 
-test('the fixture starts with skill days that have no foundation', () => {
+test('the fixture starts with a week whose skill work has no foundation in it', () => {
   assert.ok(count(PROGRAM) > 0, 'fixture no longer exhibits the defect');
+});
+
+test('a skill day is not asked to carry a pull the week already supplies', () => {
+  // The rule was same-day, and as a same-day rule it put a token one-set row on
+  // a planche and handstand day that sat between two days full of pulling. On an
+  // athlete managed for elbow symptoms that set is a cost with no return, and
+  // adjacent to a heavy pull day the adjacency gate refused it outright -- so
+  // the two rules together could not be satisfied at all.
+  assert.equal(count(FOUNDED), 0, 'a week that trains pulling and pressing is not missing a foundation');
+  assert.equal(repairSkillFoundation(FOUNDED, INTAKE).changed, false, 'nothing should be added');
+});
+
+test('where the strength sits in the week is still reported, just not as a blocker', () => {
+  const placement = auditProgramStructure(FOUNDED, INTAKE)
+    .filter((f) => f.code === 'V38_SKILL_DAY_WITHOUT_SAME_DAY_FOUNDATION');
+  assert.ok(placement.length, 'the placement question should still reach the coach');
+  for (const f of placement) assert.equal(f.severity, 'advisory');
 });
 
 test('the missing layer is added and the gate clears', () => {
   const { program, changed } = repairSkillFoundation(PROGRAM, INTAKE);
   assert.ok(changed, 'repair did not fire');
   assert.ok(count(program) < count(PROGRAM), 'the gate did not move');
+});
+
+test('the support layer borrows the cheapest exposure, not the maximal lift', () => {
+  // Donors were ordered commonest-first, and the commonest movement is the one
+  // the block is built around -- here the Weighted Pull-up. Once the adjacency
+  // reading was corrected the heaviest donor stopped being refused and won, so
+  // the repair proposed a maximal lift as a "maintenance" layer. Support takes
+  // the cheapest exposure that answers the rule.
+  const { moves } = repairSkillFoundation(PROGRAM, INTAKE);
+  assert.ok(moves.length, 'the repair must fire on a week with no pulling in it');
+  for (const m of moves) {
+    assert.equal(/weighted/i.test(m.added), false, `borrowed the maximal lift: ${m.added}`);
+  }
 });
 
 test('it only adds movements the athlete already performs', () => {

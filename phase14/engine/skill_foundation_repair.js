@@ -29,18 +29,35 @@ import { rebuild, newRow } from './tsv_rows.js';
 
 const isWarmup = (s) => /^\s*\[WARMUP\]/i.test(String(s || ''));
 
+// Severity-aware, because clearing the hard finding is what raises the advisory
+// one. Answering "this week trains no pulling at all" turns that week into one
+// the audit can then ask a placement question about, so the advisory count goes
+// up by exactly the finding that was just downgraded. Counting raw codes read
+// that as breakage and refused the repair that fixed the thing it was called
+// for. A blocking finding may never increase; an advisory one may, but only
+// where a blocking finding was actually removed.
 function brokeSomething(before, after, intake) {
-  const codes = (program) => {
-    try { return auditProgramStructure(program, intake).map((f) => f.code || f.rule).filter(Boolean); }
+  const findings = (program) => {
+    try { return auditProgramStructure(program, intake); }
     catch { return null; }
   };
-  const a = codes(before);
-  const b = codes(after);
+  const a = findings(before);
+  const b = findings(after);
   if (!a || !b) return true;
-  const tally = (l) => l.reduce((m, c) => ({ ...m, [c]: (m[c] || 0) + 1 }), {});
+
+  const blocks = (f) => f.severity !== 'advisory';
+  const tally = (l) => l.filter(blocks).reduce((m, f) => {
+    const c = f.code || f.rule;
+    return c ? { ...m, [c]: (m[c] || 0) + 1 } : m;
+  }, {});
   const ta = tally(a);
   const tb = tally(b);
-  return Object.keys(tb).some((c) => (tb[c] || 0) > (ta[c] || 0));
+  if (Object.keys(tb).some((c) => (tb[c] || 0) > (ta[c] || 0))) return true;
+
+  const blocking = (l) => l.filter(blocks).length;
+  const advisory = (l) => l.length - blocking(l);
+  if (advisory(b) > advisory(a) && blocking(b) >= blocking(a)) return true;
+  return false;
 }
 
 const hasUpperSkill = (names) => names.some((n) => {
@@ -124,10 +141,21 @@ export function repairSkillFoundation(program, intake = {}) {
     let cells = parsed.rows.map((c) => [...c]);
     let touched = false;
 
+    // What the WEEK is missing, not what each day is missing. Asking every skill
+    // session to carry its own foundational pull put a token one-set row on a
+    // planche and front-lever day that sat between two days already full of
+    // pulling -- junk volume on an athlete being managed for elbow symptoms,
+    // added for no reason but to satisfy a gate. The microcycle carries the
+    // strength; this repair exists for the week that has none of it at all.
+    const weekNames = [...byDay.values()].flatMap((x) => x.names);
+    const weekNeedsPull = !weekNames.some(isPull);
+    const weekNeedsPush = !weekNames.some(isPush);
+    if (!weekNeedsPull && !weekNeedsPush) continue;
+
     for (const [day, info] of byDay) {
       if (!hasUpperSkill(info.names)) continue;
-      const needPull = !info.names.some(isPull);
-      const needPush = !info.names.some(isPush);
+      const needPull = weekNeedsPull && !info.names.some(isPull);
+      const needPush = weekNeedsPush && !info.names.some(isPush);
       if (!needPull && !needPush) continue;
       if ((needPull && !pullDonors.length) || (needPush && !pushDonors.length)) continue;
 

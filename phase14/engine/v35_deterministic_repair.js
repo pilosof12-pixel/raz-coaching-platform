@@ -45,6 +45,7 @@ import { repairRaceRehearsal } from './race_rehearsal_repair.js';
 import { repairModalitySubstitution, repairNoteNamedMovement } from './modality_substitution_repair.js';
 import { repairNextRowClaim, repairTransitionClaim } from './structural_claim_rules.js';
 import { repairSkillFoundation } from './skill_foundation_repair.js';
+import { canonicaliseDayOrder } from './day_order_canonicalization.js';
 import { ENDURANCE_REPAIRS, repairAccessoryRedundancy, repairTaperPowerSpike } from './endurance_block_repair.js';
 import { STATEMENT_REPAIRS } from './program_statement_repair.js';
 import { repairConsecutiveTrainingDays } from './consecutive_day_repair.js';
@@ -112,6 +113,8 @@ function rowKey(cells, parsed) {
 
 const NUMBER_WORDS = { one: 1, two: 2, three: 3, four: 4, five: 5, six: 6, seven: 7, eight: 8, nine: 9, ten: 10, twelve: 12 };
 const REP_WORD_FOR = { 1: 'singles', 2: 'doubles', 3: 'triples' };
+import { namesAnAlternativeDose } from './v34_prescription_consistency.js';
+
 const CONDITIONAL = /\b(?:if|only if|when|provided|optional|earned|may|can)\b/i;
 
 // A false claim is restated in terms of the metric the claim itself names, using
@@ -241,9 +244,19 @@ function repairRowNote(note, { sets, reps, km, load, volume, measured, priorSets
     // restate, and the word in front of it is not a claim about a rep count.
     const wanted = measured ? null : (REP_WORD_FOR[reps] || `sets of ${reps}`);
     if (wanted) {
-      out = out.replace(/\b(singles?|doubles?|triples?)\b/gi, (w) => {
+      // Not a rep word that names the fallback rather than the prescription.
+      // "Strict ring doubles only if rep 1 is crisp. If rep 2 would be soft,
+      // switch to singles" is a row prescribed at 2 reps whose second rep word
+      // is deliberately a different dose -- the thing to do when the prescribed
+      // one cannot be met. Restating it as the row's own dose produced "switch
+      // to doubles" on a set already prescribed as doubles, which the coach
+      // charged as a client-facing execution error on run #138. The repair made
+      // that line worse than the model wrote it.
+      out = out.replace(/\b(singles?|doubles?|triples?)\b/gi, (w, _g, offset, whole) => {
         const n = { single: 1, singles: 1, double: 2, doubles: 2, triple: 3, triples: 3 }[String(w).toLowerCase()];
-        return (!Number.isFinite(n) || n === reps) ? w : wanted;
+        if (!Number.isFinite(n) || n === reps) return w;
+        if (namesAnAlternativeDose(whole, { 0: w, index: offset })) return w;
+        return wanted;
       });
     }
   }
@@ -261,6 +274,20 @@ function repairRowNote(note, { sets, reps, km, load, volume, measured, priorSets
   if (Number.isFinite(sets)) {
     out = out.replace(/\b(stay at|keep|hold|maintain|remain at)\s+(\d+)(\s+(?:clean|quality|good|solid)?\s*sets?\b)/gi,
       (w, verb, n, tail) => (Number(n) === sets ? w : `${verb} ${sets}${tail}`));
+
+    // An early-stop instruction has to name a set the athlete would otherwise
+    // still have in front of them. Repairs downstream of note generation cut a
+    // Dip from four sets to two and left "stop at 3 sets" behind it, so the note
+    // told him to stop at a set the row no longer contains. Stopping early means
+    // one short of what is prescribed; below two sets there is nothing to stop
+    // short of, and the clause goes.
+    out = out.replace(/(,?\s*(?:and\s+)?)\bstop at\s+(\d+)(\s+(?:clean|quality|good|solid)?\s*sets?\b)/gi,
+      (w, lead, n, tail) => {
+        if (Number(n) < sets) return w;
+        if (sets < 2) return '';
+        const kept = sets - 1;
+        return `${lead}stop at ${kept}${tail.replace(/sets\b/i, kept === 1 ? 'set' : 'sets')}`;
+      });
   }
 
   // A claimed reduction that did not happen becomes a hold statement, and a
@@ -1651,6 +1678,15 @@ export function repairDeterministicContradictions(program, intake = {}) {
       candidate = reclocked;
       repairs.push({ type: 'v77_fight_week_clock' });
     }
+  }
+
+  // Last, once nothing else will move a session: print the week in the order it
+  // is trained. The adjacency and spread repairs relabel days in place, so a
+  // corrected week can come out of the chain reading Mon/Wed/Tue/Fri/Sat.
+  const ordered = canonicaliseDayOrder(candidate, intake);
+  if (ordered.changed) {
+    candidate = ordered.program;
+    repairs.push({ type: 'canonicaliseDayOrder', moves: ordered.moves.length });
   }
 
   return { program: candidate, repaired: repairs.length > 0, repairs };
