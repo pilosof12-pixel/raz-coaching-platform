@@ -1,21 +1,21 @@
 {
-  "timestamp": "2026-09-25T13:08:20.031Z",
+  "timestamp": "2026-09-25T14:32:39.490Z",
   "base": "https://raz-coaching-platform.onrender.com",
-  "head_sha": "96fa01146aabf4858a6d77013c99c4848bd021a0",
-  "runtime": "live75 2026-09-25T13:07:05Z",
+  "head_sha": "00eb1f9d95a94ff7f3ea17eefd06da85e7330e24",
+  "runtime": "live76 2026-09-25T14:31:47Z",
   "results": [
     {
       "id": "advanced_calisthenics",
-      "job_id": "5d5975acdb48aa5bebd734140f7fce66",
+      "job_id": "f40cedc0da67c85b0cbb69cd0bd88ef0",
       "ok": true,
       "status": "done",
       "stage": "finalizing",
       "attempt": 4,
-      "detail": "saving program after 4 model call(s) QA trace: A1:V34_NOTE_UNDEFINED_LOAD_REFERENCE+UNBENCHMARKED_VARIATION_LOAD_TOO_ASSERTIVE+PRIMARY_EXACT_MOVEMENT_MISSING -> A2:UNBENCHMARKED_VARIATION_LOAD_TOO_ASSERTIVE+PRIMARY_EXACT_MOVEMENT_MISSING -> A3:V34_NOTE_UNDEFINED_LOAD_REFERENCE.",
+      "detail": "delivered with unresolved rules: V34_NOTE_UNDEFINED_LOAD_REFERENCE QA trace: A1:EQUIPMENT_VIOLATION+V34_NOTE_UNDEFINED_LOAD_REFERENCE -> A2:V34_NOTE_UNDEFINED_LOAD_REFERENCE -> A3:V34_NOTE_UNDEFINED_LOAD_REFERENCE -> A4:V34_NOTE_UNDEFINED_LOAD_REFERENCE.",
       "last_seen_status": "done",
       "error": null,
-      "program_chars": 26192,
-      "seconds": 459
+      "program_chars": 23628,
+      "seconds": 466
     }
   ],
   "reasoning_effort": "medium",
