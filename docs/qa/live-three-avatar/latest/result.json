@@ -1,21 +1,21 @@
 {
-  "timestamp": "2026-09-25T14:32:39.490Z",
+  "timestamp": "2026-09-25T15:21:29.125Z",
   "base": "https://raz-coaching-platform.onrender.com",
-  "head_sha": "00eb1f9d95a94ff7f3ea17eefd06da85e7330e24",
-  "runtime": "live76 2026-09-25T14:31:47Z",
+  "head_sha": "45658bc3b0a15b4e6a8172b6627a0d585d73f56a",
+  "runtime": "live77 2026-09-25T15:11:01Z",
   "results": [
     {
       "id": "advanced_calisthenics",
-      "job_id": "f40cedc0da67c85b0cbb69cd0bd88ef0",
+      "job_id": "566041b6ae80b5dd11e92802e577507f",
       "ok": true,
       "status": "done",
       "stage": "finalizing",
       "attempt": 4,
-      "detail": "delivered with unresolved rules: V34_NOTE_UNDEFINED_LOAD_REFERENCE QA trace: A1:EQUIPMENT_VIOLATION+V34_NOTE_UNDEFINED_LOAD_REFERENCE -> A2:V34_NOTE_UNDEFINED_LOAD_REFERENCE -> A3:V34_NOTE_UNDEFINED_LOAD_REFERENCE -> A4:V34_NOTE_UNDEFINED_LOAD_REFERENCE.",
+      "detail": "delivered with unresolved rules: UNBENCHMARKED_VARIATION_LOAD_TOO_ASSERTIVE+PRIMARY_EXACT_MOVEMENT_MISSING QA trace: A1:UNBENCHMARKED_VARIATION_LOAD_TOO_ASSERTIVE+PRIMARY_EXACT_MOVEMENT_MISSING -> A2:UNBENCHMARKED_VARIATION_LOAD_TOO_ASSERTIVE+PRIMARY_EXACT_MOVEMENT_MISSING -> A3:UNBENCHMARKED_VARIATION_LOAD_TOO_ASSERTIVE+PRIMARY_EXACT_MOVEMENT_MISSING -> A4:UNBENCHMARKED_VARIATION_LOAD_TOO_ASSERTIVE+PRIMARY_EXACT_MOVEMENT_MISSING.",
       "last_seen_status": "done",
       "error": null,
-      "program_chars": 23628,
-      "seconds": 466
+      "program_chars": 22050,
+      "seconds": 464
     }
   ],
   "reasoning_effort": "medium",

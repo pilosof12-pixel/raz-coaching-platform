@@ -1,154 +1,141 @@
-Monday and Thursday drive the two main pulling goals: heavy Weighted Pull-up plus clean Ring Muscle-up work. Tuesday and Friday keep the inversion and straight-arm skill work in, and Wednesday stays deliberately low-cost so the primary pulling can keep moving.
+This block keeps two direct weighted Pull-up exposures each week plus two ring muscle-up exposures: Monday trains longer-set muscle-up ability alongside the heavier pull-up anchor, and Friday keeps the crisp singles exposure. Straight-arm planche and lever work stay split and modest so your elbow recovery still belongs to the primary bent-arm goals.
 
-Weeks 2-3 nudge the main qualities without bloating fatigue: Monday pull-up load climbs, Thursday’s Ring Muscle-up ladder grows from a clean double plus singles to a triple top set, Tuesday Back-to-Wall Handstand Push-Up moves from triples to fours, and Wednesday’s Freestanding Handstand Push-up Negative gets longer from 3 to 5 seconds. Week 4 is consolidation: fewer total sets, similar moderate loads, cleaner reps, fresher elbows.
+Weeks 2-3 only add belt load on Pull-up if the prior exposure stayed inside the RPE cap, extend the Monday ring muscle-up ladder, and build a little more freestanding handstand control. Week 4 is a consolidation week: fewer non-essential sets, but the main standards stay moderate so you finish fresher, not detrained.
 
-If the left medial elbow rises above its usual short-lived baseline, remove straight-arm stress in this order: Band-Assisted Straddle Planche, then Advanced Tuck Planche, then Advanced Tuck Front Lever. Keep Ring Muscle-up and Weighted Pull-up unless pain also appears during bent-arm pulling; if it does, stop that row, cut the next pull session by 2.5-5 kg or one set, and repeat the last clean week.
+If the left medial elbow ache goes above 2/10, lasts past 48 hours, or is worse the next morning, remove rows in this order: Band-Assisted Straddle Planche, then Advanced Tuck Planche, then Advanced Tuck Front Lever. Keep Pull-up and Strict Ring Muscle-up unless they themselves become painful; bent-arm pulling is the last thing to trim here. If freestanding handstand negatives turn head-first or asymmetrical, swap that day’s Freestanding Handstand Push-up Negative for Wall Handstand Push-up at the same sets.
 
 START_WEEK1_TSV
 Day	Exercise	Weight	Sets	Reps	Rest	Target RPE	Notes	Results
-Mon	[WARMUP] Band Pull-Apart Warm-up	Light band	2	15	30s	4	Easy scap and shoulder prep; then 2 easy ramp sets on the first pull and first press.; Squat-and-reach x 6; Bodyweight squat x 8; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Band shoulder pass-through x 10; Scapular push-up x 8; Ramp Weighted Pull-up: bodyweight x 5, +10 kg x 3, +20 kg x 2 before +30 kg work sets.	
-Mon	Weighted Pull-up	+30 kg	4	3	4 min	8	Added load only. Start around 94% of your +32 kg x3 benchmark; if set 1 is over RPE 8 or chest no longer reaches bar, drop to +27.5 kg and keep clean triples.	
-Mon	Ring Muscle-up	BW	5	1	2-3 min	7.5	Quality singles only. Strict rings, no kip; false grip if it gives the cleanest turnover. Stop the session at the first miss or soft lockout.	
-Mon	Dip	RPE-selected load	3	5	3 min	7.5	Added load only. Support strength for muscle-up; leave 1-2 reps in reserve and keep the turnover crisp.	
-Mon	Pistol Squat	Belt load to RPE 8	3	8 each leg	2 min	8	Use added belt load if bodyweight is too easy; controlled 2-3s down.	
-Mon	Band Pallof Press	Light band	2	12 each side	60s	6	Trunk anti-rotation; first accessory to remove if time runs tight.	
-Tue	[WARMUP] Band Pull-Apart Warm-up	Light band	2	15	30s	4	Easy scap, wrists and shoulder elevation prep before handstand work.; Squat-and-reach x 6; Bodyweight squat x 8; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Band shoulder pass-through x 10; Scapular push-up x 8	
-Tue	Controlled Handstand Kick-up	BW	5	2-3 attempts	60s	6	Fresh balance practice. Max 15 total attempts; stop a set early if entries get wild.	
-Tue	Freestanding Handstand Hold	BW	5	6-10s	60-90s	6	Own the line, ribs down, toes stacked. End the set when balance drifts or shoulders shrug unevenly.	
-Tue	Back-to-Wall Handstand Push-Up	BW	4	3	3 min	7.5	Use the same folded-towel depth each set. If rep speed collapses or head tracks forward, hold the reps here and do not force more.	
-Tue	Band-Assisted Straddle Planche	Light band	2	3-5s	2-3 min	8	Small bridge exposure toward straddle. Locked elbows and protraction only; stop immediately if the left elbow speaks up.	
-Tue	Advanced Tuck Planche	BW	4	4-6s	2 min	7.5	Main planche volume stays at your owned rung. Stop before elbow bend, loss of protraction or pelvic collapse.	
-Tue	Inverted Row	BW	3	8-10	90s	8	Horizontal pull balance for the week; full pause at the top.	
-Tue	Banded Squat	Band tension to RPE 7	3	10	2 min	7	Lower-body support without stealing recovery from the primary pull days; keep all reps smooth and non-grindy.	
-Wed	[WARMUP] Deep Squat Hold	BW	2	30s	30s	3	Easy hips, ankles and bracing; then 2 easy handstand kick-ups before the first work set.; Squat-and-reach x 6; Bodyweight squat x 8; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Band shoulder pass-through x 10; Scapular push-up x 8	
-Wed	Freestanding Handstand Push-up Negative	BW	4	1	2-3 min	7.5	Low-cost recovery-contingent day. Use a 3 second lower; if balance is lost before halfway down or you go head-first, end the rep there.	
-Wed	Pistol Squat	BW	3	5 each leg	90s	6.5	Stay crisp and submaximal; this day should leave Thursday's pulling fresh.	
-Wed	Australian Pull-up	BW	3	10-12	90s	7	Easy horizontal pulling volume; stop 2-3 reps before form slips.	
-Wed	Plank	BW	2	45s	45s	6	Brace hard, no sag. Optional to remove if you need the shortest possible session.	
-Thu	[WARMUP] Band Pull-Apart Warm-up	Light band	2	15	30s	4	Easy scap and shoulder prep; then brief ring transition practice below fatigue.; Squat-and-reach x 6; Bodyweight squat x 8; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Band shoulder pass-through x 10; Scapular push-up x 8; Ramp Weighted Pull-up: bodyweight x 5, +10 kg x 3, +17.5 kg x 2 before +25 kg work sets.	
-Thu	Ring Muscle-up	BW	4	2,1,1,1	3-4 min	8	Descending ladder for consecutive-rep skill. Set 1 is the top set; back-off sets are singles. Stop the ladder on the first miss and do not retry.	
-Thu	Weighted Pull-up	+25 kg	3	5	3-4 min	7.5	Added load only. Volume-strength exposure at about 78% of your +32 kg x3 benchmark; if it climbs above RPE 8, keep +25 kg and cap it at 4 reps.	
-Thu	Dip	RPE-selected load	3	4	3 min	8	Added load only. Keep shoulders down and turnover mechanics crisp; do not grind.	
-Thu	Pistol Squat	Belt load to RPE 8	3	8 each leg	2 min	8	Second meaningful lower-body exposure of the week; use load or tempo to hit the target effort.	
-Thu	Plank	BW	2	60s	45-60s	6	Simple trunk work; keep this easy enough that it does not steal from Friday.	
-Fri	[WARMUP] Band Pull-Apart Warm-up	Light band	2	15	30s	4	Easy scap, wrists and shoulder elevation prep.; Squat-and-reach x 6; Bodyweight squat x 8; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Band shoulder pass-through x 10; Scapular push-up x 8	
-Fri	Controlled Handstand Kick-up	BW	4	2-3 attempts	60s	6	Fresh entries only. Stop once timing fades; no chasing volume.	
-Fri	Freestanding Handstand Hold	BW	4	6-10s	60-90s	6	Same standard as Tuesday; quality balance practice, not fatigue work.	
-Fri	Back-to-Wall Handstand Push-Up	BW	3	3	3 min	7	Secondary wall strength dose held submaximal to protect recovery.	
-Fri	Advanced Tuck Front Lever	BW	3	8-10s	2 min	6.5	Maintenance held on purpose. Straight elbows, scapular control, stop well before shaking turns ugly.	
-Fri	Advanced Tuck Planche	BW	3	4-6s	2 min	7	Easier accumulated-quality exposure; keep this cleaner than Tuesday, not harder.	
-Fri	Inverted Row	BW	3	10	90s	8	Extra horizontal pulling without heavy elbow-flexor fatigue.	
-Fri	Banded Squat	Band tension to RPE 7	2	10	2 min	7	Low-stress lower-body support to keep the day full-body; stop well short of a grind.	
-Fri	Band Pallof Press	Light band	2	12 each side	60s	6	Trunk finish. Remove this before cutting any primary or direct skill row.	
+Mon	[WARMUP] Band Pull-Apart Warm-up	Light band	2	15	30s	3	Then 3-5 min wrists shoulders hips and 2-3 ramp sets toward today’s belt-loaded Pull-up work; keep warm-up easy.; Squat-and-reach x 6; Bodyweight squat x 8; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Band shoulder pass-through x 10; Scapular push-up x 8; Ramp Pull-up with 2-3 easy belt jumps to today’s work weight.	
+Mon	Pull-up	RPE-selected belt load	4	3	3-4 min	8	Direct weighted pull-up anchor using the belt. Added load only; bodyweight is part of total. Choose a belt load that makes all 3 reps land at the target RPE. If set 1 is above target, reduce 5-10% or stop at 3 sets.	
+Mon	Strict Ring Muscle-up	BW	4	2,1,1,1	2-3 min	8	Descending ladder on rings. Stop on first miss soft turnover or elbow discomfort. If the top double is not clean, switch the remaining work to singles only.	
+Mon	Dip	RPE-selected load	2	5	2.5-3 min	8	Added load only. Strong support and lockout for ring turnover; keep 1-2 reps in reserve.	
+Mon	Pistol Squat	RPE-selected belt load	3	5/leg	2 min	7	Use the belt only if balance stays clean. Smooth down and no bounce out of the bottom.	
+Mon	Dead Bug	BW	3	8/side	45-60s	6	Brace hard and exhale fully each rep.	
+Tue	[WARMUP] Band Pull-Apart Warm-up	Light band	2	15	30s	3	Then 3-5 min wrists shoulders and kick-up prep; keep the warm-up easy.; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Band shoulder pass-through x 10; Scapular push-up x 8	
+Tue	Freestanding Handstand Hold	BW	5	10s	60-90s	6	Balance practice only. Stop each set at the first chase step or banana line; do not turn this into fatigue work.	
+Tue	Freestanding Handstand Push-up Negative	BW	4	1	2 min	7	Lower under control for about 3 seconds. Stop if head path shifts forward or shoulders collapse.	
+Tue	Wall Handstand Push-up	BW	3	4	2-3 min	7	Same folded-towel setup each week. Held stable on purpose while free-balance work progresses; stop 1-2 reps before form loss.	
+Tue	Band-Assisted Straddle Planche	Light band	3	5s	2-3 min	7	Next-rung bridge exposure. Locked elbows and strong protraction only; if left elbow awareness rises above 2/10, skip this row first. Prescribed attempts are a ceiling, not a quota: stop the set early if quality, symmetry or balance breaks down.	
+Tue	Nordic Hamstring Curl	BW	2	5	2 min	8	Anchor ankles under a low bar or fixed frame. Use hands lightly on the catch so hamstrings do the work.	
+Tue	Pallof Press	Light band	2	10/side	45-60s	6	Low-cost trunk and shoulder control.	
+Wed	[WARMUP] Band Pull-Apart Warm-up	Light band	2	15	30s	3	Then 3-5 min hips ankles and shoulders; keep this day low fatigue.; Squat-and-reach x 6; Bodyweight squat x 8; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Band shoulder pass-through x 10; Scapular push-up x 8	
+Wed	Explosive Push-up	BW	2	4	90s	6	Fast off the floor with a full reset each rep. Stop if speed drops.	
+Wed	Inverted Row	BW	3	10	90s	6	Horizontal pull volume; keep ribs down and squeeze 1 second at the top.	
+Wed	Dip	BW	2	8	2 min	7	Easy hypertrophy support only; leave 2-3 reps in reserve.	
+Wed	Dead Bug	BW	2	8/side	45-60s	6	Recovery-biased support day; keep the whole session crisp and low stress.	
+Fri	[WARMUP] Band Pull-Apart Warm-up	Light band	2	15	30s	3	Then 3-5 min false-grip shoulder and hip prep plus 2-3 ramp sets toward today’s belt-loaded Pull-up work.; Squat-and-reach x 6; Bodyweight squat x 8; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Band shoulder pass-through x 10; Scapular push-up x 8; Ramp Pull-up with 2-3 easy belt jumps to today’s work weight.	
+Fri	Pull-up	RPE-selected belt load	4	3	3 min	7	Direct weighted pull-up anchor using the belt. Added load only; bodyweight is part of total. Choose a slightly lighter belt load than Monday if needed so every rep stays crisp and below grind; if set 1 feels above RPE 7.5, reduce 5-10% or cut the last set.	
+Fri	Strict Ring Muscle-up	BW	5	1	90-120s	7	Quality singles on rings. Dead hang to support, no kip. Stop the day at the first ugly rep and do not chase fatigue.	
+Fri	Dip	RPE-selected load	2	6	2-3 min	7	Added load only. Support pushing without draining Sat shoulders.	
+Fri	Lunge	RPE-selected belt load	3	8/leg	90-120s	7	Long stride and controlled knee touch; use the belt only if balance allows.	
+Fri	Pallof Press	Light band	2	12/side	45-60s	6	Trunk stiffness for rings and handstand line.	
+Sat	[WARMUP] Band Pull-Apart Warm-up	Light band	2	15	30s	3	Then 3-5 min wrists shoulders hips and scapular prep; keep it easy.; Squat-and-reach x 6; Bodyweight squat x 8; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Band shoulder pass-through x 10; Scapular push-up x 8	
+Sat	Advanced Tuck Planche	BW	4	5-6s	2 min	7	Owned-rung volume held stable on purpose. Stop before elbow bend or loss of protraction.	
+Sat	Advanced Tuck Front Lever	BW	2	8s	2 min	7	Maintenance dose held unchanged through the block. Stop if hips drop or elbows soften.	
+Sat	Pike Push-up	BW	3	8	90s	7	Vertical press volume without adding another hard Wall Handstand Push-up day.	
+Sat	Australian Pull-up	BW	3	10	90s	6	Easy horizontal pull balance; keep chest to the implement.	
+Sat	Dead Bug	BW	2	8/side	45-60s	6	If week fatigue is high, this is the first row to remove.	
 END_WEEK1_TSV
+
 START_WEEK2_TSV
 Day	Exercise	Weight	Sets	Reps	Rest	Target RPE	Notes	Results
-Mon	[WARMUP] Band Pull-Apart Warm-up	Light band	2	15	30s	4	Easy scap and shoulder prep; then 2 easy ramp sets on the first pull and first press.; Squat-and-reach x 6; Bodyweight squat x 8; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Band shoulder pass-through x 10; Scapular push-up x 8; Ramp Weighted Pull-up: bodyweight x 5, +10 kg x 3, +22.5 kg x 2 before +31 kg work sets.	
-Mon	Weighted Pull-up	+31 kg	4	3	4 min	8	Added load only. Start around 97% of your +32 kg x3 benchmark; if set 1 is over RPE 8, hold +30 kg for the day and keep clean triples.	
-Mon	Ring Muscle-up	BW	6	1	2-3 min	7.5	Quality singles only. Strict rings, no kip; false grip if it gives the cleanest turnover. Stop the session at the first miss or soft lockout.	
-Mon	Dip	RPE-selected load	3	5	3 min	7.5	Added load only. Support strength for muscle-up; leave 1-2 reps in reserve and keep the turnover crisp.	
-Mon	Pistol Squat	Belt load to RPE 8	3	8 each leg	2 min	8	Use added belt load if bodyweight is too easy; controlled 2-3s down.	
-Mon	Band Pallof Press	Light band	2	12 each side	60s	6	Trunk anti-rotation; first accessory to remove if time runs tight.	
-Tue	[WARMUP] Band Pull-Apart Warm-up	Light band	2	15	30s	4	Easy scap, wrists and shoulder elevation prep before handstand work.; Squat-and-reach x 6; Bodyweight squat x 8; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Band shoulder pass-through x 10; Scapular push-up x 8	
-Tue	Controlled Handstand Kick-up	BW	5	2-3 attempts	60s	6	Fresh balance practice. Max 15 total attempts; stop a set early if entries get wild.	
-Tue	Freestanding Handstand Hold	BW	5	6-10s	60-90s	6	Own the line, ribs down, toes stacked. End the set when balance drifts or shoulders shrug unevenly.	
-Tue	Back-to-Wall Handstand Push-Up	BW	4	4	3 min	8	Use the same folded-towel depth each set. If rep speed collapses or head tracks forward, stay at 4s and keep them clean.	
-Tue	Band-Assisted Straddle Planche	Light band	2	3-5s	2-3 min	8	Small bridge exposure toward straddle. Locked elbows and protraction only; stop immediately if the left elbow speaks up.	
-Tue	Advanced Tuck Planche	BW	4	4-6s	2 min	7.5	Main planche volume stays at your owned rung. Stop before elbow bend, loss of protraction or pelvic collapse.	
-Tue	Inverted Row	BW	3	8-10	90s	8	Horizontal pull balance for the week; full pause at the top.	
-Tue	Banded Squat	Band tension to RPE 7	3	10	2 min	7	Lower-body support without stealing recovery from the primary pull days; keep all reps smooth and non-grindy.	
-Wed	[WARMUP] Deep Squat Hold	BW	2	30s	30s	3	Easy hips, ankles and bracing; then 2 easy handstand kick-ups before the first work set.; Squat-and-reach x 6; Bodyweight squat x 8; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Band shoulder pass-through x 10; Scapular push-up x 8	
-Wed	Freestanding Handstand Push-up Negative	BW	4	1	2-3 min	7.5	Low-cost recovery-contingent day. Use a 4 second lower; if balance is lost before halfway down or you go head-first, end the rep there.	
-Wed	Pistol Squat	BW	3	5 each leg	90s	6.5	Stay crisp and submaximal; this day should leave Thursday's pulling fresh.	
-Wed	Australian Pull-up	BW	3	10-12	90s	7	Easy horizontal pulling volume; stop 2-3 reps before form slips.	
-Wed	Plank	BW	2	45s	45s	6	Brace hard, no sag. Optional to remove if you need the shortest possible session.	
-Thu	[WARMUP] Band Pull-Apart Warm-up	Light band	2	15	30s	4	Easy scap and shoulder prep; then brief ring transition practice below fatigue.; Squat-and-reach x 6; Bodyweight squat x 8; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Band shoulder pass-through x 10; Scapular push-up x 8; Ramp Weighted Pull-up: bodyweight x 5, +10 kg x 3, +17.5 kg x 2 before +25 kg work sets.	
-Thu	Ring Muscle-up	BW	5	2,1,1,1,1	3-4 min	8	Descending ladder for consecutive-rep skill. Set 1 is the top set; back-off sets are singles. Stop the ladder on the first miss and do not retry.	
-Thu	Weighted Pull-up	+25 kg	3	6	3-4 min	8	Added load only. Same load, more clean work. If rep 6 would turn ugly, keep the set at 5 and repeat this week next time.	
-Thu	Dip	RPE-selected load	3	4	3 min	8	Added load only. Keep shoulders down and turnover mechanics crisp; do not grind.	
-Thu	Pistol Squat	Belt load to RPE 8	3	8 each leg	2 min	8	Second meaningful lower-body exposure of the week; use load or tempo to hit the target effort.	
-Thu	Plank	BW	2	60s	45-60s	6	Simple trunk work; keep this easy enough that it does not steal from Friday.	
-Fri	[WARMUP] Band Pull-Apart Warm-up	Light band	2	15	30s	4	Easy scap, wrists and shoulder elevation prep.; Squat-and-reach x 6; Bodyweight squat x 8; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Band shoulder pass-through x 10; Scapular push-up x 8	
-Fri	Controlled Handstand Kick-up	BW	4	2-3 attempts	60s	6	Fresh entries only. Stop once timing fades; no chasing volume.	
-Fri	Freestanding Handstand Hold	BW	4	6-10s	60-90s	6	Same standard as Tuesday; quality balance practice, not fatigue work.	
-Fri	Back-to-Wall Handstand Push-Up	BW	3	3	3 min	7	Secondary wall strength dose held submaximal to protect recovery.	
-Fri	Advanced Tuck Front Lever	BW	3	8-10s	2 min	6.5	Maintenance held on purpose. Straight elbows, scapular control, stop well before shaking turns ugly.	
-Fri	Advanced Tuck Planche	BW	3	4-6s	2 min	7	Easier accumulated-quality exposure; keep this cleaner than Tuesday, not harder.	
-Fri	Inverted Row	BW	3	10	90s	8	Extra horizontal pulling without heavy elbow-flexor fatigue.	
-Fri	Banded Squat	Band tension to RPE 7	2	10	2 min	7	Low-stress lower-body support to keep the day full-body; stop well short of a grind.	
-Fri	Band Pallof Press	Light band	2	12 each side	60s	6	Trunk finish. Remove this before cutting any primary or direct skill row.	
+Mon	[WARMUP] Band Pull-Apart Warm-up	Light band	2	15	30s	3	Then 3-5 min wrists shoulders hips and 2-3 ramp sets toward today’s belt-loaded Pull-up work; keep warm-up easy.; Squat-and-reach x 6; Bodyweight squat x 8; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Band shoulder pass-through x 10; Scapular push-up x 8; Ramp Pull-up with 2-3 easy belt jumps to today’s work weight.	
+Mon	Pull-up	RPE-selected belt load	4	3	3-4 min	8	Direct weighted pull-up anchor using the belt. Added load only; bodyweight is part of total. Start from Week 1's successful belt load and add a small plate only if all 3 reps still land at the target RPE. If set 1 is above target, hold the set count.	
+Mon	Strict Ring Muscle-up	BW	4	2,2,1,1	2-3 min	8	Descending ladder on rings. Stop on first miss soft turnover or elbow discomfort. If the second double is not clean, make the last two sets singles only.	
+Mon	Dip	RPE-selected load	2	5	2.5-3 min	8	Added load only. Strong support and lockout for ring turnover; keep 1-2 reps in reserve.	
+Mon	Pistol Squat	RPE-selected belt load	3	5/leg	2 min	7	Use the belt only if balance stays clean. Smooth down and no bounce out of the bottom.	
+Mon	Dead Bug	BW	3	8/side	45-60s	6	Brace hard and exhale fully each rep.	
+Tue	[WARMUP] Band Pull-Apart Warm-up	Light band	2	15	30s	3	Then 3-5 min wrists shoulders and kick-up prep; keep the warm-up easy.; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Band shoulder pass-through x 10; Scapular push-up x 8	
+Tue	Freestanding Handstand Hold	BW	5	12s	60-90s	6	Balance practice only. Stop each set at the first chase step or banana line; do not turn this into fatigue work.	
+Tue	Freestanding Handstand Push-up Negative	BW	4	1	2 min	7	Lower under control for about 3 seconds. Stop if head path shifts forward or shoulders collapse. Held at 4 sets across the week: the primary quality session advances, so secondary volume stays where it was.	
+Tue	Wall Handstand Push-up	BW	3	4	2-3 min	7	Same folded-towel setup each week. Held stable on purpose while free-balance work progresses; stop 1-2 reps before form loss.	
+Tue	Band-Assisted Straddle Planche	Light band	3	6s	2-3 min	7	Next-rung bridge exposure. Locked elbows and strong protraction only; if left elbow awareness rises above 2/10, skip this row first. Prescribed attempts are a ceiling, not a quota: stop the set early if quality, symmetry or balance breaks down.	
+Tue	Nordic Hamstring Curl	BW	2	5	2 min	8	Anchor ankles under a low bar or fixed frame. Use hands lightly on the catch so hamstrings do the work.	
+Tue	Pallof Press	Light band	2	10/side	45-60s	6	Low-cost trunk and shoulder control.	
+Wed	[WARMUP] Band Pull-Apart Warm-up	Light band	2	15	30s	3	Then 3-5 min hips ankles and shoulders; keep this day low fatigue.; Squat-and-reach x 6; Bodyweight squat x 8; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Band shoulder pass-through x 10; Scapular push-up x 8	
+Wed	Explosive Push-up	BW	2	4	90s	6	Fast off the floor with a full reset each rep. Stop if speed drops.	
+Wed	Inverted Row	BW	3	10	90s	6	Horizontal pull volume; keep ribs down and squeeze 1 second at the top.	
+Wed	Dip	BW	2	8	2 min	7	Easy hypertrophy support only; leave 2-3 reps in reserve.	
+Wed	Dead Bug	BW	2	8/side	45-60s	6	Recovery-biased support day; keep the whole session crisp and low stress.	
+Fri	[WARMUP] Band Pull-Apart Warm-up	Light band	2	15	30s	3	Then 3-5 min false-grip shoulder and hip prep plus 2-3 ramp sets toward today’s belt-loaded Pull-up work.; Squat-and-reach x 6; Bodyweight squat x 8; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Band shoulder pass-through x 10; Scapular push-up x 8; Ramp Pull-up with 2-3 easy belt jumps to today’s work weight.	
+Fri	Pull-up	RPE-selected belt load	4	3	3 min	7	Direct weighted pull-up anchor using the belt. Added load only; bodyweight is part of total. Start from Week 1's successful Friday belt load and only add load if set 1 still lands at the target RPE; otherwise hold the load and set count.	
+Fri	Strict Ring Muscle-up	BW	6	1	90-120s	7	Quality singles on rings. Dead hang to support, no kip. Stop the day at the first ugly rep and do not chase fatigue.	
+Fri	Dip	RPE-selected load	2	6	2-3 min	7	Added load only. Support pushing without draining Sat shoulders.	
+Fri	Lunge	RPE-selected belt load	3	8/leg	90-120s	7	Long stride and controlled knee touch; use the belt only if balance allows.	
+Fri	Pallof Press	Light band	2	12/side	45-60s	6	Trunk stiffness for rings and handstand line.	
+Sat	[WARMUP] Band Pull-Apart Warm-up	Light band	2	15	30s	3	Then 3-5 min wrists shoulders hips and scapular prep; keep it easy.; Squat-and-reach x 6; Bodyweight squat x 8; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Band shoulder pass-through x 10; Scapular push-up x 8	
+Sat	Advanced Tuck Planche	BW	4	5-6s	2 min	7	Owned-rung volume held stable on purpose. Stop before elbow bend or loss of protraction.	
+Sat	Advanced Tuck Front Lever	BW	2	8s	2 min	7	Maintenance dose held unchanged through the block. Stop if hips drop or elbows soften.	
+Sat	Pike Push-up	BW	2	8	90s	7	Vertical press volume without adding another hard Wall Handstand Push-up day.	
+Sat	Australian Pull-up	BW	3	10	90s	6	Easy horizontal pull balance; keep chest to the implement.	
+Sat	Dead Bug	BW	2	8/side	45-60s	6	If week fatigue is high, this is the first row to remove.	
 END_WEEK2_TSV
+
 START_WEEK3_TSV
 Day	Exercise	Weight	Sets	Reps	Rest	Target RPE	Notes	Results
-Mon	[WARMUP] Band Pull-Apart Warm-up	Light band	2	15	30s	4	Easy scap and shoulder prep; then 2 easy ramp sets on the first pull and first press.; Squat-and-reach x 6; Bodyweight squat x 8; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Band shoulder pass-through x 10; Scapular push-up x 8; Ramp Weighted Pull-up: bodyweight x 5, +10 kg x 3, +22.5 kg x 2 before +32 kg work sets.	
-Mon	Weighted Pull-up	+32 kg	4	3	4 min	8.5	Added load only. This matches your current +32 kg x3 benchmark across work sets; if set 2 runs past RPE 8.5, finish the remaining sets at +30 kg rather than forcing the day.	
-Mon	Ring Muscle-up	BW	6	1	2-3 min	7.5	Hold the single count here on purpose. Make each rep cleaner rather than adding more fatigue before Thursday's set-length work.	
-Mon	Dip	RPE-selected load	3	5	3 min	7.5	Added load only. Support strength for muscle-up; leave 1-2 reps in reserve and keep the turnover crisp.	
-Mon	Pistol Squat	Belt load to RPE 8	3	8 each leg	2 min	8	Use added belt load if bodyweight is too easy; controlled 2-3s down.	
-Mon	Band Pallof Press	Light band	2	12 each side	60s	6	Trunk anti-rotation; first accessory to remove if time runs tight.	
-Tue	[WARMUP] Band Pull-Apart Warm-up	Light band	2	15	30s	4	Easy scap, wrists and shoulder elevation prep before handstand work.; Squat-and-reach x 6; Bodyweight squat x 8; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Band shoulder pass-through x 10; Scapular push-up x 8	
-Tue	Controlled Handstand Kick-up	BW	5	2-3 attempts	60s	6	Fresh balance practice. Max 15 total attempts; stop a set early if entries get wild.	
-Tue	Freestanding Handstand Hold	BW	5	6-10s	60-90s	6	Own the line, ribs down, toes stacked. End the set when balance drifts or shoulders shrug unevenly.	
-Tue	Back-to-Wall Handstand Push-Up	BW	4	4	3 min	8	Match Week 2's reps with cleaner line and steadier speed; if quality slips, stop at the last clean set.	
-Tue	Band-Assisted Straddle Planche	Light band	2	3-5s	2-3 min	8	Small bridge exposure toward straddle. Locked elbows and protraction only; stop immediately if the left elbow speaks up.	
-Tue	Advanced Tuck Planche	BW	4	4-6s	2 min	7.5	Main planche volume stays at your owned rung. Stop before elbow bend, loss of protraction or pelvic collapse.	
-Tue	Inverted Row	BW	3	8-10	90s	8	Horizontal pull balance for the week; full pause at the top.	
-Tue	Banded Squat	Band tension to RPE 7	3	10	2 min	7	Lower-body support without stealing recovery from the primary pull days; keep all reps smooth and non-grindy.	
-Wed	[WARMUP] Deep Squat Hold	BW	2	30s	30s	3	Easy hips, ankles and bracing; then 2 easy handstand kick-ups before the first work set.; Squat-and-reach x 6; Bodyweight squat x 8; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Band shoulder pass-through x 10; Scapular push-up x 8	
-Wed	Freestanding Handstand Push-up Negative	BW	4	1	2-3 min	8	Low-cost recovery-contingent day. Use a 5 second lower; if balance is lost before halfway down or you go head-first, end the rep there.	
-Wed	Pistol Squat	BW	3	5 each leg	90s	6.5	Stay crisp and submaximal; this day should leave Thursday's pulling fresh.	
-Wed	Australian Pull-up	BW	3	10-12	90s	7	Easy horizontal pulling volume; stop 2-3 reps before form slips.	
-Wed	Plank	BW	2	45s	45s	6	Brace hard, no sag. Optional to remove if you need the shortest possible session.	
-Thu	[WARMUP] Band Pull-Apart Warm-up	Light band	2	15	30s	4	Easy scap and shoulder prep; then brief ring transition practice below fatigue.; Squat-and-reach x 6; Bodyweight squat x 8; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Band shoulder pass-through x 10; Scapular push-up x 8; Ramp Weighted Pull-up: bodyweight x 5, +10 kg x 3, +20 kg x 2 before +27.5 kg work sets.	
-Thu	Ring Muscle-up	BW	5	3,1,1,1,1	3-4 min	8.5	Descending ladder for consecutive-rep skill. Set 1 is the top set; back-off sets are singles. A miss, kip or soft turnover ends the ladder immediately.	
-Thu	Weighted Pull-up	+27.5 kg	3	5	3-4 min	8	Added load only. Heavier volume-strength exposure; if set 1 already feels like RPE 8.5, keep +25 kg and own the reps.	
-Thu	Dip	RPE-selected load	3	4	3 min	8	Added load only. Keep shoulders down and turnover mechanics crisp; do not grind.	
-Thu	Pistol Squat	Belt load to RPE 8	3	8 each leg	2 min	8	Second meaningful lower-body exposure of the week; use load or tempo to hit the target effort.	
-Thu	Plank	BW	2	60s	45-60s	6	Simple trunk work; keep this easy enough that it does not steal from Friday.	
-Fri	[WARMUP] Band Pull-Apart Warm-up	Light band	2	15	30s	4	Easy scap, wrists and shoulder elevation prep.; Squat-and-reach x 6; Bodyweight squat x 8; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Band shoulder pass-through x 10; Scapular push-up x 8	
-Fri	Controlled Handstand Kick-up	BW	4	2-3 attempts	60s	6	Fresh entries only. Stop once timing fades; no chasing volume.	
-Fri	Freestanding Handstand Hold	BW	4	6-10s	60-90s	6	Same standard as Tuesday; quality balance practice, not fatigue work.	
-Fri	Back-to-Wall Handstand Push-Up	BW	3	3	3 min	7	Secondary wall strength dose held submaximal to protect recovery.	
-Fri	Advanced Tuck Front Lever	BW	3	8-10s	2 min	6.5	Maintenance held on purpose. Straight elbows, scapular control, stop well before shaking turns ugly.	
-Fri	Advanced Tuck Planche	BW	3	4-6s	2 min	7	Easier accumulated-quality exposure; keep this cleaner than Tuesday, not harder.	
-Fri	Inverted Row	BW	3	10	90s	8	Extra horizontal pulling without heavy elbow-flexor fatigue.	
-Fri	Banded Squat	Band tension to RPE 7	2	10	2 min	7	Low-stress lower-body support to keep the day full-body; stop well short of a grind.	
-Fri	Band Pallof Press	Light band	2	12 each side	60s	6	Trunk finish. Remove this before cutting any primary or direct skill row.	
+Mon	[WARMUP] Band Pull-Apart Warm-up	Light band	2	15	30s	3	Then 3-5 min wrists shoulders hips and 2-3 ramp sets toward today’s belt-loaded Pull-up work; keep warm-up easy.; Squat-and-reach x 6; Bodyweight squat x 8; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Band shoulder pass-through x 10; Scapular push-up x 8; Ramp Pull-up with 2-3 easy belt jumps to today’s work weight.	
+Mon	Pull-up	RPE-selected belt load	4	3	3-4 min	8.5	Direct weighted pull-up anchor using the belt. Added load only; bodyweight is part of total. Start from Week 2's successful belt load and add a small plate only if 3 clean reps still land at the target RPE. If set 1 overshoots, hold the total reps.	
+Mon	Strict Ring Muscle-up	BW	4	3,1,1,1	2-3 min	8.5	Hardest week. Attempt the triple only if the first rep is as clean as Week 2; otherwise repeat Week 2. Stop on first miss soft turnover or elbow discomfort.	
+Mon	Dip	RPE-selected load	2	5	2.5-3 min	8	Added load only. Strong support and lockout for ring turnover; keep 1-2 reps in reserve.	
+Mon	Pistol Squat	RPE-selected belt load	3	5/leg	2 min	7	Use the belt only if balance stays clean. Smooth down and no bounce out of the bottom.	
+Mon	Dead Bug	BW	3	8/side	45-60s	6	Brace hard and exhale fully each rep.	
+Tue	[WARMUP] Band Pull-Apart Warm-up	Light band	2	15	30s	3	Then 3-5 min wrists shoulders and kick-up prep; keep the warm-up easy.; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Band shoulder pass-through x 10; Scapular push-up x 8	
+Tue	Freestanding Handstand Hold	BW	5	15s	60-90s	6	Balance practice only. Stop each set at the first chase step or banana line; do not turn this into fatigue work.	
+Tue	Freestanding Handstand Push-up Negative	BW	4	1	2 min	7.5	Lower under control for about 4 seconds. Stop if head path shifts forward or shoulders collapse. Held at 4 sets across the week: the primary quality session advances, so secondary volume stays where it was.	
+Tue	Wall Handstand Push-up	BW	3	4	2-3 min	7	Same folded-towel setup each week. Held stable on purpose while free-balance work progresses; stop 1-2 reps before form loss.	
+Tue	Band-Assisted Straddle Planche	Lighter band	3	6s	2-3 min	7.5	Next-rung bridge exposure. Use less help only if elbows stay locked and the left elbow stays calm the next day. Prescribed attempts are a ceiling, not a quota: stop the set early if quality, symmetry or balance breaks down.	
+Tue	Nordic Hamstring Curl	BW	2	5	2 min	8	Anchor ankles under a low bar or fixed frame. Use hands lightly on the catch so hamstrings do the work.	
+Tue	Pallof Press	Light band	2	10/side	45-60s	6	Low-cost trunk and shoulder control.	
+Wed	[WARMUP] Band Pull-Apart Warm-up	Light band	2	15	30s	3	Then 3-5 min hips ankles and shoulders; keep this day low fatigue.; Squat-and-reach x 6; Bodyweight squat x 8; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Band shoulder pass-through x 10; Scapular push-up x 8	
+Wed	Explosive Push-up	BW	2	4	90s	6	Fast off the floor with a full reset each rep. Stop if speed drops.	
+Wed	Inverted Row	BW	3	10	90s	6.5	Horizontal pull volume; keep ribs down and squeeze 1 second at the top.	
+Wed	Dip	BW	2	8	2 min	7	Easy hypertrophy support only; leave 2-3 reps in reserve.	
+Wed	Dead Bug	BW	2	8/side	45-60s	6	Recovery-biased support day; keep the whole session crisp and low stress.	
+Fri	[WARMUP] Band Pull-Apart Warm-up	Light band	2	15	30s	3	Then 3-5 min false-grip shoulder and hip prep plus 2-3 ramp sets toward today’s belt-loaded Pull-up work.; Squat-and-reach x 6; Bodyweight squat x 8; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Band shoulder pass-through x 10; Scapular push-up x 8; Ramp Pull-up with 2-3 easy belt jumps to today’s work weight.	
+Fri	Pull-up	RPE-selected belt load	4	3	3 min	7.5	Direct weighted pull-up anchor using the belt. Added load only; bodyweight is part of total. Start from Week 2's successful Friday belt load and add load only if set 1 still lands at the target RPE; otherwise hold the set count.	
+Fri	Strict Ring Muscle-up	BW	6	1	90-120s	7	Quality singles on rings. Dead hang to support, no kip. Stop the day at the first ugly rep and do not chase fatigue.	
+Fri	Dip	RPE-selected load	2	6	2-3 min	7	Added load only. Support pushing without draining Sat shoulders.	
+Fri	Lunge	RPE-selected belt load	3	8/leg	90-120s	7	Long stride and controlled knee touch; use the belt only if balance allows.	
+Fri	Pallof Press	Light band	2	12/side	45-60s	6	Trunk stiffness for rings and handstand line.	
+Sat	[WARMUP] Band Pull-Apart Warm-up	Light band	2	15	30s	3	Then 3-5 min wrists shoulders hips and scapular prep; keep it easy.; Squat-and-reach x 6; Bodyweight squat x 8; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Band shoulder pass-through x 10; Scapular push-up x 8	
+Sat	Advanced Tuck Planche	BW	4	5-6s	2 min	7	Owned-rung volume held stable on purpose. Stop before elbow bend or loss of protraction.	
+Sat	Advanced Tuck Front Lever	BW	2	8s	2 min	7	Maintenance dose held unchanged through the block. Stop if hips drop or elbows soften.	
+Sat	Pike Push-up	BW	2	8	90s	7	Vertical press volume without adding another hard Wall Handstand Push-up day.	
+Sat	Australian Pull-up	BW	3	10	90s	6.5	Easy horizontal pull balance; keep chest to the implement.	
+Sat	Dead Bug	BW	2	8/side	45-60s	6	If week fatigue is high, this is the first row to remove.	
 END_WEEK3_TSV
+
 START_WEEK4_TSV
 Day	Exercise	Weight	Sets	Reps	Rest	Target RPE	Notes	Results
-Mon	[WARMUP] Band Pull-Apart Warm-up	Light band	2	15	30s	4	Easy scap and shoulder prep; then 2 easy ramp sets on the first pull and first press.; Squat-and-reach x 6; Bodyweight squat x 8; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Band shoulder pass-through x 10; Scapular push-up x 8; Ramp Weighted Pull-up: bodyweight x 5, +10 kg x 3, +22.5 kg x 2 before +31 kg work sets.	
-Mon	Weighted Pull-up	+31 kg	3	3	4 min	8	Consolidation week. Keep the load moderate, own the bar path, and stop at 2 sets if elbows or speed feel worse than Week 3.	
-Mon	Ring Muscle-up	BW	4	1	2-3 min	7	Consolidation week. Match your best clean single standard from Weeks 2-3 with fewer total reps.	
-Mon	Dip	RPE-selected load	2	5	3 min	7.5	Consolidation week. Same support pattern, one set less.	
-Mon	Pistol Squat	Belt load to RPE 8	2	8 each leg	2 min	8	Consolidation week. Keep the effort honest without chasing extra fatigue.	
-Mon	Band Pallof Press	Light band	1	12 each side	60s	6	Optional trunk touch only; remove it first if you want the shortest day.	
-Tue	[WARMUP] Band Pull-Apart Warm-up	Light band	2	15	30s	4	Easy scap, wrists and shoulder elevation prep before handstand work.; Squat-and-reach x 6; Bodyweight squat x 8; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Band shoulder pass-through x 10; Scapular push-up x 8	
-Tue	Controlled Handstand Kick-up	BW	4	2 attempts	60s	6	Consolidation week. Fewer attempts; keep only the best entries.	
-Tue	Freestanding Handstand Hold	BW	4	6-10s	60-90s	6	Consolidation week. Match your best Week 3 line with less total practice.	
-Tue	Back-to-Wall Handstand Push-Up	BW	3	3	3 min	7.5	Consolidation week. Keep the same depth and cleaner speed; no grinding.	
-Tue	Band-Assisted Straddle Planche	Light band	1	3-5s	2-3 min	7.5	Consolidation week. Keep one crisp bridge exposure only.	
-Tue	Advanced Tuck Planche	BW	3	4-6s	2 min	7	Main planche quality stays, total volume drops. End the set at the first sign of elbow irritation or soft elbows.	
-Tue	Inverted Row	BW	2	8-10	90s	7.5	One set less this week; keep the pause and range.	
-Tue	Banded Squat	Band tension to RPE 7	2	10	2 min	7	Consolidation week. Enough lower-body work to stay full-body without adding drag.	
-Wed	[WARMUP] Deep Squat Hold	BW	2	30s	30s	3	Easy hips, ankles and bracing; then 2 easy handstand kick-ups before the first work set.; Squat-and-reach x 6; Bodyweight squat x 8; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Band shoulder pass-through x 10; Scapular push-up x 8	
-Wed	Freestanding Handstand Push-up Negative	BW	3	1	2-3 min	7.5	Consolidation week. Keep the 5 second lower you earned in Week 3, just do fewer total reps.	
-Wed	Pistol Squat	BW	2	5 each leg	90s	6	Consolidation week. Stay smooth and well short of fatigue.	
-Wed	Australian Pull-up	BW	2	10-12	90s	6.5	Consolidation week. Easy pulling only; keep Thursday fresh.	
-Wed	Plank	BW	1	45s	45s	6	Optional brace reset; remove it if you want the shortest possible session.	
-Thu	[WARMUP] Band Pull-Apart Warm-up	Light band	2	15	30s	4	Easy scap and shoulder prep; then brief ring transition practice below fatigue.; Squat-and-reach x 6; Bodyweight squat x 8; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Band shoulder pass-through x 10; Scapular push-up x 8; Ramp Weighted Pull-up: bodyweight x 5, +10 kg x 3, +20 kg x 2 before +27.5 kg work sets.	
-Thu	Ring Muscle-up	BW	3	2,1,1	3-4 min	8	Consolidation week. Keep the clean double standard from the block, then stop after two crisp singles.	
-Thu	Weighted Pull-up	+27.5 kg	2	5	3-4 min	7.5	Consolidation week. Same moderate-heavy feel, lower total volume. If form slips, stop at 4 reps and move on.	
-Thu	Dip	RPE-selected load	2	4	3 min	7.5	Consolidation week. Same support pattern, one set less.	
-Thu	Pistol Squat	Belt load to RPE 8	2	8 each leg	2 min	8	Consolidation week. Keep tension high, fatigue low.	
-Thu	Plank	BW	1	60s	45-60s	6	Simple trunk work; optional to remove if you need more recovery.	
-Fri	[WARMUP] Band Pull-Apart Warm-up	Light band	2	15	30s	4	Easy scap, wrists and shoulder elevation prep.; Squat-and-reach x 6; Bodyweight squat x 8; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Band shoulder pass-through x 10; Scapular push-up x 8	
-Fri	Controlled Handstand Kick-up	BW	3	2 attempts	60s	6	Consolidation week. Fewer attempts; only keep clean entries.	
-Fri	Freestanding Handstand Hold	BW	3	6-10s	60-90s	6	Consolidation week. Match the best line from earlier weeks with less total time upside down.	
-Fri	Back-to-Wall Handstand Push-Up	BW	2	3	3 min	7	Consolidation week. Just enough pressing to hold the groove.	
-Fri	Advanced Tuck Front Lever	BW	2	8-10s	2 min	6.5	Consolidation week. Maintenance dose only; keep this clean and easy.	
-Fri	Advanced Tuck Planche	BW	2	4-6s	2 min	7	Consolidation week. Cleaner holds, fewer sets.	
-Fri	Inverted Row	BW	2	10	90s	7.5	Consolidation week. Pause each rep and keep it submaximal.	
-Fri	Banded Squat	Band tension to RPE 7	2	10	2 min	7	Low-stress lower-body support to keep the day full-body.	
-Fri	Band Pallof Press	Light band	1	12 each side	60s	6	Optional trunk finish; remove this before cutting any direct skill or primary row.	
+Mon	[WARMUP] Band Pull-Apart Warm-up	Light band	2	15	30s	3	Then 3-5 min wrists shoulders hips and 2-3 ramp sets toward today’s belt-loaded Pull-up work; keep warm-up easy.; Squat-and-reach x 6; Bodyweight squat x 8; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Band shoulder pass-through x 10; Scapular push-up x 8; Ramp Pull-up with 2-3 easy belt jumps to today’s work weight.	
+Mon	Pull-up	RPE-selected belt load	3	3	3-4 min	8	Direct weighted pull-up anchor using the belt. Added load only; bodyweight is part of total. Use the best successful Week 3 belt load only if it still lands at the target RPE; otherwise trim 5-10% and keep all 3 sets crisp.	
+Mon	Strict Ring Muscle-up	BW	3	2,1,1	2-3 min	8	Consolidation week. Keep the best clean Week 3 standard but with less total work; stop on first miss or soft turnover.	
+Mon	Dip	RPE-selected load	2	5	2.5-3 min	8	Added load only. Volume trimmed, pushing quality preserved.	
+Mon	Pistol Squat	RPE-selected belt load	2	5/leg	2 min	7	Keep the same smooth standard with one less set.	
+Mon	Dead Bug	BW	2	8/side	45-60s	6	Short and crisp only.	
+Tue	[WARMUP] Band Pull-Apart Warm-up	Light band	2	15	30s	3	Then 3-5 min wrists shoulders and kick-up prep; keep the warm-up easy.; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Band shoulder pass-through x 10; Scapular push-up x 8	
+Tue	Freestanding Handstand Hold	BW	4	10s	60-90s	6	Consolidation week. Keep balance quality high and stop each set at the first chase step.	
+Tue	Freestanding Handstand Push-up Negative	BW	3	1	2 min	7	Lower under control for about 4 seconds. Keep the Week 3 line standard with fewer attempts. Prescribed attempts are a ceiling, not a quota: stop the set early if quality, symmetry or balance breaks down.	
+Tue	Wall Handstand Push-up	BW	2	4	2-3 min	7	Same folded-towel setup. Small direct strength dose only this week. Prescribed attempts are a ceiling, not a quota: stop the set early if quality, symmetry or balance breaks down.	
+Tue	Band-Assisted Straddle Planche	Light band	2	5s	2-3 min	7	Keep it clean and low fatigue. If elbow awareness rises above 2/10, skip this row first.	
+Tue	Nordic Hamstring Curl	BW	1	5	2 min	8	One crisp maintenance set only.	
+Tue	Pallof Press	Light band	1	10/side	45-60s	6	Low-cost trunk only.	
+Wed	[WARMUP] Band Pull-Apart Warm-up	Light band	2	15	30s	3	Then 3-5 min hips ankles and shoulders; keep this day low fatigue.; Squat-and-reach x 6; Bodyweight squat x 8; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Band shoulder pass-through x 10; Scapular push-up x 8	
+Wed	Explosive Push-up	BW	2	4	90s	6	Fast off the floor with a full reset each rep. Stop if speed drops.	
+Wed	Inverted Row	BW	2	8	90s	6	Horizontal pull volume trimmed for consolidation.	
+Wed	Dip	BW	2	8	2 min	7	Easy support only; leave 2-3 reps in reserve.	
+Wed	Dead Bug	BW	1	8/side	45-60s	6	Brief recovery-biased trunk dose.	
+Fri	[WARMUP] Band Pull-Apart Warm-up	Light band	2	15	30s	3	Then 3-5 min false-grip shoulder and hip prep plus 2-3 ramp sets toward today’s belt-loaded Pull-up work.; Squat-and-reach x 6; Bodyweight squat x 8; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Band shoulder pass-through x 10; Scapular push-up x 8; Ramp Pull-up with 2-3 easy belt jumps to today’s work weight.	
+Fri	Strict Ring Muscle-up	BW	4	1	90-120s	7	Quality singles only. Match the best clean Week 3 standard with less total work.	
+Fri	Pull-up	RPE-selected belt load	3	3	3 min	7	Direct weighted pull-up anchor using the belt. Added load only; bodyweight is part of total. Use the best successful Week 3 Friday belt load only if it still lands at the target RPE; otherwise trim 5-10% and keep every rep crisp.	
+Fri	Dip	RPE-selected load	2	5	2-3 min	7	Added load only. Small support dose to preserve pressing strength.	
+Fri	Lunge	RPE-selected belt load	2	8/leg	90-120s	7	Trim one set and keep balance clean.	
+Fri	Pallof Press	Light band	1	12/side	45-60s	6	Short trunk stiffness dose only.	
+Sat	[WARMUP] Band Pull-Apart Warm-up	Light band	2	15	30s	3	Then 3-5 min wrists shoulders hips and scapular prep; keep it easy.; Squat-and-reach x 6; Bodyweight squat x 8; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Band shoulder pass-through x 10; Scapular push-up x 8	
+Sat	Advanced Tuck Planche	BW	3	5s	2 min	7	Consolidation week. Keep the same body line with one less set. Prescribed attempts are a ceiling, not a quota: stop the set early if quality, symmetry or balance breaks down.	
+Sat	Advanced Tuck Front Lever	BW	2	8s	2 min	7	Maintenance dose stays unchanged; stop if hips drop or elbows soften.	
+Sat	Pike Push-up	BW	2	8	90s	7	Easy vertical press support only.	
+Sat	Australian Pull-up	BW	2	10	90s	6	Easy horizontal pull balance only.	
+Sat	Dead Bug	BW	1	8/side	45-60s	6	Remove this first if you are short on time or feel fully recovered already.	
 END_WEEK4_TSV
