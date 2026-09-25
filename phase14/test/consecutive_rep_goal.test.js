@@ -16,6 +16,7 @@ import { fileURLToPath } from 'node:url';
 
 import {
   consecutiveRepGoals, collectConsecutiveRepGoalFlags, repairConsecutiveRepGoal,
+  ladderOf, topSetOf,
 } from '../engine/consecutive_rep_goal.js';
 
 const here = path.dirname(fileURLToPath(import.meta.url));
@@ -148,4 +149,47 @@ test('a goal the athlete cannot yet hold for two reps is left alone', () => {
 test('a goal with no rep target is left alone', () => {
   const noTarget = { ...INTAKE, primary_goals: ['Strict muscle-up on rings'] };
   assert.deepEqual(consecutiveRepGoals(PROGRAM, noTarget), []);
+});
+
+// --- what the live run taught ------------------------------------------------
+//
+// Run #139 is the first build where the model wrote the ladder itself, and it
+// wrote it the way a coach writes one: a single row, four sets, reps
+// "2/1/1/1". Number() on that is NaN, so the repair scored Monday's whole
+// prescription as zero reps, concluded Friday must be the primary session, and
+// built a second ladder there. Both sessions ended up training set length when
+// the entire point of the rule is that one does and the other stays quality
+// volume.
+
+const RUN139 = fs.readFileSync(path.join(here, 'fixtures/run139_advanced_calisthenics.txt'), 'utf8');
+
+test('a ladder the model wrote is read as a ladder', () => {
+  assert.deepEqual(ladderOf('2/1/1/1'), [2, 1, 1, 1]);
+  assert.deepEqual(ladderOf('2-1-1-1'), [2, 1, 1, 1]);
+  assert.deepEqual(ladderOf('3 (1+1+1)'), [1, 1, 1]);
+  assert.equal(topSetOf('2/1/1/1'), 2);
+});
+
+test('a rep range is not a ladder', () => {
+  // "8-10" is eight to ten reps. Reading it as a ladder of eight then ten would
+  // let a range satisfy a rule about how long a single set is.
+  assert.equal(ladderOf('8-10'), null);
+  assert.equal(ladderOf('4-5s'), null);
+  assert.equal(topSetOf('8-10'), 8, 'the guaranteed set length is the bottom of the range');
+});
+
+test('a week that already carries the ladder is left alone', () => {
+  assert.deepEqual(collectConsecutiveRepGoalFlags(RUN139, INTAKE), []);
+  assert.equal(repairConsecutiveRepGoal(RUN139, INTAKE).changed, false,
+    'a second ladder on the other session is volume nobody asked for');
+});
+
+test('only one session is given the ladder', () => {
+  const { program } = repairConsecutiveRepGoal(PROGRAM, INTAKE);
+  for (const n of [1, 2, 3, 4]) {
+    const days = new Set(muscleUps(program, n)
+      .filter((r) => r.reps >= 2)
+      .map((r) => r.day));
+    assert.ok(days.size <= 1, `week ${n} trains set length on ${days.size} days`);
+  }
 });

@@ -23,6 +23,50 @@ const loose = (name) => new RegExp(
   String(name).trim().replace(/[.*+?^${}()|[\]\\]/g, '\\$&').replace(/[\s-]+/g, '[\\s-]?'), 'i',
 );
 
+// A reps cell the athlete reads as a ladder: "2/1/1/1", "2-1-1-1", "3 (1+1+1)".
+// The model writes the ladder this way when it writes one itself, and Number()
+// on it is NaN. Run #139 scored that day's whole prescription as zero reps,
+// decided the OTHER session must be the primary one, and built a second ladder
+// there -- so both sessions trained set length when the point of the rule is
+// that one does and the other stays quality volume.
+export function ladderOf(cell) {
+  const text = String(cell || '').trim();
+  if (!text) return null;
+  const inner = (text.match(/\(([^)]*)\)/) || [])[1] || text;
+  const nums = (sep) => {
+    const parts = inner.split(sep).map((x) => Number(String(x).trim()));
+    return parts.every((n) => Number.isFinite(n) && n > 0) ? parts : null;
+  };
+  // Slash and plus mean a ladder at two parts. A hyphen usually means a rep
+  // RANGE -- "8-10" is eight to ten reps, not a ladder of eight then ten -- so it
+  // takes three parts before it reads as one.
+  const slashed = /[/+]/.test(inner) ? nums(/[/+]/) : null;
+  if (slashed && slashed.length >= 2) return slashed;
+  const dashed = /[\u2013\u2014-]/.test(inner) ? nums(/[\u2013\u2014-]/) : null;
+  if (dashed && dashed.length >= 3) return dashed;
+  return null;
+}
+
+// The longest single set a row prescribes, whether written as a number or a ladder.
+export function topSetOf(cell) {
+  const ladder = ladderOf(cell);
+  if (ladder) return Math.max(...ladder);
+  // The first number, not the last: "8-10" is a range whose guaranteed set
+  // length is eight, and reading the top of a range as the set length would let
+  // a range satisfy a rule about how long a set actually is.
+  const m = String(cell || '').match(/\d+(?:\.\d+)?/);
+  return m ? Number(m[0]) : 0;
+}
+
+// The reps a row actually prescribes, given its set count.
+function repsInRow(setsCell, repsCell) {
+  const ladder = ladderOf(repsCell);
+  if (ladder) return ladder.reduce((a, b) => a + b, 0);
+  const sets = Number(setsCell) || 0;
+  const first = String(repsCell || '').match(/\d+(?:\.\d+)?/);
+  return sets * (first ? Number(first[0]) : 0);
+}
+
 // The set lengths one exposure should carry, top first, by week.
 function ladderFor(week, current) {
   if (week === 2) return [current, current];
@@ -103,7 +147,7 @@ export function collectConsecutiveRepGoalFlags(program, intake = {}) {
     for (const { name, target, current } of goals) {
       const rows = parsed.rows.filter((r) => String(r[parsed.exercise] || '').trim().toLowerCase() === name.toLowerCase());
       if (!rows.length) continue;
-      const longest = Math.max(...rows.map((r) => Number(r[parsed.reps]) || 0));
+      const longest = Math.max(...rows.map((r) => topSetOf(r[parsed.reps])));
       const wanted = ladderFor(week, current)[0];
       if (longest >= Math.min(wanted, 2)) continue;
       // Only where the repair could answer it. A day whose whole prescription is
@@ -113,7 +157,7 @@ export function collectConsecutiveRepGoalFlags(program, intake = {}) {
       const byDay = new Map();
       for (const r of rows) {
         const day = String(r[parsed.day] || '').trim();
-        byDay.set(day, (byDay.get(day) || 0) + (Number(r[parsed.sets]) || 0) * (Number(r[parsed.reps]) || 0));
+        byDay.set(day, (byDay.get(day) || 0) + repsInRow(r[parsed.sets], r[parsed.reps]));
       }
       if (Math.max(...byDay.values()) < current) continue;
       flags.push({
@@ -155,8 +199,18 @@ export function repairConsecutiveRepGoal(program, intake = {}) {
         if (!byDay.has(day)) byDay.set(day, { day, rows: [], total: 0 });
         const e = byDay.get(day);
         e.rows.push(i);
-        e.total += (Number(c[parsed.sets]) || 0) * (Number(c[parsed.reps]) || 0);
+        e.total += repsInRow(c[parsed.sets], c[parsed.reps]);
       }
+      // Already answered. If any session this week carries a set at or above the
+      // length the ladder is for, the requirement is met and a second ladder on
+      // the other day is volume nobody asked for.
+      const wanted = ladderFor(week, current)[0];
+      // Against the full target, not the gate's conservative floor: the gate only
+      // asks for a set above singles, but week 3 is meant to reach one rep beyond
+      // capacity, and a week already at 2 still has that to do.
+      const already = index.some(({ c }) => topSetOf(c[parsed.reps]) >= wanted);
+      if (already) continue;
+
       const primary = [...byDay.values()].sort((a, b) => b.total - a.total)[0];
       if (!primary || primary.total < current) continue;
 
