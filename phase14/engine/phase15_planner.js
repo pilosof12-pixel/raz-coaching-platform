@@ -228,6 +228,41 @@ export function buildDeterministicBrief(intake = {}) {
     forbidden.push('Unrequested hard intervals, threshold, VO2, AMRAP, sprints or hard running when combat sport already supplies high-intensity conditioning.');
   }
 
+  // Which work comes out first when a joint complains depends on what provokes
+  // it, not on a fixed order. The elbow of a calisthenics athlete is loaded two
+  // quite different ways -- straight-arm holds (planche, front lever) put the
+  // biceps tendon and medial structures under long-lever tension, while bent-arm
+  // pulling loads them through range -- and an athlete whose symptoms come from
+  // one of those is not helped by removing the other first. Run #138 wrote a
+  // sensible removal order for a straight-arm-provoked elbow and would have
+  // written the same one for a bent-arm-provoked elbow.
+  if (/elbow|biceps|forearm|epicondyl/i.test(pain)) {
+    // What the athlete says HURTS, not what he says he tolerates. Reading the
+    // whole pain blob made this athlete look both straight-arm and bent-arm
+    // provoked, because his own notes say "all bent-arm pulling is tolerated"
+    // and "no pain in bent-arm work at all" -- the two clearest statements that
+    // bent-arm work is fine. A clause that tolerates or negates is dropped
+    // before the provoking pattern is looked for.
+    const painObj = intake.pain && typeof intake.pain === 'object' ? intake.pain : {};
+    const provoking = [painObj.description, painObj.character, painObj.severity, intake.injuries]
+      .map((x) => String(x || ''))
+      .join('. ')
+      .split(/[.;]/)
+      .filter((clause) => !/\bno pain\b|\btolerat|\bis fine\b|\bcomfortable\b|\bwithout symptoms\b|\bsettles\b/i.test(clause))
+      .join('. ');
+    const tolerated = String(painObj.tolerated_movements || '');
+    const straightArmProvoked = /straight[- ]arm|planche|lever|isometric hold|long lever/i.test(provoking);
+    const bentArmProvoked = /bent[- ]arm|pull[- ]?up|chin[- ]?up|\brow\b|curl|weighted pull/i.test(provoking)
+      && !/bent[- ]arm|pull[- ]?up|\brow\b/i.test(tolerated);
+    if (straightArmProvoked && !bentArmProvoked) {
+      required.push('ELBOW DE-LOAD ORDER (STRAIGHT-ARM PROVOKED): the athlete\u2019s own account ties these symptoms to straight-arm loading, so the flare-up instruction must remove straight-arm volume first -- the most advanced planche or lever exposure, then the next -- and reach bent-arm pulling last. Name the specific rows in that order.');
+    } else if (bentArmProvoked && !straightArmProvoked) {
+      required.push('ELBOW DE-LOAD ORDER (BENT-ARM PROVOKED): the athlete\u2019s own account ties these symptoms to bent-arm pulling, so the flare-up instruction must reduce the light supporting bent-arm pulling on the non-primary days first -- rows and light pull-ups -- before touching straight-arm holds or the primary weighted work. Do not write a removal order that starts with planche or lever work here.');
+    } else {
+      required.push('ELBOW DE-LOAD ORDER: state the flare-up instruction in two branches, because straight-arm holds and bent-arm pulling load the elbow differently: if symptoms follow straight-arm work, remove the most advanced planche or lever exposure first; if they follow pulling, reduce the supporting rows and light pull-ups on the non-primary days first. Reach the primary weighted work last in either case.');
+    }
+  }
+
   if (/sciatica|lumbar|lower back|low back/i.test(pain)) {
     forbidden.push('Deep loaded squatting that reproduces lumbar-flexion symptoms.');
     forbidden.push('Heavy Romanian Deadlift, Good Morning or Back Extension unless tolerance is explicitly established and the row states a tolerance gate.');

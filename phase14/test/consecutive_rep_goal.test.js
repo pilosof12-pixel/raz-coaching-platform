@@ -106,6 +106,25 @@ test('a day too short to hold one set at capacity is not flagged', () => {
   assert.equal(repairConsecutiveRepGoal(tiny, INTAKE).changed, false);
 });
 
+test('a back-off rung is described as the rung it is on', () => {
+  // In the hardest week the second rung is a double behind a triple. Calling
+  // that "the same length" is wrong in the athlete's hands, and the coach caught
+  // it on the first build that carried the ladder.
+  const { program } = repairConsecutiveRepGoal(PROGRAM, INTAKE);
+  const w3 = program.match(/START_WEEK3_TSV([\s\S]*?)END_WEEK3_TSV/)[1]
+    .split('\n').map((l) => l.split('\t'))
+    .filter((c) => c.length === 9 && c[1] === 'Muscle-up' && c[0] === 'Mon');
+  const top = Number(w3[0][4]);
+  for (const c of w3.slice(1)) {
+    const reps = Number(c[4]);
+    if (reps === top) continue;
+    assert.equal(/at the same length/i.test(c[7]), false,
+      `a set of ${reps} behind a top set of ${top} is not the same length`);
+  }
+  const second = w3.find((c) => Number(c[4]) === 2);
+  assert.match(second[7], /back-off set of 2 behind the top set of 3/i);
+});
+
 test('it is idempotent', () => {
   const once = repairConsecutiveRepGoal(PROGRAM, INTAKE).program;
   assert.equal(repairConsecutiveRepGoal(once, INTAKE).changed, false);

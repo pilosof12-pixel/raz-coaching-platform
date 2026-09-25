@@ -184,11 +184,22 @@ export function repairConsecutiveRepGoal(program, intake = {}) {
         reps: String(p.reps),
         rest: Number.isInteger(parsed.rest) ? String(template[parsed.rest] || '') : '',
         rpe: templateRpe,
-        note: k === 0 && p.reps > 1
-          ? `Top set: the longest clean set of the week, and the one that moves the ${target}-rep goal. Stop the set the moment a rep turns soft -- a short clean set counts and a forced one does not.`
-          : (p.reps > 1
-            ? `Second set at the same length, taken only if the top set was clean throughout.`
-            : `Back-off singles at the same standard. Quality volume behind the top set; stop if turnover slows.`),
+        // The note has to describe the rung it is actually on. In the hardest
+        // week the second rung is a double behind a triple, and calling that
+        // "the same length" is wrong in the athlete's hands -- the coach caught
+        // it on the first build that carried the ladder.
+        note: (() => {
+          if (p.reps > 1 && k === 0) {
+            return `Top set: the longest clean set of the week, and the one that moves the ${target}-rep goal. Stop the set the moment a rep turns soft -- a short clean set counts and a forced one does not.`;
+          }
+          if (p.reps > 1 && p.reps === planned[0].reps) {
+            return `Second set at the same length, taken only if the top set was clean throughout.`;
+          }
+          if (p.reps > 1) {
+            return `Back-off set of ${p.reps} behind the top set of ${planned[0].reps}. Take it only if the top set held its standard; stop here if it did not.`;
+          }
+          return `Back-off singles at the same standard. Quality volume behind the top set; stop if turnover slows.`;
+        })(),
       }));
 
       const at = primary.rows[0];

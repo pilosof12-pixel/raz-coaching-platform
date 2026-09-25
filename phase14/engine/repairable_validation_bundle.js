@@ -19,6 +19,7 @@ import {
 } from './goal_exposure.js';
 import { repairOptionalQualifiers } from './v46_language_accuracy.js';
 import { repairSessionTimeBudget, repairLowFatigueAerobic } from './session_shape.js';
+import { repairConsolidationWeekVolume } from './consolidation_week_volume.js';
 import { repairTacticalHardRules } from './v40_tactical_hard_rules.js';
 import { repairUnconditionalProgression, repairHandstandBalance } from './coaching_spec_v1_quality.js';
 import { repairMarathonSubordination } from './advanced_hybrid_quality.js';
@@ -525,6 +526,16 @@ export function collectRepairableValidationFailures(program, intake = {}, option
 
   mrv_trim = trimExcessSupportVolume(candidate, intake);
   if (mrv_trim.repaired) candidate = mrv_trim.program;
+
+  // Directly after the support-volume trim, because that is what inverts a
+  // taper. It works against a recoverable-volume ceiling with no view of the
+  // block, so the heavy build weeks get trimmed and the already-light
+  // consolidation week does not -- and week 4 ends up carrying more of a
+  // movement than week 3. Run #138 shipped with Dip up fifty per cent in the
+  // week its own text calls a consolidation week. This only ever removes sets,
+  // and only from the last week.
+  const consolidated = repairConsolidationWeekVolume(candidate, intake);
+  if (consolidated.changed) candidate = consolidated.program;
 
   let model = parseProgramModel(candidate, intake);
   const semanticChecks = [
