@@ -93,6 +93,29 @@ if (!s.includes('QA-TRACE-DIAGNOSTICS-DETAIL')) {
   s = s.replace(progressOld, progressNew);
 }
 
+// Say why a build is regenerating, while it is regenerating.
+//
+// The trace was only ever emitted on the way out -- on a saved program or a
+// salvage. A build that is killed, times out, or is still running reports
+// "regenerating after quality check" and nothing else, so the two QA rejections
+// the calisthenics athlete hit on run #137 left no record of what they were.
+// The information existed in qaTrace the whole time; it just never reached the
+// poller until the end, and that build never had an end.
+//
+// Gated on qa_diagnostics like the rest of the trace output, so a real client
+// never sees internal codes.
+{
+  const genOld = '    await onProgress("generating", attempt, attempt === 1 ? "initial generation" : "regenerating after quality check");';
+  const genNew = `    const qaSoFar = intake && intake.qa_diagnostics === true && qaTrace.length
+      ? \` [\${qaTrace.join(" -> ")}]\`
+      : "";
+    await onProgress("generating", attempt, attempt === 1 ? "initial generation" : \`regenerating after quality check\${qaSoFar}\`); // QA-TRACE-ON-REGENERATION`;
+  if (!s.includes('QA-TRACE-ON-REGENERATION')) {
+    if (!s.includes(genOld)) throw new Error('regeneration progress anchor missing');
+    s = s.replace(genOld, genNew);
+  }
+}
+
 // 4. The salvage path writes a LATER detail than the one above, so on exactly
 //    the builds worth diagnosing -- the slow ones that exhausted their attempts
 //    -- it overwrote the trace and result.json lost it. Run #122 spent five
