@@ -1,40 +1,26 @@
 {
-  "timestamp": "2026-09-25T07:27:18.180Z",
+  "timestamp": "2026-09-25T07:57:56.421Z",
   "base": "https://raz-coaching-platform.onrender.com",
-  "head_sha": "73af23a1031bce2bdb22605689a39cb1c362caba",
-  "runtime": "live73 2026-09-25T07:26:27Z",
+  "head_sha": "5edcb708c8a0328d39b778cb46f4a85b770bf1b7",
+  "runtime": "live74 2026-09-25T07:57:03Z",
   "results": [
     {
-      "id": "youth_gymnastics",
-      "job_id": "21d1d06ec315213966a29e0356962425",
+      "id": "advanced_calisthenics",
+      "job_id": "c4d9d402825b951c1b8568a8cea57907",
       "ok": true,
       "status": "done",
       "stage": "finalizing",
-      "attempt": 2,
-      "detail": "saving program after 2 model call(s) QA trace: A1:YOUTH_CONSOLIDATION_RESET_TO_BASELINE.",
+      "attempt": 4,
+      "detail": "delivered with unresolved rules: V38_SKILL_WITHOUT_FOUNDATION+UNBENCHMARKED_VARIATION_LOAD_TOO_ASSERTIVE QA trace: A1:V38_SKILL_WITHOUT_FOUNDATION+UNBENCHMARKED_VARIATION_LOAD_TOO_ASSERTIVE+PRIMARY_EXACT_MOVEMENT_MISSING -> A2:V38_SKILL_WITHOUT_FOUNDATION+UNBENCHMARKED_VARIATION_LOAD_TOO_ASSERTIVE+PRIMARY_EXACT_MOVEMENT_MISSING -> A3:V38_SKILL_WITHOUT_FOUNDATION+UNBENCHMARKED_VARIATION_LOAD_TOO_ASSERTIVE -> A4:V38_SKILL_WITHOUT_FOUNDATION+UNBENCHMARKED_VARIATION_LOAD_TOO_ASSERTIVE.",
       "last_seen_status": "done",
       "error": null,
-      "program_chars": 16181,
-      "seconds": 181
-    },
-    {
-      "id": "advanced_calisthenics",
-      "job_id": "db4b947a13b09bf9e153987a10daaf43",
-      "ok": false,
-      "status": "job_disappeared",
-      "stage": "generating",
-      "attempt": 3,
-      "detail": "regenerating after quality check",
-      "last_seen_status": "pending",
-      "error": "Job state absent for 180s after successful earlier polling; service likely restarted mid-build.",
-      "program_chars": 0,
-      "seconds": 535
+      "program_chars": 23320,
+      "seconds": 509
     }
   ],
   "reasoning_effort": "medium",
   "selection": [
-    "youth_gymnastics",
     "advanced_calisthenics"
   ],
-  "ok": false
+  "ok": true
 }
