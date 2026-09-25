@@ -370,11 +370,35 @@ export function repairUnbenchmarkedVariationLoads(program, intake={}) {
     const ex=String(cells[1]||'').trim();
     if(!ex || /^\s*\[WARMUP\]/i.test(ex)) return line;
     const family=liftFamily(ex);
-    if(!family || !fixedKg.test(String(cells[2]||''))) return line;
+    if(!family) return line;
     const sameFamily=benches.filter(b=>b.family===family);
     if(!sameFamily.length) return line;
     const exact=sameFamily.some(b=>canonicalLift(ex)===b.canonical);
     if(exact) return line;
+
+    // A pull-up carrying a belt is a weighted pull-up.
+    //
+    // Run #141 delivered a block with no kilograms anywhere for an athlete whose
+    // primary goal is a +40 kg weighted pull-up. The model wrote the row as
+    // "Pull-up" with an added belt load; the benchmark is for the weighted
+    // variation, so this repair read the bare name as unbenchmarked and stripped
+    // the load to "RPE-selected". PRIMARY_EXACT_MOVEMENT_MISSING then fired
+    // because no Weighted Pull-up row existed, and the two flags rode every
+    // attempt -- four calls, 464 seconds, delivered unresolved.
+    //
+    // The load cell says which movement this is. Where the weighted form is the
+    // one the athlete has a benchmark for, naming the row correctly keeps his
+    // number and answers both flags. This renames; it does not invent a load.
+    const addedLoad=/\d+(?:\.\d+)?\s*kg\b|\bbelt\b|\bplate/i.test(String(cells[2]||''));
+    if(addedLoad && !/^weighted\b/i.test(ex)){
+      const weighted=`Weighted ${ex}`;
+      if(sameFamily.some(b=>canonicalLift(weighted)===b.canonical)){
+        cells[1]=weighted;
+        return cells.join('\t');
+      }
+    }
+
+    if(!fixedKg.test(String(cells[2]||''))) return line;
     cells[2]='RPE-selected load';
     return cells.join('\t');
   }).join('\n');
