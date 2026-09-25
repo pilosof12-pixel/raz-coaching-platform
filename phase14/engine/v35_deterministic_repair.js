@@ -862,10 +862,77 @@ function repairUndefinedLoadReferences(program, intake, repairs) {
       if (!note.trim()) continue;
       const rowLoads = new Set(Number.isInteger(parsed.load) ? loadTokensIn(cells[parsed.load]).map(normaliseToken) : []);
 
-      const sentences = note.split(/(?<=[.!?])\s+/).filter((x) => x.trim());
-      if (sentences.length < 2) continue; // the only sentence stays; see above
-      const kept = sentences.filter((sentence) => !loadTokensIn(sentence)
-        .some((t) => !rowLoads.has(normaliseToken(t)) && !established.has(normaliseToken(t))));
+      const unverifiable = (t) => !rowLoads.has(normaliseToken(t)) && !established.has(normaliseToken(t));
+
+      // Restate before deleting. A note citing a load the program never
+      // establishes is nearly always citing the wrong number for its own row --
+      // a load that moved under it during repair -- and the row itself says what
+      // the right one is. Restating is what every other reconciler here does,
+      // and unlike deleting it always has an answer.
+      //
+      // Deleting alone could not converge. A single-sentence note was never
+      // touched, and a note whose every sentence carried a load was left whole,
+      // so V34_NOTE_UNDEFINED_LOAD_REFERENCE survived each attempt and the build
+      // spent all four calls on it: run #140 took 466 seconds and shipped with
+      // the rule unresolved.
+      const rowLoadToken = Number.isInteger(parsed.load) ? loadTokensIn(cells[parsed.load])[0] : null;
+
+      // A fallback clause is the exception. "Drop to +35 kg if it turns grindy"
+      // names a load to retreat TO, so restating it as the row's own load makes
+      // it vacuous -- an instruction to drop to the weight already on the belt.
+      // Where other sentences survive, that clause goes instead.
+      const fallback = /\b(?:drop(?:ping)? (?:back )?to|reduce(?:d)? to|fall(?:ing)? back (?:on|to)|revert(?:ing)? to|back (?:down )?to|switch(?:ing)? to)\b/i;
+      const all = note.split(/(?<=[.!?])\s+/).filter((x) => x.trim());
+      const survivors = all.filter((x) => !(fallback.test(x) && loadTokensIn(x).some(unverifiable)));
+      if (survivors.length && survivors.length < all.length) {
+        const trimmed = survivors.join(' ').replace(/\s{2,}/g, ' ').trim();
+        if (trimmed !== note) {
+          cells[parsed.notes] = trimmed;
+          repairs.push({ type: 'v49_unverifiable_fallback_load_dropped', week, exercise: name });
+          changed = true;
+          if (!loadTokensIn(trimmed).some(unverifiable)) continue;
+        }
+      }
+
+      // Only where the sentence is telling him what to lift today. A load can
+      // also be referenced rather than prescribed -- "build toward your +30 kg
+      // standard from the last block" is a claim about his history, and
+      // restating that as the weight on the bar this week does not make it true,
+      // it makes it false. Those still reach the gate, deliberately.
+      const PRESCRIBES = /\b(?:start(?:ing)? at|begin at|open at|work(?:ing)? at|use|hold|keep|stay at|top set at|load(?:ed)? at|add|take)\b/i;
+      const REFERENCES = /\b(?:your|his|her|their)\b[^.]{0,40}\b(?:standard|best|pr|max|record)\b|\b(?:last|previous|prior|earlier) (?:block|cycle|phase|programme|program)\b|\ball[- ]time\b/i;
+      const restatable = (sentence) => PRESCRIBES.test(sentence) && !REFERENCES.test(sentence);
+
+      if (rowLoadToken) {
+        const current = String(cells[parsed.notes] || '');
+        let restated = current
+          .split(/(?<=[.!?])\s+/)
+          .map((sentence) => {
+            if (!restatable(sentence)) return sentence;
+            let outS = sentence;
+            for (const t of loadTokensIn(sentence)) {
+              if (unverifiable(t)) outS = outS.split(t).join(rowLoadToken);
+            }
+            return outS;
+          })
+          .join(' ');
+        if (restated !== current) {
+          cells[parsed.notes] = restated.replace(/\s{2,}/g, ' ').trim();
+          repairs.push({ type: 'v49_unverifiable_load_reference_restated', week, exercise: name });
+          changed = true;
+          continue;
+        }
+      }
+
+      // No load on the row to restate against, so the claim cannot be made true
+      // and the sentence carrying it goes. Where that is the whole note the note
+      // goes with it: an empty cell is a smaller problem than a rule the build
+      // cannot clear, which is what the old caution actually bought.
+      // Deleting is the fallback, and it keeps its old caution: where the claim
+      // is the whole note there is nothing to delete down to, and an empty note
+      // is worse than an unverifiable one. Those reach the gate.
+      const sentences = String(cells[parsed.notes] || '').split(/(?<=[.!?])\s+/).filter((x) => x.trim());
+      const kept = sentences.filter((sentence) => !loadTokensIn(sentence).some(unverifiable));
       if (kept.length === sentences.length || !kept.length) continue;
 
       cells[parsed.notes] = kept.join(' ').replace(/\s{2,}/g, ' ').trim();
