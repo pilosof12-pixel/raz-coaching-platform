@@ -38,13 +38,22 @@ const repaired = () => {
 
 const rows = (program) => program.split('\n').map((l) => l.split('\t')).filter((c) => c.length === 9 && c[0] !== 'Day');
 
-test('a fallback rep word is left as the fallback it is', () => {
-  const muscleUp = rows(repaired()).filter((c) => /^muscle-up$/i.test(c[1].trim()) && c[4].trim() === '2');
-  assert.ok(muscleUp.length, 'the doubles row must still be there');
-  for (const c of muscleUp) {
-    assert.equal(/switch to doubles/i.test(c[7]), false,
-      'a row prescribed as doubles cannot tell the athlete to fall back to doubles');
-    assert.ok(/switch to singles/i.test(c[7]), 'the fallback the model wrote is the correct one');
+const REP_WORD = { single: 1, singles: 1, double: 2, doubles: 2, triple: 3, triples: 3 };
+
+test('no note tells the athlete to fall back to the dose already prescribed', () => {
+  // "Strict ring doubles only if rep 1 is crisp. If rep 2 would be soft, switch
+  // to singles" is a 2-rep row whose second rep word is deliberately a different
+  // dose. Restating it as the row's own produced "switch to doubles" on a set
+  // already prescribed as doubles -- the repair making the line worse than the
+  // model wrote it. This is the invariant, whatever the prescription ends up as.
+  for (const c of rows(repaired())) {
+    const reps = Number(c[4]);
+    if (!Number.isFinite(reps)) continue;
+    const re = /\b(?:switch(?:ing)? to|drop(?:ping)? (?:back )?to|fall(?:ing)? back (?:on|to)|revert(?:ing)? to)\s+(?:\w+\s+){0,2}(singles?|doubles?|triples?)\b/gi;
+    for (const m of String(c[7]).matchAll(re)) {
+      assert.notEqual(REP_WORD[m[1].toLowerCase()], reps,
+        `${c[0]} ${c[1]} is prescribed at ${reps} reps and its note says to fall back to ${m[1]}`);
+    }
   }
 });
 

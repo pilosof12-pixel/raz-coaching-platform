@@ -19,6 +19,7 @@ import {
   CATEGORY, ROLE, classifyExercise, isFoundationalStrength,
   stressSignature, dayKey, dayGap,
 } from './v38_movement_taxonomy.js';
+import { collectConsecutiveRepGoalFlags } from './consecutive_rep_goal.js';
 
 function arr(v) { return Array.isArray(v) ? v : v ? [v] : []; }
 function txt(v) {
@@ -371,6 +372,7 @@ export function auditProgramStructure(program, intake = {}) {
     ...auditFoundationalStrength(program, intake),
     ...auditCircularScheduling(program, intake),
     ...auditLoadedCarryProgression(program, intake),
+    ...collectConsecutiveRepGoalFlags(program, intake),
   ];
 }
 

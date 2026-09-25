@@ -46,6 +46,8 @@ import { repairModalitySubstitution, repairNoteNamedMovement } from './modality_
 import { repairNextRowClaim, repairTransitionClaim } from './structural_claim_rules.js';
 import { repairSkillFoundation } from './skill_foundation_repair.js';
 import { canonicaliseDayOrder } from './day_order_canonicalization.js';
+import { repairConsecutiveRepGoal } from './consecutive_rep_goal.js';
+import { repairSupportivePullBudget } from './supportive_pull_budget.js';
 import { ENDURANCE_REPAIRS, repairAccessoryRedundancy, repairTaperPowerSpike } from './endurance_block_repair.js';
 import { STATEMENT_REPAIRS } from './program_statement_repair.js';
 import { repairConsecutiveTrainingDays } from './consecutive_day_repair.js';
@@ -1412,6 +1414,21 @@ export function repairDeterministicContradictions(program, intake = {}) {
   if (inSeason !== candidate) {
     candidate = inSeason;
     repairs.push({ type: 'v83_match_day_protected' });
+  }
+
+  // Before the note pass and the structural repairs, so everything downstream
+  // sees the prescription the athlete will actually train: a goal stated as
+  // consecutive reps has to be trained in sets, not only in weekly volume.
+  const pullBudget = repairSupportivePullBudget(candidate, intake);
+  if (pullBudget.changed) {
+    candidate = pullBudget.program;
+    repairs.push({ type: 'supportivePullBudget', moves: pullBudget.moves.length });
+  }
+
+  const laddered = repairConsecutiveRepGoal(candidate, intake);
+  if (laddered.changed) {
+    candidate = laddered.program;
+    repairs.push({ type: 'consecutiveRepGoal', moves: laddered.moves.length });
   }
 
   const sharpened = repairCampSharpening(candidate, intake);

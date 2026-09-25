@@ -1260,6 +1260,26 @@
     "killedLive": ""
   },
   {
+    "code": "PRIMARY_SKILL_CONSECUTIVE_REP_GOAL_UNTRAINED",
+    "modules": [
+      "engine/consecutive_rep_goal.js"
+    ],
+    "owners": [
+      "collectConsecutiveRepGoalFlags"
+    ],
+    "advisory": false,
+    "reachable": true,
+    "repairs": [
+      "repairConsecutiveRepGoal"
+    ],
+    "wired": [
+      "repairConsecutiveRepGoal"
+    ],
+    "tested": true,
+    "stressed": false,
+    "killedLive": ""
+  },
+  {
     "code": "PROGRAM_MODEL_NO_WEEK_BLOCKS",
     "modules": [
       "engine/program_model.js"

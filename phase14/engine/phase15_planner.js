@@ -183,6 +183,14 @@ export function buildDeterministicBrief(intake = {}) {
       forbidden.push('Generic Chin-up as the main bar-muscle-up progression when the athlete already demonstrates a ring muscle-up / strong pull-up base.');
     }
   }
+  // A goal stated as a number of consecutive reps is a set-length goal, and
+  // weekly rep total is a different adaptation. Run #138 trained a five-rep ring
+  // muscle-up goal as 5x1, 6x1, 3x2, 4x1 on an athlete who already held two, and
+  // the coach charged it twice as the largest remaining programming issue. The
+  // deterministic repair rebuilds this when the model does not, but the model
+  // writing it correctly is what makes the artifact read like coaching.
+  required.push('CONSECUTIVE-REP GOAL FORM: when a goal names a number of consecutive reps and the athlete already holds two or more, at least one exposure each week must train set length, not only weekly volume. Build that session as a descending ladder -- a top set at current capacity, one rep beyond it in the hardest week, then back-off singles -- and keep the other weekly exposure as quality singles. Do not satisfy the goal with total reps alone.');
+
   if (freestandingHandstandGoal) {
     required.push('FREESTANDING HANDSTAND DIRECT-SKILL RULE: a named freestanding handstand goal requires direct balance-specific practice every week. General pressing or wall strength work is support, not a replacement for balance practice.');
     required.push('HANDSTAND_DIRECT: for an athlete without reliable unsupported balance, use Controlled Handstand Kick-up as the direct skill row and dose it as high-quality practice rather than fatigue work.');

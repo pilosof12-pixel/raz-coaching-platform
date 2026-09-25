@@ -50,6 +50,9 @@ const RULE_REGISTRY = {
   // --- structural architecture (v38) --------------------------------------
   V38_INCOMPLETE_SESSION: { classification: CLASSIFICATION.HARD, dimension: 'exercise_selection' },
   V38_SKILL_WITHOUT_FOUNDATION: { classification: CLASSIFICATION.HARD, dimension: 'exercise_selection' },
+  // A goal stated as consecutive reps trained only as singles. Weekly rep total
+  // and set length are different adaptations, and only one of them is the goal.
+  PRIMARY_SKILL_CONSECUTIVE_REP_GOAL_UNTRAINED: { classification: CLASSIFICATION.HARD, dimension: 'specificity' },
   // Placement, not a missing layer: the week already supplies the strength, so
   // this reports how the microcycle is organised rather than blocking a release.
   // Forcing same-day foundation put this rule in direct contradiction with the
