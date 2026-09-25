@@ -49,6 +49,7 @@ import { canonicaliseDayOrder } from './day_order_canonicalization.js';
 import { repairConsecutiveRepGoal } from './consecutive_rep_goal.js';
 import { ladderOf, kgOf } from './tsv_rows.js';
 import { repairSupportivePullBudget } from './supportive_pull_budget.js';
+import { repairAccessoryBudget } from './accessory_budget.js';
 import { ENDURANCE_REPAIRS, repairAccessoryRedundancy, repairTaperPowerSpike } from './endurance_block_repair.js';
 import { STATEMENT_REPAIRS } from './program_statement_repair.js';
 import { repairConsecutiveTrainingDays } from './consecutive_day_repair.js';
@@ -1432,6 +1433,12 @@ export function repairDeterministicContradictions(program, intake = {}) {
   // Before the note pass and the structural repairs, so everything downstream
   // sees the prescription the athlete will actually train: a goal stated as
   // consecutive reps has to be trained in sets, not only in weekly volume.
+  const accessories = repairAccessoryBudget(candidate, intake);
+  if (accessories.changed) {
+    candidate = accessories.program;
+    repairs.push({ type: 'accessoryBudget', moves: accessories.moves.length });
+  }
+
   const pullBudget = repairSupportivePullBudget(candidate, intake);
   if (pullBudget.changed) {
     candidate = pullBudget.program;
