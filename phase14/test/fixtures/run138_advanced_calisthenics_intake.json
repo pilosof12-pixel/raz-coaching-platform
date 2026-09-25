@@ -1,0 +1,54 @@
+{
+  "age": 28,
+  "language": "en",
+  "experience": "Advanced (3+ years)",
+  "bodyweight": "72 kg",
+  "primary_goals": [
+    "Strict muscle-up on rings for 5 clean reps",
+    "Weighted pull-up with 40 kg for 3"
+  ],
+  "secondary_goals": [
+    "Hold a 10 second straddle planche",
+    "Freestanding handstand push-up"
+  ],
+  "maintenance_goals": [
+    "Keep my front lever, currently advanced tuck"
+  ],
+  "goal_priority_model": "tiered_equal_primary",
+  "days_per_week": 5,
+  "session_duration_minutes": 90,
+  "gym_availability_mode": "flexible",
+  "available_gym_days": [],
+  "training_location": "calisthenics_park",
+  "equipment": "Outdoor calisthenics park: pull-up bars, dip bars, rings on a fixed frame, parallettes, a weight belt that takes plates up to 50 kg, resistance bands. No barbell, no rack, no machines, no bench, no box.",
+  "sport": "",
+  "sport_schedule": [],
+  "sleep_hours": "7-8",
+  "recovery_rating": "Good",
+  "current_numbers": "Weighted pull-up: 32 kg x 3\nWeighted dip: 45 kg x 3\nStrict ring muscle-up: 2 clean reps\nRing dip: 12 reps\nAdvanced tuck front lever: 12 s\nTuck planche: 15 s\nAdvanced tuck planche: 6 s\nHandstand against wall: 60 s\nFreestanding handstand: 8 s\nPistol squat: 8 each leg\nWall handstand push-up: 6 reps to a folded towel\nFreestanding handstand push-up: none yet\nCurrently 5 sessions a week, all calisthenics",
+  "performance_markers": [
+    "Weighted pull-up: 32 kg x 3",
+    "Strict ring muscle-up: 2 reps",
+    "Advanced tuck planche: 6 s"
+  ],
+  "injuries": "Left elbow gets sore after high-volume straight-arm work; settles in two days and has never stopped training. No pain in bent-arm work at all.",
+  "pain": {
+    "active": false,
+    "description": "Occasional left medial elbow ache after heavy straight-arm days",
+    "severity": "2/10, gone in 48 hours",
+    "character": "dull, localised to the inner elbow",
+    "next_day_baseline": "returns to normal",
+    "tolerated_movements": "All bent-arm pulling and pressing is tolerated including weighted work. High-volume straight-arm holds back to back on consecutive days are not."
+  },
+  "mobility": {
+    "active": false,
+    "limitation": ""
+  },
+  "notes": "Two primary goals that pull in different directions: the ring muscle-up is a skill and the weighted pull-up is maximal strength, and both are bent-arm pulling. The straight-arm work (planche, front lever) is secondary and maintenance and must not be allowed to eat the elbow's recovery budget or the bent-arm progression. There is no barbell and no machine of any kind: if a session depends on one it will not happen. He can add external load only through the belt or a band.",
+  "clarification_answers": {
+    "benchmark_handstand_pushup": "Wall handstand push-up 6 reps to a folded towel; no freestanding handstand push-up yet",
+    "equipment_load_ceiling": "Weight belt that takes plates up to 50 kg; bands for assistance only",
+    "adherence_exclusions": "None. He will do anything the park allows."
+  },
+  "qa_diagnostics": true
+}

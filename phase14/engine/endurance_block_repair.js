@@ -291,6 +291,13 @@ export function repairUnanchoredCompetitionLoad(program, intake = {}) {
     return b && Number.isFinite(b.kg) ? b.kg : null;
   };
 
+  // Loading modes under which the movement carries no external kilograms at all.
+  // Narrower than "not a number on purpose": "RPE-selected load" on a snatch is
+  // an autoregulation instruction on a lift that HAS a benchmark max, and
+  // anchoring it to a percentage is the whole job of this repair. "Bodyweight"
+  // is different in kind -- it names the load, and adding plates to it changes
+  // which exercise is being done.
+  const NON_KILOGRAM_PRESCRIPTION = /bodyweight|body ?weight|\bband\b|assist|unloaded|no added (?:load|weight)/i;
   let out = String(program || '');
   const moves = [];
   for (let week = 1; week <= 4; week += 1) {
@@ -323,7 +330,16 @@ export function repairUnanchoredCompetitionLoad(program, intake = {}) {
       const kg = round2p5(max * fraction);
       const written = Number((text.match(/(\d+(?:\.\d+)?)\s*kg/i) || [])[1]);
 
-      // Nothing to read: write the number.
+      // Nothing to read: write the number. A cell naming how the movement is
+      // loaded is not nothing -- it is the prescription. "Bodyweight" on a light
+      // foundational Pull-up carries no digits, so this branch read it as blank
+      // and wrote a percentage of the athlete's WEIGHTED pull-up max over it,
+      // turning a deliberate 2x5 at RPE 6.5 the day after a heavy pull day into a
+      // near-maximal weighted set. UNBENCHMARKED_VARIATION_LOAD_TOO_ASSERTIVE
+      // then correctly rejected it, the repair rewrote it on the next attempt,
+      // and run #138 spent four model calls and 8.5 minutes in that loop before
+      // shipping unresolved.
+      if (NON_KILOGRAM_PRESCRIPTION.test(text)) return;
       if (!/\d+(?:\.\d+)?\s*(?:kg|%)|\d{1,2}:\d{2}/.test(text)) {
         row[parsed.load] = `${kg} kg (${Math.round(fraction * 100)}% of current max)`;
         moves.push({ week, movement: name, kg, pct: Math.round(fraction * 100) });

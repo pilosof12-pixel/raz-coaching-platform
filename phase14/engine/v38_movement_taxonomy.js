@@ -135,6 +135,21 @@ export function isFoundationalStrength(name) {
 }
 
 // Which tissues and systems a row taxes, used by the circular weekly stress model.
+// Which pattern a skill actually demands. Both, only where the movement really
+// is both: a muscle-up is a pull, a transition and a dip.
+const SKILL_DEMAND = [
+  [/muscle[- ]?up|transition drill/i, { upperPull: 1, upperPush: 1 }],
+  [/human flag/i, { upperPull: 1, upperPush: 1 }],
+  [/front lever|back lever/i, { upperPull: 1, upperPush: 0 }],
+  [/planche/i, { upperPull: 0, upperPush: 1 }],
+  [/handstand/i, { upperPull: 0, upperPush: 1 }],
+];
+
+export function skillDemand(name) {
+  for (const [re, demand] of SKILL_DEMAND) if (re.test(String(name || ''))) return demand;
+  return { upperPull: 1, upperPush: 1 };
+}
+
 export function stressSignature(name) {
   const { category } = classifyExercise(name);
   const sig = { axial: 0, lower: 0, upperPull: 0, upperPush: 0, neural: 0, impact: 0, elbow: 0 };
@@ -146,7 +161,24 @@ export function stressSignature(name) {
     case CATEGORY.HORIZONTAL_PULL: sig.upperPull = 2; sig.elbow = 1; break;
     case CATEGORY.VERTICAL_PUSH: sig.upperPush = 3; sig.axial = 2; sig.neural = 2; break;
     case CATEGORY.HORIZONTAL_PUSH: sig.upperPush = 2; sig.elbow = 1; break;
-    case CATEGORY.SKILL: sig.upperPull = 1; sig.upperPush = 1; sig.neural = 2; sig.elbow = 1; break;
+    case CATEGORY.SKILL: {
+      // A skill is not a blanket exposure of both patterns. Handstand and
+      // planche work is pressing; front and back lever work is pulling. Charging
+      // every skill row one unit of each meant a calisthenics athlete's handstand
+      // and planche day accumulated "vertical pulling" load it never performed --
+      // four such rows reached 2.0 before a single pull existed, so one light
+      // maintenance row tipped the day over the adjacency threshold. That put
+      // V38_SKILL_WITHOUT_FOUNDATION (which requires foundational pulling on a
+      // skill day) in direct contradiction with V38_CONSECUTIVE_CONFLICTING_
+      // EXPOSURE (which then forbade it), and no program could satisfy both:
+      // run #138 spent four model calls and 8.5 minutes on it and shipped
+      // unresolved. The demand now follows the movement. Unrecognised skills keep
+      // the conservative both-patterns reading.
+      const demand = skillDemand(name);
+      sig.upperPull = demand.upperPull;
+      sig.upperPush = demand.upperPush;
+      sig.neural = 2; sig.elbow = 1; break;
+    }
     case CATEGORY.POWER: sig.neural = 3; sig.lower = 2; sig.impact = 2; break;
     case CATEGORY.ENDURANCE: sig.impact = 3; sig.lower = 2; break;
     case CATEGORY.LOADED_CARRY: sig.impact = 2; sig.lower = 2; sig.axial = 2; break;

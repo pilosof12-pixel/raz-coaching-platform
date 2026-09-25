@@ -23,7 +23,7 @@
 // had the layer, and writing one from nothing would be composing training.
 
 import { parseWeek } from './v34_workload_accounting.js';
-import { CATEGORY, ROLE, classifyExercise, isFoundationalStrength } from './v38_movement_taxonomy.js';
+import { CATEGORY, ROLE, classifyExercise, isFoundationalStrength, stressSignature } from './v38_movement_taxonomy.js';
 import { auditProgramStructure } from './v38_structural_audit.js';
 import { rebuild, newRow } from './tsv_rows.js';
 
@@ -77,13 +77,26 @@ function donorsFor(program, test) {
       });
     }
   }
-  // Every candidate, commonest first. The first version took only the most
+  // Every candidate, cheapest first. The first version took only the most
   // frequent, which for this athlete was the Weighted Pull-up: adding that to a
   // skill day raised V38_CONSECUTIVE_CONFLICTING_EXPOSURE against the day beside
   // it, the guard refused, and the repair did nothing at all. A lighter exposure
   // of the same pattern answers the rule without the clash, so the repair tries
   // them in turn rather than giving up on the first refusal.
-  return [...seen.entries()].sort((a, b) => b[1].count - a[1].count);
+  //
+  // Ordering by frequency made the commonest movement the first thing tried, and
+  // the commonest movement is the one the block is built around -- the athlete's
+  // maximal lift. Once the adjacency reading was corrected the heaviest donor
+  // stopped being refused, so it won: the repair proposed a Weighted Pull-up as
+  // the "maintenance" layer on a skill day beside a heavy pull day. This layer is
+  // support, so the cheapest exposure that satisfies the rule is the right one,
+  // and frequency only breaks ties.
+  const cost = ([name, dose]) => {
+    const sig = stressSignature(name);
+    const loaded = /\d+(?:\.\d+)?\s*kg\b/i.test(String(dose.load || '')) ? 2 : 0;
+    return sig.upperPull + sig.upperPush + sig.lower + loaded;
+  };
+  return [...seen.entries()].sort((a, b) => cost(a) - cost(b) || b[1].count - a[1].count);
 }
 
 export function repairSkillFoundation(program, intake = {}) {

@@ -2,10 +2,22 @@
 //
 // Run #130's calisthenics build failed V38_CONSECUTIVE_CONFLICTING_EXPOSURE on
 // all four weeks, spent four model calls and 649s on it, and shipped the
-// defects anyway. Monday is the weighted pull session and Tuesday is the
-// handstand and planche session; both are correct, and they are simply next to
-// each other. Swapping the Tuesday and Wednesday sessions clears every week
-// with nothing added, removed or de-loaded.
+// defects anyway. Two sessions are both correct and simply next to each other,
+// and moving one clears every week with nothing added, removed or de-loaded.
+//
+// The fixture originally put the second session on Tuesday -- handstand, planche
+// and pike push-up -- and that pair only clashed because every skill row was
+// charged one unit of pulling AND one of pushing regardless of what the skill
+// demanded. Handstand and planche work is pressing, so the "vertical pulling"
+// the audit saw on that Tuesday was phantom, and the finding named no items at
+// all. With the skill demand corrected the pair no longer clashes, which is the
+// right answer for it.
+//
+// So the fixture now uses the adjacency this rule exists for and the old one
+// could not reach: the week is circular, and Sunday's weighted pull session sits
+// immediately before Monday's. Both days total 3.5 and both name a real
+// Weighted Pull-up, so the clash is genuine rather than an artefact of the
+// signature.
 
 import test from 'node:test';
 import assert from 'node:assert/strict';
@@ -27,10 +39,10 @@ const INTAKE = {
 
 const HEAD = 'Day\tExercise\tWeight\tSets\tReps\tRest\tTarget RPE\tNotes\tResults';
 
-// Monday and Tuesday are run #130's week 1 as delivered, including the RPE
-// column: the audit weights a row at 1.0 only when it is heavy (RPE >= 7.5 over
-// 2+ sets) and 0.5 otherwise, so Monday totals 3.5 and Tuesday 4.0 and the pair
-// clashes. Wednesday is the leg day the swap moves into the gap.
+// Run #130's week 1 as delivered, including the RPE column: the audit weights a
+// row at 1.0 only when it is heavy (RPE >= 7.5 over 2+ sets) and 0.5 otherwise,
+// so Sunday and Monday each total 3.5 on vertical pulling and the pair clashes
+// across the week boundary. Wednesday is the leg day the swap moves into the gap.
 const ROWS = [
   'Mon\t[WARMUP] Band Pull-Apart Warm-up\tLight band\t2\t15\t0:45\tN/A\tWarm-up.\t',
   'Mon\tRing Muscle-up\tBW\t6\t2\t2:30\t7-8\tPrimary skill.\t',
@@ -54,10 +66,10 @@ const ROWS = [
   'Fri\tDip\tRPE-selected load\t3\t8\t2:00\t7\tPressing.\t',
   'Fri\tControlled Handstand Kick-up\tBW\t3\t2 attempts\t1:00\t6\tSkill.\t',
   'Fri\tBulgarian Split Squat\tBW\t3\t8\t1:30\t7\tLower.\t',
-  'Sat\tWeighted Pull-up\t26 kg added\t4\t5\t2:30\t7.5\tVolume.\t',
-  'Sat\tAdvanced Tuck Planche\tBW\t4\t12s\t1:30\t8\tSkill.\t',
-  'Sat\tAdvanced Tuck Front Lever\tBW\t3\t10s\t1:30\t7\tMaintenance.\t',
-  'Sat\tDip\tRPE-selected load\t3\t8\t2:00\t7\tPressing.\t',
+  'Sun\tWeighted Pull-up\t26 kg added\t4\t5\t2:30\t7.5\tVolume.\t',
+  'Sun\tAdvanced Tuck Planche\tBW\t4\t12s\t1:30\t8\tSkill.\t',
+  'Sun\tAdvanced Tuck Front Lever\tBW\t3\t10s\t1:30\t7\tMaintenance.\t',
+  'Sun\tDip\tRPE-selected load\t3\t8\t2:00\t7\tPressing.\t',
 ];
 
 const PROGRAM = [1, 2, 3, 4]
@@ -94,8 +106,8 @@ test('the primary session stays on the first training day', () => {
 
 test('it takes the smallest swap that works', () => {
   const { moves } = repairSessionAdjacency(PROGRAM, INTAKE);
-  assert.deepEqual(moves[0].from, ['mon', 'tue', 'wed', 'fri', 'sat']);
-  assert.deepEqual(moves[0].to, ['mon', 'wed', 'tue', 'fri', 'sat']);
+  assert.deepEqual(moves[0].from, ['mon', 'tue', 'wed', 'fri', 'sun']);
+  assert.deepEqual(moves[0].to, ['mon', 'tue', 'sun', 'fri', 'wed']);
 });
 
 test('a week with no clash is left alone', () => {
@@ -111,7 +123,7 @@ test('it declines when the weeks do not share a day set', () => {
   // days, and guessing one would move a session onto a rest day.
   const shifted = PROGRAM.replace(
     /(START_WEEK2_TSV[\s\S]*?END_WEEK2_TSV)/,
-    (wk) => wk.replace(/^Sat\t/gm, 'Sun\t'),
+    (wk) => wk.replace(/^Sun\t/gm, 'Sat\t'),
   );
   const { changed } = repairSessionAdjacency(shifted, INTAKE);
   assert.equal(changed, false);
