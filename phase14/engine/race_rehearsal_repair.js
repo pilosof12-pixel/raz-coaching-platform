@@ -143,7 +143,25 @@ export function orderIntoCompetitionSequence(program, intake, week, hostDay) {
   // #124 from clean to two findings. With at least as many runs as stations,
   // alternating from the run gives both the race order and a run behind every
   // station. With fewer, starting from the station is what preserves the pairs.
-  const leadWithRun = runs.length >= comps.length;
+  // The run leads, always.
+  //
+  // This used to lead with the station when runs were scarce, to protect the
+  // compromised-work floor: that floor counts station-then-run pairs, and a run
+  // in front of every station spends them before any station can be followed by
+  // one. Leading with the run took run #124 from clean to two findings, which
+  // is why the trade was made.
+  //
+  // He has now priced the other side of it at 0.35, the largest finding on run
+  // #136: "HYROX competition structure is effectively Run -> station -> Run ->
+  // station, so the program contains the correct movements and largely the
+  // correct station ordering, but the rehearsal is shifted by one element and
+  // therefore does not reproduce the transition sequence exactly." His INSTEAD
+  // opens with Run 1000 m.
+  //
+  // A rehearsal exists to put the athlete through the race's own sequence. An
+  // order that is right about everything except where it starts is not that
+  // sequence, and it costs more than the pairs it was protecting.
+  const leadWithRun = true;
   const ordered = [];
   let r = 0;
   if (leadWithRun) {

@@ -216,7 +216,7 @@ function restateFalseClaims(text, current, prior) {
 
 // --- 1. note claims restated from the row's own fields -----------------------
 
-function repairRowNote(note, { sets, reps, km, load, volume, priorSets, priorReps, priorKm, priorVolume, priorLoad }) {
+function repairRowNote(note, { sets, reps, km, load, volume, measured, priorSets, priorReps, priorKm, priorVolume, priorLoad }) {
   let out = String(note || '');
   if (!out.trim()) return { note: out, changed: false };
   const before = out;
@@ -232,11 +232,20 @@ function repairRowNote(note, { sets, reps, km, load, volume, priorSets, priorRep
       });
     // Rep words describing this row's own dose. Above three reps there is no
     // natural word, so name the number instead of leaving the contradiction.
-    const wanted = REP_WORD_FOR[reps] || `sets of ${reps}`;
-    out = out.replace(/\b(singles?|doubles?|triples?)\b/gi, (w) => {
-      const n = { single: 1, singles: 1, double: 2, doubles: 2, triple: 3, triples: 3 }[String(w).toLowerCase()];
-      return (!Number.isFinite(n) || n === reps) ? w : wanted;
-    });
+    //
+    // Not on a row prescribed by distance or time. A Farmer Carry written as
+    // 1 x 100 m parses reps as 100, and "Single direct touch for grip and
+    // posture" came out as "sets of 100 reps, direct touch for grip and
+    // posture" -- twice in run #136, which he charged 0.08 as a genuine
+    // client-facing execution error. A carry measured in metres has no reps to
+    // restate, and the word in front of it is not a claim about a rep count.
+    const wanted = measured ? null : (REP_WORD_FOR[reps] || `sets of ${reps}`);
+    if (wanted) {
+      out = out.replace(/\b(singles?|doubles?|triples?)\b/gi, (w) => {
+        const n = { single: 1, singles: 1, double: 2, doubles: 2, triple: 3, triples: 3 }[String(w).toLowerCase()];
+        return (!Number.isFinite(n) || n === reps) ? w : wanted;
+      });
+    }
   }
 
   // "N total attempts" must equal sets x reps.
@@ -1207,8 +1216,10 @@ export function repairDeterministicContradictions(program, intake = {}) {
       if (isWarmup(name) || !Number.isInteger(parsed.notes)) return;
 
       const p = prior.get(key) || {};
+      // A reps cell carrying a unit is a distance or a duration, not a count.
+      const measured = /\d\s*(?:m|km|mi|min|minutes?|sec|s)\b/i.test(String(cells[parsed.reps] || ''));
       const { note, changed: noteChanged } = repairRowNote(cells[parsed.notes], {
-        sets, reps, load, km, volume,
+        sets, reps, load, km, volume, measured,
         priorSets: p.sets, priorReps: p.reps, priorLoad: p.load, priorKm: p.km, priorVolume: p.volume,
       });
       if (noteChanged) {
