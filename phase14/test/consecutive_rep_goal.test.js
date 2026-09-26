@@ -196,3 +196,35 @@ test('only one session is given the ladder', () => {
     assert.ok(days.size <= 1, `week ${n} trains set length on ${days.size} days`);
   }
 });
+
+// --- a goal names a movement; it does not quote the catalogue -----------------
+//
+// Run #142 wrote the row as "Strict Ring Muscle-up" and the goal reads "Strict
+// muscle-up on rings for 5 clean reps". Same movement, different word order, and
+// the phrase matcher saw neither -- so this rule was blind to the athlete's first
+// primary goal. The build passed only because the model built the ladder
+// unprompted; had it regressed, nothing here would have noticed.
+
+const RUN142 = fs.readFileSync(path.join(here, 'fixtures/run142_advanced_calisthenics.txt'), 'utf8');
+
+test('the goal is recognised however the row is named', () => {
+  const found = consecutiveRepGoals(RUN142, INTAKE);
+  assert.equal(found.length, 1, 'the muscle-up goal must be seen');
+  assert.equal(found[0].name, 'Strict Ring Muscle-up');
+  assert.equal(found[0].target, 5);
+  assert.equal(found[0].current, 2, 'capacity is read from the same words');
+});
+
+test("run #142's own ladder already satisfies the rule", () => {
+  // 1x2 + 4x1, then 1x2 + 5x1, then 1x3 + 4x1, then 1x2 + 3x1 -- set length
+  // 2, 2, 3, 2, written by the model rather than by the repair.
+  assert.deepEqual(collectConsecutiveRepGoalFlags(RUN142, INTAKE), []);
+  assert.equal(repairConsecutiveRepGoal(RUN142, INTAKE).changed, false,
+    'nothing to add where the model got there itself');
+});
+
+test('a differently-named row with only singles is still caught', () => {
+  const singlesOnly = RUN142.replace(/^(Wed\tStrict Ring Muscle-up\t[^\t]*\t)1(\t)[23](\t)/gm, '$14$21$3');
+  assert.ok(collectConsecutiveRepGoalFlags(singlesOnly, INTAKE).length > 0,
+    'the rule has to bite when the ladder is gone');
+});

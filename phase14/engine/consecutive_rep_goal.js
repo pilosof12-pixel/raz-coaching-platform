@@ -22,9 +22,29 @@ export { ladderOf, topSetOf };
 
 const isWarmup = (s) => /^\s*\[WARMUP\]/i.test(String(s || ''));
 const arr = (v) => (Array.isArray(v) ? v : v ? [v] : []);
-const loose = (name) => new RegExp(
-  String(name).trim().replace(/[.*+?^${}()|[\]\\]/g, '\\$&').replace(/[\s-]+/g, '[\\s-]?'), 'i',
-);
+// A goal names a movement; it does not quote the catalogue.
+//
+// The matcher used to require the movement's name as a phrase, in order. Run
+// #142 wrote the row as "Strict Ring Muscle-up" and the goal reads "Strict
+// muscle-up on rings for 5 clean reps" -- the same movement, different word
+// order -- so this rule was blind to the athlete's first primary goal. It passed
+// only because the model built the ladder unprompted; had it regressed, nothing
+// here would have noticed.
+//
+// The head of the name is what identifies the movement. "Muscle-up" is the
+// movement and "Strict Ring" is how it is done, so the head is matched against
+// the text and the modifiers are not required to appear in the same order or at
+// all.
+const movementHead = (name) => {
+  const tokens = String(name || '').trim().toLowerCase().split(/\s+/).filter(Boolean);
+  return tokens.length ? tokens[tokens.length - 1] : '';
+};
+const loose = (name) => {
+  const head = movementHead(name);
+  if (!head) return /$^/;
+  const escaped = head.replace(/[.*+?^${}()|[\]\\]/g, '\\$&').replace(/-/g, '[\\s-]?');
+  return new RegExp(`\\b${escaped}s?\\b`, 'i');
+};
 
 
 
