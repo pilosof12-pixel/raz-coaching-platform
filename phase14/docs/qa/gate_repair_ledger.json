@@ -878,6 +878,26 @@
     "killedLive": ""
   },
   {
+    "code": "ECCENTRIC_EXPOSURE_DOES_NOT_PROGRESS",
+    "modules": [
+      "engine/eccentric_tempo_progression.js"
+    ],
+    "owners": [
+      "collectEccentricTempoFlags"
+    ],
+    "advisory": false,
+    "reachable": true,
+    "repairs": [
+      "repairEccentricTempo"
+    ],
+    "wired": [
+      "repairEccentricTempo"
+    ],
+    "tested": true,
+    "stressed": false,
+    "killedLive": ""
+  },
+  {
     "code": "EQUIPMENT_VIOLATION",
     "modules": [
       "engine/exercise_dictionary.js"

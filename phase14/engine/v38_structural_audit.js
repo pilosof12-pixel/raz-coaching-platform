@@ -21,6 +21,7 @@ import {
 } from './v38_movement_taxonomy.js';
 import { collectConsecutiveRepGoalFlags } from './consecutive_rep_goal.js';
 import { collectIsometricDurationFlags } from './isometric_duration.js';
+import { collectEccentricTempoFlags } from './eccentric_tempo_progression.js';
 
 function arr(v) { return Array.isArray(v) ? v : v ? [v] : []; }
 function txt(v) {
@@ -375,6 +376,7 @@ export function auditProgramStructure(program, intake = {}) {
     ...auditLoadedCarryProgression(program, intake),
     ...collectConsecutiveRepGoalFlags(program, intake),
     ...collectIsometricDurationFlags(program, intake),
+    ...collectEccentricTempoFlags(program, intake),
   ];
 }
 

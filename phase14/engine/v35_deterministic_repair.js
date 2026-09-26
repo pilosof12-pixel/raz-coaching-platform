@@ -52,6 +52,7 @@ import { repairSupportivePullBudget } from './supportive_pull_budget.js';
 import { repairSupportivePressVolume } from './supportive_press_volume.js';
 import { repairAccessoryBudget } from './accessory_budget.js';
 import { repairIsometricDuration } from './isometric_duration.js';
+import { repairEccentricTempo } from './eccentric_tempo_progression.js';
 import { ENDURANCE_REPAIRS, repairAccessoryRedundancy, repairTaperPowerSpike } from './endurance_block_repair.js';
 import { STATEMENT_REPAIRS } from './program_statement_repair.js';
 import { repairConsecutiveTrainingDays } from './consecutive_day_repair.js';
@@ -1552,6 +1553,15 @@ export function repairDeterministicContradictions(program, intake = {}) {
   // consecutive reps has to be trained in sets, not only in weekly volume.
   // Before the note passes, so a duration moved into the prescription is what the
   // notes are then reconciled against.
+  // Beside the hold-duration repair: the same question -- what does this row
+  // actually ask for -- for a movement whose only progressable dimension is the
+  // time it spends under control on the way down.
+  const eccentric = repairEccentricTempo(candidate, intake);
+  if (eccentric.moves.length) {
+    candidate = eccentric.program;
+    repairs.push({ type: 'eccentricTempo', moves: eccentric.moves.length });
+  }
+
   const heldForTime = repairIsometricDuration(candidate, intake);
   if (heldForTime.changed) {
     candidate = heldForTime.program;
