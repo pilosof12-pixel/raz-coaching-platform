@@ -1,21 +1,21 @@
 {
-  "timestamp": "2026-09-25T15:21:29.125Z",
+  "timestamp": "2026-09-26T04:36:08.355Z",
   "base": "https://raz-coaching-platform.onrender.com",
-  "head_sha": "45658bc3b0a15b4e6a8172b6627a0d585d73f56a",
-  "runtime": "live77 2026-09-25T15:11:01Z",
+  "head_sha": "9363804bb20cc9c92d41594b403f1a272aa3e4fb",
+  "runtime": "live78 2026-09-26T04:35:19Z",
   "results": [
     {
       "id": "advanced_calisthenics",
-      "job_id": "566041b6ae80b5dd11e92802e577507f",
+      "job_id": "bee0a13eb0c5b7d1f606fe2353718d6c",
       "ok": true,
       "status": "done",
       "stage": "finalizing",
-      "attempt": 4,
-      "detail": "delivered with unresolved rules: UNBENCHMARKED_VARIATION_LOAD_TOO_ASSERTIVE+PRIMARY_EXACT_MOVEMENT_MISSING QA trace: A1:UNBENCHMARKED_VARIATION_LOAD_TOO_ASSERTIVE+PRIMARY_EXACT_MOVEMENT_MISSING -> A2:UNBENCHMARKED_VARIATION_LOAD_TOO_ASSERTIVE+PRIMARY_EXACT_MOVEMENT_MISSING -> A3:UNBENCHMARKED_VARIATION_LOAD_TOO_ASSERTIVE+PRIMARY_EXACT_MOVEMENT_MISSING -> A4:UNBENCHMARKED_VARIATION_LOAD_TOO_ASSERTIVE+PRIMARY_EXACT_MOVEMENT_MISSING.",
+      "attempt": 1,
+      "detail": "saving program after 1 model call(s)",
       "last_seen_status": "done",
       "error": null,
-      "program_chars": 22050,
-      "seconds": 464
+      "program_chars": 21390,
+      "seconds": 261
     }
   ],
   "reasoning_effort": "medium",
