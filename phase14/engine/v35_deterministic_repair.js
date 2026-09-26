@@ -128,8 +128,15 @@ function rowKey(cells, parsed) {
 }
 
 const NUMBER_WORDS = { one: 1, two: 2, three: 3, four: 4, five: 5, six: 6, seven: 7, eight: 8, nine: 9, ten: 10, twelve: 12 };
-const REP_WORD_FOR = { 1: 'singles', 2: 'doubles', 3: 'triples' };
-import { namesAnAlternativeDose } from './v34_prescription_consistency.js';
+import {
+  namesAnAlternativeDose, expectedLadderRungs,
+  REP_WORDS, REP_WORD_PLURAL, REP_WORD_SINGULAR,
+} from './v34_prescription_consistency.js';
+// One home for the rep-word vocabulary. This file held two more copies of it --
+// a number-to-word map here and a word-to-number map inlined in the rewrite
+// below -- which is how the detector and the repair end up disagreeing about
+// what a word means. The detector's copy is now the only copy.
+const REP_WORD_FOR = REP_WORD_PLURAL;
 
 const CONDITIONAL = /\b(?:if|only if|when|provided|optional|earned|may|can)\b/i;
 
@@ -255,7 +262,7 @@ function restateFalseClaims(text, current, prior) {
 
 // --- 1. note claims restated from the row's own fields -----------------------
 
-function repairRowNote(note, { sets, reps, km, load, volume, measured, priorSets, priorReps, priorKm, priorVolume, priorLoad }) {
+function repairRowNote(note, { sets, reps, km, load, volume, measured, ladder, priorSets, priorReps, priorKm, priorVolume, priorLoad }) {
   let out = String(note || '');
   if (!out.trim()) return { note: out, changed: false };
   const before = out;
@@ -289,12 +296,33 @@ function repairRowNote(note, { sets, reps, km, load, volume, measured, priorSets
       // charged as a client-facing execution error on run #138. The repair made
       // that line worse than the model wrote it.
       out = out.replace(/\b(singles?|doubles?|triples?)\b/gi, (w, _g, offset, whole) => {
-        const n = { single: 1, singles: 1, double: 2, doubles: 2, triple: 3, triples: 3 }[String(w).toLowerCase()];
+        const n = REP_WORDS[String(w).toLowerCase()];
         if (!Number.isFinite(n) || n === reps) return w;
         if (namesAnAlternativeDose(whole, { 0: w, index: offset })) return w;
         return wanted;
       });
     }
+  }
+
+  // A ladder's rungs differ, so the word has to match the rung it points at
+  // rather than a rep count the row never states. Run #143 shipped "Top set is
+  // clean current capacity, then crisp doubles" on 4 x 2,1,1,1, where the
+  // back-offs are singles, and the coach charged it.
+  //
+  // expectedLadderRungs is imported from the detector rather than reimplemented,
+  // so the two cannot disagree about which rungs a cue points at -- a detector
+  // that flags what its repair will not rewrite is a build that never finishes.
+  if (Array.isArray(ladder) && ladder.length >= 2) {
+    out = out.replace(/\b(singles?|doubles?|triples?)\b/gi, (w, _g, offset, whole) => {
+      const n = REP_WORDS[String(w).toLowerCase()];
+      if (!Number.isFinite(n)) return w;
+      if (namesAnAlternativeDose(whole, { 0: w, index: offset })) return w;
+      const expected = expectedLadderRungs(whole, offset, ladder);
+      if (!expected || expected.includes(n)) return w;
+      const plural = /s$/i.test(w);
+      const fixed = (plural ? REP_WORD_PLURAL : REP_WORD_SINGULAR)[expected[0]];
+      return fixed || w;
+    });
   }
 
   // "N total attempts" must equal sets x reps.
@@ -1350,7 +1378,7 @@ export function repairDeterministicContradictions(program, intake = {}) {
       // A reps cell carrying a unit is a distance or a duration, not a count.
       const measured = /\d\s*(?:m|km|mi|min|minutes?|sec|s)\b/i.test(String(cells[parsed.reps] || ''));
       const { note, changed: noteChanged } = repairRowNote(cells[parsed.notes], {
-        sets, reps, load, km, volume, measured,
+        sets, reps, load, km, volume, measured, ladder: ladderOf(cells[parsed.reps]),
         priorSets: p.sets, priorReps: p.reps, priorLoad: p.load, priorKm: p.km, priorVolume: p.volume,
       });
       if (noteChanged) {

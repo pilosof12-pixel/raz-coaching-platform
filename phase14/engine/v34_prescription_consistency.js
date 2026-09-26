@@ -10,7 +10,7 @@
 // structured fields. Qualitative cues are never inspected.
 
 import { clusterStructure } from './v81_cluster_notation.js';
-import { repCount, kgOf } from './tsv_rows.js';
+import { repCount, kgOf, ladderOf } from './tsv_rows.js';
 
 function firstNum(raw) {
   const m = String(raw || '').match(/\d+(?:\.\d+)?/);
@@ -176,8 +176,52 @@ export function collectPrescriptionConsistencyFlags(program, intake = {}) {
 // ---------------------------------------------------------------------------
 
 const NUMBER_WORDS = { one: 1, two: 2, three: 3, four: 4, five: 5, six: 6, seven: 7, eight: 8, nine: 9, ten: 10, twelve: 12 };
-// "doubles" means 2 reps, "triples" 3, "singles" 1.
-const REP_WORDS = { single: 1, singles: 1, double: 2, doubles: 2, triple: 3, triples: 3 };
+// "doubles" means 2 reps, "triples" 3, "singles" 1. Exported because the repair
+// in v35 has to read a rep word exactly the way this detector reads it; it had
+// its own inline copy of this map, which is how repCount and kgOf came to exist
+// in three and four copies and put a detector and its repair into permanent
+// disagreement.
+export const REP_WORDS = { single: 1, singles: 1, double: 2, doubles: 2, triple: 3, triples: 3 };
+export const REP_WORD_PLURAL = { 1: 'singles', 2: 'doubles', 3: 'triples' };
+export const REP_WORD_SINGULAR = { 1: 'single', 2: 'double', 3: 'triple' };
+
+// Which rungs of a ladder a rep word in the note is talking about.
+//
+// A ladder's rungs differ, so unlike a flat row there is no single "the dose"
+// to compare a word against. Run #143 shipped "Top set is clean current
+// capacity, then crisp doubles" on 4 x 2,1,1,1: the top set is the double and
+// the back-offs are singles, and the coach charged it as a semantic mismatch.
+//
+// Only a cue-scoped word is judged, and only when the rungs it names are all
+// the same. A bare word with no cue could fairly describe any rung, and mixed
+// rungs have no single word that describes them -- flagging either would be a
+// rule the repair could not converge on, which is how a build dies. Cues are
+// read within the word's own clause and the nearest one wins, so a later
+// sentence does not inherit an earlier sentence's cue.
+const BACK_OFF_CUE = /\b(?:then|back[- ]?offs?|remaining|rest of the|subsequent|following|drop(?:ping)?\s+to)\b/gi;
+const TOP_SET_CUE = /\b(?:top set|first set|opening set|opener|lead with)\b/gi;
+
+function lastCueIndex(text, re) {
+  const scan = new RegExp(re.source, 'gi');
+  let at = -1;
+  let m;
+  while ((m = scan.exec(text))) at = m.index;
+  return at;
+}
+
+export function expectedLadderRungs(note, index, ladder) {
+  if (!Array.isArray(ladder) || ladder.length < 2) return null;
+  const before = String(note || '').slice(0, index);
+  const clause = before.replace(/^[\s\S]*[.;!?]/, '');
+  const back = lastCueIndex(clause, BACK_OFF_CUE);
+  const top = lastCueIndex(clause, TOP_SET_CUE);
+  if (back < 0 && top < 0) return null;
+  if (back > top) {
+    const backOffs = ladder.slice(1);
+    return backOffs.every((r) => r === backOffs[0]) ? backOffs : null;
+  }
+  return [Math.max(...ladder)];
+}
 
 function rowKey(cells, parsed) {
   return `${String(cells[parsed.day] || '').trim().toLowerCase()}|${String(cells[parsed.exercise] || '').trim().toLowerCase()}`;
@@ -353,7 +397,11 @@ export function collectRepWordFlags(program) {
       const exercise = String(cells[parsed.exercise] || '').trim();
       if (!exercise || isWarmup(exercise)) return;
       const reps = repCount(cells[parsed.reps]);
-      if (!Number.isFinite(reps)) return;
+      // A ladder has no single rep count, which is exactly why repCount returns
+      // null for one. Returning here on that null is what let run #143 ship
+      // "then crisp doubles" on 4 x 2,1,1,1: the row was never examined at all.
+      const ladderCell = clusterStructure(cells[parsed.reps]) ? null : ladderOf(cells[parsed.reps]);
+      if (!Number.isFinite(reps) && !ladderCell) return;
       const note = String(cells[parsed.notes] || '');
       const where = { week, row, exercise };
 
@@ -369,10 +417,21 @@ export function collectRepWordFlags(program) {
       // three singles, and calling them triples is the error the notation
       // exists to prevent. Compare against the unit the structure declares.
       const cluster = clusterStructure(cells[parsed.reps]);
+      const ladder = ladderCell;
       const unit = cluster ? cluster[0] : reps;
       for (const m of (companionRows > 1 ? [] : note.matchAll(/\b(singles?|doubles?|triples?)\b/gi))) {
         const n = REP_WORDS[String(m[1]).toLowerCase()];
         if (namesAnAlternativeDose(note, m)) continue;
+        if (ladder) {
+          // A ladder has no single dose, so judge the word against the rungs it
+          // is pointing at rather than against a rep count the row never states.
+          const expected = expectedLadderRungs(note, m.index, ladder);
+          if (Number.isFinite(n) && expected && !expected.includes(n)) {
+            flags.push({ code: 'V34_NOTE_REP_WORD_MISMATCH', ...where, note_claim: m[1], prescribed_reps: ladder.join('+'),
+              message: `${exercise} (Week ${week}) is prescribed as a ladder of ${ladder.join('+')} but its note describes ${m[1]} where the prescription is ${expected[0]} rep(s) per set.` });
+          }
+          continue;
+        }
         if (Number.isFinite(n) && n !== unit) {
           flags.push({ code: 'V34_NOTE_REP_WORD_MISMATCH', ...where, note_claim: m[1], prescribed_reps: reps,
             message: cluster
