@@ -81,3 +81,32 @@ test('the detector and the repair agree about a ladder note', () => {
     'and the detector must still be satisfied afterwards',
   );
 });
+
+test('a comma-separated ladder is a ladder too', () => {
+  // Run #143's model wrote "4 sets of 2,1,1,1". The sweep had taught every
+  // reader about slashes, plus signs and hyphens, so this third notation walked
+  // straight past all of them: repCount answered 2, which is the number the note
+  // reconciler would have rewritten every rep word to match, and repsInRow
+  // charged the day eight reps for a five-rep ladder.
+  assert.deepEqual(ladderOf('2,1,1,1'), [2, 1, 1, 1]);
+  assert.deepEqual(ladderOf('2, 1, 1, 1'), [2, 1, 1, 1], 'spaces after the commas are the same ladder');
+  assert.equal(repCount('2,1,1,1'), null, 'a ladder has no single rep count');
+  assert.equal(topSetOf('2,1,1,1'), 2);
+  assert.equal(repsInRow('4', '2,1,1,1'), 5, 'five reps, not four sets of two');
+
+  // A comma in a cell that is not a list of bare numbers is not a ladder.
+  assert.equal(ladderOf('10, each side'), null);
+  assert.equal(repCount('10, each side'), 10, 'and that cell still reads as ten reps');
+
+  // The note reconciler is the defect that shipped for the slash form.
+  const note = 'Hardest week; only take the double if rep 2 is clean, then finish the singles.';
+  const program = block('4', '2,1,1,1', note);
+  assert.deepEqual(
+    collectPrescriptionConsistencyFlags(program, INTAKE).filter((f) => /REP_WORD/.test(f.code)), [],
+    'a comma ladder note naming doubles and singles is not a mismatch',
+  );
+  const repaired = repairDeterministicContradictions(program, INTAKE).program;
+  const after = repaired.split('\n').map((l) => l.split('\t'))
+    .find((c) => c.length === 9 && c[1] === 'Muscle-up')[7];
+  assert.equal(after, note, 'and the repair must leave the note alone');
+});

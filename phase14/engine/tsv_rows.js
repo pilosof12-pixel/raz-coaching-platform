@@ -60,7 +60,13 @@ export function ladderOf(cell) {
   // Slash and plus mean a ladder at two parts. A hyphen usually means a rep
   // RANGE -- "8-10" is eight to ten reps, not a ladder of eight then ten -- so it
   // takes three parts before it reads as one.
-  const slashed = /[/+]/.test(inner) ? nums(/[/+]/) : null;
+  // Slash, plus and comma all mean a ladder at two parts. The comma was missed:
+  // run #143 wrote "2,1,1,1" and repCount read it as two reps, which is the same
+  // defect the slash form had -- the note reconciler rewriting every rep word to
+  // match a number the row does not prescribe, and the session estimate charging
+  // four sets of two instead of five reps. A comma-separated list of bare numbers
+  // is a ladder; anything with other text in it is not, which nums() enforces.
+  const slashed = /[/+,]/.test(inner) ? nums(/[/+,]/) : null;
   if (slashed && slashed.length >= 2) return slashed;
   const dashed = /[–—-]/.test(inner) ? nums(/[–—-]/) : null;
   if (dashed && dashed.length >= 3) return dashed;
