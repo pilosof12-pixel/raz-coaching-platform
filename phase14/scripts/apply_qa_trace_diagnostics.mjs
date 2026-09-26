@@ -52,11 +52,14 @@ if (!s.includes(resetNew)) {
 
 // 2. Record it on the way out of the generator. The success path is the one
 //    that used to throw the trace away.
+// The success path returns the program runQualityChain handed back, so that the
+// identical chain can be re-run over a deterministic candidate before the loop
+// pays for another model call.
 const successOld = `      await onProgress("finalizing", attempt, "quality checks passed including Phase 15 v5");
-      return program;`;
+      return finished;`;
 const successNew = `      await onProgress("finalizing", attempt, "quality checks passed including Phase 15 v5");
       lastQaTrace = qaTrace.slice(); // QA-TRACE-DIAGNOSTICS-SUCCESS
-      return program;`;
+      return finished;`;
 if (!s.includes('QA-TRACE-DIAGNOSTICS-SUCCESS')) {
   if (!s.includes(successOld)) throw new Error('success-return anchor missing');
   s = s.replace(successOld, successNew);

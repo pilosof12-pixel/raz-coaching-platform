@@ -1869,8 +1869,12 @@ async function generateValidatedProgram(intake, onProgress = async () => {}) {
       continue;
     }
     let program = fixInvalidExerciseNames(raw); // step 1
-    try {
-      await onProgress("validating", attempt, "exercise and coaching validators");
+    // Steps 2-9, extracted so a deterministic substitution can be re-validated
+    // against this identical chain rather than trusted. Each step writes its
+    // normalized program back to `program`, because the retry path keeps that as
+    // the last structurally valid candidate.
+    const runQualityChain = (start) => {
+      program = start;
       const dict = validateExercisesAgainstDictionary(program, intake); // step 2
       program = dict.program;
       const skills = validateAndCalibrateSkills(program, intake); // step 3
@@ -1881,8 +1885,13 @@ async function generateValidatedProgram(intake, onProgress = async () => {}) {
       validateSportDayCoupling(program, intake);                // step 7
       validateWeeklyVolumeBudget(program, intake);              // step 8
       program = reformatWarmupCells(program);                   // step 9
-      await onProgress("finalizing", attempt, "quality checks passed");
       return program;
+    };
+    try {
+      await onProgress("validating", attempt, "exercise and coaching validators");
+      const finished = runQualityChain(program);
+      await onProgress("finalizing", attempt, "quality checks passed");
+      return finished;
     } catch (err) {
       if (err && err.code && RETRIABLE_CODES.has(err.code)) {
         lastValid = program;

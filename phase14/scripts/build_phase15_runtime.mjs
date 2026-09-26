@@ -69,10 +69,20 @@ once(
   "protect Phase15 direct skill rows"
 );
 
+// Steps 10 and 11 go INSIDE runQualityChain, not after it. The retry loop now
+// re-runs that chain over a deterministic substitution before it will spend
+// another model call, so anything left outside the chain would be a gate the
+// substituted program never had to pass.
 once(
-  '      program = reformatWarmupCells(program);                   // step 9\n      await onProgress("finalizing", attempt, "quality checks passed");\n      return program;',
-  '      program = reformatWarmupCells(program);                   // step 9\n      program = repairPhase15Program(program);                    // step 10: safe ordering only\n      validatePhase15FinalProgram(program, intake);              // step 11: variation-aware final QA\n      await onProgress("finalizing", attempt, "quality checks passed including Phase 15 v5");\n      return program;',
+  '      program = reformatWarmupCells(program);                   // step 9\n      return program;\n    };',
+  '      program = reformatWarmupCells(program);                   // step 9\n      program = repairPhase15Program(program);                    // step 10: safe ordering only\n      validatePhase15FinalProgram(program, intake);              // step 11: variation-aware final QA\n      return program;\n    };',
   "validator pipeline"
+);
+
+once(
+  '      await onProgress("finalizing", attempt, "quality checks passed");\n      return finished;',
+  '      await onProgress("finalizing", attempt, "quality checks passed including Phase 15 v5");\n      return finished;',
+  "validator pipeline progress label"
 );
 
 once(

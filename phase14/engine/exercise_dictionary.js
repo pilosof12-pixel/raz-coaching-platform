@@ -1133,6 +1133,62 @@ function canonicalFromNorm(core) {
   return null;
 }
 
+// A hard substitution changes the movement, which stops two cells in the row
+// from being true.
+//
+// The load is the dangerous one. An absolute kg was chosen for the movement the
+// model wrote, and it only transfers when the substitute is loaded the same way.
+// A sandbag carry's 40 kg is a farmer carry's 40 kg, but a 40 kg lat pulldown is
+// not a 40 kg weighted pull-up, and a 100 kg back squat is emphatically not a
+// 100 kg Bulgarian split squat -- that one is roughly double the real per-leg
+// load, handed to the client as a prescription. Where the load does not transfer
+// the row falls back to the RPE-selected loading the engine already uses when no
+// benchmark anchors a lift.
+//
+// The note is the quality one. Overwriting it deleted the coaching cue and left
+// the client a row whose only note explains the substitution's own paperwork.
+// Keep the cue, unless it talks about the movement or implement we just removed.
+const LOADABLE_IMPLEMENTS = new Set([
+  "barbell", "dumbbells", "kettlebells", "sandbag", "sled", "plates",
+  "weighted_vest", "cable_stack", "machine", "smith_machine", "trap_bar",
+]);
+const ABSOLUTE_LOAD_CELL = /\d+(?:\.\d+)?\s*(?:kg|kgs|lb|lbs)\b/i;
+// Implement nouns a cue written for the old movement would be wrong about.
+const CUE_NAMES_AN_IMPLEMENT = /\b(?:machine|cable|stack|pull-?down|pulldown|sled|prowler|sandbag|erg|rower|assault bike)\b/i;
+
+function isImplementLoaded(name) {
+  const m = matchDictionary(name);
+  const canonical = m.status === "alias" ? m.canonical : (canonicalFromNorm(name) || name);
+  const req = EXERCISE_EQUIPMENT_REQUIREMENTS.get(canonical) || (m.composed ? m.requirements : null);
+  return Boolean(req && req.some((t) => LOADABLE_IMPLEMENTS.has(t)));
+}
+
+function cueSurvivesSubstitution(cue, core) {
+  if (!cue) return false;
+  if (CUE_NAMES_AN_IMPLEMENT.test(cue)) return false;
+  const words = String(core || "").toLowerCase().match(/[a-z]{4,}/g) || [];
+  return !words.some((w) => new RegExp(`\\b${w.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}`, "i").test(cue));
+}
+
+// Rewrite one row for a substitution: rename the movement, drop a load that does
+// not carry across, and explain the swap without discarding the coaching.
+function applyRowSubstitution(cells, ctx, core, replacement, reason) {
+  cells[ctx.exIdx] = cells[ctx.exIdx].replace(core, replacement);
+  const loadIdx = colIdx(ctx.header, "weight", "load / target", "load/target");
+  if (loadIdx >= 0 && loadIdx < cells.length
+    && ABSOLUTE_LOAD_CELL.test(String(cells[loadIdx] || ""))
+    && !(isImplementLoaded(core) && isImplementLoaded(replacement))) {
+    cells[loadIdx] = "RPE-selected load";
+  }
+  const notesIdx = ctx.header.indexOf("notes");
+  if (notesIdx >= 0 && notesIdx < cells.length) {
+    const sentence = `Substituted for ${core}: ${reason}`;
+    const cue = String(cells[notesIdx] || "").trim();
+    cells[notesIdx] = cueSurvivesSubstitution(cue, core) ? `${sentence} ${cue}` : sentence;
+  }
+  return cells;
+}
+
 const EQUIPMENT_SUBSTITUTIONS = new Map([
   ["Assault Bike", { outdoor: "Hill Sprints", default: "Burpee EMOM" }],
   ["Rower", { outdoor: "Hill Sprints", default: "Burpee EMOM" }],
@@ -1186,12 +1242,7 @@ export function hardSubstituteEquipment(program, intake = {}) {
     const subReq = EXERCISE_EQUIPMENT_REQUIREMENTS.get(subCanonical)
       || (subMatch.composed ? subMatch.requirements : null);
     if (subReq && subReq.length && !subReq.every((t) => effective.has(t))) return null;
-    cells[ctx.exIdx] = cell.replace(core, replacement);
-    const notesIdx = ctx.header.indexOf("notes");
-    if (notesIdx >= 0 && notesIdx < cells.length) {
-      cells[notesIdx] = `Substituted for ${core}: not available at your training location.`;
-    }
-    return cells;
+    return applyRowSubstitution(cells, ctx, core, replacement, "not available at your training location.");
   });
 }
 
@@ -1251,12 +1302,8 @@ export function hardSubstituteUnilateral(program, intake = {}) {
     else replacement = "Weighted Pistol Squat";
     // final fallback if none of the above make sense
     if (!replacement) replacement = "5-Second Eccentric Pistol Squat";
-    cells[ctx.exIdx] = cell.replace(core, replacement);
-    const notesIdx = ctx.header.indexOf("notes");
-    if (notesIdx >= 0 && notesIdx < cells.length) {
-      cells[notesIdx] = `Substituted for ${core}: your benchmark shows the original would be under-stimulating.`;
-    }
-    return cells;
+    return applyRowSubstitution(cells, ctx, core, replacement,
+      "your benchmark shows the original would be under-stimulating.");
   });
 }
 
