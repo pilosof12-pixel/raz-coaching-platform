@@ -1054,6 +1054,26 @@
     "killedLive": ""
   },
   {
+    "code": "ISOMETRIC_DURATION_MUST_BE_IN_PRESCRIPTION",
+    "modules": [
+      "engine/isometric_duration.js"
+    ],
+    "owners": [
+      "collectIsometricDurationFlags"
+    ],
+    "advisory": false,
+    "reachable": true,
+    "repairs": [
+      "repairIsometricDuration"
+    ],
+    "wired": [
+      "repairIsometricDuration"
+    ],
+    "tested": true,
+    "stressed": false,
+    "killedLive": ""
+  },
+  {
     "code": "LOW_INTENSITY_PACE_CONTRADICTS_CURRENT_PERFORMANCE",
     "modules": [
       "engine/phase15_elite_guardrails.js"

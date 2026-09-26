@@ -50,6 +50,7 @@ import { repairConsecutiveRepGoal } from './consecutive_rep_goal.js';
 import { ladderOf, kgOf } from './tsv_rows.js';
 import { repairSupportivePullBudget } from './supportive_pull_budget.js';
 import { repairAccessoryBudget } from './accessory_budget.js';
+import { repairIsometricDuration } from './isometric_duration.js';
 import { ENDURANCE_REPAIRS, repairAccessoryRedundancy, repairTaperPowerSpike } from './endurance_block_repair.js';
 import { STATEMENT_REPAIRS } from './program_statement_repair.js';
 import { repairConsecutiveTrainingDays } from './consecutive_day_repair.js';
@@ -182,10 +183,30 @@ function replaceSentence(text, from, to, phrase) {
   return text.slice(0, owner.index) + lead + body + trailing + text.slice(owner.index + owner[0].length);
 }
 
+// A conjunction or a clause boundary can carry a new clause. A determiner, a
+// number or an adjective cannot: whatever it was modifying has just been removed,
+// so splicing a standalone clause after it leaves the modifier dangling.
+//
+// This is what shipped in run #142 and the coach charged it for the third time:
+// "aim for a slightly calmer hold the total reps", "make the hold the total
+// reps", "same load, one hold the set count". Each is a phrase spliced onto words
+// that were describing the verb it replaced. Where the join cannot work, the
+// whole sentence is restated instead -- blunter, and the coach has never charged
+// bluntness.
+const CAN_PRECEDE_A_CLAUSE = /(?:[.;!?,]|\b(?:and|but|or|so|then|otherwise|instead|however)\b)\s*$/i;
+// Only prose can dangle. The reps cell is repaired through this same path and
+// relies on the phrase being spliced in so the cell can then be stripped back to
+// its bare dose -- "2 Lower the volume this week." becomes "2", not a sentence.
+// A dose is a number, and a number in front of the claim was never modifying it.
+const ENDS_IN_A_WORD = /[A-Za-z]\s*$/;
+
 function replaceClaim(text, from, to, phrase) {
   const span = strandedSpan(text, from, to);
   const before = text.slice(0, span.start).replace(/\s+$/, '');
   const startsSentence = !before || /[.!?]$/.test(before);
+  if (!startsSentence && ENDS_IN_A_WORD.test(before) && !CAN_PRECEDE_A_CLAUSE.test(before)) {
+    return replaceSentence(text, from, to, phrase);
+  }
   const body = startsSentence
     ? phrase.charAt(0).toUpperCase() + phrase.slice(1)
     : phrase.charAt(0).toLowerCase() + phrase.slice(1);
@@ -1500,6 +1521,14 @@ export function repairDeterministicContradictions(program, intake = {}) {
   // Before the note pass and the structural repairs, so everything downstream
   // sees the prescription the athlete will actually train: a goal stated as
   // consecutive reps has to be trained in sets, not only in weekly volume.
+  // Before the note passes, so a duration moved into the prescription is what the
+  // notes are then reconciled against.
+  const heldForTime = repairIsometricDuration(candidate, intake);
+  if (heldForTime.changed) {
+    candidate = heldForTime.program;
+    repairs.push({ type: 'isometricDuration', moves: heldForTime.moves.length });
+  }
+
   const accessories = repairAccessoryBudget(candidate, intake);
   if (accessories.changed) {
     candidate = accessories.program;
