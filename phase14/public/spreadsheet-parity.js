@@ -2,23 +2,21 @@
 // Overrides the older raw Strength Block workbook with the approved client structure:
 // Overview -> Warm-Up -> Week 1 -> Week 2 -> Week 3 -> Week 4.
 (() => {
-  // Black and turquoise. The workbook was navy and mint; these are the brand's
-  // two colours, so the sheet the client keeps looks like the rest of the brand.
-  //
-  // The two colour-named constants are renamed with their values -- a constant
-  // called INK holding black is a trap for whoever reads this next. The rest are
-  // named for the role they fill, not the colour, so only their values move.
-  const INK = 'FF000000';        // title bands
-  const INK_SOFT = 'FF0D1A17';   // subtitle band: near-black, faint turquoise cast
-  const BAND = 'FF0E7C6B';       // deep turquoise
-  const HEADER = 'FF0E7C6B';     // column-header rows, white text on deep turquoise
-  const BODY = 'FFE8F8F5';       // turquoise tint, readable under black text
-  const LABEL = 'FFF1F6F5';      // label column, a step lighter than the body
-  const DAY_BAND = 'FFB8EDE4';   // session / section bands
+  // The brand's own black and turquoise, taken from the logo file rather than
+  // guessed: the mark is #00F5D3 on #221F1F. INK matches that background exactly,
+  // so the logo sits on the title band with no rectangle around it, and the rest
+  // are shades and tints of the same turquoise hue rather than invented teals.
+  const INK = 'FF221F1F';        // title bands, and the logo's own background
+  const INK_SOFT = 'FF2E2A2A';   // subtitle band, one step up from the brand black
+  const BAND = 'FF007060';       // deep shade of the brand hue
+  const HEADER = 'FF007060';     // column-header rows, white text
+  const BODY = 'FFE9FDF9';       // the faintest tint of the brand turquoise
+  const LABEL = 'FFF3FBF9';      // label column, a step lighter than the body
+  const DAY_BAND = 'FF93F6E5';   // session / section bands, dark text
   const WHITE = 'FFFFFFFF';
-  const TEXT = 'FF0B1F1A';       // near-black with a green cast, not pure grey
-  const LINK = 'FF0E7C6B';       // the exercise-name demo link, underlined
-  const ON_DARK = 'FFD7F5EF';    // subtitle text sitting on INK_SOFT
+  const TEXT = 'FF221F1F';       // body text in the brand black
+  const LINK = 'FF007060';       // the exercise-name demo link
+  const ON_DARK = 'FF00F5D3';    // the brand turquoise itself, on the dark bands
 
   // Which language this workbook is in.
   //
@@ -271,10 +269,23 @@
     } catch(e) { return null; }
   }
 
+  // "מתח (Pull-up)" -> "Pull-up". LOCALIZATION_RULES requires a Hebrew Exercise
+  // cell to carry its English canonical in parentheses precisely so the demo link
+  // can be built from it.
+  const bilingualEnglish = (raw) => {
+    const m = String(raw||'').trim().match(/^(.+?)\s*\(([^)]+)\)\s*$/);
+    return (m && /[\u0590-\u05FF]/.test(m[1]) && /[A-Za-z]/.test(m[2])) ? m[2].trim() : null;
+  };
+
   function fallbackDemo(name) {
     const direct = window.ExerciseDemos?.resolveExerciseDemo ? window.ExerciseDemos.resolveExerciseDemo(name) : null;
     if(direct?.url) return direct.url;
-    return 'https://www.youtube.com/results?search_query=' + encodeURIComponent(clean(name) + ' exercise demo').replace(/%20/g,'+');
+    // The library is optional -- buildParitySpreadsheet catches its load failure
+    // and carries on -- and this branch used the raw name, so a Hebrew program
+    // whose demo library had not loaded sent every athlete to a Hebrew-language
+    // search. The English the cell already carries is read here too.
+    const query = bilingualEnglish(name) || clean(name);
+    return 'https://www.youtube.com/results?search_query=' + encodeURIComponent(query + ' exercise demo').replace(/%20/g,'+');
   }
   function setHyperlink(cell, name, visibleText='Open demo', linkStyle=true) {
     // A protocol row carries its drills in the coaching note and has no
@@ -452,8 +463,10 @@
       // Floating over the black title band, left-aligned, with the row grown to
       // fit it. The title text keeps its own cell, so a missing logo changes
       // nothing about the layout.
-      ws.getRow(1).height=44;
-      ws.addImage(logoId,{ tl:{col:0.15,row:0.15}, ext:{width:132,height:44} });
+      // The mark is taller than it is wide (518x615 in the supplied artwork), so
+      // the width follows the height rather than stretching it to a banner.
+      ws.getRow(1).height=46;
+      ws.addImage(logoId,{ tl:{col:0.12,row:0.10}, ext:{width:44,height:52} });
     }
     // This said "EXACT LIVE PRODUCTION ACCEPTANCE — 4-WEEK BLOCK". That is our
     // acceptance-harness vocabulary on the first line of the client's own file.

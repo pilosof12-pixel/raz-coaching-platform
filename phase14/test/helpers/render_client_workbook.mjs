@@ -8,7 +8,7 @@ import vm from 'node:vm';
 
 const ROOT = path.join(path.dirname(fileURLToPath(import.meta.url)), '..', '..');
 
-export async function renderParityWorkbook(program, intake, cwd = ROOT, logoPath = null) {
+export async function renderParityWorkbook(program, intake, cwd = ROOT, logoPath = null, withDemoLibrary = false) {
   let raw = null;
   const sandbox = { console, setTimeout, clearTimeout, Buffer, process, TextEncoder, TextDecoder };
   sandbox.window = sandbox; sandbox.self = sandbox; sandbox.globalThis = sandbox;
@@ -28,6 +28,10 @@ export async function renderParityWorkbook(program, intake, cwd = ROOT, logoPath
   };
   sandbox.btoa = (b) => Buffer.from(b, 'binary').toString('base64');
   sandbox.fetch = async (url) => {
+    const name = String(url).includes('overrides') ? 'exercise_demo_overrides.json' : 'exercise_demos.json';
+    if (String(url).includes('exercise_demo')) {
+      return { ok: true, json: async () => JSON.parse(fs.readFileSync(`${cwd}/public/data/${name}`, 'utf8')) };
+    }
     if (String(url).includes('brand-logo.png') && logoPath && fs.existsSync(logoPath)) {
       const buf = fs.readFileSync(logoPath);
       return { ok: true, arrayBuffer: async () => buf.buffer.slice(buf.byteOffset, buf.byteOffset + buf.byteLength) };
@@ -36,6 +40,13 @@ export async function renderParityWorkbook(program, intake, cwd = ROOT, logoPath
   };
   vm.createContext(sandbox);
   vm.runInContext(fs.readFileSync(`${cwd}/public/exceljs.lib.js`, 'utf8'), sandbox, { filename: 'exceljs.lib.js' });
+  // The demo library is optional in production: buildParitySpreadsheet catches a
+  // load failure and carries on with search links. Both paths matter, so the
+  // caller chooses which one this render exercises.
+  if (withDemoLibrary) {
+    sandbox.document.getElementById = () => null;
+    vm.runInContext(fs.readFileSync(`${cwd}/public/exerciseDemos.js`, 'utf8'), sandbox, { filename: 'exerciseDemos.js' });
+  }
   vm.runInContext(fs.readFileSync(`${cwd}/public/spreadsheet-parity.js`, 'utf8'), sandbox, { filename: 'spreadsheet-parity.js' });
   const rows = await sandbox.window.buildStrengthSpreadsheet(program, intake);
   // Re-open in the same realm: a Buffer made outside it fails JSZip's type check.

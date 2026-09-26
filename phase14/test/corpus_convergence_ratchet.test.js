@@ -83,4 +83,21 @@ test('the number measures the engine, not the weekday', () => {
     src.indexOf("process.env.CORPUS_NOW = '") < src.indexOf("await import('./corpus.mjs')"),
     'the pin must precede the import it exists to affect',
   );
+  // Pinning the env var fixes the dates the fixtures are BUILT with. It does not
+  // fix the clock the rules are EVALUATED against: every engine rule signed
+  // `(program, intake, now = Date.now())` read the real clock regardless, so the
+  // fixtures' competition dates sat on the pinned day while the rules measured
+  // the distance to them from today, and the gap widened every real day. That is
+  // the 25 / 26 / 22 drift this file's header records.
+  assert.match(src, /Date\.now = \(\) => CORPUS_NOW/, 'the evaluation clock must be pinned too');
+  assert.match(src, /finally \{ Date\.now = real; \}/, 'and released afterwards');
+});
+
+test('measuring the corpus does not leave the clock frozen', async () => {
+  // This module is imported by tests; a clock frozen at import would follow it
+  // into whatever else the process runs and quietly date every one of them.
+  const { convergence } = await import('../scripts/corpus_convergence.mjs');
+  convergence();
+  assert.ok(Math.abs(Date.now() - new Date().getTime()) < 1000,
+    'Date.now must be the real clock again once the measurement is done');
 });

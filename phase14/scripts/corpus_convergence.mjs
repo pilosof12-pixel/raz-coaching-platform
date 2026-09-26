@@ -35,24 +35,45 @@ if (!process.env.CORPUS_NOW) process.env.CORPUS_NOW = '2026-09-23T12:00:00Z';
 // clock and the corpus would be built before the pin existed. The first version
 // of this file set the variable and imported statically, and reported the
 // unpinned number while claiming to be pinned.
-const { CORPUS } = await import('./corpus.mjs');
+const { CORPUS, CORPUS_NOW } = await import('./corpus.mjs');
 const { validateRepairableProgramBundle } = await import('../engine/repairable_validation_bundle.js');
 
 const DIR = path.join(path.dirname(fileURLToPath(import.meta.url)), '..', 'test', 'fixtures');
 
+// Pinning CORPUS_NOW fixes the dates the fixture intakes are BUILT with. It does
+// not fix the clock the rules are EVALUATED against: a rule signed
+// `(program, intake, now = Date.now())` reads the real clock whatever the corpus
+// was built for, so the fixtures' competition dates sat at the pinned day while
+// V79 measured the distance to them from today. The gap widens every real day,
+// which is the drift the header above records -- 25, then 26, then 22 -- and it
+// is the script reporting an unpinned number while saying it is pinned, which is
+// the exact failure the dynamic import below was added to avoid.
+//
+// Frozen around the measurement and restored afterwards, rather than at import:
+// this module is imported by the ratchet test, and a permanently frozen clock
+// would follow it into whatever else that process runs.
+function withPinnedClock(fn) {
+  if (!CORPUS_NOW) return fn();
+  const real = Date.now;
+  Date.now = () => CORPUS_NOW;
+  try { return fn(); } finally { Date.now = real; }
+}
+
 export function convergence() {
-  const rows = [];
-  for (const [file, intake] of CORPUS) {
-    const program = fs.readFileSync(path.join(DIR, file), 'utf8');
-    try {
-      validateRepairableProgramBundle(program, intake);
-      rows.push({ file, accepted: true, codes: [] });
-    } catch (e) {
-      const codes = [...new Set((e.flags || []).map((f) => f.code).filter(Boolean))].sort();
-      rows.push({ file, accepted: false, codes });
+  return withPinnedClock(() => {
+    const rows = [];
+    for (const [file, intake] of CORPUS) {
+      const program = fs.readFileSync(path.join(DIR, file), 'utf8');
+      try {
+        validateRepairableProgramBundle(program, intake);
+        rows.push({ file, accepted: true, codes: [] });
+      } catch (e) {
+        const codes = [...new Set((e.flags || []).map((f) => f.code).filter(Boolean))].sort();
+        rows.push({ file, accepted: false, codes });
+      }
     }
-  }
-  return rows;
+    return rows;
+  });
 }
 
 if (import.meta.url === `file://${process.argv[1]}`) {

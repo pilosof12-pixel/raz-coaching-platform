@@ -87,10 +87,13 @@ test('the workbook is black and turquoise', async () => {
   const { wb } = await renderParityWorkbook(ENGLISH, INTAKE);
   const ov = wb.getWorksheet('Overview');
   const w1 = wb.getWorksheet('Week 1');
-  assert.equal(fillOf(ov.getCell(1, 1)), 'FF000000', 'the title band is black');
-  assert.equal(fillOf(w1.getCell(4, 1)), 'FF0E7C6B', 'column headers are deep turquoise');
-  assert.equal(fillOf(w1.getCell(5, 1)), 'FFB8EDE4', 'session bands are turquoise');
-  assert.equal(fillOf(w1.getCell(6, 1)), 'FFE8F8F5', 'body rows are a turquoise tint');
+  // The values come from the brand's own logo artwork -- #00F5D3 on #221F1F --
+  // not from a guess at "turquoise". The title band matching the logo's own
+  // background is what lets the mark sit on it without a rectangle around it.
+  assert.equal(fillOf(ov.getCell(1, 1)), 'FF221F1F', 'the title band is the brand black');
+  assert.equal(fillOf(w1.getCell(4, 1)), 'FF007060', 'column headers are a deep shade of the brand hue');
+  assert.equal(fillOf(w1.getCell(5, 1)), 'FF93F6E5', 'session bands are a brand turquoise tint');
+  assert.equal(fillOf(w1.getCell(6, 1)), 'FFE9FDF9', 'body rows are the faintest tint');
 });
 
 test('every exercise name is a link and looks like one', async () => {
@@ -104,7 +107,7 @@ test('every exercise name is a link and looks like one', async () => {
     assert.match(String(cell.hyperlink), /^https:\/\/www\.youtube\.com\//);
     // Clickable is not enough: a name rendered in body text tells the client
     // nothing, and pressing the exercise title is how they reach the demo.
-    assert.equal(cell.font.color.argb, 'FF0E7C6B', `row ${r} link needs the link colour`);
+    assert.equal(cell.font.color.argb, 'FF007060', `row ${r} link needs the link colour`);
   }
   assert.ok(linked >= 10, `expected the week's exercises to be linked, found ${linked}`);
 });
@@ -150,5 +153,5 @@ test('a brand logo is embedded when one is supplied', async () => {
   const { wb } = await renderParityWorkbook(ENGLISH, INTAKE, ROOT, logo);
   const ov = wb.getWorksheet('Overview');
   assert.equal(ov.getImages().length, 1, 'public/data/brand-logo.png is picked up when present');
-  assert.equal(ov.getRow(1).height, 44, 'the title row grows to fit it');
+  assert.equal(ov.getRow(1).height, 46, 'the title row grows to fit it');
 });

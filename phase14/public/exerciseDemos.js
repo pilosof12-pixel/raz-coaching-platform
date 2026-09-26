@@ -34,12 +34,48 @@
   }
 
   const HEBREW_TO_ENGLISH = {
-    "סקוואט אחורי": "Back Squat", "סקוואט קדמי": "Front Squat", "דדליפט": "Deadlift",
-    "דדליפט רומני": "Romanian Deadlift", "לחיצת חזה": "Bench Press", "לחיצת כתפיים": "Overhead Press",
-    "מתח": "Pull-up", "דיפ": "Dip", "לחיצת עמידת ידיים על הקיר": "Wall Handstand Push-up",
+    // Kept in step with HEBREW_EXERCISE_MAP in engine/exercise_dictionary.js, which
+    // is the authoritative Hebrew->English table; a test asserts this covers all of
+    // it. This copy had drifted to 16 of its 29 entries, and the gap is what sent a
+    // Hebrew athlete's "פיסטול סקוואט" to a Hebrew-language search instead of a
+    // Pistol Squat demonstration.
+    //
+    // This is the fallback, not the mechanism. LOCALIZATION_RULES now requires every
+    // Hebrew Exercise cell to carry its English canonical in parentheses, and
+    // canonicalLookupName reads that first, so a correctly translated program never
+    // reaches this table. It is here for programs translated under the old rule,
+    // which asked for the English only on a movement's first appearance in a week.
+    "סקוואט אחורי": "Back Squat", "סקוואט קדמי": "Front Squat", "סקוואט": "Bodyweight Squat",
+    "סקוואט גוף מלא": "Bodyweight Squat", "דדליפט": "Deadlift", "דדליפט רומני": "Romanian Deadlift",
+    "דדליפט רומני על רגל אחת": "Single-Leg Romanian Deadlift", "לחיצת חזה": "Bench Press",
+    "לחיצת כתפיים": "Overhead Press", "מתח": "Pull-up", "מתח בהחזקת סופינציה": "Chin-up",
+    "דיפ": "Dip", "חתירה": "Barbell Row", "היפ תראסט": "Hip Thrust",
+    "ספליט סקוואט בולגרי": "Bulgarian Split Squat", "פיסטול סקוואט": "Pistol Squat",
+    "עלייה על ספסל": "Step-Up", "לחיצת עמידת ידיים על הקיר": "Wall Handstand Push-up",
     "לחיצת עמידת ידיים חופשית": "Freestanding Handstand Push-up", "פרונט לבר": "Front Lever",
     "דגל אנושי": "Human Flag", "פלאנץ": "Planche", "מאסל-אפ": "Muscle-up", "מאסל אפ": "Muscle-up",
-    "מתח יד אחת": "One-Arm Pull-up"
+    "מתח יד אחת": "One-Arm Pull-up", "שכיבות סמיכה": "Push-up", "ריצת גבעה": "Hill Sprint",
+    "ספרינט": "Sprint", "קפיצה על קופסה": "Box Jump",
+
+    // Movements this platform writes that the engine's input table does not carry,
+    // because it maps what a client types in an intake rather than what the engine
+    // prescribes back.
+    "מתח במשקל": "Weighted Pull-up", "דיפ במשקל": "Weighted Dip",
+    "מאסל-אפ בטבעות": "Ring Muscle-up", "מאסל אפ בטבעות": "Ring Muscle-up",
+    "חתירה הפוכה": "Inverted Row", "חתירה עם גומייה": "Band Row",
+    "מתח סקפולרי": "Scapular Pull-up", "פלאנץ' טאק מתקדם": "Advanced Tuck Planche",
+    "פלאנץ טאק מתקדם": "Advanced Tuck Planche", "פלאנץ' פיסוק": "Straddle Planche",
+    "פלאנץ פיסוק": "Straddle Planche", "פרונט לבר טאק": "Tuck Front Lever",
+    "עמידת ידיים": "Handstand", "עמידת ידיים חופשית": "Freestanding Handstand",
+    "אחזקת עמידת ידיים": "Handstand Hold", "לחיצת עמידת ידיים": "Handstand Push-up",
+    "פלאנק": "Plank", "פלאנק צד": "Side Plank", "הולו הולד": "Hollow Hold",
+    "אל-סיט": "L-Sit", "אל סיט": "L-Sit", "לחיצת פאלוף": "Pallof Press",
+    "הליכת החקלאי": "Farmer Carry", "כפיפת ברך נורדית": "Nordic Hamstring Curl",
+    "קפיצה לרוחק": "Broad Jump", "לאנג' בהליכה": "Walking Lunge", "לאנג בהליכה": "Walking Lunge",
+    "ספליט סקוואט": "Split Squat", "הרמת רגליים בתלייה": "Hanging Leg Raise",
+    "דד באג": "Dead Bug", "גשר ישבן": "Glute Bridge", "הרמות עקבים": "Calf Raise",
+    "ריצה": "Run", "הליכה עם משקל": "Ruck", "כפיפת מרפקים": "Biceps Curl",
+
   };
 
   function canonicalLookupName(name) {
