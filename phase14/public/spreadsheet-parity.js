@@ -2,16 +2,133 @@
 // Overrides the older raw Strength Block workbook with the approved client structure:
 // Overview -> Warm-Up -> Week 1 -> Week 2 -> Week 3 -> Week 4.
 (() => {
-  const NAVY = 'FF0B1324';
-  const NAVY_2 = 'FF16213A';
-  const BAND = 'FF111C32';
-  const HEADER = 'FF263757';
-  const BODY = 'FFECFDF5';
-  const LABEL = 'FFF2F5F9';
-  const DAY_BAND = 'FFD9E5F5';
+  // Black and turquoise. The workbook was navy and mint; these are the brand's
+  // two colours, so the sheet the client keeps looks like the rest of the brand.
+  //
+  // The two colour-named constants are renamed with their values -- a constant
+  // called INK holding black is a trap for whoever reads this next. The rest are
+  // named for the role they fill, not the colour, so only their values move.
+  const INK = 'FF000000';        // title bands
+  const INK_SOFT = 'FF0D1A17';   // subtitle band: near-black, faint turquoise cast
+  const BAND = 'FF0E7C6B';       // deep turquoise
+  const HEADER = 'FF0E7C6B';     // column-header rows, white text on deep turquoise
+  const BODY = 'FFE8F8F5';       // turquoise tint, readable under black text
+  const LABEL = 'FFF1F6F5';      // label column, a step lighter than the body
+  const DAY_BAND = 'FFB8EDE4';   // session / section bands
   const WHITE = 'FFFFFFFF';
-  const TEXT = 'FF111827';
-  const LINK = 'FF0563C1';
+  const TEXT = 'FF0B1F1A';       // near-black with a green cast, not pure grey
+  const LINK = 'FF0E7C6B';       // the exercise-name demo link, underlined
+  const ON_DARK = 'FFD7F5EF';    // subtitle text sitting on INK_SOFT
+
+  // Which language this workbook is in.
+  //
+  // The premium exporter replaced the legacy one and did not carry its Hebrew
+  // support across, so spreadsheet.js still holds `rightToLeft: isHebrew` that
+  // nothing runs: a Hebrew client has been getting a left-to-right workbook.
+  //
+  // Read from the program text, exactly as app.js's detectProgramLanguage does,
+  // because the client can toggle the displayed program's language after the
+  // build and the export has to match what is on screen rather than what the
+  // intake once said.
+  let isHebrew = false;
+  const detectHebrew = (program) => /[\u0590-\u05FF]/.test(String(program || ''));
+
+  // Sheet chrome only. Column headers, tab names and the Mon/Tue day tokens stay
+  // English on purpose: LOCALIZATION_RULES keeps those structural in the program
+  // TSV too, so the workbook matches the program the athlete already sees. What
+  // gets translated is the prose this exporter writes itself.
+  const LABELS = {
+    blockSubtitle:   ['4-WEEK TRAINING BLOCK', 'בלוק אימון של 4 שבועות'],
+    athleteProfile:  ['ATHLETE PROFILE', 'פרופיל המתאמן'],
+    detail:          ['DETAIL', 'פירוט'],
+    weeklyStructure: ['WEEKLY STRUCTURE', 'מבנה השבוע'],
+    session:         ['SESSION', 'אימון'],
+    sessionType:     ['TYPE', 'סוג'],
+    coachingPurpose: ['COACHING PURPOSE', 'מטרת האימון'],
+    programRules:    ['PROGRAM RULES', 'כללי התוכנית'],
+    warmupTitle:     ['RAZ — WARM-UP / PREPARATION', 'RAZ — חימום / הכנה'],
+    warmupSubtitle:  ['Warm up for the session you are about to train. This prepares the work; it is not the work.',
+                      'בצע את החימום של האימון שאתה עומד לבצע. הוא מכין את העבודה, הוא אינו העבודה.'],
+    weekSubtitle:    ['Each band is one session. Record what you actually did in the Log column.',
+                      'כל רצועה היא אימון אחד. רשום ביומן את מה שבוצע בפועל.'],
+  };
+  const L = (key) => { const pair = LABELS[key] || ['','']; return isHebrew ? (pair[1] || pair[0]) : pair[0]; };
+
+  // Prose this exporter writes itself, keyed on the English it writes. Applied at
+  // the render sites rather than inside each generator, so the generators stay
+  // single-language and the English stays greppable. An unmapped string falls
+  // through as English, which is a partly-translated sheet rather than a blank one.
+  const HE = {
+    // Profile labels
+    'Age': 'גיל',
+    'Bodyweight': 'משקל גוף',
+    'Primary goals': 'מטרות עיקריות',
+    'Secondary goal': 'מטרה משנית',
+    'Muscle-up / pulling baseline': 'בסיס מאסל-אפ / משיכה',
+    'Handstand baseline': 'בסיס עמידת ידיים',
+    'Lower-body benchmark': 'נתון פלג גוף תחתון',
+    'Current benchmarks': 'נתוני פתיחה',
+    'Training frequency': 'תדירות אימונים',
+    'Equipment': 'ציוד',
+    'Concurrent sport': 'ספורט מקביל',
+    'Pain / injury': 'כאב / פציעה',
+    // Session types
+    'Handstand': 'עמידת ידיים',
+    'Bar muscle-up': 'מאסל-אפ במתח',
+    'Athletic / lower-body strength': 'כוח אתלטי / פלג גוף תחתון',
+    'Pull strength': 'כוח משיכה',
+    'Push strength': 'כוח דחיפה',
+    'Strength / skill session': 'אימון כוח / מוטוריקה',
+    // Session purposes
+    'Fresh skill practice; bar-specific pulling/transition; push/pull foundation; lower-body strength where relevant.':
+      'תרגול מוטורי במצב רענן; משיכה ומעבר ספציפיים למתח; בסיס דחיפה/משיכה; כוח פלג גוף תחתון היכן שרלוונטי.',
+    'Second direct exposure to both primary skills; complementary strength; preserve quality and athleticism.':
+      'חשיפה ישירה שנייה לשתי המוטוריקות העיקריות; כוח משלים; שמירה על איכות ואתלטיות.',
+    'Primary work first; supporting strength and accessories follow without displacing the stated goals.':
+      'העבודה העיקרית ראשונה; כוח תומך ותרגילי עזר אחריה, בלי לדחוק את המטרות שהוגדרו.',
+    // Program rules
+    'Progress the main goals only when rep quality and the prescribed effort remain intact.':
+      'קדם את המטרות העיקריות רק כאשר איכות החזרות והמאמץ שנקבע נשמרים.',
+    'Bar muscle-up progress stays bar-specific: direct transition practice plus high/explosive pulling; generic pulling is support, not a replacement.':
+      'התקדמות במאסל-אפ נשארת ספציפית למתח: תרגול מעבר ישיר יחד עם משיכה גבוהה/נפיצה; משיכה כללית היא תמיכה, לא תחליף.',
+    'Handstand progress is judged by better kick-up control, alignment and independent balance — not wall-hold duration alone.':
+      'התקדמות בעמידת ידיים נמדדת בשליטה טובה יותר בעלייה, ביישור ובאיזון עצמאי — לא במשך האחזקה על הקיר בלבד.',
+    'Skill quality comes before fatigue. No max-effort grinders or repeated failed attempts; stop when speed, position or confidence clearly deteriorates.':
+      'איכות מוטורית לפני עייפות. בלי סטים מתישים במאמץ מקסימלי ובלי נסיונות כושלים חוזרים; עצור כאשר המהירות, המיצב או הביטחון מתדרדרים באופן ברור.',
+    'Pain rule: stop or regress any movement that clearly worsens the reported issue; do not force the planned variation.':
+      'כלל הכאב: הפסק או הורד דרגה בכל תנועה שמחמירה באופן ברור את הבעיה שדווחה; אל תכריח את הווריאציה המתוכננת.',
+    'If time or recovery is limited, remove the lowest-priority accessory before cutting the primary skill/strength exposure.':
+      'אם הזמן או ההתאוששות מוגבלים, הסר קודם את תרגיל העזר בעל העדיפות הנמוכה ביותר, ורק אחר כך את החשיפה העיקרית לכוח או למוטוריקה.',
+    'The exercise name is the demo link: a curated direct demo where one exists, otherwise an exercise-specific search.':
+      'שם התרגיל הוא הקישור להדגמה: סרטון נבחר היכן שקיים, ואחרת חיפוש ממוקד לאותו תרגיל.',
+    // Warm-up sheet: category bands, purposes and notes
+    'WRIST / SHOULDER': 'שורש כף היד / כתף',
+    'SHOULDER': 'כתף',
+    'PULL': 'משיכה',
+    'LOWER': 'פלג גוף תחתון',
+    'JUMP PREP': 'הכנה לקפיצה',
+    'PRESS': 'דחיפה',
+    'GENERAL': 'כללי',
+    'Session-specific preparation': 'הכנה ייעודית לאימון',
+    'Prepare wrists for handstand loading': 'הכנת שורשי כף היד לעומס עמידת ידיים',
+    'Gentle, pain-free range.': 'טווח עדין, ללא כאב.',
+    'Prime shoulder control': 'הפעלת שליטה בכתף',
+    'Smooth reps; no fatigue.': 'חזרות חלקות; בלי לייצר עייפות.',
+    'Prime active hang and pulling mechanics': 'הפעלת תלייה אקטיבית ומכניקת משיכה',
+    'Elbows straight; full control.': 'מרפקים ישרים; שליטה מלאה.',
+    'Prepare hips and legs': 'הכנת מפרקי הירך והרגליים',
+    'Short and dynamic.': 'קצר ודינמי.',
+    'Prepare ankle stiffness and landing rhythm': 'הכנת קשיחות הקרסול וקצב הנחיתה',
+    'Quiet contacts.': 'מגע שקט עם הקרקע.',
+    'Prepare shoulder range': 'הכנת טווח התנועה בכתף',
+    'Smooth, controlled circles.': 'סיבובים חלקים ומבוקרים.',
+    'Easy movement + joint prep': 'תנועה קלה + הכנת מפרקים',
+    'Raise temperature without fatigue': 'העלאת חום הגוף בלי לייצר עייפות',
+    'Stay conversational and fresh.': 'הישאר בקצב שיחה ורענן.',
+    'Session': 'אימון',
+
+  };
+  const t = (en) => { const k=String(en==null?'':en); return (isHebrew && HE[k]) ? HE[k] : en; };
 
   const toList = (v) => Array.isArray(v) ? v.filter(Boolean).map(String) : (v ? [String(v)] : []);
   const text = (v) => v == null ? '' : String(v);
@@ -26,7 +143,11 @@
       color:{argb: opts.color || TEXT}, underline: !!opts.underline };
   }
   function align(cell, opts={}) {
-    cell.alignment = { vertical:'middle', horizontal:opts.horizontal || 'left', wrapText:true };
+    // readingOrder is what makes a mixed Hebrew/English cell lay out correctly.
+    // rightToLeft on the sheet flips the columns; without this the text inside a
+    // cell still runs the wrong way around an English exercise name or a load.
+    cell.alignment = { vertical:'middle', horizontal:opts.horizontal || 'left', wrapText:true,
+      readingOrder: isHebrew ? 'rtl' : 'ltr' };
   }
   function styleRange(ws, range, opts={}) {
     ws.getCell(range.split(':')[0]);
@@ -133,6 +254,23 @@
     }
     return parts.join(' | ');
   }
+  // The brand logo on the Overview sheet.
+  //
+  // Optional by design: the file is not in the repo, and a workbook that refuses
+  // to build because a logo is missing would be worse than one without a logo.
+  // Drop a PNG at public/data/brand-logo.png and it appears; leave it out and the
+  // sheet renders exactly as it does today.
+  async function loadLogo() {
+    try {
+      const res = await fetch('data/brand-logo.png', { cache:'no-cache' });
+      if(!res.ok) return null;
+      const bytes = new Uint8Array(await res.arrayBuffer());
+      if(!bytes.length) return null;
+      let binary=''; for(let i=0;i<bytes.length;i++) binary += String.fromCharCode(bytes[i]);
+      return { base64: btoa(binary), extension: 'png' };
+    } catch(e) { return null; }
+  }
+
   function fallbackDemo(name) {
     const direct = window.ExerciseDemos?.resolveExerciseDemo ? window.ExerciseDemos.resolveExerciseDemo(name) : null;
     if(direct?.url) return direct.url;
@@ -147,7 +285,11 @@
     if(!target){ cell.value=''; align(cell); return null; }
     const url=fallbackDemo(name);
     cell.value={text:String(visibleText||'').trim()||target,hyperlink:url,tooltip:'Open exercise demonstration'};
-    if(linkStyle) font(cell,{size:10,color:LINK,underline:true}); else font(cell,{size:11,color:TEXT});
+    // The exercise name is the link, so it has to look like one. It was rendered
+    // in plain body text: clickable, with nothing telling the client to click.
+    // Turquoise without an underline gives the affordance without turning a whole
+    // column of exercise names into a wall of underlined blue.
+    if(linkStyle) font(cell,{size:10,color:LINK,underline:true}); else font(cell,{size:11,color:LINK});
     align(cell);
     return url;
   }
@@ -201,7 +343,9 @@
 
   function sessionLabel(intake, session, i) {
     const flexible=String(intake.gym_availability_mode||'').toLowerCase()==='flexible' && !(intake.available_gym_days||[]).length;
-    return flexible ? `Session ${String.fromCharCode(65+i)}` : (session.day || `Session ${String.fromCharCode(65+i)}`);
+    // The letter is an index, not a word, so it stays; only "Session" translates.
+    const generic = `${t('Session')} ${String.fromCharCode(65+i)}`;
+    return flexible ? generic : (session.day || generic);
   }
   function sessionType(session) {
     const s=session.rows.map(r=>r.exercise).join(' ');
@@ -300,23 +444,50 @@
     return ex.total + ' training day' + (ex.total === 1 ? '' : 's') + '/week' + detail + sport;
   }
 
-  function renderOverview(ws, intake, week1) {
+  function renderOverview(ws, intake, week1, logoId=null) {
     ws.views=[{showGridLines:false}];
     [28,34,16,48].forEach((w,i)=>ws.getColumn(i+1).width=w);
-    mergeTitle(ws,1,4,overviewTitle(intake),NAVY,16);
-    mergeTitle(ws,2,4,'EXACT LIVE PRODUCTION ACCEPTANCE — 4-WEEK BLOCK',NAVY_2,10,'FFDCE7F7');
+    mergeTitle(ws,1,4,overviewTitle(intake),INK,16);
+    if(logoId!==null && logoId!==undefined){
+      // Floating over the black title band, left-aligned, with the row grown to
+      // fit it. The title text keeps its own cell, so a missing logo changes
+      // nothing about the layout.
+      ws.getRow(1).height=44;
+      ws.addImage(logoId,{ tl:{col:0.15,row:0.15}, ext:{width:132,height:44} });
+    }
+    // This said "EXACT LIVE PRODUCTION ACCEPTANCE — 4-WEEK BLOCK". That is our
+    // acceptance-harness vocabulary on the first line of the client's own file.
+    mergeTitle(ws,2,4,L('blockSubtitle'),INK_SOFT,10,ON_DARK);
     let row=4;
-    ['ATHLETE / PROGRAM','DETAIL','',''].forEach((v,i)=>{const c=ws.getRow(row).getCell(i+1);c.value=v;fill(c,HEADER);font(c,{size:10,bold:true,color:WHITE});align(c,{horizontal:'center'});});
+    [L('athleteProfile'),L('detail'),'',''].forEach((v,i)=>{const c=ws.getRow(row).getCell(i+1);c.value=v;fill(c,HEADER);font(c,{size:10,bold:true,color:WHITE});align(c,{horizontal:'center'});});
     row++;
     for(const [k,v] of profileRows(intake, describeExposures(weeklyExposures(week1), intake))){
       const a=ws.getRow(row).getCell(1), b=ws.getRow(row).getCell(2);
-      a.value=k; b.value=v; fill(a,LABEL); font(a,{size:10,bold:true}); align(a);
+      a.value=t(k); b.value=v; fill(a,LABEL); font(a,{size:10,bold:true}); align(a);
       ws.mergeCells(row,2,row,4); fill(b,BODY); font(b,{size:10}); align(b); ws.getRow(row).height=34; row++;
     }
     row++;
-    mergeTitle(ws,row,4,'PROGRAM RULES',DAY_BAND,10,'FF0B1324'); row++;
+    // What each training day is for. sessionType and sessionPurpose were written
+    // for this section and then nothing called them: the client got a profile and
+    // a rule list with no map of the week between them.
+    mergeTitle(ws,row,4,L('weeklyStructure'),DAY_BAND,10,TEXT); row++;
+    [L('session'),L('sessionType'),L('coachingPurpose'),''].forEach((v,i)=>{const c=ws.getRow(row).getCell(i+1);c.value=v;fill(c,HEADER);font(c,{size:10,bold:true,color:WHITE});align(c,{horizontal:'center'});});
+    row++;
+    sessions(week1).forEach((session,i)=>{
+      const a=ws.getRow(row).getCell(1), b=ws.getRow(row).getCell(2), c=ws.getRow(row).getCell(3);
+      a.value=sessionLabel(intake,session,i);
+      // sessionType joins its tags with " + ", so translate the tags not the join.
+      b.value=String(sessionType(session)).split(' + ').map(t).join(' + ');
+      c.value=t(sessionPurpose(session,i));
+      fill(a,LABEL); font(a,{size:10,bold:true}); align(a);
+      fill(b,BODY); font(b,{size:10}); align(b);
+      ws.mergeCells(row,3,row,4); fill(c,BODY); font(c,{size:10}); align(c);
+      ws.getRow(row).height=34; row++;
+    });
+    row++;
+    mergeTitle(ws,row,4,L('programRules'),DAY_BAND,10,TEXT); row++;
     for(const rule of programRules(intake)){
-      ws.mergeCells(row,1,row,4); const c=ws.getRow(row).getCell(1); c.value='• '+rule; fill(c,BODY); font(c,{size:10}); align(c); ws.getRow(row).height=32; row++;
+      ws.mergeCells(row,1,row,4); const c=ws.getRow(row).getCell(1); c.value='• '+t(rule); fill(c,BODY); font(c,{size:10}); align(c); ws.getRow(row).height=32; row++;
     }
   }
 
@@ -348,8 +519,10 @@
   function renderWarmup(ws, intake, week1) {
     ws.views=[{showGridLines:false}];
     [18,32,10,18,12,54].forEach((w,i)=>ws.getColumn(i+1).width=w);
-    mergeTitle(ws,1,6,'RAZ — WARM-UP / PREPARATION',NAVY,16);
-    mergeTitle(ws,2,6,'Warm-ups are separated from the weekly prescription so the training sheets stay clean and use the approved 11-column template.',NAVY_2,10,'FFDCE7F7');
+    mergeTitle(ws,1,6,L('warmupTitle'),INK,16);
+    // Was: "...stay clean and use the approved 11-column template" -- our template
+    // vocabulary, on the client's sheet, and wrong besides: this sheet has six columns.
+    mergeTitle(ws,2,6,L('warmupSubtitle'),INK_SOFT,10,ON_DARK);
     let row=4;
     ['SESSION / DAY','EXERCISE','SETS','REPS / DURATION','REST','COACHING NOTE'].forEach((v,j)=>{const c=ws.getRow(row).getCell(j+1);c.value=v;fill(c,HEADER);font(c,{size:10,bold:true,color:WHITE});align(c,{horizontal:'center'});});
     row++;
@@ -371,10 +544,11 @@
           }
         }
       } else {
-        items=derivedWarmup(session,intake).map(x=>{const [sets,reps]=splitWarmupDose(x[2]);return {exercise:x[1],sets,reps,rest:x[3]||'N/A',note:[x[4],x[5]].filter(Boolean).join(' ')};});
+        items=derivedWarmup(session,intake).map(x=>{const [sets,reps]=splitWarmupDose(x[2]);return {exercise:x[1],sets,reps,rest:x[3]||'N/A',note:[x[4],x[5]].filter(Boolean).map(t).join(' ')};});
       }
       items.forEach((item,itemIndex)=>{
-        const vals=[itemIndex===0?label:'',item.exercise,item.sets,item.reps,item.rest,item.note];
+        // The exercise name stays as written: it is the demo link's lookup key.
+        const vals=[itemIndex===0?label:'',item.exercise,item.sets,item.reps,item.rest,t(item.note)];
         vals.forEach((v,j)=>{const c=ws.getRow(row).getCell(j+1);c.value=v;fill(c,BODY);font(c,{size:10});align(c);});
         setHyperlink(ws.getRow(row).getCell(2),item.exercise,item.exercise,false);
         ws.getRow(row).height=34; row++;
@@ -482,8 +656,10 @@
   function renderWeek(ws, intake, week, program) {
     ws.views=[{showGridLines:false,state:'frozen',ySplit:4}];
     [32,24,9,18,14,16,58,16].forEach((w,i)=>ws.getColumn(i+1).width=w);
-    mergeTitle(ws,1,8,weekTitle(week.week, program),NAVY,16);
-    mergeTitle(ws,2,8,'Exact live production prescription in the approved client template. Day names are section bands, not a permanent data column.',NAVY_2,10,'FFDCE7F7');
+    mergeTitle(ws,1,8,weekTitle(week.week, program),INK,16);
+    // Was a description of our own data model -- "exact live production
+    // prescription", "not a permanent data column" -- which tells the athlete nothing.
+    mergeTitle(ws,2,8,L('weekSubtitle'),INK_SOFT,10,ON_DARK);
     // The exercise name carries its own demo link, so a separate Video column
     // duplicated it. Status and Done were tracking scaffolding nobody asked
     // for; Log is where an athlete writes what they actually did, and it reads
@@ -495,7 +671,7 @@
     const ss=sessions(week);
     ss.forEach((session,i)=>{
       ws.mergeCells(row,1,row,8);
-      const band=ws.getRow(row).getCell(1); band.value=sessionLabel(intake,session,i); fill(band,DAY_BAND); font(band,{size:10,bold:true,color:'FF0B1324'}); align(band); ws.getRow(row).height=24; row++;
+      const band=ws.getRow(row).getCell(1); band.value=sessionLabel(intake,session,i); fill(band,DAY_BAND); font(band,{size:10,bold:true,color:TEXT}); align(band); ws.getRow(row).height=24; row++;
       for(const r of session.rows){
         const vals=[r.exercise,r.load,r.sets,r.reps,r.rest,r.effort,r.notes,''];
         vals.forEach((v,j)=>{const c=ws.getRow(row).getCell(j+1);c.value=v;fill(c,BODY);font(c,{size:10});align(c,{horizontal:[3,4,5,6].includes(j+1)?'center':'left'});});
@@ -535,8 +711,8 @@
   function renderCampSchedule(ws, intake, camp) {
     ws.views=[{showGridLines:false}];
     [10,20,20,20,20,20,20,20,16].forEach((w,i)=>ws.getColumn(i+1).width=w);
-    mergeTitle(ws,1,9,'CAMP SCHEDULE — SPORT AND GYM',NAVY,16);
-    mergeTitle(ws,2,9,'Sport sessions are load. The gym is built around them.',NAVY_2,10,'FFDCE7F7');
+    mergeTitle(ws,1,9,'CAMP SCHEDULE — SPORT AND GYM',INK,16);
+    mergeTitle(ws,2,9,'Sport sessions are load. The gym is built around them.',INK_SOFT,10,ON_DARK);
     let row=4;
     if(camp.intro){ ws.mergeCells(row,1,row,9); const c=ws.getRow(row).getCell(1); c.value=camp.intro; font(c,{size:10}); align(c,{wrapText:true}); ws.getRow(row).height=30; row+=2; }
     const head=['Week',...camp.head];
@@ -554,12 +730,19 @@
     if(window.ExerciseDemos?.load){ try{await window.ExerciseDemos.load();}catch(e){console.warn('Exercise demo library unavailable; using search-link fallback.',e);} }
     const weeks=[1,2,3,4].map(n=>parseWeek(program,n));
     if(weeks.some(w=>!w.rows.length)) throw new Error('The program is missing one or more week tables, so the premium spreadsheet could not be built safely.');
+    isHebrew=detectHebrew(program);
     const wb=new ExcelJS.Workbook(); wb.creator='RAZ Performance Coaching Engine'; wb.created=new Date();
-    renderOverview(wb.addWorksheet('Overview'),intake,weeks[0]);
+    const logo=await loadLogo();
+    const logoId=logo? wb.addImage(logo) : null;
+    renderOverview(wb.addWorksheet('Overview'),intake,weeks[0],logoId);
     renderWarmup(wb.addWorksheet('Warm-Up'),intake,weeks[0]);
     const camp=parseCampSchedule(program);
     if(camp) renderCampSchedule(wb.addWorksheet('Camp Schedule'),intake,camp);
     weeks.forEach(w=>renderWeek(wb.addWorksheet(`Week ${w.week}`),intake,w,program));
+    // Every sheet, after they are all built: each renderer sets its own views for
+    // gridlines and frozen panes, so flipping them here is the one place that
+    // cannot be missed when a sheet is added later.
+    if(isHebrew) wb.worksheets.forEach(ws=>{ ws.views=(ws.views&&ws.views.length?ws.views:[{}]).map(v=>({...v, rightToLeft:true})); });
     const buffer=await wb.xlsx.writeBuffer();
     const blob=new Blob([buffer],{type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'});
     const url=URL.createObjectURL(blob); const a=document.createElement('a');

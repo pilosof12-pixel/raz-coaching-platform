@@ -14,9 +14,20 @@ test('approved spreadsheet has exact six-tab production structure',()=>{
 test('approved week sheets use one 8-column header and simple day bands',()=>{
   assert.match(src,/WEEK 1 — FOUNDATION/);
   assert.match(src,/WEEK 4 — CONSOLIDATE \/ EXPRESS/);
-  assert.match(src,/Exact live production prescription in the approved client template\. Day names are section bands, not a permanent data column\./);
+  // The week subtitle used to be pinned here verbatim. It read "Exact live
+  // production prescription in the approved client template. Day names are
+  // section bands, not a permanent data column." -- our acceptance vocabulary and
+  // a description of our own data model, on the client's sheet. What this test
+  // is for is that the week sheets have a subtitle and one 8-column header, not
+  // that the subtitle says any particular thing, so it now checks that and that
+  // the copy is client-facing.
+  assert.match(src,/mergeTitle\(ws,2,8,L\('weekSubtitle'\)/);
+  assert.doesNotMatch(src,/Exact live production prescription/);
   assert.match(src,/\['Exercise','Load \/ Target','Sets','Reps \/ Duration','Rest','Effort','Coaching Note','Log'\]/);
-  assert.match(src,/const DAY_BAND = 'FFD9E5F5'/);
+  // The band colour moved from the old navy/mint palette to the brand's
+  // turquoise. The assertion is that day bands have their own fill, not that it
+  // is one particular blue.
+  assert.match(src,/const DAY_BAND = 'FF[0-9A-F]{6}'/);
   assert.doesNotMatch(src,/COACH NOTES/);
   assert.doesNotMatch(src,/WARM-UP • Use/);
 });

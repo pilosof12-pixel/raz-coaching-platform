@@ -55,8 +55,23 @@ test('approved exporter renders day/session labels as section bands before the 8
   assert.match(renderWeek, /const ss=sessions\(week\)/);
 });
 
-test('flexible schedules export Session A/B rather than invented weekdays', () => {
-  assert.match(parity, /return flexible \? `Session \$\{String\.fromCharCode\(65\+i\)\}`/);
+test('flexible schedules export Session A/B rather than invented weekdays', async () => {
+  // Was a grep for the exact expression, which broke the moment "Session" had to
+  // become translatable. Render it instead: what matters is the label the client
+  // reads, not how it is spelled in the source.
+  const { renderParityWorkbook, cellText } = await import('./helpers/render_client_workbook.mjs');
+  const fsMod = await import('node:fs');
+  const program = fsMod.readFileSync(new URL('../run143-advanced-calisthenics-for-coach.txt', import.meta.url), 'utf8');
+  const intake = JSON.parse(fsMod.readFileSync(new URL('./fixtures/run138_advanced_calisthenics_intake.json', import.meta.url), 'utf8'));
+
+  const { wb } = await renderParityWorkbook(program, intake);
+  const labels = [];
+  const wu = wb.getWorksheet('Warm-Up');
+  for (let r = 5; r <= 20; r += 1) { const v = cellText(wu.getCell(r, 1)); if (v) labels.push(v); }
+  assert.ok(labels.includes('Session A') && labels.includes('Session B'),
+    `flexible intake must export lettered sessions, got ${JSON.stringify(labels)}`);
+  assert.ok(!labels.some((v) => /^(?:Mon|Tue|Wed|Thu|Fri|Sat|Sun)\b/.test(v)),
+    'a flexible athlete was never promised a particular weekday');
 });
 
 test('approved exporter remains the final client spreadsheet implementation', () => {
