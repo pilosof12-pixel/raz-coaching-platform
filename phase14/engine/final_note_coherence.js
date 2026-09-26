@@ -91,7 +91,11 @@ function repairNote(note, { sets, reps, priorSets }) {
 
   // (b) "reduce/drop/trim one set" when the set count did not actually fall.
   if (Number.isFinite(sets) && Number.isFinite(priorSets) && sets >= priorSets) {
-    out = out.replace(/\b(?:reduce|drop|trim|cut|remove)\s+(?:one|a|1)\s+set\b[,.]?\s*/gi, () => {
+    // "with one less set" and "one fewer set" are the same claim as "reduce one
+    // set" and were not matched. A repair that trims a set count upstream turns
+    // that phrasing false, and run #142 shipped "Keep the best clean Week 3
+    // standard, but with one less set" on a week whose set count had not moved.
+    out = out.replace(/\b(?:(?:reduce|drop|trim|cut|remove)\s+(?:one|a|1)|(?:with\s+)?(?:one|1)\s+(?:less|fewer))\s+set\b[,.]?\s*/gi, () => {
       changes.push({ kind: 'false_set_reduction', sets, prior_sets: priorSets });
       return 'Hold the set count and consolidate through rep quality and a slightly lower effort, ';
     });

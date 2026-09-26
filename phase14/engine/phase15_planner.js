@@ -255,7 +255,13 @@ export function buildDeterministicBrief(intake = {}) {
     const bentArmProvoked = /bent[- ]arm|pull[- ]?up|chin[- ]?up|\brow\b|curl|weighted pull/i.test(provoking)
       && !/bent[- ]arm|pull[- ]?up|\brow\b/i.test(tolerated);
     if (straightArmProvoked && !bentArmProvoked) {
-      required.push('ELBOW DE-LOAD ORDER (STRAIGHT-ARM PROVOKED): the athlete\u2019s own account ties these symptoms to straight-arm loading, so the flare-up instruction must remove straight-arm volume first -- the most advanced planche or lever exposure, then the next -- and reach bent-arm pulling last. Name the specific rows in that order.');
+      // Both branches, even here. The current pattern decides which order leads,
+      // but symptoms move, and a program that only plans for the pattern the
+      // athlete has today leaves him guessing on the day it changes. The coach
+      // asked for this explicitly: "if symptoms do shift toward bent-arm pulling,
+      // the program does not define what to remove first".
+      required.push('ELBOW DE-LOAD ORDER (STRAIGHT-ARM PROVOKED): the athlete\u2019s own account ties these symptoms to straight-arm loading, so the flare-up instruction leads with straight-arm volume -- the most advanced planche or lever exposure, then the next -- and reaches bent-arm pulling last. Name the specific rows in that order.');
+      required.push('ELBOW DE-LOAD ORDER (SECOND BRANCH REQUIRED): state a second, shorter contingency for the case where symptoms instead follow bent-arm pulling, because that is the pattern this instruction does not yet cover and the athlete would otherwise have to guess. Order it by what the block can most afford to lose: the low-priority supporting row first, then the secondary skill exposure, then the volume session of the primary lift, and the primary heavy exposure only if symptoms persist after all three. Name the specific rows and days.');
     } else if (bentArmProvoked && !straightArmProvoked) {
       required.push('ELBOW DE-LOAD ORDER (BENT-ARM PROVOKED): the athlete\u2019s own account ties these symptoms to bent-arm pulling, so the flare-up instruction must reduce the light supporting bent-arm pulling on the non-primary days first -- rows and light pull-ups -- before touching straight-arm holds or the primary weighted work. Do not write a removal order that starts with planche or lever work here.');
     } else {

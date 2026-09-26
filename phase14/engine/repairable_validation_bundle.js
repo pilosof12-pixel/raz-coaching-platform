@@ -626,6 +626,18 @@ export function collectRepairableValidationFailures(program, intake = {}, option
   candidate = deterministicText.program;
   if (deterministicText.repaired) deterministic_repairs.push({ type: 'v35_deterministic_contradiction_repair', rows: deterministicText.repairs });
 
+  // And again, immediately, because the chain above changes prescriptions. The
+  // note pass ran before it and the consistency gate runs after it, so a set
+  // count trimmed in there left a note claiming a reduction that no longer
+  // happened -- and the gate threw before the end-of-bundle pass could reconcile
+  // it. Run #142 hit exactly that: "Keep the best clean Week 3 standard, but with
+  // one less set" on a week whose set count had stopped moving.
+  const notesAfterChain = normalizeFinalNoteCoherence(candidate, intake);
+  if (notesAfterChain.repaired) {
+    candidate = notesAfterChain.program;
+    deterministic_repairs.push({ type: 'final_note_coherence_after_chain', rows: notesAfterChain.repairs });
+  }
+
   const finalModel = parseProgramModel(candidate, intake);
   runRepairable(flags, () => validateAdvancedHybridManualAcceptanceSemantic(candidate, intake, finalModel));
   runRepairable(flags, () => validateAdvancedHybridCoachingSpecV1(candidate, intake, finalModel));

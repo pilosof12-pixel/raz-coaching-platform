@@ -96,3 +96,56 @@ test('no exercise, load or rep change beyond the trim it declares', () => {
     assert.ok(owned.has(line.split('\t')[1]), `invented a movement: ${line.split('\t')[1]}`);
   }
 });
+
+// --- elbow economy: frequency, not just intensity -----------------------------
+//
+// Run #142 put the primary work on Monday, Wednesday and Saturday and a support
+// row on Tuesday and Friday as well, so bent-arm pulling touched every training
+// day. The coach charged it: for a recurring medial-elbow signal, four support
+// exposures on top of the primary work are not worth the frequency. And Advanced
+// Tuck Planche sat at four sets of six seconds at RPE 8 on the same day as the
+// heaviest Weighted Pull-up, which is the opposite of the hierarchy the program
+// itself states.
+
+const RUN142 = fs.readFileSync(path.join(here, 'fixtures/run142_advanced_calisthenics.txt'), 'utf8');
+const w1rows = (p) => week1(p).split('\n').map((l) => l.split('\t'))
+  .filter((c) => c.length === 9 && c[0] !== 'Day' && !/^\s*\[WARMUP\]/.test(c[1]));
+
+test('support pulling shares a day that already pulls; it does not add one', () => {
+  const before = w1rows(RUN142).filter((c) => /Australian Pull-up/.test(c[1])).map((c) => c[0]);
+  assert.deepEqual(before, ['Tue', 'Wed', 'Fri'], 'fixture must start on three days');
+
+  const { program } = repairSupportivePullBudget(RUN142, INTAKE);
+  const after = w1rows(program).filter((c) => /Australian Pull-up/.test(c[1])).map((c) => c[0]);
+  assert.deepEqual(after, ['Wed'], 'only the exposure beside the muscle-up survives');
+});
+
+test('the muscle-up counts as bent-arm pulling', () => {
+  // It is not foundational strength and its name carries no "pull", so the
+  // ordinary pull test misses it -- while being the hardest bent-arm pull of the
+  // week. Wednesday is kept precisely because the muscle-up is already there.
+  const { program } = repairSupportivePullBudget(RUN142, INTAKE);
+  const wed = w1rows(program).filter((c) => c[0] === 'Wed').map((c) => c[1]);
+  assert.ok(wed.some((n) => /Muscle-up/i.test(n)));
+  assert.ok(wed.some((n) => /Australian Pull-up/i.test(n)));
+});
+
+test('straight-arm volume on the heaviest pull day drops to a maintenance touch', () => {
+  const beforeRow = w1rows(RUN142).find((c) => c[0] === 'Mon' && /Advanced Tuck Planche/.test(c[1]));
+  assert.equal(beforeRow[3], '4');
+  assert.equal(beforeRow[6], '8');
+
+  const { program } = repairSupportivePullBudget(RUN142, INTAKE);
+  const after = w1rows(program).find((c) => c[0] === 'Mon' && /Advanced Tuck Planche/.test(c[1]));
+  assert.equal(after[3], '2', 'two sets');
+  assert.equal(after[6], '7', 'at RPE 7');
+  // And the exposure still exists where the skill work lives.
+  assert.ok(w1rows(program).some((c) => c[0] !== 'Mon' && /Planche/.test(c[1])));
+});
+
+test('an athlete with no elbow signal keeps both', () => {
+  const clear = { ...INTAKE, injuries: 'None reported.', pain: { active: false, description: '', tolerated_movements: '' } };
+  const { moves } = repairSupportivePullBudget(RUN142, clear);
+  assert.deepEqual(moves.filter((m) => /elbow signal/.test(m.why || '')), []);
+  assert.deepEqual(moves.filter((m) => m.capped && /Planche/.test(m.capped)), []);
+});
