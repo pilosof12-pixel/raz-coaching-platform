@@ -43,13 +43,18 @@ jobs:
           if(!expected) throw new Error('checkout runtime fingerprint is empty');
           const sleep=ms=>new Promise(r=>setTimeout(r,ms));
           let last='';
-          for(let i=0;i<120;i++){
+          // 10 minutes was not enough. Run #141's deploy landed at 10m12s and only
+          // succeeded on the final poll; the run before it would have failed on
+          // infrastructure rather than on anything the generator did. Render's build
+          // time is not something this workflow controls, and losing a paid run to it
+          // is the expensive kind of flake.
+          for(let i=0;i<240;i++){
             try{
               const r=await fetch(base+'/runtime-version.txt?qa='+Date.now(),{headers:{'cache-control':'no-cache','accept':'text/plain'}});
               last=(await r.text()).trim();
               if(r.ok&&last===expected){console.log('EXACT_RUNTIME_OK',expected);process.exit(0);}
             }catch(e){last=String(e?.message||e);}
-            if(i<119) await sleep(5000);
+            if(i<239) await sleep(5000);
           }
           throw new Error(`exact runtime not deployed: expected=${expected} last=${last}`);
           NODE

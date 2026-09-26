@@ -72,9 +72,32 @@ const GEMINI_MODEL = process.env.GEMINI_MODEL || "gemini-2.5-flash";
 const OPENAI_API_KEY = process.env.OPENAI_API_KEY || "";
 const OPENAI_MODEL = process.env.OPENAI_MODEL || "gpt-5.4";
 const OPENAI_REASONING_EFFORT = process.env.OPENAI_REASONING_EFFORT || "high";
+const ALLOWED_REASONING_EFFORTS = new Set(["low", "medium", "high"]);
+// Reasoning effort is the biggest single lever on generation time, and until
+// now it could only be moved by redeploying -- so measuring what "medium"
+// costs in quality meant changing it for every athlete at once. A QA intake
+// may name its own effort so one avatar can be timed and scored against the
+// standing configuration. Gated on qa_diagnostics, which the acceptance
+// harness sets and ordinary intakes do not, and restricted to the values the
+// API accepts so a typo cannot fail a paid call.
+function reasoningEffortFor(intake) {
+  if (!intake || intake.qa_diagnostics !== true) return OPENAI_REASONING_EFFORT;
+  const want = String(intake.qa_reasoning_effort || "").toLowerCase();
+  return ALLOWED_REASONING_EFFORTS.has(want) ? want : OPENAI_REASONING_EFFORT;
+}
 const OPENAI_MAX_OUTPUT_TOKENS = Number(process.env.OPENAI_MAX_OUTPUT_TOKENS || 48000);
-const AI_REQUEST_TIMEOUT_MS = Number(process.env.AI_REQUEST_TIMEOUT_MS || (OPENAI_API_KEY ? 420000 : 110000));
-const BUILD_JOB_TIMEOUT_MS = Number(process.env.BUILD_JOB_TIMEOUT_MS || (OPENAI_API_KEY ? 1740000 : 210000));
+const AI_REQUEST_TIMEOUT_MS = Number(process.env.AI_REQUEST_TIMEOUT_MS || (OPENAI_API_KEY ? 600000 : 110000));
+const BUILD_JOB_TIMEOUT_MS = Number(process.env.BUILD_JOB_TIMEOUT_MS || (OPENAI_API_KEY ? 1200000 : 210000));
+let buildDeadlineAt = null;
+function setBuildDeadline(at) { buildDeadlineAt = at; }
+// A call must not be allowed to run past the budget that owns it. The ceiling
+// was a fixed 600s regardless of how much budget remained, so a call starting
+// one minute before the deadline still ran a full ten past it. The floor keeps
+// a nearly-exhausted budget from firing a call that is certain to abort.
+function currentRequestCeilingMs() {
+  if (!buildDeadlineAt) return AI_REQUEST_TIMEOUT_MS;
+  return Math.max(60000, Math.min(AI_REQUEST_TIMEOUT_MS, buildDeadlineAt - Date.now()));
+}
 let lastAIUsage = null;
 // The rules the delivered program still breaks, or null when it breaks none.
 // Read at the save boundary and reported on the job. // QA-SALVAGE-DELIVERY
@@ -98,6 +121,14 @@ function recordDiscardedCall(d) {
 function resetBuildUsage() {
   lastQaSalvage = null;
   lastQaTrace = null; buildUsage = { calls: 0, input_tokens: 0, cached_input_tokens: 0, output_tokens: 0, reasoning_tokens: 0, openai_ms: 0, discarded_calls: 0, discarded_ms: 0 }; }
+// A hard ceiling on what one program may cost, in tokens.
+// The budget bounded time and the ceiling bounded a single request, but
+// nothing bounded spend: run #132 put six calls through at 48000
+// max_output_tokens and delivered no program at all. Reasoning counts
+// against that budget, so a build that keeps failing keeps paying full price
+// for nothing. The largest program ever delivered is under 7000 output
+// tokens, so a build that has spent this much is not close, it is looping.
+const MAX_BUILD_OUTPUT_TOKENS = Number(process.env.MAX_BUILD_OUTPUT_TOKENS || 60000);
 function recordBuildUsage(u) {
   if (!buildUsage) resetBuildUsage();
   buildUsage.calls += 1;
@@ -106,6 +137,12 @@ function recordBuildUsage(u) {
   buildUsage.output_tokens += Number(u?.output_tokens || 0);
   buildUsage.reasoning_tokens += Number(u?.reasoning_tokens || 0);
   buildUsage.openai_ms += Number(u?.elapsed_ms || 0);
+  if (buildUsage.output_tokens > MAX_BUILD_OUTPUT_TOKENS) {
+    const err = new Error(`Program generation stopped after spending ${buildUsage.output_tokens} output tokens across ${buildUsage.calls} calls without converging.`);
+    err.code = "BUILD_SPEND_EXCEEDED";
+    err.spend = { ...buildUsage };
+    throw err;
+  }
 }
 
 // ---------- Reasoning budget (program QUALITY, env-switchable) ----------
@@ -424,11 +461,11 @@ async function openAIFetchWithTransportRetry(url, init, signal, maxAttempts = 3)
 }
 async function runEngineRaw(userContent, engineOptions = {}) {
   const effectiveMaxOutputTokens = Number(engineOptions?.maxOutputTokens || OPENAI_MAX_OUTPUT_TOKENS);
-  const effectiveReasoningEffort = String(engineOptions?.reasoningEffort || OPENAI_REASONING_EFFORT); // EMPTY-OUTPUT-ESCALATION
+  const effectiveReasoningEffort = String(engineOptions?.reasoningEffort || reasoningEffortFor(extractOpenAIIntake(userContent))); // EMPTY-OUTPUT-ESCALATION
   let sourceGroundedGeminiFallback = false;
   if (OPENAI_API_KEY) {
     const controller = new AbortController();
-    const timer = setTimeout(() => controller.abort(), AI_REQUEST_TIMEOUT_MS);
+    const timer = setTimeout(() => controller.abort(), currentRequestCeilingMs());
     const started = Date.now();
     try {
       const intake = extractOpenAIIntake(userContent);
@@ -2291,6 +2328,9 @@ async function generateValidatedProgram(intake, onProgress = async () => {}) {
   const qaTrace = [];
   let lastRepairDetail = "";
   const deadline = Date.now() + BUILD_JOB_TIMEOUT_MS;
+  // Tell the transport which budget owns its calls, so a request cannot run
+  // past the deadline that is supposed to bound it.
+  if (typeof setBuildDeadline === "function") setBuildDeadline(deadline);
   // Timeouts and empty responses are infrastructure, not quality verdicts, so
   // they retry on their own budget rather than eating the repair attempts.
   let transientRetries = 0;
@@ -2299,13 +2339,39 @@ async function generateValidatedProgram(intake, onProgress = async () => {}) {
   // thinking is what is eating the budget -- less room to think.
   let engineOptions = {};
 
+  // Ship what we have rather than throwing it away.
+  //
+  // This used to raise BUILD_TIMEOUT, which discards `lastValid` -- a program
+  // that already passed structural validation and was waiting for a polish
+  // attempt. The athlete then got an error and a suggestion to retry, and the
+  // credits already spent bought nothing. The salvage path at the bottom of
+  // this function does exactly the right thing in that situation and the
+  // deadline branch simply never reached it.
+  //
+  // Run #132 is what made this urgent: 4 attempts x a 600s request ceiling is
+  // 40 minutes of wall clock, and the only thing standing between a slow build
+  // and a thrown-away program was luck about which check fired first.
+  const outOfTime = () => Date.now() >= deadline;
+  const salvage = async (why) => {
+    if (!lastValid) return null;
+    let program = lastValid;
+    for (const code of Object.keys(failCounts)) program = hardSubstitute(code, program, intake);
+    await onProgress("finalizing", MAX_ATTEMPTS, why);
+    return reformatWarmupCells(program);
+  };
+
   for (let attempt = 1; attempt <= MAX_ATTEMPTS; attempt++) {
-    if (Date.now() >= deadline) {
+    if (outOfTime()) {
+      const salvaged = await salvage("time budget reached; shipping the last structurally valid program");
+      if (salvaged) return salvaged;
       const err = new Error("Program generation exceeded the safe time limit. Please retry; your intake has been saved.");
       err.code = "BUILD_TIMEOUT";
       throw err;
     }
-    await onProgress("generating", attempt, attempt === 1 ? "initial generation" : "regenerating after quality check");
+    const qaSoFar = intake && intake.qa_diagnostics === true && qaTrace.length
+      ? ` [${qaTrace.join(" -> ")}]`
+      : "";
+    await onProgress("generating", attempt, attempt === 1 ? "initial generation" : `regenerating after quality check${qaSoFar}`); // QA-TRACE-ON-REGENERATION
     const cumulativeRepairFeedback = amendments.length
       ? amendments.join("\n\n--- PRESERVE PRIOR QA CONSTRAINT ---\n\n")
       : repairFeedback;
@@ -2328,6 +2394,16 @@ async function generateValidatedProgram(intake, onProgress = async () => {}) {
       // it -- and an abort was ending the build outright, leaving the whole
       // remaining build budget unspent. Run #79 lost both avatars that way,
       // each at 422s, with nineteen minutes of budget untouched.
+      // Spend is the one failure that must never be retried. Every other
+      // branch here reasons about whether asking again could help; asking
+      // again after the token ceiling is precisely what the ceiling exists to
+      // stop. Ship whatever already passed validation and end the build.
+      if (e?.code === "BUILD_SPEND_EXCEEDED") {
+        console.warn(`generateValidatedProgram: ${e.message}`);
+        const salvaged = await salvage("token budget reached; shipping the last structurally valid program");
+        if (salvaged) return salvaged;
+        throw e;
+      }
       const aborted = e?.name === "AbortError" || /operation was aborted/i.test(String(e?.message || ""));
       const retriable = e?.code === "OPENAI_EMPTY_OUTPUT" || aborted;
       // The deadline check at the top of the loop still owns the real limit, so
@@ -2531,6 +2607,29 @@ async function generateValidatedProgram(intake, onProgress = async () => {}) {
           "WEEK_MARKER_ORDER", "MISSING_WEEK_BLOCK", "WEEK_BLOCK_MISSING", "HEADER_MISMATCH"
         ]);
         const requiresFreshCandidate = specificCodes.some((code) => structuralRepairCodes.has(String(code || "")));
+        // The bundle repaired this candidate before it threw. Try it as it
+        // stands: a deterministic chain that has already answered the flag
+        // does not need a model call to answer it again. // REPAIRED-CANDIDATE-REUSE
+        const repairedByBundle = err && typeof err.repairedProgram === "string" ? err.repairedProgram : "";
+        if (repairedByBundle.trim() && !requiresFreshCandidate) {
+          try {
+            const settled = validateRepairableProgramBundle(repairedByBundle, intake, {
+              skipSkillCalibration: Boolean(OPENAI_API_KEY),
+            });
+            const finished = settled.program;
+            validateClientOutputCleanliness(finished);
+            await onProgress("finalizing", attempt, "deterministic repair converged without another model call");
+            qaTrace.push("A" + attempt + ":converged-without-regeneration"); // REPAIRED-CANDIDATE-REUSE
+            lastQaTrace = qaTrace.slice();
+            return finished;
+          } catch (stillFlagged) {
+            // Not clean yet. The improvement is still worth more than the
+            // text the model wrote, so the next attempt starts from it.
+            void stillFlagged;
+          }
+          repairCandidate = repairedByBundle; // REPAIRED-CANDIDATE-REUSE
+          continue;
+        }
         repairCandidate = requiresFreshCandidate ? null : program; // STRUCTURAL-ONLY-FRESH-CANDIDATE
         continue;
       }
