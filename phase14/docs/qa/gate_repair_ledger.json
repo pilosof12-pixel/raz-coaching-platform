@@ -1524,6 +1524,26 @@
     "killedLive": ""
   },
   {
+    "code": "SUPPORTIVE_PRESS_VOLUME_EXCESS",
+    "modules": [
+      "engine/supportive_press_volume.js"
+    ],
+    "owners": [
+      "collectSupportivePressVolumeFlags"
+    ],
+    "advisory": false,
+    "reachable": false,
+    "repairs": [
+      "repairSupportivePressVolume"
+    ],
+    "wired": [
+      "repairSupportivePressVolume"
+    ],
+    "tested": false,
+    "stressed": false,
+    "killedLive": ""
+  },
+  {
     "code": "TACTICAL_3K_INTERVAL_PROGRESSION_VIOLATION",
     "modules": [
       "engine/tactical_3k_gpp_quality.js"

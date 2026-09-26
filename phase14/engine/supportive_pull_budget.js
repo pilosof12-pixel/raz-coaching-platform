@@ -49,7 +49,7 @@ const num = (v) => {
 
 // The movement a goal actually names. "Pull-up" matches the text of a weighted
 // pull-up goal too, so the longest match wins or every support row looks primary.
-function goalMovements(program, intake) {
+export function goalMovements(program, intake) {
   const names = new Set();
   for (let week = 1; week <= 4; week += 1) {
     const parsed = parseWeek(program, week);

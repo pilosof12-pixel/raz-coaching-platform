@@ -61,6 +61,7 @@ function repCount(raw) {
 }
 
 const ORDINALS = { second: 2, third: 3, fourth: 4, fifth: 5 };
+const ORDINAL_WORD = { 1: 'first', 2: 'second', 3: 'third', 4: 'fourth', 5: 'fifth' };
 const NUMBER_WORDS = { one: 1, two: 2, three: 3, four: 4, five: 5, six: 6, seven: 7, eight: 8, nine: 9, ten: 10, eleven: 11, twelve: 12 };
 
 function countNoun(noun, count) {
@@ -132,6 +133,35 @@ function repairNote(note, { sets, reps, priorSets }) {
         if (!Number.isFinite(ordinal) || ordinal <= sets) return whole;
         changes.push({ kind: 'nonexistent_set_claim', ordinal, sets });
         return '';
+      },
+    );
+  }
+
+  // (c2b) "remove set 3 first" on a two-set row -- the same defect as (c2),
+  // pointing the other way. A trim is how it gets made: run #143's Wednesday dip
+  // note read "if you feel flat, remove set 3 first" and the supportive-press
+  // trim then took that row to two sets, so the note named a set the athlete no
+  // longer has.
+  //
+  // Renumbered rather than deleted. The instruction is "shed the last set when
+  // you are flat", which is autoregulation both reviewers scored well, and it is
+  // still exactly right on a shorter row -- it just has to name the set that is
+  // actually last. Only when there is no set to shed does the clause go.
+  if (Number.isFinite(sets)) {
+    out = out.replace(
+      /\b(remove|drop|cut|skip|trim)(\s+the\s+|\s+)(?:set\s+(\d+)|(second|third|fourth|fifth|\d+(?:st|nd|rd|th))\s+set)\b/gi,
+      (whole, verb, gap, numeral, word) => {
+        const w = String(word || '').toLowerCase();
+        const ordinal = numeral
+          ? Number(numeral)
+          : (ORDINALS[w] ?? Number((w.match(/^\d+/) || [])[0]));
+        if (!Number.isFinite(ordinal) || ordinal <= sets) return whole;
+        if (sets < 2) {
+          changes.push({ kind: 'nonexistent_set_claim', ordinal, sets });
+          return '';
+        }
+        changes.push({ kind: 'nonexistent_set_claim', ordinal, sets, renumbered_to: sets });
+        return numeral ? `${verb}${gap}set ${sets}` : `${verb}${gap}${ORDINAL_WORD[sets] || `set ${sets}`} set`;
       },
     );
   }

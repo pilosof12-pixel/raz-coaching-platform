@@ -49,6 +49,7 @@ import { canonicaliseDayOrder } from './day_order_canonicalization.js';
 import { repairConsecutiveRepGoal } from './consecutive_rep_goal.js';
 import { ladderOf, kgOf } from './tsv_rows.js';
 import { repairSupportivePullBudget } from './supportive_pull_budget.js';
+import { repairSupportivePressVolume } from './supportive_press_volume.js';
 import { repairAccessoryBudget } from './accessory_budget.js';
 import { repairIsometricDuration } from './isometric_duration.js';
 import { ENDURANCE_REPAIRS, repairAccessoryRedundancy, repairTaperPowerSpike } from './endurance_block_repair.js';
@@ -1567,6 +1568,15 @@ export function repairDeterministicContradictions(program, intake = {}) {
   if (pullBudget.changed) {
     candidate = pullBudget.program;
     repairs.push({ type: 'supportivePullBudget', moves: pullBudget.moves.length });
+  }
+
+  // Beside the pull budget, and before the note reconciliation below: trimming a
+  // set can leave a note telling the athlete to "remove set 3 first" on a row
+  // that now has two, which is the nonexistent-set claim the note rules catch.
+  const pressVolume = repairSupportivePressVolume(candidate, intake);
+  if (pressVolume.repairs.length) {
+    candidate = pressVolume.program;
+    repairs.push({ type: 'supportivePressVolume', moves: pressVolume.repairs.length });
   }
 
   const laddered = repairConsecutiveRepGoal(candidate, intake);
