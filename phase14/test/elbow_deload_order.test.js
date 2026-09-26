@@ -73,3 +73,57 @@ test('an athlete with no elbow complaint gets no elbow instruction', () => {
   const clear = { ...INTAKE, injuries: 'None reported.', pain: { active: false, description: '', severity: '', character: '', tolerated_movements: '' } };
   assert.equal(/ELBOW DE-LOAD ORDER/.test(guidance(clear)), false);
 });
+
+// Run #143 wrote both branches, and the coach accepted them -- then pointed at
+// what the order itself does: the bent-arm branch cut Friday Front Lever before
+// Saturday Weighted Pull-up because the template said so. A front lever that is
+// not reproducing symptoms should not come out ahead of a weighted pull-up that
+// is. "Symptom routing should allow the provoking movement pattern to override
+// the default hierarchy."
+const elbow = (description, tolerated) => ({
+  ...INTAKE,
+  injuries: '',
+  pain: {
+    active: false, description, severity: '2/10', character: 'dull, inner elbow',
+    tolerated_movements: tolerated || '',
+  },
+});
+
+test('the removal order yields to what actually reproduces the symptoms', () => {
+  const g = guidance(INTAKE);
+  assert.match(g, /PROVOCATION OUTRANKS THE ORDER/);
+  assert.match(g, /the movement actually reproducing the symptoms comes out first/);
+  assert.match(g, /leave the asymptomatic one alone/,
+    'the point is not to cut a row that is not hurting');
+});
+
+test('the override reaches every provoked elbow, not just this pattern', () => {
+  // The correction was raised against the bent-arm branch, so an athlete provoked
+  // only that way must get it too, and so must one whose pattern is unclear.
+  for (const intake of [
+    elbow('Medial elbow ache after weighted pull-ups'),
+    elbow('Occasional medial elbow ache'),
+  ]) {
+    assert.match(guidance(intake), /PROVOCATION OUTRANKS THE ORDER/);
+  }
+});
+
+test('recovery slipping is a separate trigger from a symptom flare', () => {
+  // The second reviewer's single concrete ask: "treat Saturday weighted pull ups
+  // as the first performance volume lever to trim when recovery starts slipping,
+  // rather than waiting for obvious elbow symptoms." By the time the elbow talks,
+  // the volume decision is overdue.
+  const g = guidance(INTAKE);
+  assert.match(g, /RECOVERY-TRIGGERED VOLUME LEVER/);
+  assert.match(g, /when recovery slips but nothing hurts yet/);
+  assert.match(g, /the volume session rather than the heavy one/,
+    'where the primary lift is trained twice, the volume day is the lever');
+});
+
+test('neither instruction reaches an athlete with no elbow signal', () => {
+  const knee = { ...INTAKE, injuries: '', pain: { description: 'Patellar tendon ache after jumps' } };
+  const g = guidance(knee);
+  assert.doesNotMatch(g, /ELBOW DE-LOAD/);
+  assert.doesNotMatch(g, /PROVOCATION OUTRANKS THE ORDER/);
+  assert.doesNotMatch(g, /RECOVERY-TRIGGERED VOLUME LEVER/);
+});

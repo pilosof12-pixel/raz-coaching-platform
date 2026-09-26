@@ -267,6 +267,20 @@ export function buildDeterministicBrief(intake = {}) {
     } else {
       required.push('ELBOW DE-LOAD ORDER: state the flare-up instruction in two branches, because straight-arm holds and bent-arm pulling load the elbow differently: if symptoms follow straight-arm work, remove the most advanced planche or lever exposure first; if they follow pulling, reduce the supporting rows and light pull-ups on the non-primary days first. Reach the primary weighted work last in either case.');
     }
+    // The order is a default, not a ranking of what hurts. The coach's
+    // correction on run #143: the block cut Friday Front Lever before Saturday
+    // Weighted Pull-up because the template said so, and a front lever that is
+    // not reproducing symptoms should not come out ahead of a weighted pull-up
+    // that is. What the athlete's own body reports outranks the hierarchy.
+    required.push('ELBOW DE-LOAD ORDER (PROVOCATION OUTRANKS THE ORDER): state that the removal order is the default and that the movement actually reproducing the symptoms comes out first regardless of where the order places it. Say so explicitly: if a named row clearly reproduces the ache and an earlier row in the order does not, reduce the row that reproduces it and leave the asymptomatic one alone. Do not present the order as a sequence to be followed past the evidence.');
+    // Distinct trigger, and it was the second reviewer's single concrete ask:
+    // recovery slipping is not the same signal as a symptom flare, and by the
+    // time the elbow talks the volume decision is overdue. A block with two
+    // heavy exposures of the same primary lift has an obvious first lever --
+    // the volume session, not the heavy one -- and it should be named before
+    // anything hurts. Scoped to this provocation branch rather than made a
+    // general rule, so it does not reach avatars nobody asked it for.
+    required.push('RECOVERY-TRIGGERED VOLUME LEVER: name, separately from the symptom contingency, the first performance-volume row to trim when recovery slips but nothing hurts yet -- rising RPE at the same load, worse sleep, slower warm-ups. Where the primary lift is trained twice, that lever is the volume session rather than the heavy one. State it as a planned decision the athlete makes on recovery evidence, not as something to wait for pain to trigger.');
   }
 
   if (/sciatica|lumbar|lower back|low back/i.test(pain)) {
