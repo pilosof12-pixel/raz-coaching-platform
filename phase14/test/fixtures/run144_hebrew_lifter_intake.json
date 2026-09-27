@@ -1,0 +1,84 @@
+{
+  "hebrew": {
+    "age": 31,
+    "language": "he",
+    "experience": "Intermediate (1-3 years)",
+    "bodyweight": "82 ק\"ג",
+    "primary_goals": [
+      "סקוואט 140 ק\"ג לחזרה אחת",
+      "לחיצת חזה 100 ק\"ג לחזרה אחת"
+    ],
+    "secondary_goals": [
+      "להוסיף מסת שריר בפלג גוף עליון"
+    ],
+    "maintenance_goals": [
+      "לשמור על הכושר האירובי שיש לי"
+    ],
+    "days_per_week": 3,
+    "session_duration_minutes": 75,
+    "gym_availability_mode": "flexible",
+    "available_gym_days": [],
+    "training_location": "commercial_gym",
+    "equipment": "חדר כושר מסחרי מלא: מוטות, משקולות יד, מתקן סקוואט, כבלים, מכונות.",
+    "current_numbers": "סקוואט: 120 ק\"ג לחזרה אחת\nלחיצת חזה: 85 ק\"ג לחזרה אחת\nדדליפט: 150 ק\"ג לחזרה אחת\nמתח: 8 חזרות",
+    "performance_markers": [
+      "סקוואט: 120 ק\"ג",
+      "לחיצת חזה: 85 ק\"ג"
+    ],
+    "sport": "",
+    "sport_schedule": [],
+    "sleep_hours": "6-7 שעות",
+    "recovery_rating": "בינוני",
+    "injuries": "כאב קל בכתף ימין בלחיצות מעל הראש, חולף עם חימום.",
+    "pain": {
+      "active": false
+    },
+    "mobility": {
+      "active": false,
+      "limitation": ""
+    },
+    "notes": "הלקוח דובר עברית בלבד. שלושה אימונים בשבוע, 75 דקות כל אחד.",
+    "qa_diagnostics": true
+  },
+  "english_twin": {
+    "age": 31,
+    "language": "en",
+    "experience": "Intermediate (1-3 years)",
+    "bodyweight": "82 kg",
+    "primary_goals": [
+      "Back Squat 140 kg for one rep",
+      "Bench Press 100 kg for one rep"
+    ],
+    "secondary_goals": [
+      "Add upper-body muscle mass"
+    ],
+    "maintenance_goals": [
+      "Maintain the aerobic fitness I have"
+    ],
+    "days_per_week": 3,
+    "session_duration_minutes": 75,
+    "gym_availability_mode": "flexible",
+    "available_gym_days": [],
+    "training_location": "commercial_gym",
+    "equipment": "Full commercial gym: barbells, dumbbells, squat rack, cables, machines.",
+    "current_numbers": "Back Squat: 120 kg x 1\nBench Press: 85 kg x 1\nDeadlift: 150 kg x 1\nPull-up: 8 reps",
+    "performance_markers": [
+      "Back Squat: 120 kg",
+      "Bench Press: 85 kg"
+    ],
+    "sport": "",
+    "sport_schedule": [],
+    "sleep_hours": "6-7 hours",
+    "recovery_rating": "moderate",
+    "injuries": "Mild right shoulder pain in overhead pressing, clears with warm-up.",
+    "pain": {
+      "active": false
+    },
+    "mobility": {
+      "active": false,
+      "limitation": ""
+    },
+    "notes": "Three sessions a week, 75 minutes each.",
+    "qa_diagnostics": true
+  }
+}

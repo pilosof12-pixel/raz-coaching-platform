@@ -39,6 +39,7 @@ import { trimExcessSupportVolume } from './mrv_support_trim.js';
 import { enrichSpecificWarmups } from './specific_warmup_enrichment.js';
 import { normalizeFinalNoteCoherence } from './final_note_coherence.js'; // FINAL-NOTE-COHERENCE-WIRED
 import { validatePrescriptionConsistency } from './v34_prescription_consistency.js'; // V34-PRESCRIPTION-CONSISTENCY-WIRED
+import { withEnglishTerms } from './intake_language.js'; // INTAKE-LANGUAGE-NORMALISED
 import { validateCoachingStandards } from './v35_coaching_standards.js'; // V35-COACHING-STANDARDS-WIRED
 import { auditProgramStructure } from './v38_structural_audit.js'; // V38-STRUCTURAL-AUDIT-WIRED
 import { auditTacticalHardRules } from './v40_tactical_hard_rules.js'; // V40-TACTICAL-HARD-RULES-WIRED
@@ -431,6 +432,18 @@ function applyDeterministicCandidateRepairs(program, intake = {}) {
 }
 
 export function collectRepairableValidationFailures(program, intake = {}, options = {}) {
+  // Every rule below matches English words against the athlete's own words. Run
+  // #144 handed a Hebrew lifter a block with no squat and no bench press, for an
+  // athlete whose two goals are a 140 kg squat and a 100 kg bench, and it passed
+  // here without a single flag: the same program with the same goals in English is
+  // refused by NAMED_GOAL_DIRECT_EXPOSURE_MISSING and PRIMARY_EXACT_MOVEMENT_MISSING.
+  // The gate was not failing for Hebrew athletes, it was not running.
+  //
+  // One normalisation at the door beats teaching 43 modules Hebrew one at a time
+  // and forgetting the forty-fourth. The English is appended to the athlete's own
+  // words, so a rule that quotes a goal back still quotes what they wrote, and an
+  // intake with no Hebrew in it is passed through as the very object that came in.
+  intake = withEnglishTerms(intake);
   const skipSkillCalibration = options?.skipSkillCalibration === true;
   let candidate = stripNonExerciseScheduleRows(program, intake);
   const flags = [];
