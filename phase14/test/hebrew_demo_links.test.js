@@ -125,11 +125,23 @@ test('links stay English even if the demo library never loads', async () => {
   ]), false);
 });
 
-test('the localization rule asks for the English name on every row', async () => {
-  // The rule is the mechanism; the tables above are only the safety net. It used
-  // to say "the first time it appears in a week, then just Hebrew after".
+test('exercise names are structural and never translated', async () => {
+  // The rule is the mechanism; the tables above are only the safety net for
+  // programs translated under an older one.
+  //
+  // It first asked for a Hebrew name with the English in parentheses on the
+  // movement's first appearance only, which cost every later row its link. Then
+  // on every row, which worked but left the athlete reading two names for one
+  // movement. The name is now simply English everywhere: it is the link, it is
+  // the key every validator matches on, and translated movement names drift
+  // between weeks. The coaching lives in the Notes cell, translated in full.
   const server = fs.readFileSync(path.join(ROOT, 'server.js'), 'utf8');
-  assert.match(server, /ALWAYS keep the English canonical name in parentheses/);
-  assert.match(server, /on EVERY row, not only the first appearance in a week/);
+  assert.match(server, /Exercise names stay in English in EVERY language/);
   assert.doesNotMatch(server, /the first time it appears in a week, then just Hebrew after/);
+  assert.doesNotMatch(server, /ALWAYS keep the English canonical name in parentheses/);
+  // And it is listed as structural, beside the day tokens and the [WARMUP] prefix.
+  const structural = server.slice(server.indexOf('WHAT MUST STAY IN ENGLISH'));
+  assert.ok(structural.indexOf('The Exercise cell name.') > 0
+    && structural.indexOf('The Exercise cell name.') < structural.indexOf('=== '),
+    'the exercise name belongs in the structural list');
 });

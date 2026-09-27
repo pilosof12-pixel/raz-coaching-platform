@@ -47,6 +47,7 @@
     warmupTitle:     ['RAZ — WARM-UP / PREPARATION', 'RAZ — חימום / הכנה'],
     warmupSubtitle:  ['Warm up for the session you are about to train. This prepares the work; it is not the work.',
                       'בצע את החימום של האימון שאתה עומד לבצע. הוא מכין את העבודה, הוא אינו העבודה.'],
+    howItWorks:      ['HOW THIS BLOCK WORKS', 'איך הבלוק הזה בנוי'],
     weekSubtitle:    ['Each band is one session. Record what you actually did in the Log column.',
                       'כל רצועה היא אימון אחד. רשום ביומן את מה שבוצע בפועל.'],
   };
@@ -169,6 +170,26 @@
     cell.value = value;
     fill(cell,bg); font(cell,{size,bold:true,color}); align(cell);
     ws.getRow(row).height = Math.max(20, size + 8);
+  }
+
+  // The coaching the program opens with, which the workbook used to drop entirely.
+  //
+  // Everything before the first week table: why the week is shaped the way it is,
+  // how weeks 2 to 4 progress, and what to remove first when a joint complains --
+  // on run #143 that last paragraph is the two elbow contingencies the coach
+  // scored the block 9.1 for. None of it reached the client's file. They got the
+  // tables and none of the reasoning, which is why the program reads as thinner
+  // on the sheet than it is.
+  //
+  // It is the model's own prose, so in a Hebrew program it is already Hebrew.
+  function narrativeParagraphs(program) {
+    const head = text(program).split(/START_WEEK1_TSV/i)[0] || '';
+    return head
+      .replace(/```(?:tsv|text|plaintext)?/gi, '')
+      .split(/\n\s*\n/)
+      .map((p) => p.replace(/\s+/g, ' ').trim())
+      // Drop stray markers and anything too short to be a paragraph of coaching.
+      .filter((p) => p.length > 60 && !/^(?:START_|END_|Day\t)/i.test(p) && !/^#{1,6}\s/.test(p));
   }
 
   function block(textValue, n) {
@@ -455,7 +476,7 @@
     return ex.total + ' training day' + (ex.total === 1 ? '' : 's') + '/week' + detail + sport;
   }
 
-  function renderOverview(ws, intake, week1, logoId=null) {
+  function renderOverview(ws, intake, week1, logoId=null, programText='') {
     ws.views=[{showGridLines:false}];
     [28,34,16,48].forEach((w,i)=>ws.getColumn(i+1).width=w);
     mergeTitle(ws,1,4,overviewTitle(intake),INK,16);
@@ -480,6 +501,19 @@
       ws.mergeCells(row,2,row,4); fill(b,BODY); font(b,{size:10}); align(b); ws.getRow(row).height=34; row++;
     }
     row++;
+    const narrative = narrativeParagraphs(programText);
+    if(narrative.length){
+      mergeTitle(ws,row,4,L('howItWorks'),DAY_BAND,10,TEXT); row++;
+      for(const para of narrative){
+        ws.mergeCells(row,1,row,4);
+        const c=ws.getRow(row).getCell(1);
+        c.value=para; fill(c,BODY); font(c,{size:10}); align(c);
+        // Four columns of roughly 126 characters a line at this width.
+        ws.getRow(row).height=Math.max(30, Math.ceil(para.length/108)*15);
+        row++;
+      }
+      row++;
+    }
     // What each training day is for. sessionType and sessionPurpose were written
     // for this section and then nothing called them: the client got a profile and
     // a rule list with no map of the week between them.
@@ -747,7 +781,7 @@
     const wb=new ExcelJS.Workbook(); wb.creator='RAZ Performance Coaching Engine'; wb.created=new Date();
     const logo=await loadLogo();
     const logoId=logo? wb.addImage(logo) : null;
-    renderOverview(wb.addWorksheet('Overview'),intake,weeks[0],logoId);
+    renderOverview(wb.addWorksheet('Overview'),intake,weeks[0],logoId,program);
     renderWarmup(wb.addWorksheet('Warm-Up'),intake,weeks[0]);
     const camp=parseCampSchedule(program);
     if(camp) renderCampSchedule(wb.addWorksheet('Camp Schedule'),intake,camp);

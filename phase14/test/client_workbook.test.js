@@ -155,3 +155,32 @@ test('a brand logo is embedded when one is supplied', async () => {
   assert.equal(ov.getImages().length, 1, 'public/data/brand-logo.png is picked up when present');
   assert.equal(ov.getRow(1).height, 46, 'the title row grows to fit it');
 });
+
+test('the coaching the program opens with reaches the client', async () => {
+  // The workbook carried the tables and dropped every word of reasoning in front
+  // of them: why the week is shaped this way, how weeks 2 to 4 progress, and what
+  // to remove first when the elbow complains. On run #143 that last paragraph is
+  // the pair of contingencies the coach scored the block 9.1 for, and the athlete
+  // it was written for never saw it.
+  const { wb } = await renderParityWorkbook(ENGLISH, INTAKE);
+  const ov = wb.getWorksheet('Overview');
+  const column = [];
+  for (let r = 1; r <= 40; r += 1) column.push(cellText(ov.getCell(r, 1)));
+  const joined = column.join('\n');
+
+  assert.ok(column.includes('HOW THIS BLOCK WORKS'), 'the section must exist');
+  assert.match(joined, /Mon and Sat owning the two bent-arm priorities/, 'the session architecture');
+  assert.match(joined, /Week 3 is the hardest week/, 'the progression logic');
+  assert.match(joined, /medial-elbow ache follows straight-arm work/, 'the first elbow branch');
+  assert.match(joined, /soreness instead follows bent-arm pulling/, 'and the second');
+});
+
+test('a program with no opening prose simply has no such section', async () => {
+  const bare = ENGLISH.slice(ENGLISH.indexOf('START_WEEK1_TSV'));
+  const { wb } = await renderParityWorkbook(bare, INTAKE);
+  const ov = wb.getWorksheet('Overview');
+  const column = [];
+  for (let r = 1; r <= 40; r += 1) column.push(cellText(ov.getCell(r, 1)));
+  assert.ok(!column.includes('HOW THIS BLOCK WORKS'), 'no heading over an empty section');
+  assert.ok(column.includes('WEEKLY STRUCTURE'), 'and the rest of the sheet is unaffected');
+});

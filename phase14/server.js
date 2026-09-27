@@ -868,8 +868,7 @@ const LOCALIZATION_RULES = [
   "WHAT LOCALIZES (translate to Hebrew when language == 'he'):",
   "  * The intro paragraph (why this week is structured this way).",
   "  * The 'How to progress weeks 2-4' paragraph.",
-  "  * Every Exercise cell name (translate the exercise name, and ALWAYS keep the English canonical name in parentheses after it — e.g. 'סקוואט אחורי (Back Squat)' — on EVERY row, not only the first appearance in a week).",
-  "    The English name in parentheses is not decoration. The exercise name is the demo hyperlink in the client's spreadsheet, and the link is built from that name: a bare Hebrew name sends the athlete to a Hebrew-language search instead of the demonstration, and for most movements no curated video is found at all. This rule used to ask for the English only on first appearance, which is why every row after the first lost its link.",
+  "  * Every Notes cell (all client-facing coaching language) — see the structural list below for what must NOT be translated.",
   "  * Every Notes cell (all client-facing coaching language).",
   "  * The Target RPE cell descriptor ('קל / בינוני / קשה').",
   "  * The Rest cell descriptor.",
@@ -878,6 +877,8 @@ const LOCALIZATION_RULES = [
   "  * The TSV column headers, EXACTLY: 'Day\\tExercise\\tWeight\\tSets\\tReps\\tRest\\tTarget RPE\\tNotes\\tResults'.",
   "  * The day-of-week token in the Day column, EXACTLY: 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'. The spreadsheet parser regex-matches these tokens; Hebrew day names break the day-boundary borders and per-week tabs.",
   "  * The '[WARMUP]' prefix at the start of any warm-up Exercise cell. The validator regex-matches this literal.",
+  "  * The Exercise cell name. Exercise names stay in English in EVERY language, on every row, with no Hebrew and no parenthetical.",
+  "    Three reasons. The exercise name is the demo hyperlink in the client's spreadsheet and the link is built from that name, so a translated name sends the athlete to a foreign-language search instead of the demonstration. The name is also the key every validator and the exercise dictionary match on. And translated movement names drift: the same movement comes back spelled differently between weeks, and the athlete is left comparing two names for one exercise. The coaching belongs in the Notes cell, which is translated in full.",
   "  * Numeric values (weights, sets, reps) in Western Arabic digits, kg unit, seconds/minutes with 's'/'min'.",
   "  * The week-block header labels: 'WEEK1', 'WEEK2', 'WEEK3', 'WEEK4' and 'PASTE_WEEK1'/etc if used.",
   "",
@@ -2068,8 +2069,7 @@ async function runSetLanguageJob(jobId, token, targetLang) {
       "Do NOT change any loads, sets, reps, rest times, RPE targets, days, or exercise selection.",
       "Do NOT rebuild the program. Only re-emit every client-facing string in the target language.",
       "Obey LOCALIZATION_RULES exactly: structural TSV tokens (column headers, Mon/Tue/... day tokens, [WARMUP] prefix, WEEK1..WEEK4 labels, kg/s/min units and numeric values) remain in English regardless of target language.",
-      "When translating INTO Hebrew, every Exercise cell keeps its English canonical name in parentheses after the Hebrew — 'מתח (Pull-up)' — on every row. The exercise name is the demo hyperlink and it must resolve to the English demonstration.",
-      "When translating INTO English, drop any such parenthetical so the cell carries the English name once.",
+      "Exercise cell names are STRUCTURAL and stay in English in every language, on every row, with no Hebrew and no parenthetical. If the program being translated has Hebrew exercise names from an earlier translation, restore them to their English canonical names. The exercise name is the demo hyperlink and the key every validator matches on; the coaching goes in the Notes cell, which is translated in full.",
       `intake.language is now '${targetLang}' — keep it that way.`,
     ].join(" ");
     const program = privacyScrub(await runEngine(adjustPrompt(intake, client.program, changeRequest)), intake);
