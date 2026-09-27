@@ -564,7 +564,9 @@
   }
 
   function renderWarmup(ws, intake, week1) {
-    ws.views=[{showGridLines:false}];
+    // Frozen below the header, as the week sheets are. Its rows run past a phone
+    // screen and the column titles scrolled away with them.
+    ws.views=[{showGridLines:false, state:'frozen', ySplit:4}];
     [18,32,10,18,12,54].forEach((w,i)=>ws.getColumn(i+1).width=w);
     mergeTitle(ws,1,6,L('warmupTitle'),INK,16);
     // Was: "...stay clean and use the approved 11-column template" -- our template

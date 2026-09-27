@@ -184,3 +184,75 @@ test('a program with no opening prose simply has no such section', async () => {
   assert.ok(!column.includes('HOW THIS BLOCK WORKS'), 'no heading over an empty section');
   assert.ok(column.includes('WEEKLY STRUCTURE'), 'and the rest of the sheet is unaffected');
 });
+
+test('nothing the program prescribes is missing from the workbook', async () => {
+  // The narrative was lost for as long as this exporter has existed, and nobody
+  // noticed because no test asked the question in general: does everything the
+  // program says reach the file the client opens?
+  //
+  // Loads, rests and coaching notes must survive verbatim. Two shapes change on
+  // purpose and are excluded by shape rather than by name: the [WARMUP] prefix is
+  // stripped when a warm-up moves to its own sheet, and a warm-up whose drills are
+  // one semicolon-joined protocol is split into a row per drill.
+  const { wb } = await renderParityWorkbook(ENGLISH, INTAKE, ROOT, null, true);
+  let haystack = '';
+  for (const ws of wb.worksheets) {
+    ws.eachRow({ includeEmpty: false }, (row) => {
+      row.eachCell({ includeEmpty: false }, (cell) => { haystack += `${cellText(cell)}\n`; });
+    });
+  }
+
+  const missing = [];
+  const seen = new Set();
+  for (const line of ENGLISH.split('\n')) {
+    const cells = line.split('\t');
+    if (cells.length !== 9 || !/^(?:Mon|Tue|Wed|Thu|Fri|Sat|Sun)$/.test(cells[0])) continue;
+    const isWarmup = /^\s*\[WARMUP\]/i.test(cells[1]);
+    const check = (label, value) => {
+      const v = String(value || '').trim();
+      if (!v || seen.has(label + v)) return;
+      seen.add(label + v);
+      if (!haystack.includes(v)) missing.push(`${label}: ${v.slice(0, 70)}`);
+    };
+    check('load', cells[2]);
+    check('rest', cells[5]);
+    if (!isWarmup) { check('exercise', cells[1]); check('note', cells[7]); }
+    // A split protocol keeps its drills, which is what matters; assert those.
+    if (isWarmup && cells[7].includes(';')) {
+      for (const part of cells[7].split(';').map((x) => x.trim()).filter(Boolean)) {
+        const drill = part.replace(/\s*x\s*\d.*$/i, '').trim();
+        if (drill.length > 6 && !haystack.toLowerCase().includes(drill.toLowerCase())) {
+          missing.push(`warm-up drill: ${drill.slice(0, 60)}`);
+        }
+      }
+    }
+  }
+  assert.deepEqual(missing, [], 'these are prescribed to the athlete and never shown to them');
+});
+
+test('every program in the corpus produces a workbook', async () => {
+  // The exporter is the last thing between a finished program and the client, and
+  // it had only ever been run against one program. A shape it throws on is a
+  // build the athlete pays for and cannot open.
+  const { CORPUS } = await import('../scripts/corpus.mjs');
+  const failures = [];
+  for (const [file, intake] of CORPUS) {
+    const program = fs.readFileSync(path.join(here, 'fixtures', file), 'utf8');
+    try {
+      const { wb } = await renderParityWorkbook(program, intake, ROOT, null, true);
+      assert.ok(wb.worksheets.length >= 6, `${file} produced ${wb.worksheets.length} sheets`);
+    } catch (e) {
+      failures.push(`${file}: ${e.message}`);
+    }
+  }
+  assert.deepEqual(failures, []);
+});
+
+test('the sheets a client scrolls keep their column titles in view', async () => {
+  const { wb } = await renderParityWorkbook(ENGLISH, INTAKE);
+  for (const name of ['Warm-Up', 'Week 1', 'Week 2', 'Week 3', 'Week 4']) {
+    const view = wb.getWorksheet(name).views[0];
+    assert.equal(view.state, 'frozen', `${name} must freeze its header`);
+    assert.ok(view.ySplit >= 1, `${name} must freeze below the header row`);
+  }
+});
