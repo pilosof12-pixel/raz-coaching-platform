@@ -1,25 +1,39 @@
 {
-  "timestamp": "2026-09-26T11:17:30.919Z",
+  "timestamp": "2026-09-27T13:27:23.243Z",
   "base": "https://raz-coaching-platform.onrender.com",
-  "head_sha": "cbcbf1e878eeae05041095441b536d882c1cb82d",
-  "runtime": "live79 2026-09-26T11:16:43Z",
+  "head_sha": "05614bef2906ab3348dc87d87254a4f3ac835bac",
+  "runtime": "live80 2026-09-27T13:26:24Z",
   "results": [
     {
-      "id": "advanced_calisthenics",
-      "job_id": "672eb13436cd4fb715e0e3098797569b",
+      "id": "hebrew_lifter",
+      "job_id": "1326f834ae70aa538135007f9c45156a",
       "ok": true,
       "status": "done",
       "stage": "finalizing",
-      "attempt": 2,
-      "detail": "saving program after 2 model call(s) QA trace: A1:EQUIPMENT_VIOLATION+NAMED_GOAL_DIRECT_EXPOSURE_MISSING+V35_SECONDARY_VOLUME_CREEP.",
+      "attempt": 1,
+      "detail": "saving program after 1 model call(s)",
       "last_seen_status": "done",
       "error": null,
-      "program_chars": 21012,
-      "seconds": 316
+      "program_chars": 8642,
+      "seconds": 165
+    },
+    {
+      "id": "advanced_calisthenics",
+      "job_id": "df618685ff57752c27dee8c808bae7de",
+      "ok": true,
+      "status": "done",
+      "stage": "finalizing",
+      "attempt": 1,
+      "detail": "saving program after 1 model call(s)",
+      "last_seen_status": "done",
+      "error": null,
+      "program_chars": 21359,
+      "seconds": 257
     }
   ],
   "reasoning_effort": "medium",
   "selection": [
+    "hebrew_lifter",
     "advanced_calisthenics"
   ],
   "ok": true
