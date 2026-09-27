@@ -141,6 +141,20 @@
     cell.font = { name:'Calibri', size: opts.size || 11, bold: !!opts.bold, italic: !!opts.italic,
       color:{argb: opts.color || TEXT}, underline: !!opts.underline };
   }
+  // A prescription cell is text, and is told so.
+  //
+  // "8-10" reps, "12-15", "6-8" -- 45 of them across the corpus -- are what a
+  // spreadsheet reads as a date. ExcelJS writes a JS string as a string-typed
+  // cell, so Excel does not re-parse them on open, but the moment the athlete
+  // edits one, or the file is imported by Sheets or LibreOffice, a General-format
+  // cell is fair game and "8-10" becomes the 8th of October. The legacy exporter
+  // set this on every dose cell; the premium one that replaced it did not.
+  function setTextCell(cell, value) {
+    cell.value = value === null || value === undefined ? '' : value;
+    cell.numFmt = "@";
+    return cell.value;
+  }
+
   function align(cell, opts={}) {
     // readingOrder is what makes a mixed Hebrew/English cell lay out correctly.
     // rightToLeft on the sheet flips the columns; without this the text inside a
@@ -598,7 +612,7 @@
       items.forEach((item,itemIndex)=>{
         // The exercise name stays as written: it is the demo link's lookup key.
         const vals=[itemIndex===0?label:'',item.exercise,item.sets,item.reps,item.rest,t(item.note)];
-        vals.forEach((v,j)=>{const c=ws.getRow(row).getCell(j+1);c.value=v;fill(c,BODY);font(c,{size:10});align(c);});
+        vals.forEach((v,j)=>{const c=ws.getRow(row).getCell(j+1);setTextCell(c,v);fill(c,BODY);font(c,{size:10});align(c);});
         setHyperlink(ws.getRow(row).getCell(2),item.exercise,item.exercise,false);
         ws.getRow(row).height=34; row++;
       });
@@ -723,7 +737,7 @@
       const band=ws.getRow(row).getCell(1); band.value=sessionLabel(intake,session,i); fill(band,DAY_BAND); font(band,{size:10,bold:true,color:TEXT}); align(band); ws.getRow(row).height=24; row++;
       for(const r of session.rows){
         const vals=[r.exercise,r.load,r.sets,r.reps,r.rest,r.effort,r.notes,''];
-        vals.forEach((v,j)=>{const c=ws.getRow(row).getCell(j+1);c.value=v;fill(c,BODY);font(c,{size:10});align(c,{horizontal:[3,4,5,6].includes(j+1)?'center':'left'});});
+        vals.forEach((v,j)=>{const c=ws.getRow(row).getCell(j+1);setTextCell(c,v);fill(c,BODY);font(c,{size:10});align(c,{horizontal:[3,4,5,6].includes(j+1)?'center':'left'});});
         // The exercise name carries its own demo link, so a coach clicks the
         // thing they are reading rather than hunting for a separate column.
         // The Warm-Up sheet already reads this way; the week tables did not.
