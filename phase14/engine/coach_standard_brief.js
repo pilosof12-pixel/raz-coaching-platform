@@ -117,6 +117,8 @@ export function buildSupportingStandardBrief(intake = {}) {
     '  Where the athlete has no benchmark for a variation, do not invent a kilogram figure -- but "RPE-selected load" on its own is a blank, not a prescription. State how many clean reps should remain in reserve on the last set, and tell them to record the load they used so the next week starts from a real number. A carry is judged by whether posture and grip hold for the full distance, not by reps in reserve, and a bodyweight movement is not asking for a weight at all.',
     '* A WEEK-SCOPED CLAIM MUST BE TRUE.',
     '  Do not write "only this week" about a dose that a later week prescribes again. The athlete plans around that sentence, and a note that contradicts its own table teaches them not to trust either.',
+    '* THE CONSOLIDATION WEEK IS NOT WHERE THE PROGRESSION GOES.',
+    '  If a movement is deliberately held through the build weeks, do not put its only load or effort increase in Week 4. A delivered block carried its secondary press at one load and one RPE for three weeks and then wrote a heavier, harder version into the deload, so the single place the press advanced all block was the week meant to back off. Progress it in the build weeks, or hold it all block and say so. Either is defensible; the deload is neither.',
     '* A BENCHMARK THE ATHLETE FLAGGED IS ADDRESSED, EVEN IF IT IS ABSENT.',
     '  If the intake names a lift as not attempted, untested, avoided or feared, either program it or say in the guidance that it is deliberately not here, what covers the same pattern instead, and what has to be true before it comes back. Leaving it out can be right; leaving it unmentioned means they cannot tell whether it was a decision or an oversight.',
   ].join('\n');
