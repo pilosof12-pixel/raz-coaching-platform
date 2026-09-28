@@ -295,10 +295,24 @@ export function validateYouthCoachingSpecV1HardRules(program, intake = {}, suppl
         { week: week.week, day: day.day, exercise: name, rest },
       );
     }
+    // Forbidding the thing is not prescribing it. The note has to be read for what
+    // it asks the athlete to DO, so every way of ruling failure work out is
+    // removed before the sentence is judged.
+    //
+    // This stripped "no grinding" and not "no grinders", so a Youth program whose
+    // notes read "Clean depth and control; no grinders" -- the exact standard
+    // YG-07 exists to enforce -- was failed for prescribing grinders. The golden
+    // Youth program says it on every Pistol Squat row in all four weeks, which is
+    // why it stopped passing its own production chain.
+    //
+    // The rule itself is unchanged: a note that actually asks for failure work,
+    // an AMRAP or forced reps still fails, and the test below proves it.
     const failureText = `${notes} ${exercise?.dose?.reps_raw || ''}`
-      .replace(/\b(?:do not|don't|never)\s+(?:train\s+)?to failure\b/gi, '')
+      .replace(/\b(?:do not|don't|never|avoid|without|no)\s+(?:train(?:ing)?\s+)?(?:to\s+)?failure\b/gi, '')
+      .replace(/\b(?:short|shy|well short|stopping)\s+of\s+failure\b/gi, '')
       .replace(/\bstop[^.\n]{0,60}before[^.\n]{0,30}failure\b/gi, '')
-      .replace(/\bno grinding\b/gi, '');
+      .replace(/\b(?:no|never|avoid|without)\s+grind(?:ing|ers?)\b/gi, '')
+      .replace(/\b(?:no|never|avoid|without)\s+forced\s+reps?\b/gi, '');
     if (/to failure|amrap|forced rep|grind(?:er|ing)?|until failure/i.test(failureText)) {
       fail(
         'COACH_SPEC_V1_YG_FAILURE_BASED_DEFAULT',
