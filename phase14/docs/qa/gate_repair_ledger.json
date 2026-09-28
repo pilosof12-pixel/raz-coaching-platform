@@ -3626,6 +3626,46 @@
     "killedLive": ""
   },
   {
+    "code": "V93_SUPPORTING_PROGRESSION_UNSTATED",
+    "modules": [
+      "engine/supporting_progression_standard.js"
+    ],
+    "owners": [
+      "collectSupportingProgressionFlags"
+    ],
+    "advisory": false,
+    "reachable": true,
+    "repairs": [
+      "normalizeSupportingProgressionStandard"
+    ],
+    "wired": [
+      "normalizeSupportingProgressionStandard"
+    ],
+    "tested": true,
+    "stressed": false,
+    "killedLive": ""
+  },
+  {
+    "code": "V94_WEEK_SCOPE_CLAIM_CONTRADICTED",
+    "modules": [
+      "engine/week_scope_claims.js"
+    ],
+    "owners": [
+      "collectWeekScopeClaimFlags"
+    ],
+    "advisory": false,
+    "reachable": true,
+    "repairs": [
+      "normalizeWeekScopeClaims"
+    ],
+    "wired": [
+      "normalizeWeekScopeClaims"
+    ],
+    "tested": true,
+    "stressed": false,
+    "killedLive": ""
+  },
+  {
     "code": "WEEKLY_MRV_EXCEEDED",
     "modules": [
       "engine/exercise_dictionary.js",

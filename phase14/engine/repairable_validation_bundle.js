@@ -80,6 +80,8 @@ import {
 import { normalizeAdvancedHybridAdjacentPulling } from './advanced_hybrid_pull_spacing_normalizer.js'; // COACH-SPEC-V1-AH04-NORMALIZER
 import { normalizeAdvancedHybridOHPComplement } from './advanced_hybrid_ohp_normalizer.js';
 import { normalizeYouthPrimarySkillOrder } from './youth_skill_order_normalizer.js';
+import { normalizeSupportingProgressionStandard } from './supporting_progression_standard.js'; // V93-SUPPORTING-PROGRESSION-WIRED
+import { normalizeWeekScopeClaims } from './week_scope_claims.js'; // V94-WEEK-SCOPE-CLAIM-WIRED
 import { normalizeYouthAcquisitionGoalFloors } from './youth_goal_floor_normalizer.js';
 import { normalizeYouthSessionQuality } from './youth_session_quality_normalizer.js';
 import { normalizeYouthWeek4Consolidation } from './youth_consolidation_normalizer.js';
@@ -419,6 +421,18 @@ function applyDeterministicCandidateRepairs(program, intake = {}) {
   const advancedSecondaryRun = normalizeAdvancedHybridSecondaryRunStability(candidate, intake);
   candidate = advancedSecondaryRun.program;
   if (advancedSecondaryRun.repaired) repairs.push({ type: 'advanced_hybrid_secondary_run_stability', rows: advancedSecondaryRun.repairs });
+
+  // Notes-only, and last of the row-editing repairs so it sees the final
+  // prescription. A week-scoped claim is only false once the loads around it have
+  // settled, and an exposure only counts as unchanging once every other
+  // normalizer has finished changing it.
+  const weekScope = normalizeWeekScopeClaims(candidate, intake);
+  candidate = weekScope.program;
+  if (weekScope.repaired) repairs.push({ type: 'week_scope_claim_corrected', rows: weekScope.repairs });
+
+  const supportingProgression = normalizeSupportingProgressionStandard(candidate, intake);
+  candidate = supportingProgression.program;
+  if (supportingProgression.repaired) repairs.push({ type: 'supporting_progression_standard', rows: supportingProgression.repairs });
 
   const youthAcquisitionQuality = normalizeYouthSkillAcquisitionQuality(candidate, intake);
   candidate = youthAcquisitionQuality.program;
