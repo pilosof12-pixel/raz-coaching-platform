@@ -80,7 +80,7 @@ export function collectUntestedBenchmarkFlags(program, intake = {}) {
     if (names.some((n) => benchmark.re.test(n))) continue;
     if (benchmark.re.test(guidance)) continue;
     flags.push({
-      code: 'V95_UNTESTED_BENCHMARK_UNADDRESSED',
+      code: 'V99_UNTESTED_BENCHMARK_UNADDRESSED',
       exercise: benchmark.label,
       signal,
       detail: `The intake flags ${benchmark.label} as untested or avoided ("${signal}"), and the block neither programs it nor mentions it. Leaving it out can be right; leaving it unsaid means the athlete cannot tell whether it was a decision or an oversight.`,

@@ -73,7 +73,7 @@ export function collectWeekScopeClaimFlags(program, intake = {}) {
         if (!contradictedIn.length) continue;
 
         flags.push({
-          code: 'V94_WEEK_SCOPE_CLAIM_CONTRADICTED',
+          code: 'V98_WEEK_SCOPE_CLAIM_CONTRADICTED',
           week,
           exercise: name,
           contradicted_in: contradictedIn,

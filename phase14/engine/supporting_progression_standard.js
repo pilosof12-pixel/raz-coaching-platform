@@ -119,7 +119,7 @@ export function collectSupportingProgressionFlags(program, intake = {}) {
     });
 
     flags.push({
-      code: 'V93_SUPPORTING_PROGRESSION_UNSTATED',
+      code: 'V97_SUPPORTING_PROGRESSION_UNSTATED',
       exercise: entries[0].name,
       identical_notes: new Set(notes).size === 1,
       detail: `${entries[0].name} carries the same load, sets and reps in Weeks 1, 2 and 3, and no week says what the athlete is meant to improve instead. Holding the prescription is often correct beside a heavy primary or on a return to training, but then the block must state the standard being beaten -- execution, control, symmetry or RPE at the same load. An unchanged prescription under an unchanged note reads as copy-paste.`,

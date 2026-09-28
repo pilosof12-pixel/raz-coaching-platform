@@ -43,6 +43,14 @@ export const ROLE = {
 const PATTERNS = [
   [/^\s*\[WARMUP\]/i, CATEGORY.WARMUP, ROLE.WARMUP],
 
+  // A rowing ergometer has to come before the generic "erg" GPP rule below, which
+  // otherwise shadows it: patterns are first-match-wins. A bare erg sprint beside
+  // a sled is conditioning, but for a rower the ergometer IS the endurance tool
+  // and, for a masters rower returning to a 2 km, the primary goal movement.
+  // Classifying it as GPP made the block's most important row invisible to every
+  // rule that reasons about endurance.
+  [/^\s*(?:rowing ergometer|row(?:ing)?\s+erg(?:ometer)?|concept\s?2|c2\s+erg)\b/i, CATEGORY.ENDURANCE, ROLE.CONDITIONING],
+
   // Skill practice: the target skill itself, or a drill that exists only to build it.
   [/muscle[- ]?up transition|transition drill/i, CATEGORY.SKILL, ROLE.SKILL_PRACTICE],
   [/banded muscle[- ]?up|bar muscle[- ]?up|ring muscle[- ]?up|^muscle[- ]?up/i, CATEGORY.SKILL, ROLE.SKILL_PRACTICE],

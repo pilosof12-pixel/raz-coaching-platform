@@ -1833,6 +1833,26 @@
     "killedLive": ""
   },
   {
+    "code": "V100_SELF_SELECTED_LOAD_WITHOUT_PROTOCOL",
+    "modules": [
+      "engine/self_selected_load_protocol.js"
+    ],
+    "owners": [
+      "collectSelfSelectedLoadFlags"
+    ],
+    "advisory": false,
+    "reachable": true,
+    "repairs": [
+      "normalizeSelfSelectedLoadProtocol"
+    ],
+    "wired": [
+      "normalizeSelfSelectedLoadProtocol"
+    ],
+    "tested": true,
+    "stressed": false,
+    "killedLive": ""
+  },
+  {
     "code": "V34_DUPLICATE_SPECIFIC_RAMP",
     "modules": [
       "engine/v34_prescription_consistency.js"
@@ -3626,7 +3646,7 @@
     "killedLive": ""
   },
   {
-    "code": "V93_SUPPORTING_PROGRESSION_UNSTATED",
+    "code": "V97_SUPPORTING_PROGRESSION_UNSTATED",
     "modules": [
       "engine/supporting_progression_standard.js"
     ],
@@ -3646,7 +3666,7 @@
     "killedLive": ""
   },
   {
-    "code": "V94_WEEK_SCOPE_CLAIM_CONTRADICTED",
+    "code": "V98_WEEK_SCOPE_CLAIM_CONTRADICTED",
     "modules": [
       "engine/week_scope_claims.js"
     ],
@@ -3666,7 +3686,7 @@
     "killedLive": ""
   },
   {
-    "code": "V95_UNTESTED_BENCHMARK_UNADDRESSED",
+    "code": "V99_UNTESTED_BENCHMARK_UNADDRESSED",
     "modules": [
       "engine/untested_benchmark_disclosure.js"
     ],

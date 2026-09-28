@@ -80,9 +80,10 @@ import {
 import { normalizeAdvancedHybridAdjacentPulling } from './advanced_hybrid_pull_spacing_normalizer.js'; // COACH-SPEC-V1-AH04-NORMALIZER
 import { normalizeAdvancedHybridOHPComplement } from './advanced_hybrid_ohp_normalizer.js';
 import { normalizeYouthPrimarySkillOrder } from './youth_skill_order_normalizer.js';
-import { normalizeSupportingProgressionStandard } from './supporting_progression_standard.js'; // V93-SUPPORTING-PROGRESSION-WIRED
-import { normalizeWeekScopeClaims } from './week_scope_claims.js'; // V94-WEEK-SCOPE-CLAIM-WIRED
-import { normalizeUntestedBenchmarkDisclosure } from './untested_benchmark_disclosure.js'; // V95-UNTESTED-BENCHMARK-WIRED
+import { normalizeSupportingProgressionStandard } from './supporting_progression_standard.js'; // V97-SUPPORTING-PROGRESSION-WIRED
+import { normalizeWeekScopeClaims } from './week_scope_claims.js'; // V98-WEEK-SCOPE-CLAIM-WIRED
+import { normalizeUntestedBenchmarkDisclosure } from './untested_benchmark_disclosure.js'; // V99-UNTESTED-BENCHMARK-WIRED
+import { normalizeSelfSelectedLoadProtocol } from './self_selected_load_protocol.js'; // V100-SELF-SELECTED-LOAD-WIRED
 import { normalizeYouthAcquisitionGoalFloors } from './youth_goal_floor_normalizer.js';
 import { normalizeYouthSessionQuality } from './youth_session_quality_normalizer.js';
 import { normalizeYouthWeek4Consolidation } from './youth_consolidation_normalizer.js';
@@ -427,6 +428,12 @@ function applyDeterministicCandidateRepairs(program, intake = {}) {
   // prescription. A week-scoped claim is only false once the loads around it have
   // settled, and an exposure only counts as unchanging once every other
   // normalizer has finished changing it.
+  // Before the week-scope and progression cues, so those read a row that already
+  // states how its load is chosen.
+  const loadProtocol = normalizeSelfSelectedLoadProtocol(candidate, intake);
+  candidate = loadProtocol.program;
+  if (loadProtocol.repaired) repairs.push({ type: 'self_selected_load_protocol', rows: loadProtocol.repairs });
+
   const weekScope = normalizeWeekScopeClaims(candidate, intake);
   candidate = weekScope.program;
   if (weekScope.repaired) repairs.push({ type: 'week_scope_claim_corrected', rows: weekScope.repairs });

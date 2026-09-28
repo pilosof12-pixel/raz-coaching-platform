@@ -31,7 +31,7 @@ test('a supporting lift frozen across the build weeks under one note is flagged'
   const flags = collectSupportingProgressionFlags(flatSupport(), {});
   assert.equal(flags.length, 1);
   assert.equal(flags[0].exercise, 'Goblet Squat');
-  assert.equal(flags[0].code, 'V93_SUPPORTING_PROGRESSION_UNSTATED');
+  assert.equal(flags[0].code, 'V97_SUPPORTING_PROGRESSION_UNSTATED');
 });
 
 test('low-cost trunk, tissue and GPP work may hold flat without a standard', () => {
@@ -94,7 +94,7 @@ test('a week-scoped claim contradicted by a later week is flagged and corrected'
   const bad = scopedClaim('20 kg');
   const flags = collectWeekScopeClaimFlags(bad, {});
   assert.equal(flags.length, 1);
-  assert.equal(flags[0].code, 'V94_WEEK_SCOPE_CLAIM_CONTRADICTED');
+  assert.equal(flags[0].code, 'V98_WEEK_SCOPE_CLAIM_CONTRADICTED');
   assert.deepEqual(flags[0].contradicted_in, [2, 3]);
 
   const fixed = normalizeWeekScopeClaims(bad, {});
@@ -141,7 +141,7 @@ test('a benchmark the intake flags as untested and the block omits is flagged', 
   const flags = collectUntestedBenchmarkFlags(HINGE_BLOCK, RETURNING);
   assert.equal(flags.length, 1);
   assert.equal(flags[0].exercise, 'Deadlift');
-  assert.equal(flags[0].code, 'V95_UNTESTED_BENCHMARK_UNADDRESSED');
+  assert.equal(flags[0].code, 'V99_UNTESTED_BENCHMARK_UNADDRESSED');
 });
 
 test('the disclosure names the covering work and defers the retest to the clinician', () => {
@@ -167,4 +167,70 @@ test('a benchmark the block actually programs needs no disclosure', () => {
 test('a benchmark the intake never raises is left alone', () => {
   const quiet = { current_numbers: 'Goblet squat: 24 kg x 8 comfortable' };
   assert.deepEqual(collectUntestedBenchmarkFlags(HINGE_BLOCK, quiet), []);
+});
+
+// --- self-selected loads need a way to be selected ---------------------------
+
+import {
+  collectSelfSelectedLoadFlags,
+  normalizeSelfSelectedLoadProtocol,
+} from '../engine/self_selected_load_protocol.js';
+
+const UNSPECIFIED = `Guidance.\n\n${block(1, [
+  row('Tue', 'Seated Cable Row', 'RPE-selected load', 2, 10, '6-7', 'Horizontal pulling balance.'),
+  row('Tue', 'Seated Calf Raise', 'RPE-selected load', 2, 12, 6, 'Tissue-capacity work.'),
+  row('Tue', 'Push-up', 'RPE-selected load', 2, 8, 6, 'Pressing floor.'),
+  row('Mon', 'Rowing Ergometer', 'N/A', 1, '25 min', '3-4', 'Easy aerobic.'),
+  row('Mon', 'Goblet Squat', '18 kg', 3, 6, '6-7', 'Anchored to her benchmark.'),
+])}`;
+
+test('a load left to the athlete with no way to choose it is flagged', () => {
+  const flags = collectSelfSelectedLoadFlags(UNSPECIFIED, {});
+  assert.deepEqual(flags.map((f) => f.exercise), ['Seated Cable Row', 'Seated Calf Raise']);
+  assert.equal(flags[0].code, 'V100_SELF_SELECTED_LOAD_WITHOUT_PROTOCOL');
+});
+
+test('anchored loads, bodyweight movements and endurance rows are left alone', () => {
+  const named = collectSelfSelectedLoadFlags(UNSPECIFIED, {}).map((f) => f.exercise);
+  // A kilogram figure needs no protocol; a push-up is not asking for a weight;
+  // an erg is dosed by split and duration.
+  assert.equal(named.includes('Goblet Squat'), false);
+  assert.equal(named.includes('Push-up'), false);
+  assert.equal(named.includes('Rowing Ergometer'), false);
+});
+
+test('the protocol derives reps in reserve from the row own target RPE', () => {
+  const out = normalizeSelfSelectedLoadProtocol(UNSPECIFIED, {});
+  assert.equal(out.repaired, true);
+  const noteFor = (name) => out.program.split('\n').find((l) => l.includes(`\t${name}\t`)).split('\t')[7];
+  // RPE 6-7 leaves 3-4 in reserve; a flat RPE 6 leaves 4.
+  assert.match(noteFor('Seated Cable Row'), /about 3-4 clean reps still in reserve/);
+  assert.match(noteFor('Seated Calf Raise'), /about 4 clean reps still in reserve/);
+  // It also says where to write the number down, so next week can repeat it.
+  assert.match(noteFor('Seated Cable Row'), /write it in the Results column/);
+  assert.deepEqual(collectSelfSelectedLoadFlags(out.program, {}), []);
+});
+
+test('the load protocol changes no prescription field and is idempotent', () => {
+  const out = normalizeSelfSelectedLoadProtocol(UNSPECIFIED, {});
+  const fields = (p) => p.split('\n').filter((l) => l.includes('\t'))
+    .map((l) => l.split('\t').slice(0, 7).join('\t'));
+  assert.deepEqual(fields(out.program), fields(UNSPECIFIED));
+  const twice = normalizeSelfSelectedLoadProtocol(out.program, {});
+  assert.equal(twice.repaired, false);
+  assert.equal(twice.program, out.program);
+});
+
+test('a rowing ergometer is endurance, not general conditioning', async () => {
+  const { CATEGORY, classifyExercise } = await import('../engine/v38_movement_taxonomy.js');
+  // For a masters rower returning to a 2 km, this is the primary goal movement.
+  // Classifying it as GPP made the block's most important row invisible to every
+  // rule that reasons about endurance.
+  for (const name of ['Rowing Ergometer', 'Rowing Erg', 'Row Erg']) {
+    assert.equal(classifyExercise(name).category, CATEGORY.ENDURANCE, name);
+  }
+  // The generic sled/bike conditioning rule it sits in front of still applies.
+  assert.equal(classifyExercise('Sled Push').category, CATEGORY.GPP);
+  // And a cable row is still a horizontal pull, not an erg.
+  assert.equal(classifyExercise('Seated Cable Row').category, CATEGORY.HORIZONTAL_PULL);
 });
