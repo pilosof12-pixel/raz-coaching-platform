@@ -6,11 +6,19 @@ export const OAP_REVALIDATION_MARKER = 'ADVANCED-HYBRID-OAP-REPAIR-REVALIDATION-
 export const OAP_COACHING_ALIGNMENT_MARKER = 'ADVANCED-HYBRID-OAP-PROGRESSION-AXIS-LOCK';
 export const OAP_REPAIR_FEEDBACK_MARKER = 'ADVANCED-HYBRID-OAP-REPAIR-VOLUME-LOCK';
 
+// The exact runtime lines this patch keys off. Exported so tests build their
+// fixtures from the same strings the patch matches instead of a hand-copied
+// duplicate that silently rots the moment the pipeline gains an argument.
+export const OAP_IMPORT_ANCHOR =
+  'import { normalizeYouthPrimarySkillOrder } from "./engine/youth_skill_order_normalizer.js"; // YOUTH-SKILL-ORDER-REPAIR-WIRED';
+export const OAP_PROGRAM_ANCHOR =
+  '    let program = normalizeYouthPrimarySkillOrder(enrichSpecificWarmups(repairUnbenchmarkedVariationLoads(fixInvalidExerciseNames(raw), intake), intake), intake).program; // step 1: DETERMINISTIC-UNBENCHMARKED-LOAD-REPAIR + SPECIFIC-WARMUP-ENRICHMENT + YOUTH-SKILL-ORDER-REPAIR';
+
 export function patchAdvancedHybridOapPipelineSource(input) {
   let source = String(input || '');
 
   if (!source.includes(OAP_PIPELINE_MARKER)) {
-    const importAnchor = 'import { normalizeYouthPrimarySkillOrder } from "./engine/youth_skill_order_normalizer.js"; // YOUTH-SKILL-ORDER-REPAIR-WIRED';
+    const importAnchor = OAP_IMPORT_ANCHOR;
     const importCount = source.split(importAnchor).length - 1;
     if (importCount !== 1) throw new Error(`Advanced Hybrid OAP pipeline import anchor expected once, found ${importCount}`);
     source = source.replace(
@@ -18,7 +26,7 @@ export function patchAdvancedHybridOapPipelineSource(input) {
       `${importAnchor}\nimport { normalizeAdvancedHybridWeek4OapConsolidation } from "./engine/advanced_hybrid_oap_consolidation_normalizer.js"; // ${OAP_PIPELINE_MARKER}`,
     );
 
-    const programAnchor = '    let program = normalizeYouthPrimarySkillOrder(enrichSpecificWarmups(repairUnbenchmarkedVariationLoads(fixInvalidExerciseNames(raw), intake), intake), intake).program; // step 1: DETERMINISTIC-UNBENCHMARKED-LOAD-REPAIR + SPECIFIC-WARMUP-ENRICHMENT + YOUTH-SKILL-ORDER-REPAIR';
+    const programAnchor = OAP_PROGRAM_ANCHOR;
     const programCount = source.split(programAnchor).length - 1;
     if (programCount !== 1) throw new Error(`Advanced Hybrid OAP pipeline program anchor expected once, found ${programCount}`);
     source = source.replace(

@@ -26,23 +26,51 @@ const H = 'Day\tExercise\tWeight\tSets\tReps\tRest\tTarget RPE\tNotes\tResults';
 function row(day, exercise, weight, sets, reps, rpe, notes='') {
   return [day, exercise, weight, String(sets), String(reps), '3 min', String(rpe), notes, ''].join('\t');
 }
+// The Advanced validator demands a real progressive load ramp before every
+// heavy barbell exposure, so the fixture has to carry one or it fails on a rule
+// that has nothing to do with the OAP consolidation these tests cover.
+function ramp(day, exercise, loads) {
+  const anchors = loads.map((kg, i) => `${kg} kg x ${5 - i}`).join(', ');
+  return row(day, `[WARMUP] ${exercise} ramp`, '', 1, '-', '5', `Empty bar x 8, then ${anchors}.`);
+}
 function week(n, strictSets) {
   const squatHeavy = [165, 170, 175, 165][n - 1];
   const squatVolume = [145, 150, 155, 145][n - 1];
   const w4 = n === 4;
   const rows = [
+    ramp('Mon', 'Back Squat', [60, 100, 130]),
     row('Mon', 'Back Squat', `${squatHeavy} kg`, w4 ? 2 : 3, '3', w4 ? '7' : n === 3 ? '8' : '7.5', 'Primary heavy squat exposure.'),
+    ramp('Tue', 'Back Squat', [60, 90, 120]),
     row('Tue', 'Back Squat', `${squatVolume} kg`, w4 ? 1 : 2, '6', w4 ? '6.5' : '7', 'Lower-cost squat specificity exposure.'),
+    ramp('Tue', 'Overhead Press', [20, 40, 55]),
     row('Tue', 'Overhead Press', w4 ? '62.5 kg' : '65 kg', w4 ? 1 : 2, '5', w4 ? '6.5' : '7', 'Secondary press exposure.'),
+    row('Tue', 'Push Press', w4 ? '60 kg' : '62.5 kg', w4 ? 1 : 2, '3', w4 ? '6' : '7', 'Low-cost complementary vertical press.'),
     row('Fri', 'One-Arm Pull-up', 'BW', strictSets, '1 / arm', w4 ? '7' : '8', 'Strict quality singles, full reset between arms.'),
     row('Fri', 'Weighted Chin-up', '+45 kg', w4 ? 1 : 2, '5', w4 ? '6.5' : '7', 'Bilateral pull support.'),
     row('Sun', 'Assisted One-Arm Pull-up', 'Light band', w4 ? 2 : 3, '2 / arm', w4 ? '6' : '7', 'Clean assisted unilateral volume.'),
     row('Sun', 'Dumbbell Bench Press', 'RPE-selected load', w4 ? 1 : 2, '6', w4 ? '6' : '7', 'Low-cost upper support.'),
+    // One easy marathon-support run a week, dropping in Week 4. The marathon is
+    // a secondary goal here, and the validator rejects both its absence and any
+    // attempt to make it hard.
+    row('Sun', 'Run', `${[16, 18, 20, 14][n - 1]} km`, 1, 'continuous', w4 ? '5' : '6', 'Easy conversational pace, marathon support only.'),
   ];
   return `START_WEEK${n}_TSV\n${H}\n${rows.join('\n')}\nEND_WEEK${n}_TSV`;
 }
-function program(w4StrictSets = 4) {
-  return [week(1, 3), week(2, 3), week(3, 3), week(4, w4StrictSets)].join('\n\n');
+// Week 3 is addressable on its own. Weeks 1-3 are otherwise byte-identical, so
+// a string replace aimed at "the Week 3 row" silently rewrote Week 1 instead and
+// the test asserted against a program it never built.
+// The Sets cell of every strict One-Arm Pull-up row, week by week. The normalizer
+// has two jobs -- cap Week 4 volume, and write the Week 1-3 build standard into
+// the notes -- so "the volume repair did nothing" has to be asserted on the set
+// cells rather than on the whole program text.
+function strictOapSetCells(text) {
+  return String(text).split('\n')
+    .filter((line) => /\tOne-Arm Pull-up\t/.test(line))
+    .map((line) => line.split('\t')[3]);
+}
+
+function program(w4StrictSets = 4, w3StrictSets = 3) {
+  return [week(1, 3), week(2, 3), week(3, w3StrictSets), week(4, w4StrictSets)].join('\n\n');
 }
 
 test('Advanced validator rejects Week 4 strict OAP set volume above Week 3', () => {
@@ -65,9 +93,12 @@ test('deterministic Advanced repair caps Week 4 strict OAP volume at Week 3 with
 test('Advanced repair is a no-op when Week 4 already holds or reduces strict OAP volume', () => {
   const good = program(3);
   const fixed = normalizeAdvancedHybridWeek4OapConsolidation(good, intake);
-  assert.equal(fixed.repaired, false);
-  assert.equal(fixed.program, good);
-  assert.doesNotThrow(() => validateAdvancedHybridQualitySemantic(good, intake));
+  assert.equal(fixed.repairs.some((r) => r.type === 'week4_strict_oap_volume'), false);
+  assert.deepEqual(strictOapSetCells(fixed.program), strictOapSetCells(good));
+  const again = normalizeAdvancedHybridWeek4OapConsolidation(fixed.program, intake);
+  assert.equal(again.repaired, false);
+  assert.equal(again.program, fixed.program);
+  assert.doesNotThrow(() => validateAdvancedHybridQualitySemantic(fixed.program, intake));
 });
 
 test('Week 4 set cell with per-arm suffix is parsed exactly like the release validator and converges to an exact set count', () => {
@@ -86,10 +117,7 @@ test('Week 4 set cell with per-arm suffix is parsed exactly like the release val
 });
 
 test('Week 3 set range uses the same conservative first-number metric as the release validator', () => {
-  const bad = program(3).replace(
-    'Fri\tOne-Arm Pull-up\tBW\t3\t1 / arm\t3 min\t8\tStrict quality singles, full reset between arms.\nFri\tWeighted Chin-up',
-    'Fri\tOne-Arm Pull-up\tBW\t2-3\t1 / arm\t3 min\t8\tStrict quality singles, full reset between arms.\nFri\tWeighted Chin-up',
-  );
+  const bad = program(3, '2-3');
   assert.throws(
     () => validateAdvancedHybridQualitySemantic(bad, intake),
     (error) => error?.code === 'ADVANCED_HYBRID_WEEK4_OAP_VOLUME_INCREASED',
@@ -106,7 +134,10 @@ test('set range is left unchanged when its first-number metric already satisfies
     'Fri\tOne-Arm Pull-up\tBW\t3-4\t1 / arm',
   );
   const fixed = normalizeAdvancedHybridWeek4OapConsolidation(good, intake);
-  assert.equal(fixed.repaired, false);
-  assert.equal(fixed.program, good);
+  assert.equal(fixed.repairs.some((r) => r.type === 'week4_strict_oap_volume'), false);
+  assert.deepEqual(strictOapSetCells(fixed.program), strictOapSetCells(good));
+  const again = normalizeAdvancedHybridWeek4OapConsolidation(fixed.program, intake);
+  assert.equal(again.repaired, false);
+  assert.equal(again.program, fixed.program);
   assert.doesNotThrow(() => validateAdvancedHybridQualitySemantic(good, intake));
 });

@@ -185,7 +185,10 @@ function stabilizeSecondaryPressDose(program, intake = {}) {
           rowChanged = true;
         }
       }
-      if (rowChanged) changedExercises.add(name);
+      // Keyed by the same lowercased name the baseline map uses. Adding the
+      // display name here and the lowercased name below counted every held
+      // press twice, so the repair log reported double the repairs actually made.
+      if (rowChanged) changedExercises.add(name.toLowerCase());
     }
     if (changed) candidate = rewriteWeek(candidate, parsed);
 

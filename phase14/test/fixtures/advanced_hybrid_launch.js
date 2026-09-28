@@ -38,10 +38,25 @@ const HEADER = 'Day\tExercise\tWeight\tSets\tReps\tRest\tTarget RPE\tNotes\tResu
 function rowsForWeek(week) {
   const squatHeavy = [175, 177.5, 180, 172.5][week - 1];
   const squatVolume = [160, 162.5, 165, 160][week - 1];
-  const ohp = [70, 72.5, 75, 70][week - 1];
+  // Secondary strict OHP holds its Week-1 dose through the build weeks. The
+  // AH-01 hierarchy puts squat and OAP first against five MMA sessions, and the
+  // deterministic normalizer enforces that hold, so the fixture has to state it.
+  const ohp = [70, 70, 70, 70][week - 1];
   const strictOapSets = [4, 5, 5, 4][week - 1];
   const assistedReps = ['2 / arm', '3 / arm', '2 / arm', '2 / arm'][week - 1];
   const runKm = [20, 20, 21, 18][week - 1];
+  // Build weeks 2-3 are the deterministic hold: same load, same sets, same reps
+  // as Week 1, with the ramp and the coaching cue stating the hold rather than
+  // advertising a load progression the rows do not make. This fixture is meant to
+  // be a fixed point of the production pipeline, so it carries the converged text.
+  const holding = week === 2 || week === 3;
+  const pressPrep = holding
+    ? 'Press prep: scapular wall slide x 8 and band pull-apart x 12. Ramp Overhead Press: 27.5 kg x 5, 42.5 kg x 3, 55 kg x 1-2 before 70 kg work sets.'
+    : 'Press prep: scapular wall slide x 8 and band pull-apart x 12. Ramp Overhead Press: empty bar x 10, 40 kg x 5, 55 kg x 3, 65 kg x 1 before work sets.';
+  const ohpNote = holding
+    ? 'Hold the Week 1 strict-press dose at 70 kg in this build week; progress rep quality and bar speed, not load. No layback or grindy lockouts.'
+    : 'Secondary strict OHP held at a recoverable build-week dose. Keep reps crisp before MMA.';
+
   const runNote = week === 4
     ? 'Easy conversational long run. Consolidate durability; marathon remains secondary to strength and MMA quality.'
     : 'Easy conversational long run. Build marathon durability without adding hard intervals around five MMA sessions.';
@@ -52,8 +67,8 @@ function rowsForWeek(week) {
     ['Mon', 'One-Arm Pull-up', 'BW', `${strictOapSets}`, '1 / arm', '2-3 min', '8', 'Primary OAP skill-strength. Clean full-ROM singles with one rep in reserve.', ''],
     ['Mon', 'Pallof Press', 'RPE-selected load', '2', '8 / side', '60s', '6-7', 'Low-cost trunk support; remove first if MMA fatigue is high.', ''],
 
-    ['Tue', '[WARMUP]', 'BW / barbell', '1', '6-8 min', 'N/A', 'N/A', 'Press prep: scapular wall slide x 8 and band pull-apart x 12. Ramp Overhead Press: empty bar x 10, 40 kg x 5, 55 kg x 3, 65 kg x 1 before work sets.', ''],
-    ['Tue', 'Overhead Press', `${ohp} kg`, week === 4 ? '2' : '3', week === 3 ? '4' : '5', '3 min', '7.5-8', 'Secondary strict OHP progression. Keep reps crisp before MMA.', ''],
+    ['Tue', '[WARMUP]', 'BW / barbell', '1', '6-8 min', 'N/A', 'N/A', pressPrep, ''],
+    ['Tue', 'Overhead Press', `${ohp} kg`, week === 4 ? '2' : '3', '5', '3 min', '7.5-8', ohpNote, ''],
     ['Tue', 'Bulgarian Split Squat', 'RPE-selected load', '2', '6 / side', '2 min', '7', 'Minimum useful unilateral hypertrophy/strength support.', ''],
 
     ['Wed', 'Run', 'Easy conversational pace', '1', `${runKm} km`, 'N/A', '4-5', runNote, ''],

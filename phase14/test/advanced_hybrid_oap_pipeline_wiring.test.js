@@ -5,18 +5,20 @@ import {
   OAP_PIPELINE_MARKER,
   OAP_REVALIDATION_MARKER,
   OAP_COACHING_ALIGNMENT_MARKER,
+  OAP_IMPORT_ANCHOR,
+  OAP_PROGRAM_ANCHOR,
   patchAdvancedHybridOapPipelineSource,
 } from '../scripts/apply_advanced_hybrid_oap_pipeline_wiring.mjs';
 
 function fixture() {
   return [
-    'import { normalizeYouthPrimarySkillOrder } from "./engine/youth_skill_order_normalizer.js"; // YOUTH-SKILL-ORDER-REPAIR-WIRED',
+    OAP_IMPORT_ANCHOR,
     'const OPENAI_COMPACT_DEVELOPER = [',
     '  "Use realistic current-performance anchors. Goal numbers are targets, not current capacities. Prefer low fatigue and specificity when sport load is high. Do not assign a high RPE to a load that is obviously too light for the athlete\'s current benchmark.",',
-    '];',
+    '].join("\\n");',
     'async function generateValidatedProgram(intake) {',
     '  const raw = await runEngineRaw("x");',
-    '    let program = normalizeYouthPrimarySkillOrder(enrichSpecificWarmups(repairUnbenchmarkedVariationLoads(fixInvalidExerciseNames(raw), intake)), intake).program; // step 1: DETERMINISTIC-UNBENCHMARKED-LOAD-REPAIR + SPECIFIC-WARMUP-ENRICHMENT + YOUTH-SKILL-ORDER-REPAIR',
+    OAP_PROGRAM_ANCHOR,
     '  for (let attempt = 1; attempt <= 4; attempt++) {',
     '    validatePhase15FinalProgram(program, intake);',
     '    program = await runEngineRaw("repair candidate");',
