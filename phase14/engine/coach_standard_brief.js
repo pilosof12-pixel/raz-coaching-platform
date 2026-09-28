@@ -96,6 +96,32 @@ export function buildProgressionBrief(intake = {}) {
   ].join('\n');
 }
 
+// The progression brief above is scoped to the goals the athlete asked to
+// improve, and the work underneath those goals falls outside it. That is where
+// the defect actually lived: the masters block progressed her erg correctly and
+// froze five supporting exposures for three weeks under unchanging notes.
+// The deterministic repair catches this, but a repair writes a repair's prose.
+// Saying it here gets it written by the coach instead.
+export function buildSupportingStandardBrief(intake = {}) {
+  // Gated on the athlete having stated a goal at all, so an empty intake still
+  // produces an empty brief rather than four rules about nothing.
+  const goals = ['primary', 'secondary', 'maintenance']
+    .flatMap((t) => arr(intake[`${t}_goals`]).map(String))
+    .filter((g) => g.trim());
+  if (!goals.length) return '';
+  return [
+    '* SUPPORTING WORK EITHER MOVES OR STATES ITS STANDARD.',
+    '  Every loaded exposure that is not trunk, tissue-capacity or GPP work must either change across Weeks 1-3 -- load, reps, sets, tempo or range -- or say in that row, week by week, what the athlete is beating while the numbers hold: depth and bracing, control of the lowering, a lockout that does not slow, symmetry, or the same load at a lower RPE. Holding a dose is often right. Three identical weeks under three identical notes is copy-paste, and reads as one.',
+    '  Write the standard in the movement\'s own terms. A squat is judged on depth and bracing, a hinge on a controlled lockout, a press on a lockout that holds its speed, a carry on posture and grip over the full distance. The same sentence on five different exercises is the same defect wearing a different coat.',
+    '* A SELF-SELECTED LOAD SAYS HOW TO SELECT IT.',
+    '  Where the athlete has no benchmark for a variation, do not invent a kilogram figure -- but "RPE-selected load" on its own is a blank, not a prescription. State how many clean reps should remain in reserve on the last set, and tell them to record the load they used so the next week starts from a real number. A carry is judged by whether posture and grip hold for the full distance, not by reps in reserve, and a bodyweight movement is not asking for a weight at all.',
+    '* A WEEK-SCOPED CLAIM MUST BE TRUE.',
+    '  Do not write "only this week" about a dose that a later week prescribes again. The athlete plans around that sentence, and a note that contradicts its own table teaches them not to trust either.',
+    '* A BENCHMARK THE ATHLETE FLAGGED IS ADDRESSED, EVEN IF IT IS ABSENT.',
+    '  If the intake names a lift as not attempted, untested, avoided or feared, either program it or say in the guidance that it is deliberately not here, what covers the same pattern instead, and what has to be true before it comes back. Leaving it out can be right; leaving it unmentioned means they cannot tell whether it was a decision or an oversight.',
+  ].join('\n');
+}
+
 export function buildSchedulingBrief(intake = {}) {
   if (String(intake.gym_availability_mode || '').toLowerCase() !== 'flexible') return '';
   const history = `${intake.injuries || ''} ${JSON.stringify(intake.pain || {})}`;
@@ -141,6 +167,7 @@ export function buildCoachStandardBrief(intake = {}) {
   return [
     buildBenchmarkExposureBrief(intake),
     buildProgressionBrief(intake),
+    buildSupportingStandardBrief(intake),
     buildSpeedBrief(intake),
     buildSchedulingBrief(intake),
   ].filter(Boolean).join('\n');

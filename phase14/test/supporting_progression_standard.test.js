@@ -234,3 +234,20 @@ test('a rowing ergometer is endurance, not general conditioning', async () => {
   // And a cable row is still a horizontal pull, not an erg.
   assert.equal(classifyExercise('Seated Cable Row').category, CATEGORY.HORIZONTAL_PULL);
 });
+
+// --- the model is told, not just corrected -----------------------------------
+
+test('the coach brief asks for all four standards up front', async () => {
+  const { buildCoachStandardBrief } = await import('../engine/coach_standard_brief.js');
+  const brief = buildCoachStandardBrief({
+    primary_goals: ['Race a 2 km erg again'],
+    current_numbers: '2 km erg: 8:58\nDeadlift: not attempted since the injury',
+  });
+  // A repair writes a repair's prose. These exist so the coach writes it first.
+  assert.match(brief, /SUPPORTING WORK EITHER MOVES OR STATES ITS STANDARD/);
+  assert.match(brief, /A SELF-SELECTED LOAD SAYS HOW TO SELECT IT/);
+  assert.match(brief, /A WEEK-SCOPED CLAIM MUST BE TRUE/);
+  assert.match(brief, /A BENCHMARK THE ATHLETE FLAGGED IS ADDRESSED/);
+  // And it names the failure mode the repair itself fell into first time round.
+  assert.match(brief, /same sentence on five different exercises/i);
+});
