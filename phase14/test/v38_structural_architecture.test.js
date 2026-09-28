@@ -24,6 +24,18 @@ const LIVE = path.join(process.cwd(), '..', 'docs', 'qa', 'live-three-avatar', '
 const readLive = (n) => {
   return fs.readFileSync(path.join(process.cwd(), 'test', 'fixtures', `${n}-program.txt`), 'utf8');
 };
+
+// The artifacts the coach's review was actually written about, frozen under
+// their own path. These tests are negative fixtures: their whole value is that
+// the detectors still catch the defects that review found. Reading them from
+// the live-run directory pointed them at a moving target -- every acceptance run
+// overwrites it -- so once the generator improved, the defects vanished and the
+// tests failed for the best possible reason. Pinning them keeps the detectors
+// honest while the live artifacts go on improving.
+const readReviewArtifact = (n) => fs.readFileSync(
+  path.join(process.cwd(), 'test', 'fixtures', 'v37-review', `${n}-program.txt`),
+  'utf8',
+);
 const HEADER = 'Day\tExercise\tWeight\tSets\tReps\tRest\tTarget RPE\tNotes\tResults';
 const block = (w, rows) => `START_WEEK${w}_TSV\n${HEADER}\n${rows.join('\n')}\nEND_WEEK${w}_TSV`;
 
@@ -223,7 +235,7 @@ test('[T15] the brief states mandatory categories and the circular-week rule', (
 // --- the live artifacts as negative fixtures ---------------------------------
 
 test('[T16] the v37 live programs reproduce every structural defect the review found', () => {
-  const hybrid = auditProgramStructure(readLive('advanced_hybrid'), HYBRID);
+  const hybrid = auditProgramStructure(readReviewArtifact('advanced_hybrid'), HYBRID);
   const hCodes = new Set(hybrid.map((f) => f.code));
   assert.ok(hCodes.has('V38_INCOMPLETE_SESSION'), 'Hybrid: two-exercise Sunday');
   const hCoverage = hybrid.filter((f) => f.code === 'V38_MISSING_MOVEMENT_CATEGORY');
@@ -233,11 +245,15 @@ test('[T16] the v37 live programs reproduce every structural defect the review f
   assert.ok(hCodes.has('V38_CONSECUTIVE_CONFLICTING_EXPOSURE'), 'Hybrid: sun->mon squat conflict');
   assert.ok(hybrid.some((f) => f.from === 'sun' && f.to === 'mon'));
 
-  const youth = auditProgramStructure(readLive('youth_gymnastics'), YOUTH);
-  const yb = youth.find((f) => f.code === 'V38_SKILL_WITHOUT_FOUNDATION' && f.session === 'Session B');
-  assert.ok(yb, 'Youth: Session B skill work without foundational strength');
+  const youth = auditProgramStructure(readReviewArtifact('youth_gymnastics'), YOUTH);
+  // Session A carries the Ring Row and Ring Dip, so the week does supply the
+  // foundation and the hard week-level code correctly stays silent. The finding
+  // the review described is the day-level one -- and it is the only one of the
+  // two that carries a session, which is what this assertion filters on.
+  const yb = youth.find((f) => f.code === 'V38_SKILL_DAY_WITHOUT_SAME_DAY_FOUNDATION' && f.session === 'Session B');
+  assert.ok(yb, 'Youth: Session B skill work without same-day foundational strength');
 
-  const tactical = auditProgramStructure(readLive('tactical_3k'), TACTICAL);
+  const tactical = auditProgramStructure(readReviewArtifact('tactical_3k'), TACTICAL);
   assert.ok(tactical.some((f) => f.code === 'V38_CARRY_PACE_ONLY_PROGRESSION'), 'Tactical: ruck pace-only progression');
 });
 

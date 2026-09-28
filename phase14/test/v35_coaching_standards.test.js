@@ -25,6 +25,18 @@ const LIVE = path.join(process.cwd(), '..', 'docs', 'qa', 'live-three-avatar', '
 const readLive = (n) => {
   return fs.readFileSync(path.join(process.cwd(), 'test', 'fixtures', `${n}-program.txt`), 'utf8');
 };
+
+// The artifacts the v35 review was actually written about, frozen under their
+// own path. These tests are negative fixtures: their whole value is that
+// the detectors still catch the defects that review found. Reading them from
+// the live-run directory pointed them at a moving target -- every acceptance run
+// overwrites it -- so once the generator improved, the defects vanished and the
+// tests failed for the best possible reason. Pinning them keeps the detectors
+// honest while the live artifacts go on improving.
+const readReviewArtifact = (n) => fs.readFileSync(
+  path.join(process.cwd(), 'test', 'fixtures', 'v35-review', `${n}-program.txt`),
+  'utf8',
+);
 const HEADER = 'Day\tExercise\tWeight\tSets\tReps\tRest\tTarget RPE\tNotes\tResults';
 const block = (w, rows) => `START_WEEK${w}_TSV\n${HEADER}\n${rows.join('\n')}\nEND_WEEK${w}_TSV`;
 const program = (head, weeks) => `${head}\n\n${weeks.join('\n\n')}`;
@@ -159,10 +171,10 @@ test('[S7] Youth raises no coaching-standard flags: the gates stay silent when n
 
 test('[S8] the gates reproduce the reviewer findings on the current live artifacts', () => {
   const AH = { primary_goals: ['220kg back squat', '4 One arm pullups'], secondary_goals: ['100kg overhead press', 'Marathon'] };
-  const hybrid = collectCoachingStandardFlags(readLive('advanced_hybrid'), AH).map((f) => f.code);
+  const hybrid = collectCoachingStandardFlags(readReviewArtifact('advanced_hybrid'), AH).map((f) => f.code);
   assert.ok(hybrid.includes('V35_NARRATIVE_PROGRESSION_CLAIM_UNSUPPORTED'), 'Hybrid summary claims the long run builds while it is held');
 
-  const tactical = collectCoachingStandardFlags(readLive('tactical_3k'), TACTICAL);
+  const tactical = collectCoachingStandardFlags(readReviewArtifact('tactical_3k'), TACTICAL);
   const codes = tactical.map((f) => f.code);
   assert.ok(codes.includes('V35_CONFLICTING_SYMPTOM_ALGORITHM'), 'Tactical states two symptom hierarchies');
   assert.ok(codes.includes('V35_SECONDARY_VOLUME_CREEP'), 'Tactical raises accessory volume in the Week 3 progression week');

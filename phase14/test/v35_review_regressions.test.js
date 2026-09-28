@@ -23,6 +23,18 @@ const LIVE = path.join(process.cwd(), '..', 'docs', 'qa', 'live-three-avatar', '
 const readLive = (n) => {
   return fs.readFileSync(path.join(process.cwd(), 'test', 'fixtures', `${n}-program.txt`), 'utf8');
 };
+
+// The artifacts the v35 review was actually written about, frozen under their
+// own path. These tests are negative fixtures: their whole value is that
+// the detectors still catch the defects that review found. Reading them from
+// the live-run directory pointed them at a moving target -- every acceptance run
+// overwrites it -- so once the generator improved, the defects vanished and the
+// tests failed for the best possible reason. Pinning them keeps the detectors
+// honest while the live artifacts go on improving.
+const readReviewArtifact = (n) => fs.readFileSync(
+  path.join(process.cwd(), 'test', 'fixtures', 'v35-review', `${n}-program.txt`),
+  'utf8',
+);
 const HEADER = 'Day\tExercise\tWeight\tSets\tReps\tRest\tTarget RPE\tNotes\tResults';
 const block = (w, rows) => `START_WEEK${w}_TSV\n${HEADER}\n${rows.join('\n')}\nEND_WEEK${w}_TSV`;
 
@@ -156,9 +168,9 @@ test('[R12] the same movement may not have its specific ramp prescribed twice on
 // --- the reviewed artifacts --------------------------------------------------
 
 test('[R13] every contradiction the reviewer found in the v34 artifacts is now detected', () => {
-  const hybrid = collectAllV34ConsistencyFlags(readLive('advanced_hybrid'), { current_numbers: 'Weighted Chin-up: +80 kg 1RM' });
-  const youth = collectAllV34ConsistencyFlags(readLive('youth_gymnastics'), {});
-  const tactical = collectAllV34ConsistencyFlags(readLive('tactical_3k'), { current_numbers: 'Weighted Pull-up: +30 kg x 5' });
+  const hybrid = collectAllV34ConsistencyFlags(readReviewArtifact('advanced_hybrid'), { current_numbers: 'Weighted Chin-up: +80 kg 1RM' });
+  const youth = collectAllV34ConsistencyFlags(readReviewArtifact('youth_gymnastics'), {});
+  const tactical = collectAllV34ConsistencyFlags(readReviewArtifact('tactical_3k'), { current_numbers: 'Weighted Pull-up: +30 kg x 5' });
 
   const has = (flags, code, exercise) => flags.some((f) => f.code === code && new RegExp(exercise, 'i').test(f.exercise));
   // Hybrid: Week 4 OHP "repeat" while the load rises; assisted OAP "doubles" on 1 rep.
