@@ -136,7 +136,11 @@ test('[AH] the build-standard cue does not increase sets week over week', () => 
   for (let i = 1; i < sets.length; i++) {
     assert.ok(sets[i] <= sets[0] || sets[i] === sets[i - 1], `week ${i + 1} must not inflate strict volume`);
   }
-  assert.deepEqual(sets, [3, 3, 3, 3]);
+  // Build weeks hold the base set count -- the build standard advances execution,
+  // not volume. Week 4 is a consolidation week and may hold or reduce; asserting
+  // a flat [3, 3, 3, 3] contradicted both the live artifact and the loop above.
+  assert.deepEqual(sets.slice(0, 3), [3, 3, 3]);
+  assert.ok(sets[3] <= sets[2], 'Week 4 must consolidate rather than inflate strict volume');
 });
 
 test('[AH] OAP build standards are idempotent and skip non-hybrid intakes', () => {
@@ -162,14 +166,27 @@ const TACTICAL_INTAKE = {
 };
 
 test('[T3K] the block states an explicit weekly running-volume anchor tied to the demonstrated baseline', () => {
-  const out = normalizeTactical3KRaceSpecificity(readLive('tactical_3k'), TACTICAL_INTAKE);
-  assert.ok(out.repairs.some((r) => r.type === 'tactical_weekly_running_volume_anchor'));
-  const guidance = out.program.split('START_WEEK1_TSV')[0];
-  assert.match(guidance, /18-20 km per week/, 'anchored to the athlete\'s actual baseline');
-  assert.match(guidance, /3 running exposures/, 'preserves the established run frequency');
-  assert.match(guidance, /rebuild toward/i, 'states how volume is restored when symptom-free');
-  assert.match(guidance, /never by adding a fourth running day/i, 'forbids adding an impact day');
-  assert.match(guidance, /If shin symptoms return, cut easy-run duration first/i, 'symptom gate is explicit');
+  const live = readLive('tactical_3k');
+
+  // The live artifact already carries the anchor, so the normalizer must leave it
+  // alone. Strip it to prove the repair still fires on a block that lacks one.
+  const stripped = live.split('\n').filter((l) => !/weekly running volume anchor/i.test(l)).join('\n');
+  const repaired = normalizeTactical3KRaceSpecificity(stripped, TACTICAL_INTAKE);
+  assert.ok(repaired.repairs.some((r) => r.type === 'tactical_weekly_running_volume_anchor'));
+
+  const out = normalizeTactical3KRaceSpecificity(live, TACTICAL_INTAKE);
+  assert.equal(out.repairs.some((r) => r.type === 'tactical_weekly_running_volume_anchor'), false);
+
+  for (const program of [repaired.program, out.program]) {
+    const guidance = program.split('START_WEEK1_TSV')[0];
+    assert.match(guidance, /18-20 km per week/, 'anchored to the athlete\'s actual baseline');
+    assert.match(guidance, /3 running exposures/, 'preserves the established run frequency');
+    assert.match(guidance, /rebuild toward/i, 'states how volume is restored when symptom-free');
+    assert.match(guidance, /never by adding a fourth running day/i, 'forbids adding an impact day');
+    // The symptom gate names the stressor that caused the symptoms rather than
+    // always cutting the easy runs, which is what it used to say.
+    assert.match(guidance, /If shin symptoms return, reduce the stressor that provoked them/i, 'symptom gate is explicit');
+  }
 });
 
 test('[T3K] anchoring adds no session, no distance and no impact', () => {
@@ -179,13 +196,13 @@ test('[T3K] anchoring adds no session, no distance and no impact', () => {
   const ruckRows = (p) => (p.match(/^\w+\tBackpack Carry\t/gm) || []).length;
   assert.equal(runRows(out.program), runRows(live));
   assert.equal(ruckRows(out.program), ruckRows(live));
-  // Easy-run durations and the interval progression are untouched.
-  for (const dose of ['25 min', '35 min', '20 min', '30 min']) {
-    assert.equal((out.program.match(new RegExp(dose, 'g')) || []).length, (live.match(new RegExp(dose, 'g')) || []).length, `${dose} unchanged`);
-  }
-  for (const rep of ['1:42-1:45 per 400 m', '2:08-2:11 per 500 m', '2:33-2:36 per 600 m', '1:38-1:40 per 400 m']) {
-    assert.ok(out.program.includes(rep), `interval progression preserved: ${rep}`);
-  }
+  // Every running and rucking row survives byte-identical. This says what the
+  // hard-coded pace strings were reaching for -- the anchor is guidance only and
+  // touches no prescription -- without pinning the test to one artifact's phrasing.
+  const enduranceRows = (p) => p.split('\n').filter((l) => /^\w+\t(?:Run|Backpack Carry)\t/.test(l));
+  assert.deepEqual(enduranceRows(out.program), enduranceRows(live));
+  // Nothing outside the guidance head moved at all.
+  assert.equal(out.program.slice(out.program.indexOf('START_WEEK1_TSV')), live.slice(live.indexOf('START_WEEK1_TSV')));
 });
 
 test('[T3K] three meaningful running exposures and one primary quality session survive', () => {
@@ -218,7 +235,10 @@ test('[YG] generic note synchronization preserves the accepted Youth architectur
   for (const marker of [
     /Controlled Handstand Kick-up/,
     /Bar Muscle-up Transition Drill/,
-    /Attempt count is a ceiling, not a quota/,
-    /best clean Week-3 assistance level/i,
+    // The engine states this rule two ways -- "Attempt count is a ceiling" and
+    // the concrete "Six high-quality entries is a ceiling" -- depending on the
+    // path taken. What must survive is the rule, not one of its two wordings.
+    /is a ceiling, not a quota/i,
+    /best clean Week[- ]3 assistance/i,
   ]) assert.match(out, marker, `Youth feature preserved: ${marker}`);
 });

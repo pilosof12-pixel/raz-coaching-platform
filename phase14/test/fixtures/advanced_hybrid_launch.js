@@ -37,7 +37,11 @@ const HEADER = 'Day\tExercise\tWeight\tSets\tReps\tRest\tTarget RPE\tNotes\tResu
 
 function rowsForWeek(week) {
   const squatHeavy = [175, 177.5, 180, 172.5][week - 1];
-  const squatVolume = [160, 162.5, 165, 160][week - 1];
+  // The Friday squat is the deliberately lower-cost exposure. AH-02 treats any
+  // Back Squat at >=80% of the supplied 205 kg 1RM (164 kg) as substantial, so
+  // holding this one below that line is what makes it genuinely secondary rather
+  // than a second heavy day wearing a "volume" label.
+  const squatVolume = [155, 157.5, 160, 152.5][week - 1];
   // Secondary strict OHP holds its Week-1 dose through the build weeks. The
   // AH-01 hierarchy puts squat and OAP first against five MMA sessions, and the
   // deterministic normalizer enforces that hold, so the fixture has to state it.
@@ -70,11 +74,15 @@ function rowsForWeek(week) {
     ['Tue', '[WARMUP]', 'BW / barbell', '1', '6-8 min', 'N/A', 'N/A', pressPrep, ''],
     ['Tue', 'Overhead Press', `${ohp} kg`, week === 4 ? '2' : '3', '5', '3 min', '7.5-8', ohpNote, ''],
     ['Tue', 'Bulgarian Split Squat', 'RPE-selected load', '2', '6 / side', '2 min', '7', 'Minimum useful unilateral hypertrophy/strength support.', ''],
+    // A third exposure so Tuesday is a complete session rather than a two-item
+    // stub. Shoulder tissue capacity is the right category next to the strict
+    // press for an athlete taking five MMA sessions a week.
+    ['Tue', 'Face Pull', 'RPE-selected load', week === 4 ? '1' : '2', '12-15', '60s', '6', 'Posterior shoulder tissue capacity around pressing and MMA volume.', ''],
 
     ['Wed', 'Run', 'Easy conversational pace', '1', `${runKm} km`, 'N/A', '4-5', runNote, ''],
 
     ['Fri', '[WARMUP]', 'BW / barbell', '1', '8-10 min', 'N/A', 'N/A', 'Squat and pull prep: bodyweight squat x 8, scapular pull-up x 6. Ramp Back Squat: empty bar x 10, 60 kg x 5, 100 kg x 3, 135 kg x 2, 150 kg x 1 before work sets. Ramp Weighted Chin-up separately with BW x 5, +20 kg x 3, +35 kg x 2.', ''],
-    ['Fri', 'Back Squat', `${squatVolume} kg`, week === 4 ? '2' : '3', '5', '3 min', '7-8', 'Primary squat volume exposure. Technique and bar speed stay repeatable.', ''],
+    ['Fri', 'Back Squat', `${squatVolume} kg`, week === 4 ? '2' : '3', '5', '3 min', '7', 'Primary squat volume exposure, deliberately lower cost than Monday. Technique and bar speed stay repeatable.', ''],
     ['Fri', 'Assisted One-Arm Pull-up', week === 3 ? 'Minimum clean assistance' : 'Light assistance', '3', assistedReps, '2 min', '7-8', 'Second direct OAP exposure. Reduce assistance only when both arms stay symmetrical.', ''],
     ['Fri', 'Dip', 'BW', '2', '6-8', '90s', '7', 'Small pressing/hypertrophy floor; first accessory to trim when MMA recovery is poor.', ''],
 
