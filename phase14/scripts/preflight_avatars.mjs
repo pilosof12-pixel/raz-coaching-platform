@@ -101,7 +101,6 @@ const ALIAS = (x) => (
             : x.startsWith('mma') || x.startsWith('fight') ? 'mma_fight_camp'
               : x.startsWith('foot') || x.startsWith('soccer') || x.startsWith('inseason') ? 'inseason_footballer'
                 : x.startsWith('master') || x.startsWith('row') ? 'masters_return'
-                  : x.startsWith('heb') || x.startsWith('ivrit') ? 'hebrew_lifter'
                     : x.startsWith('dual') || x.startsWith('hyrox') ? 'dual_event_hyrox'
                       : x.startsWith('trav') || x.startsWith('exec') || x.startsWith('hotel') ? 'travelling_exec'
                         : x.startsWith('post') || x.startsWith('partum') ? 'postpartum_runner'

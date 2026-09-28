@@ -17,8 +17,11 @@ const read = (f) => fs.readFileSync(path.join(root, '..', f), 'utf8');
 
 test('[J1] background jobs are spawned with a rejection handler', () => {
   const server = read('server.js');
-  const spawns = server.match(/^\s*run(?:Build|Adjust|SetLanguage)Job\(.*$/gm) || [];
-  assert.ok(spawns.length >= 3, 'expected the three fire-and-forget job spawns');
+  // Two job types now, not three: the set-language job went with Hebrew. The
+  // count was never the point -- what matters is that every fire-and-forget
+  // spawn is guarded, which the loop below asserts for each one it finds.
+  const spawns = server.match(/^\s*run(?:Build|Adjust)Job\(.*$/gm) || [];
+  assert.ok(spawns.length >= 2, 'expected the fire-and-forget job spawns');
   for (const line of spawns) {
     assert.match(line, /\.catch\(/, `unguarded background job spawn: ${line.trim()}`);
   }

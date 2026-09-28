@@ -225,11 +225,9 @@ Object.assign(INTAKES, {
   },
   inseason_footballer: workflowIntake('footballer'),
   masters_return: workflowIntake('masters'),
-  // Both of these produced for the first time in run #110, so until now neither
-  // had a program to stress. The Hebrew client is the only non-English avatar
-  // the suite covers, and the postpartum return is the only athlete whose
-  // progression is measured in time on feet rather than pace.
-  hebrew_lifter: workflowIntake('hebrewLifter'),
+  // The postpartum return is the only athlete whose progression is measured in
+  // time on feet rather than pace. The Hebrew lifter that used to sit beside it
+  // went with Hebrew.
   postpartum_runner: workflowIntake('postpartum'),
 });
 
@@ -426,16 +424,8 @@ const PERTURBATIONS = [
   },
 
   {
-    id: 'english-drills-in-hebrew-notes', seen: 'coach review of the Hebrew lifter',
-    applies: ['hebrew_lifter'],
-    // The state the Hebrew program actually shipped in: Hebrew coaching notes
-    // with English drill lists inside them.
-    apply: (p) => p.replace(/\u05de\u05ea\u05d7 \u05e1\u05e7\u05e4\u05d5\u05dc\u05e8\u05d9/g, 'Scapular pull-up')
-      .replace(/\u05e4\u05ea\u05d9\u05d7\u05ea \u05d2\u05d5\u05de\u05d9\u05d9\u05d4/g, 'Band pull-apart'),
-  },
-  {
     id: 'warmup-boilerplate-restored', seen: 'coach review: output reads as templated',
-    applies: ['hebrew_lifter', 'postpartum_runner'],
+    applies: ['postpartum_runner'],
     apply: (p) => p.replace(/(\[WARMUP\][^\n]*?)\t([^\t]*)\t\t?$/gm,
       (m, head, note) => `${head}\t${note} Keep the warm-up specific and non-fatiguing.\t`),
   },
@@ -627,7 +617,7 @@ const checks = [
       dual_event_hyrox: 4.08,
       advanced_hybrid: 1.44, youth_gymnastics: 0.15, tactical_3k: 1.92,
       weightlifter_peak: 2.40, weightlifter_meet_week: 2.40, mma_fight_camp: 1.44,
-      inseason_footballer: 0.78, masters_return: 0.80, hebrew_lifter: 0.00,
+      inseason_footballer: 0.78, masters_return: 0.80,
       postpartum_runner: 0.80,
     };
     let ok = true;

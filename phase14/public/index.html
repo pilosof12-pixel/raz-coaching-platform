@@ -61,16 +61,6 @@
     .status.err{color:var(--red)} .status.ok{color:var(--ok)}
     .hidden{display:none!important}
 
-    /* Language toggle (intake + program card) */
-    .lang-toggle{display:inline-flex;gap:0;background:var(--panel2);border:1px solid var(--line);
-      border-radius:10px;padding:4px;margin:6px 0 2px}
-    .lang-btn{background:transparent;color:var(--muted);border:none;padding:9px 18px;
-      font-size:14px;font-weight:600;border-radius:7px;cursor:pointer;letter-spacing:.2px;
-      transition:background .15s ease,color .15s ease}
-    .lang-btn:hover{color:var(--text)}
-    .lang-btn.active{background:var(--teal);color:#04211f}
-    .lang-btn[disabled]{opacity:.5;cursor:not-allowed}
-    .lang-toggle-compact .lang-btn{padding:6px 12px;font-size:13px}
     .program-head{display:flex;align-items:flex-start;justify-content:space-between;gap:14px;flex-wrap:wrap;margin-bottom:12px}
     /* Right-to-left rendering when program is Hebrew */
     #program-render[dir="rtl"] table{direction:rtl}
@@ -173,13 +163,6 @@
       <div class="progress-track" aria-hidden="true"><div class="progress-fill" id="progress-fill"></div></div>
 
       <div class="wizard-step active" data-step="0" data-title="What are we building toward?" data-hint="Start with the result that matters most. The coach will protect this priority when goals compete.">
-        <label>Program language <span class="req">*</span></label>
-        <div class="lang-toggle" role="radiogroup" aria-label="Program language">
-          <button type="button" class="lang-btn active" data-lang="en" id="lang-en">English</button>
-          <button type="button" class="lang-btn" data-lang="he" id="lang-he">עברית · Hebrew</button>
-        </div>
-        <select id="language" class="hidden" aria-hidden="true"><option value="en" selected>English</option><option value="he">עברית (Hebrew)</option></select>
-
         <div class="goal-stack">
           <div class="priority-block main-priority">
             <div class="priority-badge">PRIMARY GOALS</div>
@@ -362,12 +345,7 @@
           <h3 style="margin:0">Your program <span class="pill" id="prog-pill">Week 1</span></h3>
           <p class="hint" id="prog-sub" style="margin:6px 0 0">Your individualized plan. Scroll the table, then make a spreadsheet or adjust it below.</p>
         </div>
-        <div class="lang-toggle lang-toggle-compact" role="radiogroup" aria-label="Program language">
-          <button type="button" class="lang-btn active" data-lang="en" id="prog-lang-en">EN</button>
-          <button type="button" class="lang-btn" data-lang="he" id="prog-lang-he">עברית</button>
-        </div>
       </div>
-      <div class="status" id="prog-lang-status" style="margin-top:6px"></div>
 
       <!-- SAVE CODE — shown FIRST, before the program, so it can't be missed -->
       <div class="save-note save-note-strong" id="save-note">
