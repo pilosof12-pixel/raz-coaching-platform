@@ -129,12 +129,43 @@ export function collectSymptomAlgorithmFlags(program, intake = {}) {
 
 // --- 3. accessory volume may not rise with a primary progression --------------
 
+// Every modality the athlete's primary goals name, not just the first one found.
+//
+// This returned on the first match, so an athlete with two equal primary goals
+// had one of them treated as secondary -- and then v66 held its volume flat every
+// week the other advanced, which is the opposite of what a primary goal is for.
+//
+// The Youth gymnast is the clearest case: "Achieve first bar muscle-up" and
+// "Achieve a freestanding handstand" are equal primaries, the muscle-up matched
+// first, and the handstand work was pinned at Week 1's set count for the whole
+// block. Its own progression, built correctly one step earlier in the chain, was
+// flattened from 3/4/4/3 sets to 3/3/3/3 -- which also erased the Week 4
+// consolidation and left the Week 4 note claiming a reduction that no longer
+// existed. The Advanced Hybrid athlete has the same shape: a 220 kg back squat
+// and four one-arm pull-ups, where squat matched first and the pull-up goal was
+// held.
+//
+// There was also no handstand branch at all, so a handstand goal was invisible
+// here however it was written.
+const PRIMARY_MODALITIES = [
+  [/\b\d+\s*k(?:m)?\b|marathon|run|3\s*k/, /\brun(?:ning)?\b/i],
+  [/squat/, /squat/i],
+  [/pull[- ]?up|muscle[- ]?up|chin[- ]?up/, /pull[- ]?up|muscle[- ]?up|chin[- ]?up/i],
+  [/handstand/, /handstand/i],
+  [/planche/, /planche/i],
+  [/front lever|back lever/, /lever/i],
+  [/dip\b/, /\bdip/i],
+  [/deadlift|hinge/, /deadlift/i],
+  [/bench(?: press)?/, /bench/i],
+  [/overhead press|\bohp\b|strict press/, /overhead press|shoulder press/i],
+  [/row(?:ing)?\b|\berg\b/, /row(?:ing)?\b|\berg\b/i],
+];
+
 function primaryModalityPattern(intake = {}) {
   const primary = goals(intake, 'primary').toLowerCase();
-  if (/\b\d+\s*k(?:m)?\b|marathon|run|3\s*k/.test(primary)) return /\brun(?:ning)?\b/i;
-  if (/squat/.test(primary)) return /squat/i;
-  if (/pull[- ]?up|muscle[- ]?up/.test(primary)) return /pull[- ]?up|muscle[- ]?up/i;
-  return null;
+  const sources = PRIMARY_MODALITIES.filter(([goal]) => goal.test(primary)).map(([, ex]) => ex.source);
+  if (!sources.length) return null;
+  return new RegExp(sources.join('|'), 'i');
 }
 
 // Total quality metres of the primary running session, per week.
