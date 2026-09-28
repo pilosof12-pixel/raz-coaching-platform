@@ -1,0 +1,101 @@
+Skills stay first while you are fresh. Session A is more bar-muscle-up focused, and Session B puts a little more attention on handstand balance and lower-body athleticism.
+
+Weeks 2-4: Week 2 makes the main skill step-up by using less help on the straight-bar turnover and slightly more handstand control. Week 3 holds that skill standard on purpose and builds the support underneath it. Week 4 trims fatigue but keeps the best clean standards you earned.
+
+If you get sharp or local wrist, elbow, shoulder, or knee pain, stop that row right away. For handstands, shorten the set or use the wall sooner; for straight-bar turnover work, add bench or band help back immediately; for pistols, reduce depth to the cleanest pain-free range and keep control slow.
+
+START_WEEK1_TSV
+Day	Exercise	Weight	Sets	Reps	Rest	Target RPE	Notes	Results
+Session A	[WARMUP] Band Pull-Apart Warm-up	Bodyweight	2	12	30 s	3	Add wrist rocks between sets; easy prep only.; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Band shoulder pass-through x 10; Scapular push-up x 8	
+Session A	Bar Muscle-up Transition Drill	Moderate band assistance for a smooth, repeatable bar turnover	3	2	90s	5-6	Direct bar-specific turnover practice for first bar muscle-up acquisition. Reduce assistance only after fast symmetrical reps; stop before failed turnover attempts.	
+Session A	Wall Handstand Hold	BW	3	15-20 sec	60-90s	5-6	Substantive wall-supported position capacity for line, confidence and shoulder endurance. Keep ribs/pelvis controlled and stop well before fatigue failure.	
+Session A	Explosive Hip-to-Bar Pull-up	Bodyweight	4	2	105 s	N/A	Pull as high and fast as possible, full reset between reps. End the row if bar height drops.	
+Session A	Controlled Handstand Kick-up	Bodyweight	3	2	45-60 s	N/A	Controlled entries only; aim to land stacked without chasing the wall. Stop the set after the first messy attempt. Six high-quality entries is a ceiling, not a quota; stop earlier if balance quality deteriorates.	
+Session A	Banded Muscle-up	Band assistance selected for a smooth full bar turnover	2	1	90 sec	6	Integrated assisted full-skill bar muscle-up singles after component practice. Use enough assistance for a clean catch; stop after any miss or technical deterioration.	
+Session A	Ring Dip	Bodyweight	3	3	90 s	7	Submax only; 1 s support at the top, smooth depth, no grinding. If set 2 already feels harder than 7, keep set 3 easy or stop at 2 sets.	
+Session A	Ring Row	Bodyweight	3	8	75 s	7	Choose a body angle that leaves about 2 clean reps in reserve. Record foot position and match it next week.	
+Session A	Dead Bug	Bodyweight	2	6/side	45 s	6	Slow exhale; low back stays down for every rep.	
+Session B	[WARMUP] Band Pull-Apart Warm-up	Bodyweight	2	12	30 s	3	Add wrist rocks between sets; easy prep only.; Squat-and-reach x 6; Bodyweight squat x 8; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Band shoulder pass-through x 10; Scapular push-up x 8	
+Session B	Controlled Handstand Kick-up	Bodyweight	3	2	45-60 s	N/A	Controlled entries only; try to land stacked and still. End the set after the first messy attempt. Six high-quality entries is a ceiling, not a quota; stop earlier if balance quality deteriorates.	
+Session B	Handstand Hold	Bodyweight	3	15 s	60 s	6	Wall-facing; last few seconds can include 1-2 gentle toe-pulls if you are stacked. Stop if the line collapses or wrists complain.	
+Session B	Bar Muscle-up Transition Drill	Moderate band assistance for a smooth, repeatable bar turnover	3	1	75 s	N/A	This is straight-bar muscle-up transition practice, not regular pull-up reps. Clean turnover singles only; if elbows get uneven, add help back and keep it crisp.	
+Session B	Banded Muscle-up	Band assistance selected for a smooth full bar turnover	2	1	90 sec	6	Integrated assisted full-skill bar muscle-up singles after component practice. Use enough assistance for a clean catch; stop after any miss or technical deterioration.	
+Session B	Box Jump	Bodyweight	4	2	90 s	N/A	Full reset between reps, stick the landing, and stop if distance or landing quality drops.	
+Session B	Pistol Squat	Bodyweight	3	4/side	90 s	7	Use the cleanest depth you can fully control; pause briefly at the bottom and stand smoothly. If balance breaks down, hold reps and keep the tempo slower.	
+Session B	Ring Push-up	Bodyweight	3	6	75 s	7	Keep the rings stable, body rigid, and stop 1-2 reps before form breaks.	
+Session B	Ring Row	Bodyweight	3	8	75 s	7	Match the same body angle on all sets; chest reaches the rings without shrugging.	
+Session B	Band Pallof Press	Light band	2	8/side	45 s	6	Quiet hips and ribs; this is trunk control, not a max effort set.	
+END_WEEK1_TSV
+
+START_WEEK2_TSV
+Day	Exercise	Weight	Sets	Reps	Rest	Target RPE	Notes	Results
+Session A	[WARMUP] Band Pull-Apart Warm-up	Bodyweight	2	12	30 s	3	Add wrist rocks between sets; easy prep only.; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Band shoulder pass-through x 10; Scapular push-up x 8	
+Session A	Bar Muscle-up Transition Drill	Slightly lighter band assistance if every Week 1 turnover was clean	3	2	90s	5-6	Direct bar-specific turnover practice for first bar muscle-up acquisition. Reduce assistance only after fast symmetrical reps; stop before failed turnover attempts.	
+Session A	Wall Handstand Hold	BW	3	20-25 sec	60-90s	5-6	Substantive wall-supported position capacity for line, confidence and shoulder endurance. Keep ribs/pelvis controlled and stop well before fatigue failure.	
+Session A	Explosive Hip-to-Bar Pull-up	Bodyweight	4	2	105 s	N/A	Hold Week 1 volume and beat it with higher bar contact, not fatigue. End the row if bar height drops.	
+Session A	Controlled Handstand Kick-up	Bodyweight	4	2	45-60 s	N/A	Add one mini-set only if entries stay controlled. Stop the set after the first messy attempt. Up to eight high-quality entries only if Week 1 stayed crisp; otherwise repeat the prior ceiling.	
+Session A	Banded Muscle-up	Band assistance selected for a smooth full bar turnover	2	1	90 sec	6	Integrated assisted full-skill bar muscle-up singles after component practice. Use enough assistance for a clean catch; stop after any miss or technical deterioration.	
+Session A	Ring Dip	Bodyweight	3	3	90 s	7	Keep the same dose and beat Week 1 with steadier rings and an easier lockout. If it overshoots the target, keep the last set easy or cut it.	
+Session A	Ring Row	Bodyweight	3	8	75 s	7	Same dose; match Week 1 foot position and make the last rep cleaner and more controlled while keeping about 2 reps in reserve.	
+Session A	Dead Bug	Bodyweight	2	6/side	45 s	6	Same slow breathing standard; no arching.	
+Session B	[WARMUP] Band Pull-Apart Warm-up	Bodyweight	2	12	30 s	3	Add wrist rocks between sets; easy prep only.; Squat-and-reach x 6; Bodyweight squat x 8; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Band shoulder pass-through x 10; Scapular push-up x 8	
+Session B	Controlled Handstand Kick-up	Bodyweight	4	2	45-60 s	N/A	Add one mini-set only if entries stay controlled and quiet. End the set after the first messy attempt. Up to eight high-quality entries only if Week 1 stayed crisp; otherwise repeat the prior ceiling.	
+Session B	Handstand Hold	Bodyweight	3	18 s	60 s	6	Wall-facing; hold the same line while making toe-pulls smaller and calmer. Stop if the line collapses or wrists complain.	
+Session B	Bar Muscle-up Transition Drill	Slightly lighter band assistance if every Week 1 turnover was clean	3	1	75 s	N/A	This is straight-bar muscle-up transition practice, not regular pull-up reps. Same clean turnover standard with slightly less help; add help back immediately if elbows get uneven.	
+Session B	Banded Muscle-up	Band assistance selected for a smooth full bar turnover	2	1	90 sec	6	Integrated assisted full-skill bar muscle-up singles after component practice. Use enough assistance for a clean catch; stop after any miss or technical deterioration.	
+Session B	Box Jump	Bodyweight	4	2	90 s	N/A	Same low-fatigue power dose; beat Week 1 with sharper takeoff and a cleaner stick. Stop if distance or landing quality drops.	
+Session B	Pistol Squat	Bodyweight	3	4/side	90 s	7	Same dose; make the pause and ascent smoother than Week 1. If control slips, keep reps here and slow the descent a little more.	
+Session B	Ring Push-up	Bodyweight	3	6	75 s	7	Keep the rings stable, body rigid, and stop 1-2 reps before form breaks.	
+Session B	Ring Row	Bodyweight	3	8	75 s	7	Repeat the same body angle and make chest-to-rings cleaner on every rep.	
+Session B	Band Pallof Press	Light band	2	8/side	45 s	6	Same trunk standard; no extra torso twist to finish reps.	
+END_WEEK2_TSV
+
+START_WEEK3_TSV
+Day	Exercise	Weight	Sets	Reps	Rest	Target RPE	Notes	Results
+Session A	[WARMUP] Band Pull-Apart Warm-up	Bodyweight	2	12	30 s	3	Add wrist rocks between sets; easy prep only.; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Band shoulder pass-through x 10; Scapular push-up x 8	
+Session A	Bar Muscle-up Transition Drill	Lightest band assistance that still preserves a clean bar turnover	3	2	90s	5-6	Direct bar-specific turnover practice for first bar muscle-up acquisition. Reduce assistance only after fast symmetrical reps; stop before failed turnover attempts.	
+Session A	Wall Handstand Hold	BW	3	20-30 sec	60-90s	5-6	Substantive wall-supported position capacity for line, confidence and shoulder endurance. Keep ribs/pelvis controlled and stop well before fatigue failure.	
+Session A	Explosive Hip-to-Bar Pull-up	Bodyweight	4	2	105 s	N/A	Add one set only because Week 2 bar height stayed sharp. Full reset between reps; stop immediately if height drops. Progress height, speed and technical output before adding power volume; stop if output drops.	
+Session A	Controlled Handstand Kick-up	Bodyweight	4	3	45-60 s	N/A	Hold Week 2 attempt volume and beat it with calmer landings. Stop the set after the first messy attempt. Up to twelve high-quality entries only if control remains stable; stop before fatigue-driven misses.	
+Session A	Banded Muscle-up	Band assistance selected for a smooth full bar turnover	2	1	90 sec	6	Integrated assisted full-skill bar muscle-up singles after component practice. Use enough assistance for a clean catch; stop after any miss or technical deterioration.	
+Session A	Pull-up	Light band + bench assist	6	1	75 s	N/A	Hold the Week 2 assistance on purpose and beat it with cleaner symmetry, not more fatigue. Stop early after 2 misses, any slow rep, or any pain.	
+Session A	Ring Dip	Bodyweight	3	4	90 s	7	Add 4 reps per set only if Week 2 stayed clearly submaximal. Keep a 1 s top support and stop if rep speed drops sharply.	
+Session A	Ring Row	Bodyweight	3	8	75 s	7	Keep the same angle and make every rep pause lightly at the top without shrugging.	
+Session A	Dead Bug	Bodyweight	2	6/side	45 s	6	Same slow breathing standard; no arching.	
+Session B	[WARMUP] Band Pull-Apart Warm-up	Bodyweight	2	12	30 s	3	Add wrist rocks between sets; easy prep only.; Squat-and-reach x 6; Bodyweight squat x 8; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Band shoulder pass-through x 10; Scapular push-up x 8	
+Session B	Controlled Handstand Kick-up	Bodyweight	4	3	45-60 s	N/A	Hold Week 2 attempt volume and beat it with more stacked catches. End the set after the first messy attempt. Up to twelve high-quality entries only if control remains stable; stop before fatigue-driven misses.	
+Session B	Bar Muscle-up Transition Drill	Lightest band assistance that still preserves a clean bar turnover	3	2	90s	5-6	Direct bar-specific turnover practice for first bar muscle-up acquisition. Reduce assistance only after fast symmetrical reps; stop before failed turnover attempts.	
+Session B	Handstand Hold	Bodyweight	3	18 s	60 s	6	Hold Week 2 time on purpose; aim for the same line with smaller toe-pull corrections. Stop if the line collapses or wrists complain.	
+Session B	Banded Muscle-up	Band assistance selected for a smooth full bar turnover	2	1	90 sec	6	Integrated assisted full-skill bar muscle-up singles after component practice. Use enough assistance for a clean catch; stop after any miss or technical deterioration.	
+Session B	Pull-up	Light band + bench assist	5	1	75 s	N/A	Hold the Week 2 assistance on purpose and make each turnover faster and more even. Add help back immediately if form slips.	
+Session B	Box Jump	Bodyweight	4	2	90 s	N/A	Add one set only if all Week 2 landings were sharp. Full reset each rep; stop if distance or landing quality drops. Progress height, speed and technical output before adding power volume; stop if output drops.	
+Session B	Pistol Squat	Bodyweight	3	5/side	90 s	7	Add one rep per side only if Week 2 stayed smooth and balanced. Keep the same clean depth and a brief bottom pause.	
+Session B	Ring Push-up	Bodyweight	3	7	75 s	7	Keep the rings stable, body rigid, and stop 1-2 reps before form breaks.	
+Session B	Ring Row	Bodyweight	3	8	75 s	7	Same angle; beat Week 2 with cleaner chest contact and quieter shoulders.	
+Session B	Band Pallof Press	Light band	2	8/side	45 s	6	Same trunk standard; keep hips square.	
+END_WEEK3_TSV
+
+START_WEEK4_TSV
+Day	Exercise	Weight	Sets	Reps	Rest	Target RPE	Notes	Results
+Session A	[WARMUP] Band Pull-Apart Warm-up	Bodyweight	2	12	30 s	3	Add wrist rocks between sets; easy prep only.; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Band shoulder pass-through x 10; Scapular push-up x 8	
+Session A	Bar Muscle-up Transition Drill	Lightest band assistance that still preserves the clean Week 3 turnover; retain the earned assistance standard rather than chasing extra work	2	2	90s	5-6	Direct bar-specific turnover practice. Consolidate the best clean Week 3 assistance and technique with less total volume; no failed reps.	
+Session A	Wall Handstand Hold	BW	2	20-25 sec	60-90s	5-6	Wall-supported line and shoulder-capacity consolidation. Retain the best Week 3 body-line standard with lower volume. Prescribed attempts are a ceiling, not a quota: stop the set early if quality, symmetry or balance breaks down.	
+Session A	Explosive Hip-to-Bar Pull-up	Bodyweight	4	2	105 s	N/A	Hold the total reps. Stop immediately if height drops.	
+Session A	Controlled Handstand Kick-up	Bodyweight	3	3	45-60 s	N/A	Fewer attempts, but keep the best Week 3 entry standard. Stop the set after the first messy attempt. Consolidation week: reduce set exposure while preserving the best clean Week 3 balance and entry standard; stop before fatigue-driven misses.	
+Session A	Banded Muscle-up	Band assistance selected for a smooth full bar turnover	2	1	90 sec	6	Integrated assisted full-skill bar muscle-up singles after component practice. Use enough assistance for a clean catch; stop after any miss or technical deterioration.	
+Session A	Pull-up	Light band + bench assist	5	1	75 s	N/A	Keep the best clean Week 3 turnover standard with fewer singles. Stop early after any miss, slow rep, or pain.	
+Session A	Ring Dip	Bodyweight	2	4	90 s	7	Keep the Week 3 rep standard, just with fewer sets. No grinding.	
+Session A	Ring Row	Bodyweight	2	8	75 s	7	Easy crisp maintenance; same clean top position as Week 3.	
+Session A	Dead Bug	Bodyweight	2	6/side	45 s	6	Same slow breathing standard; no arching.	
+Session B	[WARMUP] Band Pull-Apart Warm-up	Bodyweight	2	12	30 s	3	Add wrist rocks between sets; easy prep only.; Squat-and-reach x 6; Bodyweight squat x 8; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Band shoulder pass-through x 10; Scapular push-up x 8	
+Session B	Controlled Handstand Kick-up	Bodyweight	3	3	45-60 s	N/A	Fewer attempts, but keep the best clean Week 3 entry standard. End the set after the first messy attempt. Consolidation week: reduce set exposure while preserving the best clean Week 3 balance and entry standard; stop before fatigue-driven misses.	
+Session B	Bar Muscle-up Transition Drill	Lightest band assistance that still preserves the clean Week 3 turnover; retain the earned assistance standard rather than chasing extra work	2	2	90s	5-6	Direct bar-specific turnover practice. Retain the best clean Week 3 assistance and technique with lower total volume; no failed reps.	
+Session B	Handstand Hold	Bodyweight	2	18 s	60 s	6	Keep the best Week 3 wall line and toe-pull control with fewer sets. Stop if the line collapses or wrists complain.	
+Session B	Banded Muscle-up	Band assistance selected for a smooth full bar turnover	2	1	90 sec	6	Integrated assisted full-skill bar muscle-up singles after component practice. Use enough assistance for a clean catch; stop after any miss or technical deterioration.	
+Session B	Pull-up	Light band + bench assist	4	1	75 s	N/A	Keep the best clean Week 3 turnover standard with fewer singles. Add help back immediately if elbows get uneven.	
+Session B	Box Jump	Bodyweight	3	2	90 s	N/A	Fewer total jumps, same sharp takeoff and landing as Week 3. Stop if distance or landing quality drops.	
+Session B	Pistol Squat	Bodyweight	2	5/side	90 s	7	Keep the Week 3 rep standard with fewer sets and the same clean depth.	
+Session B	Ring Push-up	Bodyweight	2	7	75 s	7	Keep the rings stable, body rigid, and stop 1-2 reps before form breaks.	
+Session B	Ring Row	Bodyweight	2	8	75 s	7	Easy crisp maintenance; same clean chest contact as Week 3.	
+Session B	Band Pallof Press	Light band	2	8/side	45 s	6	Same trunk standard; keep hips square.	
+END_WEEK4_TSV

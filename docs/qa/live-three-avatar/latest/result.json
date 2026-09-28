@@ -1,26 +1,40 @@
 {
-  "timestamp": "2026-09-28T16:32:05.935Z",
+  "timestamp": "2026-09-28T16:51:29.568Z",
   "base": "https://raz-coaching-platform.onrender.com",
-  "head_sha": "82a9cc0f0f606c35a734ed039d4520ac14ddf504",
-  "runtime": "live83 2026-09-28T16:31:08Z",
+  "head_sha": "e72cdd25025e0d3449ea9fbfd1f417699e3b4bbb",
+  "runtime": "live84 2026-09-28T16:50:40Z",
   "results": [
     {
       "id": "advanced_hybrid",
-      "job_id": "bb0f8d8848335a85b3d0f4e859987f62",
+      "job_id": "423aae08e0b7fd7cbe572107c2b1450d",
       "ok": true,
       "status": "done",
       "stage": "finalizing",
-      "attempt": 3,
-      "detail": "saving program after 3 model call(s) QA trace: A1:ADVANCED_HYBRID_MARATHON_SUBORDINATION+V34_NOTE_REP_WORD_MISMATCH -> A2:ADVANCED_HYBRID_MARATHON_SUBORDINATION+NAMED_GOAL_DIRECT_EXPOSURE_MISSING+TARGET_MODALITY_EXPOSURE_REDUCED+EVENT_PROGRESSING_SESSION_MISSING+SPORT_MODALITY_SPECIFICITY_MISSING. First failure evidence: Week 1 should contain one substantive easy/conversational marathon-support run while the marathon remains secondary to primary strength/skill goals. Do not add extra hard endurance work. | Named secondary goal 'Marathon' has no direct Week 1 exposure. Support work/cross-training cannot replace the stated goal pattern. | running is a named secondary performance goal. The intake documents about 1 current running exposure(s) per week, but Week 1 programs 0. Do not silently remove target-modality practice; preserve the athlete's stated current exposure unless the authored plan makes and explains a",
+      "attempt": 4,
+      "detail": "delivered with unresolved rules: ADVANCED_HYBRID_MARATHON_SUBORDINATION QA trace: A1:ADVANCED_HYBRID_MARATHON_SUBORDINATION+V34_NOTE_UNDEFINED_LOAD_REFERENCE -> A2:ADVANCED_HYBRID_MARATHON_SUBORDINATION+NAMED_GOAL_DIRECT_EXPOSURE_MISSING+TARGET_MODALITY_EXPOSURE_REDUCED+EVENT_PROGRESSING_SESSION_MISSING+SPORT_MODALITY_SPECIFICITY_MISSING -> A3:ADVANCED_HYBRID_MARATHON_SUBORDINATION -> A4:ADVANCED_HYBRID_MARATHON_SUBORDINATION. First failure evidence: Week 1 contains no running at all. The marathon is a named secondary goal and the athlete already runs about once a week, so removing running is not the fix and will fail the named-goal, target-modality and event-progression gates as well. Add exactly one substantive easy, conversational run this week and change nothing else.",
       "last_seen_status": "done",
       "error": null,
-      "program_chars": 28209,
-      "seconds": 381
+      "program_chars": 23925,
+      "seconds": 455
+    },
+    {
+      "id": "youth_gymnastics",
+      "job_id": "4c6a24877600bc8bd83721f4750dfc0c",
+      "ok": true,
+      "status": "done",
+      "stage": "finalizing",
+      "attempt": 2,
+      "detail": "saving program after 2 model call(s) QA trace: A1:COACH_SPEC_V1_YG_FAILURE_BASED_DEFAULT. First failure evidence: Coaching Specification v1.0 YG-07: Week 2 session a uses failure/grinding language for youth work (Ring Row). Default youth strength/skill progression must remain technical and submaximal rather than failure-based.",
+      "last_seen_status": "done",
+      "error": null,
+      "program_chars": 17152,
+      "seconds": 206
     }
   ],
   "reasoning_effort": "medium",
   "selection": [
-    "advanced_hybrid"
+    "advanced_hybrid",
+    "youth_gymnastics"
   ],
   "ok": true
 }
