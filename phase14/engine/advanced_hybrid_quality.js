@@ -169,8 +169,25 @@ export function validateAdvancedHybridQualitySemantic(program, intake = {}) {
 
     if (marathonGoalTier(intake) === 'secondary') {
       const runs = work.filter(isRun);
-      if (runs.length !== 1 || !/easy|zone\s*2|conversational/i.test(`${runs[0]?.load || ''} ${runs[0]?.notes || ''}`)) {
-        fail('ADVANCED_HYBRID_MARATHON_SUBORDINATION', `Week ${week} should contain one substantive easy/conversational marathon-support run while the marathon remains secondary to primary strength/skill goals. Do not add extra hard endurance work.`, { week, runs: runs.length });
+      const easy = /easy|zone\s*2|conversational/i.test(`${runs[0]?.load || ''} ${runs[0]?.notes || ''}`);
+      if (runs.length !== 1 || !easy) {
+        // Say which of the three states this is, and say what NOT to do.
+        //
+        // The old amendment ended "Do not add extra hard endurance work" whatever
+        // had gone wrong, including when the week contained no running at all.
+        // Live run #148 shows the cost: attempt 1 failed this rule, the model read
+        // the instruction as "take the running out", and attempt 2 came back with
+        // zero runs -- failing this rule again plus NAMED_GOAL_DIRECT_EXPOSURE_MISSING,
+        // TARGET_MODALITY_EXPOSURE_REDUCED, EVENT_PROGRESSING_SESSION_MISSING and
+        // SPORT_MODALITY_SPECIFICITY_MISSING. Three model calls, 381 seconds, and
+        // the second one was spent obeying an instruction that did not fit the
+        // defect. The rule is unchanged; only its repair instruction is.
+        const amendment = runs.length === 0
+          ? `Week ${week} contains no running at all. The marathon is a named secondary goal and the athlete already runs about once a week, so removing running is not the fix and will fail the named-goal, target-modality and event-progression gates as well. Add exactly one substantive easy, conversational run this week and change nothing else.`
+          : runs.length > 1
+            ? `Week ${week} contains ${runs.length} runs. Keep exactly one substantive easy, conversational marathon-support run and remove the additional endurance work, which is what makes the marathon compete with the primary strength and skill goals. Do not remove running altogether: one easy run must remain.`
+            : `Week ${week} has its one run, but it is not prescribed as easy or conversational. Make that single run easy and conversational -- pace, effort and note -- so the marathon stays secondary to the primary strength and skill goals. Do not delete the run and do not add a second one.`;
+        fail('ADVANCED_HYBRID_MARATHON_SUBORDINATION', amendment, { week, runs: runs.length, easy });
       }
     }
 

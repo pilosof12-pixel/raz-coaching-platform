@@ -141,3 +141,39 @@ test('set range is left unchanged when its first-number metric already satisfies
   assert.equal(again.program, fixed.program);
   assert.doesNotThrow(() => validateAdvancedHybridQualitySemantic(good, intake));
 });
+
+// --- the amendment has to fit the defect -------------------------------------
+
+test('the marathon-subordination amendment names which of the three states it is', () => {
+  const noRun = program().split('\n').filter((l) => !/\tRun\t/.test(l)).join('\n');
+  assert.throws(
+    () => validateAdvancedHybridQualitySemantic(noRun, intake),
+    (error) => {
+      assert.equal(error.code, 'ADVANCED_HYBRID_MARATHON_SUBORDINATION');
+      // Live run #148 failed this rule, read "do not add extra hard endurance
+      // work" as "take the running out", came back with none, and failed four
+      // more gates for it. A week with no running must be told to add one.
+      assert.match(error.amendment, /contains no running at all/i);
+      assert.match(error.amendment, /removing running is not the fix/i);
+      assert.match(error.amendment, /Add exactly one substantive easy, conversational run/i);
+      assert.doesNotMatch(error.amendment, /Do not add extra hard endurance work/i);
+      return true;
+    },
+  );
+});
+
+test('a week with two runs is told to drop one, not all of them', () => {
+  const extra = program().replace(
+    /(START_WEEK1_TSV\n[^\n]*\n)/,
+    `$1${row('Sat', 'Run', '10 km', 1, 'continuous', 8, 'Hard tempo effort.')}\n`,
+  );
+  assert.throws(
+    () => validateAdvancedHybridQualitySemantic(extra, intake),
+    (error) => {
+      assert.equal(error.code, 'ADVANCED_HYBRID_MARATHON_SUBORDINATION');
+      assert.match(error.amendment, /contains 2 runs/i);
+      assert.match(error.amendment, /Do not remove running altogether/i);
+      return true;
+    },
+  );
+});

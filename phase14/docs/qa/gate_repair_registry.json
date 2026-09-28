@@ -9,10 +9,6 @@
       "status": "repair-demonstrated-gate-unproven",
       "note": "Exercised by the event-week-labelled-by-countdown stress perturbation, which is where it was found; no test names the code."
     },
-    "ADVANCED_HYBRID_MARATHON_SUBORDINATION": {
-      "status": "repair-demonstrated-gate-unproven",
-      "note": "As above, demonstrated in high_concurrency_repairs.test.js."
-    },
     "ADVANCED_HYBRID_RUN_BASELINE_EXCEEDED": {
       "status": "repair-demonstrated-gate-unproven",
       "note": "The repair is demonstrated in spec_floor_repairs.test.js. What is not demonstrated is that the validator would refuse without it: it reads a parsed program model whose conditions a minimal fixture does not meet."
