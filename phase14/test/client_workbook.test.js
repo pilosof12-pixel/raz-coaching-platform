@@ -256,3 +256,51 @@ test('the sheets a client scrolls keep their column titles in view', async () =>
     assert.ok(view.ySplit >= 1, `${name} must freeze below the header row`);
   }
 });
+
+test('no exercise in any program is left without a link', async () => {
+  // "No missing hyperlinks", measured rather than assumed: every exercise cell in
+  // every corpus program, on the week sheets and the warm-up sheet. Session bands
+  // are section headers spanning the table, not exercises, and carry no link.
+  const { CORPUS } = await import('../scripts/corpus.mjs');
+  const BAND = /^(?:Session [A-Z]|Mon|Tue|Wed|Thu|Fri|Sat|Sun)\b/;
+  let checked = 0;
+  const missing = [];
+
+  for (const [file, intake] of CORPUS) {
+    const program = fs.readFileSync(path.join(here, 'fixtures', file), 'utf8');
+    const { wb } = await renderParityWorkbook(program, intake, ROOT, null, true);
+    for (const name of ['Week 1', 'Week 2', 'Week 3', 'Week 4', 'Warm-Up']) {
+      const ws = wb.getWorksheet(name);
+      if (!ws) continue;
+      const col = name === 'Warm-Up' ? 2 : 1;
+      ws.eachRow({ includeEmpty: false }, (row, r) => {
+        if (r < 5) return;                       // title, subtitle and header rows
+        const cell = row.getCell(col);
+        const value = cellText(cell).trim();
+        if (!value || BAND.test(value)) return;
+        checked += 1;
+        if (!cell.hyperlink) missing.push(`${file} ${name} r${r}: ${value}`);
+        else if (!/^https:\/\/www\.youtube\.com\//.test(String(cell.hyperlink))) {
+          missing.push(`${file} ${name} r${r}: ${value} -> ${cell.hyperlink}`);
+        }
+      });
+    }
+  }
+  assert.ok(checked > 1500, `expected the whole corpus, only checked ${checked}`);
+  assert.deepEqual(missing, [], 'these exercises reach the client with nowhere to look');
+});
+
+test('the one cell the athlete writes in looks like a field', async () => {
+  // The Log column was filled and ruled exactly like the seven cells they are
+  // meant to read, so nothing said it was theirs.
+  const { wb } = await renderParityWorkbook(ENGLISH, INTAKE, ROOT, null, true);
+  const w1 = wb.getWorksheet('Week 1');
+  const log = w1.getCell(6, 8);
+  const body = w1.getCell(6, 1);
+  assert.equal(log.fill.fgColor.argb, 'FFFFFFFF', 'the Log cell is white, not body fill');
+  assert.notEqual(body.fill.fgColor.argb, 'FFFFFFFF');
+  for (const side of ['top', 'bottom', 'left', 'right']) {
+    assert.ok(log.border?.[side], `the Log cell needs a ${side} edge to read as a field`);
+  }
+  assert.equal(body.border?.bottom?.style, 'hair', 'body rows get a hairline to track across');
+});

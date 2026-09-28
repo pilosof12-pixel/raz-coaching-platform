@@ -17,7 +17,8 @@
     a{color:var(--teal)}
     .wrap{max-width:880px;margin:0 auto;padding:32px 20px 80px}
     header.brand{display:flex;align-items:center;gap:12px;margin-bottom:8px}
-    .logo{width:34px;height:34px;flex:0 0 auto}
+    /* The mark is taller than it is wide, so the height leads. */
+    .logo{height:34px;width:auto;flex:0 0 auto;display:block}
     .brand h1{font-size:19px;margin:0;font-weight:700;letter-spacing:-.01em}
     .brand .sub{color:var(--muted);font-size:13px;margin-top:2px}
     .hero{margin:26px 0 22px}
@@ -117,16 +118,14 @@
     .intake-shell{padding:0;overflow:hidden}.intake-topline{display:flex;justify-content:space-between;gap:16px;align-items:flex-start;padding:22px 22px 14px}.eyebrow{text-transform:uppercase;letter-spacing:.12em;font-size:10px;font-weight:800;color:var(--teal);margin-bottom:4px}.step-count{font-size:12px;font-weight:800;color:var(--muted);background:var(--panel2);border:1px solid var(--line);padding:6px 9px;border-radius:999px;white-space:nowrap}.progress-track{height:4px;background:var(--panel2)}.progress-fill{height:100%;width:20%;background:var(--teal);transition:width .25s ease}.wizard-step{display:none;padding:18px 22px 8px;animation:stepIn .18s ease}.wizard-step.active{display:block}@keyframes stepIn{from{opacity:.35;transform:translateY(5px)}to{opacity:1;transform:none}}.wizard-actions{display:flex;justify-content:space-between;gap:10px;padding:18px 22px 22px;border-top:1px solid var(--line);margin-top:14px}.wizard-actions .btn:last-child{margin-left:auto}.goal-stack{display:grid;gap:12px;margin-top:14px}.priority-block{border:1px solid var(--line);background:var(--panel2);border-radius:14px;padding:14px}.priority-block.main-priority{border-color:rgba(24,211,197,.55);box-shadow:inset 0 0 0 1px rgba(24,211,197,.08)}.priority-block label{margin-top:6px}.priority-badge{display:inline-block;font-size:10px;letter-spacing:.08em;font-weight:900;color:#04211f;background:var(--teal);padding:4px 7px;border-radius:6px}.muted-badge{background:#27302f;color:#bed0cd}.sport-key{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0 12px}.sport-key span{font-size:11.5px;color:var(--muted);border:1px solid var(--line);background:var(--panel2);border-radius:9px;padding:7px 9px}.sport-key b{color:#eef5f4}.intake-summary{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:18px}.summary-item{border:1px solid var(--line);background:var(--panel2);border-radius:10px;padding:10px}.summary-item small{display:block;color:var(--muted);font-size:10.5px;text-transform:uppercase;letter-spacing:.06em;margin-bottom:3px}.summary-item strong{display:block;color:#fff;font-size:13px}.build-expectation{display:flex;flex-direction:column;gap:4px;margin-top:14px;background:rgba(24,211,197,.07);border:1px solid rgba(24,211,197,.22);border-radius:12px;padding:13px}.build-expectation strong{color:var(--teal);font-size:12px}.build-expectation span{font-size:12.5px;color:#d7e7e4}.generation-stage{color:var(--muted)}.mini-link{margin-top:8px;padding:0;border:0;background:none;color:var(--teal);font:inherit;font-size:12px;font-weight:800;cursor:pointer}.choice-row{display:flex;gap:8px;margin-top:8px}.choice-btn{border:1px solid var(--line);background:var(--panel2);color:var(--muted);border-radius:10px;padding:9px 14px;font-weight:800;cursor:pointer}.choice-btn.active{background:rgba(24,211,197,.14);border-color:var(--teal);color:var(--teal)}.conditional-panel{margin-top:12px;padding:13px;border:1px solid var(--line);border-radius:12px;background:rgba(255,255,255,.02)}.performance-rows{display:grid;gap:8px;margin-top:8px}.performance-row{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr) auto;gap:8px}.performance-row button{border:1px solid var(--line);background:var(--panel2);color:var(--muted);border-radius:9px;padding:0 10px;cursor:pointer}@media(max-width:560px){.performance-row{grid-template-columns:1fr 1fr}.performance-row button{grid-column:2;justify-self:end;padding:7px 10px}}
     @media(max-width:560px){.wrap{padding:20px 14px 60px}.hero{margin:20px 2px 16px}.hero h2{font-size:25px}.card{border-radius:15px}.intake-topline,.wizard-step,.wizard-actions{padding-left:16px;padding-right:16px}.intake-summary{grid-template-columns:1fr}.sport-day{align-items:flex-start}.sport-day .daybtn{flex-basis:58px}.sport-day .intensity{flex:1}.sport-day .ibtn{padding:7px 9px}.trust-row span{font-size:11px}}
   </style>
+  <link rel="icon" type="image/png" href="data/favicon.png">
+  <link rel="apple-touch-icon" href="data/favicon.png">
   <link rel="stylesheet" href="launch-mobile.css">
 </head>
 <body>
   <div class="wrap">
     <header class="brand">
-      <svg class="logo" viewBox="0 0 40 40" fill="none" aria-label="Coaching Engine logo">
-        <rect x="2" y="2" width="36" height="36" rx="9" stroke="currentColor" stroke-width="2" style="color:var(--teal)"/>
-        <path d="M11 26 L17 14 L23 26 M13.5 21 H20.5" stroke="var(--teal)" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
-        <circle cx="28.5" cy="15" r="3" fill="var(--teal)"/>
-      </svg>
+      <img class="logo" src="data/brand-mark.png" alt="Raz Pilosof" width="28" height="34">
       <div>
         <h1>RAZ Performance</h1>
         <div class="sub">Strength programming that understands the rest of your week</div>

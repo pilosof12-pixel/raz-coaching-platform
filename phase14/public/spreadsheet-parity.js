@@ -141,6 +141,26 @@
     cell.font = { name:'Calibri', size: opts.size || 11, bold: !!opts.bold, italic: !!opts.italic,
       color:{argb: opts.color || TEXT}, underline: !!opts.underline };
   }
+  // The Log column is the one cell the athlete is meant to write in, and it was
+  // filled and bordered exactly like the seven cells they are meant to read. It
+  // now looks like a field: white, with an edge.
+  const LOG_EDGE = 'FFBFE9DF';
+  function inputCell(cell) {
+    fill(cell, WHITE);
+    cell.border = {
+      top:{style:'thin',color:{argb:LOG_EDGE}}, bottom:{style:'thin',color:{argb:LOG_EDGE}},
+      left:{style:'thin',color:{argb:LOG_EDGE}}, right:{style:'thin',color:{argb:LOG_EDGE}},
+    };
+  }
+
+  // A hairline under each row. Eight columns of wrapped text with no rule between
+  // them is hard to track across on a phone, where the row is tall and the screen
+  // is narrow.
+  const ROW_RULE = 'FFD8F0EA';
+  function rowRule(cell) {
+    cell.border = { ...(cell.border || {}), bottom:{style:'hair',color:{argb:ROW_RULE}} };
+  }
+
   // A prescription cell is text, and is told so.
   //
   // "8-10" reps, "12-15", "6-8" -- 45 of them across the corpus -- are what a
@@ -737,7 +757,13 @@
       const band=ws.getRow(row).getCell(1); band.value=sessionLabel(intake,session,i); fill(band,DAY_BAND); font(band,{size:10,bold:true,color:TEXT}); align(band); ws.getRow(row).height=24; row++;
       for(const r of session.rows){
         const vals=[r.exercise,r.load,r.sets,r.reps,r.rest,r.effort,r.notes,''];
-        vals.forEach((v,j)=>{const c=ws.getRow(row).getCell(j+1);setTextCell(c,v);fill(c,BODY);font(c,{size:10});align(c,{horizontal:[3,4,5,6].includes(j+1)?'center':'left'});});
+        vals.forEach((v,j)=>{
+          const c=ws.getRow(row).getCell(j+1);
+          setTextCell(c,v); fill(c,BODY); font(c,{size:10});
+          align(c,{horizontal:[3,4,5,6].includes(j+1)?'center':'left'});
+          rowRule(c);
+          if(j+1===8) inputCell(c);   // Log
+        });
         // The exercise name carries its own demo link, so a coach clicks the
         // thing they are reading rather than hunting for a separate column.
         // The Warm-Up sheet already reads this way; the week tables did not.

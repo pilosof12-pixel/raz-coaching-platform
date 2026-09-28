@@ -65,7 +65,7 @@ async function guardProgramPass(req,res,next){
       token=crypto.randomBytes(16).toString("hex");await passStore.activatePass(passCode,token,Date.now(),PROGRAM_PASS_DAYS);req.body.token=token;captureCommercialJob(req,res,"build",token);return next();
     }
     const pm=req.path.match(/^\/api\/program\/([^/]+)$/);if(req.method==="GET"&&pm){const a=await activePass(pm[1]);if(a.error)return res.status(a.status).json({error:a.error});return next();}
-    if(req.method==="POST"&&(req.path==="/api/adjust"||req.path==="/api/set-language")){
+    if(req.method==="POST"&&req.path==="/api/adjust"){
       const token=String(req.body?.token||"").trim();const a=await activePass(token);if(a.error)return res.status(a.status).json({error:a.error});
       if(req.path==="/api/adjust"){const used=Number(a.pass.adjustment_count||0),limit=Number(a.pass.adjustment_limit||PROGRAM_PASS_ADJUSTMENTS);if(used>=limit)return res.status(403).json({error:`You've used all ${limit} included Program Pass adjustments. Purchase a new Program Pass for a new training block.`});captureCommercialJob(req,res,"adjust",token);}
       return next();
@@ -91,7 +91,7 @@ function securityMiddleware(req,res,next){
     if(requiredClarifications(clarifications).length)return res.status(422).json({error:"A few details are needed before I can build this accurately.",clarification_required:true,clarifications});
     if(!consumeHourly(req,"build",GENERATION_BUILDS_PER_HOUR))return res.status(429).json({error:"Too many program generation requests from this connection. Please try again later."});
   }
-  if(req.method==="POST"&&(req.path==="/api/adjust"||req.path==="/api/set-language")){
+  if(req.method==="POST"&&req.path==="/api/adjust"){
     if(!consumeHourly(req,"adjust",GENERATION_ADJUSTS_PER_HOUR))return res.status(429).json({error:"Too many adjustment requests from this connection. Please try again later."});
     if(typeof req.body?.request==="string"&&req.body.request.length>MAX_FIELD_CHARS)return res.status(413).json({error:"The adjustment request is too long."});
   }
