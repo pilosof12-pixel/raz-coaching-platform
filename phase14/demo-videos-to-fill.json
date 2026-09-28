@@ -1,0 +1,470 @@
+{
+  "_what": "Paste a YouTube URL next to each movement and I will wire them into the client workbook. Leave any you do not want and it keeps its exercise-specific search link.",
+  "_format": "https://www.youtube.com/watch?v=VIDEOID  — no playlist, timestamp or tracking parameters.",
+  "_channels_preferred": [
+    "Squat University",
+    "Calisthenicmovement",
+    "Juggernaut Training Systems",
+    "Catalyst Athletics",
+    "Jeff Nippard",
+    "Alan Thrall / Untamed Strength",
+    "Barbell Medicine",
+    "FitnessFAQs",
+    "GMB Fitness",
+    "Tom Merrick",
+    "Renaissance Periodization",
+    "Power Monkey Fitness",
+    "Athlean-X",
+    "E3 Rehab",
+    "Brussels Barbell",
+    "Knees Over Toes Guy / Ben Patrick",
+    "Buff Dudes",
+    "CrossFit Invictus",
+    "Tiger Fitness"
+  ],
+  "_coverage_today": "39 of 173 movements have a video. 28% of client exercise rows link to one.",
+  "_if_you_fill_the_top_20": "roughly 83% of rows would link to a real demonstration.",
+  "movements": [
+    {
+      "rank": 1,
+      "rows_affected": 106,
+      "exercise": "Run",
+      "library_key": "run",
+      "demo_url": ""
+    },
+    {
+      "rank": 2,
+      "rows_affected": 75,
+      "exercise": "Snatch",
+      "library_key": "snatch",
+      "demo_url": ""
+    },
+    {
+      "rank": 3,
+      "rows_affected": 64,
+      "exercise": "Clean and Jerk",
+      "library_key": "clean_and_jerk",
+      "demo_url": ""
+    },
+    {
+      "rank": 4,
+      "rows_affected": 60,
+      "exercise": "Machine Hamstring Curl",
+      "library_key": "machine_hamstring_curl",
+      "demo_url": ""
+    },
+    {
+      "rank": 5,
+      "rows_affected": 60,
+      "exercise": "Cable Row",
+      "library_key": "cable_row",
+      "demo_url": ""
+    },
+    {
+      "rank": 6,
+      "rows_affected": 54,
+      "exercise": "Seated Cable Row",
+      "library_key": "seated_cable_row",
+      "demo_url": ""
+    },
+    {
+      "rank": 7,
+      "rows_affected": 53,
+      "exercise": "Barbell Hip Thrust",
+      "library_key": "barbell_hip_thrust",
+      "demo_url": ""
+    },
+    {
+      "rank": 8,
+      "rows_affected": 42,
+      "exercise": "Dumbbell Bench Press",
+      "library_key": "dumbbell_bench_press",
+      "demo_url": ""
+    },
+    {
+      "rank": 9,
+      "rows_affected": 42,
+      "exercise": "Push-up",
+      "library_key": "push_up",
+      "demo_url": ""
+    },
+    {
+      "rank": 10,
+      "rows_affected": 40,
+      "exercise": "Calf Raise",
+      "library_key": "calf_raise",
+      "demo_url": ""
+    },
+    {
+      "rank": 11,
+      "rows_affected": 38,
+      "exercise": "Reverse Lunge",
+      "library_key": "reverse_lunge",
+      "demo_url": ""
+    },
+    {
+      "rank": 12,
+      "rows_affected": 36,
+      "exercise": "Dead Bug",
+      "library_key": "dead_bug",
+      "demo_url": ""
+    },
+    {
+      "rank": 13,
+      "rows_affected": 36,
+      "exercise": "Pull-up",
+      "library_key": "pull_up",
+      "demo_url": ""
+    },
+    {
+      "rank": 14,
+      "rows_affected": 36,
+      "exercise": "Rowing Ergometer",
+      "library_key": "rowing_ergometer",
+      "demo_url": ""
+    },
+    {
+      "rank": 15,
+      "rows_affected": 29,
+      "exercise": "Prowler Push",
+      "library_key": "prowler_push",
+      "demo_url": ""
+    },
+    {
+      "rank": 16,
+      "rows_affected": 29,
+      "exercise": "Plank",
+      "library_key": "plank",
+      "demo_url": ""
+    },
+    {
+      "rank": 17,
+      "rows_affected": 28,
+      "exercise": "Band Pull-Apart Warm-up",
+      "library_key": "band_pull_apart_warm_up",
+      "demo_url": ""
+    },
+    {
+      "rank": 18,
+      "rows_affected": 23,
+      "exercise": "Explosive Push-up",
+      "library_key": "explosive_push_up",
+      "demo_url": ""
+    },
+    {
+      "rank": 19,
+      "rows_affected": 20,
+      "exercise": "Overhead Squat",
+      "library_key": "overhead_squat",
+      "demo_url": ""
+    },
+    {
+      "rank": 20,
+      "rows_affected": 20,
+      "exercise": "Neck Isometric",
+      "library_key": "neck_isometric",
+      "demo_url": ""
+    },
+    {
+      "rank": 21,
+      "rows_affected": 19,
+      "exercise": "Deep Squat Hold",
+      "library_key": "deep_squat_hold",
+      "demo_url": ""
+    },
+    {
+      "rank": 22,
+      "rows_affected": 16,
+      "exercise": "Backpack Carry",
+      "library_key": "backpack_carry",
+      "demo_url": ""
+    },
+    {
+      "rank": 23,
+      "rows_affected": 16,
+      "exercise": "Leg Press Machine",
+      "library_key": "leg_press_machine",
+      "demo_url": ""
+    },
+    {
+      "rank": 24,
+      "rows_affected": 16,
+      "exercise": "Nordic Hamstring Curl",
+      "library_key": "nordic_hamstring_curl",
+      "demo_url": ""
+    },
+    {
+      "rank": 25,
+      "rows_affected": 12,
+      "exercise": "Chin-up",
+      "library_key": "chin_up",
+      "demo_url": ""
+    },
+    {
+      "rank": 26,
+      "rows_affected": 12,
+      "exercise": "Trap Bar Jump",
+      "library_key": "trap_bar_jump",
+      "demo_url": ""
+    },
+    {
+      "rank": 27,
+      "rows_affected": 12,
+      "exercise": "Goblet Squat",
+      "library_key": "goblet_squat",
+      "demo_url": ""
+    },
+    {
+      "rank": 28,
+      "rows_affected": 11,
+      "exercise": "Clean and jerk",
+      "library_key": "clean_and_jerk",
+      "demo_url": ""
+    },
+    {
+      "rank": 29,
+      "rows_affected": 9,
+      "exercise": "Scapular pull-up",
+      "library_key": "scapular_pull_up",
+      "demo_url": ""
+    },
+    {
+      "rank": 30,
+      "rows_affected": 9,
+      "exercise": "Band pull-apart",
+      "library_key": "band_pull_apart",
+      "demo_url": ""
+    },
+    {
+      "rank": 31,
+      "rows_affected": 8,
+      "exercise": "Easy movement + joint prep",
+      "library_key": "easy_movement_joint_prep",
+      "demo_url": ""
+    },
+    {
+      "rank": 32,
+      "rows_affected": 8,
+      "exercise": "Ring Hamstring Curl",
+      "library_key": "ring_hamstring_curl",
+      "demo_url": ""
+    },
+    {
+      "rank": 33,
+      "rows_affected": 8,
+      "exercise": "Shuttle Run",
+      "library_key": "shuttle_run",
+      "demo_url": ""
+    },
+    {
+      "rank": 34,
+      "rows_affected": 8,
+      "exercise": "Seated Calf Raise",
+      "library_key": "seated_calf_raise",
+      "demo_url": ""
+    },
+    {
+      "rank": 35,
+      "rows_affected": 7,
+      "exercise": "Squat-and-reach",
+      "library_key": "squat_and_reach",
+      "demo_url": ""
+    },
+    {
+      "rank": 36,
+      "rows_affected": 7,
+      "exercise": "Bodyweight squat",
+      "library_key": "bodyweight_squat",
+      "demo_url": ""
+    },
+    {
+      "rank": 37,
+      "rows_affected": 7,
+      "exercise": "Ring Push-up",
+      "library_key": "ring_push_up",
+      "demo_url": ""
+    },
+    {
+      "rank": 38,
+      "rows_affected": 6,
+      "exercise": "Front Rack Carry",
+      "library_key": "front_rack_carry",
+      "demo_url": ""
+    },
+    {
+      "rank": 39,
+      "rows_affected": 5,
+      "exercise": "Scapular Pull-up",
+      "library_key": "scapular_pull_up",
+      "demo_url": ""
+    },
+    {
+      "rank": 40,
+      "rows_affected": 4,
+      "exercise": "Band shoulder pass-through",
+      "library_key": "band_shoulder_pass_through",
+      "demo_url": ""
+    },
+    {
+      "rank": 41,
+      "rows_affected": 4,
+      "exercise": "Leg Swings",
+      "library_key": "leg_swings",
+      "demo_url": ""
+    },
+    {
+      "rank": 42,
+      "rows_affected": 4,
+      "exercise": "Medicine Ball Rotational Throw",
+      "library_key": "medicine_ball_rotational_throw",
+      "demo_url": ""
+    },
+    {
+      "rank": 43,
+      "rows_affected": 4,
+      "exercise": "Medicine Ball Scoop Throw",
+      "library_key": "medicine_ball_scoop_throw",
+      "demo_url": ""
+    },
+    {
+      "rank": 44,
+      "rows_affected": 4,
+      "exercise": "Shoulder CARs",
+      "library_key": "shoulder_cars",
+      "demo_url": ""
+    },
+    {
+      "rank": 45,
+      "rows_affected": 4,
+      "exercise": "Bodyweight Squat",
+      "library_key": "bodyweight_squat",
+      "demo_url": ""
+    },
+    {
+      "rank": 46,
+      "rows_affected": 3,
+      "exercise": "Ramp Snatch",
+      "library_key": "ramp_snatch",
+      "demo_url": ""
+    },
+    {
+      "rank": 47,
+      "rows_affected": 3,
+      "exercise": "Ramp Clean and Jerk",
+      "library_key": "ramp_clean_and_jerk",
+      "demo_url": ""
+    },
+    {
+      "rank": 48,
+      "rows_affected": 3,
+      "exercise": "Ramp Back Squat",
+      "library_key": "ramp_back_squat",
+      "demo_url": ""
+    },
+    {
+      "rank": 49,
+      "rows_affected": 3,
+      "exercise": "Dumbbell Bulgarian Split Squat",
+      "library_key": "dumbbell_bulgarian_split_squat",
+      "demo_url": ""
+    },
+    {
+      "rank": 50,
+      "rows_affected": 3,
+      "exercise": "Rower",
+      "library_key": "rower",
+      "demo_url": ""
+    },
+    {
+      "rank": 51,
+      "rows_affected": 3,
+      "exercise": "Sandbag Carry",
+      "library_key": "sandbag_carry",
+      "demo_url": ""
+    },
+    {
+      "rank": 52,
+      "rows_affected": 2,
+      "exercise": "Ramp Front Squat",
+      "library_key": "ramp_front_squat",
+      "demo_url": ""
+    },
+    {
+      "rank": 53,
+      "rows_affected": 2,
+      "exercise": "Scapular push-up",
+      "library_key": "scapular_push_up",
+      "demo_url": ""
+    },
+    {
+      "rank": 54,
+      "rows_affected": 2,
+      "exercise": "Hip-hinge drill",
+      "library_key": "hip_hinge_drill",
+      "demo_url": ""
+    },
+    {
+      "rank": 55,
+      "rows_affected": 2,
+      "exercise": "Glute bridge",
+      "library_key": "glute_bridge",
+      "demo_url": ""
+    },
+    {
+      "rank": 56,
+      "rows_affected": 2,
+      "exercise": "Wall slide",
+      "library_key": "wall_slide",
+      "demo_url": ""
+    },
+    {
+      "rank": 57,
+      "rows_affected": 2,
+      "exercise": "Ramp Deadlift",
+      "library_key": "ramp_deadlift",
+      "demo_url": ""
+    },
+    {
+      "rank": 58,
+      "rows_affected": 2,
+      "exercise": "Ramp Overhead Press",
+      "library_key": "ramp_overhead_press",
+      "demo_url": ""
+    },
+    {
+      "rank": 59,
+      "rows_affected": 2,
+      "exercise": "Bike",
+      "library_key": "bike",
+      "demo_url": ""
+    },
+    {
+      "rank": 60,
+      "rows_affected": 2,
+      "exercise": "Broad Jump",
+      "library_key": "broad_jump",
+      "demo_url": ""
+    },
+    {
+      "rank": 61,
+      "rows_affected": 1,
+      "exercise": "Easy jog 6-8 min",
+      "library_key": "easy_jog_6_8_min",
+      "demo_url": ""
+    },
+    {
+      "rank": 62,
+      "rows_affected": 1,
+      "exercise": "dynamic running drills",
+      "library_key": "dynamic_running_drills",
+      "demo_url": ""
+    },
+    {
+      "rank": 63,
+      "rows_affected": 1,
+      "exercise": "Air Squat",
+      "library_key": "air_squat",
+      "demo_url": ""
+    }
+  ]
+}

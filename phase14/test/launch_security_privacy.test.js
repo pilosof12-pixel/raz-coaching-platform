@@ -117,3 +117,30 @@ test("sqlite entitlement record survives coaching-data deletion design",async()=
   const pass=await store.getPassForToken(token);
   assert.equal(pass.adjustment_count,1);assert.ok(pass.initial_build_completed_at);assert.equal(pass.status,"active");
 });
+
+test('the admin provisioning key is compared in constant time', () => {
+  // This endpoint issues Program Passes, which is the thing clients pay for. It
+  // compared the key with !==, which returns as soon as two bytes differ and so
+  // leaks the key one character at a time to anyone willing to time the
+  // responses. A 404 on failure was already right: it does not admit the route
+  // exists. The comparison is what was wrong.
+  const src = fs.readFileSync(new URL('../server_secure.js', import.meta.url), 'utf8');
+
+  assert.match(src, /function adminKeyOk\(req\)/);
+  assert.match(src, /crypto\.timingSafeEqual\(a, b\)/, 'the comparison must be constant time');
+  // timingSafeEqual throws when the lengths differ, so that has to be handled
+  // before it rather than by the caller.
+  assert.match(src, /if \(a\.length !== b\.length\) return false;/);
+  assert.match(src, /if \(!ADMIN_PROVISION_KEY\) return false;/,
+    'an unset key must lock the route, never open it');
+
+  // No admin route may still be doing it the old way.
+  assert.doesNotMatch(src, /req\.get\("x-admin-provision-key"\)\s*!==/);
+  const guards = src.match(/\/api\/admin\/[a-z-]+/g) || [];
+  assert.ok(guards.length >= 2, 'expected the admin routes');
+  for (const route of guards) {
+    const at = src.indexOf(route);
+    const body = src.slice(at, at + 260);
+    assert.match(body, /adminKeyOk\(req\)/, `${route} is not behind the checked key`);
+  }
+});
