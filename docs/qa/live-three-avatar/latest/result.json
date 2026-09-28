@@ -1,12 +1,12 @@
 {
-  "timestamp": "2026-09-27T13:27:23.243Z",
+  "timestamp": "2026-09-28T10:32:08.031Z",
   "base": "https://raz-coaching-platform.onrender.com",
-  "head_sha": "05614bef2906ab3348dc87d87254a4f3ac835bac",
-  "runtime": "live80 2026-09-27T13:26:24Z",
+  "head_sha": "11aba78f974afaa3667fb1682d80503949486144",
+  "runtime": "live81 2026-09-28T10:31:10Z",
   "results": [
     {
-      "id": "hebrew_lifter",
-      "job_id": "1326f834ae70aa538135007f9c45156a",
+      "id": "masters_return",
+      "job_id": "6cb960d7e9a74d6b7353580d4f7d423b",
       "ok": true,
       "status": "done",
       "stage": "finalizing",
@@ -14,27 +14,13 @@
       "detail": "saving program after 1 model call(s)",
       "last_seen_status": "done",
       "error": null,
-      "program_chars": 8642,
-      "seconds": 165
-    },
-    {
-      "id": "advanced_calisthenics",
-      "job_id": "df618685ff57752c27dee8c808bae7de",
-      "ok": true,
-      "status": "done",
-      "stage": "finalizing",
-      "attempt": 1,
-      "detail": "saving program after 1 model call(s)",
-      "last_seen_status": "done",
-      "error": null,
-      "program_chars": 21359,
-      "seconds": 257
+      "program_chars": 14690,
+      "seconds": 179
     }
   ],
   "reasoning_effort": "medium",
   "selection": [
-    "hebrew_lifter",
-    "advanced_calisthenics"
+    "masters_return"
   ],
   "ok": true
 }
