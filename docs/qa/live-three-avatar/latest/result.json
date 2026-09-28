@@ -1,12 +1,38 @@
 {
-  "timestamp": "2026-09-28T10:32:08.031Z",
+  "timestamp": "2026-09-28T15:57:35.144Z",
   "base": "https://raz-coaching-platform.onrender.com",
-  "head_sha": "11aba78f974afaa3667fb1682d80503949486144",
-  "runtime": "live81 2026-09-28T10:31:10Z",
+  "head_sha": "c38ded1dd24d68c147992c346b2cc837ac0a33ae",
+  "runtime": "live82 2026-09-28T15:56:44Z",
   "results": [
     {
-      "id": "masters_return",
-      "job_id": "6cb960d7e9a74d6b7353580d4f7d423b",
+      "id": "advanced_hybrid",
+      "job_id": "6ccb49b70b4f77795d99572956f2ed74",
+      "ok": false,
+      "status": "job_disappeared",
+      "stage": "generating",
+      "attempt": 2,
+      "detail": "regenerating after quality check [A1:ADVANCED_HYBRID_MARATHON_SUBORDINATION+V38_INCOMPLETE_SESSION]",
+      "last_seen_status": "pending",
+      "error": "Job state absent for 180s after successful earlier polling; service likely restarted mid-build.",
+      "program_chars": 0,
+      "seconds": 514
+    },
+    {
+      "id": "youth_gymnastics",
+      "job_id": "45c12101ed4c588adf4a2bf1b18344c7",
+      "ok": true,
+      "status": "done",
+      "stage": "finalizing",
+      "attempt": 3,
+      "detail": "saving program after 3 model call(s) QA trace: A1:COACH_SPEC_V1_YG_FAILURE_BASED_DEFAULT+V42_LOW_COST_CLAIM_CONTRADICTED -> A2:COACH_SPEC_V1_YG_FAILURE_BASED_DEFAULT. First failure evidence: Coaching Specification v1.0 YG-07: Week 3 session a uses failure/grinding language for youth work (Explosive Hip-to-Bar Pull-up). Default youth strength/skill progression must remain technical and submaximal rather than failure-based.",
+      "last_seen_status": "done",
+      "error": null,
+      "program_chars": 18424,
+      "seconds": 308
+    },
+    {
+      "id": "tactical_3k",
+      "job_id": "fff52131769d234a2aaabaf13971ce6f",
       "ok": true,
       "status": "done",
       "stage": "finalizing",
@@ -14,13 +40,29 @@
       "detail": "saving program after 1 model call(s)",
       "last_seen_status": "done",
       "error": null,
-      "program_chars": 14690,
-      "seconds": 179
+      "program_chars": 18329,
+      "seconds": 193
+    },
+    {
+      "id": "masters_return",
+      "job_id": "0980648e5606a8a2250ca1bf77ab7091",
+      "ok": true,
+      "status": "done",
+      "stage": "finalizing",
+      "attempt": 1,
+      "detail": "saving program after 1 model call(s) QA trace: A1:V34_PROGRESSION_LANGUAGE_MISMATCH -> A1:converged-without-regeneration. First failure evidence: Prescription/note consistency: Seated Calf Raise (Week 4) claims reduced volume, but that metric did not fall from the immediately previous week. Make every quantitative claim in a note agree with that row's own Sets, Reps and Weight fields, or state it as an explicitly conditional option. Do not reference a load that is neither prescribed on the row nor an established benchmark.",
+      "last_seen_status": "done",
+      "error": null,
+      "program_chars": 25125,
+      "seconds": 182
     }
   ],
   "reasoning_effort": "medium",
   "selection": [
+    "advanced_hybrid",
+    "youth_gymnastics",
+    "tactical_3k",
     "masters_return"
   ],
-  "ok": true
+  "ok": false
 }
