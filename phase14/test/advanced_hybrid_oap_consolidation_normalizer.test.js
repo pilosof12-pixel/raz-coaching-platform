@@ -177,3 +177,48 @@ test('a week with two runs is told to drop one, not all of them', () => {
     },
   );
 });
+
+test('a week with no running at all has the support run restored, not just reported', async () => {
+  const { repairMarathonSubordination } = await import('../engine/advanced_hybrid_quality.js');
+  // program(3) so Week 4 OAP volume is already legal: this test is about the
+  // running, not about the consolidation rule next to it.
+  const runless = program(3).split('\n').filter((l) => !/\tRun\t/.test(l)).join('\n');
+  // Not overriding sport_schedule here: a short one drops the intake below the
+  // high-concurrency threshold and the whole validator skips, which is how this
+  // test first "passed" by never running the rule at all.
+  const running = intake;
+
+  assert.throws(
+    () => validateAdvancedHybridQualitySemantic(runless, running),
+    (e) => e.code === 'ADVANCED_HYBRID_MARATHON_SUBORDINATION',
+  );
+
+  // Live run #149 shipped a hybrid block with zero run rows for an athlete whose
+  // stated secondary goal is a marathon, after four attempts and 455 seconds,
+  // because removing the running is a state the model cannot climb back out of.
+  const fixed = repairMarathonSubordination(runless, running);
+  assert.doesNotThrow(() => validateAdvancedHybridQualitySemantic(fixed, running));
+
+  const runs = fixed.split('\n').filter((l) => /^\w+\tRun\t/.test(l));
+  assert.equal(runs.length, 4, 'one support run in every week');
+  for (const run of runs) {
+    const cells = run.split('\t');
+    assert.match(`${cells[2]} ${cells[7]}`, /easy|conversational/i);
+    // It goes on a day the athlete is not already in the gym.
+    assert.equal(['Mon', 'Tue', 'Fri', 'Sun'].includes(cells[0]), false);
+  }
+  // Held at the demonstrated volume, so it adds no mileage they do not cover,
+  // and Week 4 still consolidates.
+  const km = runs.map((r) => Number(r.split('\t')[4].match(/[\d.]+/)[0]));
+  assert.deepEqual(km.slice(0, 3), [20, 20, 20]);
+  assert.ok(km[3] < km[2], 'Week 4 run comes down');
+
+  assert.equal(repairMarathonSubordination(fixed, running), fixed, 'idempotent');
+});
+
+test('nothing is invented when there is no demonstrated running volume to copy', async () => {
+  const { repairMarathonSubordination } = await import('../engine/advanced_hybrid_quality.js');
+  const runless = program(3).split('\n').filter((l) => !/\tRun\t/.test(l)).join('\n');
+  const noBaseline = { ...intake, current_numbers: 'Back Squat: 205 kg 1RM\nOne-Arm Pull-up: 2 strict reps each arm' };
+  assert.equal(repairMarathonSubordination(runless, noBaseline), runless);
+});

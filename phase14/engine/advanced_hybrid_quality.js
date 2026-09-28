@@ -305,6 +305,59 @@ export function repairRunBaseline(program, intake = {}) {
 const EASY_LANGUAGE = /easy|zone\s*2|conversational/i;
 const SUPPORT_RUN_NOTE = 'Easy, conversational pace: this run supports the marathon while the strength and skill goals stay in front of it. If you cannot talk through it, it is too fast.';
 
+// The day the run goes on: a day the athlete is not already in the gym, taking
+// the lightest sport load among those left. Nothing is invented if there is no
+// free day or no demonstrated running volume to copy.
+function supportRunDay(intake = {}) {
+  const gym = new Set(arr(intake.available_gym_days).map((d) => weekdayKey(d) || lower(d)).filter(Boolean));
+  const intensity = new Map();
+  for (const entry of arr(intake.sport_schedule)) {
+    const day = weekdayKey(entry?.day) || lower(entry?.day);
+    if (day) intensity.set(day, String(entry?.intensity || '').toLowerCase());
+  }
+  const cost = (day) => {
+    const level = intensity.get(day);
+    if (level === 'hard' || level === 'match') return 3;
+    if (level === 'moderate') return 2;
+    if (level) return 1;
+    return 0;
+  };
+  const free = ['thu', 'wed', 'sat', 'sun', 'mon', 'tue', 'fri'].filter((d) => !gym.has(d));
+  if (!free.length) return null;
+  return free.slice().sort((a, b) => cost(a) - cost(b))[0];
+}
+
+function restoreSupportRun(program, parsed, week, intake) {
+  const baseline = currentRunBaseline(intake);
+  if (!baseline?.weekly_km) return null;
+  const day = supportRunDay(intake);
+  if (!day) return null;
+
+  // Week 4 must stay below Week 3 for the consolidation check, and Weeks 1-3
+  // sit at -- never above -- the demonstrated weekly volume.
+  const km = week === 4
+    ? Math.max(1, Math.round(baseline.weekly_km * 0.875 * 10) / 10)
+    : baseline.weekly_km;
+
+  const row = new Array(parsed.header.length).fill('');
+  row[parsed.day] = day.charAt(0).toUpperCase() + day.slice(1);
+  row[parsed.exercise] = 'Run';
+  if (Number.isInteger(parsed.load)) row[parsed.load] = 'Easy conversational pace';
+  if (Number.isInteger(parsed.sets)) row[parsed.sets] = '1';
+  if (Number.isInteger(parsed.reps)) row[parsed.reps] = `${km} km`;
+  if (Number.isInteger(parsed.rest)) row[parsed.rest] = 'N/A';
+  const rpeCol = parsed.header.findIndex((h) => /target rpe|effort/i.test(String(h || '')));
+  if (rpeCol >= 0) row[rpeCol] = '4-5';
+  if (Number.isInteger(parsed.notes)) {
+    row[parsed.notes] = `${SUPPORT_RUN_NOTE} Held at the ${baseline.weekly_km} km a week you already run, so this adds no mileage you are not already covering.`;
+  }
+
+  const rows = parsed.rows.map((c) => c.slice());
+  rows.push(row);
+  const rebuilt = [parsed.header.join('\t'), ...rows.map((c) => c.join('\t'))].join('\n');
+  return program.replace(parsed.re, `$1${rebuilt}$3`);
+}
+
 export function repairMarathonSubordination(program, intake = {}) {
   if (!isHighConcurrencyHybrid(intake)) return String(program || '');
   if (marathonGoalTier(intake) !== 'secondary') return String(program || '');
@@ -325,7 +378,27 @@ export function repairMarathonSubordination(program, intake = {}) {
       perDay.set(lastDay, (perDay.get(lastDay) || 0) + 1);
       if (/^(?:run|running)$/i.test(name)) runs.push({ index: i, day: lastDay });
     });
-    if (!runs.length) continue;
+
+    // No running at all is the one state this repair used to walk away from,
+    // and it is the one that reached a client. Live run #149 delivered an
+    // Advanced Hybrid block with zero run rows and no mention of the marathon
+    // anywhere, for an athlete whose stated secondary goal IS a marathon and
+    // who already runs about once a week. Four attempts, 455 seconds, and the
+    // harness shipped it with the rule still unresolved, because removing the
+    // running is a state the model cannot climb back out of: it then fails this
+    // rule plus the named-goal, target-modality and event-progression gates,
+    // and every regeneration re-reads its own runless program.
+    //
+    // Restoring one easy run at the volume the athlete demonstrably already
+    // covers adds no load they are not already carrying, which is the same
+    // principle TARGET_MODALITY_EXPOSURE_REDUCED enforces: preserve the stated
+    // current exposure. Week 4 comes down so the consolidation week still
+    // consolidates.
+    if (!runs.length) {
+      const restored = restoreSupportRun(out, parsed, week, intake);
+      if (restored) out = restored;
+      continue;
+    }
 
     const cells = parsed.rows.map((c) => c.slice());
     const noteOf = (i) => (Number.isInteger(parsed.notes) ? String(cells[i][parsed.notes] || '') : '');
