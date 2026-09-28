@@ -139,5 +139,8 @@ export function buildGoalPaceBrief(intake = {}) {
     '  Include work at or near that pace every week -- short intervals early, longer ones as tolerance allows. It does not have to be much, and early on it should not be, but the athlete has to meet the pace they are training to hold.',
     '  Write the paces as numbers the athlete can hold themselves to, and move them across the block. A pace that is identical in all four weeks trains duration, not speed, and if that is deliberate the narrative should say so.',
     '  Where an injury or a return constrains the work, constrain the volume at that pace rather than removing the pace: a smaller dose of the right thing beats a larger dose of something adjacent.',
+    '* A TIMED GOAL IS ALSO A DURATION.',
+    `  ${goal.line} takes about ${mm(goal.seconds)} of continuous work. A block that visits the pace in short reps has trained the speed but never the demand -- holding a split for forty seconds and holding it for ${mm(goal.seconds)} are different events. Build toward at least one exposure that is a meaningful fraction of that duration by the end of the block.`,
+    '  If a return from injury, a low training age or the athlete\'s recovery makes that the wrong call for these four weeks, that is a legitimate decision -- but say it in the guidance. Name what the longest piece in this block is, why it stops there, and what has to be true before race-length work starts. An athlete training for a timed event will look for it, and silence reads as an oversight rather than a choice.',
   ].join('\n');
 }
