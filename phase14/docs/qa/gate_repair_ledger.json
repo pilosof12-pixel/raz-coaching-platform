@@ -3666,6 +3666,26 @@
     "killedLive": ""
   },
   {
+    "code": "V95_UNTESTED_BENCHMARK_UNADDRESSED",
+    "modules": [
+      "engine/untested_benchmark_disclosure.js"
+    ],
+    "owners": [
+      "collectUntestedBenchmarkFlags"
+    ],
+    "advisory": false,
+    "reachable": true,
+    "repairs": [
+      "normalizeUntestedBenchmarkDisclosure"
+    ],
+    "wired": [
+      "normalizeUntestedBenchmarkDisclosure"
+    ],
+    "tested": true,
+    "stressed": false,
+    "killedLive": ""
+  },
+  {
     "code": "WEEKLY_MRV_EXCEEDED",
     "modules": [
       "engine/exercise_dictionary.js",

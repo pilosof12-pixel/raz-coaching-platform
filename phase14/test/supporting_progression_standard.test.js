@@ -118,3 +118,53 @@ test('both repairs are wired into the production bundle before release QA', asyn
   assert.match(bundle, /normalizeSupportingProgressionStandard\(candidate, intake\)/);
   assert.match(bundle, /normalizeWeekScopeClaims\(candidate, intake\)/);
 });
+
+// --- benchmarks the athlete flagged and the block never mentioned ------------
+
+import {
+  collectUntestedBenchmarkFlags,
+  normalizeUntestedBenchmarkDisclosure,
+} from '../engine/untested_benchmark_disclosure.js';
+
+const RETURNING = {
+  current_numbers: 'Goblet squat: 24 kg x 8 comfortable\nDeadlift: not attempted since the injury',
+  injuries: 'L4/L5 disc herniation nine months ago. Cleared for graded loading.',
+  pain: { active: true, description: 'Occasional low-back stiffness' },
+};
+
+const HINGE_BLOCK = `Guidance paragraph for the block.\n\n${[1, 2, 3].map((w) => block(w, [
+  row('Wed', 'Barbell Hip Thrust', '20 kg', 3, 8, 6, 'Posterior chain.'),
+  row('Mon', 'Goblet Squat', '18 kg', 3, 6, '6-7', 'Upright torso.'),
+])).join('\n\n')}`;
+
+test('a benchmark the intake flags as untested and the block omits is flagged', () => {
+  const flags = collectUntestedBenchmarkFlags(HINGE_BLOCK, RETURNING);
+  assert.equal(flags.length, 1);
+  assert.equal(flags[0].exercise, 'Deadlift');
+  assert.equal(flags[0].code, 'V95_UNTESTED_BENCHMARK_UNADDRESSED');
+});
+
+test('the disclosure names the covering work and defers the retest to the clinician', () => {
+  const out = normalizeUntestedBenchmarkDisclosure(HINGE_BLOCK, RETURNING);
+  assert.equal(out.repaired, true);
+  const guidance = out.program.split('START_WEEK1_TSV')[0];
+  assert.match(guidance, /About the deadlift/i);
+  assert.match(guidance, /Barbell Hip Thrust trains the same pattern/);
+  assert.match(guidance, /clinician's input/);
+  // Guidance only: not one prescription row moves.
+  const rows = (p) => p.split('\n').filter((l) => l.includes('\t'));
+  assert.deepEqual(rows(out.program), rows(HINGE_BLOCK));
+  assert.deepEqual(collectUntestedBenchmarkFlags(out.program, RETURNING), []);
+  assert.equal(normalizeUntestedBenchmarkDisclosure(out.program, RETURNING).program, out.program);
+});
+
+test('a benchmark the block actually programs needs no disclosure', () => {
+  const withDeadlift = HINGE_BLOCK.replaceAll('\tBarbell Hip Thrust\t', '\tDeadlift\t');
+  assert.deepEqual(collectUntestedBenchmarkFlags(withDeadlift, RETURNING), []);
+  assert.equal(normalizeUntestedBenchmarkDisclosure(withDeadlift, RETURNING).repaired, false);
+});
+
+test('a benchmark the intake never raises is left alone', () => {
+  const quiet = { current_numbers: 'Goblet squat: 24 kg x 8 comfortable' };
+  assert.deepEqual(collectUntestedBenchmarkFlags(HINGE_BLOCK, quiet), []);
+});

@@ -82,6 +82,7 @@ import { normalizeAdvancedHybridOHPComplement } from './advanced_hybrid_ohp_norm
 import { normalizeYouthPrimarySkillOrder } from './youth_skill_order_normalizer.js';
 import { normalizeSupportingProgressionStandard } from './supporting_progression_standard.js'; // V93-SUPPORTING-PROGRESSION-WIRED
 import { normalizeWeekScopeClaims } from './week_scope_claims.js'; // V94-WEEK-SCOPE-CLAIM-WIRED
+import { normalizeUntestedBenchmarkDisclosure } from './untested_benchmark_disclosure.js'; // V95-UNTESTED-BENCHMARK-WIRED
 import { normalizeYouthAcquisitionGoalFloors } from './youth_goal_floor_normalizer.js';
 import { normalizeYouthSessionQuality } from './youth_session_quality_normalizer.js';
 import { normalizeYouthWeek4Consolidation } from './youth_consolidation_normalizer.js';
@@ -429,6 +430,12 @@ function applyDeterministicCandidateRepairs(program, intake = {}) {
   const weekScope = normalizeWeekScopeClaims(candidate, intake);
   candidate = weekScope.program;
   if (weekScope.repaired) repairs.push({ type: 'week_scope_claim_corrected', rows: weekScope.repairs });
+
+  // Guidance-only, and after the row repairs so it reports what the block
+  // actually ended up containing.
+  const untestedBenchmark = normalizeUntestedBenchmarkDisclosure(candidate, intake);
+  candidate = untestedBenchmark.program;
+  if (untestedBenchmark.repaired) repairs.push({ type: 'untested_benchmark_disclosed', rows: untestedBenchmark.repairs });
 
   const supportingProgression = normalizeSupportingProgressionStandard(candidate, intake);
   candidate = supportingProgression.program;
