@@ -249,6 +249,7 @@ test('the coach brief asks for all four standards up front', async () => {
   assert.match(brief, /A WEEK-SCOPED CLAIM MUST BE TRUE/);
   assert.match(brief, /A BENCHMARK THE ATHLETE FLAGGED IS ADDRESSED/);
   assert.match(brief, /THE CONSOLIDATION WEEK IS NOT WHERE THE PROGRESSION GOES/);
+  assert.match(brief, /FOR A YOUTH ATHLETE, NEVER WRITE FAILURE LANGUAGE AT ALL/);
   // And it names the failure mode the repair itself fell into first time round.
   assert.match(brief, /same sentence on five different exercises/i);
 });
