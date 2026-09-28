@@ -749,7 +749,11 @@ export function repairHandstandBalance(program, intake = {}) {
     if (!day) continue;
 
     const row = new Array(parsed.header.length).fill('');
-    row[parsed.day] = '';
+    // The block above resolves which day this exposure belongs to, and bails out
+    // when it cannot. Writing '' here threw that away, so the restored row landed
+    // with no day: the schedule parser counted it as a third, "unknown" strength
+    // day and the athlete would have received a row with an empty Day column.
+    row[parsed.day] = day;
     row[parsed.exercise] = BALANCE_MOVEMENT;
     if (Number.isInteger(parsed.load)) row[parsed.load] = 'Bodyweight';
     row[parsed.sets] = '4';

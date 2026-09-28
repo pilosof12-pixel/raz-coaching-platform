@@ -4,7 +4,11 @@ import assert from 'node:assert/strict';
 import { validateProductionProgram } from '../engine/production_validation.js';
 import { collectRepairableValidationFailures } from '../engine/repairable_validation_bundle.js';
 import { validateDirectGoalExposureSemantic } from '../engine/semantic_program_qa.js';
-import { validateTacticalGppCoverageSemantic } from '../engine/coaching_progression_gpp.js';
+import {
+  progressionAnalysis,
+  validateProgressionArchitectureSemantic,
+  validateTacticalGppCoverageSemantic,
+} from '../engine/coaching_progression_gpp.js';
 import {
   TACTICAL_3K_INTAKE,
   YOUTH_GYMNASTICS_INTAKE,
@@ -83,7 +87,20 @@ test('Youth primary skills cannot repeat an unchanged prescription for all four 
     if (cells[1] === 'Bar Muscle-up Transition Drill') cells[2] = 'BW + moderate band';
     return cells;
   });
-  expectFailure(bad, YOUTH_GYMNASTICS_INTAKE, 'PROGRESSION_ARCHITECTURE_MISSING');
+  // The semantic gate must still see the flattened prescription for what it is.
+  expectValidatorFailure(
+    () => validateProgressionArchitectureSemantic(bad, YOUTH_GYMNASTICS_INTAKE),
+    'PROGRESSION_ARCHITECTURE_MISSING',
+  );
+
+  // Production then converges it deterministically rather than failing closed:
+  // the Youth normalizers restore a real per-week attempt ceiling and assistance
+  // progression. Assert the convergence actually happened rather than trusting ok.
+  const repaired = validateProductionProgram(bad, YOUTH_GYMNASTICS_INTAKE);
+  assert.equal(repaired.ok, true);
+  const handstand = progressionAnalysis(repaired.program, YOUTH_GYMNASTICS_INTAKE)
+    .targets.find((t) => t.family === 'handstand');
+  assert.ok(handstand?.progressed, 'the handstand family must progress again after repair');
 });
 
 test('Tactical missing GPP is repaired locally but unrelated strength-session defects still fail closed', () => {
@@ -153,7 +170,17 @@ test('Tactical 3K cannot remove direct pull-up work while preserving three stren
     }
     return cells;
   }).split('\n').filter((line) => !line.includes('\tPull-up\tBodyweight\t')).join('\n');
-  expectFailure(bad, TACTICAL_3K_INTAKE, 'NAMED_GOAL_DIRECT_EXPOSURE_MISSING');
+
+  // The named-goal gate is what sees the missing direct pull-up work. Swapping
+  // every pull-up for a press also strips the tactical GPP floor and leaves a
+  // two-item session behind, so the production chain now reports those codes
+  // first; asserting the gate directly keeps this test about the pull-up.
+  expectValidatorFailure(
+    () => validateDirectGoalExposureSemantic(bad, TACTICAL_3K_INTAKE),
+    'NAMED_GOAL_DIRECT_EXPOSURE_MISSING',
+  );
+  // And the whole chain still fails closed rather than shipping the block.
+  assert.throws(() => validateProductionProgram(bad, TACTICAL_3K_INTAKE));
 });
 
 test('Youth bar muscle-up omission is rejected semantically then restored only for explicit acquisition intake', () => {
