@@ -68,6 +68,13 @@ const QUALITY = {
 };
 const DEFAULT_QUALITY = 'control of the lowering on every rep';
 
+// Some machines sit in a category whose cue is written for the free-weight
+// pattern. A machine hamstring curl is hip-dominant by classification, but
+// telling it to lock out with the ribs down is a hinge cue on a knee-flexion
+// machine. Where the movement is isolation work, its own standard wins.
+const ISOLATION = /leg curl|hamstring curl|leg extension|calf raise|(?:biceps|triceps|hammer|preacher) curl|lateral raise|(?:face|band) pull|pec (?:deck|fly)|cable fly/i;
+const ISOLATION_QUALITY = 'a controlled lowering and a full, deliberate finish at the end of range, with no swing to start the rep';
+
 const EARNED = {
   [CATEGORY.LOADED_CARRY]: 'you may add a few metres to the last carry only',
   [CATEGORY.POWER]: 'you may add one crisp rep to the last set only',
@@ -76,7 +83,7 @@ const DEFAULT_EARNED = 'you may add one clean rep to the last set only';
 
 function buildStandard(week, name) {
   const { category } = classifyExercise(name);
-  const quality = QUALITY[category] || DEFAULT_QUALITY;
+  const quality = ISOLATION.test(name) ? ISOLATION_QUALITY : (QUALITY[category] || DEFAULT_QUALITY);
   const earned = EARNED[category] || DEFAULT_EARNED;
   if (week === 1) {
     return `Week 1 standard: set the benchmark. Use a load you can repeat cleanly on every set and note ${quality} - that is what Weeks 2 and 3 are measured against, not a bigger number.`;
