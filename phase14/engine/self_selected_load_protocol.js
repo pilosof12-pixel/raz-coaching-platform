@@ -117,7 +117,12 @@ export function normalizeSelfSelectedLoadProtocol(program, intake = {}) {
       const rir = rirFrom(effortCell(cells, parsed));
       if (!rir) continue;
       const note = String(cells[parsed.notes] || '').trim();
-      const line = `${MARKER} pick a weight you could stop with about ${rir} clean rep${rir === '1' ? '' : 's'} still in reserve on the last set, write it in the Results column, and start from that number next week.`;
+      // A carry is dosed in metres, so reps in reserve is the wrong unit for it:
+      // its standard is whether posture and grip hold for the whole distance.
+      const carry = classifyExercise(name).category === CATEGORY.LOADED_CARRY;
+      const line = carry
+        ? `${MARKER} pick a weight you can carry the full distance with a tall posture and no grip failure, stopping the set the moment either goes, write it in the Results column, and start from that number next week.`
+        : `${MARKER} pick a weight you could stop with about ${rir} clean rep${rir === '1' ? '' : 's'} still in reserve on the last set, write it in the Results column, and start from that number next week.`;
       cells[parsed.notes] = note ? `${note} ${line}` : line;
       changed = true;
       repairs.push({ type: 'self_selected_load_protocol', week, exercise: name });

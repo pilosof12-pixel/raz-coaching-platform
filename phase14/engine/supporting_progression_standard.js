@@ -49,11 +49,43 @@ const STATES_WHAT_ADVANCES = /\b(?:progress(?:es|ing)?|improve|beat|advance[sd]?
 
 const MARKER = /\bWeek [1-3] standard:|\bWeek [23] advance:/i;
 
-const BUILD_STANDARD = {
-  1: 'Week 1 standard: this is the benchmark. Use the load and execution you can repeat cleanly on every set, and record how it felt - Weeks 2 and 3 are measured against this, not against a bigger number.',
-  2: 'Week 2 advance: the prescription holds on purpose, so the progression is execution. Beat Week 1 by controlling the lowering on every rep and finishing at the same or a lower RPE.',
-  3: 'Week 3 advance: the prescription holds again. If every set in Week 2 was clean at or below the target RPE, you may add one clean rep to the last set only - earned, optional, and skipped entirely on any grind, symptom or loss of position.',
+// One sentence pasted onto every flagged row would re-create the defect this
+// rule exists to remove: five exercises in a week reading identically is copy-
+// paste whether a human or a repair wrote it. The standard a lifter is asked to
+// beat differs by movement, so the cue does too -- a squat is judged on depth and
+// bracing, a press on a lockout that does not slow, a carry on posture over the
+// full distance.
+const QUALITY = {
+  [CATEGORY.KNEE_DOMINANT]: 'the same depth and bracing on every rep, with an unhurried tempo out of the bottom',
+  [CATEGORY.HIP_DOMINANT]: 'a full, controlled lockout with the ribs down and no lumbar extension to finish',
+  [CATEGORY.UNILATERAL_LOWER]: 'balance and control on the weaker side, which leads every set',
+  [CATEGORY.HORIZONTAL_PUSH]: 'a controlled lowering and a lockout that does not slow down across sets',
+  [CATEGORY.VERTICAL_PUSH]: 'a controlled lowering and a lockout that does not slow down across sets',
+  [CATEGORY.HORIZONTAL_PULL]: 'finishing each rep with the upper back rather than a swing or a shrug',
+  [CATEGORY.VERTICAL_PULL]: 'a full range from a dead hang, finishing with the back rather than a kip',
+  [CATEGORY.LOADED_CARRY]: 'a taller posture and a steadier grip across the whole distance',
+  [CATEGORY.POWER]: 'speed and height, stopping the moment either drops',
 };
+const DEFAULT_QUALITY = 'control of the lowering on every rep';
+
+const EARNED = {
+  [CATEGORY.LOADED_CARRY]: 'you may add a few metres to the last carry only',
+  [CATEGORY.POWER]: 'you may add one crisp rep to the last set only',
+};
+const DEFAULT_EARNED = 'you may add one clean rep to the last set only';
+
+function buildStandard(week, name) {
+  const { category } = classifyExercise(name);
+  const quality = QUALITY[category] || DEFAULT_QUALITY;
+  const earned = EARNED[category] || DEFAULT_EARNED;
+  if (week === 1) {
+    return `Week 1 standard: set the benchmark. Use a load you can repeat cleanly on every set and note ${quality} - that is what Weeks 2 and 3 are measured against, not a bigger number.`;
+  }
+  if (week === 2) {
+    return `Week 2 advance: beat Week 1 on ${quality}, at the same or a lower RPE. The numbers hold on purpose - this week the progression is execution.`;
+  }
+  return `Week 3 advance: the prescription holds again. If every set in Week 2 was clean at or below the target RPE, ${earned} - earned, optional, and skipped entirely on any grind, symptom or loss of position.`;
+}
 
 function rowsByName(parsed) {
   const out = new Map();
@@ -149,7 +181,8 @@ export function normalizeSupportingProgressionStandard(program, intake = {}) {
       for (const { cells, name } of entries) {
         const note = String(cells[parsed.notes] || '').trim();
         if (MARKER.test(note)) continue;
-        cells[parsed.notes] = note ? `${note} ${BUILD_STANDARD[week]}` : BUILD_STANDARD[week];
+        const standard = buildStandard(week, name);
+        cells[parsed.notes] = note ? `${note} ${standard}` : standard;
         changed = true;
         repairs.push({ type: 'supporting_progression_standard', week, exercise: name });
       }
