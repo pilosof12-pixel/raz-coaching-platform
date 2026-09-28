@@ -91,7 +91,7 @@ function buildStandard(week, name) {
   if (week === 2) {
     return `Week 2 advance: beat Week 1 on ${quality}, at the same or a lower RPE. The numbers hold on purpose - this week the progression is execution.`;
   }
-  return `Week 3 advance: the prescription holds again. If every set in Week 2 was clean at or below the target RPE, ${earned} - earned, optional, and skipped entirely on any grind, symptom or loss of position.`;
+  return `Week 3 advance: hold the numbers once more and keep ${quality}. If every set in Week 2 was clean at or below the target RPE, ${earned} - earned, optional, and skipped entirely on any grind, symptom or loss of position.`;
 }
 
 function rowsByName(parsed) {
