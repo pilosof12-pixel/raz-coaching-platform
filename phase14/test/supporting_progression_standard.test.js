@@ -253,3 +253,35 @@ test('the coach brief asks for all four standards up front', async () => {
   // And it names the failure mode the repair itself fell into first time round.
   assert.match(brief, /same sentence on five different exercises/i);
 });
+
+test('the four note repairs run after every pass that can still change a prescription', async () => {
+  const fs = await import('node:fs');
+  const bundle = fs.readFileSync(new URL('../engine/repairable_validation_bundle.js', import.meta.url), 'utf8');
+
+  // Live run #149 shipped a Youth block whose Ring Push-up sat at 2x8 with a
+  // byte-identical note in all three build weeks. The rule had flagged it and
+  // the repair had run -- before a later normalizer pass froze the rows. The
+  // rule judged a program that no longer existed by the time it was delivered.
+  const at = (needle) => {
+    const i = bundle.indexOf(needle);
+    assert.ok(i > 0, `anchor missing: ${needle}`);
+    return i;
+  };
+  const lastRowChangingPass = Math.max(
+    at('normalizeYouthSkillAcquisitionQuality(candidate, intake)'),
+    at('normalizeYouthWeek4Consolidation(candidate, intake)'),
+    at('normalizeTactical3KRaceSpecificity(candidate, intake)'),
+    at('trimExcessSupportVolume(candidate, intake)'),
+  );
+  for (const call of [
+    'normalizeSelfSelectedLoadProtocol(candidate, intake)',
+    'normalizeWeekScopeClaims(candidate, intake)',
+    'normalizeSupportingProgressionStandard(candidate, intake)',
+    'normalizeUntestedBenchmarkDisclosure(candidate, intake)',
+  ]) {
+    assert.ok(
+      bundle.lastIndexOf(call) > lastRowChangingPass,
+      `${call} must run after the last pass that can change a prescription`,
+    );
+  }
+});

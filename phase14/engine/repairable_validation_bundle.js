@@ -424,29 +424,6 @@ function applyDeterministicCandidateRepairs(program, intake = {}) {
   candidate = advancedSecondaryRun.program;
   if (advancedSecondaryRun.repaired) repairs.push({ type: 'advanced_hybrid_secondary_run_stability', rows: advancedSecondaryRun.repairs });
 
-  // Notes-only, and last of the row-editing repairs so it sees the final
-  // prescription. A week-scoped claim is only false once the loads around it have
-  // settled, and an exposure only counts as unchanging once every other
-  // normalizer has finished changing it.
-  // Before the week-scope and progression cues, so those read a row that already
-  // states how its load is chosen.
-  const loadProtocol = normalizeSelfSelectedLoadProtocol(candidate, intake);
-  candidate = loadProtocol.program;
-  if (loadProtocol.repaired) repairs.push({ type: 'self_selected_load_protocol', rows: loadProtocol.repairs });
-
-  const weekScope = normalizeWeekScopeClaims(candidate, intake);
-  candidate = weekScope.program;
-  if (weekScope.repaired) repairs.push({ type: 'week_scope_claim_corrected', rows: weekScope.repairs });
-
-  // Guidance-only, and after the row repairs so it reports what the block
-  // actually ended up containing.
-  const untestedBenchmark = normalizeUntestedBenchmarkDisclosure(candidate, intake);
-  candidate = untestedBenchmark.program;
-  if (untestedBenchmark.repaired) repairs.push({ type: 'untested_benchmark_disclosed', rows: untestedBenchmark.repairs });
-
-  const supportingProgression = normalizeSupportingProgressionStandard(candidate, intake);
-  candidate = supportingProgression.program;
-  if (supportingProgression.repaired) repairs.push({ type: 'supporting_progression_standard', rows: supportingProgression.repairs });
 
   const youthAcquisitionQuality = normalizeYouthSkillAcquisitionQuality(candidate, intake);
   candidate = youthAcquisitionQuality.program;
@@ -650,6 +627,30 @@ export function collectRepairableValidationFailures(program, intake = {}, option
   const finalTacticalRaceSpecificity = normalizeTactical3KRaceSpecificity(candidate, intake);
   candidate = finalTacticalRaceSpecificity.program;
   if (finalTacticalRaceSpecificity.repaired) deterministic_repairs.push({ type: 'final_tactical_3k_race_specificity', rows: finalTacticalRaceSpecificity.repairs }); // COACH-SPEC-V1-MANUAL-FINAL-REPAIR
+
+  // These four describe the FINISHED block, so they run after every normalizer
+  // that can still change a prescription -- including the whole second pass
+  // above. They used to sit before it, which is not a style question: live run
+  // #149 shipped a Youth block whose Ring Push-up was 2x8 with a byte-identical
+  // note in all three build weeks, because this rule judged the rows, and a
+  // later pass then froze them. The rule saw a program that no longer existed.
+  const loadProtocol = normalizeSelfSelectedLoadProtocol(candidate, intake);
+  candidate = loadProtocol.program;
+  if (loadProtocol.repaired) deterministic_repairs.push({ type: 'self_selected_load_protocol', rows: loadProtocol.repairs });
+
+  const weekScope = normalizeWeekScopeClaims(candidate, intake);
+  candidate = weekScope.program;
+  if (weekScope.repaired) deterministic_repairs.push({ type: 'week_scope_claim_corrected', rows: weekScope.repairs });
+
+  const supportingProgression = normalizeSupportingProgressionStandard(candidate, intake);
+  candidate = supportingProgression.program;
+  if (supportingProgression.repaired) deterministic_repairs.push({ type: 'supporting_progression_standard', rows: supportingProgression.repairs });
+
+  // Guidance-only, and last of the four so it reports what the block actually
+  // ended up containing.
+  const untestedBenchmark = normalizeUntestedBenchmarkDisclosure(candidate, intake);
+  candidate = untestedBenchmark.program;
+  if (untestedBenchmark.repaired) deterministic_repairs.push({ type: 'untested_benchmark_disclosed', rows: untestedBenchmark.repairs });
 
   // Last deterministic repair: every prescription above is now settled, so any
   // quantitative claim a note still makes about its own row can be checked
