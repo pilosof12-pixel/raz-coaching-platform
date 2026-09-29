@@ -1873,6 +1873,26 @@
     "killedLive": ""
   },
   {
+    "code": "V103_WIDE_REP_RANGE_WITHOUT_RULE",
+    "modules": [
+      "engine/rep_range_decision_rule.js"
+    ],
+    "owners": [
+      "collectWideRepRangeFlags"
+    ],
+    "advisory": false,
+    "reachable": true,
+    "repairs": [
+      "normalizeWideRepRange"
+    ],
+    "wired": [
+      "normalizeWideRepRange"
+    ],
+    "tested": true,
+    "stressed": false,
+    "killedLive": ""
+  },
+  {
     "code": "V34_DUPLICATE_SPECIFIC_RAMP",
     "modules": [
       "engine/v34_prescription_consistency.js"

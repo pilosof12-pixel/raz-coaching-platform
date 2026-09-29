@@ -85,6 +85,7 @@ import { normalizeWeekScopeClaims } from './week_scope_claims.js'; // V98-WEEK-S
 import { normalizeUntestedBenchmarkDisclosure } from './untested_benchmark_disclosure.js'; // V99-UNTESTED-BENCHMARK-WIRED
 import { normalizeSelfSelectedLoadProtocol } from './self_selected_load_protocol.js'; // V100-SELF-SELECTED-LOAD-WIRED
 import { normalizeGoalStatusDeclaration } from './goal_status_declaration.js'; // V101-GOAL-STATUS-WIRED
+import { normalizeWideRepRange } from './rep_range_decision_rule.js'; // V103-WIDE-REP-RANGE-WIRED
 import { progressionAnalysis } from './coaching_progression_gpp.js'; // V101-GOAL-STATUS-WIRED
 import { normalizeYouthAcquisitionGoalFloors } from './youth_goal_floor_normalizer.js';
 import { normalizeYouthSessionQuality } from './youth_session_quality_normalizer.js';
@@ -654,6 +655,10 @@ export function collectRepairableValidationFailures(program, intake = {}, option
   const weekScope = normalizeWeekScopeClaims(candidate, intake);
   candidate = weekScope.program;
   if (weekScope.repaired) deterministic_repairs.push({ type: 'week_scope_claim_corrected', rows: weekScope.repairs });
+
+  const wideRepRange = normalizeWideRepRange(candidate, intake);
+  candidate = wideRepRange.program;
+  if (wideRepRange.repaired) deterministic_repairs.push({ type: 'wide_rep_range_decision_rule', rows: wideRepRange.repairs });
 
   const supportingProgression = normalizeSupportingProgressionStandard(candidate, intake);
   candidate = supportingProgression.program;
