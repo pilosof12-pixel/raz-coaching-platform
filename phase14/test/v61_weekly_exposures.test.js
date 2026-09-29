@@ -135,7 +135,12 @@ test('the spreadsheet exporter counts the same week as the engine', () => {
 
 // Against the programs a coach actually reviewed.
 test('the live run #81 programs count as the review described', () => {
-  const dir = path.join(process.cwd(), '..', 'docs/qa/live-three-avatar/latest');
+  // Frozen copies of the run #81 programs. This read the live directory, which
+  // every acceptance run overwrites, so it was asserting run #81's numbers
+  // against whatever had been generated most recently -- and started failing the
+  // moment a later run produced a four-day hybrid week. The counter is what this
+  // test is about; the programs it counts have to hold still.
+  const dir = path.join(process.cwd(), 'test', 'fixtures', 'run81');
   const h = path.join(dir, 'advanced_hybrid-program.txt');
   const t = path.join(dir, 'tactical_3k-program.txt');
   if (!fs.existsSync(h) || !fs.existsSync(t)) return;

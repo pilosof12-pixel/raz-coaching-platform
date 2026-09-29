@@ -304,3 +304,32 @@ test('the one cell the athlete writes in looks like a field', async () => {
   }
   assert.equal(body.border?.bottom?.style, 'hair', 'body rows get a hairline to track across');
 });
+
+test('the Overview counts endurance by modality, so a rowing block does not report running', async () => {
+  // The coach read "4 strength, 2 running" on the first line of a block whose
+  // primary goal is a 2 km erg and which contains no running at all. The engine
+  // counter was fixed first and the sheet still said "running", because the
+  // Overview is built by the renderer, which carries its own copy.
+  const H = 'Day\tExercise\tWeight\tSets\tReps\tRest\tTarget RPE\tNotes\tResults';
+  const row = (day, ex, reps) => [day, ex, 'N/A', '1', reps, 'N/A', '5', 'Easy.', ''].join('\t');
+  const program = [1, 2, 3, 4].map((w) => `START_WEEK${w}_TSV\n${H}\n${[
+    row('Mon', 'Rowing Ergometer', '25 min'),
+    row('Mon', 'Goblet Squat', '8'),
+    row('Wed', 'Rowing Ergometer', '20 min'),
+    row('Fri', 'Leg Press Machine', '10'),
+  ].join('\n')}\nEND_WEEK${w}_TSV`).join('\n\n');
+
+  const { wb } = await renderParityWorkbook(program, {
+    age: 54,
+    primary_goals: ['Return to competitive masters rowing and race a 2 km erg again'],
+    days_per_week: 4,
+    sport: 'Rowing (masters)',
+  });
+  const overview = Array.from(wb.worksheets).find((w) => /overview/i.test(w.name));
+  let frequency = '';
+  overview.eachRow((r) => {
+    if (/training frequency/i.test(cellText(r.getCell(1)))) frequency = cellText(r.getCell(2));
+  });
+  assert.match(frequency, /2 rowing/);
+  assert.doesNotMatch(frequency, /running/);
+});

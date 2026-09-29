@@ -470,11 +470,26 @@
   // A run and a ruck both condition and are not interchangeable: one is the
   // event, the other competes with it for the same tissue.
   const RUCK_RE = /\bruck|backpack carry|weighted carry|loaded carry|sandbag carry\b/i;
+  // ...and neither is an ergometer a run. Everything that was not a ruck counted
+  // as running, so the masters rower's Overview read "4 strength, 2 running" on a
+  // block whose primary goal is a 2 km erg and which contains no running at all.
+  // The same bug lived in engine/v61_weekly_exposures.js; fixing that one did not
+  // reach the sheet, because the Overview is built here.
+  const MODALITY_RE = [
+    ['ruck', RUCK_RE],
+    ['rowing', /\browing\b|\berg(?:ometer)?\b|concept\s?2/i],
+    ['cycling', /\bbike|cycl|airdyne|assault bike\b/i],
+    ['swimming', /\bswim(?:ming)?\b/i],
+    ['ski', /\bski ?erg\b/i],
+  ];
+  function modalityOf(name) {
+    for (const [key, re] of MODALITY_RE) if (re.test(name)) return key;
+    return 'running';
+  }
 
   function weeklyExposures(week) {
     const byDay = new Map();
-    let running = 0;
-    let ruck = 0;
+    const modality = { running: 0, ruck: 0, rowing: 0, cycling: 0, swimming: 0, ski: 0 };
     for (const r of normalizedRows(week)) {
       const name = String(r.exercise || '');
       if (/^\s*\[(?:WARMUP|חימום)\]/i.test(name)) continue;
@@ -484,7 +499,7 @@
       const b = byDay.get(day);
       if (ENDURANCE_RE.test(name)) {
         b.endurance += 1;
-        if (RUCK_RE.test(name)) ruck += 1; else running += 1;
+        modality[modalityOf(name)] += 1;
       } else b.strength += 1;
     }
     const days = [...byDay.keys()];
@@ -492,9 +507,13 @@
       total: days.length,
       strength: days.filter((d) => byDay.get(d).strength > 0).length,
       enduranceOnly: days.filter((d) => byDay.get(d).endurance > 0 && byDay.get(d).strength === 0).length,
-      runningExposures: running,
-      ruckExposures: ruck,
-      conditioningExposures: running + ruck,
+      runningExposures: modality.running,
+      ruckExposures: modality.ruck,
+      rowingExposures: modality.rowing,
+      cyclingExposures: modality.cycling,
+      swimmingExposures: modality.swimming,
+      skiExposures: modality.ski,
+      conditioningExposures: Object.keys(modality).reduce((n, k) => n + modality[k], 0),
     };
   }
 
@@ -503,6 +522,10 @@
     const parts = [];
     if (ex.strength) parts.push(ex.strength + ' strength');
     if (ex.runningExposures) parts.push(ex.runningExposures + ' running');
+    if (ex.rowingExposures) parts.push(ex.rowingExposures + ' rowing');
+    if (ex.cyclingExposures) parts.push(ex.cyclingExposures + ' cycling');
+    if (ex.swimmingExposures) parts.push(ex.swimmingExposures + ' swimming');
+    if (ex.skiExposures) parts.push(ex.skiExposures + ' ski');
     if (ex.ruckExposures) parts.push(ex.ruckExposures + ' ruck');
     const detail = parts.length ? ' (' + parts.join(', ') + ')' : '';
     const sportDays = Array.isArray(intake && intake.sport_schedule) ? intake.sport_schedule.length : 0;
