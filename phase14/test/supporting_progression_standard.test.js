@@ -326,3 +326,27 @@ test('the brief spends the accessory budget on the primary goal', async () => {
   assert.match(brief, /not an instruction to add volume/i);
   assert.equal(buildCoachStandardBrief({}), '', 'an empty intake still produces an empty brief');
 });
+
+test('goal-specific progression guidance fires only for the goal it concerns', async () => {
+  const { buildGoalSpecificProgressionBrief } = await import('../engine/primary_goal_share.js');
+  const has = (intake, needle) => buildGoalSpecificProgressionBrief(intake).includes(needle);
+
+  const tactical = { primary_goals: ['Improve 3 km from 13:30 to sub-12:00'], secondary_goals: ['Improve 10 km ruck with 20 kg from 95 min toward 82 min', 'Improve strict pull-ups from 14 toward 18-20'] };
+  const youth = { primary_goals: ['Achieve first bar muscle-up', 'Achieve a freestanding handstand'] };
+  const masters = { primary_goals: ['Return to competitive masters rowing and race a 2 km erg again'] };
+
+  // "A ruck getting faster at 8 km doesn't completely satisfy a 10 km goal."
+  assert.ok(has(tactical, 'EVENT-DISTANCE EXPOSURE'));
+  // "Don't substitute repeated near-max testing plus singles for accumulation."
+  assert.ok(has(tactical, 'SUBMAXIMAL SET LENGTH'));
+  // "A wall handstand increasing by five seconds does not mean the freestanding
+  // handstand goal progressed."
+  assert.ok(has(youth, 'BALANCE IS TRAINED UNSUPPORTED'));
+  assert.ok(has(youth, 'ASSISTANCE-REDUCTION LADDER'));
+
+  // And nothing fires where it does not belong.
+  assert.equal(buildGoalSpecificProgressionBrief(masters), '');
+  assert.equal(has(youth, 'EVENT-DISTANCE EXPOSURE'), false);
+  assert.equal(has(tactical, 'ASSISTANCE-REDUCTION LADDER'), false);
+  assert.equal(buildGoalSpecificProgressionBrief({}), '');
+});
