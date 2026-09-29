@@ -311,3 +311,18 @@ test('the build standard never writes language a youth block is refused for', as
   assert.doesNotMatch(out.program, /to failure|amrap|forced rep/i);
   assert.doesNotThrow(() => validateYouthCoachingSpecV1HardRules(out.program, YOUTH));
 });
+
+test('the brief spends the accessory budget on the primary goal', async () => {
+  const { buildCoachStandardBrief } = await import('../engine/coach_standard_brief.js');
+  const brief = buildCoachStandardBrief({
+    primary_goals: ['Return to competitive masters rowing and race a 2 km erg again'],
+    secondary_goals: ['Rebuild lower-body and trunk strength safely'],
+  });
+  assert.match(brief, /THE ACCESSORY BUDGET IS SPENT ON THE PRIMARY GOAL FIRST/);
+  // It quotes the athlete's own goal, and says it is about allocation rather
+  // than adding volume -- the masters block was not short of work, it was short
+  // of rowing.
+  assert.match(brief, /2 km erg/);
+  assert.match(brief, /not an instruction to add volume/i);
+  assert.equal(buildCoachStandardBrief({}), '', 'an empty intake still produces an empty brief');
+});

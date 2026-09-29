@@ -1351,7 +1351,7 @@
     "repairs": [],
     "wired": [],
     "tested": true,
-    "stressed": true,
+    "stressed": false,
     "killedLive": ""
   },
   {
