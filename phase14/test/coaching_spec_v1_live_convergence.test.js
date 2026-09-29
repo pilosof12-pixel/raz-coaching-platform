@@ -249,7 +249,10 @@ test('Youth convergence caps attempts, keeps power volume at the baseline, and i
   assert.equal(repaired.repaired, true);
   assert.match(repaired.program, /START_WEEK3_TSV[\s\S]*Controlled Handstand Kick-up\tBodyweight\t4\t3\t/);
   assert.match(repaired.program, /START_WEEK3_TSV[\s\S]*Explosive Hip-to-Bar Pull-up\tBodyweight\t5\t2\t/);
-  assert.match(repaired.program, /Banded Muscle-up\tBand assistance selected for a smooth full bar turnover\t2\t1\t90 sec\t6\tIntegrated assisted full-skill/);
+  // The integrated exposure is an assistance ladder now, so its load cell says
+  // which rung the week is on rather than repeating one sentence four times.
+  assert.match(repaired.program, /START_WEEK1_TSV[\s\S]*Banded Muscle-up\tBand assistance that makes the turnover smooth and certain\t2\t1\t90 sec\t6\tIntegrated assisted full-skill/);
+  assert.match(repaired.program, /START_WEEK3_TSV[\s\S]*Banded Muscle-up\tThe least band that still gives a clean, fast catch\t2\t1\t/);
   const reviewCodes = new Set(collectYouthCoachingSpecV1ReviewSignals(repaired.program, youthLiveIntake).map((x) => x.code));
   assert.equal(reviewCodes.has('YG-02_ATTEMPT_VOLUME_REVIEW'), false);
   assert.equal(reviewCodes.has('YG-05_FULL_SKILL_INTEGRATION_REVIEW'), false);

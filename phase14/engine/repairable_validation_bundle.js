@@ -86,6 +86,7 @@ import { normalizeUntestedBenchmarkDisclosure } from './untested_benchmark_discl
 import { normalizeSelfSelectedLoadProtocol } from './self_selected_load_protocol.js'; // V100-SELF-SELECTED-LOAD-WIRED
 import { normalizeGoalStatusDeclaration } from './goal_status_declaration.js'; // V101-GOAL-STATUS-WIRED
 import { normalizeWideRepRange } from './rep_range_decision_rule.js'; // V103-WIDE-REP-RANGE-WIRED
+import { normalizeHighRepGoalTesting } from './high_rep_goal_testing.js'; // V104-HIGH-REP-TESTING-WIRED
 import { progressionAnalysis } from './coaching_progression_gpp.js'; // V101-GOAL-STATUS-WIRED
 import { normalizeYouthAcquisitionGoalFloors } from './youth_goal_floor_normalizer.js';
 import { normalizeYouthSessionQuality } from './youth_session_quality_normalizer.js';
@@ -655,6 +656,12 @@ export function collectRepairableValidationFailures(program, intake = {}, option
   const weekScope = normalizeWeekScopeClaims(candidate, intake);
   candidate = weekScope.program;
   if (weekScope.repaired) deterministic_repairs.push({ type: 'week_scope_claim_corrected', rows: weekScope.repairs });
+
+  // Before the note repairs, because it changes sets and reps and those read the
+  // settled prescription.
+  const highRepTesting = normalizeHighRepGoalTesting(candidate, intake);
+  candidate = highRepTesting.program;
+  if (highRepTesting.repaired) deterministic_repairs.push({ type: 'high_rep_goal_submaximal_volume', rows: highRepTesting.repairs });
 
   const wideRepRange = normalizeWideRepRange(candidate, intake);
   candidate = wideRepRange.program;

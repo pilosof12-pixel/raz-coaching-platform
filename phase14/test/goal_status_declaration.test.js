@@ -91,3 +91,47 @@ test('the production bundle declares status before the semantic checks read it',
   assert.ok(declaredAt > 0 && checksAt > 0);
   assert.ok(declaredAt < checksAt, 'written after the gate reads it, the declaration cannot answer it');
 });
+
+test('the integrated muscle-up is an assistance ladder with a gate, not a repeated dose', async () => {
+  const { normalizeYouthSkillAcquisitionQuality } = await import('../engine/coaching_spec_v1_convergence_normalizer.js');
+  const fs = await import('node:fs');
+  const YOUTH = {
+    age: 13,
+    days_per_week: 2,
+    primary_goals: ['Achieve first bar muscle-up', 'Achieve a freestanding handstand'],
+    secondary_goals: ['Build a strong general push and pull foundation while maintaining lower-body athleticism'],
+    current_numbers: 'Pistol squat established; ring muscle-up achieved; about 12 strict pull-ups and 6 good ring dips. Wall-facing handstand about 15 seconds; back-to-wall about 20 seconds. Controlled kick-ups are improving, but there is no reliable unsupported balance time yet.',
+    notes: 'Skill quality before fatigue; no grinders or repeated failed attempts.',
+  };
+  const H = 'Day\tExercise\tWeight\tSets\tReps\tRest\tTarget RPE\tNotes\tResults';
+  const legacy = 'Band assistance selected for a smooth full bar turnover';
+  const rows = (w) => [
+    ['Session A', 'Bar Muscle-up Transition Drill', 'Moderate band', '3', '2', '90s', '5-6', 'Turnover practice.', ''].join('\t'),
+    ['Session A', 'Banded Muscle-up', legacy, '2', '1', '90 sec', '6', 'Integrated singles.', ''].join('\t'),
+  ];
+  const program = [1, 2, 3, 4].map((w) => `START_WEEK${w}_TSV\n${H}\n${rows(w).join('\n')}\nEND_WEEK${w}_TSV`).join('\n\n');
+
+  const out = normalizeYouthSkillAcquisitionQuality(program, YOUTH);
+  const loadFor = (w) => out.program.match(new RegExp(`START_WEEK${w}_TSV[\\s\\S]*?END_WEEK${w}_TSV`))[0]
+    .split('\n').find((l) => l.includes('\tBanded Muscle-up\t')).split('\t')[2];
+
+  // The component drill progressed while the integrated movement repeated the
+  // same 2x1 in all four weeks, which is what the coach charged.
+  assert.equal(new Set([loadFor(1), loadFor(2), loadFor(3)]).size, 3, 'assistance must move week to week');
+  assert.match(loadFor(2), /less band than Week 1/i);
+  assert.match(loadFor(3), /least band/i);
+
+  // And Week 3 gates to the real thing rather than only reducing assistance.
+  const w3note = out.program.match(/START_WEEK3_TSV[\s\S]*?END_WEEK3_TSV/)[0]
+    .split('\n').find((l) => l.includes('\tBanded Muscle-up\t')).split('\t')[7];
+  assert.match(w3note, /unassisted attempts BEFORE this set/i);
+  assert.match(w3note, /while you are freshest/i);
+
+  // Volume never moves: at thirteen the progression is assistance, not fatigue.
+  for (const w of [1, 2, 3, 4]) {
+    const cells = out.program.match(new RegExp(`START_WEEK${w}_TSV[\\s\\S]*?END_WEEK${w}_TSV`))[0]
+      .split('\n').find((l) => l.includes('\tBanded Muscle-up\t')).split('\t');
+    assert.equal(cells[3], '2');
+    assert.equal(cells[4], '1');
+  }
+});

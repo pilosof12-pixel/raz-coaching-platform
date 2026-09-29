@@ -321,6 +321,21 @@ export function normalizeYouthSkillAcquisitionQuality(program, intake = {}) {
     if (applyYouthVisiblePrimaryProgression(parsed, week, intake, repairs)) changed = true; // YOUTH-V32-VISIBLE-PROGRESSION-CALL
 
     if (needsFullBar) {
+      // A block generated before the ladder existed carries the old static row
+      // in every week. Upgrade it in place rather than leaving four identical
+      // exposures standing because they happen to already be present.
+      const LEGACY_LOAD = 'Band assistance selected for a smooth full bar turnover';
+      for (const cells of parsed.rows) {
+        if (isWarmup(cells[parsed.exercise]) || !isFullMuscleUp(cells[parsed.exercise])) continue;
+        if (!Number.isInteger(parsed.load)) continue;
+        if (String(cells[parsed.load] || '').trim() !== LEGACY_LOAD) continue;
+        const spec = bandedMuscleUpSpec(week);
+        cells[parsed.load] = spec.load;
+        if (Number.isInteger(parsed.notes)) cells[parsed.notes] = spec.note;
+        repairs.push({ type: 'youth_integrated_muscle_up_assistance_ladder', week });
+        changed = true;
+      }
+
       const hasFull = parsed.rows.some((cells) => !isWarmup(cells[parsed.exercise]) && isFullMuscleUp(cells[parsed.exercise]));
       if (!hasFull) {
         const transitionIndexes = parsed.rows
@@ -336,12 +351,13 @@ export function normalizeYouthSkillAcquisitionQuality(program, intake = {}) {
           const cells = new Array(parsed.header.length).fill('');
           cells[parsed.day] = transition[parsed.day];
           cells[parsed.exercise] = 'Banded Muscle-up';
-          if (Number.isInteger(parsed.load)) cells[parsed.load] = 'Band assistance selected for a smooth full bar turnover';
+          const spec = bandedMuscleUpSpec(week);
+          if (Number.isInteger(parsed.load)) cells[parsed.load] = spec.load;
           cells[parsed.sets] = '2';
           cells[parsed.reps] = '1';
           if (Number.isInteger(parsed.rest)) cells[parsed.rest] = '90 sec';
           if (Number.isInteger(parsed.effort)) cells[parsed.effort] = '6';
-          if (Number.isInteger(parsed.notes)) cells[parsed.notes] = 'Integrated assisted full-skill bar muscle-up singles after component practice. Use enough assistance for a clean catch; stop after any miss or technical deterioration.';
+          if (Number.isInteger(parsed.notes)) cells[parsed.notes] = spec.note;
           parsed.rows.splice(i + 1, 0, cells);
           offset += 1;
           repairs.push({ type: 'youth_integrated_banded_bar_muscle_up', week, day: transition[parsed.day] });
@@ -354,6 +370,37 @@ export function normalizeYouthSkillAcquisitionQuality(program, intake = {}) {
   }
 
   return { program: candidate, repaired: repairs.length > 0, repairs };
+}
+
+// The integrated full-skill exposure is an assistance ladder with a gate, not a
+// fixed dose. It was inserted with the same band description, the same 2x1 and
+// the same sentence in all four weeks, so the component drill progressed while
+// the actual muscle-up did not -- which is what the coach charged: "the actual
+// integrated movement barely progresses... Claude should implement a
+// skill-gated progression rather than merely repeating the same 2x1."
+//
+// The rungs move assistance, never volume: at thirteen years old the progression
+// is technical quality and less help, not more fatigue.
+const BANDED_MUSCLE_UP = {
+  1: {
+    load: 'Band assistance that makes the turnover smooth and certain',
+    note: 'Integrated assisted full-skill bar muscle-up singles after component practice. Week 1 sets the standard: enough band that the catch is smooth and certain every time. Stop after any miss or technical deterioration.',
+  },
+  2: {
+    load: 'Slightly less band than Week 1, only if every Week 1 catch was smooth',
+    note: 'Integrated assisted full-skill bar muscle-up singles. Step down one band only if every Week 1 rep caught smoothly and the turnover stayed fast; otherwise repeat the Week 1 band. Stop after any miss or technical deterioration.',
+  },
+  3: {
+    load: 'The least band that still gives a clean, fast catch',
+    note: 'Integrated assisted full-skill bar muscle-up singles. Gate to the real thing: if Week 2 was smooth on the reduced band, take one or two fresh unassisted attempts BEFORE this set while you are freshest, then do the assisted singles. Stop the attempts after any miss and keep the assisted work clean.',
+  },
+  4: {
+    load: 'Hold the lightest band that stayed clean in Week 3',
+    note: 'Integrated assisted full-skill bar muscle-up singles. Hold the Week 3 assistance rather than chasing a lighter band; if the unassisted attempts felt close last week, take one fresh attempt first and leave it there. Stop after any miss.',
+  },
+};
+function bandedMuscleUpSpec(week) {
+  return BANDED_MUSCLE_UP[Math.max(1, Math.min(4, Number(week) || 1))];
 }
 
 function tacticalContext(intake = {}) {

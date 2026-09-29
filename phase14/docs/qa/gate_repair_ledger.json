@@ -1893,6 +1893,26 @@
     "killedLive": ""
   },
   {
+    "code": "V104_HIGH_REP_GOAL_TESTED_WEEKLY",
+    "modules": [
+      "engine/high_rep_goal_testing.js"
+    ],
+    "owners": [
+      "collectHighRepTestingFlags"
+    ],
+    "advisory": false,
+    "reachable": true,
+    "repairs": [
+      "normalizeHighRepGoalTesting"
+    ],
+    "wired": [
+      "normalizeHighRepGoalTesting"
+    ],
+    "tested": true,
+    "stressed": false,
+    "killedLive": ""
+  },
+  {
     "code": "V34_DUPLICATE_SPECIFIC_RAMP",
     "modules": [
       "engine/v34_prescription_consistency.js"
