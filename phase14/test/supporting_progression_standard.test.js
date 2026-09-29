@@ -285,3 +285,29 @@ test('the four note repairs run after every pass that can still change a prescri
     );
   }
 });
+
+test('the build standard never writes language a youth block is refused for', async () => {
+  const { validateYouthCoachingSpecV1HardRules } = await import('../engine/coaching_spec_v1_quality.js');
+  const YOUTH = {
+    age: 13,
+    primary_goals: ['Achieve first bar muscle-up', 'Achieve a freestanding handstand'],
+    days_per_week: 2,
+  };
+  const H2 = 'Day\tExercise\tWeight\tSets\tReps\tRest\tTarget RPE\tNotes\tResults';
+  const youthRow = (ex, note) => ['Session A', ex, 'BW', '2', '8', '90s', '7', note, ''].join('\t');
+  const stop = 'Prescribed attempts are a ceiling, not a quota: stop the set early if quality, symmetry or balance breaks down.';
+  const block2 = (w) => `START_WEEK${w}_TSV\n${H2}\n${[
+    youthRow('Ring Push-up', `Keep the rings stable and the body rigid. ${stop}`),
+    youthRow('Ring Row', `Pull the chest to the rings. ${stop}`),
+  ].join('\n')}\nEND_WEEK${w}_TSV`;
+  const frozen = [1, 2, 3, 4].map(block2).join('\n\n');
+
+  const out = normalizeSupportingProgressionStandard(frozen, YOUTH);
+  assert.equal(out.repaired, true, 'the fixture is the defect this rule exists for');
+  // YG-07 strips only negated forms, so "skipped on any grind" -- which an
+  // earlier version of this cue wrote -- reads as prescribing a grind and got
+  // every youth program this repair touched refused.
+  assert.doesNotMatch(out.program, /\bgrind(?:er|ers|ing)?\b/i);
+  assert.doesNotMatch(out.program, /to failure|amrap|forced rep/i);
+  assert.doesNotThrow(() => validateYouthCoachingSpecV1HardRules(out.program, YOUTH));
+});

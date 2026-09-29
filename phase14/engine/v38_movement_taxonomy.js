@@ -119,7 +119,10 @@ const PATTERNS = [
   [/sled|prowler|battle rope|kettlebell swing|erg|assault bike|burpee/i, CATEGORY.GPP, ROLE.CONDITIONING],
 
   // Endurance.
-  [/^\s*(?:run|running|jog|treadmill|bike|cycling|row erg|swim)\b/i, CATEGORY.ENDURANCE, ROLE.CONDITIONING],
+  // Qualified names are the same modality: a "Zone-2 Run" is a run, and treating
+  // it as unknown hid the marathon support run from every endurance rule.
+  [/^\s*(?:zone[- ]?2|z2|easy|long|tempo|recovery|steady|aerobic|base|conversational|shakeout|slow)?\s*(?:run|running|jog|treadmill|bike|cycling|row erg|swim)\b/i, CATEGORY.ENDURANCE, ROLE.CONDITIONING],
+  [/(?:^|\s)(?:run|running|jog)$/i, CATEGORY.ENDURANCE, ROLE.CONDITIONING],
 ];
 
 export function classifyExercise(name) {

@@ -70,7 +70,15 @@ function parseWeeks(program) {
 }
 
 function isWarmup(row) { return /\[warmup\]|warm[ -]?up/i.test(row.exercise); }
-function isRun(row) { return /^(?:run|running)$/i.test(String(row.exercise).trim()); }
+// A run is still a run when the model qualifies the name. Live run #149 refused
+// an Advanced Hybrid block four times for "containing no running at all" while
+// it carried an easy 16/18/20/14 km "Zone-2 Run" every week, because this
+// matched the exact strings "Run" and "Running" and nothing else. The gate was
+// blind to the name, not to the work, and the athlete's marathon support run was
+// there the whole time.
+const RUN_NAME = /(?:^|\s)(?:run|running)$/i;
+function isRunName(name) { return RUN_NAME.test(String(name || '').trim()); }
+function isRun(row) { return isRunName(row.exercise); }
 function numericSets(row) { const n = Number(String(row.sets).match(/\d+(?:\.\d+)?/)?.[0] || 0); return Number.isFinite(n) ? n : 0; }
 function numericKm(row) {
   const s = `${row.load} ${row.reps} ${row.notes}`;
@@ -265,7 +273,7 @@ export function repairRunBaseline(program, intake = {}) {
   let changed = false;
   parsed.rows.forEach((row, i) => {
     const name = String(row[parsed.exercise] || '').trim();
-    if (!/^(?:run|running)$/i.test(name)) return;
+    if (!isRunName(name)) return;
     // The rule reads the distance out of load, reps AND notes, so capping one
     // cell leaves the flag standing on whichever of the other two carried it.
     const columns = [parsed.load, parsed.reps, parsed.notes].filter(Number.isInteger);
@@ -376,7 +384,7 @@ export function repairMarathonSubordination(program, intake = {}) {
       const name = String(row[parsed.exercise] || '').trim();
       if (!name || /^\s*\[WARMUP\]/i.test(name)) return;
       perDay.set(lastDay, (perDay.get(lastDay) || 0) + 1);
-      if (/^(?:run|running)$/i.test(name)) runs.push({ index: i, day: lastDay });
+      if (isRunName(name)) runs.push({ index: i, day: lastDay });
     });
 
     // No running at all is the one state this repair used to walk away from,

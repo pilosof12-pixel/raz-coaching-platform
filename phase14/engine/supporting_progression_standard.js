@@ -81,6 +81,11 @@ const EARNED = {
 };
 const DEFAULT_EARNED = 'you may add one clean rep to the last set only';
 
+// Deliberately never says "grind". Coaching Specification v1.0 YG-07 refuses a
+// youth block whose notes carry failure or grinding language, and strips only
+// the negated forms ("no grinding"), so an earlier version of this cue -- which
+// ended "skipped entirely on any grind" -- injected the exact word the youth
+// safety rule exists to catch, into every youth program this repair touched.
 function buildStandard(week, name) {
   const { category } = classifyExercise(name);
   const quality = ISOLATION.test(name) ? ISOLATION_QUALITY : (QUALITY[category] || DEFAULT_QUALITY);
@@ -91,7 +96,7 @@ function buildStandard(week, name) {
   if (week === 2) {
     return `Week 2 advance: beat Week 1 on ${quality}, at the same or a lower RPE. The numbers hold on purpose - this week the progression is execution.`;
   }
-  return `Week 3 advance: hold the numbers once more and keep ${quality}. If every set in Week 2 was clean at or below the target RPE, ${earned} - earned, optional, and skipped entirely on any grind, symptom or loss of position.`;
+  return `Week 3 advance: hold the numbers once more and keep ${quality}. If every set in Week 2 was clean at or below the target RPE, ${earned} - earned, optional, and skipped entirely on any slowdown, symptom or loss of position.`;
 }
 
 function rowsByName(parsed) {

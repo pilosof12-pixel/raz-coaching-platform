@@ -222,3 +222,22 @@ test('nothing is invented when there is no demonstrated running volume to copy',
   const noBaseline = { ...intake, current_numbers: 'Back Squat: 205 kg 1RM\nOne-Arm Pull-up: 2 strict reps each arm' };
   assert.equal(repairMarathonSubordination(runless, noBaseline), runless);
 });
+
+test('a qualified run name is still a run', () => {
+  // Live run #149 refused an Advanced Hybrid block four times, spent 455 seconds
+  // and delivered it with the rule unresolved, for "containing no running at
+  // all" -- while it carried an easy 16/18/20/14 km "Zone-2 Run" every week. The
+  // matcher accepted the exact strings "Run" and "Running" and nothing else, so
+  // the gate was blind to the name rather than to the work.
+  const renamed = program(3).replaceAll('\tRun\t', '\tZone-2 Run\t');
+  assert.doesNotThrow(() => validateAdvancedHybridQualitySemantic(renamed, intake));
+});
+
+test('the support run is not duplicated when one is already there under another name', async () => {
+  const { repairMarathonSubordination } = await import('../engine/advanced_hybrid_quality.js');
+  const renamed = program(3).replaceAll('\tRun\t', '\tZone-2 Run\t');
+  // The restoration must see the existing run. Adding a second would take this
+  // athlete from the ~20 km a week their intake documents to nearly double it,
+  // on top of five MMA sessions.
+  assert.equal(repairMarathonSubordination(renamed, intake), renamed);
+});
