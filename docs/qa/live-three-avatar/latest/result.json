@@ -1,40 +1,68 @@
 {
-  "timestamp": "2026-09-28T16:51:29.568Z",
+  "timestamp": "2026-09-29T14:16:26.127Z",
   "base": "https://raz-coaching-platform.onrender.com",
-  "head_sha": "e72cdd25025e0d3449ea9fbfd1f417699e3b4bbb",
-  "runtime": "live84 2026-09-28T16:50:40Z",
+  "head_sha": "483741c934c36e8b1b04fe8bc33226fb837c6113",
+  "runtime": "live85 2026-09-29T07:20:00Z",
   "results": [
     {
       "id": "advanced_hybrid",
-      "job_id": "423aae08e0b7fd7cbe572107c2b1450d",
+      "job_id": "9ed1154f43cde227b1ec86983563cbb6",
       "ok": true,
       "status": "done",
       "stage": "finalizing",
-      "attempt": 4,
-      "detail": "delivered with unresolved rules: ADVANCED_HYBRID_MARATHON_SUBORDINATION QA trace: A1:ADVANCED_HYBRID_MARATHON_SUBORDINATION+V34_NOTE_UNDEFINED_LOAD_REFERENCE -> A2:ADVANCED_HYBRID_MARATHON_SUBORDINATION+NAMED_GOAL_DIRECT_EXPOSURE_MISSING+TARGET_MODALITY_EXPOSURE_REDUCED+EVENT_PROGRESSING_SESSION_MISSING+SPORT_MODALITY_SPECIFICITY_MISSING -> A3:ADVANCED_HYBRID_MARATHON_SUBORDINATION -> A4:ADVANCED_HYBRID_MARATHON_SUBORDINATION. First failure evidence: Week 1 contains no running at all. The marathon is a named secondary goal and the athlete already runs about once a week, so removing running is not the fix and will fail the named-goal, target-modality and event-progression gates as well. Add exactly one substantive easy, conversational run this week and change nothing else.",
+      "attempt": 1,
+      "detail": "saving program after 1 model call(s)",
       "last_seen_status": "done",
       "error": null,
-      "program_chars": 23925,
-      "seconds": 455
+      "program_chars": 24406,
+      "seconds": 588
     },
     {
       "id": "youth_gymnastics",
-      "job_id": "4c6a24877600bc8bd83721f4750dfc0c",
+      "job_id": "a82fefba0ebeb88a0e853bd6b56f31f0",
+      "ok": true,
+      "status": "done",
+      "stage": "finalizing",
+      "attempt": 1,
+      "detail": "saving program after 1 model call(s)",
+      "last_seen_status": "done",
+      "error": null,
+      "program_chars": 15741,
+      "seconds": 211
+    },
+    {
+      "id": "tactical_3k",
+      "job_id": "cdf51e26952851adc486c7eec18bf7fc",
       "ok": true,
       "status": "done",
       "stage": "finalizing",
       "attempt": 2,
-      "detail": "saving program after 2 model call(s) QA trace: A1:COACH_SPEC_V1_YG_FAILURE_BASED_DEFAULT. First failure evidence: Coaching Specification v1.0 YG-07: Week 2 session a uses failure/grinding language for youth work (Ring Row). Default youth strength/skill progression must remain technical and submaximal rather than failure-based.",
+      "detail": "saving program after 2 model call(s) QA trace: A1:SPORT_DAY_COUPLING_VIOLATION+TACTICAL_SCHEDULE_ARCHITECTURE_VIOLATION+TACTICAL_GPP_COVERAGE_MISSING. First failure evidence: PRIOR ATTEMPT FAILED SPORT/CALENDAR VALIDATION. days_per_week means requested strength sessions, not total active calendar days. Week 1: expected 3 strength/skill-strength days, found 4 (monday, tuesday, wednesday, saturday). Week 2: expected 3 strength/skill-strength days, found 4 (monday, tuesday, wednesday, saturday). Week 3: expected 3 strength/skill-strength days, found 4 (monday, tuesday, wednesday, saturday). Week 4: expected 3 strength/skill-strength days, found 4 (monday, tuesday, wednesday, saturday). Keep run-only, ruck-only, sport-only and conditioning-only days in the weekly calen",
       "last_seen_status": "done",
       "error": null,
-      "program_chars": 17152,
-      "seconds": 206
+      "program_chars": 19559,
+      "seconds": 677
+    },
+    {
+      "id": "masters_return",
+      "job_id": "cf63c5bb68fcb5a536c2f8358b5f71b1",
+      "ok": true,
+      "status": "done",
+      "stage": "finalizing",
+      "attempt": 1,
+      "detail": "saving program after 1 model call(s) QA trace: A1:V34_PROGRESSION_LANGUAGE_MISMATCH -> A1:converged-without-regeneration. First failure evidence: Prescription/note consistency: Leg Press Machine (Week 4) claims reduced volume, but that metric did not fall from the immediately previous week. Make every quantitative claim in a note agree with that row's own Sets, Reps and Weight fields, or state it as an explicitly conditional option. Do not reference a load that is neither prescribed on the row nor an established benchmark.",
+      "last_seen_status": "done",
+      "error": null,
+      "program_chars": 24420,
+      "seconds": 232
     }
   ],
   "reasoning_effort": "medium",
   "selection": [
     "advanced_hybrid",
-    "youth_gymnastics"
+    "youth_gymnastics",
+    "tactical_3k",
+    "masters_return"
   ],
   "ok": true
 }
