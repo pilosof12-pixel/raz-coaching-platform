@@ -22,6 +22,22 @@ const ENDURANCE = new Set(['endurance', 'loaded_carry']);
 // a single "endurance" figure hid that a week held three runs and a ruck.
 const RUCK = /\bruck|backpack carry|weighted carry|loaded carry|sandbag carry\b/i;
 
+// ...and neither is a rowing ergometer a run. Every endurance exposure that was
+// not a ruck was counted as running, so the masters rower's Overview read
+// "4 strength, 2 running" on a block whose primary goal is a 2 km erg and which
+// contains no running at all. The client reads that line first.
+const MODALITY = [
+  ['ruck', RUCK],
+  ['rowing', /\brow(?:ing)?\b|\berg(?:ometer)?\b|concept\s?2/i],
+  ['cycling', /\bbike|cycling|spin|watt ?bike|airdyne|assault bike\b/i],
+  ['swimming', /\bswim(?:ming)?\b/i],
+  ['ski', /\bski ?erg\b/i],
+];
+function modalityOf(name) {
+  for (const [key, re] of MODALITY) if (re.test(String(name || ''))) return key;
+  return 'running';
+}
+
 function arr(v) { return Array.isArray(v) ? v : v ? [v] : []; }
 function isWarmup(name) { return /^\s*\[WARMUP\]/i.test(String(name || '')); }
 
@@ -50,21 +66,26 @@ export function weeklyExposures(program, week = 1, intake = {}) {
 
   // Exposure counts, not day counts: a day carrying a run and a ruck is one
   // training day but two conditioning exposures, and a coach needs both figures.
-  let running = 0;
-  let ruck = 0;
+  const byModality = { running: 0, ruck: 0, rowing: 0, cycling: 0, swimming: 0, ski: 0 };
   for (const cells of parsed.rows) {
     const name = String(cells[parsed.exercise] || '').trim();
     if (!name || isWarmup(name)) continue;
     if (!ENDURANCE.has(classifyExercise(name).category)) continue;
-    if (RUCK.test(name)) ruck += 1; else running += 1;
+    byModality[modalityOf(name)] += 1;
   }
+  const running = byModality.running;
+  const ruck = byModality.ruck;
 
   const list = [...days.keys()];
   return {
     total: list.length,
     runningExposures: running,
     ruckExposures: ruck,
-    conditioningExposures: running + ruck,
+    rowingExposures: byModality.rowing,
+    cyclingExposures: byModality.cycling,
+    swimmingExposures: byModality.swimming,
+    skiExposures: byModality.ski,
+    conditioningExposures: Object.values(byModality).reduce((a, b) => a + b, 0),
     // A day with any non-endurance work is a strength/GPP exposure.
     strength: list.filter((d) => days.get(d).strength > 0).length,
     endurance: list.filter((d) => days.get(d).endurance > 0).length,
@@ -82,6 +103,10 @@ export function describeExposures(ex) {
   const parts = [];
   if (ex.strength) parts.push(`${ex.strength} strength`);
   if (ex.runningExposures) parts.push(`${ex.runningExposures} running`);
+  if (ex.rowingExposures) parts.push(`${ex.rowingExposures} rowing`);
+  if (ex.cyclingExposures) parts.push(`${ex.cyclingExposures} cycling`);
+  if (ex.swimmingExposures) parts.push(`${ex.swimmingExposures} swimming`);
+  if (ex.skiExposures) parts.push(`${ex.skiExposures} ski`);
   if (ex.ruckExposures) parts.push(`${ex.ruckExposures} ruck`);
   const detail = parts.length ? ` (${parts.join(', ')})` : '';
   const sport = ex.sport ? `, plus ${ex.sport} sport session${ex.sport === 1 ? '' : 's'}` : '';
@@ -96,6 +121,9 @@ const CLAIM = /\b(\d+)\s*((?:\w+\s+){0,2}?)(?:sessions?|days?)\s*(?:\/|per\s+)\s
 const CATEGORY_WORDS = [
   { re: /\b(?:strength|gpp|lifting|gym|resistance)\b/i, key: 'strength' },
   { re: /\b(?:running|run)\b/i, key: 'runningExposures' },
+  { re: /\b(?:rowing|row|erg)\b/i, key: 'rowingExposures' },
+  { re: /\b(?:cycling|bike)\b/i, key: 'cyclingExposures' },
+  { re: /\b(?:swimming|swim)\b/i, key: 'swimmingExposures' },
   { re: /\b(?:ruck|carry)\b/i, key: 'ruckExposures' },
   { re: /\b(?:conditioning)\b/i, key: 'conditioningExposures' },
   { re: /\b(?:endurance|aerobic|cardio)\b/i, key: 'enduranceOnly' },

@@ -147,3 +147,24 @@ test('the live run #81 programs count as the review described', () => {
   assert.equal(tx.total, 5, 'Sessions A-E');
   assert.equal(tx.strength, 3, 'the intake asked for 3');
 });
+
+test('endurance exposures are counted by modality, not all called running', () => {
+  // The masters rower's Overview read "4 strength, 2 running" on a block whose
+  // primary goal is a 2 km erg and which contains no running at all: every
+  // endurance exposure that was not a ruck was counted as a run. It is the first
+  // line the client reads.
+  const H = 'Day\tExercise\tWeight\tSets\tReps\tRest\tTarget RPE\tNotes\tResults';
+  const row = (d, ex, reps) => [d, ex, 'N/A', '1', reps, 'N/A', '4-5', 'Easy.', ''].join('\t');
+  const program = `START_WEEK1_TSV\n${H}\n${[
+    row('Mon', 'Rowing Ergometer', '25 min'),
+    row('Mon', 'Goblet Squat', '8'),
+    row('Wed', 'Rowing Ergometer', '20 min'),
+    row('Fri', 'Leg Press Machine', '10'),
+  ].join('\n')}\nEND_WEEK1_TSV`;
+
+  const ex = weeklyExposures(program, 1, { age: 54, primary_goals: ['Race a 2 km erg again'] });
+  assert.equal(ex.rowingExposures, 2);
+  assert.equal(ex.runningExposures, 0);
+  assert.match(describeExposures(ex), /2 rowing/);
+  assert.doesNotMatch(describeExposures(ex), /running/);
+});
