@@ -1,5 +1,6 @@
 import { parseProgramModel, directGoalExposures, strengthDaysForWeek, WEEKDAY_ORDER } from './program_model.js';
 import { RetriableValidationError } from './exercise_dictionary.js';
+import { declaresMaintenance } from './goal_status_declaration.js';
 
 function arr(v) { return Array.isArray(v) ? v : v ? [v] : []; }
 function txt(v) {
@@ -79,11 +80,24 @@ export function progressionAnalysis(program, intake = {}, suppliedModel = null) 
       weeks.push({ week: week.week, signature, count: exposures.length });
     }
     const present = weeks.filter((w) => w.count > 0);
-    const unique = new Set(present.map((w) => w.signature));
-    const progressed = present.length >= 2 && unique.size >= 2;
+    // Development happens in the build weeks. Week 4 is a consolidation week and
+    // a change that appears only there is not progression -- it is the deload
+    // rescuing the appearance of one. The Advanced Hybrid block held its named
+    // 100 kg overhead press goal at 65 kg through Weeks 1-3 and read as
+    // progressing because Week 4 said 67.5, which is the week it was meant to
+    // back off in.
+    const build = present.filter((w) => w.week <= 3);
+    const unique = new Set(build.map((w) => w.signature));
+    const progressed = build.length >= 2 && unique.size >= 2;
     const row = { family: target.family, tier: target.tier, goal: target.raw, progressed, weeks };
     targetsOut.push(row);
-    if (present.length >= 3 && !progressed) violations.push(row);
+    // A goal deliberately held, and declared as held, is a coaching decision
+    // rather than a missing progression. Without this the AH-01 hierarchy -- which
+    // requires the secondary press to hold through the build weeks -- and this
+    // gate contradict each other, and a correct program fails for obeying one of
+    // them. Silence is still a violation; the declaration is what earns the hold.
+    row.declared_maintenance = !progressed && declaresMaintenance(program, target.family);
+    if (present.length >= 3 && !progressed && !row.declared_maintenance) violations.push(row);
   }
 
   return { model, targets: targetsOut, violations };

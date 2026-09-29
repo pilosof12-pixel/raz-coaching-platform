@@ -1351,7 +1351,7 @@
     "repairs": [],
     "wired": [],
     "tested": true,
-    "stressed": false,
+    "stressed": true,
     "killedLive": ""
   },
   {
@@ -1847,6 +1847,26 @@
     ],
     "wired": [
       "normalizeSelfSelectedLoadProtocol"
+    ],
+    "tested": true,
+    "stressed": false,
+    "killedLive": ""
+  },
+  {
+    "code": "V101_GOAL_STATUS_UNDECLARED",
+    "modules": [
+      "engine/goal_status_declaration.js"
+    ],
+    "owners": [
+      "collectUndeclaredGoalStatusFlags"
+    ],
+    "advisory": false,
+    "reachable": true,
+    "repairs": [
+      "normalizeGoalStatusDeclaration"
+    ],
+    "wired": [
+      "normalizeGoalStatusDeclaration"
     ],
     "tested": true,
     "stressed": false,

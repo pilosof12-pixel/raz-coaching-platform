@@ -84,6 +84,8 @@ import { normalizeSupportingProgressionStandard } from './supporting_progression
 import { normalizeWeekScopeClaims } from './week_scope_claims.js'; // V98-WEEK-SCOPE-CLAIM-WIRED
 import { normalizeUntestedBenchmarkDisclosure } from './untested_benchmark_disclosure.js'; // V99-UNTESTED-BENCHMARK-WIRED
 import { normalizeSelfSelectedLoadProtocol } from './self_selected_load_protocol.js'; // V100-SELF-SELECTED-LOAD-WIRED
+import { normalizeGoalStatusDeclaration } from './goal_status_declaration.js'; // V101-GOAL-STATUS-WIRED
+import { progressionAnalysis } from './coaching_progression_gpp.js'; // V101-GOAL-STATUS-WIRED
 import { normalizeYouthAcquisitionGoalFloors } from './youth_goal_floor_normalizer.js';
 import { normalizeYouthSessionQuality } from './youth_session_quality_normalizer.js';
 import { normalizeYouthWeek4Consolidation } from './youth_consolidation_normalizer.js';
@@ -555,6 +557,17 @@ export function collectRepairableValidationFailures(program, intake = {}, option
   const consolidated = repairConsolidationWeekVolume(candidate, intake);
   if (consolidated.changed) candidate = consolidated.program;
 
+  // Before the semantic checks, because the progression gate reads this: a named
+  // goal that does not move across the build weeks is a violation unless the
+  // block says it is being held. Written afterwards it would arrive too late to
+  // answer the very rule it exists for. The consolidation repair above has
+  // already settled the prescriptions this judges.
+  const goalStatus = normalizeGoalStatusDeclaration(candidate, intake, progressionAnalysis(candidate, intake));
+  if (goalStatus.repaired) {
+    candidate = goalStatus.program;
+    deterministic_repairs.push({ type: 'goal_status_declared', rows: goalStatus.repairs });
+  }
+
   let model = parseProgramModel(candidate, intake);
   const semanticChecks = [
     () => validateSportDayCouplingSemantic(candidate, intake, model),
@@ -645,6 +658,7 @@ export function collectRepairableValidationFailures(program, intake = {}, option
   const supportingProgression = normalizeSupportingProgressionStandard(candidate, intake);
   candidate = supportingProgression.program;
   if (supportingProgression.repaired) deterministic_repairs.push({ type: 'supporting_progression_standard', rows: supportingProgression.repairs });
+
 
   // Guidance-only, and last of the four so it reports what the block actually
   // ended up containing.

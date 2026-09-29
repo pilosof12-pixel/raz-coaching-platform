@@ -92,11 +92,20 @@ function rowsForWeek(week) {
   ];
 }
 
+// The block holds its secondary press through the build weeks on purpose, which
+// the AH-01 hierarchy requires and the progression gate now asks it to say out
+// loud. A program that holds a named goal silently is indistinguishable from one
+// that forgot about it.
+const GUIDANCE = [
+  'Primary work stays on Back Squat and strict One-Arm Pull-up, with one easy conversational run a week supporting the marathon.',
+  'On 100kg overhead press: this block holds it at a maintenance dose rather than developing it, on purpose. The squat and one-arm pull-up goals are what this block develops, and five MMA sessions a week already own most of the recovery budget. Keeping the exposure protects what you have and leaves it ready to progress next block.',
+].join('\n\n');
+
 export function advancedHybridLaunchProgram() {
-  return [1, 2, 3, 4].map((week) => [
+  return [GUIDANCE, ...[1, 2, 3, 4].map((week) => [
     `START_WEEK${week}_TSV`,
     HEADER,
     ...rowsForWeek(week).map((row) => row.join('\t')),
     `END_WEEK${week}_TSV`,
-  ].join('\n')).join('\n\n');
+  ].join('\n'))].join('\n\n');
 }

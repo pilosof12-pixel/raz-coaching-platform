@@ -37,6 +37,7 @@ export function isDirectGoalExercise(exercise, target) {
   if (family === 'pull_up') return base === 'pull_up';
   if (family === 'ruck') return exercise.modality === 'ruck' || base === 'ruck';
   if (family === 'running') return exercise.modality === 'running' || base === 'run';
+  if (family === 'rowing') return base === 'rowing_erg' || exercise.modality === 'rowing';
   if (family === 'squat') return typeof base === 'string' && base.includes('squat');
   if (family === 'deadlift') return base === 'deadlift';
   if (family === 'overhead_press') return base === 'overhead_press';

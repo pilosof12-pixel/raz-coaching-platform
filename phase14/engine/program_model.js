@@ -81,7 +81,7 @@ const BASE_MOVEMENTS = Object.freeze([
   ['sled', /\bsled\b|\bprowler\b/i],
   ['carry', /\bcarry\b/i],
   ['bike', /\bbike\b|\bairbike\b/i],
-  ['rowing_erg', /\brower\b|\browing[ -]?erg\b|\brow[ -]?erg\b/i],
+  ['rowing_erg', /\brower\b|\browing[ -]?ergo(?:meter)?\b|\browing[ -]?erg\b|\brow[ -]?erg\b|\bconcept\s?2\b/i],
 ]);
 
 function text(value) {
@@ -245,6 +245,16 @@ function detectGoalFamilies(value) {
   if (/\bsquat\b/.test(s)) add('squat');
   if (/\bdeadlift\b/.test(s)) add('deadlift');
   if (/\boverhead press\b|\bohp\b/.test(s)) add('overhead_press');
+
+  // A marathon is a running goal. It matched nothing, so the Advanced Hybrid
+  // athlete's named secondary goal was invisible to every progression check.
+  if (/\bmarathon\b|\bhalf[- ]marathon\b|\b42\.?(?:195)?\s*km\b|\b21\.?(?:1)?\s*km\b|\b(?:5|10)\s*k(?:m)?\s*(?:race|time|pb)\b/.test(s)) add('running');
+
+  // Rowing likewise: the masters athlete's primary goal is a 2 km erg and the
+  // progression analyser reported no targets at all for her block, so nothing
+  // was ever checking the one thing she came for. Anchored on erg/ergometer or
+  // the sport word, never on a bare "row", which is a barbell row.
+  if (/\berg(?:ometer)?\b|\browing\b|\bconcept\s?2\b/.test(s)) add('rowing');
   return out;
 }
 
