@@ -20,16 +20,30 @@ const fourWeeks = (rows, intro = '') => `${intro ? `${intro}\n\n` : ''}${[1, 2, 
 
 // --- Advanced Hybrid -------------------------------------------------------
 
-// Week 1 presses 67.5 kg; the model proposes 70 kg in Week 2 and 72.5 kg in
+// Week 1 presses 77.5 kg; the model proposes 80 kg in Week 2 and 82.5 kg in
 // Week 3. The high-concurrency rule holds both build weeks at the Week 1 dose,
 // so every warm-up ramp must follow the load actually prescribed.
+//
+// Squat, One-Arm Pull-up and the long run progress alongside the press, because
+// AH-01 only refuses once four families are materially progressing. An earlier
+// version of this fixture moved the press alone and still expected a hold; it
+// got one only because the hold ran unconditionally, on every high-concurrency
+// block, whether or not the hierarchy had any objection. Tying the hold to the
+// hierarchy's actual verdict exposed that premise as untrue, so the fixture now
+// states the case it always meant to test. Every assertion below is unchanged
+// apart from the loads it reads.
 function hybridProposedPressProgression() {
-  const press = [67.5, 70, 72.5, 70];
+  const press = [77.5, 80, 82.5, 75];
+  const squat = [160, 162.5, 165, 157.5];
+  const oapReps = [2, 2, 3, 2];
+  const run = [10, 10.5, 11, 9];
   return fourWeeks((w) => [
     `Sun\t[WARMUP] Overhead Press\t20-${[55, 57.5, 60, 55][w - 1]} kg ramp\t3\t3\t60-90 sec\tN/A\tCompact ramp; keep shoulders fresh.; Ramp Overhead Press: 27.5 kg x 5, 42.5 kg x 3, 55 kg x 1-2 before ${press[w - 1]} kg work sets.; Keep the warm-up specific and non-fatiguing.\t`,
     `Sun\tOverhead Press\t${press[w - 1]} kg\t4\t4\t2-3 min\t7.5\tDirect strict press exposure; no layback.\t`,
-    'Mon\tBack Squat\t170 kg\t3\t3\t3 min\t8\tPrimary squat.\t',
-    `Tue\tRun\tConversational easy pace\t1\t20 km\tN/A\t5-6\tSecondary marathon run.\t`,
+    `Mon\tBack Squat\t${squat[w - 1]} kg\t3\t3\t3 min\t7.5\tIf technique, RPE and recovery are on target, use the listed load; otherwise hold the prior load.\t`,
+    `Mon\tOne-Arm Pull-up\tBodyweight\t2\t${oapReps[w - 1]} per arm\t3 min\t7\tClean primary-goal reps only.\t`,
+    'Fri\tPush Press\tRPE-selected load\t3\t3\t2-3 min\t6.5\tLow-cost secondary press support.\t',
+    `Sun\tRun\tEasy conversational pace\t1\t${run[w - 1]} km\tN/A\t5\tSecondary marathon exposure.\t`,
   ], 'Primary work stays centered on strict One-Arm Pull-up quality, with strict Overhead Press progressing without stealing freshness from MMA.');
 }
 
@@ -51,8 +65,8 @@ test('[AH] held OHP weeks keep the work row, the warm-up ramp target and the nar
   const out = productionHybridSequence(hybridProposedPressProgression(), ADVANCED_HYBRID_LAUNCH_INTAKE);
   for (const week of [2, 3]) {
     const { work, rampTarget, note } = pressWeek(out, week);
-    assert.equal(work, '67.5', `Week ${week} work row should hold the Week 1 dose`);
-    assert.equal(rampTarget, '67.5', `Week ${week} warm-up ramp must target the load actually prescribed`);
+    assert.equal(work, '77.5', `Week ${week} work row should hold the Week 1 dose`);
+    assert.equal(rampTarget, '77.5', `Week ${week} warm-up ramp must target the load actually prescribed`);
     assert.match(note, /hold|quality|bar speed/i, `Week ${week} note should describe a deliberate hold, not a load increase`);
     assert.doesNotMatch(note, /increase the load|add \d+(?:\.\d+)? kg/i);
   }
@@ -61,8 +75,8 @@ test('[AH] held OHP weeks keep the work row, the warm-up ramp target and the nar
     const { work, rampTarget } = pressWeek(out, week);
     assert.equal(rampTarget, work, `Week ${week} ramp target should match its own work load`);
   }
-  assert.doesNotMatch(out, /before 72\.5 kg work sets/, 'no stale Week 3 ramp target may survive');
-  assert.equal(/before 70 kg work sets/.test(out.match(/START_WEEK2_TSV[\s\S]*?END_WEEK2_TSV/)[0]), false);
+  assert.doesNotMatch(out, /before 82\.5 kg work sets/, 'no stale Week 3 ramp target may survive');
+  assert.equal(/before 80 kg work sets/.test(out.match(/START_WEEK2_TSV[\s\S]*?END_WEEK2_TSV/)[0]), false);
   assert.doesNotMatch(out, /strict Overhead Press progressing/i, 'narrative must not claim load progression during a deliberate hold');
 });
 
@@ -71,7 +85,7 @@ test('[AH] the ramp sync survives decimal ramp steps (the defect that made it si
   // it, so the sync never fired on any real program.
   const out = productionHybridSequence(hybridProposedPressProgression(), ADVANCED_HYBRID_LAUNCH_INTAKE);
   const w2 = out.match(/START_WEEK2_TSV[\s\S]*?END_WEEK2_TSV/)[0];
-  assert.match(w2, /Ramp Overhead Press: [\d.]+ kg x 5, [\d.]+ kg x 3, [\d.]+ kg x 1-2 before 67\.5 kg work sets\./);
+  assert.match(w2, /Ramp Overhead Press: [\d.]+ kg x 5, [\d.]+ kg x 3, [\d.]+ kg x 1-2 before 77\.5 kg work sets\./);
 });
 
 test('[AH] OHP work/ramp coherence is stable across a repeated normalization pass', () => {

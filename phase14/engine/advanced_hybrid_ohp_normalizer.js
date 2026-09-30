@@ -1,4 +1,5 @@
 import { isHighConcurrencyHybrid } from './advanced_hybrid_concurrency.js';
+import { validateAdvancedHybridCoachingSpecV1 } from './coaching_spec_v1_quality.js';
 import { rampText } from './specific_warmup_enrichment.js';
 
 function arr(v) { return Array.isArray(v) ? v : v ? [v] : []; }
@@ -147,12 +148,40 @@ function syncHighConcurrencyNarrative(program) {
 // not keep solving a recovery-overload rejection by re-progressing the secondary
 // press family on every repair attempt. Weeks 2-3 copy the actual Week-1 pressing
 // dose; Week 4 may remain lower for consolidation and is never increased here.
+// Only the hierarchy rule speaks to whether the press must be held. Any other
+// Coaching Specification failure is another repair's business, and reading one
+// as "the hierarchy demands a hold" made this hold a block whose real complaint
+// was COACH_SPEC_V1_AH_UNCONDITIONAL_MAJOR_LIFT_PROGRESSION.
+const HIERARCHY_CODE = 'COACH_SPEC_V1_AH_RECOVERY_HIERARCHY_OVERLOADED';
+
+function hierarchyAccepts(program, intake) {
+  try { return validateAdvancedHybridCoachingSpecV1(program, intake)?.ok === true; }
+  catch (err) { return err?.code !== HIERARCHY_CODE; }
+}
+
+
 function stabilizeSecondaryPressDose(program, intake = {}) {
   if (!isHighConcurrencyHybrid(intake) || !/(?:overhead\s*press|\bohp\b)/i.test(secondaryText(intake))) {
     return { program, repairs: [] };
   }
 
   let candidate = String(program || '');
+
+  // The hold exists to converge AH-01, not as a coaching preference. AH-01 only
+  // refuses when four or more families materially progress, so when the block
+  // already satisfies the hierarchy the hold buys nothing and costs the athlete
+  // a named goal.
+  //
+  // The coach on the delivered Advanced Hybrid: "The secondary goal is 100 kg
+  // OHP, with current performance 80x4, yet the only strict OHP exposure is
+  // 65 kg for three weeks... Do not leave a named 100 kg strength goal
+  // essentially flat for three weeks." That block progresses squat and OAP and
+  // holds the marathon -- three families with the press moving, which AH-01
+  // accepts. It was flattened anyway, by this repair, for nothing.
+  //
+  // The frozen validator is the arbiter rather than a second copy of its rule.
+  if (hierarchyAccepts(candidate, intake)) return { program: candidate, repairs: [] };
+
   const baseline = parseWeek(candidate, 1);
   if (!baseline) return { program: candidate, repairs: [] };
 
@@ -209,6 +238,129 @@ function stabilizeSecondaryPressDose(program, intake = {}) {
   return { program: candidate, repairs };
 }
 
+// The coach on the delivered block: "The secondary goal is 100 kg OHP, with
+// current performance 80x4, yet the only strict OHP exposure is 65 kg, 65, 65,
+// 67.5... I don't want more total pressing. I want the existing pressing budget
+// allocated better. Make strict OHP the main secondary press, with Push Press
+// optional/secondary... Do not leave a named 100 kg strength goal essentially
+// flat for three weeks."
+//
+// So where the hierarchy does not require the press to be held, a named press
+// goal that sits at one load through every build week is stepped. This adds no
+// pressing volume -- the sets, reps and days are untouched, and only the load on
+// the existing strict exposure moves.
+const PRESS_STEP_KG = 2.5;
+
+function pressGoalTargetKg(intake) {
+  const m = secondaryText(intake).match(/(\d+(?:\.\d+)?)\s*kg[^|]{0,20}overhead press|overhead press[^|]{0,20}?(\d+(?:\.\d+)?)\s*kg/i);
+  return m ? Number(m[1] ?? m[2]) : null;
+}
+
+function demonstratedPressKg(intake) {
+  const m = String(intake?.current_numbers || '').match(/overhead press[^\n]{0,20}?(\d+(?:\.\d+)?)\s*kg/i);
+  return m ? Number(m[1]) : null;
+}
+
+const kgOf = (raw) => {
+  const m = String(raw || '').match(/^\s*(\d+(?:\.\d+)?)\s*kg\s*$/i);
+  return m ? Number(m[1]) : null;
+};
+
+function strictPressRow(parsed) {
+  const i = parsed.rows.findIndex((cells) => /^overhead press$/i.test(rowName(parsed, cells)));
+  return i < 0 ? null : { i, cells: parsed.rows[i] };
+}
+
+function stepPress(program, base, ceiling, probe = false) {
+  let candidate = String(program || '');
+  for (const week of [2, 3]) {
+    const next = base + PRESS_STEP_KG * (week - 1);
+    if (!probe && next > ceiling) continue;
+    const parsed = parseWeek(candidate, week);
+    if (!parsed || !Number.isInteger(parsed.index.weight)) continue;
+    const row = strictPressRow(parsed);
+    if (!row) continue;
+    row.cells[parsed.index.weight] = `${next} kg`;
+    candidate = rewriteWeek(candidate, parsed);
+  }
+  return candidate;
+}
+
+function progressNamedSecondaryPress(program, intake = {}) {
+  const target = pressGoalTargetKg(intake);
+  if (!target) return { program, repairs: [] };
+
+  const loads = [];
+  for (const week of [1, 2, 3]) {
+    const parsed = parseWeek(program, week);
+    if (!parsed || !Number.isInteger(parsed.index.weight)) return { program, repairs: [] };
+    const row = strictPressRow(parsed);
+    if (!row) return { program, repairs: [] };
+    const kg = kgOf(row.cells[parsed.index.weight]);
+    if (kg == null) return { program, repairs: [] };
+    loads.push(kg);
+  }
+  // Only a genuinely flat build block is stepped. A press already moving, or one
+  // whose loads are benchmark-anchored text rather than a number, is left alone.
+  if (new Set(loads).size !== 1) return { program, repairs: [] };
+
+
+  const base = loads[0];
+  // Never past what the athlete has already demonstrated, and never past the goal.
+  const ceiling = Math.min(target, demonstratedPressKg(intake) ?? target);
+
+  // Ask the hierarchy the counterfactual before touching anything: if this press
+  // progressed at all, would AH-01 object? A press the hold flattened looks
+  // exactly like a press that was never progressed, so without this the two
+  // repairs trade blows for ever -- the hold flattens it, the step puts it back.
+  //
+  // The counterfactual ignores the demonstrated-ability ceiling on purpose. A
+  // step capped to a single week does not always restore the fourth progressing
+  // family, so asking "does the block AS REPAIRED still pass" let a partial step
+  // through and the oscillation resumed. The question that has to be asked is
+  // whether the press is allowed to move, not whether this particular move slips
+  // under the detector.
+  if (!hierarchyAccepts(stepPress(program, base, ceiling, true), intake)) return { program, repairs: [] };
+  let candidate = String(program || '');
+  const repairs = [];
+
+  for (const week of [2, 3]) {
+    const next = base + PRESS_STEP_KG * (week - 1);
+    if (next > ceiling) continue;
+    const parsed = parseWeek(candidate, week);
+    if (!parsed) continue;
+    const row = strictPressRow(parsed);
+    if (!row) continue;
+    const weight = `${next} kg`;
+    row.cells[parsed.index.weight] = weight;
+    if (Number.isInteger(parsed.index.notes)) {
+      row.cells[parsed.index.notes] = `Take the planned ${PRESS_STEP_KG} kg step only if both Week ${week - 1} sets were crisp at or under RPE 8; otherwise repeat the last successful load. Same two sets either way -- the load moves, the pressing volume does not.`;
+    }
+    candidate = rewriteWeek(candidate, parsed);
+    // The ramp and the warm-up row's own load cell were derived from the old
+    // work load, and a stale ramp is how this exact row broke before.
+    const synced = syncHeldPressCues(candidate, week, 'Overhead Press', weight);
+    candidate = synced.program;
+    const reparsed = parseWeek(candidate, week);
+    const restored = reparsed && strictPressRow(reparsed);
+    if (restored && Number.isInteger(reparsed.index.notes)) {
+      restored.cells[reparsed.index.notes] = `Take the planned ${PRESS_STEP_KG} kg step only if both Week ${week - 1} sets were crisp at or under RPE 8; otherwise repeat the last successful load. Same two sets either way -- the load moves, the pressing volume does not.`;
+      candidate = rewriteWeek(candidate, reparsed);
+    }
+    repairs.push({ week, exercise: 'Overhead Press', from: `${base} kg`, to: weight });
+  }
+
+  // The hierarchy is the arbiter here too, and it is the whole oscillation guard.
+  // A press the hold flattened looks exactly like a press that never progressed,
+  // so the step would put it straight back and the two repairs would trade blows
+  // for ever -- except that restoring it restores the fourth progressing family,
+  // which is precisely what AH-01 refuses. Stepping a genuinely held press always
+  // fails this check, so the held block is a fixed point without needing to
+  // recognise its own note.
+  if (!repairs.length || !hierarchyAccepts(candidate, intake)) return { program, repairs: [] };
+  return { program: candidate, repairs };
+}
+
 // The Advanced Hybrid contract requires one strict OHP exposure plus one small
 // complementary vertical-press exposure. Repeated live failures showed the model
 // can preserve the important strict OHP work yet omit only Push Press on every
@@ -243,6 +395,14 @@ export function normalizeAdvancedHybridOHPComplement(program, intake = {}) {
   const stabilized = stabilizeSecondaryPressDose(candidate, intake);
   candidate = stabilized.program;
   repairs.push(...stabilized.repairs);
+
+  // Only where the hierarchy did not call for a hold. A block that needed one
+  // must not have the press stepped straight back up again.
+  if (!stabilized.repairs.length) {
+    const progressed = progressNamedSecondaryPress(candidate, intake);
+    candidate = progressed.program;
+    repairs.push(...progressed.repairs);
+  }
 
   return { program: candidate, repaired: repairs.length > 0, repairs };
 }
