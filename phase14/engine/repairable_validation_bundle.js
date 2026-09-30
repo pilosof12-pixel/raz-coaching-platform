@@ -89,6 +89,7 @@ import { normalizeWideRepRange } from './rep_range_decision_rule.js'; // V103-WI
 import { normalizeHighRepGoalTesting } from './high_rep_goal_testing.js'; // V104-HIGH-REP-TESTING-WIRED
 import { normalizeImplausibleEffort } from './effort_plausibility.js'; // V105-EFFORT-PLAUSIBILITY-WIRED
 import { normalizeFreestandingBalance } from './freestanding_balance_progression.js'; // V106-FREESTANDING-BALANCE-WIRED
+import { normalizePrimaryVolumeProgression } from './primary_volume_progression.js'; // V107-PRIMARY-VOLUME-WIRED
 import { progressionAnalysis } from './coaching_progression_gpp.js'; // V101-GOAL-STATUS-WIRED
 import { normalizeYouthAcquisitionGoalFloors } from './youth_goal_floor_normalizer.js';
 import { normalizeYouthSessionQuality } from './youth_session_quality_normalizer.js';
@@ -661,6 +662,12 @@ export function collectRepairableValidationFailures(program, intake = {}, option
 
   // Before the note repairs, because it changes sets and reps and those read the
   // settled prescription.
+  // Rewrites a dose rather than adding a row, and must land before the
+  // progression gate reads whether the primary goal actually moved.
+  const primaryVolume = normalizePrimaryVolumeProgression(candidate, intake);
+  candidate = primaryVolume.program;
+  if (primaryVolume.repaired) deterministic_repairs.push({ type: 'primary_volume_progression', rows: primaryVolume.repairs });
+
   // Adds a row, so it runs before the note repairs and before the goal-status
   // declaration reads whether the handstand goal actually moved.
   const freestandingBalance = normalizeFreestandingBalance(candidate, intake);

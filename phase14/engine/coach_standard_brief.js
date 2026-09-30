@@ -24,6 +24,7 @@
 import { benchmarks, goalFamilies, goalText, toleratedFor, sprintBenchmark, matchDay } from './coach_rules.js';
 import { THRESHOLDS } from './coach_standard.js';
 import { buildPrimaryGoalShareBrief, buildGoalSpecificProgressionBrief } from './primary_goal_share.js';
+import { buildPrimaryVolumeProgressionBrief } from './primary_volume_progression.js';
 
 const arr = (v) => (Array.isArray(v) ? v : v ? [v] : []);
 const GENERIC_STRENGTH_GOAL = /maintain[^.]*\b(strength|power)\b/i;
@@ -177,6 +178,7 @@ export function buildCoachStandardBrief(intake = {}) {
     buildSupportingStandardBrief(intake),
     buildPrimaryGoalShareBrief(intake),
     buildGoalSpecificProgressionBrief(intake),
+    buildPrimaryVolumeProgressionBrief(intake),
     buildSpeedBrief(intake),
     buildSchedulingBrief(intake),
   ].filter(Boolean).join('\n');
