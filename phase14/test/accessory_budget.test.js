@@ -102,3 +102,58 @@ test('it is idempotent', () => {
   const once = repairAccessoryBudget(RUN139, INTAKE).program;
   assert.equal(repairAccessoryBudget(once, INTAKE).changed, false);
 });
+
+// Coach review of Masters Return: "Two rowing accessories... collectively it's
+// more general strength menu than this athlete needs while rebuilding
+// sport-specific tolerance. I'd rather see fewer exercises and slightly more
+// rowing progression. This is exactly where our accessory-budget principle
+// should operate."
+test('the same movement three times in a week is one exercise written three times', async () => {
+  const fs = await import('node:fs');
+  const HARD = JSON.parse(fs.readFileSync(new URL('./fixtures/hard_avatars.json', import.meta.url), 'utf8'));
+  const delivered = fs.readFileSync(new URL('./fixtures/masters_return-program.txt', import.meta.url), 'utf8');
+  const { parseWeek } = await import('../engine/v34_workload_accounting.js');
+
+  const slots = (program, week, re) => {
+    const parsed = parseWeek(program, week);
+    return parsed.rows
+      .map((c) => String(c[parsed.exercise] || '').trim())
+      .filter((n) => n && !/^\[WARMUP\]/i.test(n) && re.test(n)).length;
+  };
+
+  // Seated Cable Row (Mon), Seated Cable Row (Wed), Cable Row (Thu): three slots
+  // of one movement, while the 2 km erg goal he came for gets two.
+  assert.equal(slots(delivered, 1, /^(?:Seated )?Cable Row$/i), 3);
+
+  const { program, changed, moves } = repairAccessoryBudget(delivered, HARD.masters_return);
+  assert.equal(changed, true);
+  assert.equal(slots(program, 1, /^(?:Seated )?Cable Row$/i), 2);
+  assert.ok(moves.every((m) => /^(?:Seated )?Cable Row$/i.test(m.dropped)), 'only the duplicate was trimmed');
+
+  // The goal's own modality is never trimmed by a rule about accessories: Week 3
+  // runs three erg pieces, and that is the progression.
+  for (const [week, ergs] of [[1, 2], [3, 3]]) {
+    assert.equal(slots(program, week, /Rowing Ergometer/i), ergs, `week ${week} erg exposures`);
+  }
+  assert.equal(repairAccessoryBudget(program, HARD.masters_return).changed, false, 'converges');
+});
+
+test('a movement the athlete needs is not a duplicate, however often it appears', async () => {
+  const fs = await import('node:fs');
+  const HARD = JSON.parse(fs.readFileSync(new URL('./fixtures/hard_avatars.json', import.meta.url), 'utf8'));
+  // The in-season footballer gets Nordic Hamstring Curl, Hip Thrust and Machine
+  // Hamstring Curl in one week against a history of two biceps femoris strains.
+  // Hamstrings are named in what hurts, so none of it is an unexplained
+  // accessory -- and trimming a Nordic from a footballer's block would be the
+  // Hyrox-squat mistake repeating.
+  for (const f of ['inseason_footballer-program.txt', 'run115_inseason_footballer.txt']) {
+    const p = fs.readFileSync(new URL(`./fixtures/${f}`, import.meta.url), 'utf8');
+    const { changed } = repairAccessoryBudget(p, HARD.inseason_footballer);
+    assert.equal(changed, false, f);
+  }
+  // And the two earlier Masters blocks, which the coach did not charge.
+  for (const f of ['run100_masters_return.txt', 'run101_masters_return.txt']) {
+    const p = fs.readFileSync(new URL(`./fixtures/${f}`, import.meta.url), 'utf8');
+    assert.equal(repairAccessoryBudget(p, HARD.masters_return).changed, false, f);
+  }
+});

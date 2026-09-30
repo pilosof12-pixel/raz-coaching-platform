@@ -20,6 +20,8 @@ import { parseWeek } from './v34_workload_accounting.js';
 import { CATEGORY, ROLE, classifyExercise } from './v38_movement_taxonomy.js';
 import { rebuild } from './tsv_rows.js';
 import { auditProgramStructure } from './v38_structural_audit.js';
+import { parseProgramModel, directGoalExposures } from './program_model.js';
+import { collectPrimaryGoalShareFlags } from './primary_goal_share.js';
 
 const isWarmup = (n) => /^\s*\[WARMUP\]/i.test(String(n || ''));
 const arr = (v) => (Array.isArray(v) ? v : v ? [v] : []);
@@ -28,6 +30,9 @@ const loose = (name) => new RegExp(
 );
 
 const LOWER = [CATEGORY.KNEE_DOMINANT, CATEGORY.HIP_DOMINANT, CATEGORY.UNILATERAL_LOWER];
+
+// Two slots a week is variety. A third is the same exercise again.
+const DUPLICATE_CAP = 2;
 
 // A goal names a pattern, not a catalogue entry. "Hold my squat and pulling
 // strength" is a lower-body goal, and matching the movement name "Back Squat"
@@ -80,9 +85,49 @@ const carriesUpperSkill = (names) => names.some((n) => {
   return role === ROLE.SKILL_PRACTICE && category === CATEGORY.SKILL;
 });
 
+// Categories where repetition is the point, not waste. Trunk, tissue and GPP
+// work is cheap, and the goal's own modality must never be trimmed by a rule
+// about accessories -- the Masters block runs three erg pieces in Week 3, which
+// is the progression, not a duplicate.
+const CHEAP = [CATEGORY.TRUNK, CATEGORY.GPP, CATEGORY.TISSUE_CAPACITY, CATEGORY.ENDURANCE,
+  CATEGORY.WARMUP, CATEGORY.SKILL];
+
+// What each work row in this week is, according to the model: its base movement
+// and whether it serves a goal the athlete actually named. source_row is 1-based
+// over body rows.
+function movementIndex(model, intake, week) {
+  const byRow = new Map();
+  const servesGoal = new Set();
+  const w = (model.weeks || []).find((x) => x.week === week);
+  if (!w) return { byRow, servesGoal };
+  for (const day of w.days || []) {
+    for (const session of day.sessions || []) {
+      for (const ex of session.exercises || []) {
+        if (ex.modality === 'warm_up' || ex.role === 'warm_up') continue;
+        const i = Number(ex.source_row) - 1;
+        if (Number.isInteger(i)) byRow.set(i, { base: ex.base_movement, name: ex.display_name });
+      }
+    }
+  }
+  for (const goal of model.goals || []) {
+    for (const exposure of directGoalExposures(model, goal.family, week)) {
+      const ex = exposure.exercise || exposure;
+      const i = Number(ex.source_row) - 1;
+      if (Number.isInteger(i)) servesGoal.add(i);
+    }
+  }
+  return { byRow, servesGoal };
+}
+
 export function repairAccessoryBudget(program, intake = {}) {
   let out = String(program || '');
   const moves = [];
+  let model = null;
+  try { model = parseProgramModel(out, intake); } catch { model = null; }
+  // The weeks where the primary goal is being crowded out. Only there does a
+  // near-duplicate accessory cost the athlete anything.
+  const starvedWeeks = new Set();
+  try { for (const f of collectPrimaryGoalShareFlags(out, intake)) starvedWeeks.add(f.week); } catch { /* no share, no scope */ }
   const { named, patterns } = spokenFor(out, intake);
 
   for (let week = 1; week <= 4; week += 1) {
@@ -152,6 +197,47 @@ export function repairAccessoryBudget(program, intake = {}) {
         drop.add(r.i);
         over -= 1;
         moves.push({ week, day, dropped: r.name, why: 'skill session longer than the week around it' });
+      }
+    }
+
+    // 3. The same movement three times in a week is not three exposures. It is
+    //    one exercise written out three times.
+    //
+    //    Masters Return gave a returning rower Seated Cable Row on Monday,
+    //    Seated Cable Row on Wednesday and Cable Row on Thursday -- three slots
+    //    of one movement, while the 2 km erg goal he came for got two. The coach
+    //    asked for "fewer exercises and slightly more rowing progression", and
+    //    said this is exactly where the accessory budget should operate.
+    //
+    //    Only near-duplicates are read here, by base movement rather than by
+    //    name, because "Cable Row" and "Seated Cable Row" are the same exercise
+    //    written twice. A movement the athlete named, and anything serving a
+    //    named goal, is never a duplicate to be trimmed.
+    //    Scoped to the condition the coach actually stated: "when primary
+    //    sport/skill exposure is underdeveloped while generic accessories
+    //    consume many weekly slots". Without that scope this rule cut Pendlay
+    //    Rows out of a weightlifter peaking for a national qualifier, where
+    //    heavy pulling is the goal rather than an accessory around it. That
+    //    block raises no goal-share flag; Masters Return raises one every week.
+    if (model && starvedWeeks.has(week)) {
+      const { byRow, servesGoal } = movementIndex(model, intake, week);
+      const byBase = new Map();
+      for (const r of rows) {
+        if (drop.has(r.i) || servesGoal.has(r.i) || !cuttable(r)) continue;
+        if (CHEAP.includes(classifyExercise(r.name).category)) continue;
+        const base = byRow.get(r.i)?.base;
+        if (!base) continue;
+        if (!byBase.has(base)) byBase.set(base, []);
+        byBase.get(base).push(r);
+      }
+      for (const [base, group] of byBase) {
+        if (group.length <= DUPLICATE_CAP) continue;
+        // Trim from the longest day, so the week loses its most crowded slot.
+        const ranked = [...group].sort((a, b) => (dayCount.get(b.day) || 0) - (dayCount.get(a.day) || 0));
+        for (const r of ranked.slice(0, group.length - DUPLICATE_CAP)) {
+          drop.add(r.i);
+          moves.push({ week, day: r.day, dropped: r.name, why: `${base} already has ${DUPLICATE_CAP} weekly slots and serves no named goal` });
+        }
       }
     }
 

@@ -1881,7 +1881,7 @@
       "collectPrimaryGoalShareFlags"
     ],
     "advisory": false,
-    "reachable": false,
+    "reachable": true,
     "repairs": [],
     "wired": [],
     "tested": true,
