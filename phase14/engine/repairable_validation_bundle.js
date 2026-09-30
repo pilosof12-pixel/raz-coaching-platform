@@ -90,6 +90,7 @@ import { normalizeHighRepGoalTesting } from './high_rep_goal_testing.js'; // V10
 import { normalizeImplausibleEffort } from './effort_plausibility.js'; // V105-EFFORT-PLAUSIBILITY-WIRED
 import { normalizeFreestandingBalance } from './freestanding_balance_progression.js'; // V106-FREESTANDING-BALANCE-WIRED
 import { normalizePrimaryVolumeProgression } from './primary_volume_progression.js'; // V107-PRIMARY-VOLUME-WIRED
+import { normalizeAssistedSkillProgression } from './assisted_skill_progression.js'; // V108-ASSISTED-SKILL-WIRED
 import { progressionAnalysis } from './coaching_progression_gpp.js'; // V101-GOAL-STATUS-WIRED
 import { normalizeYouthAcquisitionGoalFloors } from './youth_goal_floor_normalizer.js';
 import { normalizeYouthSessionQuality } from './youth_session_quality_normalizer.js';
@@ -662,6 +663,11 @@ export function collectRepairableValidationFailures(program, intake = {}, option
 
   // Before the note repairs, because it changes sets and reps and those read the
   // settled prescription.
+  // Rewrites the assistance and the note, never the dose.
+  const assistedSkill = normalizeAssistedSkillProgression(candidate, intake);
+  candidate = assistedSkill.program;
+  if (assistedSkill.repaired) deterministic_repairs.push({ type: 'assisted_skill_progression', rows: assistedSkill.repairs });
+
   // Rewrites a dose rather than adding a row, and must land before the
   // progression gate reads whether the primary goal actually moved.
   const primaryVolume = normalizePrimaryVolumeProgression(candidate, intake);
