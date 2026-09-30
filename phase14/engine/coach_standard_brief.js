@@ -26,6 +26,7 @@ import { THRESHOLDS } from './coach_standard.js';
 import { buildPrimaryGoalShareBrief, buildGoalSpecificProgressionBrief } from './primary_goal_share.js';
 import { buildPrimaryVolumeProgressionBrief } from './primary_volume_progression.js';
 import { buildAssistedSkillBrief } from './assisted_skill_progression.js';
+import { buildEventDistanceBrief } from './event_distance_exposure.js';
 
 const arr = (v) => (Array.isArray(v) ? v : v ? [v] : []);
 const GENERIC_STRENGTH_GOAL = /maintain[^.]*\b(strength|power)\b/i;
@@ -181,6 +182,7 @@ export function buildCoachStandardBrief(intake = {}) {
     buildGoalSpecificProgressionBrief(intake),
     buildPrimaryVolumeProgressionBrief(intake),
     buildAssistedSkillBrief(intake),
+    buildEventDistanceBrief(intake),
     buildSpeedBrief(intake),
     buildSchedulingBrief(intake),
   ].filter(Boolean).join('\n');

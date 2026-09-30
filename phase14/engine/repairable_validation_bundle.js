@@ -91,6 +91,7 @@ import { normalizeImplausibleEffort } from './effort_plausibility.js'; // V105-E
 import { normalizeFreestandingBalance } from './freestanding_balance_progression.js'; // V106-FREESTANDING-BALANCE-WIRED
 import { normalizePrimaryVolumeProgression } from './primary_volume_progression.js'; // V107-PRIMARY-VOLUME-WIRED
 import { normalizeAssistedSkillProgression } from './assisted_skill_progression.js'; // V108-ASSISTED-SKILL-WIRED
+import { normalizeEventDistanceExposure } from './event_distance_exposure.js'; // V109-EVENT-DISTANCE-WIRED
 import { progressionAnalysis } from './coaching_progression_gpp.js'; // V101-GOAL-STATUS-WIRED
 import { normalizeYouthAcquisitionGoalFloors } from './youth_goal_floor_normalizer.js';
 import { normalizeYouthSessionQuality } from './youth_session_quality_normalizer.js';
@@ -663,6 +664,12 @@ export function collectRepairableValidationFailures(program, intake = {}, option
 
   // Before the note repairs, because it changes sets and reps and those read the
   // settled prescription.
+  // Raises one week's distance to the event's, so it runs before the volume and
+  // note rules read the block.
+  const eventDistance = normalizeEventDistanceExposure(candidate, intake);
+  candidate = eventDistance.program;
+  if (eventDistance.repaired) deterministic_repairs.push({ type: 'event_distance_exposure', rows: eventDistance.repairs });
+
   // Rewrites the assistance and the note, never the dose.
   const assistedSkill = normalizeAssistedSkillProgression(candidate, intake);
   candidate = assistedSkill.program;
