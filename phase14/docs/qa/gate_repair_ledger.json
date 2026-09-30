@@ -1873,6 +1873,22 @@
     "killedLive": ""
   },
   {
+    "code": "V102_PRIMARY_GOAL_SHARE_LOW",
+    "modules": [
+      "engine/primary_goal_share.js"
+    ],
+    "owners": [
+      "collectPrimaryGoalShareFlags"
+    ],
+    "advisory": false,
+    "reachable": false,
+    "repairs": [],
+    "wired": [],
+    "tested": true,
+    "stressed": false,
+    "killedLive": ""
+  },
+  {
     "code": "V103_WIDE_REP_RANGE_WITHOUT_RULE",
     "modules": [
       "engine/rep_range_decision_rule.js"

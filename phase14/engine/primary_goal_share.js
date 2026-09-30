@@ -16,16 +16,70 @@
 // and GPP work is excluded on both sides -- a dead bug is not what crowds out a
 // rowing session, and counting it would make every sane block look guilty.
 //
-// Stated in the brief and NOT measured here, deliberately. Which accessory to
-// cut and how much sport to put in its place is a coaching decision, and a gate
-// with no deterministic answer spends four generations and delivers nothing.
+// Measured here and advisory, not blocking: which accessory to cut and how much
+// sport to put in its place is a coaching decision, and a gate with no
+// deterministic answer spends four generations and delivers nothing.
 //
-// I also wrote the measurement and threw it away. Counting exposures that serve
-// a named goal against those that serve none flagged the Advanced Hybrid block
-// -- the one the coach rated 9.0 and told me to freeze -- and the Youth block,
-// because goal-serving work through a secondary goal was not being credited. A
-// metric that contradicts the review it came from is worse than no metric, and
-// shipping it to look thorough would have been the mistake.
+// I got this wrong twice before it worked, the same way both times. Counting
+// "exposures that serve a goal" against "exposures that serve none" flagged all
+// four avatars, including the Advanced Hybrid block the coach rated 9.0 and told
+// me to freeze -- because the program model strips the [WARMUP] marker from an
+// exercise's display name, so filtering warm-ups by name let every ramp and prep
+// row through and polluted both sides of the ratio. Warm-ups are excluded by
+// modality. With that fixed the four programs the coach scored separate cleanly:
+//
+//   masters   2 goal exposures / 11 generic = 0.18   <- his clear example
+//   youth     4 / 10                        = 0.40
+//   hybrid    6 / 7                         = 0.86
+//   tactical  10 / 4                        = 2.50
+//
+// The threshold sits at a quarter, between the block he objected to and the next
+// one up. Four programs is a thin calibration and the numbers are recorded here
+// so the next person can see the margin rather than trust the constant.
+
+import { parseProgramModel } from './program_model.js';
+import { CATEGORY, classifyExercise } from './v38_movement_taxonomy.js';
+
+const CHEAP = new Set([CATEGORY.TRUNK, CATEGORY.TISSUE_CAPACITY, CATEGORY.GPP, CATEGORY.WARMUP]);
+const SHARE_FLOOR = 0.25;
+
+export function primaryGoalShare(program, intake = {}, suppliedModel = null) {
+  const model = suppliedModel || parseProgramModel(program, intake);
+  if (!(model.goals || []).some((g) => g.tier === 'primary')) return null;
+
+  const weeks = [];
+  for (const week of model.weeks || []) {
+    let goal = 0;
+    let generic = 0;
+    for (const day of week.days || []) {
+      for (const exercise of day.exercises || []) {
+        // By modality: the model strips the [WARMUP] marker from display_name.
+        if (String(exercise.modality) === 'warm_up') continue;
+        const name = String(exercise.display_name || exercise.name || '').trim();
+        if (!name) continue;
+        if (exercise.direct_goal_exposure) { goal += 1; continue; }
+        if (CHEAP.has(classifyExercise(name).category)) continue;
+        generic += 1;
+      }
+    }
+    weeks.push({ week: week.week, goal, generic, share: generic ? goal / generic : Infinity });
+  }
+  return { weeks };
+}
+
+export function collectPrimaryGoalShareFlags(program, intake = {}, suppliedModel = null) {
+  const share = primaryGoalShare(program, intake, suppliedModel);
+  if (!share) return [];
+  return share.weeks
+    .filter((w) => w.generic >= 4 && w.share < SHARE_FLOOR)
+    .map((w) => ({
+      code: 'V102_PRIMARY_GOAL_SHARE_LOW',
+      week: w.week,
+      goal_exposures: w.goal,
+      generic_exposures: w.generic,
+      detail: `Week ${w.week} gives the primary goal ${w.goal} direct exposure${w.goal === 1 ? '' : 's'} against ${w.generic} substantive exposures that serve no named goal. No accessory is wrong on its own; together they are a general strength menu wrapped around the thing the athlete actually came for. Spend the accessory budget on the primary goal before adding to it.`,
+    }));
+}
 
 export function buildPrimaryGoalShareBrief(intake = {}) {
   const primaries = ['primary_goals'].flatMap((k) => (Array.isArray(intake[k]) ? intake[k] : [intake[k]]))
