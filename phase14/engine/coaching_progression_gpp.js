@@ -63,6 +63,47 @@ function exposureSignature(exposure) {
   ].join('|');
 }
 
+// The exposure that IS the goal, when a goal is expressed in kilograms.
+//
+// A family signature concatenates every exposure in it, so one lighter accessory
+// moving makes the whole family read as progressing while the set the goal
+// actually depends on stays put. The Advanced Hybrid block named a 100 kg
+// overhead press goal, prescribed 65 kg for three by five in Weeks 1, 2 and 3 --
+// flat -- and read as progressed because a second, lighter press went 60 to 65
+// once. The coach called it the block's main correction: "do not leave a named
+// 100 kg strength goal essentially flat for three weeks."
+//
+// Only applied where the exposures carry real loads. Skill goals -- a handstand,
+// a first muscle-up -- progress by assistance, hold time and attempt quality, and
+// have no heaviest set to track.
+function loadKg(exposure) {
+  const ex = exposure.exercise || exposure;
+  const m = String((ex.dose || {}).load || '').match(/(\d+(?:\.\d+)?)\s*kg/i);
+  return m ? Number(m[1]) : null;
+}
+
+function totalReps(exposure) {
+  const dose = (exposure.exercise || exposure).dose || {};
+  const sets = Number(String(dose.sets_raw ?? dose.sets ?? '').match(/\d+/)?.[0] || 0);
+  const reps = Number(String(dose.reps_raw ?? dose.reps ?? '').match(/\d+/)?.[0] || 0);
+  return sets * reps;
+}
+
+// Heaviest set, and on a tie the one carrying the most work. Without the
+// tie-break this picked whichever equal-load row happened to come first, so a
+// week with 65 kg for three by five and a week with the same 65 kg for two by
+// five compared different rows and the flat goal still read as progressing.
+function leadExposure(exposures) {
+  const loaded = exposures.filter((e) => Number.isFinite(loadKg(e)));
+  if (!loaded.length) return null;
+  return loaded.reduce((best, e) => {
+    const a = loadKg(e);
+    const b = loadKg(best);
+    if (a !== b) return a > b ? e : best;
+    return totalReps(e) > totalReps(best) ? e : best;
+  }, loaded[0]);
+}
+
 export function progressionAnalysis(program, intake = {}, suppliedModel = null) {
   const model = suppliedModel || parseProgramModel(program, intake);
   const targets = (model.goals || []).filter(hasProgressionIntent);
@@ -77,7 +118,13 @@ export function progressionAnalysis(program, intake = {}, suppliedModel = null) 
         .map(exposureSignature)
         .sort()
         .join(' || ');
-      weeks.push({ week: week.week, signature, count: exposures.length });
+      const lead = leadExposure(exposures);
+      weeks.push({
+        week: week.week,
+        signature,
+        count: exposures.length,
+        lead_signature: lead ? exposureSignature(lead) : null,
+      });
     }
     const present = weeks.filter((w) => w.count > 0);
     // Development happens in the build weeks. Week 4 is a consolidation week and
@@ -88,8 +135,14 @@ export function progressionAnalysis(program, intake = {}, suppliedModel = null) 
     // back off in.
     const build = present.filter((w) => w.week <= 3);
     const unique = new Set(build.map((w) => w.signature));
-    const progressed = build.length >= 2 && unique.size >= 2;
-    const row = { family: target.family, tier: target.tier, goal: target.raw, progressed, weeks };
+    let progressed = build.length >= 2 && unique.size >= 2;
+
+    // Where the goal is carried by a loaded set, that set has to be the one that
+    // moves. A lighter exposure in the same family changing does not progress it.
+    const leads = build.map((w) => w.lead_signature).filter(Boolean);
+    const leadTracked = leads.length === build.length && build.length >= 2;
+    if (progressed && leadTracked && new Set(leads).size < 2) progressed = false;
+    const row = { family: target.family, tier: target.tier, goal: target.raw, progressed, lead_tracked: leadTracked, weeks };
     targetsOut.push(row);
     // A goal deliberately held, and declared as held, is a coaching decision
     // rather than a missing progression. Without this the AH-01 hierarchy -- which

@@ -135,3 +135,52 @@ test('the integrated muscle-up is an assistance ladder with a gate, not a repeat
     assert.equal(cells[4], '1');
   }
 });
+
+test('a named kilogram goal progresses on its heaviest set, not on a lighter one', async () => {
+  const { progressionAnalysis } = await import('../engine/coaching_progression_gpp.js');
+  const H = 'Day\tExercise\tWeight\tSets\tReps\tRest\tTarget RPE\tNotes\tResults';
+  const press = (load, sets, reps) => ['Mon', 'Overhead Press', load, String(sets), String(reps), '3 min', '7', 'Press.', ''].join('\t');
+  const intake = { secondary_goals: ['100kg overhead press'], current_numbers: 'Overhead Press: 80 kg x 4' };
+
+  // The shape the coach objected to: the goal set sits at 65 kg for three weeks
+  // while a lighter second exposure moves 60 -> 65 once.
+  const flatLead = [1, 2, 3, 4].map((w) => `START_WEEK${w}_TSV\n${H}\n${[
+    press(w === 1 ? '60 kg' : '65 kg', 2, 5),
+    press('65 kg', 3, 5),
+  ].join('\n')}\nEND_WEEK${w}_TSV`).join('\n\n');
+  const flat = progressionAnalysis(flatLead, intake).targets.find((t) => t.family === 'overhead_press');
+  assert.equal(flat.lead_tracked, true);
+  assert.equal(flat.progressed, false, 'the heaviest set never moved');
+
+  // And when the goal set itself moves, it progresses.
+  const movingLead = [1, 2, 3, 4].map((w) => `START_WEEK${w}_TSV\n${H}\n${[
+    press('60 kg', 2, 5),
+    press(`${[65, 67.5, 70, 65][w - 1]} kg`, 3, 5),
+  ].join('\n')}\nEND_WEEK${w}_TSV`).join('\n\n');
+  assert.equal(progressionAnalysis(movingLead, intake).targets.find((t) => t.family === 'overhead_press').progressed, true);
+});
+
+test('declarations are rewritten wholesale, never stacked or left contradicting', async () => {
+  const { progressionAnalysis } = await import('../engine/coaching_progression_gpp.js');
+  const base = `This block trains the squat.\n\n${stripGuidance(advancedHybridLaunchProgram())}`;
+
+  const once = normalizeGoalStatusDeclaration(base, ADVANCED_HYBRID_LAUNCH_INTAKE, progressionAnalysis(base, ADVANCED_HYBRID_LAUNCH_INTAKE));
+  const twice = normalizeGoalStatusDeclaration(once.program, ADVANCED_HYBRID_LAUNCH_INTAKE, progressionAnalysis(once.program, ADVANCED_HYBRID_LAUNCH_INTAKE));
+
+  const count = (p) => (p.match(/holds it at a maintenance dose rather than developing it/g) || []).length;
+  assert.equal(count(twice.program), count(once.program), 'a second pass must not stack a second copy');
+
+  // The repair chain runs more than once on a candidate. An earlier pass once
+  // declared one goal held while naming another as developed, a later pass found
+  // that second goal flat and declared it too, and the block shipped carrying
+  // both claims. Stripping happens before the flags are computed, so a goal can
+  // never lose its declaration by having suppressed its own flag.
+  const declared = [...twice.program.matchAll(/^On ([^:]+):/gm)].map((m) => m[1]);
+  for (const goal of declared) {
+    assert.doesNotMatch(
+      twice.program,
+      new RegExp(`${goal.replace(/[.*+?^${}()|[\\]\\\\]/g, '\\\\$&')} (?:is|are) what this block develops`),
+      `${goal} is declared held and also named as developed`,
+    );
+  }
+});

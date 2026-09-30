@@ -100,14 +100,35 @@ export function collectUndeclaredGoalStatusFlags(analysis, program) {
   return flags;
 }
 
+const DECLARATION_SENTINEL = /this block holds it at a maintenance dose rather than developing it/i;
+
 export function normalizeGoalStatusDeclaration(program, intake = {}, analysis = null) {
   const original = String(program || '');
   if (!analysis) return { program: original, repaired: false, repairs: [] };
-  const flags = collectUndeclaredGoalStatusFlags(analysis, original);
-  if (!flags.length) return { program: original, repaired: false, repairs: [] };
 
   const head = original.split(/START_WEEK1_TSV/i)[0];
   if (!head.trim()) return { program: original, repaired: false, repairs: [] };
+
+  // Strip the paragraphs this repair owns BEFORE deciding what needs declaring.
+  // Doing it the other way round meant a goal was skipped because it was already
+  // declared, and then had its declaration deleted by the rewrite -- so the block
+  // shipped with the goal flat and nothing saying so. Anything the model wrote
+  // itself survives and still counts as a declaration.
+  const cleanedHead = head
+    .split(/\n\n+/)
+    .filter((para) => !DECLARATION_SENTINEL.test(para))
+    .join('\n\n')
+    .trimEnd();
+  const rest = original.slice(head.length).replace(/^\s*/, '');
+  const cleaned = `${cleanedHead}\n\n${rest}`;
+
+  const flags = collectUndeclaredGoalStatusFlags(analysis, cleaned);
+  if (!flags.length) {
+    // Nothing to declare. Only report a repair if stripping actually changed the
+    // program, which happens when a goal started progressing again.
+    const changed = cleaned !== original;
+    return { program: changed ? cleaned : original, repaired: changed, repairs: [] };
+  }
 
   const developed = developedLabels(analysis.targets || []);
   const sport = Number(intake.sport_sessions_per_week || 0);
@@ -121,9 +142,13 @@ export function normalizeGoalStatusDeclaration(program, intake = {}, analysis = 
     return `On ${f.goal}: this block holds it at a maintenance dose rather than developing it, on purpose.${why} Keeping the exposure protects what you already have and keeps it ready to progress in the next block; it is not an attempt to improve it in these four weeks.`;
   });
 
-  const rest = original.slice(head.length).replace(/^\s*/, '');
+  // Rewriting is not the same as changing. A later pass re-derives the same
+  // declarations from the same state and must report no repair, or the chain
+  // never settles and idempotency is meaningless.
+  const updated = `${cleanedHead}\n\n${lines.join('\n\n')}\n\n${rest}`;
+  if (updated === original) return { program: original, repaired: false, repairs: [] };
   return {
-    program: `${head.trimEnd()}\n\n${lines.join('\n\n')}\n\n${rest}`,
+    program: updated,
     repaired: true,
     repairs: flags.map((f) => ({ type: 'goal_status_declared', family: f.family, tier: f.tier })),
   };

@@ -679,6 +679,18 @@ export function collectRepairableValidationFailures(program, intake = {}, option
   if (supportingProgression.repaired) deterministic_repairs.push({ type: 'supporting_progression_standard', rows: supportingProgression.repairs });
 
 
+  // Declared twice on purpose. The first pass runs before the semantic checks,
+  // because the progression gate reads it. This one runs after every repair has
+  // settled, so the status the athlete reads describes the block they were
+  // actually given: an earlier pass can only declare what was true when it ran,
+  // and a later repair can change whether a goal moved. The repair rewrites its
+  // own paragraphs wholesale rather than appending, so the last pass wins.
+  const finalGoalStatus = normalizeGoalStatusDeclaration(candidate, intake, progressionAnalysis(candidate, intake));
+  if (finalGoalStatus.repaired) {
+    candidate = finalGoalStatus.program;
+    deterministic_repairs.push({ type: 'goal_status_declared_final', rows: finalGoalStatus.repairs });
+  }
+
   // Guidance-only, and last of the four so it reports what the block actually
   // ended up containing.
   const untestedBenchmark = normalizeUntestedBenchmarkDisclosure(candidate, intake);
