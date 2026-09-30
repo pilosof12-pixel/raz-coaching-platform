@@ -286,6 +286,40 @@ function stepPress(program, base, ceiling, probe = false) {
   return candidate;
 }
 
+// Week 4 consolidates, and the complementary press consolidates with it.
+//
+// makePushPressRow already writes 1 set in Week 4 and 2 in the build weeks, so
+// that is this module's own statement of the right dose. A block that arrived
+// with its own Push Press never went through that path, and the delivered
+// Advanced Hybrid carried 2 x 3 in all four weeks -- identical through a
+// consolidation week the rest of the block deloads. The grader charges it as a
+// flat secondary exposure, and the coach asked for Push Press to be the
+// optional press rather than a standing one.
+//
+// Only the consolidation week moves, and only downward: this never adds a set.
+function deloadComplementaryPress(program) {
+  let candidate = String(program || '');
+  const build = parseWeek(candidate, 2) || parseWeek(candidate, 1);
+  const week4 = parseWeek(candidate, 4);
+  if (!build || !week4 || !Number.isInteger(week4.index.sets)) return { program: candidate, repairs: [] };
+
+  const buildRow = build.rows.find((c) => /^push press$/i.test(rowName(build, c)));
+  const lateRow = week4.rows.find((c) => /^push press$/i.test(rowName(week4, c)));
+  if (!buildRow || !lateRow) return { program: candidate, repairs: [] };
+
+  const buildSets = Number(String(buildRow[build.index.sets] || '').match(/\d+/)?.[0]);
+  const lateSets = Number(String(lateRow[week4.index.sets] || '').match(/\d+/)?.[0]);
+  if (!Number.isFinite(buildSets) || !Number.isFinite(lateSets)) return { program: candidate, repairs: [] };
+  if (lateSets < buildSets || buildSets < 2) return { program: candidate, repairs: [] };
+
+  lateRow[week4.index.sets] = String(buildSets - 1);
+  if (Number.isInteger(week4.index.notes)) {
+    lateRow[week4.index.notes] = 'Low-cost complementary vertical-press microdose. Keep it fast and easy in consolidation week; one set is the whole job here.';
+  }
+  candidate = rewriteWeek(candidate, week4);
+  return { program: candidate, repairs: [{ week: 4, exercise: 'Push Press', action: 'deload_complementary_press', from: `${buildSets} sets`, to: `${buildSets - 1} sets` }] };
+}
+
 function progressNamedSecondaryPress(program, intake = {}) {
   const target = pressGoalTargetKg(intake);
   if (!target) return { program, repairs: [] };
@@ -403,6 +437,10 @@ export function normalizeAdvancedHybridOHPComplement(program, intake = {}) {
     candidate = progressed.program;
     repairs.push(...progressed.repairs);
   }
+
+  const deloaded = deloadComplementaryPress(candidate);
+  candidate = deloaded.program;
+  repairs.push(...deloaded.repairs);
 
   return { program: candidate, repaired: repairs.length > 0, repairs };
 }

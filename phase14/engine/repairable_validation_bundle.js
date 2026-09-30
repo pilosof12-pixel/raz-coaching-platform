@@ -90,7 +90,7 @@ import { normalizeHighRepGoalTesting } from './high_rep_goal_testing.js'; // V10
 import { normalizeImplausibleEffort } from './effort_plausibility.js'; // V105-EFFORT-PLAUSIBILITY-WIRED
 import { normalizeFreestandingBalance } from './freestanding_balance_progression.js'; // V106-FREESTANDING-BALANCE-WIRED
 import { normalizePrimaryVolumeProgression } from './primary_volume_progression.js'; // V107-PRIMARY-VOLUME-WIRED
-import { normalizeAssistedSkillProgression } from './assisted_skill_progression.js'; // V108-ASSISTED-SKILL-WIRED
+import { normalizeAssistedSkillProgression, normalizeAssistedGoalSkillProgression } from './assisted_skill_progression.js'; // V108-ASSISTED-SKILL-WIRED
 import { normalizeEventDistanceExposure } from './event_distance_exposure.js'; // V109-EVENT-DISTANCE-WIRED
 import { progressionAnalysis } from './coaching_progression_gpp.js'; // V101-GOAL-STATUS-WIRED
 import { normalizeYouthAcquisitionGoalFloors } from './youth_goal_floor_normalizer.js';
@@ -669,6 +669,12 @@ export function collectRepairableValidationFailures(program, intake = {}, option
   const eventDistance = normalizeEventDistanceExposure(candidate, intake);
   candidate = eventDistance.program;
   if (eventDistance.repaired) deterministic_repairs.push({ type: 'event_distance_exposure', rows: eventDistance.repairs });
+
+  // Any other assisted variant of a named goal skill -- the Advanced Hybrid's
+  // assisted One-Arm Pull-up is the costliest flat exposure the grader finds.
+  const assistedGoalSkill = normalizeAssistedGoalSkillProgression(candidate, intake);
+  candidate = assistedGoalSkill.program;
+  if (assistedGoalSkill.repaired) deterministic_repairs.push({ type: 'assisted_goal_skill_progression', rows: assistedGoalSkill.repairs });
 
   // Rewrites the assistance and the note, never the dose.
   const assistedSkill = normalizeAssistedSkillProgression(candidate, intake);

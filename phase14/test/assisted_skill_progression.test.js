@@ -97,3 +97,57 @@ test('the brief is bulleted and the chain applies the repair', () => {
   const bundle = fs.readFileSync(new URL('../engine/repairable_validation_bundle.js', import.meta.url), 'utf8');
   assert.match(bundle, /normalizeAssistedSkillProgression\(candidate, intake\)/);
 });
+
+// The grader's costliest finding on the Advanced Hybrid: "Assisted One-Arm
+// Pull-up is identical in all 4 weeks (2|1 per arm|minimum assistance for clean
+// reps) while it serves a stated primary improvement goal" -- 0.35, the primary
+// tier rate. The same defect as the youth muscle-up, on a different movement.
+test('an assisted variant of any named goal skill must shed assistance', async () => {
+  const fsm = await import('node:fs');
+  const A = JSON.parse(fsm.readFileSync(new URL('./fixtures/acceptance_intakes.json', import.meta.url), 'utf8'));
+  const { collectAssistedGoalSkillFlags, normalizeAssistedGoalSkillProgression } = await import('../engine/assisted_skill_progression.js');
+  const { parseWeek } = await import('../engine/v34_workload_accounting.js');
+  const { gradeProgram } = await import('../engine/coach_rules.js');
+
+  const H = 'Day\tExercise\tWeight\tSets\tReps\tRest\tTarget RPE\tNotes\tResults';
+  const flat = [1, 2, 3, 4].map((w) => [
+    `START_WEEK${w}_TSV`, H,
+    `Mon\tOne-Arm Pull-up\tBodyweight\t3\t1-2 each side\t3 min\t8\tPrimary skill work.\t`,
+    `Tue\tAssisted One-Arm Pull-up\tMinimum assistance for clean reps\t2\t1 per arm\t3 min\t7\tSupport exposure.\t`,
+    `END_WEEK${w}_TSV`,
+  ].join('\n')).join('\n\n');
+
+  const flags = collectAssistedGoalSkillFlags(flat, A.advanced_hybrid);
+  assert.equal(flags.length, 1);
+  assert.equal(flags[0].movement, 'One-Arm Pull-up');
+
+  const out = normalizeAssistedGoalSkillProgression(flat, A.advanced_hybrid);
+  assert.equal(out.repaired, true);
+  const assist = (w) => {
+    const parsed = parseWeek(out.program, w);
+    const c = parsed.rows.find((r) => /Assisted One-Arm Pull-up/i.test(String(r[parsed.exercise])));
+    return { load: String(c[parsed.load]), sets: c[parsed.sets], reps: c[parsed.reps] };
+  };
+  assert.equal(new Set([1, 2, 3, 4].map((w) => assist(w).load)).size, 4, 'every week names its own rung');
+  // Assistance reduction, not more volume.
+  for (const w of [1, 2, 3, 4]) {
+    assert.equal(assist(w).sets, '2', `week ${w} sets`);
+    assert.equal(assist(w).reps, '1 per arm', `week ${w} reps`);
+  }
+  // And the finding it exists to answer is gone.
+  const before = (gradeProgram(flat, A.advanced_hybrid) || []).filter((f) => f.rule === 'IMPROVEMENT_GOAL_FLAT' && /Assisted/i.test(f.movement));
+  const after = (gradeProgram(out.program, A.advanced_hybrid) || []).filter((f) => f.rule === 'IMPROVEMENT_GOAL_FLAT' && /Assisted/i.test(f.movement));
+  assert.equal(before.length, 1);
+  assert.deepEqual(after, []);
+  // Converges.
+  assert.equal(normalizeAssistedGoalSkillProgression(out.program, A.advanced_hybrid).repaired, false);
+});
+
+test('the bar muscle-up keeps its own ladder and is not double-repaired', async () => {
+  const fsm = await import('node:fs');
+  const A = JSON.parse(fsm.readFileSync(new URL('./fixtures/acceptance_intakes.json', import.meta.url), 'utf8'));
+  const { collectAssistedGoalSkillFlags } = await import('../engine/assisted_skill_progression.js');
+  // Banded Muscle-up is handled by the muscle-up rungs; the generic ladder must
+  // not also claim it, or the two would overwrite each other's wording.
+  assert.deepEqual(collectAssistedGoalSkillFlags(DELIVERED, YOUTH), []);
+});

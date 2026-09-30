@@ -75,7 +75,8 @@ test('normalizer is idempotent when Push Press already exists', () => {
   const original = advancedHybridLaunchProgram();
   const fixed = normalizeAdvancedHybridOHPComplement(original, ADVANCED_HYBRID_LAUNCH_INTAKE);
   // No Push Press is added, because the block already has one every week.
-  assert.equal(fixed.repairs.some((r) => r.exercise === 'Push Press'), false);
+  // Deloading the existing Week 4 row is a different action and is allowed.
+  assert.equal(fixed.repairs.some((r) => r.exercise === 'Push Press' && r.action !== 'deload_complementary_press'), false);
   assert.equal((fixed.program.match(/\tPush Press\t/g) || []).length,
     (original.match(/\tPush Press\t/g) || []).length);
   // The flat 70 kg press does step, once, and then the normalizer is a fixed
@@ -167,4 +168,30 @@ test('a press the hierarchy held is never stepped back up', () => {
   const twice = normalizeAdvancedHybridOHPComplement(once.program, advancedIntake);
   assert.equal(twice.program, once.program, 'the held press must be a fixed point');
   assert.match(twice.program, /START_WEEK3_TSV[\s\S]*?Overhead Press\t75 kg/i);
+});
+
+test('the complementary press consolidates in Week 4 like everything else', async () => {
+  const fsm = await import('node:fs');
+  const A = JSON.parse(fsm.readFileSync(new URL('./fixtures/acceptance_intakes.json', import.meta.url), 'utf8'));
+  const { parseWeek } = await import('../engine/v34_workload_accounting.js');
+  const delivered = fsm.readFileSync(new URL('./fixtures/advanced_hybrid-program.txt', import.meta.url), 'utf8');
+
+  const pushSets = (program, week) => {
+    const parsed = parseWeek(program, week);
+    const c = parsed.rows.find((r) => /^Push Press$/i.test(String(r[parsed.exercise]).trim()));
+    return c ? c[parsed.sets] : null;
+  };
+
+  // makePushPressRow already writes 1 set in Week 4 and 2 in the build weeks, so
+  // that is this module's own statement of the right dose. A block that arrived
+  // with its own Push Press never went through that path: the delivered one
+  // carries 2 x 3 in all four weeks, identical through a consolidation week the
+  // rest of the block deloads.
+  assert.equal(pushSets(delivered, 4), '2');
+  const out = normalizeAdvancedHybridOHPComplement(delivered, A.advanced_hybrid);
+  assert.equal(pushSets(out.program, 4), '1');
+  // Build weeks are untouched -- this never adds pressing, and the coach asked
+  // for Push Press to be the optional press, not a standing one.
+  for (const w of [1, 2, 3]) assert.equal(pushSets(out.program, w), '2', `week ${w}`);
+  assert.equal(normalizeAdvancedHybridOHPComplement(out.program, A.advanced_hybrid).program, out.program);
 });

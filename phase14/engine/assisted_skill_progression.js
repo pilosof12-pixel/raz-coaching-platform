@@ -34,6 +34,12 @@ export const ASSISTED_SKILL_STATIC = 'V108_ASSISTED_SKILL_STATIC';
 // The integrated skill, as opposed to its components. A transition drill or a
 // high pull is a piece of the movement; this is the whole thing with help.
 const INTEGRATED_ASSISTED = /\b(?:banded|assisted)\s+(?:bar\s+)?muscle-?up\b/i;
+// Any assisted variant of a skill the athlete has named as a goal. The Advanced
+// Hybrid block asks for four strict One-Arm Pull-ups and then prescribes
+// "Assisted One-Arm Pull-up | Minimum assistance for clean reps | 2 x 1 per arm"
+// in all four weeks -- the same defect as the youth muscle-up, on a PRIMARY
+// goal, and the costliest single finding the grader raises on that block.
+const ASSISTED_PREFIX = /^\s*(?:banded|assisted|band[- ]assisted)\s+(.+?)\s*$/i;
 const OWNS_IT = /\b(?:bar )?muscle-?up\b[^.\n]{0,40}\b(?:achieved|owned|established|consistent)\b/i;
 const BAR_GOAL = /\b(?:first|achieve|get)\b[^.\n]{0,30}\bbar muscle-?up\b/i;
 const BUILD_WEEKS = [1, 2, 3];
@@ -56,6 +62,55 @@ const RUNGS = {
     note: 'Consolidation: repeat the assistance you owned in Week 3 rather than chasing a lighter one. Up to 2 fresh unassisted attempts first if last week was clean.',
   },
 };
+
+// Rungs for an assisted skill that is not the bar muscle-up. Same principle --
+// assistance comes off before anything else does -- in language that fits a
+// movement with no band and no catch, where the help may be a foot, the free
+// hand or a band.
+function genericRungs(movement) {
+  const m = String(movement || 'the skill');
+  return {
+    1: {
+      weight: 'Assistance that lets every rep stay clean and fast',
+      note: `Assisted ${m}: this is the rung to beat. If every rep is clean and fast, take a measurable step off the assistance next week -- a lighter band, less foot, less hand. Stop the set the moment a rep slows.`,
+    },
+    2: {
+      weight: 'One measurable step less than Week 1, if Week 1 was clean',
+      note: `Assisted ${m}: assistance comes off before reps or sets do. Take the step down only if every Week 1 rep was clean and fast; if it was not, repeat Week 1's assistance and earn it this week. Same reps and sets either way.`,
+    },
+    3: {
+      weight: 'The least assistance you can still hold clean form on',
+      note: `Assisted ${m}: least useful assistance. If Week 2 was clean, take one or two fresh unassisted attempts before the assisted work and stop at the first slow one. The assisted sets stay as written whether or not the attempts go in.`,
+    },
+    4: {
+      weight: 'The least assistance you owned in Week 3 -- no new step this week',
+      note: `Assisted ${m}: consolidation. Repeat the assistance you owned in Week 3 rather than chasing a lighter one, and keep every rep clean.`,
+    },
+  };
+}
+
+// The assisted rows that serve a skill this athlete actually named.
+export function assistedGoalSkillRows(program, intake = {}, week) {
+  const parsed = parseWeek(program, week);
+  if (!parsed) return null;
+  const goals = [intake.primary_goals, intake.secondary_goals].flat().filter(Boolean).map(String).join(' | ');
+  const rows = [];
+  parsed.rows.forEach((cells, i) => {
+    const name = String(cells[parsed.exercise] || '').trim();
+    if (!name || /^\[WARMUP\]/i.test(name)) return;
+    const m = name.match(ASSISTED_PREFIX);
+    if (!m) return;
+    const base = m[1];
+    // "One-Arm Pull-up" has to be found in "4 One arm pullups": punctuation and
+    // plurals differ, so both sides are reduced to their letters.
+    const key = base.toLowerCase().replace(/[^a-z]/g, '');
+    const hay = goals.toLowerCase().replace(/[^a-z]/g, '');
+    const singular = key.replace(/s$/, '');
+    if (!key || (!hay.includes(key) && !hay.includes(singular))) return;
+    rows.push({ i, cells, name, base });
+  });
+  return { parsed, rows };
+}
 
 export function assistedBarMuscleUpGoal(intake = {}) {
   const goals = [intake.primary_goals].flat().filter(Boolean).map(String).join(' | ');
@@ -106,6 +161,39 @@ export function collectAssistedSkillFlags(program, intake = {}) {
   return flags;
 }
 
+// The same rule for every other assisted variant of a named goal skill.
+export function collectAssistedGoalSkillFlags(program, intake = {}) {
+  const text = String(program || '');
+  const byMovement = new Map();
+  for (const week of BUILD_WEEKS) {
+    const found = assistedGoalSkillRows(text, intake, week);
+    if (!found) continue;
+    for (const row of found.rows) {
+      if (INTEGRATED_ASSISTED.test(row.name)) continue; // owned by the muscle-up ladder
+      const key = row.name.toLowerCase();
+      if (!byMovement.has(key)) byMovement.set(key, { movement: row.base, weeks: [] });
+      byMovement.get(key).weeks.push({
+        week,
+        assistance: String(found.parsed.load != null ? row.cells[found.parsed.load] : '').trim().toLowerCase(),
+      });
+    }
+  }
+  const flags = [];
+  for (const { movement, weeks } of byMovement.values()) {
+    if (weeks.length < 2) continue;
+    const distinct = new Set(weeks.map((w) => w.assistance));
+    if (distinct.size > 1) continue;
+    flags.push({
+      code: ASSISTED_SKILL_STATIC,
+      movement,
+      weeks: weeks.map((w) => w.week),
+      detail: `Assisted ${movement} asks for the same assistance in every build week while it serves a named goal. `
+        + 'An assisted skill progresses by needing less help.',
+    });
+  }
+  return flags;
+}
+
 export function normalizeAssistedSkillProgression(program, intake = {}) {
   const original = String(program || '');
   if (!assistedBarMuscleUpGoal(intake)) return { program: original, repaired: false, repairs: [] };
@@ -129,6 +217,38 @@ export function normalizeAssistedSkillProgression(program, intake = {}) {
     });
     out = rebuild(out, parsed, rows);
     repairs.push({ week, rows: found.rows.length, assistance: rung.weight });
+  }
+
+  if (out === original) return { program: original, repaired: false, repairs: [] };
+  return { program: out, repaired: true, repairs };
+}
+
+export function normalizeAssistedGoalSkillProgression(program, intake = {}) {
+  const original = String(program || '');
+  const flagged = collectAssistedGoalSkillFlags(original, intake);
+  if (!flagged.length) return { program: original, repaired: false, repairs: [] };
+  const targets = new Set(flagged.map((f) => String(f.movement).toLowerCase()));
+
+  let out = original;
+  const repairs = [];
+  for (const week of [1, 2, 3, 4]) {
+    const found = assistedGoalSkillRows(out, intake, week);
+    if (!found || !found.rows.length) continue;
+    const { parsed } = found;
+    if (parsed.load == null || parsed.notes == null) continue;
+    const hits = found.rows.filter((r) => targets.has(String(r.base).toLowerCase()) && !INTEGRATED_ASSISTED.test(r.name));
+    if (!hits.length) continue;
+    const rows = parsed.rows.map((cells, i) => {
+      const hit = hits.find((r) => r.i === i);
+      if (!hit) return cells;
+      const rung = genericRungs(hit.base)[week];
+      const copy = cells.slice();
+      copy[parsed.load] = rung.weight;
+      copy[parsed.notes] = rung.note;
+      return copy;
+    });
+    out = rebuild(out, parsed, rows);
+    repairs.push({ week, movements: hits.map((h) => h.name) });
   }
 
   if (out === original) return { program: original, repaired: false, repairs: [] };
