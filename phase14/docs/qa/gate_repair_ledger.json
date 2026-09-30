@@ -1949,6 +1949,26 @@
     "killedLive": ""
   },
   {
+    "code": "V106_FREESTANDING_BALANCE_MISSING",
+    "modules": [
+      "engine/freestanding_balance_progression.js"
+    ],
+    "owners": [
+      "collectFreestandingBalanceFlags"
+    ],
+    "advisory": false,
+    "reachable": true,
+    "repairs": [
+      "normalizeFreestandingBalance"
+    ],
+    "wired": [
+      "normalizeFreestandingBalance"
+    ],
+    "tested": true,
+    "stressed": false,
+    "killedLive": ""
+  },
+  {
     "code": "V34_DUPLICATE_SPECIFIC_RAMP",
     "modules": [
       "engine/v34_prescription_consistency.js"

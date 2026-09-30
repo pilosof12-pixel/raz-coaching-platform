@@ -88,6 +88,7 @@ import { normalizeGoalStatusDeclaration } from './goal_status_declaration.js'; /
 import { normalizeWideRepRange } from './rep_range_decision_rule.js'; // V103-WIDE-REP-RANGE-WIRED
 import { normalizeHighRepGoalTesting } from './high_rep_goal_testing.js'; // V104-HIGH-REP-TESTING-WIRED
 import { normalizeImplausibleEffort } from './effort_plausibility.js'; // V105-EFFORT-PLAUSIBILITY-WIRED
+import { normalizeFreestandingBalance } from './freestanding_balance_progression.js'; // V106-FREESTANDING-BALANCE-WIRED
 import { progressionAnalysis } from './coaching_progression_gpp.js'; // V101-GOAL-STATUS-WIRED
 import { normalizeYouthAcquisitionGoalFloors } from './youth_goal_floor_normalizer.js';
 import { normalizeYouthSessionQuality } from './youth_session_quality_normalizer.js';
@@ -660,6 +661,12 @@ export function collectRepairableValidationFailures(program, intake = {}, option
 
   // Before the note repairs, because it changes sets and reps and those read the
   // settled prescription.
+  // Adds a row, so it runs before the note repairs and before the goal-status
+  // declaration reads whether the handstand goal actually moved.
+  const freestandingBalance = normalizeFreestandingBalance(candidate, intake);
+  candidate = freestandingBalance.program;
+  if (freestandingBalance.repaired) deterministic_repairs.push({ type: 'freestanding_balance_exposure', rows: freestandingBalance.repairs });
+
   const highRepTesting = normalizeHighRepGoalTesting(candidate, intake);
   candidate = highRepTesting.program;
   if (highRepTesting.repaired) deterministic_repairs.push({ type: 'high_rep_goal_submaximal_volume', rows: highRepTesting.repairs });
