@@ -87,6 +87,7 @@ import { normalizeSelfSelectedLoadProtocol } from './self_selected_load_protocol
 import { normalizeGoalStatusDeclaration } from './goal_status_declaration.js'; // V101-GOAL-STATUS-WIRED
 import { normalizeWideRepRange } from './rep_range_decision_rule.js'; // V103-WIDE-REP-RANGE-WIRED
 import { normalizeHighRepGoalTesting } from './high_rep_goal_testing.js'; // V104-HIGH-REP-TESTING-WIRED
+import { normalizeImplausibleEffort } from './effort_plausibility.js'; // V105-EFFORT-PLAUSIBILITY-WIRED
 import { progressionAnalysis } from './coaching_progression_gpp.js'; // V101-GOAL-STATUS-WIRED
 import { normalizeYouthAcquisitionGoalFloors } from './youth_goal_floor_normalizer.js';
 import { normalizeYouthSessionQuality } from './youth_session_quality_normalizer.js';
@@ -662,6 +663,12 @@ export function collectRepairableValidationFailures(program, intake = {}, option
   const highRepTesting = normalizeHighRepGoalTesting(candidate, intake);
   candidate = highRepTesting.program;
   if (highRepTesting.repaired) deterministic_repairs.push({ type: 'high_rep_goal_submaximal_volume', rows: highRepTesting.repairs });
+
+  // After the set/rep repairs and before the notes, so it judges the load that
+  // will actually be prescribed.
+  const effortPlausibility = normalizeImplausibleEffort(candidate, intake);
+  candidate = effortPlausibility.program;
+  if (effortPlausibility.repaired) deterministic_repairs.push({ type: 'effort_matched_to_load', rows: effortPlausibility.repairs });
 
   const wideRepRange = normalizeWideRepRange(candidate, intake);
   candidate = wideRepRange.program;

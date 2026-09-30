@@ -1913,6 +1913,26 @@
     "killedLive": ""
   },
   {
+    "code": "V105_EFFORT_IMPLAUSIBLE_FOR_LOAD",
+    "modules": [
+      "engine/effort_plausibility.js"
+    ],
+    "owners": [
+      "collectImplausibleEffortFlags"
+    ],
+    "advisory": false,
+    "reachable": true,
+    "repairs": [
+      "normalizeImplausibleEffort"
+    ],
+    "wired": [
+      "normalizeImplausibleEffort"
+    ],
+    "tested": true,
+    "stressed": false,
+    "killedLive": ""
+  },
+  {
     "code": "V34_DUPLICATE_SPECIFIC_RAMP",
     "modules": [
       "engine/v34_prescription_consistency.js"

@@ -323,7 +323,7 @@ export function goalDoseFlags(program, intake={}, parsed=null) {
   return flags;
 }
 
-function liftFamily(name='') {
+export function liftFamily(name='') {
   const s=norm(name);
   if (/squat/.test(s)) return 'squat';
   if (/(chin.?up|pull.?up)/.test(s)) return 'vertical_pull';
@@ -334,7 +334,7 @@ function liftFamily(name='') {
   return null;
 }
 
-function canonicalLift(name='') {
+export function canonicalLift(name='') {
   return norm(name)
     .replace(/\[[^\]]+\]/g,'')
     .replace(/[:].*$/,'')
@@ -345,7 +345,7 @@ function canonicalLift(name='') {
     .trim(); // EXACT-VARIATION-KEY: keep box/front/pause/ROM/push-press/etc distinct.
 }
 
-function benchmarkRows(intake={}) {
+export function benchmarkRows(intake={}) {
   const markers=Array.isArray(intake.performance_markers)?intake.performance_markers:[];
   const src=[...markers,...String(intake.current_numbers||'').split(/\n|;/)].map(String).filter(Boolean);
   const out=[];
