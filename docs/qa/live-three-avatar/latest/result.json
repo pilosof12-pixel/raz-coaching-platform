@@ -1,68 +1,39 @@
 {
-  "timestamp": "2026-09-29T14:16:26.127Z",
+  "timestamp": "2026-09-30T15:24:59.126Z",
   "base": "https://raz-coaching-platform.onrender.com",
-  "head_sha": "483741c934c36e8b1b04fe8bc33226fb837c6113",
-  "runtime": "live85 2026-09-29T07:20:00Z",
+  "head_sha": "e8821f93461848e79859088af00a19293cd13a6e",
+  "runtime": "live87 2026-09-30T15:23:49Z",
   "results": [
     {
-      "id": "advanced_hybrid",
-      "job_id": "9ed1154f43cde227b1ec86983563cbb6",
-      "ok": true,
-      "status": "done",
-      "stage": "finalizing",
+      "id": "sprint_triathlete",
+      "job_id": "e80a8df291806955941489065a31d383",
+      "ok": false,
+      "status": "error",
+      "stage": "generating",
       "attempt": 1,
-      "detail": "saving program after 1 model call(s)",
-      "last_seen_status": "done",
-      "error": null,
-      "program_chars": 24406,
-      "seconds": 588
+      "detail": "initial generation",
+      "last_seen_status": "error",
+      "error": "This operation was aborted QA trace: T1:request_ceiling -> T2:request_ceiling:JOB_BUDGET_SPENT. [QA:20]",
+      "program_chars": 0,
+      "seconds": 1202
     },
     {
-      "id": "youth_gymnastics",
-      "job_id": "a82fefba0ebeb88a0e853bd6b56f31f0",
-      "ok": true,
-      "status": "done",
-      "stage": "finalizing",
+      "id": "inseason_basketball",
+      "job_id": "bef05394ef8b8d4b350b98b241632440",
+      "ok": false,
+      "status": "error",
+      "stage": "generating",
       "attempt": 1,
-      "detail": "saving program after 1 model call(s)",
-      "last_seen_status": "done",
-      "error": null,
-      "program_chars": 15741,
-      "seconds": 211
-    },
-    {
-      "id": "tactical_3k",
-      "job_id": "cdf51e26952851adc486c7eec18bf7fc",
-      "ok": true,
-      "status": "done",
-      "stage": "finalizing",
-      "attempt": 2,
-      "detail": "saving program after 2 model call(s) QA trace: A1:SPORT_DAY_COUPLING_VIOLATION+TACTICAL_SCHEDULE_ARCHITECTURE_VIOLATION+TACTICAL_GPP_COVERAGE_MISSING. First failure evidence: PRIOR ATTEMPT FAILED SPORT/CALENDAR VALIDATION. days_per_week means requested strength sessions, not total active calendar days. Week 1: expected 3 strength/skill-strength days, found 4 (monday, tuesday, wednesday, saturday). Week 2: expected 3 strength/skill-strength days, found 4 (monday, tuesday, wednesday, saturday). Week 3: expected 3 strength/skill-strength days, found 4 (monday, tuesday, wednesday, saturday). Week 4: expected 3 strength/skill-strength days, found 4 (monday, tuesday, wednesday, saturday). Keep run-only, ruck-only, sport-only and conditioning-only days in the weekly calen",
-      "last_seen_status": "done",
-      "error": null,
-      "program_chars": 19559,
-      "seconds": 677
-    },
-    {
-      "id": "masters_return",
-      "job_id": "cf63c5bb68fcb5a536c2f8358b5f71b1",
-      "ok": true,
-      "status": "done",
-      "stage": "finalizing",
-      "attempt": 1,
-      "detail": "saving program after 1 model call(s) QA trace: A1:V34_PROGRESSION_LANGUAGE_MISMATCH -> A1:converged-without-regeneration. First failure evidence: Prescription/note consistency: Leg Press Machine (Week 4) claims reduced volume, but that metric did not fall from the immediately previous week. Make every quantitative claim in a note agree with that row's own Sets, Reps and Weight fields, or state it as an explicitly conditional option. Do not reference a load that is neither prescribed on the row nor an established benchmark.",
-      "last_seen_status": "done",
-      "error": null,
-      "program_chars": 24420,
-      "seconds": 232
+      "detail": "initial generation",
+      "last_seen_status": "error",
+      "error": "This operation was aborted QA trace: T1:request_ceiling -> T2:request_ceiling:JOB_BUDGET_SPENT. [QA:20]",
+      "program_chars": 0,
+      "seconds": 1207
     }
   ],
-  "reasoning_effort": "medium",
   "selection": [
-    "advanced_hybrid",
-    "youth_gymnastics",
-    "tactical_3k",
-    "masters_return"
+    "sprint_triathlete",
+    "inseason_basketball"
   ],
-  "ok": true
+  "ok": false
 }
