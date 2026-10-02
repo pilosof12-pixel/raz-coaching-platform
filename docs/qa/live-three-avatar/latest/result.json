@@ -1,39 +1,67 @@
 {
-  "timestamp": "2026-10-02T15:22:24.079Z",
+  "timestamp": "2026-10-02T15:51:19.151Z",
   "base": "https://raz-coaching-platform.onrender.com",
-  "head_sha": "c73cabe17c452b8c588a5197a55b76b7afc8a8b6",
-  "runtime": "live93 2026-10-02T15:21:00Z",
+  "head_sha": "2b7d36c26d074128c1823e96a21a3836c87f7d5f",
+  "runtime": "live94 2026-10-02T15:52:00Z",
   "results": [
     {
-      "id": "masters_return",
-      "job_id": "2d3590c300320a13a37d800f74768e15",
+      "id": "advanced_hybrid",
+      "job_id": "ecf8225456d980e68ec7dff73073cf50",
       "ok": true,
       "status": "done",
       "stage": "finalizing",
-      "attempt": 1,
-      "detail": "saving program after 1 model call(s) QA trace: E0:medium.",
+      "attempt": 2,
+      "detail": "saving program after 2 model call(s) QA trace: E0:medium -> A1:WEEKLY_MRV_EXCEEDED+EVENT_PROGRESSING_SESSION_MISSING. First failure evidence: PRIOR ATTEMPT FAILED WEEKLY VOLUME VALIDATION. The following single-week workload is grossly above the internal reference band: [Week 1 pull: 35.8 (17 program + 18.8 sport baseline debit; raw sport heuristic 25) vs reference 25; Week 1 push: 33.5 (17 program + 16.5 sport baseline debit; raw sport heuristic 30) vs reference 22; Week 2 pull: 35.8 (17 program + 18.8 sport baseline debit; raw sport heuristic 25) vs reference 25; Week 2 push: 32.5 (16 program + 16.5 sport baseline debit; raw sport heuristic 30) vs reference 22; Week 3 pull: 35.8 (17 program + 18.8 sport baseline debit; raw sport he",
       "last_seen_status": "done",
       "error": null,
-      "program_chars": 25001,
-      "seconds": 304
+      "program_chars": 28418,
+      "seconds": 491
     },
     {
-      "id": "sprint_triathlete",
-      "job_id": "d4d67bd7ad20ed68f47765aef760a783",
+      "id": "youth_gymnastics",
+      "job_id": "94ed05cde783346cbd045ea113fa0f92",
       "ok": true,
       "status": "done",
       "stage": "finalizing",
       "attempt": 4,
-      "detail": "delivered with unresolved rules: TARGET_MODALITY_EXPOSURE_REDUCED QA trace: E0:medium -> T1:request_ceiling@low -> A1:TARGET_MODALITY_EXPOSURE_REDUCED+EVENT_PROGRESSING_SESSION_MISSING -> A2:TARGET_MODALITY_EXPOSURE_REDUCED -> A3:TARGET_MODALITY_EXPOSURE_REDUCED -> A4:TARGET_MODALITY_EXPOSURE_REDUCED. First failure evidence: Week 4: running is a named primary performance goal. The intake documents about 3 current running exposure(s) per week, but Week 1 programs 2. Do not silently remove target-modality practice; preserve the athlete's stated current exposure unless the authored plan makes and explains a deliberate recovery tradeoff.",
+      "detail": "delivered with unresolved rules: YOUTH_REDUNDANT_HANDSTAND_CAPACITY QA trace: E0:medium -> A1:YOUTH_REDUNDANT_HANDSTAND_CAPACITY+V43_SKILL_QUOTA_WITHOUT_CEILING -> A2:YOUTH_REDUNDANT_HANDSTAND_CAPACITY -> A3:YOUTH_REDUNDANT_HANDSTAND_CAPACITY -> A4:YOUTH_REDUNDANT_HANDSTAND_CAPACITY. First failure evidence: PRIOR ATTEMPT FAILED YOUTH PER-SESSION SKILL-QUALITY VALIDATION. Week 1 session a duplicates static handstand capacity (Freestanding Handstand Hold + Wall Handstand Hold); Week 1 session b duplicates static handstand capacity (Freestanding Handstand Hold + Handstand Hold); Week 2 session a duplicates static handstand capacity (Freestanding Handstand Hold + Wall Handstand Hold); Week 2 session b duplicates static handstand capacity (Freestanding Handstand Hold + Handstand Hold); Week 3 session a duplicates static handstand capacity (Freestanding Handstand Hold + Wall Handstand Hold); Week 3 ses",
       "last_seen_status": "done",
       "error": null,
-      "program_chars": 17275,
-      "seconds": 843
+      "program_chars": 18289,
+      "seconds": 528
+    },
+    {
+      "id": "tactical_3k",
+      "job_id": "227641d8ecdbaace30050417d8d2dc98",
+      "ok": false,
+      "status": "error",
+      "stage": "generating",
+      "attempt": 2,
+      "detail": "regenerating after quality check [E0:medium -> T1:request_ceiling@low -> A1:SPORT_DAY_COUPLING_VIOLATION+PULL_UP_DOSE_EXCEEDS_KNOWN_CAPACITY+TACTICAL_GPP_COVERAGE_MISSING]",
+      "last_seen_status": "error",
+      "error": "You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/.",
+      "program_chars": 0,
+      "seconds": 701
+    },
+    {
+      "id": "inseason_basketball",
+      "job_id": "aea714e1f74ecadccd8b85b2b3d1e773",
+      "ok": false,
+      "status": "error",
+      "stage": "generating",
+      "attempt": 1,
+      "detail": "initial generation",
+      "last_seen_status": "error",
+      "error": "You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/.",
+      "program_chars": 0,
+      "seconds": 4
     }
   ],
   "selection": [
-    "masters_return",
-    "sprint_triathlete"
+    "advanced_hybrid",
+    "youth_gymnastics",
+    "tactical_3k",
+    "inseason_basketball"
   ],
-  "ok": true
+  "ok": false
 }
