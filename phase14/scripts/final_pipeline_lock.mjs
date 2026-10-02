@@ -83,7 +83,7 @@ export function lockFinalPipelineSource(input) {
 
   once(
     '  const failCounts = Object.create(null);\n  let lastValid = null;\n  const deadline = Date.now() + BUILD_JOB_TIMEOUT_MS;',
-    '  const failCounts = Object.create(null);\n  let lastValid = null;\n  let repairCandidate = null;\n  let repairFeedback = "";\n  const qaTrace = [];\n  let lastRepairDetail = "";\n  const deadline = Date.now() + BUILD_JOB_TIMEOUT_MS;',
+    '  const failCounts = Object.create(null);\n  let lastValid = null;\n  let repairCandidate = null;\n  let repairFeedback = "";\n  // The effort a build OPENS at, which the trace never recorded. Retries were\n  // annotated with "@medium" but the first attempt was not, so a run could not\n  // say what it had started from -- and /api/health is redacted to {ok:true} in\n  // production on purpose, so the deployed value could not be read from outside\n  // either. Settling whether high or medium should be the default took five\n  // separate runs partly because of that. It belongs in the acceptance record.\n  const qaTrace = intake && intake.qa_diagnostics === true ? [`E0:${reasoningEffortFor(intake)}`] : [];\n  let lastRepairDetail = "";\n  const deadline = Date.now() + BUILD_JOB_TIMEOUT_MS;',
     'internal repair state'
   );
 

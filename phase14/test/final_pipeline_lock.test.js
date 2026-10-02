@@ -143,7 +143,15 @@ test('repair prompt forbids review placeholders and unrelated conditioning subst
 
 test('safe validator-code trace exists only when QA diagnostics are requested', () => {
   const out = lockFinalPipelineSource(fixture());
-  assert.match(out, /const qaTrace = \[\]/);
+  // The trace opens empty for an ordinary build and is seeded with the
+  // configured effort only under diagnostics. This used to assert the literal
+  // `const qaTrace = []`, which is weaker than it looks: the point is not the
+  // shape of the initialiser but that nothing about the configuration reaches a
+  // build that did not ask for diagnostics. The transient-exhaustion path below
+  // annotates the thrown error with the trace and is NOT gated, so a seed that
+  // ignored qa_diagnostics would print the effort into a paying customer's
+  // failure message.
+  assert.match(out, /const qaTrace = intake && intake\.qa_diagnostics === true \? \[`E0:\$\{reasoningEffortFor\(intake\)\}`\] : \[\]/);
   assert.match(out, /qaTrace\.push\(`A\$\{attempt\}:\$\{repairLabel\}`\)/);
   assert.match(out, /Array\.isArray\(err\.flags\)/);
   assert.match(out, /intake && intake\.qa_diagnostics === true/);

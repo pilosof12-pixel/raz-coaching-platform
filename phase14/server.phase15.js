@@ -2356,7 +2356,13 @@ async function generateValidatedProgram(intake, onProgress = async () => {}) {
   let lastValid = null;
   let repairCandidate = null;
   let repairFeedback = "";
-  const qaTrace = [];
+  // The effort a build OPENS at, which the trace never recorded. Retries were
+  // annotated with "@medium" but the first attempt was not, so a run could not
+  // say what it had started from -- and /api/health is redacted to {ok:true} in
+  // production on purpose, so the deployed value could not be read from outside
+  // either. Settling whether high or medium should be the default took five
+  // separate runs partly because of that. It belongs in the acceptance record.
+  const qaTrace = intake && intake.qa_diagnostics === true ? [`E0:${reasoningEffortFor(intake)}`] : [];
   let lastRepairDetail = "";
   const deadline = Date.now() + BUILD_JOB_TIMEOUT_MS;
   // Tell the transport which budget owns its calls, so a request cannot run
