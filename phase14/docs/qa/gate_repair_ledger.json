@@ -1503,8 +1503,7 @@
       "engine/semantic_program_qa.js"
     ],
     "owners": [
-      "collectExerciseRows",
-      "validateSportDayCouplingSemantic"
+      "collectExerciseRows"
     ],
     "advisory": false,
     "reachable": true,

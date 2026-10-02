@@ -61,6 +61,28 @@ function racePartDays(model, weekNumber, components) {
     .some((x) => names.some((re) => re.test(String(x?.display_name || x?.raw_display_name || '')))));
 }
 
+// A race component is counted as a gym day because for most multi-component
+// events it is one: a Hyrox card is sled pushes, sandbag lunges and wall balls,
+// and those happen where the barbells are. Swimming, cycling and running do
+// not.
+//
+// For the sprint triathlete that made this gate unsatisfiable by construction.
+// Her components are Swim, Bike and Run, so every running day was counted as a
+// gym day, and she has two gym days and seven sport sessions -- no program for a
+// triathlete can put her race work inside her gym days. Run #160 shows exactly
+// that: four attempts raising SPORT_DAY_COUPLING_VIOLATION with identical
+// content, because the model was being asked for something that cannot exist.
+// Then a salvage path delivered the program anyway, still violating it.
+//
+// So the endurance disciplines are not gym days. Rowing stays, because a Hyrox
+// row is an erg in the gym, and this is a list of the three disciplines that are
+// definitionally elsewhere rather than a guess about equipment.
+const NON_GYM_RACE_COMPONENT = /^\s*(?:open[- ]water\s+)?(?:swim(?:ming)?|bike|cycle|cycling|ride|run(?:ning)?|trail\s+run)\s*$/i;
+
+export function gymRelevantComponents(components = []) {
+  return (components || []).filter((c) => !NON_GYM_RACE_COMPONENT.test(String(c || '')));
+}
+
 export function strengthFrequencyViolations(model, intake = {}) {
   const requested = requestedStrengthSessions(intake);
   const available = availableStrengthDays(intake);
@@ -70,7 +92,10 @@ export function strengthFrequencyViolations(model, intake = {}) {
   for (const week of model?.weeks || []) {
     const counted = new Map();
     for (const d of strengthDaysForWeek(model, week.week)) counted.set(d.day, d);
-    for (const d of racePartDays(model, week.week, components)) counted.set(d.day, d);
+    // Only components that are actually gym work. A swim, a ride or a run is a
+    // sport session, and counting it here is what made this gate impossible for
+    // a triathlete to satisfy.
+    for (const d of racePartDays(model, week.week, gymRelevantComponents(components))) counted.set(d.day, d);
     const strengthDays = [...counted.values()];
     if (available) {
       for (const day of strengthDays) {
