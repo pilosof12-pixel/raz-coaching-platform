@@ -90,7 +90,21 @@ const progressOld = '    await progress("finalizing", Number(buildUsage?.calls |
 const progressNew = `    const qaTraceSuffix = intake && intake.qa_diagnostics === true && Array.isArray(lastQaTrace) && lastQaTrace.length
       ? \` QA trace: \${lastQaTrace.join(" -> ")}.\`
       : ""; // QA-TRACE-DIAGNOSTICS-DETAIL
-    await progress("finalizing", Number(buildUsage?.calls || 0), \`saving program after \${Number(buildUsage?.calls || 0)} model call(s)\${qaTraceSuffix}\`);`;
+    // Where the seconds went. masters_return came in at 304 against a
+    // 300-second bar, and nothing in the evidence could say whether those four
+    // seconds were the model or us. The breakdown was computed -- it is in
+    // lastBuildTiming -- but only written to the console and to /api/health,
+    // which production redacts to {ok:true}. So the one number a latency
+    // decision needs was the one number the acceptance record did not carry.
+    //
+    // model is the sum across every call, not the last one. engine is what is
+    // left of generation and QA after the model: the repair chain, the
+    // validators, the parsing. If that is seconds, there is something to cut;
+    // if it is milliseconds, medium is the floor and the lever is elsewhere.
+    const timingSuffix = intake && intake.qa_diagnostics === true
+      ? \` Timing: total \${Math.round((Date.now() - buildStarted) / 1000)}s, model \${Math.round(Number(buildUsage?.openai_ms || 0) / 1000)}s across \${Number(buildUsage?.calls || 0)} call(s), engine \${Math.round(Math.max(0, generationAndQaMs - Number(buildUsage?.openai_ms || 0)) / 1000)}s.\`
+      : ""; // QA-TIMING-BREAKDOWN
+    await progress("finalizing", Number(buildUsage?.calls || 0), \`saving program after \${Number(buildUsage?.calls || 0)} model call(s)\${qaTraceSuffix}\${timingSuffix}\`);`;
 if (!s.includes('QA-TRACE-DIAGNOSTICS-DETAIL')) {
   if (!s.includes(progressOld)) throw new Error('save-progress anchor missing');
   s = s.replace(progressOld, progressNew);

@@ -7,7 +7,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 
-import { deliveryVerdict, effortThatWroteIt, unresolvedRulesFrom } from '../engine/delivery_verdict.js';
+import { deliveryVerdict, effortThatWroteIt, timingFrom, unresolvedRulesFrom } from '../engine/delivery_verdict.js';
 
 // The real string, from docs/qa/live-three-avatar/latest/result.json.
 const RUN160_TRIATHLETE = 'delivered with unresolved rules: SPORT_DAY_COUPLING_VIOLATION+LOW_INTENSITY_PACE_CONTRADICTS_CURRENT_PERFORMANCE QA trace: E0:medium -> T1:request_ceiling@low -> A1:TARGET_MODALITY_EXPOSURE_REDUCED+TARGET_MODALITY_EXPOSURE_REDUCED+EVENT_PROGRESSING_SESSION_MISSING -> A2:SPORT_DAY_COUPLING_VIOLATION+LOW_INTENSITY_PACE_CONTRADICTS_CURRENT_PERFORMANCE.';
@@ -78,4 +78,34 @@ test('a medium program is not degraded', () => {
   const r = deliveryVerdict({ ok: true, detail: RUN160_BASKETBALL });
   assert.equal(r.degraded, false);
   assert.equal(r.effort, 'medium');
+});
+
+// The 300-second bar is the product promise, and masters_return came in at 304
+// with nothing in the evidence able to say whether those four seconds were the
+// model's or ours. The breakdown existed in lastBuildTiming and went only to the
+// console and to /api/health, which production redacts to {ok:true}.
+
+test('the timing breakdown is read back from the detail', () => {
+  const detail = 'saving program after 1 model call(s) QA trace: E0:medium. Timing: total 298s, model 281s across 1 call(s), engine 2s.';
+  assert.deepEqual(timingFrom(detail), { total_s: 298, model_s: 281, calls: 1, engine_s: 2 });
+});
+
+test('a detail without timing does not invent one', () => {
+  assert.equal(timingFrom(RUN160_BASKETBALL), null);
+  assert.equal(timingFrom(''), null);
+  assert.equal(deliveryVerdict({ ok: true, detail: RUN160_BASKETBALL }).timing, null);
+});
+
+test('timing rides alongside the verdict rather than changing it', () => {
+  const slowButClean = 'saving program after 1 model call(s) QA trace: E0:medium. Timing: total 900s, model 880s across 1 call(s), engine 3s.';
+  const r = deliveryVerdict({ ok: true, detail: slowButClean });
+  assert.equal(r.verdict, 'PASS', 'slow is not dirty');
+  assert.equal(r.timing.model_s, 880);
+});
+
+test('a multi-call build reports the model sum, not the last call', () => {
+  const four = 'delivered with unresolved rules: X QA trace: E0:medium -> T1:request_ceiling@low. Timing: total 843s, model 820s across 4 call(s), engine 9s.';
+  const t = timingFrom(four);
+  assert.equal(t.calls, 4);
+  assert.equal(t.model_s, 820, 'the sum across calls is what a four-attempt build actually spent');
 });

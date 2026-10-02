@@ -2824,7 +2824,21 @@ async function runBuildJob(jobId, token, intake, isNewToken = false) {
     const qaTraceSuffix = intake && intake.qa_diagnostics === true && Array.isArray(lastQaTrace) && lastQaTrace.length
       ? ` QA trace: ${lastQaTrace.join(" -> ")}.${lastQaEvidence ? ` First failure evidence: ${String(lastQaEvidence).slice(0, 600)}` : ""}`
       : ""; // QA-TRACE-DIAGNOSTICS-DETAIL // FIRST-ATTEMPT-EVIDENCE
-    await progress("finalizing", Number(buildUsage?.calls || 0), `saving program after ${Number(buildUsage?.calls || 0)} model call(s)${qaTraceSuffix}`);
+    // Where the seconds went. masters_return came in at 304 against a
+    // 300-second bar, and nothing in the evidence could say whether those four
+    // seconds were the model or us. The breakdown was computed -- it is in
+    // lastBuildTiming -- but only written to the console and to /api/health,
+    // which production redacts to {ok:true}. So the one number a latency
+    // decision needs was the one number the acceptance record did not carry.
+    //
+    // model is the sum across every call, not the last one. engine is what is
+    // left of generation and QA after the model: the repair chain, the
+    // validators, the parsing. If that is seconds, there is something to cut;
+    // if it is milliseconds, medium is the floor and the lever is elsewhere.
+    const timingSuffix = intake && intake.qa_diagnostics === true
+      ? ` Timing: total ${Math.round((Date.now() - buildStarted) / 1000)}s, model ${Math.round(Number(buildUsage?.openai_ms || 0) / 1000)}s across ${Number(buildUsage?.calls || 0)} call(s), engine ${Math.round(Math.max(0, generationAndQaMs - Number(buildUsage?.openai_ms || 0)) / 1000)}s.`
+      : ""; // QA-TIMING-BREAKDOWN
+    await progress("finalizing", Number(buildUsage?.calls || 0), `saving program after ${Number(buildUsage?.calls || 0)} model call(s)${qaTraceSuffix}${timingSuffix}`);
     const saveStarted = Date.now();
     const now = Date.now();
     const intakeJSON = JSON.stringify(intake);
@@ -2835,7 +2849,7 @@ async function runBuildJob(jobId, token, intake, isNewToken = false) {
     }
     await store.finishJob(jobId, "done", program, null, Date.now());
     const saveToVisibleMs = Date.now() - saveStarted;
-    lastBuildTiming = { total_ms: Date.now() - buildStarted, pre_persist_ms: persistMs, generation_and_qa_ms: generationAndQaMs, openai_ms: lastAIUsage?.elapsed_ms || null, save_to_visible_ms: saveToVisibleMs, usage: buildUsage ? { ...buildUsage } : null };
+    lastBuildTiming = { total_ms: Date.now() - buildStarted, pre_persist_ms: persistMs, generation_and_qa_ms: generationAndQaMs, openai_ms: Number(buildUsage?.openai_ms || 0) || null, last_call_openai_ms: lastAIUsage?.elapsed_ms || null, save_to_visible_ms: saveToVisibleMs, usage: buildUsage ? { ...buildUsage } : null };
     console.log("Phase15 build timing:", JSON.stringify(lastBuildTiming));
     Promise.allSettled([
       store.addHistory(token, "build", intakeJSON, program, Date.now()),

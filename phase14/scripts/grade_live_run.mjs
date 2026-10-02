@@ -64,7 +64,7 @@ for (const entry of result.results || []) {
   // plainly, at the very start of the detail; the grading hid it. A report that
   // overstates what shipped is worse than no report, so an unresolved rule now
   // decides the verdict.
-  const { verdict, unresolved, effort, degraded } = deliveryVerdict(entry);
+  const { verdict, unresolved, effort, degraded, timing } = deliveryVerdict(entry);
   const line = [
     verdict.padEnd(5),
     entry.id.padEnd(20),
@@ -101,7 +101,18 @@ for (const entry of result.results || []) {
   console.log(`        tsv row shape: ${shape.length} flag(s)   descending pace ranges: ${pace.length}`);
 
   const seconds = entry.seconds;
-  if (seconds > 300) console.log(`        over the 300s bar by ${seconds - 300}s`);
+  if (timing) {
+    console.log(`        timing: model ${timing.model_s}s across ${timing.calls} call(s), engine ${timing.engine_s}s, build total ${timing.total_s}s`);
+    const harnessOverhead = seconds - timing.total_s;
+    if (harnessOverhead > 5) console.log(`        plus ${harnessOverhead}s outside the build: deploy wait, queueing and polling`);
+  }
+  if (seconds > 300) {
+    console.log(`        over the 300s bar by ${seconds - 300}s`);
+    if (timing) {
+      const cuttable = timing.engine_s + Math.max(0, seconds - timing.total_s);
+      console.log(`        of which ${timing.model_s}s is the model and about ${cuttable}s is ours`);
+    }
+  }
 
   summary.push({ id: entry.id, ok: true, program: true, shape: shape.length, pace: pace.length, seconds, unresolved });
 }

@@ -51,12 +51,28 @@ export function unresolvedRulesFrom(detail) {
 
 // FAIL: nothing was delivered. DIRTY: a program was delivered and still breaks
 // rules. PASS: a program was delivered and breaks none.
+// Where the seconds went, when the build recorded it.
+//
+// The 300-second bar is the product promise, and until now the evidence could
+// say a build took 304 seconds without saying whether those seconds were the
+// model's or ours. "engine" is generation and QA minus the model: the repair
+// chain, the validators, the parsing. Seconds there are worth cutting;
+// milliseconds mean the model is the floor and the lever is somewhere else.
+const TIMING = /Timing: total (\d+)s, model (\d+)s across (\d+) call\(s\), engine (\d+)s/;
+
+export function timingFrom(detail) {
+  const m = String(detail || '').match(TIMING);
+  if (!m) return null;
+  return { total_s: Number(m[1]), model_s: Number(m[2]), calls: Number(m[3]), engine_s: Number(m[4]) };
+}
+
 export function deliveryVerdict(entry = {}) {
   const unresolved = unresolvedRulesFrom(entry.detail);
   const effort = effortThatWroteIt(entry.detail);
+  const timing = timingFrom(entry.detail);
   // Reported alongside the verdict rather than folded into it: a clean program
   // written at low effort is still clean, and still worth a second look.
   const degraded = effort === 'low';
-  if (!entry.ok) return { verdict: 'FAIL', unresolved, effort, degraded };
-  return { verdict: unresolved.length ? 'DIRTY' : 'PASS', unresolved, effort, degraded };
+  if (!entry.ok) return { verdict: 'FAIL', unresolved, effort, degraded, timing };
+  return { verdict: unresolved.length ? 'DIRTY' : 'PASS', unresolved, effort, degraded, timing };
 }
