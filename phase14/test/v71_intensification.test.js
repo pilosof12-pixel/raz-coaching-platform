@@ -115,3 +115,31 @@ test('Week 4 is only called Consolidate / Express when volume actually falls', (
   assert.equal(weekTitle(4, BLOCK), 'WEEK 4 — PEAK LOAD', 'flat volume must not claim consolidation');
   assert.equal(weekTitle(4, repairIntensification(BLOCK, LIFTER)), 'WEEK 4 — CONSOLIDATE / EXPRESS');
 });
+
+test('an athlete whose competition is not a lift is out of scope entirely', async () => {
+  const fsm = await import('node:fs');
+  const V = JSON.parse(fsm.readFileSync(new URL('./fixtures/launch_v2_avatars.json', import.meta.url), 'utf8'));
+  const C = JSON.parse(fsm.readFileSync(new URL('./fixtures/competition_avatars.json', import.meta.url), 'utf8'));
+  const weeks = (rows) => [1, 2, 3, 4].map((w) => [`START_WEEK${w}_TSV`,
+    'Day\tExercise\tWeight\tSets\tReps\tRest\tTarget RPE\tNotes\tResults', ...rows, `END_WEEK${w}_TSV`].join('\n')).join('\n\n');
+  const flat = weeks([
+    'Tue\tBack Squat\t75 kg\t3\t5\t2 min\t7\tStrength support.\t',
+    'Tue\tRun intervals\tThreshold pace\t1\t6 km\tN/A\t8\tKey run.\t',
+  ]);
+  const inWeeks = (w) => new Date(Date.now() + w * 7 * 86400000).toISOString().slice(0, 10);
+
+  // Every rule here reasons about the snatch and the clean and jerk. On a sprint
+  // triathlete the classic-lift share is 0% in every week, which satisfies "share
+  // is not rising" -- so the gate charged her for the absence of the thing it
+  // protects, and told her to cut rows and hamstring curls to make room for lifts
+  // she does not train. Three flags, three paid attempts, in run #154.
+  const triathlete = { ...V.sprint_triathlete, event_type: 'triathlon', competition_date: inWeeks(8) };
+  assert.deepEqual(collectIntensificationFlags(flat, triathlete), []);
+  assert.deepEqual(collectIntensificationFlags(flat, V.inseason_basketball), []);
+
+  // And the athlete it was written for is untouched by the narrowing.
+  const lifter = { ...C.weightlifter_peak, event_type: 'strength_meet', competition_date: inWeeks(8) };
+  const codes = collectIntensificationFlags(flat, lifter).map((f) => f.code);
+  assert.ok(codes.includes('V71_CLASSIC_SHARE_NOT_RISING'), 'the weightlifter must still be judged');
+  assert.ok(codes.includes('V71_INTENSIFICATION_VOLUME_FLAT'));
+});

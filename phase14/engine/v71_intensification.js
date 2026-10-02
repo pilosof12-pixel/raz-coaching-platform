@@ -97,7 +97,29 @@ function weekFacts(program, week) {
 }
 
 // Does this block sit in the run-up rather than the taper?
+// Every rule in this module reasons about competition LIFTS: the share of work
+// that is the snatch and the clean and jerk, the secondary pressing that should
+// give way to them, the squat support that should ease off before the meet. None
+// of it means anything for an athlete whose competition is not a lift.
+//
+// It was scoped on nothing but "has a competition date and is mid-block", so it
+// fired on the sprint triathlete in run #154 -- and it fired BECAUSE she has no
+// competition lifts at all: a classic-lift share of 0% in every week satisfies
+// "share is not rising", so the gate charged her for the absence of the very
+// thing it exists to protect, and told her to cut rows and hamstring curls to
+// make room for lifts she is not training. Three flags on one avatar, each
+// spending a paid attempt on advice that could not apply.
+const LIFT_MEET = /weightlifting|strength[_\s-]?meet|powerlifting|olympic lifting/i;
+const LIFT_GOAL = /\bsnatch\b|\bclean\s*(?:and|&)\s*jerk\b|\bc\s*&\s*j\b|classic lift/i;
+
+function isLiftingCompetition(intake = {}) {
+  const goals = [intake.primary_goals, intake.secondary_goals, intake.maintenance_goals]
+    .flat().filter(Boolean).map(String).join(' | ');
+  return LIFT_MEET.test(`${intake.event_type || ''} ${intake.sport || ''}`) || LIFT_GOAL.test(goals);
+}
+
 function isIntensification(intake, now) {
+  if (!isLiftingCompetition(intake)) return false;
   const profile = competitionProfile(intake, now);
   if (!profile) return false;
   const states = profile.weeks.map((w) => w.state);
