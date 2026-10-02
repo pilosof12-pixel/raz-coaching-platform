@@ -1641,8 +1641,12 @@
     ],
     "advisory": false,
     "reachable": true,
-    "repairs": [],
-    "wired": [],
+    "repairs": [
+      "normalizeTacticalStrengthSpacing"
+    ],
+    "wired": [
+      "normalizeTacticalStrengthSpacing"
+    ],
     "tested": true,
     "stressed": false,
     "killedLive": ""

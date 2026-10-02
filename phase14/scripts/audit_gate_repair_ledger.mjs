@@ -88,6 +88,28 @@ for (const file of engineFiles) {
   if (names.length) repairExports.set(path.relative(root, file), names);
 }
 
+// A repair does not have to live in the module that raises the code, and when
+// it does not, module proximity cannot see it at all. The day-spacing repair
+// for the tactical schedule gate is a separate module on purpose: it rewrites
+// the program, where the gate only reads it.
+//
+// So the association can be declared -- but a declaration is not evidence, and
+// this is deliberately weaker than it looks. Each entry is verified twice
+// before it counts: the named function must really be exported by that module,
+// and it must really be called in the production chain below. Neither is taken
+// on trust, and a declaration that fails either check is dropped with a
+// warning rather than credited.
+//
+// What a declaration still cannot do is prove the code clears. That evidence
+// comes only from `tested` and `stressed`, which are read from the suite, never
+// from this map. Declaring a repair moves a code from UNREPAIRED to repaired;
+// it does not make it proven.
+const DECLARED_REPAIRS = {
+  TACTICAL_SCHEDULE_ARCHITECTURE_VIOLATION: [
+    ['engine/tactical_strength_spacing.js', 'normalizeTacticalStrengthSpacing'],
+  ],
+};
+
 // Which repairs the production chain actually calls. A repair nobody calls is
 // the defect that killed two builds in one run.
 const bundleSrc = fs.readFileSync(path.join(root, 'engine', 'repairable_validation_bundle.js'), 'utf8');
@@ -230,7 +252,12 @@ const stressCoverage = (() => {
 const ledger = [];
 for (const [code, files] of [...raisedIn].sort()) {
   const modules = [...files];
-  const repairsNearby = modules.flatMap((f) => repairExports.get(f) || []);
+  const declared = (DECLARED_REPAIRS[code] || []).filter(([file, fn]) => {
+    const exported = (repairExports.get(file) || []).includes(fn);
+    if (!exported) console.warn(`declared repair not exported: ${code} -> ${file}:${fn}`);
+    return exported;
+  }).map(([, fn]) => fn);
+  const repairsNearby = [...new Set([...modules.flatMap((f) => repairExports.get(f) || []), ...declared])];
   const wired = repairsNearby.filter((n) => new RegExp(`\\b${n}\\(`).test(wiredText));
   const owners = modules.map((f) => enclosingExport(f, code)).filter(Boolean);
   // Raised by a module production loads, from a function production calls.

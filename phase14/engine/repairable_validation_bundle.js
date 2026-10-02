@@ -35,6 +35,7 @@ import { normalizeWeekTsvShape } from './tsv_shape.js';
 import { repairPhase15Program } from './phase15_program_qa.js';
 import { repairTsvRowShape } from './tsv_row_shape_repair.js'; // TSV-ROW-SHAPE-REPAIR-WIRED
 import { normalizePaceRangeOrder } from './pace_range_order.js'; // PACE-RANGE-ORDER-WIRED
+import { normalizeTacticalStrengthSpacing } from './tactical_strength_spacing.js'; // TACTICAL-DAY-SPACING-WIRED
 import { validatePhase15FinalProgram } from './phase15_final_qa.js';
 import { parseProgramModel } from './program_model.js';
 import { trimExcessSupportVolume } from './mrv_support_trim.js';
@@ -594,6 +595,27 @@ export function collectRepairableValidationFailures(program, intake = {}, option
   if (goalStatus.repaired) {
     candidate = goalStatus.program;
     deterministic_repairs.push({ type: 'goal_status_declared', rows: goalStatus.repairs });
+  }
+
+  // TACTICAL_SCHEDULE_ARCHITECTURE_VIOLATION is a blocking gate that the ledger
+  // carries with repairs: [], and in run #158 it charged us for that. The
+  // tactical block came back with strength on three consecutive days in all
+  // four weeks; the gate aborted, the model rewrote the whole program, and the
+  // second attempt put the same three sessions on Mon, Thu and Sat. Two billed
+  // calls and 1026 seconds for a block whose exercises and doses were never
+  // wrong -- only the weekday each one sat on.
+  //
+  // Three of that gate's four violation types are day placement, and day
+  // placement is a permutation. So swap the labels before asking the model
+  // again. Content is untouched and the set of training weekdays is preserved
+  // exactly, which is why this cannot start failing an explicit calendar-day
+  // budget in order to spread the week out. The gate's own analysis scores each
+  // candidate swap, so the repair converges on the real rule rather than a copy
+  // of it.
+  const daySpacing = normalizeTacticalStrengthSpacing(candidate, intake);
+  if (daySpacing.repaired) {
+    candidate = daySpacing.program;
+    deterministic_repairs.push({ type: 'tactical_day_spacing', swaps: daySpacing.repairs });
   }
 
   let model = parseProgramModel(candidate, intake);
