@@ -1,25 +1,51 @@
 {
-  "timestamp": "2026-10-02T03:39:47.275Z",
+  "timestamp": "2026-10-02T06:03:02.473Z",
   "base": "https://raz-coaching-platform.onrender.com",
-  "head_sha": "a3509c8a411a77058d7c60e3c7dc99be71102976",
-  "runtime": "live88 2026-10-02T03:37:25Z",
+  "head_sha": "07b6e703d84d2e581f62fcca9394e315ba0430b6",
+  "runtime": "live89 2026-10-02T06:02:16Z",
   "results": [
     {
-      "id": "sprint_triathlete",
-      "job_id": "47568a1037da0177495efa657c0cd8bb",
+      "id": "advanced_hybrid",
+      "job_id": "785f9e5773edfd2bd95484483c2e4504",
+      "ok": true,
+      "status": "done",
+      "stage": "finalizing",
+      "attempt": 2,
+      "detail": "saving program after 2 model call(s) QA trace: T1:request_ceiling@medium -> A1:EVENT_PROGRESSING_SESSION_MISSING. First failure evidence: Week 4: The running performance goal 'Marathon' has no progression-bearing event-specific session in Week 1. For marathon preparation, an explicitly identified long run with a prescribed duration/distance is a valid event-specific progression anchor; other events still require their source-supported pace/power/split/interval or equivalent progression.",
+      "last_seen_status": "done",
+      "error": null,
+      "program_chars": 25932,
+      "seconds": 937
+    },
+    {
+      "id": "youth_gymnastics",
+      "job_id": "05df652f951e4a28667cde5b926028e9",
+      "ok": false,
+      "status": "error",
+      "stage": "finalizing",
+      "attempt": 4,
+      "detail": "token budget reached; shipping the last structurally valid program",
+      "last_seen_status": "error",
+      "error": "Phase 15 quality gate failed: TSV_ROW_COLUMN_COUNT_MISMATCH, TSV_ROW_COLUMN_COUNT_MISMATCH, TSV_ROW_COLUMN_COUNT_MISMATCH, TSV_ROW_COLUMN_COUNT_MISMATCH, TSV_ROW_COLUMN_COUNT_MISMATCH, TSV_ROW_COLUMN_COUNT_MISMATCH, TSV_ROW_COLUMN_COUNT_MISMATCH, TSV_ROW_COLUMN_COUNT_MISMATCH, TSV_ROW_COLUMN_COUNT_MISMATCH, TSV_ROW_COLUMN_COUNT_MISMATCH, TSV_ROW_COLUMN_COUNT_MISMATCH, TSV_ROW_COLUMN_COUNT_MISMATCH, TSV_ROW_COLUMN_COUNT_MISMATCH, TSV_ROW_COLUMN_COUNT_MISMATCH, TSV_ROW_COLUMN_COUNT_MISMATCH, TSV_ROW_COLUMN_COUNT_MISMATCH, TSV_ROW_COLUMN_COUNT_MISMATCH, TSV_ROW_COLUMN_COUNT_MISMATCH, TSV_ROW_COLUMN_COUNT_MISMATCH, TSV_ROW_COLUMN_COUNT_MISMATCH, TSV_ROW_COLUMN_COUNT_MISMATCH, TSV_ROW_COLUMN_COUNT_MISMATCH, TSV_ROW_COLUMN_COUNT_MISMATCH, TSV_ROW_COLUMN_COUNT_MISMATCH, TSV_ROW_COLUMN_COUNT_MISMATCH, TSV_ROW_COLUMN_COUNT_MISMATCH, TSV_ROW_COLUMN_COUNT_MISMATCH, TSV_ROW_COLUMN_COUNT_MISMATCH, TSV_ROW_COLUMN_COUNT_MISMATCH, TSV_ROW_COLUMN_COUNT_MISMATCH, TSV_ROW_COLUMN_COUNT_MISMATCH, TSV_ROW_COLUMN_COUNT_MISMATCH, TSV_ROW_COLUMN_COUNT_MISMATCH, TSV_ROW_COLUMN_COUNT_MISMATCH, TSV_ROW_COLUMN_COUNT_MISMATCH, TSV_ROW_COLUMN_COUNT_MISMATCH, TSV_ROW_COLUMN_COUNT_MISMATCH, TSV_ROW_COLUMN_COUNT_MISMATCH, TSV_ROW_COLUMN_COUNT_MISMATCH, TSV_ROW_COLUMN_COUNT_MISMATCH, TSV_ROW_COLUMN_COUNT_MISMATCH, TSV_ROW_COLUMN_COUNT_MISMATCH, TSV_ROW_COLUMN_COUNT_MISMATCH, TSV_ROW_COLUMN_COUNT_MISMATCH, TSV_ROW_COLUMN_COUNT_MISMATCH, TSV_ROW_COLUMN_COUNT_MISMATCH, TSV_ROW_COLUMN_COUNT_MISMATCH, TSV_ROW_COLUMN_COUNT_MISMATCH, TSV_ROW_COLUMN_COUNT_MISMATCH, TSV_ROW_COLUMN_COUNT_MISMATCH, TSV_ROW_COLUMN_COUNT_MISMATCH, TSV_ROW_COLUMN_COUNT_MISMATCH, TSV_ROW_COLUMN_COUNT_MISMATCH, TSV_ROW_COLUMN_COUNT_MISMATCH, TSV_ROW_COLUMN_COUNT_MISMATCH, TSV_ROW_COLUMN_COUNT_MISMATCH, TSV_ROW_COLUMN_COUNT_MISMATCH, TSV_ROW_COLUMN_COUNT_MISMATCH, TSV_ROW_COLUMN_COUNT_MISMATCH, TSV_ROW_COLUMN_COUNT_MISMATCH, TSV_ROW_COLUMN_COUNT_MISMATCH, TSV_ROW_COLUMN_COUNT_MISMATCH, TSV_ROW_COLUMN_COUNT_MISMATCH, TSV_ROW_COLUMN_COUNT_MISMATCH, TSV_ROW_COLUMN_COUNT_MISMATCH, TSV_ROW_COLUMN_COUNT_MISMATCH, TSV_ROW_COLUMN_COUNT_MISMATCH, TSV_ROW_COLUMN_COUNT_MISMATCH, TSV_ROW_COLUMN_COUNT_MISMATCH, TSV_ROW_COLUMN_COUNT_MISMATCH, TSV_ROW_COLUMN_COUNT_MISMATCH, TSV_ROW_COLUMN_COUNT_MISMATCH, TSV_ROW_COLUMN_COUNT_MISMATCH, TSV_ROW_COLUMN_COUNT_MISMATCH, TSV_ROW_COLUMN_COUNT_MISMATCH, TSV_ROW_COLUMN_COUNT_MISMATCH, TSV_ROW_COLUMN_COUNT_MISMATCH, TSV_ROW_COLUMN_COUNT_MISMATCH, TSV_ROW_COLUMN_COUNT_MISMATCH, TSV_ROW_COLUMN_COUNT_MISMATCH [QA:PHASE15_QUALITY_VIOLATION+TSV_ROW_COLUMN_COUNT_MISMATCH]",
+      "program_chars": 0,
+      "seconds": 779
+    },
+    {
+      "id": "tactical_3k",
+      "job_id": "40118c2f92948f8eb0628253f5be018d",
       "ok": false,
       "status": "error",
       "stage": "generating",
-      "attempt": 2,
-      "detail": "regenerating after quality check [T1:request_ceiling@medium -> A1:SPORT_DAY_COUPLING_VIOLATION+V71_CLASSIC_SHARE_NOT_RISING+REQUESTED_STRENGTH_SESSIONS_UNACCOUNTED+CARDIO_ONLY_STRENGTH_DAY]",
+      "attempt": 1,
+      "detail": "initial generation",
       "last_seen_status": "error",
-      "error": "This operation was aborted QA trace: T1:request_ceiling@medium -> A1:SPORT_DAY_COUPLING_VIOLATION+V71_CLASSIC_SHARE_NOT_RISING+REQUESTED_STRENGTH_SESSIONS_UNACCOUNTED+CARDIO_ONLY_STRENGTH_DAY -> T2:request_ceiling:JOB_BUDGET_SPENT. [QA:20]",
+      "error": "OpenAI compact build prompt exceeded 70000 characters.",
       "program_chars": 0,
-      "seconds": 1226
+      "seconds": 2
     },
     {
-      "id": "inseason_basketball",
-      "job_id": "491d1eaedf9a900e5fa2984c3596a296",
+      "id": "masters_return",
+      "job_id": "78b2509dbfd7ea4db846c6782f8e3708",
       "ok": true,
       "status": "done",
       "stage": "finalizing",
@@ -27,11 +53,25 @@
       "detail": "saving program after 1 model call(s)",
       "last_seen_status": "done",
       "error": null,
-      "program_chars": 16965,
-      "seconds": 299
+      "program_chars": 22895,
+      "seconds": 566
+    },
+    {
+      "id": "sprint_triathlete",
+      "ok": false,
+      "error": "build not accepted 429 {\"error\":\"Too many program generation requests from this connection. Please try again later.\"}"
+    },
+    {
+      "id": "inseason_basketball",
+      "ok": false,
+      "error": "build not accepted 429 {\"error\":\"Too many program generation requests from this connection. Please try again later.\"}"
     }
   ],
   "selection": [
+    "advanced_hybrid",
+    "youth_gymnastics",
+    "tactical_3k",
+    "masters_return",
     "sprint_triathlete",
     "inseason_basketball"
   ],
