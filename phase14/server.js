@@ -1641,13 +1641,34 @@ app.disable("x-powered-by");
 app.use(express.json({ limit: "256kb" }));
 app.use(express.static(path.join(__dirname, "public")));
 
-const apiLimiter = rateLimit({
+// One 20-per-minute budget across all of /api/ put status polling in
+// competition with program creation, and polling always wins because there is
+// so much more of it. A build runs for ten to twenty minutes and the client
+// polls /api/job/:id the whole time, so a customer waiting for the program
+// they paid for spends the budget their next request needs.
+//
+// Run #159 is the bill for that: the sprint triathlete's build ran 1201
+// seconds and the basketball avatar behind it was refused outright with 429,
+// having never started. The same thing happens to a real customer who opens a
+// second tab, or whose client polls every second.
+//
+// So reads and writes get separate budgets. The expensive operations keep the
+// strict one, and the hourly build cap in server_secure.js is untouched --
+// what changes is that reading the state of a job you already own is no
+// longer rationed against starting a new one.
+const readLimiter = rateLimit({
+  windowMs: 60 * 1000,
+  max: 120,
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+const writeLimiter = rateLimit({
   windowMs: 60 * 1000,
   max: 20,
   standardHeaders: true,
   legacyHeaders: false,
 });
-app.use("/api/", apiLimiter);
+app.use("/api/", (req, res, next) => (req.method === "GET" ? readLimiter : writeLimiter)(req, res, next));
 
 // Health
 app.get("/api/health", async (req, res) => {
