@@ -124,6 +124,8 @@ export function progressionAnalysis(program, intake = {}, suppliedModel = null) 
         signature,
         count: exposures.length,
         lead_signature: lead ? exposureSignature(lead) : null,
+        lead_load: lead ? loadKg(lead) : null,
+        lead_reps: lead ? totalReps(lead) : null,
       });
     }
     const present = weeks.filter((w) => w.count > 0);
@@ -142,6 +144,26 @@ export function progressionAnalysis(program, intake = {}, suppliedModel = null) 
     const leads = build.map((w) => w.lead_signature).filter(Boolean);
     const leadTracked = leads.length === build.length && build.length >= 2;
     if (progressed && leadTracked && new Set(leads).size < 2) progressed = false;
+
+    // A changed signature is not the same thing as a progression, and run #156
+    // showed the difference costing a named goal. The Advanced Hybrid ran two
+    // strict presses: Monday 62.5 for 2x6 and Sunday 67.5 for 4x4 in Week 1, both
+    // 67.5 for 3x4 in Weeks 2 and 3. The heaviest row is chosen per week, so the
+    // tie in Week 2 flipped the lead from Sunday to Monday, the signature changed
+    // with it, and a press that never left 67.5 read as progressing. Worse, 4x4
+    // down to 3x4 at the same load is a REDUCTION, and "the signature changed"
+    // counts it as progress.
+    //
+    // So where the lead carries a real load, the load decides: it has to rise, or
+    // hold while the work at that load rises. Nothing here judges an unloaded
+    // family -- bodyweight skill work still progresses by the signature above.
+    const loadedLeads = build.filter((w) => Number.isFinite(w.lead_load));
+    if (progressed && loadedLeads.length === build.length && build.length >= 2) {
+      const first = loadedLeads[0];
+      const moved = loadedLeads.slice(1).some((w) => w.lead_load > first.lead_load
+        || (w.lead_load === first.lead_load && Number.isFinite(w.lead_reps) && Number.isFinite(first.lead_reps) && w.lead_reps > first.lead_reps));
+      if (!moved) progressed = false;
+    }
     const row = { family: target.family, tier: target.tier, goal: target.raw, progressed, lead_tracked: leadTracked, weeks };
     targetsOut.push(row);
     // A goal deliberately held, and declared as held, is a coaching decision
