@@ -1,25 +1,12 @@
 {
-  "timestamp": "2026-10-02T14:36:20.969Z",
+  "timestamp": "2026-10-02T15:22:24.079Z",
   "base": "https://raz-coaching-platform.onrender.com",
-  "head_sha": "742ddc0b53795759d340bcdf8be5407c7e4ca31b",
-  "runtime": "live92 2026-10-02T14:35:00Z",
+  "head_sha": "c73cabe17c452b8c588a5197a55b76b7afc8a8b6",
+  "runtime": "live93 2026-10-02T15:21:00Z",
   "results": [
     {
-      "id": "sprint_triathlete",
-      "job_id": "dad9f319ce8eb0bc2bcc6bb50a77730e",
-      "ok": true,
-      "status": "done",
-      "stage": "finalizing",
-      "attempt": 4,
-      "detail": "delivered with unresolved rules: SPORT_DAY_COUPLING_VIOLATION+LOW_INTENSITY_PACE_CONTRADICTS_CURRENT_PERFORMANCE QA trace: E0:medium -> T1:request_ceiling@low -> A1:TARGET_MODALITY_EXPOSURE_REDUCED+TARGET_MODALITY_EXPOSURE_REDUCED+EVENT_PROGRESSING_SESSION_MISSING -> A2:SPORT_DAY_COUPLING_VIOLATION+LOW_INTENSITY_PACE_CONTRADICTS_CURRENT_PERFORMANCE -> A3:SPORT_DAY_COUPLING_VIOLATION+LOW_INTENSITY_PACE_CONTRADICTS_CURRENT_PERFORMANCE -> A4:SPORT_DAY_COUPLING_VIOLATION+LOW_INTENSITY_PACE_CONTRADICTS_CURRENT_PERFORMANCE. First failure evidence: PRIOR ATTEMPT FAILED SPORT/CALENDAR VALIDATION. days_per_week means requested strength sessions, not total active calendar days. Week 1: strength/skill-strength work is scheduled on unavailable day(s) monday. Week 1: strength/skill-strength work is scheduled on unavailable day(s) wednesday. Week 1: strength/skill-strength work is scheduled on unavailable day(s) saturday. Week 1: expected 2 strength/skill-strength days, found 5 (tuesday, friday, monday, wednesday, saturday). Week 2: strength/skill-strength work is scheduled on unavailable day(s) monday. Week 2: strength/skill-strength work is s",
-      "last_seen_status": "done",
-      "error": null,
-      "program_chars": 17975,
-      "seconds": 872
-    },
-    {
-      "id": "inseason_basketball",
-      "job_id": "93bba6c3d7d30455b6b6ed3431c55da0",
+      "id": "masters_return",
+      "job_id": "2d3590c300320a13a37d800f74768e15",
       "ok": true,
       "status": "done",
       "stage": "finalizing",
@@ -27,13 +14,26 @@
       "detail": "saving program after 1 model call(s) QA trace: E0:medium.",
       "last_seen_status": "done",
       "error": null,
-      "program_chars": 15364,
-      "seconds": 193
+      "program_chars": 25001,
+      "seconds": 304
+    },
+    {
+      "id": "sprint_triathlete",
+      "job_id": "d4d67bd7ad20ed68f47765aef760a783",
+      "ok": true,
+      "status": "done",
+      "stage": "finalizing",
+      "attempt": 4,
+      "detail": "delivered with unresolved rules: TARGET_MODALITY_EXPOSURE_REDUCED QA trace: E0:medium -> T1:request_ceiling@low -> A1:TARGET_MODALITY_EXPOSURE_REDUCED+EVENT_PROGRESSING_SESSION_MISSING -> A2:TARGET_MODALITY_EXPOSURE_REDUCED -> A3:TARGET_MODALITY_EXPOSURE_REDUCED -> A4:TARGET_MODALITY_EXPOSURE_REDUCED. First failure evidence: Week 4: running is a named primary performance goal. The intake documents about 3 current running exposure(s) per week, but Week 1 programs 2. Do not silently remove target-modality practice; preserve the athlete's stated current exposure unless the authored plan makes and explains a deliberate recovery tradeoff.",
+      "last_seen_status": "done",
+      "error": null,
+      "program_chars": 17275,
+      "seconds": 843
     }
   ],
   "selection": [
-    "sprint_triathlete",
-    "inseason_basketball"
+    "masters_return",
+    "sprint_triathlete"
   ],
   "ok": true
 }
