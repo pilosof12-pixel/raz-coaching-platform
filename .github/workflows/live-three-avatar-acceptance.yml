@@ -314,7 +314,7 @@ jobs:
           fi
           mkdir -p docs/qa/live-three-avatar/latest
           cp docs/qa/live-three-avatar/result.json docs/qa/live-three-avatar/latest/result.json
-          for f in advanced_calisthenics-program.txt advanced_hybrid-program.txt youth_gymnastics-program.txt tactical_3k-program.txt weightlifter_peak-program.txt mma_fight_camp-program.txt inseason_footballer-program.txt masters_return-program.txt weightlifter_meet_week-program.txt dual_event_hyrox-program.txt travelling_exec-program.txt postpartum_runner-program.txt; do
+          for f in advanced_calisthenics-program.txt advanced_hybrid-program.txt youth_gymnastics-program.txt tactical_3k-program.txt weightlifter_peak-program.txt mma_fight_camp-program.txt inseason_footballer-program.txt masters_return-program.txt weightlifter_meet_week-program.txt dual_event_hyrox-program.txt travelling_exec-program.txt postpartum_runner-program.txt sprint_triathlete-program.txt inseason_basketball-program.txt; do
             if [ -f "docs/qa/live-three-avatar/$f" ]; then
               cp "docs/qa/live-three-avatar/$f" "docs/qa/live-three-avatar/latest/$f"
             else
