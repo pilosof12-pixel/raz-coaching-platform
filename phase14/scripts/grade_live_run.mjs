@@ -18,6 +18,7 @@ import { fileURLToPath } from 'node:url';
 
 import { collectTsvRowShapeFlags } from '../engine/tsv_row_shape_repair.js';
 import { collectPaceRangeOrderFlags } from '../engine/pace_range_order.js';
+import { deliveryVerdict } from '../engine/delivery_verdict.js';
 
 // The acceptance evidence lives at the repository root, not under phase14, and
 // the workflow writes both a fresh directory and a published `latest`. Resolve
@@ -49,25 +50,44 @@ console.log(`head ${String(result.head_sha || '').slice(0, 8)}\n`);
 const summary = [];
 for (const entry of result.results || []) {
   const program = read(path.join(dir, `${entry.id}-program.txt`));
+
+  // A delivered program is not necessarily a clean one. When four repair
+  // attempts cannot clear a rule, the salvage path ships the best candidate
+  // rather than throwing away a complete program and charging for nothing --
+  // a deliberate decision, and the right one -- and it records what stayed
+  // broken at the front of the job detail.
+  //
+  // This script used to read only the `QA trace:` part of that detail and print
+  // PASS, which is how run #160 got reported as two of two when one of the two
+  // shipped carrying SPORT_DAY_COUPLING_VIOLATION and
+  // LOW_INTENSITY_PACE_CONTRADICTS_CURRENT_PERFORMANCE. The engine said so
+  // plainly, at the very start of the detail; the grading hid it. A report that
+  // overstates what shipped is worse than no report, so an unresolved rule now
+  // decides the verdict.
+  const { verdict, unresolved } = deliveryVerdict(entry);
   const line = [
-    entry.ok ? 'PASS' : 'FAIL',
+    verdict.padEnd(5),
     entry.id.padEnd(20),
     `${String(entry.seconds).padStart(5)}s`,
     `${String(entry.program_chars).padStart(6)} chars`,
   ].join('  ');
   console.log(line);
+  if (unresolved.length) {
+    console.log(`        DELIVERED WITH ${unresolved.length} UNRESOLVED RULE(S): ${unresolved.join(', ')}`);
+    console.log('        this program reached a customer carrying known violations');
+  }
   if (entry.detail) {
     const trace = String(entry.detail).match(/QA trace: ([^.]*)/);
     if (trace) console.log(`        trace: ${trace[1]}`);
   }
   if (!entry.ok) {
     console.log(`        ${entry.status}: ${entry.error || entry.detail || ''}`.slice(0, 200));
-    summary.push({ id: entry.id, ok: false });
+    summary.push({ id: entry.id, ok: false, unresolved });
     continue;
   }
   if (!program) {
     console.log('        delivered but no program file in this directory');
-    summary.push({ id: entry.id, ok: true, program: false });
+    summary.push({ id: entry.id, ok: true, program: false, unresolved });
     continue;
   }
 
@@ -79,13 +99,20 @@ for (const entry of result.results || []) {
   const seconds = entry.seconds;
   if (seconds > 300) console.log(`        over the 300s bar by ${seconds - 300}s`);
 
-  summary.push({ id: entry.id, ok: true, program: true, shape: shape.length, pace: pace.length, seconds });
+  summary.push({ id: entry.id, ok: true, program: true, shape: shape.length, pace: pace.length, seconds, unresolved });
 }
 
 console.log('\n--- what still needs a human ---');
 console.log('coach_rules reports findings, not scores, and two of these archetypes have');
 console.log('no dimension weights, so no overall number is printed for them. Run');
 console.log('gradeProgram against a program with its intake to list findings.');
+const clean = summary.filter((s) => s.ok && !(s.unresolved || []).length);
+const dirty = summary.filter((s) => s.ok && (s.unresolved || []).length);
 console.log(`\n${summary.filter((s) => s.ok).length} of ${summary.length} delivered`);
+console.log(`${clean.length} of ${summary.length} clean${dirty.length ? `, ${dirty.length} carrying unresolved rules: ${dirty.map((s) => s.id).join(', ')}` : ''}`);
+if (dirty.length) {
+  console.log('\nA delivered program with unresolved rules is not a pass. Reporting it as');
+  console.log('one is how a launch decision gets made on a number that was never true.');
+}
 
 export { summary };
