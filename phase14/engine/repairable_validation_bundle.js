@@ -33,6 +33,7 @@ import { stripRepeatedHeaderRows } from './stray_header_repair.js';
 import { repairPainTolerance, collectPainToleranceFlags } from './pain_tolerance.js';
 import { normalizeWeekTsvShape } from './tsv_shape.js';
 import { repairPhase15Program } from './phase15_program_qa.js';
+import { repairTsvRowShape } from './tsv_row_shape_repair.js'; // TSV-ROW-SHAPE-REPAIR-WIRED
 import { validatePhase15FinalProgram } from './phase15_final_qa.js';
 import { parseProgramModel } from './program_model.js';
 import { trimExcessSupportVolume } from './mrv_support_trim.js';
@@ -464,7 +465,19 @@ export function collectRepairableValidationFailures(program, intake = {}, option
   let warnings = [];
   let schedule = [];
   let mrv_trim = null;
+  // Nine columns is a format, not a judgement. TSV_ROW_COLUMN_COUNT_MISMATCH is
+  // a blocking gate the ledger has carried with repairs: [] and
+  // killedLive: "2026-09-12 mma_fight_camp", and in run #156 it killed the youth
+  // gymnast too -- four paid attempts raising the same flag until the token
+  // budget ran out, over rows with the wrong number of tabs.
+  //
+  // It runs first because every repair after it reads rows by position, so a row
+  // with a stray tab in its Notes would be misread by all of them.
+  const tsvShape = repairTsvRowShape(candidate);
+  candidate = tsvShape.program;
+
   let deterministic_repairs = [];
+  if (tsvShape.repaired) deterministic_repairs.push({ type: 'tsv_row_shape', weeks: tsvShape.repairs });
 
   // Before anything reads the table, make sure the table is readable. A row
   // with eight cells instead of nine is a typing accident with one correct

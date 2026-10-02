@@ -224,6 +224,14 @@ jobs:
           const V2 = ['sprint_triathlete','inseason_basketball'];
           // The six the launch review scores: the four already reviewed plus the two new.
           const SIX = ['advanced_hybrid','youth_gymnastics','tactical_3k','masters_return','sprint_triathlete','inseason_basketball'];
+          // server_secure.js caps builds at GENERATION_BUILDS_PER_HOUR (default 4)
+          // per client IP, in a rolling hour. That is an abuse guard for real
+          // clients and is working as intended -- but it means a six-avatar run
+          // cannot finish from one runner: in run #156 the fifth and sixth avatars
+          // came back 429 "Too many program generation requests" without ever
+          // reaching the engine. So the six-avatar review is two runs.
+          const SIX_A = ['masters_return','youth_gymnastics','tactical_3k'];
+          const SIX_B = ['advanced_hybrid','sprint_triathlete','inseason_basketball'];
           const alias = (x) =>
             x.startsWith('hyb') ? 'advanced_hybrid'
             : x.startsWith('you') ? 'youth_gymnastics'
@@ -247,6 +255,8 @@ jobs:
             : selectionRaw === 'skill' ? SKILL
             : selectionRaw === 'v2' ? V2
             : selectionRaw === 'six' ? SIX
+            : selectionRaw === 'six-a' ? SIX_A
+            : selectionRaw === 'six-b' ? SIX_B
             : selectionRaw === 'everything' ? CORE.concat(COMP).concat(HARD).concat(LAUNCH).concat(SKILL).concat(V2)
             : selectionRaw.split(',').map(x=>x.trim()).filter(Boolean).map(alias);
           const selected=[hybrid,youth,tactical,weightlifter,mmacamp,footballer,masters,lifterMeet,dualEvent,traveller,postpartum,calisthenics,triathlete,basketball].filter(a=>wanted.includes(a.id));
@@ -264,6 +274,13 @@ jobs:
             result.reasoning_effort=effortTag.toLowerCase();
           }
           console.log('Running avatars:', selected.map(a=>a.id).join(', '));
+          // Say it before the credits are spent rather than after the 429.
+          const BUILD_CAP = Number(process.env.GENERATION_BUILDS_PER_HOUR || 4);
+          if (selected.length > BUILD_CAP) {
+            console.warn('WARNING: ' + selected.length + ' avatars selected but the server allows ' + BUILD_CAP
+              + ' builds per hour per IP. The ones past that will return 429 without reaching the engine.'
+              + ' Use [AVATARS:six-a] and [AVATARS:six-b] in two runs, or raise GENERATION_BUILDS_PER_HOUR.');
+          }
           result.selection=selected.map(a=>a.id);
           // A throw from one avatar used to kill the script before result.json
           // was written, so run #114 reported nothing at all for the two

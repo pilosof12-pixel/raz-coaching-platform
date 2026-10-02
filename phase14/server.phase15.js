@@ -472,7 +472,27 @@ async function runEngineRaw(userContent, engineOptions = {}) {
     const started = Date.now();
     try {
       const intake = extractOpenAIIntake(userContent);
-      const compactUser = buildOpenAICompactUser(userContent);
+      let compactUser = buildOpenAICompactUser(userContent);
+      // OPENAI-COMPACT-PROMPT-BUDGET-TRIM: trim the retrieved excerpts rather than lose the build.
+      if (/A NEW CLIENT has submitted/i.test(String(userContent || "")) && compactUser.length > 70000) {
+        const header = "=== CURATED COACHING SOURCE EXCERPTS";
+        const at = compactUser.indexOf(header);
+        if (at >= 0) {
+          const nextHeader = compactUser.indexOf("\n=== ", at + header.length);
+          const endOfBlock = nextHeader >= 0 ? nextHeader : compactUser.length;
+          const over = compactUser.length - 70000;
+          const block = compactUser.slice(at, endOfBlock);
+          // Keep a floor of excerpt text: a grounding section trimmed to nothing
+          // is a different prompt, not a smaller one.
+          const keep = Math.max(2000, block.length - over - 400);
+          if (keep < block.length) {
+            const trimmed = block.slice(0, keep).replace(/\n[^\n]*$/, "")
+              + "\n[Excerpts truncated to fit the prompt budget. The rules above are complete; only the lowest-ranked source excerpts were dropped.]";
+            compactUser = compactUser.slice(0, at) + trimmed + compactUser.slice(endOfBlock);
+            console.warn("OpenAI prompt budget: trimmed " + (block.length - trimmed.length) + " characters of source excerpts to fit 70000.");
+          }
+        }
+      }
       const developerChars = OPENAI_COMPACT_DEVELOPER.length;
       const sourceUserChars = String(userContent || "").length;
       const sentUserChars = compactUser.length;

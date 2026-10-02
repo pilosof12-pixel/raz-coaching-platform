@@ -1719,15 +1719,20 @@
   {
     "code": "TSV_ROW_COLUMN_COUNT_MISMATCH",
     "modules": [
-      "engine/phase15_final_qa.js"
+      "engine/phase15_final_qa.js",
+      "engine/tsv_row_shape_repair.js"
     ],
     "owners": [
       "allWeekTsvShapeFlags"
     ],
     "advisory": false,
     "reachable": true,
-    "repairs": [],
-    "wired": [],
+    "repairs": [
+      "repairTsvRowShape"
+    ],
+    "wired": [
+      "repairTsvRowShape"
+    ],
     "tested": true,
     "stressed": false,
     "killedLive": "2026-09-12 mma_fight_camp"
