@@ -34,6 +34,7 @@ import { repairPainTolerance, collectPainToleranceFlags } from './pain_tolerance
 import { normalizeWeekTsvShape } from './tsv_shape.js';
 import { repairPhase15Program } from './phase15_program_qa.js';
 import { repairTsvRowShape } from './tsv_row_shape_repair.js'; // TSV-ROW-SHAPE-REPAIR-WIRED
+import { normalizePaceRangeOrder } from './pace_range_order.js'; // PACE-RANGE-ORDER-WIRED
 import { validatePhase15FinalProgram } from './phase15_final_qa.js';
 import { parseProgramModel } from './program_model.js';
 import { trimExcessSupportVolume } from './mrv_support_trim.js';
@@ -476,8 +477,15 @@ export function collectRepairableValidationFailures(program, intake = {}, option
   const tsvShape = repairTsvRowShape(candidate);
   candidate = tsvShape.program;
 
+  // A pace range written high-low contradicts the ascending form the same
+  // programs use elsewhere, and leaves the athlete guessing which number is the
+  // target. Only the order changes.
+  const paceOrder = normalizePaceRangeOrder(candidate);
+  candidate = paceOrder.program;
+
   let deterministic_repairs = [];
   if (tsvShape.repaired) deterministic_repairs.push({ type: 'tsv_row_shape', weeks: tsvShape.repairs });
+  if (paceOrder.repaired) deterministic_repairs.push({ type: 'pace_range_order', ranges: paceOrder.repairs });
 
   // Before anything reads the table, make sure the table is readable. A row
   // with eight cells instead of nine is a typing accident with one correct

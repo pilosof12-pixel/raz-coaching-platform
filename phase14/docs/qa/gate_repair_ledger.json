@@ -1220,6 +1220,26 @@
     "killedLive": ""
   },
   {
+    "code": "PACE_RANGE_DESCENDING",
+    "modules": [
+      "engine/pace_range_order.js"
+    ],
+    "owners": [
+      "collectPaceRangeOrderFlags"
+    ],
+    "advisory": false,
+    "reachable": true,
+    "repairs": [
+      "normalizePaceRangeOrder"
+    ],
+    "wired": [
+      "normalizePaceRangeOrder"
+    ],
+    "tested": true,
+    "stressed": false,
+    "killedLive": ""
+  },
+  {
     "code": "PAIN_TOLERANCE_CONFLICT",
     "modules": [
       "engine/pain_tolerance.js",

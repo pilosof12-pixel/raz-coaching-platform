@@ -195,3 +195,47 @@ test('the complementary press consolidates in Week 4 like everything else', asyn
   for (const w of [1, 2, 3]) assert.equal(pushSets(out.program, w), '2', `week ${w}`);
   assert.equal(normalizeAdvancedHybridOHPComplement(out.program, A.advanced_hybrid).program, out.program);
 });
+
+test('the press that carries the goal is the one that progresses', async () => {
+  const fsm = await import('node:fs');
+  const A = JSON.parse(fsm.readFileSync(new URL('./fixtures/acceptance_intakes.json', import.meta.url), 'utf8'));
+  const { parseWeek } = await import('../engine/v34_workload_accounting.js');
+
+  // A block can run two strict OHP exposures. Run #156 delivered a lighter Monday
+  // row beside the Sunday row the goal actually rides on, and the Sunday press sat
+  // at 67.5 / 67.5 / 67.5 before bumping to 70 in the consolidation week -- the
+  // exact shape the coach charged. Taking the first matching row read 62.5 in Week
+  // 1 against 67.5 later, so the loads looked like they were already moving.
+  const H = 'Day\tExercise\tWeight\tSets\tReps\tRest\tTarget RPE\tNotes\tResults';
+  const mon = ['62.5', '67.5', '67.5', '62.5'];
+  const sun = ['67.5', '67.5', '67.5', '70'];
+  const squat = ['170', '172.5', '180', '180'];
+  const oap = ['2', '2', '3', '2'];
+  const program = [1, 2, 3, 4].map((w) => [
+    `START_WEEK${w}_TSV`, H,
+    `Mon\tOverhead Press\t${mon[w - 1]} kg\t2\t6\t2-3 min\t7\tSecondary press volume.\t`,
+    `Mon\tBack Squat\t${squat[w - 1]} kg\t3\t3\t3 min\t7.5\tIf technique, RPE and recovery are on target, use the listed load; otherwise hold the prior load.\t`,
+    `Mon\tOne-Arm Pull-up\tBodyweight\t2\t${oap[w - 1]} per arm\t3 min\t7\tClean primary-goal reps only.\t`,
+    `Fri\tPush Press\tRPE-selected load\t2\t3\t2-3 min\t6.5\tLow-cost complementary vertical-press microdose.\t`,
+    `Sun\tOverhead Press\t${sun[w - 1]} kg\t3\t4\t2-3 min\t7\tDirect strict work.\t`,
+    `END_WEEK${w}_TSV`,
+  ].join('\n')).join('\n\n');
+
+  const out = normalizeAdvancedHybridOHPComplement(program, A.advanced_hybrid);
+  const press = (week, day) => {
+    const parsed = parseWeek(out.program, week);
+    const row = parsed.rows.find((c) => /^Overhead Press$/i.test(String(c[parsed.exercise]).trim())
+      && String(c[parsed.day]).trim() === day);
+    return String(row[parsed.load]).trim();
+  };
+
+  // His own numbers: "Progress strict OHP 67.5 -> 70 -> 72.5".
+  assert.equal(press(1, 'Sun'), '67.5 kg');
+  assert.equal(press(2, 'Sun'), '70 kg');
+  assert.equal(press(3, 'Sun'), '72.5 kg');
+  // The lighter exposure is not the one being tracked and must not be stepped.
+  assert.equal(press(2, 'Mon'), '67.5 kg');
+  assert.equal(press(3, 'Mon'), '67.5 kg');
+  // And it settles.
+  assert.equal(normalizeAdvancedHybridOHPComplement(out.program, A.advanced_hybrid).program, out.program);
+});

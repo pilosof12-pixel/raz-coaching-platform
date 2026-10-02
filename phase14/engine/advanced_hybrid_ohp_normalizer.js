@@ -266,19 +266,67 @@ const kgOf = (raw) => {
   return m ? Number(m[1]) : null;
 };
 
-function strictPressRow(parsed) {
-  const i = parsed.rows.findIndex((cells) => /^overhead press$/i.test(rowName(parsed, cells)));
-  return i < 0 ? null : { i, cells: parsed.rows[i] };
+// The press that carries the goal, not whichever one is typed first.
+//
+// A block can run two strict OHP exposures in a week, and the delivered Advanced
+// Hybrid does: a lighter Monday row beside the Sunday row that is the actual
+// progression. Taking the first match read 62.5 in Week 1 against 67.5 in Weeks 2
+// and 3, so the loads looked like they were already moving and the step-up bailed
+// -- leaving the Sunday press at 67.5 / 67.5 / 67.5 and bumping to 70 in the
+// consolidation week, which is the exact shape the coach charged: "Do not leave a
+// named 100 kg strength goal essentially flat for three weeks."
+//
+// The lead is the heaviest loaded row, with total reps as the tie-break. Same
+// rule coaching_progression_gpp.js already uses to decide whether a family moved.
+// A progression belongs to ONE exposure, tracked across the block.
+//
+// Computing the lead per week independently picked Sunday in Week 1 (67.5 for
+// 4x4) and Monday in Weeks 2 and 3 (both rows 67.5 for 3x4, tie broken by
+// position), so the step-up moved Monday and left the Sunday press flat at 67.5
+// -- progressing a row nobody was tracking while the one the goal rides on stood
+// still. The lead day is fixed from Week 1 and every later week reads that day.
+function leadPressDay(program) {
+  const parsed = parseWeek(program, 1);
+  if (!parsed) return null;
+  const lead = strictPressRow(parsed);
+  return lead ? rowDay(parsed, lead.cells) : null;
+}
+
+function strictPressRow(parsed, onDay = null) {
+  let candidates = parsed.rows
+    .map((cells, i) => ({ i, cells }))
+    .filter(({ cells }) => /^overhead press$/i.test(rowName(parsed, cells)));
+  if (onDay) {
+    const sameDay = candidates.filter(({ cells }) => rowDay(parsed, cells) === onDay);
+    if (sameDay.length) candidates = sameDay;
+  }
+  if (!candidates.length) return null;
+  if (candidates.length === 1) return candidates[0];
+
+  const load = ({ cells }) => (Number.isInteger(parsed.index.weight) ? kgOf(cells[parsed.index.weight]) : null);
+  const volume = ({ cells }) => {
+    const n = (k) => Number(String(k ?? '').match(/\d+/)?.[0] || 0);
+    return n(Number.isInteger(parsed.index.sets) ? cells[parsed.index.sets] : 0)
+      * n(Number.isInteger(parsed.index.reps) ? cells[parsed.index.reps] : 0);
+  };
+  const loaded = candidates.filter((c) => Number.isFinite(load(c)));
+  const pool = loaded.length ? loaded : candidates;
+  return pool.reduce((best, c) => {
+    const a = load(c); const b = load(best);
+    if (Number.isFinite(a) && Number.isFinite(b) && a !== b) return a > b ? c : best;
+    return volume(c) > volume(best) ? c : best;
+  }, pool[0]);
 }
 
 function stepPress(program, base, ceiling, probe = false) {
   let candidate = String(program || '');
+  const onDay = leadPressDay(candidate);
   for (const week of [2, 3]) {
     const next = base + PRESS_STEP_KG * (week - 1);
     if (!probe && next > ceiling) continue;
     const parsed = parseWeek(candidate, week);
     if (!parsed || !Number.isInteger(parsed.index.weight)) continue;
-    const row = strictPressRow(parsed);
+    const row = strictPressRow(parsed, onDay);
     if (!row) continue;
     row.cells[parsed.index.weight] = `${next} kg`;
     candidate = rewriteWeek(candidate, parsed);
@@ -324,11 +372,12 @@ function progressNamedSecondaryPress(program, intake = {}) {
   const target = pressGoalTargetKg(intake);
   if (!target) return { program, repairs: [] };
 
+  const onDay = leadPressDay(program);
   const loads = [];
   for (const week of [1, 2, 3]) {
     const parsed = parseWeek(program, week);
     if (!parsed || !Number.isInteger(parsed.index.weight)) return { program, repairs: [] };
-    const row = strictPressRow(parsed);
+    const row = strictPressRow(parsed, onDay);
     if (!row) return { program, repairs: [] };
     const kg = kgOf(row.cells[parsed.index.weight]);
     if (kg == null) return { program, repairs: [] };
@@ -363,7 +412,7 @@ function progressNamedSecondaryPress(program, intake = {}) {
     if (next > ceiling) continue;
     const parsed = parseWeek(candidate, week);
     if (!parsed) continue;
-    const row = strictPressRow(parsed);
+    const row = strictPressRow(parsed, onDay);
     if (!row) continue;
     const weight = `${next} kg`;
     row.cells[parsed.index.weight] = weight;
@@ -376,7 +425,7 @@ function progressNamedSecondaryPress(program, intake = {}) {
     const synced = syncHeldPressCues(candidate, week, 'Overhead Press', weight);
     candidate = synced.program;
     const reparsed = parseWeek(candidate, week);
-    const restored = reparsed && strictPressRow(reparsed);
+    const restored = reparsed && strictPressRow(reparsed, onDay);
     if (restored && Number.isInteger(reparsed.index.notes)) {
       restored.cells[reparsed.index.notes] = `Take the planned ${PRESS_STEP_KG} kg step only if both Week ${week - 1} sets were crisp at or under RPE 8; otherwise repeat the last successful load. Same two sets either way -- the load moves, the pressing volume does not.`;
       candidate = rewriteWeek(candidate, reparsed);
