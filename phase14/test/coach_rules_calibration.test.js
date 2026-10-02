@@ -26,12 +26,22 @@ const A = json('acceptance_intakes.json');
 // this runs, and an offset of 21 or 22 crosses from week 4 into week 3 partway
 // through an ordinary afternoon. That is how these tests went from passing to
 // failing overnight with no source change. gradeProgram takes no clock, so the
-// date has to stay relative to real time and gain margin instead: the first
-// Saturday at least 23 days out is inside week 4 at every hour of every day.
-const WEEK4_SAFE_DAYS = 23;
+// date has to stay relative to real time and gain margin instead.
+//
+// That margin used to be "the first Saturday at least 23 days out", snapping
+// FORWARD, and the comment claimed it was inside week 4 at every hour of every
+// day. It is not. Snapping forward from day 23 reaches day 29 when the run
+// happens on a Friday, which is past the end of a 28-day block: the fight falls
+// outside week 4, the camp rules find nothing, and three tests fail with no
+// source change. Run on a Wednesday it lands on day 24 and they pass. The suite
+// was green on 30 September and red on 2 October for exactly that reason.
+//
+// Snapping BACKWARD from the last day of the block cannot leave it: the result
+// is always the Saturday in [22, 28] days, whichever weekday the suite runs on.
+const BLOCK_DAYS = 28;
 const eventSaturday = () => {
-  const d = new Date(Date.now() + WEEK4_SAFE_DAYS * 86400000);
-  d.setUTCDate(d.getUTCDate() + ((6 - d.getUTCDay() + 7) % 7));
+  const d = new Date(Date.now() + BLOCK_DAYS * 86400000);
+  d.setUTCDate(d.getUTCDate() - ((d.getUTCDay() - 6 + 7) % 7));
   return d.toISOString().slice(0, 10);
 };
 // Eight weeks out sits far outside the block in every direction, so it needs

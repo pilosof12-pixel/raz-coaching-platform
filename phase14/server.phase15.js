@@ -106,6 +106,9 @@ let lastQaSalvage = null;
 // every exit from generateValidatedProgram, read only when the intake asked for
 // diagnostics. // QA-TRACE-DIAGNOSTICS
 let lastQaTrace = null;
+// The flag text and offending rows behind the first entry in that trace, or "".
+// FIRST-ATTEMPT-EVIDENCE
+let lastQaEvidence = "";
 let lastBuildTiming = null;
 // Per-build token accounting. lastAIUsage only ever held the most recent
 // call, so a build that spent four attempts reported the cost of one. The
@@ -120,7 +123,8 @@ function recordDiscardedCall(d) {
 }
 function resetBuildUsage() {
   lastQaSalvage = null;
-  lastQaTrace = null; buildUsage = { calls: 0, input_tokens: 0, cached_input_tokens: 0, output_tokens: 0, reasoning_tokens: 0, openai_ms: 0, discarded_calls: 0, discarded_ms: 0 }; }
+  lastQaTrace = null;
+  lastQaEvidence = ""; buildUsage = { calls: 0, input_tokens: 0, cached_input_tokens: 0, output_tokens: 0, reasoning_tokens: 0, openai_ms: 0, discarded_calls: 0, discarded_ms: 0 }; }
 // A hard ceiling on what one program may cost, in tokens.
 // The budget bounded time and the ceiling bounded a single request, but
 // nothing bounded spend: run #132 put six calls through at 48000
@@ -246,16 +250,16 @@ function isValidProgram(p) {
   const t = p.trim();
   if (t.length < 800) return false;
   // Collapsed/degenerate: too few LETTERS relative to length (dashes/dots/spam).
-  // NOTE: we count letters from ANY script (Latin, Hebrew, Cyrillic, CJK, etc.)
-  // via the Unicode Letter property. The previous [A-Za-z]-only check rejected
-  // valid Hebrew programs as "degenerate" and drove the 5-attempt retry loop
-  // into failure when intake.language == 'he'.
+  // Letters from ANY script, via the Unicode Letter property. An [A-Za-z]-only
+  // check called a program degenerate for characters it simply could not count,
+  // and drove the retry loop into failure. Programs are English now, but a
+  // client's own name or a pasted note is not necessarily Latin.
   let letters = 0;
   try {
     letters = (t.match(/\p{L}/gu) || []).length;
   } catch (_e) {
-    // Extremely old Node without \p{L} support: fall back to Latin + Hebrew.
-    letters = (t.match(/[A-Za-z\u0590-\u05FF]/g) || []).length;
+    // Extremely old Node without \p{L} support.
+    letters = (t.match(/[A-Za-z\u0590-\u05FF\u0400-\u04FF]/g) || []).length;
   }
   if (letters / t.length < 0.25) return false;
   // Whitespace-run collapse: a rare large-prompt MAX_TOKENS failure where the model
@@ -263,8 +267,7 @@ function isValidProgram(p) {
   // program never contains a 400+ char unbroken whitespace run, so reject and retry.
   if (/[ \t]{400,}|\n{200,}/.test(p)) return false;
   // Must contain the machine block markers the rest of the app and the UI rely on.
-  // These are STRUCTURAL tokens that stay literal English per LOCALIZATION_RULES,
-  // so they are safe to check regardless of the program's language.
+  // These are STRUCTURAL tokens the parser and the spreadsheet builder match on.
   if (!t.includes("START_WEEK1_TSV") || !t.includes("END_WEEK1_TSV")) return false;
   return true;
 }
@@ -754,7 +757,6 @@ const INTAKE_HANDLING_RULES = [
   "- Preserve healthy-limb and pain-free training where appropriate. A unilateral symptom does NOT automatically delete training for the unaffected side. Do not increase total weekly load on the same turn that a new significant injury is reported.",
   "- 'split_preference' tells you the client's preferred week structure: 'coach_decide' = choose the optimal split; 'full_body' = full-body; 'ppl' = push/pull/legs; 'upper_lower' = upper/lower. Honour an explicit choice unless it conflicts with days_per_week, sport load, or safety, then choose the closest workable option and explain briefly.",
   "- 'equipment' is the equipment they actually have. Select exercises strictly from within it and the training-location whitelist.",
-  "- 'language' is 'en' or 'he'. Apply LOCALIZATION_RULES.",
   "- 'sport_schedule' is an ARRAY of { day, intensity }. Treat every sport session as real training stress, but do not assume hard sport and heavy lifting can never share a day. Same-day stress consolidation can be appropriate when the athlete has sufficient spacing and recovery; if timing is unknown, use the conservative option and avoid stacking the highest-fatigue lower-body work on a hard sport day.",
   "- 'sleep_hours' and 'recovery_rating' modify the dose, not the athlete's identity. Poor recovery trims optional volume first while preserving the most specific primary exposures when tolerable.",
   "- 'days_per_week' is the number of gym training days. Build exactly that many gym sessions.",
@@ -1263,46 +1265,6 @@ const UNILATERAL_LEG_INTENSITY_RULES = [
   "  - Silent load-cap acceptance: emitting an under-stimulating load with no Notes cell explanation of an equipment cap AND no fallback vector applied.",
 ].join("\n");
 
-const LOCALIZATION_RULES = [
-  "=== LANGUAGE / LOCALIZATION (MANDATORY when intake.language is set) ===",
-  "The intake carries an optional 'language' field. If it is 'he' (Hebrew), the CLIENT-FACING prose is written in Hebrew. If it is 'en' or missing, everything stays in English.",
-  "",
-  "WHAT LOCALIZES (translate to Hebrew when language == 'he'):",
-  "  * The intro paragraph (why this week is structured this way).",
-  "  * The 'How to progress weeks 2-4' paragraph.",
-  "  * Every Exercise cell name (translate the exercise name; keep the exercise recognisable — e.g. 'סקוואט אחורי (Back Squat)' the first time it appears in a week, then just Hebrew after).",
-  "  * Every Notes cell (all client-facing coaching language).",
-  "  * The Target RPE cell descriptor ('קל / בינוני / קשה').",
-  "  * The Rest cell descriptor.",
-  "",
-  "WHAT MUST STAY IN ENGLISH (structural tokens — the parser and spreadsheet builder depend on them):",
-  "  * The TSV column headers, EXACTLY: 'Day\\tExercise\\tWeight\\tSets\\tReps\\tRest\\tTarget RPE\\tNotes\\tResults'.",
-  "  * The day-of-week token in the Day column, EXACTLY: 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'. The spreadsheet parser regex-matches these tokens; Hebrew day names break the day-boundary borders and per-week tabs.",
-  "  * The '[WARMUP]' prefix at the start of any warm-up Exercise cell. The validator regex-matches this literal.",
-  "  * Numeric values (weights, sets, reps) in Western Arabic digits, kg unit, seconds/minutes with 's'/'min'.",
-  "  * The week-block header labels: 'WEEK1', 'WEEK2', 'WEEK3', 'WEEK4' and 'PASTE_WEEK1'/etc if used.",
-  "",
-  "OUTPUT LAYOUT (RTL safety):",
-  "  * Hebrew text inside a cell reads right-to-left; the spreadsheet renderer handles cell direction automatically. Do NOT wrap Hebrew in any BiDi markers.",
-  "  * Do NOT reorder columns or rows for RTL. The parser expects the same column order regardless of language.",
-  "  * When mixing Hebrew and Latin in one cell (e.g. exercise name plus load), put the Hebrew phrase first, then a space, then the Latin fragment (e.g. 'סקוואט אחורי, 100 kg').",
-  "",
-  "TERMINOLOGY DICTIONARY (canonical translations — use these consistently):",
-  "  * Warm-up = חימום ; General prep = הכנה כללית ; Specific ramp = ראמפ ספציפי ; skill primer = פריימר טכני",
-  "  * Sets = סטים ; Reps = חזרות ; Rest = מנוחה ; Weight = משקל ; Notes = הערות ; Target RPE = RPE יעד ; Results = תוצאות",
-  "  * Heavy day = יום כבד ; Moderate day = יום בינוני ; Speed day = יום מהירות ; Recovery = התאוששות ; Deload = פריקה",
-  "  * Back Squat = סקוואט אחורי ; Front Squat = סקוואט קדמי ; Deadlift = דדליפט ; RDL = דדליפט רומני ; Bench Press = לחיצת חזה ; Overhead Press = לחיצת כתפיים ; Pull-up = מתח ; Chin-up = מתח בהחזקת סופינציה ; Dip = דיפ ; Row = חתירה ; Hip Thrust = היפ ת'ראסט",
-  "  * Bulgarian Split Squat = ספליט סקוואט בולגרי ; Pistol Squat = פיסטול סקוואט ; Single-Leg RDL = דדליפט רומני על רגל אחת ; Step-Up = עלייה על ספסל",
-  "  * Wall Handstand Push-Up = לחיצת עמידת ידיים על הקיר ; Freestanding HSPU = לחיצת עמידת ידיים חופשית ; Front Lever = פרונט לבר ; Human Flag = דגל אנושי ; Planche = פלאנץ' ; Muscle-Up = מאסל-אפ ; One-Arm Pull-up = מתח יד אחת",
-  "  * Zone 2 = זון 2 ; EMOM = EMOM ; AMRAP = AMRAP ; tempo = טמפו ; eccentric = אקסצנטרי ; RIR = RIR",
-  "",
-  "HARD FAILS (validator will flag):",
-  "  - Client-facing prose (intro paragraph, notes) in English when language == 'he'.",
-  "  - Day column containing anything other than Mon/Tue/Wed/Thu/Fri/Sat/Sun.",
-  "  - Column headers translated (must stay the fixed English tokens).",
-  "  - '[WARMUP]' prefix translated (must stay literal English).",
-  "  - Weights in non-metric units (must be kg; Hebrew locale still uses kg for strength).",
-].join("\n");
 
 function buildPrompt(intake) {
   return [
@@ -1333,8 +1295,6 @@ function buildPrompt(intake) {
     UNILATERAL_LEG_INTENSITY_RULES,
     "",
     LOCATION_EQUIPMENT_RULES,
-    "",
-    LOCALIZATION_RULES,
     "",
     phase15PromptRules(intake),
     "",
@@ -1372,8 +1332,6 @@ function adjustPrompt(intake, currentProgram, changeRequest) {
     UNILATERAL_LEG_INTENSITY_RULES,
     "",
     LOCATION_EQUIPMENT_RULES,
-    "",
-    LOCALIZATION_RULES,
     "",
     "=== CURRENT PROGRAM (their existing plan) ===",
     currentProgram,
@@ -2449,6 +2407,18 @@ async function generateValidatedProgram(intake, onProgress = async () => {}) {
       }
       transientRetries++;
       attempt--; // this attempt judged nothing, so it does not count as one
+      if (aborted) {
+        // REQUEST-CEILING-DEESCALATION: the ceiling is time, and the retry has exactly as little of
+        // it. Re-sending at the same effort is the one thing guaranteed to fail
+        // identically, which is what run #153 did twice on two avatars.
+        const CEILING_LADDER = { high: "medium", medium: "low" };
+        const currentEffort = String(engineOptions.reasoningEffort || reasoningEffortFor(intake));
+        const nextEffort = CEILING_LADDER[currentEffort];
+        if (nextEffort) {
+          engineOptions = { ...engineOptions, reasoningEffort: nextEffort };
+          console.warn(`generateValidatedProgram: request ceiling at effort ${currentEffort}; retrying at ${nextEffort}`);
+        }
+      }
       if (e?.code === "OPENAI_EMPTY_OUTPUT") {
         const ceiling = Number(engineOptions.maxOutputTokens || OPENAI_MAX_OUTPUT_TOKENS);
         engineOptions = { ...engineOptions, maxOutputTokens: Math.min(96000, Math.round(ceiling * 1.5)) };
@@ -2462,7 +2432,7 @@ async function generateValidatedProgram(intake, onProgress = async () => {}) {
       // last error, and the question "did the retry even run?" needs the
       // service logs to answer -- which is how two runs went by without anyone
       // being able to say why the dual-event block produced nothing.
-      qaTrace.push(`T${transientRetries}:${aborted ? "request_ceiling" : "empty_output"}${e?.incompleteReason ? "(" + e.incompleteReason + ")" : ""}`);
+      qaTrace.push(`T${transientRetries}:${aborted ? "request_ceiling" : "empty_output"}${e?.incompleteReason ? "(" + e.incompleteReason + ")" : ""}${engineOptions.reasoningEffort ? "@" + engineOptions.reasoningEffort : ""}`);
       console.warn(`generateValidatedProgram: ${reason}; transient retry ${transientRetries}/${MAX_TRANSIENT_RETRIES}`);
       // Say which retry this is. Decrementing the attempt counter and re-emitting
       // the same stage and detail made a discarded seven-minute generation look
@@ -2486,16 +2456,25 @@ async function generateValidatedProgram(intake, onProgress = async () => {}) {
     }
     let program = normalizeYouthPrimarySkillOrder(enrichSpecificWarmups(repairUnbenchmarkedVariationLoads(fixInvalidExerciseNames(raw), intake), intake), intake).program; // step 1: DETERMINISTIC-UNBENCHMARKED-LOAD-REPAIR + SPECIFIC-WARMUP-ENRICHMENT + YOUTH-SKILL-ORDER-REPAIR
     program = normalizeAdvancedHybridWeek4OapConsolidation(program, intake).program; // ADVANCED-HYBRID-OAP-CONSOLIDATION-REPAIR-WIRED
-    try {
-      await onProgress("validating", attempt, "exercise and coaching validators");
+    // Steps 2-9, extracted so a deterministic substitution can be re-validated
+    // against this identical chain rather than trusted. Each step writes its
+    // normalized program back to `program`, because the retry path keeps that as
+    // the last structurally valid candidate.
+    const runQualityChain = (start) => {
+      program = start;
       const aggregateValidation = validateRepairableProgramBundle(program, intake, {
         skipSkillCalibration: Boolean(OPENAI_API_KEY), // OPENAI-DIRECT-SKILL-CALIBRATION-GUARD
       }); // AGGREGATE-REPAIR-VALIDATION-RUNTIME
       program = aggregateValidation.program;
       validateClientOutputCleanliness(program); // CLIENT-OUTPUT-CLEANLINESS-INLOOP              // step 11: variation-aware final QA
-      await onProgress("finalizing", attempt, "quality checks passed including Phase 15 v5");
-      lastQaTrace = qaTrace.slice(); // QA-TRACE-DIAGNOSTICS-SUCCESS
       return program;
+    };
+    try {
+      await onProgress("validating", attempt, "exercise and coaching validators");
+      const finished = runQualityChain(program);
+      await onProgress("finalizing", attempt, "quality checks passed including Phase 15 v5");
+      lastQaTrace = qaTrace.slice(); lastQaEvidence = lastRepairDetail || lastQaEvidence; // FIRST-ATTEMPT-EVIDENCE // QA-TRACE-DIAGNOSTICS-SUCCESS
+      return finished;
     } catch (err) {
       const repairable = Boolean(err && (
         (err.code && RETRIABLE_CODES.has(err.code)) ||
@@ -2544,7 +2523,7 @@ async function generateValidatedProgram(intake, onProgress = async () => {}) {
               qaTrace.push(`A${attempt}:${repairLabel}->DETERMINISTIC_NOTE_REPAIR`);
               console.warn(`generateValidatedProgram: quality-preserving deterministic note repair passed for ${repairLabel}; avoided full regeneration`);
               await onProgress("finalizing", attempt, "objective wording mismatch repaired without changing prescription");
-              lastQaTrace = qaTrace.slice(); // QA-TRACE-DIAGNOSTICS-FASTPATH
+              lastQaTrace = qaTrace.slice(); lastQaEvidence = lastRepairDetail || lastQaEvidence; // FIRST-ATTEMPT-EVIDENCE // QA-TRACE-DIAGNOSTICS-FASTPATH
               return repairedProgram;
             } catch (deterministicErr) {
               // Keep the objectively improved candidate, then allow the normal
@@ -2620,7 +2599,7 @@ async function generateValidatedProgram(intake, onProgress = async () => {}) {
             validateClientOutputCleanliness(finished);
             await onProgress("finalizing", attempt, "deterministic repair converged without another model call");
             qaTrace.push("A" + attempt + ":converged-without-regeneration"); // REPAIRED-CANDIDATE-REUSE
-            lastQaTrace = qaTrace.slice();
+            lastQaTrace = qaTrace.slice(); lastQaEvidence = lastRepairDetail || lastQaEvidence; // FIRST-ATTEMPT-EVIDENCE
             return finished;
           } catch (stillFlagged) {
             // Not clean yet. The improvement is still worth more than the
@@ -2629,6 +2608,31 @@ async function generateValidatedProgram(intake, onProgress = async () => {}) {
           }
           repairCandidate = repairedByBundle; // REPAIRED-CANDIDATE-REUSE
           continue;
+        }
+        // A fix the dictionary already knows does not need a model call to
+        // find it again. Re-validated in full before it is accepted. // DETERMINISTIC-SUBSTITUTION-FIRST
+        const programBeforeSubstitution = program;
+        let substituted = "";
+        try {
+          const candidate = hardSubstitute(repairCode, program, intake);
+          if (typeof candidate === "string" && candidate.trim() && candidate !== program) substituted = candidate;
+        } catch (noSubstitution) {
+          void noSubstitution;
+        }
+        if (substituted) {
+          try {
+            const finished = runQualityChain(substituted);
+            validateClientOutputCleanliness(finished);
+            await onProgress("finalizing", attempt, "deterministic substitution converged without another model call");
+            qaTrace.push("A" + attempt + ":substituted-without-regeneration"); // DETERMINISTIC-SUBSTITUTION-FIRST
+            lastQaTrace = qaTrace.slice(); lastQaEvidence = lastRepairDetail || lastQaEvidence; // FIRST-ATTEMPT-EVIDENCE
+            return finished;
+          } catch (stillFlagged) {
+            // runQualityChain normalizes `program` as it goes, so put the
+            // model's own text back before handing this to the next attempt.
+            program = programBeforeSubstitution;
+            void stillFlagged; // DETERMINISTIC-SUBSTITUTION-FIRST
+          }
         }
         repairCandidate = requiresFreshCandidate ? null : program; // STRUCTURAL-ONLY-FRESH-CANDIDATE
         continue;
@@ -2661,7 +2665,7 @@ async function generateValidatedProgram(intake, onProgress = async () => {}) {
     };
     console.warn("generateValidatedProgram: delivering a repaired candidate with unresolved rules:",
       JSON.stringify({ unresolved, trace }));
-    lastQaTrace = qaTrace.slice(); // QA-TRACE-DIAGNOSTICS-SALVAGE
+    lastQaTrace = qaTrace.slice(); lastQaEvidence = lastRepairDetail || lastQaEvidence; // FIRST-ATTEMPT-EVIDENCE // QA-TRACE-DIAGNOSTICS-SALVAGE
     return reformatWarmupCells(salvaged);
   } // QA-SALVAGE-TAIL
   throw new Error(
@@ -2739,8 +2743,8 @@ async function runBuildJob(jobId, token, intake, isNewToken = false) {
     validateClientOutputCleanliness(program); // SAVE-BOUNDARY-CLIENT-CLEANLINESS
     const generationAndQaMs = Date.now() - generationStarted;
     const qaTraceSuffix = intake && intake.qa_diagnostics === true && Array.isArray(lastQaTrace) && lastQaTrace.length
-      ? ` QA trace: ${lastQaTrace.join(" -> ")}.`
-      : ""; // QA-TRACE-DIAGNOSTICS-DETAIL
+      ? ` QA trace: ${lastQaTrace.join(" -> ")}.${lastQaEvidence ? ` First failure evidence: ${String(lastQaEvidence).slice(0, 600)}` : ""}`
+      : ""; // QA-TRACE-DIAGNOSTICS-DETAIL // FIRST-ATTEMPT-EVIDENCE
     await progress("finalizing", Number(buildUsage?.calls || 0), `saving program after ${Number(buildUsage?.calls || 0)} model call(s)${qaTraceSuffix}`);
     const saveStarted = Date.now();
     const now = Date.now();
@@ -2823,79 +2827,6 @@ app.post("/api/build", async (req, res) => {
 });
 
 // Adjust an existing program (surgical diff) -> returns a job id
-// Change program language (en <-> he) WITHOUT rebuilding the whole plan.
-// Persists intake.language and triggers an adjust-style translation job so
-// prose, exercise names and Notes are re-emitted in the target language
-// while structural TSV tokens (columns, day names, [WARMUP] prefix, loads)
-// stay unchanged.
-async function runSetLanguageJob(jobId, token, targetLang) {
-  try {
-    const client = await store.getClient(token);
-    if (!client) throw new Error("No saved program for this client yet.");
-    const intake = JSON.parse(client.intake);
-    const previousLang = intake.language || "en";
-    intake.language = targetLang;
-    const now = Date.now();
-    // Persist the language change FIRST so future adjusts inherit it even if
-    // the translation step fails.
-    await store.upsertClient(token, JSON.stringify(intake), client.program, now);
-
-    const targetName = targetLang === "he" ? "Hebrew" : "English";
-    const changeRequest = [
-      `LANGUAGE CHANGE ONLY. Translate this entire program from ${previousLang === "he" ? "Hebrew" : "English"} to ${targetName}.`,
-      "Do NOT change any loads, sets, reps, rest times, RPE targets, days, or exercise selection.",
-      "Do NOT rebuild the program. Only re-emit every client-facing string in the target language.",
-      "Obey LOCALIZATION_RULES exactly: structural TSV tokens (column headers, Mon/Tue/... day tokens, [WARMUP] prefix, WEEK1..WEEK4 labels, kg/s/min units and numeric values) remain in English regardless of target language.",
-      `intake.language is now '${targetLang}' — keep it that way.`,
-    ].join(" ");
-    const program = privacyScrub(await runEngine(adjustPrompt(intake, client.program, changeRequest)), intake);
-    const finishedAt = Date.now();
-    await store.updateClientProgram(token, program, finishedAt);
-    await store.addHistory(token, "adjust", `[language:${targetLang}] ${changeRequest}`, program, finishedAt);
-    await store.finishJob(jobId, "done", program, null, finishedAt);
-  } catch (e) {
-    console.error("set-language job error:", e);
-    await store.finishJob(jobId, "error", null, e.message || "Engine error.", Date.now());
-  }
-}
-
-app.post("/api/set-language", async (req, res) => {
-  try {
-    const token = (req.body?.token || "").trim();
-    const language = (req.body?.language || "").trim().toLowerCase();
-    if (!token) return res.status(400).json({ error: "Missing client token." });
-    if (language !== "en" && language !== "he") {
-      return res.status(400).json({ error: "Language must be 'en' or 'he'." });
-    }
-    const client = await store.getClient(token);
-    if (!client) return res.status(404).json({ error: "No saved program for this client yet." });
-
-    // Fast path: if the requested language already matches the stored intake,
-    // there is nothing to translate. Return the current program immediately.
-    const intake = JSON.parse(client.intake);
-    if ((intake.language || "en") === language) {
-      return res.json({ status: "nochange", token, language });
-    }
-
-    // Language change counts against the adjust quota because it uses the
-    // same engine path.
-    const u = await store.getUsage(token);
-    if (u.adjusts >= DAILY_ADJUSTS) {
-      return res.status(429).json({
-        error: `You've reached today's adjustment limit (${DAILY_ADJUSTS}). Try again tomorrow.`,
-      });
-    }
-
-    const jobId = crypto.randomBytes(16).toString("hex");
-    await store.createJob(jobId, token, "adjust", Date.now());
-    runSetLanguageJob(jobId, token, language).catch((err) => failJobSafely(jobId, err, "set-language"));
-    res.status(202).json({ job_id: jobId, token, status: "pending", language });
-  } catch (e) {
-    console.error("set-language error:", e);
-    res.status(500).json({ error: e.message || "Engine error." });
-  }
-});
-
 app.post("/api/adjust", async (req, res) => {
   try {
     const token = (req.body?.token || "").trim();
