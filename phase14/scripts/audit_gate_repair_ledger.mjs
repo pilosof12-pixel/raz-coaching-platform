@@ -64,15 +64,48 @@ const CODE_RE = [
   /\bfail\(\s*['"]([A-Z][A-Z0-9_]{4,})['"]/g,
   /Phase15QualityError\(\[\{\s*code:\s*['"]([A-Z][A-Z0-9_]{4,})['"]/g,
 ];
+// Not every gate names its code in the throw. youth_session_quality.js picks
+// between two codes with a ternary, assigns the result to a variable, and
+// throws the variable -- so neither code appeared anywhere in this ledger. One
+// of them, YOUTH_REDUNDANT_HANDSTAND_CAPACITY, aborted the youth gymnast's
+// first attempt in run #158. A paid build died on a code the dead-build audit
+// did not know existed, which is the one thing this file is for.
+//
+// So where the first argument is an identifier rather than a literal, follow it
+// to the literals assigned to it in the same file. Narrow on purpose: only that
+// identifier's own assignments, and only strings already shaped like a code.
+const THROWN_IDENT = [
+  /RetriableValidationError\(\s*([a-z_$][\w$]*)\s*,/g,
+  /Phase15QualityError\(\[\{\s*code:\s*([a-z_$][\w$]*)\s*[,}]/g,
+  /\bfail\(\s*([a-z_$][\w$]*)\s*,/g,
+];
+const CODE_LITERAL = /['"]([A-Z][A-Z0-9_]{4,})['"]/g;
+
+function codesBehindIdentifiers(src) {
+  const found = new Set();
+  const idents = new Set();
+  for (const re of THROWN_IDENT) for (const m of src.matchAll(re)) idents.add(m[1]);
+  for (const ident of idents) {
+    // The assignment statement, up to the semicolon that ends it.
+    const assign = new RegExp(`(?:const|let|var)\\s+${ident}\\s*=([^;]*);|(?<![.\\w])${ident}\\s*=([^;=][^;]*);`, 'g');
+    for (const m of src.matchAll(assign)) {
+      const expr = m[1] || m[2] || '';
+      for (const lit of expr.matchAll(CODE_LITERAL)) found.add(lit[1]);
+    }
+  }
+  return found;
+}
+
 const raisedIn = new Map(); // code -> Set(file)
 for (const file of engineFiles) {
   const src = fs.readFileSync(file, 'utf8');
-  for (const re of CODE_RE) {
-    for (const m of src.matchAll(re)) {
-      if (!raisedIn.has(m[1])) raisedIn.set(m[1], new Set());
-      raisedIn.get(m[1]).add(path.relative(root, file));
-    }
-  }
+  const rel = path.relative(root, file);
+  const add = (code) => {
+    if (!raisedIn.has(code)) raisedIn.set(code, new Set());
+    raisedIn.get(code).add(rel);
+  };
+  for (const re of CODE_RE) for (const m of src.matchAll(re)) add(m[1]);
+  for (const code of codesBehindIdentifiers(src)) add(code);
 }
 
 // A module that raises a flag and also exports a repair is suggestive, and no
@@ -107,6 +140,16 @@ for (const file of engineFiles) {
 const DECLARED_REPAIRS = {
   TACTICAL_SCHEDULE_ARCHITECTURE_VIOLATION: [
     ['engine/tactical_strength_spacing.js', 'normalizeTacticalStrengthSpacing'],
+  ],
+  // youth_session_quality.js raises both of these and repairs neither; the
+  // repair is next door in youth_session_quality_normalizer.js, which the
+  // bundle calls. Module proximity could not see it, so the ledger reported
+  // the youth session gates as having no answer at all.
+  YOUTH_REDUNDANT_HANDSTAND_CAPACITY: [
+    ['engine/youth_session_quality_normalizer.js', 'normalizeYouthSessionQuality'],
+  ],
+  YOUTH_PRIMARY_SKILL_SESSION_COVERAGE_MISSING: [
+    ['engine/youth_session_quality_normalizer.js', 'normalizeYouthSessionQuality'],
   ],
 };
 

@@ -23,6 +23,17 @@ function barSkill(name) { return /bar muscle[- ]?up|muscle[- ]?up transition/i.t
 function kickup(name) { return /controlled handstand kick[- ]?up|freestanding handstand/i.test(String(name || '')); }
 function handstandHold(name) { return /handstand/i.test(String(name || '')) && /hold/i.test(String(name || '')); }
 function explicitWallHold(name) { return /wall/i.test(String(name || '')) && handstandHold(name); }
+// "15-20 sec" and "25s" both describe a hold; the longest number in the cell is
+// what the athlete is working toward, so it is the one that measures the dose.
+function longestHoldSeconds(reps) {
+  const numbers = String(reps || '').match(/\d+(?:\.\d+)?/g);
+  return numbers ? Math.max(...numbers.map(Number)) : 0;
+}
+function holdSubstantiveness(cells, index) {
+  const sets = Number(String(cells[index.sets] || '').match(/\d+/)?.[0] || 0) || 1;
+  const seconds = longestHoldSeconds(cells[index.reps]) || 1;
+  return sets * seconds;
+}
 function mislabeledTransition(cells, index) {
   const exercise = String(cells[index.exercise] || '');
   const notes = String(cells[index.notes] || '');
@@ -175,9 +186,30 @@ export function normalizeYouthSessionQuality(program, intake = {}) {
       // Handstand Hold in the same session is redundant rather than a new skill.
       indexes = rowIndexesForDay(rows, index, day);
       const holdIndexes = indexes.filter((i) => handstandHold(rows[i][index.exercise]));
-      const explicitWall = holdIndexes.filter((i) => explicitWallHold(rows[i][index.exercise]));
-      if (holdIndexes.length > 1 && explicitWall.length) {
-        const keep = explicitWall[0];
+      if (holdIndexes.length > 1) {
+        // The coverage half of this same validator wants independent balance
+        // practised directly in every session, and "Freestanding Handstand
+        // Hold" is both a static hold and that exposure. Where it is the only
+        // row carrying it, dropping it would clear the redundancy and open a
+        // coverage violation in its place, which repairs nothing.
+        const balanceIndexes = indexes.filter((i) => kickup(rows[i][index.exercise]));
+        const protectedIndex = balanceIndexes.length === 1 && holdIndexes.includes(balanceIndexes[0])
+          ? balanceIndexes[0]
+          : null;
+        const explicitWall = holdIndexes.filter((i) => explicitWallHold(rows[i][index.exercise]) && i !== protectedIndex);
+        // An explicit wall-supported row is the capacity row the standard names,
+        // so it is still preferred. What used to happen without one -- two holds
+        // and neither says "wall" -- is that this repair declined, the blocking
+        // gate refused the program, and the model was asked to rewrite the whole
+        // block. That is how run #158's youth attempt was aborted. So when no
+        // row names a wall, keep the most substantive hold rather than give up:
+        // one hold per session is what the rule asks for either way, and the
+        // larger dose is the one worth keeping.
+        const keep = protectedIndex !== null
+          ? protectedIndex
+          : explicitWall.length
+            ? explicitWall[0]
+            : holdIndexes.reduce((best, i) => (holdSubstantiveness(rows[i], index) > holdSubstantiveness(rows[best], index) ? i : best));
         for (const duplicateIndex of holdIndexes.filter((i) => i !== keep).sort((a, b) => b - a)) {
           rows.splice(duplicateIndex, 1);
           repairs.push({ type: 'remove_redundant_handstand_hold', week, day });

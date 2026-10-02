@@ -1201,10 +1201,12 @@
   {
     "code": "NAMED_GOAL_DIRECT_EXPOSURE_MISSING",
     "modules": [
-      "engine/phase15_elite_guardrails.js"
+      "engine/phase15_elite_guardrails.js",
+      "engine/semantic_program_qa.js"
     ],
     "owners": [
-      "goalDoseFlags"
+      "goalDoseFlags",
+      "validateDirectGoalExposureSemantic"
     ],
     "advisory": false,
     "reachable": true,
@@ -1702,10 +1704,12 @@
   {
     "code": "TARGET_MODALITY_EXPOSURE_REDUCED",
     "modules": [
-      "engine/phase15_elite_guardrails.js"
+      "engine/phase15_elite_guardrails.js",
+      "engine/semantic_program_qa.js"
     ],
     "owners": [
-      "endurancePerformanceIntegrityFlags"
+      "endurancePerformanceIntegrityFlags",
+      "validateDirectGoalExposureSemantic"
     ],
     "advisory": false,
     "reachable": true,
@@ -3976,6 +3980,26 @@
     "killedLive": ""
   },
   {
+    "code": "YOUTH_PRIMARY_SKILL_SESSION_COVERAGE_MISSING",
+    "modules": [
+      "engine/youth_session_quality.js"
+    ],
+    "owners": [
+      "validateYouthSessionQualitySemantic"
+    ],
+    "advisory": false,
+    "reachable": true,
+    "repairs": [
+      "normalizeYouthSessionQuality"
+    ],
+    "wired": [
+      "normalizeYouthSessionQuality"
+    ],
+    "tested": true,
+    "stressed": false,
+    "killedLive": ""
+  },
+  {
     "code": "YOUTH_PROGRESSION_QUALITY_MISSING",
     "modules": [
       "engine/coaching_acceptance_quality.js"
@@ -3987,6 +4011,26 @@
     "reachable": true,
     "repairs": [],
     "wired": [],
+    "tested": true,
+    "stressed": false,
+    "killedLive": ""
+  },
+  {
+    "code": "YOUTH_REDUNDANT_HANDSTAND_CAPACITY",
+    "modules": [
+      "engine/youth_session_quality.js"
+    ],
+    "owners": [
+      "validateYouthSessionQualitySemantic"
+    ],
+    "advisory": false,
+    "reachable": true,
+    "repairs": [
+      "normalizeYouthSessionQuality"
+    ],
+    "wired": [
+      "normalizeYouthSessionQuality"
+    ],
     "tested": true,
     "stressed": false,
     "killedLive": ""
