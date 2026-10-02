@@ -38,6 +38,68 @@ function goalStatesBaselineAndTarget(s) {
   return /(?:\bfrom\b[\s\S]{0,80}\bto\b|(?:-|=)>|→)/i.test(raw);
 }
 
+// An intake can contradict itself, and when it does the model pays for it.
+//
+// The sprint triathlete's sport_schedule put a long run on Sunday and running
+// intervals on Monday, while her own notes said "No two running days are
+// consecutive, which is deliberate" because the achilles does not tolerate
+// back-to-back ones. In run #159 that build ran 1201 seconds, exhausted the job
+// budget at two different reasoning efforts and delivered nothing: the model was
+// handed a rule and a schedule that cannot both hold, and spent the whole budget
+// trying. Every other avatar in that run reached a program.
+//
+// A contradiction is cheap to find and expensive to send. This costs
+// microseconds and turns a billed twenty-minute failure into a question, which
+// is the one thing the athlete can actually resolve.
+//
+// Deliberately conservative: it asks only when the intake states the rule in so
+// many words AND the supplied schedule breaks it. A schedule that simply has
+// back-to-back runs is not a contradiction -- plenty of runners train that way
+// -- so nothing is asked unless the athlete has said it should not happen.
+const WEEK_ORDER = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'];
+const NO_CONSECUTIVE_RUN_DAYS = [
+  /\bno\s+two\s+running\s+days?\s+(?:are|should\s+be|can\s+be)?\s*consecutive\b/i,
+  /\bconsecutive\s+running\s+days?\s+are\s+not\s+(?:tolerated|possible|an option)\b/i,
+  /\b(?:does\s+not|doesn't|cannot|can't)\s+tolerate\s+(?:back[- ]to[- ]back|consecutive)\s+(?:runs?|running)\b/i,
+  /\b(?:back[- ]to[- ]back|consecutive)\s+running\s+days?\s+are\s+not\b/i,
+];
+
+function scheduleRunDays(intake = {}) {
+  const schedule = Array.isArray(intake?.sport_schedule) ? intake.sport_schedule : [];
+  const days = [];
+  for (const entry of schedule) {
+    const label = `${entry?.type || ''} ${entry?.session || ''} ${entry?.activity || ''}`;
+    if (!/\brun(?:ning)?\b/i.test(label)) continue;
+    const key = String(entry?.day || '').trim().slice(0, 3).toLowerCase();
+    const index = WEEK_ORDER.indexOf(key);
+    if (index >= 0) days.push(index);
+  }
+  return [...new Set(days)].sort((a, b) => a - b);
+}
+
+// Circular, because a Sunday long run and a Monday interval session are
+// consecutive days and reading the week as a flat list is what missed it.
+function consecutivePairs(days) {
+  const pairs = [];
+  for (let i = 0; i < days.length; i += 1) {
+    for (let j = i + 1; j < days.length; j += 1) {
+      const gap = Math.abs(days[i] - days[j]);
+      if (gap === 1 || gap === WEEK_ORDER.length - 1) pairs.push([days[i], days[j]]);
+    }
+  }
+  return pairs;
+}
+
+export function scheduleContradictsStatedRunSpacing(intake = {}) {
+  const stated = text([intake?.notes, intake?.pain, intake?.injuries, intake?.limitations, intake?.clarification_answers]);
+  if (!NO_CONSECUTIVE_RUN_DAYS.some((re) => re.test(stated))) return null;
+  const days = scheduleRunDays(intake);
+  const pairs = consecutivePairs(days);
+  if (!pairs.length) return null;
+  const label = (i) => WEEK_ORDER[i].replace(/^./, (c) => c.toUpperCase());
+  return { pairs: pairs.map(([a, b]) => [label(a), label(b)]), run_days: days.map(label) };
+}
+
 function addQuestion(out, intake, q) {
   if (out.length >= 4 || answered(intake, q.id) || out.some(x => x.id === q.id)) return;
   out.push({ answer_type:'text', required:true, ...q });
@@ -52,6 +114,18 @@ export function requiredClarifications(questions) {
 
 export function detectIntakeClarifications(intake = {}) {
   const out = [];
+
+  // Asked before anything else, because the four-question cap must not be able
+  // to hide a contradiction: a missing number makes the engine guess, while a
+  // contradiction makes the build run until the budget is gone.
+  const spacing = scheduleContradictsStatedRunSpacing(intake);
+  if (spacing) {
+    addQuestion(out, intake, {
+      id: 'run_day_spacing_conflict',
+      prompt: `Your week has running on ${spacing.run_days.join(', ')}, which puts ${spacing.pairs.map(([a, b]) => `${a} and ${b}`).join(' and also ')} on consecutive days -- but you have also said no two running days should be consecutive. Which should the block follow?`,
+      help: 'Either name the day a run should move to, or say that consecutive running days are in fact acceptable. Both are fine answers; the two cannot both be true at once.',
+    });
+  }
   const goals = goalText(intake);
   const current = currentText(intake);
   const pain = painText(intake);
