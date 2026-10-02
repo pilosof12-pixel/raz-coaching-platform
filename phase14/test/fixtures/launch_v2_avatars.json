@@ -29,27 +29,27 @@
     "sport_schedule": [
       {
         "day": "Mon",
-        "type": "Swim",
-        "intensity": "moderate"
-      },
-      {
-        "day": "Tue",
         "type": "Run intervals",
         "intensity": "hard"
       },
       {
+        "day": "Tue",
+        "type": "Swim",
+        "intensity": "moderate"
+      },
+      {
         "day": "Wed",
+        "type": "Run easy",
+        "intensity": "light"
+      },
+      {
+        "day": "Thu",
         "type": "Bike",
         "intensity": "moderate"
       },
       {
-        "day": "Thu",
-        "type": "Swim technique",
-        "intensity": "light"
-      },
-      {
         "day": "Fri",
-        "type": "Run easy",
+        "type": "Swim technique",
         "intensity": "light"
       },
       {
@@ -84,7 +84,7 @@
       "active": false,
       "limitation": ""
     },
-    "notes": "The race is 8 weeks out, so this four-week block is the middle of the build and is NOT the taper. The swim is the weakest leg by a distance and the one she loses most time in, and it is also the cheapest leg to recover from. The run is the leg the achilles limits. If something has to give, hold the bike rather than developing it. Works full time with two young children. She trains seven times a week but only TWO of those are gym sessions, fixed on Tuesday and Friday, and both land on a running day. The swim, bike and run sessions are the sport week and are listed in sport_schedule; do not convert a gym day into a cardio day or count a swim as a strength session. No two running days are consecutive, which is deliberate: the achilles tolerates the current three runs and does not tolerate back-to-back ones. Do not prescribe rehabilitation: the achilles is asymptomatic and she wants to race.",
+    "notes": "The race is 8 weeks out, so this four-week block is the middle of the build and is NOT the taper. The swim is the weakest leg by a distance and the one she loses most time in, and it is also the cheapest leg to recover from. The run is the leg the achilles limits. If something has to give, hold the bike rather than developing it. Works full time with two young children. She trains seven times a week but only TWO of those are gym sessions, fixed on Tuesday and Friday, and both land on a running day. The swim, bike and run sessions are the sport week and are listed in sport_schedule; do not convert a gym day into a cardio day or count a swim as a strength session. No two running days are consecutive, which is deliberate: the achilles tolerates the current three runs and does not tolerate back-to-back ones. The two gym days carry the swims rather than the hard run or the long ride, because easy low-intensity work sits closer to lifting at a lower acute cost than hard intervals do. Do not prescribe rehabilitation: the achilles is asymptomatic and she wants to race.",
     "qa_diagnostics": true
   },
   "inseason_basketball": {
