@@ -7,7 +7,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 
-import { deliveryVerdict, unresolvedRulesFrom } from '../engine/delivery_verdict.js';
+import { deliveryVerdict, effortThatWroteIt, unresolvedRulesFrom } from '../engine/delivery_verdict.js';
 
 // The real string, from docs/qa/live-three-avatar/latest/result.json.
 const RUN160_TRIATHLETE = 'delivered with unresolved rules: SPORT_DAY_COUPLING_VIOLATION+LOW_INTENSITY_PACE_CONTRADICTS_CURRENT_PERFORMANCE QA trace: E0:medium -> T1:request_ceiling@low -> A1:TARGET_MODALITY_EXPOSURE_REDUCED+TARGET_MODALITY_EXPOSURE_REDUCED+EVENT_PROGRESSING_SESSION_MISSING -> A2:SPORT_DAY_COUPLING_VIOLATION+LOW_INTENSITY_PACE_CONTRADICTS_CURRENT_PERFORMANCE.';
@@ -49,4 +49,33 @@ test('a missing or empty detail does not invent a verdict', () => {
   assert.equal(deliveryVerdict({ ok: true }).verdict, 'PASS');
   assert.deepEqual(unresolvedRulesFrom(undefined), []);
   assert.deepEqual(unresolvedRulesFrom(''), []);
+});
+
+// The ladder is not quality-neutral the whole way down. high -> medium costs
+// nothing, because high never finished inside the request ceiling on four of
+// five avatars and medium was already writing every program. medium -> low is
+// different: in run #160 the triathlete fell to low and it shows, with six
+// minutes of intervals on her Monday and weekly running volume at roughly half
+// the 22-25 km she tolerates. That is the right trade against delivering
+// nothing, and it is not something a report should leave to be inferred from a
+// trace string.
+
+test('the effort that wrote the program is the last one named', () => {
+  assert.equal(effortThatWroteIt('QA trace: E0:medium -> T1:request_ceiling@low -> A1:X.'), 'low');
+  assert.equal(effortThatWroteIt('QA trace: E0:high -> T1:request_ceiling@medium.'), 'medium');
+  assert.equal(effortThatWroteIt('saving program after 1 model call(s) QA trace: E0:medium.'), 'medium');
+  assert.equal(effortThatWroteIt('no trace here'), null);
+});
+
+test('a low-effort program is marked degraded without changing its verdict', () => {
+  const clean = deliveryVerdict({ ok: true, detail: 'QA trace: E0:medium -> T1:request_ceiling@low.' });
+  assert.equal(clean.verdict, 'PASS', 'clean is still clean');
+  assert.equal(clean.degraded, true, 'and still worth a second look');
+  assert.equal(clean.effort, 'low');
+});
+
+test('a medium program is not degraded', () => {
+  const r = deliveryVerdict({ ok: true, detail: RUN160_BASKETBALL });
+  assert.equal(r.degraded, false);
+  assert.equal(r.effort, 'medium');
 });

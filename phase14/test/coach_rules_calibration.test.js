@@ -38,12 +38,22 @@ const A = json('acceptance_intakes.json');
 //
 // Snapping BACKWARD from the last day of the block cannot leave it: the result
 // is always the Saturday in [22, 28] days, whichever weekday the suite runs on.
-const BLOCK_DAYS = 28;
-const eventSaturday = () => {
-  const d = new Date(Date.now() + BLOCK_DAYS * 86400000);
-  d.setUTCDate(d.getUTCDate() - ((d.getUTCDay() - 6 + 7) % 7));
-  return d.toISOString().slice(0, 10);
-};
+// The fight camp is pinned to fixed dates, not computed from today.
+//
+// It used to take "28 days out, then back to Saturday", and that quietly
+// depends on what day of the week it is run. The rules that look at the day
+// before the event read the LAST week of the camp plan, and whether a Saturday
+// 22 days out lands in that week depends on where today sits inside its own
+// Mon-Sun week. On a Friday it does not, so two tests failed for a reason that
+// has nothing to do with the rules they check. This file already had one
+// calendar-drift bug fixed today, in a different helper, and the fix there was
+// still a computed date.
+//
+// A computed date is the wrong shape for this. These rules take `now` as a
+// parameter, so both ends can be fixed and the test cannot drift again: a
+// Monday, with the bout on the Saturday of the fourth week after it.
+const FIGHT_NOW = Date.parse('2026-10-05T12:00:00Z'); // a Monday
+const FIGHT_DAY = '2026-10-31'; // the Saturday of week 4
 // Eight weeks out sits far outside the block in every direction, so it needs
 // no margin treatment.
 const saturday = (w) => {
@@ -53,7 +63,7 @@ const saturday = (w) => {
 };
 const LIFTER = { ...C.weightlifter_peak, competition_date: saturday(8), event_type: 'strength_meet', event_priority: 'A' };
 const TACTICAL = A.tactical_3k;
-const FIGHTER = { ...C.mma_fight_camp, competition_date: eventSaturday() };
+const FIGHTER = { ...C.mma_fight_camp, competition_date: FIGHT_DAY };
 
 const P1 = () => read('run101_weightlifter_peak.txt');
 const P2 = () => read('run81_tactical_3k.txt');
@@ -68,7 +78,7 @@ test('his five-consecutive-days finding is reproduced from the tables', () => {
   assert.equal(flags.length, 4, 'all four weeks');
   assert.match(flags[0].detail, /5 days in a row \(mon, tue, wed, thu, fri\) against a limit of 3/);
   // Not raised when the athlete cannot move their days.
-  assert.deepEqual(consecutiveTrainingDays(P3(), FIGHTER), []);
+  assert.deepEqual(consecutiveTrainingDays(P3(), FIGHTER, FIGHT_NOW), []);
 });
 
 // The training week wraps. Reading the calendar left to right scored Sat, Sun,
@@ -145,21 +155,21 @@ test('a ruck below the distance the athlete already tolerates is found', () => {
 });
 
 test('two primers on the day before the fight are found', () => {
-  const flags = dayMinusOneStacked(P3(), FIGHTER);
+  const flags = dayMinusOneStacked(P3(), FIGHTER, FIGHT_NOW);
   assert.equal(flags.length, 1);
   assert.equal(flags[0].day, 'fri');
   assert.match(flags[0].detail, /both an MMA technical session and/);
   // An explicit either/or is the fix, and clears it.
   const fixed = `If the technical session already includes fast pad work, that session is the primer.\n${P3()}`;
-  assert.deepEqual(dayMinusOneStacked(fixed, FIGHTER), []);
+  assert.deepEqual(dayMinusOneStacked(fixed, FIGHTER, FIGHT_NOW), []);
 });
 
 test('rewriting the athlete sport week without owning it is found', () => {
-  const flags = sportScheduleChangedSilently(P3(), FIGHTER);
+  const flags = sportScheduleChangedSilently(P3(), FIGHTER, FIGHT_NOW);
   assert.equal(flags.length, 1);
   assert.match(flags[0].detail, /reduces mon, wed, fri from the intake's hard session/);
   const owned = `This program assumes your MMA coach reduces Friday to technical work from Week 1. If Friday remains a hard session, Friday gym becomes two throws and one clean set.\n${P3()}`;
-  assert.deepEqual(sportScheduleChangedSilently(owned, FIGHTER), []);
+  assert.deepEqual(sportScheduleChangedSilently(owned, FIGHTER, FIGHT_NOW), []);
 });
 
 test('a contingency that stacks the same lift on consecutive days is found', () => {
@@ -235,8 +245,8 @@ test('the encoded rules reproduce fifteen of the coach eighteen findings', () =>
     'program-1': rulesOf(gradeProgram(P1(), LIFTER)),
     'program-2': new Set([...rulesOf(gradeProgram(P2(), TACTICAL)),
       ...(collectClaimIntegrityFlags(P2(), TACTICAL).length ? ['STATED_PROGRESSION_ABSENT'] : [])]),
-    'program-3': new Set([...rulesOf(gradeProgram(P3(), FIGHTER)),
-      ...(collectSportStateFlags(P3(), FIGHTER).length ? ['SPORT_STATE_MISDESCRIBED'] : [])]),
+    'program-3': new Set([...rulesOf(gradeProgram(P3(), FIGHTER, FIGHT_NOW)),
+      ...(collectSportStateFlags(P3(), FIGHTER, FIGHT_NOW).length ? ['SPORT_STATE_MISDESCRIBED'] : [])]),
   };
   let total = 0;
   for (const [id, wanted] of Object.entries(expect)) {

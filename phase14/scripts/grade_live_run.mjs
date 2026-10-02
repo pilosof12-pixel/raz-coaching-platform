@@ -64,7 +64,7 @@ for (const entry of result.results || []) {
   // plainly, at the very start of the detail; the grading hid it. A report that
   // overstates what shipped is worse than no report, so an unresolved rule now
   // decides the verdict.
-  const { verdict, unresolved } = deliveryVerdict(entry);
+  const { verdict, unresolved, effort, degraded } = deliveryVerdict(entry);
   const line = [
     verdict.padEnd(5),
     entry.id.padEnd(20),
@@ -75,6 +75,10 @@ for (const entry of result.results || []) {
   if (unresolved.length) {
     console.log(`        DELIVERED WITH ${unresolved.length} UNRESOLVED RULE(S): ${unresolved.join(', ')}`);
     console.log('        this program reached a customer carrying known violations');
+  }
+  if (degraded) {
+    console.log(`        WRITTEN AT ${String(effort).toUpperCase()} EFFORT after de-escalation`);
+    console.log('        completion was bought with quality; read this one before trusting it');
   }
   if (entry.detail) {
     const trace = String(entry.detail).match(/QA trace: ([^.]*)/);
@@ -110,6 +114,8 @@ const clean = summary.filter((s) => s.ok && !(s.unresolved || []).length);
 const dirty = summary.filter((s) => s.ok && (s.unresolved || []).length);
 console.log(`\n${summary.filter((s) => s.ok).length} of ${summary.length} delivered`);
 console.log(`${clean.length} of ${summary.length} clean${dirty.length ? `, ${dirty.length} carrying unresolved rules: ${dirty.map((s) => s.id).join(', ')}` : ''}`);
+const low = summary.filter((s) => s.degraded);
+if (low.length) console.log(`${low.length} written at low effort after de-escalation: ${low.map((s) => s.id).join(', ')}`);
 if (dirty.length) {
   console.log('\nA delivered program with unresolved rules is not a pass. Reporting it as');
   console.log('one is how a launch decision gets made on a number that was never true.');
