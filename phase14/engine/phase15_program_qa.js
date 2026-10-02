@@ -254,14 +254,41 @@ export function validatePhase15Program(program, intake = {}) {
 
   if (asksStrengthDays(intake) && Number(intake.days_per_week)>0) {
     const e=parsed.idx.exercise, d=parsed.idx.day;
-    const allDays=new Set(parsed.rows.map(r=>r.cells[d]).filter(Boolean));
+    // "each listed gym day" is what this rule says, and it used to check every
+    // day in the program instead. For an endurance athlete those are not the
+    // same thing at all: a sprint triathlete with two gym days and seven sport
+    // sessions has cardio-only days on purpose, and a Thursday that reads
+    // "Zone 2 Bike 60 min" was charged here as a gym day with no strength in
+    // it. The flag blocks, and repairPhase15Program does not clear it, so a
+    // correct triathlon week was a dead build waiting to happen.
+    //
+    // Where the athlete named her gym days, those are the days this checks. The
+    // rule keeps its teeth on them: a gym day carrying only a swim is still
+    // caught, and gym days that got no session at all still fail the count.
+    // Where no gym days are named there is nothing to narrow to, so every
+    // training day is still required to carry work, as before.
+    const dayKey=(v)=>String(v||"").trim().slice(0,3).toLowerCase();
+    const WEEKDAY=/^(?:mon|tue|wed|thu|fri|sat|sun)$/;
+    const namedGymDays=(Array.isArray(intake.available_gym_days)?intake.available_gym_days:[]).map(dayKey).filter(Boolean);
+    const programDays=parsed.rows.map(r=>r.cells[d]).filter(Boolean);
+    // Matching named gym days against the table only means anything when the
+    // table is labelled by weekday. A fight camp labelled by countdown, or a
+    // youth block labelled "Session A", matches none of them -- and reading
+    // that as "her gym days got no sessions" is how narrowing this rule first
+    // broke two stress archetypes that had converged for weeks. Where the
+    // program does not speak in weekdays there is nothing to narrow to, so
+    // every training day is required to carry work, exactly as before.
+    const labelledByWeekday=programDays.some(day=>WEEKDAY.test(dayKey(day)));
+    const requiredDays=new Set(namedGymDays.length&&labelledByWeekday
+      ? programDays.filter(day=>namedGymDays.includes(dayKey(day)))
+      : programDays);
     const strengthDays=new Set();
     for (const row of parsed.rows) {
       const ex=row.cells[e]||"";
       if (/^\s*\[WARMUP\]/i.test(ex)||/zone.?2|easy bike|easy row/i.test(ex)) continue;
       strengthDays.add(row.cells[d]);
     }
-    if (allDays.size < Number(intake.days_per_week) || [...allDays].some(day=>!strengthDays.has(day))) flags.push({ code:"CARDIO_ONLY_STRENGTH_DAY", message:`Requested ${Number(intake.days_per_week)} strength days; each listed gym day must contain actual strength/skill work.` });
+    if (requiredDays.size < Number(intake.days_per_week) || [...requiredDays].some(day=>!strengthDays.has(day))) flags.push({ code:"CARDIO_ONLY_STRENGTH_DAY", message:`Requested ${Number(intake.days_per_week)} strength days; each listed gym day must contain actual strength/skill work.` });
   }
 
   const pain=JSON.stringify(intake.pain||intake.limitations||"");

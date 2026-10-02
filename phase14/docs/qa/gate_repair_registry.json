@@ -13,10 +13,6 @@
       "status": "repair-demonstrated-gate-unproven",
       "note": "The repair is demonstrated in spec_floor_repairs.test.js. What is not demonstrated is that the validator would refuse without it: it reads a parsed program model whose conditions a minimal fixture does not meet."
     },
-    "CARDIO_ONLY_STRENGTH_DAY": {
-      "status": "repair-exists-unproven",
-      "note": "engine/phase15_program_qa.js exports repairPhase15Program, but nothing shows it clearing this code."
-    },
     "COACH_SPEC_V1_YG_HANDSTAND_BALANCE_SPECIFICITY_MISSING": {
       "status": "repair-demonstrated-gate-unproven",
       "note": "As above, demonstrated in spec_floor_repairs.test.js."
