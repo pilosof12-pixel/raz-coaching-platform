@@ -1,53 +1,59 @@
 {
-  "timestamp": "2026-10-02T11:56:43.084Z",
+  "timestamp": "2026-10-02T13:05:11.823Z",
   "base": "https://raz-coaching-platform.onrender.com",
-  "head_sha": "43b2ef7d2937e8c6f3ae6b149d506b73a2356832",
-  "runtime": "live90 2026-10-02T11:55:26Z",
+  "head_sha": "5ee99c899299c6cff675c45fe6b88645270961f3",
+  "runtime": "live91 2026-10-02T13:02:00Z",
   "results": [
     {
+      "id": "advanced_hybrid",
+      "job_id": "76bca5fc556da162f0243225a59c0c63",
+      "ok": true,
+      "status": "done",
+      "stage": "finalizing",
+      "attempt": 2,
+      "detail": "saving program after 2 model call(s) QA trace: T1:request_ceiling@medium -> A1:WEEKLY_MRV_EXCEEDED+EVENT_PROGRESSING_SESSION_MISSING -> A2:WEEKLY_MRV_EXCEEDED -> A2:converged-without-regeneration. First failure evidence: PRIOR ATTEMPT FAILED WEEKLY VOLUME VALIDATION. The following single-week workload is grossly above the internal reference band: [Week 1 push: 31.5 (15 program + 16.5 sport baseline debit; raw sport heuristic 30) vs reference 22; Week 2 push: 32.5 (16 program + 16.5 sport baseline debit; raw sport heuristic 30) vs reference 22; Week 3 push: 32.5 (16 program + 16.5 sport baseline debit; raw sport heuristic 30) vs reference 22]. External sport is treated as an already-tolerated baseline that reduces programming headroom; it is not allowed to hard-fail the week by itself. These references are heur",
+      "last_seen_status": "done",
+      "error": null,
+      "program_chars": 29114,
+      "seconds": 1040
+    },
+    {
       "id": "youth_gymnastics",
-      "job_id": "7891eb41908d1dbf637bb68036e290d7",
+      "job_id": "884d074dda29c19d23ba53522ebb1e3a",
+      "ok": true,
+      "status": "done",
+      "stage": "finalizing",
+      "attempt": 4,
+      "detail": "saving program after 4 model call(s)",
+      "last_seen_status": "done",
+      "error": null,
+      "program_chars": 16462,
+      "seconds": 763
+    },
+    {
+      "id": "sprint_triathlete",
+      "job_id": "55d15b74448d876a1f19e3f0122d212d",
       "ok": false,
-      "status": "job_disappeared",
+      "status": "error",
       "stage": "generating",
-      "attempt": 2,
-      "detail": "regenerating after quality check [A1:YOUTH_REDUNDANT_HANDSTAND_CAPACITY]",
-      "last_seen_status": "pending",
-      "error": "Job state absent for 180s after successful earlier polling; service likely restarted mid-build.",
-      "program_chars": 0,
-      "seconds": 572
-    },
-    {
-      "id": "tactical_3k",
-      "job_id": "af97e4e427042951c3c355ae3f8352a2",
-      "ok": true,
-      "status": "done",
-      "stage": "finalizing",
-      "attempt": 2,
-      "detail": "saving program after 2 model call(s) QA trace: T1:request_ceiling@medium -> A1:TACTICAL_SCHEDULE_ARCHITECTURE_VIOLATION. First failure evidence: PRIOR ATTEMPT FAILED TACTICAL WEEKLY-ARCHITECTURE VALIDATION. Week 1: 3 consecutive strength days despite flexible scheduling Week 2: 3 consecutive strength days despite flexible scheduling Week 3: 3 consecutive strength days despite flexible scheduling Week 4: 3 consecutive strength days despite flexible scheduling. Respect an explicitly stated total calendar-day budget by combining compatible low-cost endurance with strength when needed. When gym availability is flexible, do not default three strength sessions onto three consecutive days. Separate substantive priority pull-up exposures by at",
-      "last_seen_status": "done",
-      "error": null,
-      "program_chars": 21156,
-      "seconds": 1026
-    },
-    {
-      "id": "masters_return",
-      "job_id": "3cc3f5d5efaa0c8f607e688ffc48596e",
-      "ok": true,
-      "status": "done",
-      "stage": "finalizing",
       "attempt": 1,
-      "detail": "saving program after 1 model call(s) QA trace: T1:request_ceiling@medium.",
-      "last_seen_status": "done",
-      "error": null,
-      "program_chars": 21267,
-      "seconds": 858
+      "detail": "initial generation",
+      "last_seen_status": "error",
+      "error": "This operation was aborted QA trace: T1:request_ceiling@medium -> T2:request_ceiling:JOB_BUDGET_SPENT. [QA:20]",
+      "program_chars": 0,
+      "seconds": 1201
+    },
+    {
+      "id": "inseason_basketball",
+      "ok": false,
+      "error": "build not accepted 429 Too many requests, please try again later."
     }
   ],
   "selection": [
+    "advanced_hybrid",
     "youth_gymnastics",
-    "tactical_3k",
-    "masters_return"
+    "sprint_triathlete",
+    "inseason_basketball"
   ],
   "ok": false
 }
