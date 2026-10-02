@@ -1,59 +1,39 @@
 {
-  "timestamp": "2026-10-02T13:05:11.823Z",
+  "timestamp": "2026-10-02T14:36:20.969Z",
   "base": "https://raz-coaching-platform.onrender.com",
-  "head_sha": "5ee99c899299c6cff675c45fe6b88645270961f3",
-  "runtime": "live91 2026-10-02T13:02:00Z",
+  "head_sha": "742ddc0b53795759d340bcdf8be5407c7e4ca31b",
+  "runtime": "live92 2026-10-02T14:35:00Z",
   "results": [
     {
-      "id": "advanced_hybrid",
-      "job_id": "76bca5fc556da162f0243225a59c0c63",
-      "ok": true,
-      "status": "done",
-      "stage": "finalizing",
-      "attempt": 2,
-      "detail": "saving program after 2 model call(s) QA trace: T1:request_ceiling@medium -> A1:WEEKLY_MRV_EXCEEDED+EVENT_PROGRESSING_SESSION_MISSING -> A2:WEEKLY_MRV_EXCEEDED -> A2:converged-without-regeneration. First failure evidence: PRIOR ATTEMPT FAILED WEEKLY VOLUME VALIDATION. The following single-week workload is grossly above the internal reference band: [Week 1 push: 31.5 (15 program + 16.5 sport baseline debit; raw sport heuristic 30) vs reference 22; Week 2 push: 32.5 (16 program + 16.5 sport baseline debit; raw sport heuristic 30) vs reference 22; Week 3 push: 32.5 (16 program + 16.5 sport baseline debit; raw sport heuristic 30) vs reference 22]. External sport is treated as an already-tolerated baseline that reduces programming headroom; it is not allowed to hard-fail the week by itself. These references are heur",
-      "last_seen_status": "done",
-      "error": null,
-      "program_chars": 29114,
-      "seconds": 1040
-    },
-    {
-      "id": "youth_gymnastics",
-      "job_id": "884d074dda29c19d23ba53522ebb1e3a",
+      "id": "sprint_triathlete",
+      "job_id": "dad9f319ce8eb0bc2bcc6bb50a77730e",
       "ok": true,
       "status": "done",
       "stage": "finalizing",
       "attempt": 4,
-      "detail": "saving program after 4 model call(s)",
+      "detail": "delivered with unresolved rules: SPORT_DAY_COUPLING_VIOLATION+LOW_INTENSITY_PACE_CONTRADICTS_CURRENT_PERFORMANCE QA trace: E0:medium -> T1:request_ceiling@low -> A1:TARGET_MODALITY_EXPOSURE_REDUCED+TARGET_MODALITY_EXPOSURE_REDUCED+EVENT_PROGRESSING_SESSION_MISSING -> A2:SPORT_DAY_COUPLING_VIOLATION+LOW_INTENSITY_PACE_CONTRADICTS_CURRENT_PERFORMANCE -> A3:SPORT_DAY_COUPLING_VIOLATION+LOW_INTENSITY_PACE_CONTRADICTS_CURRENT_PERFORMANCE -> A4:SPORT_DAY_COUPLING_VIOLATION+LOW_INTENSITY_PACE_CONTRADICTS_CURRENT_PERFORMANCE. First failure evidence: PRIOR ATTEMPT FAILED SPORT/CALENDAR VALIDATION. days_per_week means requested strength sessions, not total active calendar days. Week 1: strength/skill-strength work is scheduled on unavailable day(s) monday. Week 1: strength/skill-strength work is scheduled on unavailable day(s) wednesday. Week 1: strength/skill-strength work is scheduled on unavailable day(s) saturday. Week 1: expected 2 strength/skill-strength days, found 5 (tuesday, friday, monday, wednesday, saturday). Week 2: strength/skill-strength work is scheduled on unavailable day(s) monday. Week 2: strength/skill-strength work is s",
       "last_seen_status": "done",
       "error": null,
-      "program_chars": 16462,
-      "seconds": 763
-    },
-    {
-      "id": "sprint_triathlete",
-      "job_id": "55d15b74448d876a1f19e3f0122d212d",
-      "ok": false,
-      "status": "error",
-      "stage": "generating",
-      "attempt": 1,
-      "detail": "initial generation",
-      "last_seen_status": "error",
-      "error": "This operation was aborted QA trace: T1:request_ceiling@medium -> T2:request_ceiling:JOB_BUDGET_SPENT. [QA:20]",
-      "program_chars": 0,
-      "seconds": 1201
+      "program_chars": 17975,
+      "seconds": 872
     },
     {
       "id": "inseason_basketball",
-      "ok": false,
-      "error": "build not accepted 429 Too many requests, please try again later."
+      "job_id": "93bba6c3d7d30455b6b6ed3431c55da0",
+      "ok": true,
+      "status": "done",
+      "stage": "finalizing",
+      "attempt": 1,
+      "detail": "saving program after 1 model call(s) QA trace: E0:medium.",
+      "last_seen_status": "done",
+      "error": null,
+      "program_chars": 15364,
+      "seconds": 193
     }
   ],
   "selection": [
-    "advanced_hybrid",
-    "youth_gymnastics",
     "sprint_triathlete",
     "inseason_basketball"
   ],
-  "ok": false
+  "ok": true
 }
