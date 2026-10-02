@@ -55,7 +55,14 @@ test('the ladder steps down once and then stops', () => {
 test('a first attempt is untouched, so production still starts where it is configured', () => {
   // The fix changes retries only. The effort a build opens with still comes from
   // OPENAI_REASONING_EFFORT via reasoningEffortFor.
-  assert.match(server, /const OPENAI_REASONING_EFFORT = process\.env\.OPENAI_REASONING_EFFORT \|\| "high"/);
+  // What this test is for is that the de-escalation fix changed retries only.
+  // It used to pin the literal "high" to say so, which made it fail when the
+  // default moved for reasons that have nothing to do with this fix. The intent
+  // is that the opening effort comes from configuration and is overridable
+  // without a deploy, so that is what is asserted.
+  assert.match(server, /const OPENAI_REASONING_EFFORT = process\.env\.OPENAI_REASONING_EFFORT \|\| "(?:low|medium|high)"/);
+  assert.match(server, /function reasoningEffortFor\(intake\)/,
+    'the first attempt must still resolve its effort through reasoningEffortFor');
   assert.match(server, /engineOptions\.reasoningEffort \|\| reasoningEffortFor\(intake\)/,
     'the retry must read the effort actually in force, not a hardcoded default');
 });

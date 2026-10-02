@@ -71,7 +71,7 @@ const GEMINI_API_KEY = process.env.GEMINI_API_KEY || "";
 const GEMINI_MODEL = process.env.GEMINI_MODEL || "gemini-2.5-flash";
 const OPENAI_API_KEY = process.env.OPENAI_API_KEY || "";
 const OPENAI_MODEL = process.env.OPENAI_MODEL || "gpt-5.4";
-const OPENAI_REASONING_EFFORT = process.env.OPENAI_REASONING_EFFORT || "high";
+const OPENAI_REASONING_EFFORT = process.env.OPENAI_REASONING_EFFORT || "medium";
 const ALLOWED_REASONING_EFFORTS = new Set(["low", "medium", "high"]);
 // Reasoning effort is the biggest single lever on generation time, and the
 // default is under question on evidence rather than preference.
@@ -85,11 +85,19 @@ const ALLOWED_REASONING_EFFORTS = new Set(["low", "medium", "high"]);
 // medium from the start and finished in 299s, one call, zero findings, inside
 // the five-minute bar.
 //
-// That is two or three observations, against a test that deliberately guards
-// this value because lowering effort for latency is a quality decision and not
-// a side effect. Run #159 opens four avatars at high and settles it. Until it
-// reports, the default stays where it is configured; /api/health now publishes
-// the effort actually in force so the answer does not depend on reading code. A QA intake
+// Run #159 settled it. Four of five avatars abort at high -- tactical and
+// masters in #158, advanced_hybrid and sprint_triathlete in #159 -- and each
+// abort costs the full ceiling and buys nothing. Only youth_gymnastics
+// completes at high, in 763s across four attempts, and it reaches medium by the
+// ladder if it ever stops.
+//
+// The default is therefore where the programs are actually written. high stays
+// reachable: the ladder never raises effort, but a QA intake may name it, which
+// is how this was measured and how it can be re-measured.
+//
+// What this does not fix is sprint_triathlete, whose medium retry also ran past
+// the ceiling and spent the whole job budget. Her build is slow at both levels,
+// so that is a prompt or constraint problem and not an effort setting. A QA intake
 // may name its own effort so one avatar can be timed and scored against the
 // standing configuration. Gated on qa_diagnostics, which the acceptance
 // harness sets and ordinary intakes do not, and restricted to the values the

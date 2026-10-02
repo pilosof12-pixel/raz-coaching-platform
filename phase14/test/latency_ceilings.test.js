@@ -63,9 +63,36 @@ test('both remain overridable without a deploy', () => {
   assert.match(runtime, /process\.env\.AI_REQUEST_TIMEOUT_MS/);
 });
 
-test('reasoning effort is untouched', () => {
-  assert.match(runtime, /OPENAI_REASONING_EFFORT \|\| "high"/,
-    'effort was lowered as part of a latency change; that is a quality decision');
+// This guard used to pin the default to "high" and say, correctly, that
+// lowering it as part of a latency change is a quality decision and not a side
+// effect. The quality decision has since been made, on evidence, so the guard
+// now holds the decision rather than the old value -- and it still refuses a
+// silent change, because the number and the reason are asserted together.
+//
+// The evidence: an effort that runs past the request ceiling is discarded
+// whole, so it contributes no content at all. Four of five avatars abort at
+// high -- tactical_3k and masters_return in run #158, advanced_hybrid and
+// sprint_triathlete in #159 -- which means every program those builds delivered
+// was written by the medium retry that followed, after up to 600 seconds of
+// billed reasoning that produced nothing. Basketball ran medium from the start
+// in #154 and finished in 299s, one call, zero findings.
+test('the default effort is the one that actually produces programs', () => {
+  assert.match(runtime, /OPENAI_REASONING_EFFORT \|\| "medium"/,
+    'the default is medium because high aborts at the ceiling on four of five avatars and is discarded whole');
+});
+
+// Lowering the default must not quietly remove the ability to ask for more.
+test('high is still reachable, so the decision stays measurable', () => {
+  assert.match(runtime, /ALLOWED_REASONING_EFFORTS = new Set\(\["low", "medium", "high"\]\)/);
+  assert.match(runtime, /intake\.qa_reasoning_effort/,
+    'a QA intake must still be able to name high, which is how this was measured');
+});
+
+// youth_gymnastics does complete at high, in 763s across four attempts, so the
+// ladder is the thing that keeps a slow avatar from dying rather than a
+// formality. If it is ever removed, this change becomes a one-way door.
+test('the ladder still gives a slow build somewhere to go', () => {
+  assert.match(runtime, /CEILING_LADDER = \{ high: "medium", medium: "low" \}/);
 });
 
 // The effort in force was not observable from outside the process. An
