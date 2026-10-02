@@ -1,34 +1,34 @@
 {
-  "timestamp": "2026-09-30T15:24:59.126Z",
+  "timestamp": "2026-10-02T03:39:47.275Z",
   "base": "https://raz-coaching-platform.onrender.com",
-  "head_sha": "e8821f93461848e79859088af00a19293cd13a6e",
-  "runtime": "live87 2026-09-30T15:23:49Z",
+  "head_sha": "a3509c8a411a77058d7c60e3c7dc99be71102976",
+  "runtime": "live88 2026-10-02T03:37:25Z",
   "results": [
     {
       "id": "sprint_triathlete",
-      "job_id": "e80a8df291806955941489065a31d383",
+      "job_id": "47568a1037da0177495efa657c0cd8bb",
       "ok": false,
       "status": "error",
       "stage": "generating",
-      "attempt": 1,
-      "detail": "initial generation",
+      "attempt": 2,
+      "detail": "regenerating after quality check [T1:request_ceiling@medium -> A1:SPORT_DAY_COUPLING_VIOLATION+V71_CLASSIC_SHARE_NOT_RISING+REQUESTED_STRENGTH_SESSIONS_UNACCOUNTED+CARDIO_ONLY_STRENGTH_DAY]",
       "last_seen_status": "error",
-      "error": "This operation was aborted QA trace: T1:request_ceiling -> T2:request_ceiling:JOB_BUDGET_SPENT. [QA:20]",
+      "error": "This operation was aborted QA trace: T1:request_ceiling@medium -> A1:SPORT_DAY_COUPLING_VIOLATION+V71_CLASSIC_SHARE_NOT_RISING+REQUESTED_STRENGTH_SESSIONS_UNACCOUNTED+CARDIO_ONLY_STRENGTH_DAY -> T2:request_ceiling:JOB_BUDGET_SPENT. [QA:20]",
       "program_chars": 0,
-      "seconds": 1202
+      "seconds": 1226
     },
     {
       "id": "inseason_basketball",
-      "job_id": "bef05394ef8b8d4b350b98b241632440",
-      "ok": false,
-      "status": "error",
-      "stage": "generating",
+      "job_id": "491d1eaedf9a900e5fa2984c3596a296",
+      "ok": true,
+      "status": "done",
+      "stage": "finalizing",
       "attempt": 1,
-      "detail": "initial generation",
-      "last_seen_status": "error",
-      "error": "This operation was aborted QA trace: T1:request_ceiling -> T2:request_ceiling:JOB_BUDGET_SPENT. [QA:20]",
-      "program_chars": 0,
-      "seconds": 1207
+      "detail": "saving program after 1 model call(s)",
+      "last_seen_status": "done",
+      "error": null,
+      "program_chars": 16965,
+      "seconds": 299
     }
   ],
   "selection": [
