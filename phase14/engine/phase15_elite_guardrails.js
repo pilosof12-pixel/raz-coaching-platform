@@ -199,7 +199,29 @@ export function endurancePerformanceIntegrityFlags(program, intake={}, parsed=nu
       if(race) {
         for(const item of rows) {
           const rowText=String(item.ctx||'')+' '+String(item.dose||'');
-          if(!/\b(?:zone\s*[- ]?2|easy|conversational|low[- ]?intensity)\b/i.test(rowText)) continue;
+          // An interval row describes its own warm-up, and that description used
+          // to make it a Zone-2 row. The sprint triathlete's Monday session was
+          // 4 x 90 sec at 4:37-4:40/km with RPE 7 and the note "use 8 min easy
+          // warm-up and 6 min easy cooldown inside the session" -- correct
+          // coaching, and flagged, because the word "easy" appeared somewhere in
+          // the row. 4:37/km is faster than her demonstrated 4:54/km 5K, which
+          // is exactly what an interval should be.
+          //
+          // That made the rule unsatisfiable in practice: there is no way to
+          // prescribe intervals and mention their warm-up without tripping it.
+          // In run #160 the model wrote that session three times and the gate
+          // refused it three times, and the program shipped still carrying the
+          // violation.
+          //
+          // So easy work that is explicitly a warm-up or a cooldown does not
+          // make the row low-intensity. Only those phrases are removed, not the
+          // surrounding text, so a genuinely mislabelled easy run still reads as
+          // one: "Easy maintenance run only; keep it fully conversational" keeps
+          // both of its signals. // LOW-INTENSITY-WARMUP-PHRASE-EXEMPT
+          const intensityText=rowText
+            .replace(/\b(?:easy|light|conversational|low[- ]?intensity)\s+(?:\d+\s*(?:min|minutes?)\s+)?(?:warm[- ]?up|cool[- ]?down|jog|prep)\b/ig,' ')
+            .replace(/\b(?:warm[- ]?up|cool[- ]?down)\s+(?:at\s+)?(?:an?\s+)?(?:easy|light|conversational)\b/ig,' ');
+          if(!/\b(?:zone\s*[- ]?2|easy|conversational|low[- ]?intensity)\b/i.test(intensityText)) continue;
           const prescribed=prescribedPaceSecPerKm(rowText);
           if(prescribed!=null && prescribed<=race.paceSecPerKm) {
             flags.push({
