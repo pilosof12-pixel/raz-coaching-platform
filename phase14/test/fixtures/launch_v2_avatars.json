@@ -15,7 +15,7 @@
       "Keep the trunk and hip work that has kept the achilles quiet"
     ],
     "goal_priority_model": "tiered",
-    "days_per_week": 5,
+    "days_per_week": 2,
     "session_duration_minutes": 75,
     "gym_availability_mode": "limited",
     "available_gym_days": [
@@ -26,7 +26,43 @@
     "equipment": "25 m pool with pull buoy and paddles, road bike plus indoor trainer with power, full gym, treadmill and road access.",
     "sport": "Triathlon (sprint distance)",
     "sport_sessions_per_week": 7,
-    "sport_schedule": [],
+    "sport_schedule": [
+      {
+        "day": "Mon",
+        "type": "Swim",
+        "intensity": "moderate"
+      },
+      {
+        "day": "Tue",
+        "type": "Run intervals",
+        "intensity": "hard"
+      },
+      {
+        "day": "Wed",
+        "type": "Bike",
+        "intensity": "moderate"
+      },
+      {
+        "day": "Thu",
+        "type": "Swim technique",
+        "intensity": "light"
+      },
+      {
+        "day": "Fri",
+        "type": "Run easy",
+        "intensity": "light"
+      },
+      {
+        "day": "Sat",
+        "type": "Bike long",
+        "intensity": "hard"
+      },
+      {
+        "day": "Sun",
+        "type": "Run long",
+        "intensity": "moderate"
+      }
+    ],
     "sleep_hours": "6-7, broken about twice a week",
     "recovery_rating": "Moderate",
     "current_numbers": "Sprint triathlon: 1:22 (750 m swim 16:10, 20 km bike 38:40, 5 km run 24:30)\n5 km standalone: 23:05\n20 km bike time trial: 38:40 at about 185 W\n750 m swim: 16:10\nBack Squat: 75 kg x 5\nSingle-leg calf raise: 18 reps right, 24 left\nCurrently 2 swims, 2 rides and 3 runs a week, about 22-25 km of running",
@@ -48,7 +84,7 @@
       "active": false,
       "limitation": ""
     },
-    "notes": "The race is 8 weeks out, so this four-week block is the middle of the build and is NOT the taper. The swim is the weakest leg by a distance and the one she loses most time in, and it is also the cheapest leg to recover from. The run is the leg the achilles limits. If something has to give, hold the bike rather than developing it. Works full time with two young children; the two gym days are fixed on Tuesday and Friday and cannot move. Do not prescribe rehabilitation: the achilles is asymptomatic and she wants to race.",
+    "notes": "The race is 8 weeks out, so this four-week block is the middle of the build and is NOT the taper. The swim is the weakest leg by a distance and the one she loses most time in, and it is also the cheapest leg to recover from. The run is the leg the achilles limits. If something has to give, hold the bike rather than developing it. Works full time with two young children. She trains seven times a week but only TWO of those are gym sessions, fixed on Tuesday and Friday, and both land on a running day. The swim, bike and run sessions are the sport week and are listed in sport_schedule; do not convert a gym day into a cardio day or count a swim as a strength session. No two running days are consecutive, which is deliberate: the achilles tolerates the current three runs and does not tolerate back-to-back ones. Do not prescribe rehabilitation: the achilles is asymptomatic and she wants to race.",
     "qa_diagnostics": true
   },
   "inseason_basketball": {
