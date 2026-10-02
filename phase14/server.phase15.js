@@ -73,9 +73,23 @@ const OPENAI_API_KEY = process.env.OPENAI_API_KEY || "";
 const OPENAI_MODEL = process.env.OPENAI_MODEL || "gpt-5.4";
 const OPENAI_REASONING_EFFORT = process.env.OPENAI_REASONING_EFFORT || "high";
 const ALLOWED_REASONING_EFFORTS = new Set(["low", "medium", "high"]);
-// Reasoning effort is the biggest single lever on generation time, and until
-// now it could only be moved by redeploying -- so measuring what "medium"
-// costs in quality meant changing it for every athlete at once. A QA intake
+// Reasoning effort is the biggest single lever on generation time, and the
+// default is under question on evidence rather than preference.
+//
+// A high call that runs past the request ceiling is discarded whole --
+// attempt-- and continue, nothing kept -- so it contributes no content and up
+// to 600 seconds of billed reasoning. In run #158 both delivered programs read
+// T1:request_ceiling@medium, meaning high aborted and the medium retry wrote
+// the program: masters_return spent roughly 600 of its 858 seconds on a
+// discarded attempt, and tactical_3k 1026 the same way. Basketball in #154 ran
+// medium from the start and finished in 299s, one call, zero findings, inside
+// the five-minute bar.
+//
+// That is two or three observations, against a test that deliberately guards
+// this value because lowering effort for latency is a quality decision and not
+// a side effect. Run #159 opens four avatars at high and settles it. Until it
+// reports, the default stays where it is configured; /api/health now publishes
+// the effort actually in force so the answer does not depend on reading code. A QA intake
 // may name its own effort so one avatar can be timed and scored against the
 // standing configuration. Gated on qa_diagnostics, which the acceptance
 // harness sets and ordinary intakes do not, and restricted to the values the
@@ -2114,6 +2128,16 @@ app.get("/api/health", async (req, res) => {
       openai_execution_path: OPENAI_API_KEY ? "deterministic-skeleton-v5.2.10-source-grounded" : null,
       openai_legacy_engine_chars_not_sent: OPENAI_API_KEY ? ENGINE.length : null,
       openai_compact_developer_chars: OPENAI_API_KEY ? OPENAI_COMPACT_DEVELOPER.length : null,
+      // What the running service is actually configured to do, which was not
+      // observable from outside. The default moved from high to medium on the
+      // evidence that high never produced a delivered program, and an
+      // environment variable set in the host dashboard silently overrides it.
+      // Without this there is no way to tell a deploy that took effect from one
+      // that was overridden, which is a question nobody could answer today.
+      reasoning_effort: OPENAI_API_KEY ? OPENAI_REASONING_EFFORT : null,
+      reasoning_effort_source: OPENAI_API_KEY ? (process.env.OPENAI_REASONING_EFFORT ? "environment" : "code-default") : null,
+      request_ceiling_ms: AI_REQUEST_TIMEOUT_MS,
+      build_budget_ms: BUILD_JOB_TIMEOUT_MS,
       last_ai_usage: lastAIUsage,
       last_build_timing: lastBuildTiming,
       storage: store.backend,

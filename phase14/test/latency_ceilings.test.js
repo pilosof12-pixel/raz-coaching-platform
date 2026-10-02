@@ -67,3 +67,16 @@ test('reasoning effort is untouched', () => {
   assert.match(runtime, /OPENAI_REASONING_EFFORT \|\| "high"/,
     'effort was lowered as part of a latency change; that is a quality decision');
 });
+
+// The effort in force was not observable from outside the process. An
+// environment variable set in the host dashboard silently overrides the code
+// default, so "we changed it" and "it took effect" were indistinguishable
+// without reading the service logs. The latency question turns on this value,
+// so health publishes it along with the budgets that bound a call.
+test('health publishes the effort and budgets actually in force', () => {
+  assert.match(runtime, /reasoning_effort: OPENAI_API_KEY \? OPENAI_REASONING_EFFORT : null/);
+  assert.match(runtime, /reasoning_effort_source: OPENAI_API_KEY \? \(process\.env\.OPENAI_REASONING_EFFORT \? "environment" : "code-default"\)/,
+    'a change that the host overrides must be distinguishable from one that took effect');
+  assert.match(runtime, /request_ceiling_ms: AI_REQUEST_TIMEOUT_MS/);
+  assert.match(runtime, /build_budget_ms: BUILD_JOB_TIMEOUT_MS/);
+});
