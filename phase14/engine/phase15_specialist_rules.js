@@ -10,6 +10,7 @@ import {
 import { overcomingGravityRulesForFamily } from './overcoming_gravity_rules.js';
 import { buildRoadmapPromptRules } from './goal_progression_graph.js';
 import { isHighConcurrencyHybrid } from './advanced_hybrid_concurrency.js';
+import { enduranceFamilySpecialistRules } from './endurance_specialist_rules.js';
 
 function arr(v) { return Array.isArray(v) ? v : v ? [v] : []; }
 function str(v) { return typeof v === 'string' ? v : JSON.stringify(v || ''); }
@@ -152,7 +153,17 @@ function manualAcceptanceRules(intake = {}) {
 }
 
 export function buildSpecialistRules(intake = {}) {
-  const rules = [...gymnasticsRules(intake), ...streetLiftingRules(intake), ...manualAcceptanceRules(intake)];
+  // The endurance family covers the three archetypes this layer never reached:
+  // the endurance-priority athlete, the multisport athlete and the in-season
+  // intermittent-sport athlete. Measured over the six launch avatars, those
+  // three were getting zero characters of specialist guidance, and the lowest
+  // score the coach gave was one of them.
+  const rules = [
+    ...gymnasticsRules(intake),
+    ...streetLiftingRules(intake),
+    ...manualAcceptanceRules(intake),
+    ...enduranceFamilySpecialistRules(intake),
+  ];
   const roadmap = buildRoadmapPromptRules(intake);
   if (!rules.length && !roadmap) return '';
   return [
