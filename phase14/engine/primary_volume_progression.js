@@ -139,6 +139,44 @@ function step(volume) {
   return Math.max(1, Math.round(raw));
 }
 
+// A note that still describes the dose this repair just changed.
+//
+// The engine's own output contract requires it: "For any row that CHANGED from
+// the prior week, the Notes cell states the change in plain language." This
+// repair changed the row and left the sentence alone, so the Masters block came
+// out of it reading "Same total work, slightly faster split only" above 4 x 275
+// m where Week 1 had 4 x 250 m -- 1000 m against 1100 m. That is the coach's
+// TEXT_CONTRADICTS_TABLE, introduced by the thing meant to fix the week.
+//
+// The coaching in these notes is worth keeping: stroke rate, the stop rule, what
+// to do if posture drifts. So only the sentence that makes the false claim is
+// replaced, and when no sentence makes one the change is simply stated.
+const SAME_DOSE_CLAIM = [
+  /\b(?:the\s+)?same\s+(?:total\s+)?(?:work|volume|distance|duration|dose|length)\b/i,
+  /\b(?:split|pace|speed)\s+only\b/i,
+  /\bonly\s+the\s+(?:split|pace|speed)\b/i,
+  /\bno\s+(?:extra|more|additional)\s+(?:work|volume|distance)\b/i,
+];
+
+function reconcileNote(note, volume, fromValue, nextValue) {
+  const unit = volume.written === 'km' ? 'km' : volume.written;
+  const asText = (v) => (volume.written === 'km' ? `${+(v / 1000).toFixed(2)} km` : `${v} ${unit}`);
+  const stated = volume.sets > 1
+    ? `Each interval steps from ${asText(fromValue)} to ${asText(nextValue)} this week; the number of intervals is unchanged.`
+    : `Steps from ${asText(fromValue)} to ${asText(nextValue)} this week.`;
+
+  const text = String(note || '').trim();
+  if (!text) return stated;
+  // Sentence-wise, so the rest of the coaching survives.
+  const parts = text.split(/(?<=[.!?])\s+/);
+  const hit = parts.findIndex((part) => SAME_DOSE_CLAIM.some((re) => re.test(part)));
+  if (hit >= 0) {
+    parts[hit] = stated;
+    return parts.join(' ');
+  }
+  return `${stated} ${text}`;
+}
+
 function writeDose(cells, parsed, volume, nextValue) {
   const out = cells.slice();
   const written = volume.written === 'km' ? `${+(nextValue / 1000).toFixed(2)} km` : `${nextValue} ${volume.written}`;
@@ -146,6 +184,9 @@ function writeDose(cells, parsed, volume, nextValue) {
     volume.written === 'km' ? KM : volume.written === 'm' ? METRES : MINUTES,
     written,
   );
+  if (parsed.notes != null) {
+    out[parsed.notes] = reconcileNote(cells[parsed.notes], volume, volume.value, nextValue);
+  }
   return out;
 }
 

@@ -8,6 +8,7 @@ import {
   collectPrimaryVolumeProgressionFlags,
   normalizePrimaryVolumeProgression,
 } from '../engine/primary_volume_progression.js';
+import { parseWeek } from '../engine/v34_workload_accounting.js';
 
 const HARD = JSON.parse(fs.readFileSync(new URL('./fixtures/hard_avatars.json', import.meta.url), 'utf8'));
 const MASTERS = HARD.masters_return;
@@ -100,4 +101,34 @@ test('the production chain applies it', () => {
   assert.match(bundle, /normalizePrimaryVolumeProgression\(candidate, intake\)/);
   const brief = fs.readFileSync(new URL('../engine/coach_standard_brief.js', import.meta.url), 'utf8');
   assert.match(brief, /buildPrimaryVolumeProgressionBrief\(intake\)/);
+});
+
+test('a repair that changes the dose does not leave the note describing the old one', () => {
+  // The engine's output contract: "For any row that CHANGED from the prior week,
+  // the Notes cell states the change in plain language." This repair changed the
+  // row and left the sentence, so the Masters block read "Same total work,
+  // slightly faster split only" above 4 x 275 m where Week 1 had 4 x 250 m --
+  // 1000 m against 1100 m, which is TEXT_CONTRADICTS_TABLE introduced by the fix.
+  const out = normalizePrimaryVolumeProgression(DELIVERED, MASTERS);
+  const parsed = parseWeek(out.program, 2);
+  const row = parsed.rows.find((c) => /Rowing Ergometer/.test(String(c[parsed.exercise])) && /m\s*$/.test(String(c[parsed.reps])));
+  const note = String(row[parsed.notes]);
+
+  assert.doesNotMatch(note, /same\s+(?:total\s+)?(?:work|volume|distance)/i, 'the false claim must be gone');
+  assert.doesNotMatch(note, /(?:split|pace)\s+only/i);
+  assert.match(note, /250 m to 275 m/, 'the note states the change it made');
+  // The coaching in the note survives: this is a reconciliation, not a rewrite.
+  assert.match(note, /RPE|posture|Week 1/i, 'the original coaching must not be discarded');
+});
+
+test('a note with no claim about the dose simply gains the change', () => {
+  const H = 'Day\tExercise\tWeight\tSets\tReps\tRest\tTarget RPE\tNotes\tResults';
+  const row = (reps) => `Mon\tRowing Ergometer\t2:10 /500m\t4\t${reps}\t2:00\t7\tKeep the stroke rate at 24 spm.\t`;
+  const flat = [1, 2, 3, 4].map((w) => [`START_WEEK${w}_TSV`, H, row('250 m'), `END_WEEK${w}_TSV`].join('\n')).join('\n\n');
+  const out = normalizePrimaryVolumeProgression(flat, MASTERS);
+  assert.equal(out.repaired, true);
+  const parsed = parseWeek(out.program, 2);
+  const note = String(parsed.rows.find((c) => /Rowing Ergometer/.test(String(c[parsed.exercise])))[parsed.notes]);
+  assert.match(note, /steps from 250 m to 275 m/i);
+  assert.match(note, /24 spm/, 'and the stroke rate the endurance source asks for is kept');
 });
