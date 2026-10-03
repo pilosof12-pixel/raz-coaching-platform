@@ -36,3 +36,11 @@ test('rides already on scheduled days, or no schedule, are left alone', () => {
   assert.equal(normalizeSportScheduleIdentity(onDays, { sport_schedule: schedule }).repaired, false);
   assert.equal(normalizeSportScheduleIdentity(block(['Tue\tBike\t150 W\t1\t40 min\tN/A\t4\tSteady.\t']), {}).repaired, false);
 });
+
+test('running twice does not repeat the scheduled-ride label', () => {
+  const once = normalizeSportScheduleIdentity(block(['Fri\tBike\t150 W\t1\t50 min\tN/A\t4\tSteady ride.\t']), { sport_schedule: schedule }).program;
+  // A later pass that meets a note already carrying the label (a row copied
+  // back, or a second chain) must not prepend it again.
+  const again = normalizeSportScheduleIdentity(once.replace(/\nThu\tBike/g, '\nFri\tBike'), { sport_schedule: schedule }).program;
+  assert.equal((again.match(/Your scheduled Thursday ride\./g) || []).length, 4, 'once per week');
+});

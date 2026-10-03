@@ -85,7 +85,9 @@ export function normalizeSportScheduleIdentity(program, intake = {}) {
         rows = rows.filter((r) => r !== c);
         const moved = c.slice();
         moved[t.h.day] = LABEL[target.day];
-        if (t.h.notes >= 0) moved[t.h.notes] = `Your scheduled ${LONG[target.day]} ${mod.noun}. ${String(c[t.h.notes] || '').replace(/\b(?:so )?(?:sunday|saturday|friday|thursday|wednesday|tuesday|monday) [a-z ]*?(?:quality|session)[^.;]*/gi, '').replace(/\s{2,}/g, ' ').replace(/\s+([.;,])/g, '$1').trim()}`.trim();
+        const label = `Your scheduled ${LONG[target.day]} ${mod.noun}.`;
+        const existing = String(c[t.h.notes] || '').split(label).join('').replace(/^\s+/, '');
+        if (t.h.notes >= 0) moved[t.h.notes] = `${label} ${existing.replace(/\b(?:so )?(?:sunday|saturday|friday|thursday|wednesday|tuesday|monday) [a-z ]*?(?:quality|session)[^.;]*/gi, '').replace(/\s{2,}/g, ' ').replace(/\s+([.;,])/g, '$1').trim()}`.trim();
         // Into the target day, keeping the table in weekday order.
         let at = rows.length;
         for (let i = 0; i < rows.length; i += 1) { const d = dayIdx(rows[i][t.h.day]); if (d > target.day) { at = i; break; } }
