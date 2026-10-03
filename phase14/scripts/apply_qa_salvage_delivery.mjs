@@ -101,6 +101,45 @@ if (!s.includes('QA-SALVAGE-TAIL')) {
   s = s.replace(tailOld, `${tailNew} // QA-SALVAGE-TAIL`);
 }
 
+// 2b. The deadline and spend-cap salvage takes the same sweep. It shipped
+//     lastValid -- the model's raw text -- with only the equipment
+//     substitution applied: none of the bundle's repairs, and no record of
+//     what was still wrong. A clean sweep records nothing, exactly as before.
+const earlyOld = `  const salvage = async (why) => {
+    if (!lastValid) return null;
+    let program = lastValid;
+    for (const code of Object.keys(failCounts)) program = hardSubstitute(code, program, intake);
+    await onProgress("finalizing", MAX_ATTEMPTS, why);
+    return reformatWarmupCells(program);
+  };`;
+const earlyNew = `  const salvage = async (why) => {
+    if (!lastValid) return null;
+    let program = lastValid;
+    for (const code of Object.keys(failCounts)) program = hardSubstitute(code, program, intake);
+    let unresolved = [];
+    try {
+      const swept = validateRepairableProgramBundle(program, intake);
+      program = swept.program || program;
+    } catch (sweepErr) {
+      const repaired = typeof sweepErr?.repairedProgram === "string" && sweepErr.repairedProgram
+        ? sweepErr.repairedProgram
+        : sweepErr?.program;
+      if (typeof repaired === "string" && repaired) program = repaired;
+      const flags = Array.isArray(sweepErr?.flags) ? sweepErr.flags : [];
+      unresolved = [...new Set(flags.map((f) => f && f.code).filter(Boolean))];
+      if (!unresolved.length && sweepErr?.code) unresolved = [sweepErr.code];
+    }
+    if (unresolved.length) {
+      lastQaSalvage = { codes: unresolved, qa_trace: qaTrace.slice(), detail: String(why || "").slice(0, 600) };
+    }
+    await onProgress("finalizing", MAX_ATTEMPTS, why);
+    return reformatWarmupCells(program);
+  }; // QA-SALVAGE-EARLY-SWEEP`;
+if (!s.includes('QA-SALVAGE-EARLY-SWEEP')) {
+  if (!s.includes(earlyOld)) throw new Error('early salvage anchor missing');
+  s = s.replace(earlyOld, earlyNew);
+}
+
 // 3. The save boundary has to let a salvage through, and only a salvage. A
 //    build that never exhausted its attempts is validated exactly as before, so
 //    this cannot become a general bypass.

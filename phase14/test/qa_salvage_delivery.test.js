@@ -72,3 +72,21 @@ test('no validator was removed to make this work', () => {
   assert.ok(runtime.includes('validateClientOutputCleanliness(program)'),
     'client output cleanliness still runs on the delivered program');
 });
+
+test('the deadline and spend-cap salvage is swept and recorded the same way', () => {
+  // It shipped lastValid -- the model's raw text -- with only the equipment
+  // substitution, and recorded nothing about what was still wrong.
+  const body = runtime.slice(runtime.indexOf('const salvage = async (why) => {'), runtime.indexOf('QA-SALVAGE-EARLY-SWEEP'));
+  assert.ok(body.length > 0, 'early salvage present');
+  assert.match(body, /validateRepairableProgramBundle\(program, intake\)/);
+  assert.match(body, /sweepErr\?\.repairedProgram/);
+  assert.match(body, /lastQaSalvage = \{ codes: unresolved/);
+});
+
+test('every program the build returns has been through the bundle', () => {
+  // The two salvages were the only paths that returned text the bundle had not
+  // repaired. Each remaining return is the bundle's own output.
+  const fn = runtime.slice(runtime.indexOf('async function generateValidatedProgram('), runtime.indexOf('async function failJobSafely('));
+  const returns = [...fn.matchAll(/return (reformatWarmupCells\(\w+\)|finished|repairedProgram|program);/g)].map((m) => m[1]);
+  assert.deepEqual([...new Set(returns)].sort(), ['finished', 'program', 'reformatWarmupCells(program)', 'reformatWarmupCells(salvaged)', 'repairedProgram'].sort());
+});

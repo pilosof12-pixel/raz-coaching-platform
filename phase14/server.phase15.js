@@ -2393,9 +2393,25 @@ async function generateValidatedProgram(intake, onProgress = async () => {}) {
     if (!lastValid) return null;
     let program = lastValid;
     for (const code of Object.keys(failCounts)) program = hardSubstitute(code, program, intake);
+    let unresolved = [];
+    try {
+      const swept = validateRepairableProgramBundle(program, intake);
+      program = swept.program || program;
+    } catch (sweepErr) {
+      const repaired = typeof sweepErr?.repairedProgram === "string" && sweepErr.repairedProgram
+        ? sweepErr.repairedProgram
+        : sweepErr?.program;
+      if (typeof repaired === "string" && repaired) program = repaired;
+      const flags = Array.isArray(sweepErr?.flags) ? sweepErr.flags : [];
+      unresolved = [...new Set(flags.map((f) => f && f.code).filter(Boolean))];
+      if (!unresolved.length && sweepErr?.code) unresolved = [sweepErr.code];
+    }
+    if (unresolved.length) {
+      lastQaSalvage = { codes: unresolved, qa_trace: qaTrace.slice(), detail: String(why || "").slice(0, 600) };
+    }
     await onProgress("finalizing", MAX_ATTEMPTS, why);
     return reformatWarmupCells(program);
-  };
+  }; // QA-SALVAGE-EARLY-SWEEP
 
   for (let attempt = 1; attempt <= MAX_ATTEMPTS; attempt++) {
     if (outOfTime()) {
