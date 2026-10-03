@@ -96,7 +96,13 @@ export function taperPowerSpike(program, intake = {}) {
 
 const VOCABULARY = [
   { sport: /mma|boxing|wrestl|grappl|judo|bjj|combat|fight/i, words: /\b(?:takedown|takedowns|level change|level changes|clinch|sparring|grappling|mat work|opponent|weigh-?in|fight week|round(?:s)? of (?:sparring|rolling)|shoot(?:ing)? entries)\b/i, label: 'combat sport' },
-  { sport: /football|soccer|rugby|basketball|hockey/i, words: /\b(?:matchday|match day|md-?\d|fixture|selection|the gaffer|pitch session)\b/i, label: 'team sport' },
+  // "selection" is team-sport language only when it means picking a squad. The
+  // engine's own self-selected load protocol writes "Load selection:" into every
+  // row whose weight is the athlete's to choose, so the bare word charged the
+  // masters rower and the postpartum runner for borrowing team-sport language
+  // from a line the engine itself had written. Exercise, load and self-selection
+  // are training vocabulary in every sport.
+  { sport: /football|soccer|rugby|basketball|hockey/i, words: /\b(?:matchday|match day|md-?\d|fixture|(?<!\b(?:load|exercise|self|weight|pace|intensity|movement|variation|drill)[\s-])selection|the gaffer|pitch session)\b/i, label: 'team sport' },
   { sport: /weightlifting|olympic lifting/i, words: /\b(?:snatch balance|jerk recovery|platform|the podium lift)\b/i, label: 'weightlifting' },
 ];
 

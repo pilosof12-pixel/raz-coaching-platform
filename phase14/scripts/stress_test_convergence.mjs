@@ -100,6 +100,186 @@ const fixture = (n) => fs.readFileSync(path.join(root, '..', 'test', 'fixtures',
 const quiet = process.argv.includes('--quiet');
 
 export const INTAKES = {
+  // The two newest avatars had no stress coverage at all, and every dead gate
+  // found on 2026-10-02 belonged to them or to the youth gymnast: race
+  // components counted as gym days, an interval's warm-up read as Zone 2, a
+  // consolidated interval session dropping below the exposure floor. Each was
+  // found by a paid live run that delivered DIRTY or nothing, after four
+  // identical refusals. This suite exists to find exactly that for free, and it
+  // had never been asked about these two athletes.
+  //
+  // The fixtures are the delivered programs from runs #161 and #160, both clean
+  // through the production bundle, so the undamaged control starts clean. The
+  // race is 56 days out: outside the four-week block in every direction, so no
+  // week-boundary arithmetic can make the control drift with the calendar.
+  sprint_triathlete: {
+    competition_date: new Date(Date.now() + 56 * 86400000).toISOString().slice(0, 10),
+    "event_type": "triathlon",
+    "event_priority": "A",
+    "age": 38,
+    "language": "en",
+    "experience": "Intermediate (1-3 years)",
+    "bodyweight": "61 kg",
+    "primary_goals": [
+      "Go sub-1:15 at the sprint triathlon in 8 weeks, from a current 1:22"
+    ],
+    "secondary_goals": [
+      "Stop losing time in the swim: 750 m from 16:10 toward 14:30",
+      "Hold squat and single-leg strength through the build"
+    ],
+    "maintenance_goals": [
+      "Keep the trunk and hip work that has kept the achilles quiet"
+    ],
+    "goal_priority_model": "tiered",
+    "days_per_week": 2,
+    "session_duration_minutes": 75,
+    "gym_availability_mode": "limited",
+    "available_gym_days": [
+      "Tue",
+      "Fri"
+    ],
+    "training_location": "commercial_gym",
+    "equipment": "25 m pool with pull buoy and paddles, road bike plus indoor trainer with power, full gym, treadmill and road access.",
+    "sport": "Triathlon (sprint distance)",
+    "sport_sessions_per_week": 7,
+    "sport_schedule": [
+      {
+        "day": "Mon",
+        "type": "Run intervals",
+        "intensity": "hard"
+      },
+      {
+        "day": "Tue",
+        "type": "Swim",
+        "intensity": "moderate"
+      },
+      {
+        "day": "Wed",
+        "type": "Run easy",
+        "intensity": "light"
+      },
+      {
+        "day": "Thu",
+        "type": "Bike",
+        "intensity": "moderate"
+      },
+      {
+        "day": "Fri",
+        "type": "Swim technique",
+        "intensity": "light"
+      },
+      {
+        "day": "Sat",
+        "type": "Bike long",
+        "intensity": "hard"
+      },
+      {
+        "day": "Sun",
+        "type": "Run long",
+        "intensity": "moderate"
+      }
+    ],
+    "sleep_hours": "6-7, broken about twice a week",
+    "recovery_rating": "Moderate",
+    "current_numbers": "Sprint triathlon: 1:22 (750 m swim 16:10, 20 km bike 38:40, 5 km run 24:30)\n5 km standalone: 23:05\n20 km bike time trial: 38:40 at about 185 W\n750 m swim: 16:10\nBack Squat: 75 kg x 5\nSingle-leg calf raise: 18 reps right, 24 left\nCurrently 2 swims, 2 rides and 3 runs a week, about 22-25 km of running",
+    "performance_markers": [
+      "Sprint triathlon: 1:22",
+      "750 m swim: 16:10",
+      "5 km run: 24:30"
+    ],
+    "injuries": "Right achilles tendinopathy 14 months ago after adding two running days in one week. Currently symptom-free at the present running volume, but it stiffens the morning after hill running or any sudden jump in volume.",
+    "pain": {
+      "active": false,
+      "description": "No pain at present; occasional right achilles stiffness the morning after hills",
+      "severity": "",
+      "character": "",
+      "next_day_baseline": "normal",
+      "tolerated_movements": "Current 22-25 km per week of running across three runs is tolerated. Hill repeats and consecutive running days are not. Bike and swim volume cause no symptoms. Heavy slow calf loading is tolerated and has helped."
+    },
+    "mobility": {
+      "active": false,
+      "limitation": ""
+    },
+    "notes": "The race is 8 weeks out, so this four-week block is the middle of the build and is NOT the taper. The swim is the weakest leg by a distance and the one she loses most time in, and it is also the cheapest leg to recover from. The run is the leg the achilles limits. If something has to give, hold the bike rather than developing it. Works full time with two young children. She trains seven times a week but only TWO of those are gym sessions, fixed on Tuesday and Friday, and both land on a running day. The swim, bike and run sessions are the sport week and are listed in sport_schedule; do not convert a gym day into a cardio day or count a swim as a strength session. No two running days are consecutive, which is deliberate: the achilles tolerates the current three runs and does not tolerate back-to-back ones. The two gym days carry the swims rather than the hard run or the long ride, because easy low-intensity work sits closer to lifting at a lower acute cost than hard intervals do. Do not prescribe rehabilitation: the achilles is asymptomatic and she wants to race."
+  },
+  inseason_basketball: {
+    "age": 24,
+    "language": "en",
+    "experience": "Advanced (3+ years)",
+    "bodyweight": "88 kg",
+    "primary_goals": [
+      "Stay available for every fixture through the second half of the season"
+    ],
+    "secondary_goals": [
+      "Hold repeated jump height late in games rather than fading in the fourth quarter",
+      "Maintain lower-body strength through the season"
+    ],
+    "maintenance_goals": [
+      "Maintain upper-body pressing and pulling"
+    ],
+    "goal_priority_model": "tiered",
+    "days_per_week": 2,
+    "session_duration_minutes": 45,
+    "gym_availability_mode": "limited",
+    "available_gym_days": [
+      "Mon",
+      "Thu"
+    ],
+    "training_location": "commercial_gym",
+    "equipment": "Team gym: barbell, rack, dumbbells, trap bar, plyo boxes, bands, sled.",
+    "sport": "Basketball, semi-professional",
+    "sport_sessions_per_week": 6,
+    "sport_schedule": [
+      {
+        "day": "Mon",
+        "intensity": "moderate"
+      },
+      {
+        "day": "Tue",
+        "intensity": "hard"
+      },
+      {
+        "day": "Wed",
+        "intensity": "match"
+      },
+      {
+        "day": "Thu",
+        "intensity": "moderate"
+      },
+      {
+        "day": "Fri",
+        "intensity": "light"
+      },
+      {
+        "day": "Sat",
+        "intensity": "match"
+      }
+    ],
+    "sleep_hours": "7-8",
+    "recovery_rating": "Moderate in a two-game week",
+    "current_numbers": "Back Squat: 150 kg x 3\nTrap Bar Deadlift: 180 kg x 3\nCountermovement jump: 61 cm fresh, 52 cm in the fourth quarter\nBench Press: 100 kg x 5\nChin-up: bodyweight x 12\nCurrently 4 team practices and 2 games most weeks",
+    "performance_markers": [
+      "Countermovement jump: 61 cm fresh, 52 cm late in games"
+    ],
+    "season_phase": "in-season",
+    "injuries": "Right patellar tendinopathy, managed for two seasons. It flares with heavy slow squatting the day before a game and in back-to-back game weeks, never with jumping itself.",
+    "pain": {
+      "active": true,
+      "description": "Right patellar tendon, 2-3/10 on stairs the morning after a game week",
+      "severity": "2-3/10, activity-related",
+      "character": "localised, warms up within ten minutes",
+      "next_day_baseline": "returns to baseline by the second day",
+      "tolerated_movements": "Jumping, sprinting, split squats and trap bar pulling are all tolerated. Heavy slow back squat within 48 hours of a game is not. Isometric holds have reliably reduced symptoms."
+    },
+    "mobility": {
+      "active": false,
+      "limitation": ""
+    },
+    "clarification_answers": {
+      "running_current_exposure": "No separate running programme at all. Court volume only: 4 team practices and 2 games a week, roughly 25 km of running across the week, all of it on court in short accelerations rather than steady running."
+    },
+    "notes": "In-season block with no event to peak for: there is a game every Wednesday and Saturday and the season runs past this block, so he has to be ready every week. Matchday minus one is Tuesday and Friday. Two 45-minute gym slots, Monday and Thursday, both the day after a game. The fourth-quarter jump drop-off is the thing the coaching staff actually want fixed. Do not add conditioning: he gets plenty from practice."
+  },
   // The avatar that has caused every latency problem and killed four live
   // builds was the one avatar this suite did not cover. Ten athletes were
   // perturbed and checked for convergence; the Hyrox racer was not among them,
@@ -470,9 +650,11 @@ function allFindings(program, intake, id) {
 function releasable(program, intake) {
   try {
     const r = collectRepairableValidationFailures(program, intake, { skipSkillCalibration: true });
-    return { ok: Boolean(r.ok), codes: (r.flags || []).map((f) => f.code).filter(Boolean) };
+    // The program the bundle hands back is the one production would ship, so it
+    // is the one quality has to be measured on.
+    return { ok: Boolean(r.ok), codes: (r.flags || []).map((f) => f.code).filter(Boolean), program: r.program || program };
   } catch (e) {
-    return { ok: false, codes: [e?.code || 'THROWN'] };
+    return { ok: false, codes: [e?.code || 'THROWN'], program };
   }
 }
 
@@ -498,8 +680,16 @@ for (const [id, intake] of Object.entries(INTAKES)) {
     // printed as the verdict for each row. That number is 9.8 for every program
     // it has ever been shown, so the row now reports the finding count and the
     // coach severity instead -- two numbers that actually move.
-    const findings = allFindings(repaired.program, intake, id);
-    const severity = coachSeverity(repaired.program, intake);
+    // Measured on what ships, not on the half-way point. Severity used to be
+    // computed on v35's output, before the bundle had restored the table, so
+    // rows-one-cell-short was graded with 77 broken rows the customer never
+    // sees and reported the worst severity in the suite on nearly every avatar:
+    // 4.08 on the Hyrox racer, 3.45 on the triathlete. The repair was fine; the
+    // measurement was of the wrong program, and it read as the single largest
+    // quality risk the engine had.
+    const shipped = verdict.program || repaired.program;
+    const findings = allFindings(shipped, intake, id);
+    const severity = coachSeverity(shipped, intake);
     results.push({
       avatar: id,
       perturbation: perturbation.id,
