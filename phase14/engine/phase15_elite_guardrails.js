@@ -122,7 +122,19 @@ function meaningfulModalityRows(parsed, def) {
     const dose=`${r>=0?row.cells[r]||'':''} ${w>=0?row.cells[w]||'':''} ${note}`;
     const mins=[...dose.matchAll(/(\d+(?:\.\d+)?)\s*(?:min|minutes?)\b/gi)].map(m=>Number(m[1]));
     const setCount=Math.max(1,Number(row.cells[parsed.idx.sets]||1)||1);
-    const meaningful=mins.some(x=>x>=15||x*setCount>=15)||/\b\d+(?:\.\d+)?\s*(?:km|m)\b/i.test(dose)||/\b\d+\s*(?:x|×)\s*\d+(?:\.\d+)?\s*(?:m|km|min|minutes?)\b/i.test(dose); // MEANINGFUL-INTERVAL-SETS-DURATION
+    // A structured interval session is running practice whatever its total
+    // work comes to. The 15-minute floor exists to keep a six-minute warm-up jog
+    // from counting as an exposure, and it did that -- but it also stopped
+    // counting the sprint triathlete's Week 4 intervals, 4 x 3 min at
+    // 4:35-4:37/km, because consolidation took them from 20 minutes of work to
+    // 12. She ran on four days that week. TARGET_MODALITY_EXPOSURE_REDUCED said
+    // she ran on two, and that is what run #161 shipped DIRTY for: a frequency
+    // rule refusing a week whose frequency had gone up.
+    //
+    // So repeated work against a stated pace is meaningful by intensity. A
+    // single unpaced jog is still not. // STRUCTURED-INTERVAL-IS-AN-EXPOSURE
+    const pacedRepeats=setCount>=2&&/\b\d{1,2}:[0-5]\d(?:\s*[-–]\s*\d{1,2}:[0-5]\d)?\s*\/\s*(?:km|mi|500\s*m|400\s*m|100\s*m)\b/i.test(dose);
+    const meaningful=pacedRepeats||mins.some(x=>x>=15||x*setCount>=15)||/\b\d+(?:\.\d+)?\s*(?:km|m)\b/i.test(dose)||/\b\d+\s*(?:x|×)\s*\d+(?:\.\d+)?\s*(?:m|km|min|minutes?)\b/i.test(dose); // MEANINGFUL-INTERVAL-SETS-DURATION
     if(meaningful) rows.push({row,day:row.cells[d]||'unknown',ctx,dose});
   }
   return rows;
@@ -192,7 +204,7 @@ export function endurancePerformanceIntegrityFlags(program, intake={}, parsed=nu
     const required=existing>0?existing:1;
     if(actualDays<required) flags.push({
       code:'TARGET_MODALITY_EXPOSURE_REDUCED',
-      message:`${def.key} is a named ${priority} performance goal. The intake documents about ${existing||'at least one'} current ${def.key} exposure(s) per week, but Week 1 programs ${actualDays}. Do not silently remove target-modality practice; preserve the athlete's stated current exposure unless the authored plan makes and explains a deliberate recovery tradeoff.`
+      message:`${def.key} is a named ${priority} performance goal. The intake documents about ${existing||'at least one'} current ${def.key} exposure(s) per week, but this week programs ${actualDays}. Do not silently remove target-modality practice; preserve the athlete's stated current exposure unless the authored plan makes and explains a deliberate recovery tradeoff.`
     });
     if(def.key==='running') {
       const race=currentRunningRaceAnchor(intake);
