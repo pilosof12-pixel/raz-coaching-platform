@@ -87,7 +87,12 @@ test('a medium program is not degraded', () => {
 
 test('the timing breakdown is read back from the detail', () => {
   const detail = 'saving program after 1 model call(s) QA trace: E0:medium. Timing: total 298s, model 281s across 1 call(s), engine 2s.';
-  assert.deepEqual(timingFrom(detail), { total_s: 298, model_s: 281, calls: 1, engine_s: 2 });
+  assert.deepEqual(timingFrom(detail), { total_s: 298, model_s: 281, calls: 1, engine_s: 2, tokens: null });
+});
+
+test('the token split is read back when the trace carries it', () => {
+  const detail = 'saving program after 1 model call(s) QA trace: E0:medium. Timing: total 298s, model 281s across 1 call(s), engine 2s. Tokens: reasoning 9000, output 7000, input 30000.';
+  assert.deepEqual(timingFrom(detail).tokens, { reasoning: 9000, output: 7000, input: 30000 });
 });
 
 test('a detail without timing does not invent one', () => {
