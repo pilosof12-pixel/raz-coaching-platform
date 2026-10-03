@@ -47,8 +47,18 @@ test('a week the gate does not flag is never touched', () => {
   assert.equal(restoreScheduledModalityExposure(program, INTAKE).repaired, false);
 });
 
-test('without a schedule, or without the session anywhere in the block, nothing is invented', () => {
+test('without a schedule nothing is restored', () => {
   assert.equal(restoreScheduledModalityExposure(block([mon, tue, sat(8)]), { ...INTAKE, sport_schedule: [] }).repaired, false);
-  const noWednesdayAnywhere = [1, 2, 3, 4].map((n) => week(n, [mon, tue, sat(9)])).join('\n\n');
-  assert.equal(restoreScheduledModalityExposure(noWednesdayAnywhere, INTAKE).repaired, false);
+});
+
+test('an easy scheduled session missing from every week gets the endurance default, a hard one does not', () => {
+  const noWednesday = [1, 2, 3, 4].map((n) => week(n, [mon, tue, sat(9)])).join('\n\n');
+  const out = restoreScheduledModalityExposure(noWednesday, INTAKE);
+  assert.equal(out.repaired, true);
+  const wedRows = out.program.split('\n').filter((l) => l.startsWith('Wed\tRun\t'));
+  assert.equal(wedRows.length, 4);
+  assert.match(wedRows[0], /\tEasy conversational pace\t1\t30 min\tN\/A\t4\t/);
+  // Monday is "Run intervals": a hard session has no default dose.
+  const noMonday = [1, 2, 3, 4].map((n) => week(n, [tue, wed(6), sat(9)])).join('\n\n');
+  assert.equal(restoreScheduledModalityExposure(noMonday, INTAKE).repaired, false);
 });

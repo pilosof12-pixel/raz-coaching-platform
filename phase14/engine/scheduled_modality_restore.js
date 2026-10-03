@@ -28,6 +28,10 @@ const SCHEDULE_TYPE = {
   rowing: /\b(?:row(?:ing)?|erg)\b/i,
 };
 const RESTORED_NOTE = 'Your scheduled session, kept at the lightest dose this block already uses for it.';
+const DEFAULT_NOTE = 'Your scheduled easy session: fully conversational, flat and relaxed. It keeps your usual weekly rhythm without adding load.';
+const DEFAULT_NAME = { running: 'Run', cycling: 'Bike', swimming: 'Swim', rowing: 'Rowing Ergometer' };
+const WEEKDAY_LABEL = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+const typeOf = (e) => Boolean(e && (e.type || e.session || e.activity));
 
 function dayIdx(label) { return WEEKDAYS.indexOf(weekdayKey(String(label || '').trim())); }
 
@@ -107,11 +111,36 @@ export function restoreScheduledModalityExposure(program, intake = {}) {
             }
           }
         }
-        if (!sources.length) continue;
-        sources.sort((a, b) => (a.dose - b.dose) || (Math.abs(a.week - week) - Math.abs(b.week - week)));
-        const copy = sources[0].cells.slice();
+        let copy;
+        let fromWeek = null;
+        if (sources.length) {
+          sources.sort((a, b) => (a.dose - b.dose) || (Math.abs(a.week - week) - Math.abs(b.week - week)));
+          copy = sources[0].cells.slice();
+          fromWeek = sources[0].week;
+          if (t.idx.notes >= 0) copy[t.idx.notes] = RESTORED_NOTE;
+        } else {
+          // The session is missing from every week, so there is nothing in the
+          // block to copy. An EASY scheduled session has a rule-based dose from
+          // the endurance cluster: conversational aerobic work, short enough to
+          // sit inside what the athlete already tolerates. A hard or long
+          // session has no such default and is left to the model.
+          const entry = schedule.find((e) => dayIdx(e?.day) === day && typeOf(e));
+          const easy = entry && /\b(?:easy|recovery|aerobic|zone ?2|z2|light|technique)\b/i.test(`${entry.type || ''} ${entry.intensity || ''}`);
+          const name = DEFAULT_NAME[flag.key];
+          if (!easy || !name) continue;
+          copy = t.lines[0].split('\t').map(() => '');
+          copy[t.idx.day] = rows.find((c) => dayIdx(c[t.idx.day]) === day)?.[t.idx.day] || WEEKDAY_LABEL[day];
+          copy[t.idx.exercise] = name;
+          if (t.idx.weight >= 0) copy[t.idx.weight] = 'Easy conversational pace';
+          copy[t.idx.sets] = '1';
+          copy[t.idx.reps] = '30 min';
+          const rest = t.lines[0].split('\t').map((h) => h.trim().toLowerCase()).indexOf('rest');
+          if (rest >= 0) copy[rest] = 'N/A';
+          const rpe = t.lines[0].split('\t').map((h) => h.trim().toLowerCase()).findIndex((h) => /rpe|effort/.test(h));
+          if (rpe >= 0) copy[rpe] = '4';
+          if (t.idx.notes >= 0) copy[t.idx.notes] = DEFAULT_NOTE;
+        }
         if (copy.length !== t.lines[0].split('\t').length) continue;
-        if (t.idx.notes >= 0) copy[t.idx.notes] = RESTORED_NOTE;
 
         // After the last row on or before that day, so the table stays in week order.
         let at = 0;
@@ -125,7 +154,7 @@ export function restoreScheduledModalityExposure(program, intake = {}) {
         const after = flagsFor(next, intake, week).find((f) => f.key === flag.key)?.actual_days;
         if (after !== undefined && after <= before) continue;
         current = next;
-        repairs.push({ week, modality: flag.key, day: WEEKDAYS[day], from_week: sources[0].week });
+        repairs.push({ week, modality: flag.key, day: WEEKDAYS[day], from_week: fromWeek });
       }
     }
   }

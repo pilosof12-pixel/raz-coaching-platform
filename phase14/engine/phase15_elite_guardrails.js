@@ -219,7 +219,8 @@ export function endurancePerformanceIntegrityFlags(program, intake={}, parsed=nu
     if(actualDays<required) flags.push({
       code:'TARGET_MODALITY_EXPOSURE_REDUCED',
       key:def.key, actual_days:actualDays, required_days:required,
-      message:`${def.key} is a named ${priority} performance goal. The intake documents about ${existing||'at least one'} current ${def.key} exposure(s) per week, but this week programs ${actualDays}. Do not silently remove target-modality practice; preserve the athlete's stated current exposure unless the authored plan makes and explains a deliberate recovery tradeoff.`
+      days:[...new Set(rows.map(x=>x.day))],
+      message:`${def.key} is a named ${priority} performance goal. The intake documents about ${existing||'at least one'} current ${def.key} exposure(s) per week, but this week programs ${actualDays}${actualDays?` (${[...new Set(rows.map(x=>x.day))].join(', ')})`:''}. Do not silently remove target-modality practice; preserve the athlete's stated current exposure unless the authored plan makes and explains a deliberate recovery tradeoff.`
     });
     if(def.key==='running') {
       const race=currentRunningRaceAnchor(intake);
