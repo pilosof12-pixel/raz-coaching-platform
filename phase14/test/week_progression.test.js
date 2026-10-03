@@ -156,3 +156,24 @@ test('a primary added-load goal progresses on the belt, and intensifies past the
   assert.equal(rowOf(out, 3, 'Weighted Pull-up').reps, '2');
   assert.equal(rowOf(out, 4, 'Weighted Pull-up').load, '+32.5 kg');
 });
+
+import { skillMaxReps } from '../engine/week_progression.js';
+
+test('a consecutive-rep skill goal near the max lengthens one set, never jumps past the max', () => {
+  // Coach on run #166: 5 consecutive muscle-ups is not more total singles, and
+  // OAP 2 -> 3 is not ring row 8 -> 9. Current max: 2 clean reps.
+  const intake = { primary_goals: ['Strict muscle-up on rings for 5 clean reps'], current_numbers: 'Strict ring muscle-up: 2 clean reps' };
+  assert.equal(skillMaxReps(intake, 'Strict Muscle-up'), 2);
+  const out = buildWeeksFromWeekOne(w1([
+    'Mon\tStrict Muscle-up\tBodyweight\t5\t1\t2 min\t8\tSingles.\t',
+    'Fri\tStrict Muscle-up\tBodyweight\t1\t2\t3 min\t8\tTop double.\t',
+    'Fri\tStrict Muscle-up\tBodyweight\t3\t1\t2 min\t7\tSingles.\t',
+  ]), intake).program;
+  const day = (w) => out.match(new RegExp(`START_WEEK${w}_TSV\\n([\\s\\S]*?)\\nEND_WEEK${w}_TSV`))[1].split('\n').slice(1).map((l) => { const c = l.split('\t'); return `${c[0]} ${c[3]}x${c[4]}`; });
+  assert.deepEqual(day(2), ['Mon 3x2', 'Fri 2x2', 'Fri 3x1']);
+  assert.deepEqual(day(3), ['Mon 3x2', 'Fri 2x2', 'Fri 4x1']);
+  assert.deepEqual(day(4), ['Mon 2x2', 'Fri 1x2', 'Fri 3x1']);
+  // No prescribed set is longer than the current max; the extra rep is an offer.
+  for (const w of [2, 3, 4]) for (const d of day(w)) assert.ok(Number(d.split('x')[1]) <= 2, d);
+  assert.match(out, /Make the first set 3 reps only if every Week 2 set was crisp/);
+});

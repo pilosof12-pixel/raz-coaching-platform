@@ -99,6 +99,26 @@ function addedBenchmark(intake = {}, name = '', reps = null) {
   return best;
 }
 
+// The athlete's current max reps for a skill, from their own numbers:
+// "Strict ring muscle-up: 2 clean reps", "One-Arm Pull-up: 2 strict reps each arm".
+const SKILL_BENCH_WORDS = {
+  one_arm_pull: /one[- ]arm (?:pull|chin)/i, muscle_up: /muscle[- ]?up/i, handstand: /handstand push|hspu/i,
+  planche: /planche push/i, front_lever: /front lever (?:pull|raise|row)/i,
+};
+export function skillMaxReps(intake = {}, name = '') {
+  const fam = skillFamilyOf(name)?.key;
+  const words = SKILL_BENCH_WORDS[fam];
+  if (!words) return null;
+  if (/handstand/.test(fam) && !/push|hspu/i.test(name)) return null;
+  let best = null;
+  for (const line of txt([intake.current_numbers, intake.performance_markers]).split(/\n|\||;/)) {
+    if (!words.test(line) || /assist|band|negative|weighted|\+\s*\d/i.test(line)) continue;
+    const m = line.match(/(\d+)\s*(?:clean |strict |good )?reps?\b/i);
+    if (m) best = Math.max(best ?? 0, Number(m[1]));
+  }
+  return best;
+}
+
 // The heaviest load a set of `reps` at `rpe` should carry for that max.
 function capFor(max, reps, rpeCell) {
   if (!max || !reps) return null;
@@ -248,6 +268,40 @@ function progressRow(cells, p, role, week, plateau) {
       note = `Consolidation: keep the Week 3 reps and load, ${consolidate(c, p, sets)}.`;
     }
     if (plateau && (week === 2 || week === 3)) note += ' Plateau intensifier: on the last set, a drop set -- take about 20% off and continue twice, no rest between drops.';
+  } else if (role === 'skill' && p.skillMax != null && !isRange(reps) && num(reps) != null) {
+    // A rep goal near the athlete's max progresses the LENGTH of one set, not
+    // every set. Coach on run #166: OAP at a 2-rep max going to 2x3 is not the
+    // same stimulus as a ring row going 8 to 9, and five consecutive
+    // muscle-ups are not more total singles. The day's top set lengthens up to
+    // the current max; the short volume sets only grow in number; one rep past
+    // the max is offered in Week 3 only if Week 2 was crisp, never prescribed;
+    // Week 4 keeps the length reached at lower volume.
+    const r = num(reps);
+    const m = p.skillMax;
+    const grow = Math.min(r + 1, Math.max(m, r));
+    if (p.topSet) {
+      if (week === 2) {
+        if (r < m) { c[p.reps] = bumpFirst(reps, () => grow); setsTo(c, p.sets, Math.max(1, Math.ceil((sets * r) / grow))); note = `One rep longer per set, up to your current ${m}; every rep strict and crisp.`; }
+        else { if (sets < 4) setsTo(c, p.sets, sets + 1); note = 'Same set length, one more set of the same quality.'; }
+      }
+      if (week === 3) {
+        const w2 = progressRow(cells, p, role, 2, false);
+        c[p.reps] = w2[p.reps]; c[p.sets] = w2[p.sets];
+        const len = num(w2[p.reps]);
+        note = `Same as Week 2. Make the first set ${len + 1} reps only if every Week 2 set was crisp; otherwise keep it at ${len}.`;
+      }
+      if (week === 4) {
+        const w2 = progressRow(cells, p, role, 2, false);
+        c[p.reps] = w2[p.reps];
+        const w2sets = num(w2[p.sets]) || sets;
+        setsTo(c, p.sets, Math.min(sets, w2sets >= 3 ? w2sets - 1 : w2sets));
+        note = 'Consolidation: keep the set length you reached, with less volume than Week 2.';
+      }
+    } else {
+      if (week === 2) note = 'Same short sets; every rep crisp.';
+      if (week === 3) { if (sets < 5) setsTo(c, p.sets, sets + 1); note = 'One more short set: more clean reps in total, the same length.'; }
+      if (week === 4) note = 'Consolidation: Week 1 volume, same quality.';
+    }
   } else if (role === 'skill') {
     const hold = reps.match(/(\d+)\s*(?:s|sec|seconds)\b/i);
     if (week === 2) { if (sets < 5) setsTo(c, p.sets, sets + 1); note = 'One more set of the same quality as Week 1. Stop a set at the first clearly worse rep.'; }
@@ -355,11 +409,25 @@ export function buildWeeksFromWeekOne(program, intake = {}) {
 
   const blocks = [];
   for (const week of [2, 3, 4]) {
-    const rows = w1.rows.map((cells) => {
+    // The top set of a skill on a day: its row with the most reps.
+    const topIndex = new Map();
+    let lastDay = '';
+    w1.rows.forEach((cells, i) => {
+      const day = String(cells[p.day] || '').trim() || lastDay;
+      lastDay = day;
+      const fam = skillFamilyOf(cells[p.exercise])?.key;
+      if (!fam) return;
+      const key = `${day}|${fam}`;
+      const r = num(cells[p.reps]) ?? 0;
+      if (!topIndex.has(key) || r > (num(w1.rows[topIndex.get(key)][p.reps]) ?? 0)) topIndex.set(key, i);
+    });
+    const tops = new Set(topIndex.values());
+    const rows = w1.rows.map((cells, i) => {
       const name = cells[p.exercise];
       const role = roleOf(name, cells[p.reps], Number.isInteger(p.load) ? cells[p.load] : '', intake);
       const plateau = plateauRows.some((re) => re.test(String(name || '')));
-      return progressRow(cells, { ...p, max: knownMaxKg(intake, name), intake }, role, week, plateau).join('\t');
+      const ctx = { ...p, max: knownMaxKg(intake, name), intake, skillMax: role === 'skill' ? skillMaxReps(intake, name) : null, topSet: tops.has(i) };
+      return progressRow(cells, ctx, role, week, plateau).join('\t');
     });
     blocks.push(`START_WEEK${week}_TSV\n${header.join('\t')}\n${rows.join('\n')}\nEND_WEEK${week}_TSV`);
   }
@@ -379,6 +447,7 @@ export function week1OnlySection(intake = {}) {
     'This overrides the output contract above. Write the short client intro, the pain/substitution guidance relevant to this athlete, and ONLY the START_WEEK1_TSV ... END_WEEK1_TSV block.',
     'Do not write Weeks 2-4 and do not write a weeks 2-4 progression note: the system builds Weeks 2-4 from your Week 1 with fixed rules (single progression on loaded strength, double progression on hypertrophy work, sets then reps or hold time on goal skills, about 10% a week on one endurance lever, goal lifts progressing while support lifts hold, Week 4 consolidation).',
     'So Week 1 is the template for the whole block: every session, exercise, order, dose and coaching note must be complete and correct, and every row must name its real role (for example identify the long run as the long run).',
+    'No exercise can appear later in this block that is not in Week 1, so do not promise one ("Deadlift comes back once..."): a movement held back for now belongs to the next block, and should be described that way.',
   ].join('\n');
 }
 

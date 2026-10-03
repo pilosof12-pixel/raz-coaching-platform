@@ -39,6 +39,8 @@ import { normalizeTacticalStrengthSpacing } from './tactical_strength_spacing.js
 import { normalizeTrainingDaysReading } from './training_days_reading.js'; // TRAINING-DAYS-READING-WIRED
 import { normalizeRunDaySpacing } from './run_day_spacing.js'; // RUN-DAY-SPACING-WIRED
 import { restoreScheduledModalityExposure } from './scheduled_modality_restore.js'; // SCHEDULED-MODALITY-RESTORE-WIRED
+import { normalizeSportScheduleIdentity } from './sport_schedule_identity.js'; // SPORT-SCHEDULE-IDENTITY-WIRED
+import { normalizeNarrativePromises } from './narrative_promises.js'; // NARRATIVE-PROMISES-WIRED
 import { validatePhase15FinalProgram } from './phase15_final_qa.js';
 import { parseProgramModel } from './program_model.js';
 import { trimExcessSupportVolume } from './mrv_support_trim.js';
@@ -641,6 +643,14 @@ export function collectRepairableValidationFailures(program, intake = {}, option
     deterministic_repairs.push({ type: 'stated_run_spacing', repairs: runSpacing.repairs });
   }
 
+  // A sport session goes back to the day the athlete's schedule gives it,
+  // before anything counts sessions per day.
+  const scheduleIdentity = normalizeSportScheduleIdentity(candidate, intake);
+  if (scheduleIdentity.repaired) {
+    candidate = scheduleIdentity.program;
+    deterministic_repairs.push({ type: 'sport_schedule_identity', repairs: scheduleIdentity.repairs });
+  }
+
   // After the spacing repair, which can remove a run: the restore only ever
   // fills a day the athlete's own schedule gives that modality.
   const modalityRestore = restoreScheduledModalityExposure(candidate, intake);
@@ -821,6 +831,12 @@ export function collectRepairableValidationFailures(program, intake = {}, option
   // Last deterministic repair: every prescription above is now settled, so any
   // quantitative claim a note still makes about its own row can be checked
   // against the final structured fields.
+  const promises = normalizeNarrativePromises(candidate);
+  if (promises.repaired) {
+    candidate = promises.program;
+    deterministic_repairs.push({ type: 'narrative_promise_restated', repairs: promises.repairs });
+  }
+
   const finalNoteCoherence = normalizeFinalNoteCoherence(candidate, intake);
   candidate = finalNoteCoherence.program;
   if (finalNoteCoherence.repaired) deterministic_repairs.push({ type: 'final_note_coherence', rows: finalNoteCoherence.repairs });
