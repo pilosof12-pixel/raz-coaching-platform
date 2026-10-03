@@ -674,6 +674,11 @@ for (const [id, intake] of Object.entries(INTAKES)) {
     // codes while still counting toward "proven".
     const repaired = repairDeterministicContradictions(damaged, intake);
     const verdict = releasable(repaired.program, intake);
+    // Production does not run v35 first: it hands the model's text straight to
+    // the bundle. Measured both ways, 6 of 128 damaged programs converged here
+    // and were refused in production. The suite now reports production's answer
+    // next to its own, so the two cannot drift apart unnoticed again.
+    const production = releasable(damaged, intake);
     // Every collector still runs on every perturbed program, which is why this
     // call stays: a collector that throws on damaged input is worth catching
     // here. What used to follow it was scoreProgram(findings), whose number was
@@ -696,6 +701,8 @@ for (const [id, intake] of Object.entries(INTAKES)) {
       seen: perturbation.seen,
       applied: changed || perturbation.id === 'undamaged',
       converged: verdict.ok,
+      productionConverged: production.ok,
+      productionResidual: production.codes,
       severity,
       residual: verdict.codes,
       findingCount: findings.length,
@@ -839,6 +846,32 @@ for (const [label, ok] of checks) {
   if (!ok) failed += 1;
   console.log(`  ${ok ? 'PASS' : 'FAIL'}  ${label}`);
 }
+// Damaged programs this suite repairs but production refuses, each a
+// regeneration live. They are listed rather than hidden, the list can only
+// shrink, and a divergence not on it fails the verdict -- the same discipline
+// as the gate-repair registry.
+const KNOWN_PRODUCTION_DIVERGENCE = new Set([
+  // The finisher is removed, and something later in the chain leaves the
+  // block without progression architecture. The stale-flag fix exposed this;
+  // it was hidden behind ADVANCED_HYBRID_EXTRA_HARD_CONDITIONING before.
+  'advanced_hybrid/optional-finisher-added',
+  'weightlifter_meet_week/week4-not-consolidating',
+  'weightlifter_meet_week/repeated-doubles-in-comp-week',
+  'weightlifter_meet_week/session-grows-into-day-zero',
+]);
+const divergent = results.filter((r) => r.applied && r.converged && !r.productionConverged)
+  .map((r) => `${r.avatar}/${r.perturbation}`);
+const unaccounted = divergent.filter((k) => !KNOWN_PRODUCTION_DIVERGENCE.has(k));
+const outlived = [...KNOWN_PRODUCTION_DIVERGENCE].filter((k) => !divergent.includes(k));
+console.log(`\n--- production path: ${divergent.length} damaged program(s) converge here but are refused in production ---`);
+for (const k of divergent) {
+  const r = results.find((x) => `${x.avatar}/${x.perturbation}` === k);
+  console.log(`  ${KNOWN_PRODUCTION_DIVERGENCE.has(k) ? 'known ' : 'NEW   '} ${k.padEnd(52)} ${[...new Set(r.productionResidual)].join(',')}`);
+}
+checks.splice(checks.length - 1, 0,
+  [`no unaccounted production divergence${unaccounted.length ? ` (${unaccounted.join(', ')})` : ''}`, unaccounted.length === 0],
+  [`the accounted divergence list is current${outlived.length ? ` (fixed, remove: ${outlived.join(', ')})` : ''}`, outlived.length === 0],
+);
 const required = checks.slice(0, checks.length - 1); // the last is aspirational, reported not enforced
 const requiredFailed = required.filter(([, ok]) => !ok).length;
 console.log(`\nVERDICT: ${requiredFailed === 0 ? 'PASS' : 'FAIL'} (${required.length - requiredFailed}/${required.length} required checks)`);
