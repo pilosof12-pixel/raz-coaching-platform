@@ -1,67 +1,39 @@
 {
-  "timestamp": "2026-10-03T07:17:28.521Z",
+  "timestamp": "2026-10-03T09:10:46.116Z",
   "base": "https://raz-coaching-platform.onrender.com",
-  "head_sha": "bdf824805ed8f7aff5aa5a9225255a4eac18c33c",
-  "runtime": "live95 2026-10-03T00:00:00Z",
+  "head_sha": "300efccb2cc17f2176e5c8fce655a6df2a36e270",
+  "runtime": "live97 2026-10-03T09:10:00Z",
   "results": [
     {
       "id": "advanced_hybrid",
-      "job_id": "da834e749c788ecfaab10a9ea1f9b386",
+      "job_id": "bb48881b5589f91a282f490c709aa036",
       "ok": true,
       "status": "done",
       "stage": "finalizing",
       "attempt": 2,
-      "detail": "saving program after 2 model call(s) QA trace: E0:medium -> A1:V34_NOTE_REP_WORD_MISMATCH. First failure evidence: Prescription/note consistency: Side Plank (Week 4) prescribes 30 rep(s) per set but its note describes Single. Make every quantitative claim in a note agree with that row's own Sets, Reps and Weight fields, or state it as an explicitly conditional option. Do not reference a load that is neither prescribed on the row nor an established benchmark. Timing: total 258s, model 249s across 2 call(s), engine 8s.",
+      "detail": "saving program after 2 model call(s) QA trace: E0:medium -> A1:EVENT_PROGRESSING_SESSION_MISSING+WEEKLY_MRV_EXCEEDED. First failure evidence: Week 3: The running performance goal 'Marathon' has no progression-bearing event-specific session in Week 1. For marathon preparation, an explicitly identified long run with a prescribed duration/distance is a valid event-specific progression anchor; other events still require their source-supported pace/power/split/interval or equivalent progression. | PRIOR ATTEMPT FAILED WEEKLY VOLUME VALIDATION. The following single-week workload is grossly above the internal reference band: [Week 1 push: 35.5 (19 program + 16.5 sport baseline debit; raw sport heuristic 30) vs reference 22; Week 2 push: 35 Timing: total 326s, model 314s across 2 call(s), engine 11s. Tokens: reasoning 17158, output 29869, input 42092.",
       "last_seen_status": "done",
       "error": null,
-      "program_chars": 25566,
-      "seconds": 261
-    },
-    {
-      "id": "youth_gymnastics",
-      "job_id": "8851b03f7ed0c487f86d5564cadb0bb6",
-      "ok": true,
-      "status": "done",
-      "stage": "finalizing",
-      "attempt": 4,
-      "detail": "delivered with unresolved rules: YOUTH_PRIMARY_SKILL_NOT_FRESH+TSV_ROW_COLUMN_COUNT_MISMATCH QA trace: E0:medium -> A1:YOUTH_PRIMARY_SKILL_NOT_FRESH -> A2:YOUTH_PRIMARY_SKILL_NOT_FRESH -> A3:YOUTH_PRIMARY_SKILL_NOT_FRESH -> A4:YOUTH_PRIMARY_SKILL_NOT_FRESH. First failure evidence: Week 1 session a: primary bar-muscle-up/handstand skill work appears after 1 support exercise(s). Put primary skill practice first while fresh, then foundation strength and accessories.",
-      "last_seen_status": "done",
-      "error": null,
-      "program_chars": 23651,
-      "seconds": 426
+      "program_chars": 26603,
+      "seconds": 329
     },
     {
       "id": "sprint_triathlete",
-      "job_id": "8bc6bd360b1ce61d69e5f3973f6febb5",
+      "job_id": "72294ca4c9e36569a9ca1266115015b2",
       "ok": true,
       "status": "done",
       "stage": "finalizing",
       "attempt": 3,
-      "detail": "saving program after 3 model call(s) QA trace: E0:medium -> A1:TARGET_MODALITY_EXPOSURE_REDUCED+TARGET_MODALITY_EXPOSURE_REDUCED+EVENT_PROGRESSING_SESSION_MISSING -> A2:TARGET_MODALITY_EXPOSURE_REDUCED. First failure evidence: Week 4: running is a named primary performance goal. The intake documents about 3 current running exposure(s) per week, but this week programs 2. Do not silently remove target-modality practice; preserve the athlete's stated current exposure unless the authored plan makes and explains a deliberate recovery tradeoff. Timing: total 565s, model 556s across 3 call(s), engine 8s.",
+      "detail": "saving program after 3 model call(s) QA trace: E0:medium -> A1:TARGET_MODALITY_EXPOSURE_REDUCED -> A2:TARGET_MODALITY_EXPOSURE_REDUCED. First failure evidence: running is a named primary performance goal. The intake documents about 3 current running exposure(s) per week, but this week programs 2. Do not silently remove target-modality practice; preserve the athlete's stated current exposure unless the authored plan makes and explains a deliberate recovery tradeoff. Timing: total 477s, model 468s across 3 call(s), engine 9s. Tokens: reasoning 26365, output 42317, input 59574.",
       "last_seen_status": "done",
       "error": null,
-      "program_chars": 19838,
-      "seconds": 567
-    },
-    {
-      "id": "inseason_basketball",
-      "job_id": "340606ed61a05edba10758932c91b257",
-      "ok": true,
-      "status": "done",
-      "stage": "finalizing",
-      "attempt": 1,
-      "detail": "saving program after 1 model call(s) QA trace: E0:medium. Timing: total 169s, model 168s across 1 call(s), engine 1s.",
-      "last_seen_status": "done",
-      "error": null,
-      "program_chars": 12994,
-      "seconds": 171
+      "program_chars": 18917,
+      "seconds": 480
     }
   ],
   "selection": [
     "advanced_hybrid",
-    "youth_gymnastics",
-    "sprint_triathlete",
-    "inseason_basketball"
+    "sprint_triathlete"
   ],
   "ok": true
 }
