@@ -380,7 +380,22 @@ function buildOpenAICompactUser(userContent) {
     "YOUTH HANDSTAND COMPONENT RULE: for a youth seeking a first freestanding handstand who still relies on the wall, preserve BOTH Wall Handstand Hold for position/static capacity and Controlled Handstand Kick-up for fresh entry/independent-balance practice. Do not delete wall-supported capacity merely because kick-ups are present, and do not replace balance practice with longer wall holds.",
     "YOUTH WEEK-4 RETENTION RULE: consolidation reduces fatigue, not earned capability. Reduce sets or attempts first while retaining the best clean Week-2/3 rep, assistance, balance, entry, ROM or execution standard. Explicitly reference retaining/matching the best Week-3 skill quality when volume is reduced.",
     "Week 4 is not automatically a deload. Consolidate or trim only when justified by the athlete constraints.",
-  ].join("\n");
+  ].join("\n") + qaCorrectionsFrom(src); // QA-CORRECTIONS-SURVIVE-COMPACTION
+}
+
+// The compact prompt is rebuilt from the intake, and everything else in the
+// incoming text was dropped -- including the accumulated QA corrections a
+// fresh regeneration carries. A build that regenerated after a structural
+// failure was asked again with no word about what had failed, and could only
+// repeat it. The corrections section is kept, verbatim, at the end.
+function qaCorrectionsFrom(src) {
+  const marker = "=== ACCUMULATED QA CORRECTIONS ===";
+  const at = String(src || "").indexOf(marker);
+  if (at < 0) return "";
+  // Bounded: the compact prompt has a hard 70k ceiling, and the newest
+  // corrections are the ones the next attempt most needs.
+  const body = String(src).slice(at + marker.length);
+  return "\n\n" + marker + "\n" + (body.length > 8000 ? "[earlier corrections omitted]\n" + body.slice(-8000) : body.trim());
 }
 
 function hasCurrentBenchmark(intake, re) {
