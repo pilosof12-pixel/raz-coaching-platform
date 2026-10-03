@@ -28,6 +28,7 @@ import { validateTactical3KIntervalProgressionSemantic, validateTacticalStrength
 import { validateHardRunWarmupSemantic, validateYouthProgressionQualitySemantic } from "./engine/coaching_acceptance_quality.js"; // ACCEPTANCE-QUALITY-SEMANTIC-QA-WIRED
 import { validateYouthConsolidationRetentionSemantic } from "./engine/coaching_consolidation_quality.js"; // CONSOLIDATION-RETENTION-SEMANTIC-QA-WIRED
 import { validateClientOutputCleanliness } from "./engine/client_output_qa.js"; // CLIENT-OUTPUT-CLEANLINESS-WIRED
+import { weeksImplicatedBy, scopeRepairPrompt, spliceWeekBlocks } from "./engine/week_scoped_repair.js"; // WEEK-SCOPED-REPAIR
 import { validateRepairableProgramBundle } from "./engine/repairable_validation_bundle.js"; // AGGREGATE-REPAIR-VALIDATION-WIRED
 import { enrichSpecificWarmups } from "./engine/specific_warmup_enrichment.js"; // SPECIFIC-WARMUP-ENRICHMENT-WIRED
 import { normalizeYouthPrimarySkillOrder } from "./engine/youth_skill_order_normalizer.js"; // YOUTH-SKILL-ORDER-REPAIR-WIRED
@@ -2355,6 +2356,7 @@ async function generateValidatedProgram(intake, onProgress = async () => {}) {
   const failCounts = Object.create(null);
   let lastValid = null;
   let repairCandidate = null;
+  let repairWeeks = null; // WEEK-SCOPED-REPAIR: the weeks the next repair may rewrite, or null for all
   let repairFeedback = "";
   // The effort a build OPENS at, which the trace never recorded. Retries were
   // annotated with "@medium" but the first attempt was not, so a run could not
@@ -2428,8 +2430,11 @@ async function generateValidatedProgram(intake, onProgress = async () => {}) {
     const cumulativeRepairFeedback = amendments.length
       ? amendments.join("\n\n--- PRESERVE PRIOR QA CONSTRAINT ---\n\n")
       : repairFeedback;
+    const scopedWeeks = repairCandidate && Array.isArray(repairWeeks) && repairWeeks.length ? repairWeeks.slice() : null; // WEEK-SCOPED-REPAIR
     const userContent = repairCandidate
-      ? buildInternalQualityRepairPrompt(intake, repairCandidate, cumulativeRepairFeedback)
+      ? (scopedWeeks
+        ? scopeRepairPrompt(buildInternalQualityRepairPrompt(intake, repairCandidate, cumulativeRepairFeedback), scopedWeeks)
+        : buildInternalQualityRepairPrompt(intake, repairCandidate, cumulativeRepairFeedback))
       : (amendments.length ? basePrompt + "\n\n=== ACCUMULATED QA CORRECTIONS ===\n" + amendments.join("\n\n") : basePrompt);
     // An empty model response is transient, not a verdict on the program: with
     // high reasoning effort the model can spend its whole output budget thinking
@@ -2540,6 +2545,18 @@ async function generateValidatedProgram(intake, onProgress = async () => {}) {
         `${aborted ? "generation ran past the time limit" : "model returned no content"}; starting over (${transientRetries}/${MAX_TRANSIENT_RETRIES})`,
       );
       continue;
+    }
+    if (scopedWeeks) {
+      // Put the returned weeks into the candidate; a reply that does not carry
+      // every requested week is repaired in full on the next attempt. // WEEK-SCOPED-REPAIR
+      const spliced = spliceWeekBlocks(repairCandidate, raw, scopedWeeks);
+      if (spliced) {
+        raw = spliced;
+        qaTrace.push("S" + attempt + ":weeks" + scopedWeeks.join(""));
+      } else {
+        qaTrace.push("S" + attempt + ":splice-failed");
+        repairWeeks = null;
+      }
     }
     if (!isValidProgram(raw)) {
       console.warn(
@@ -2699,7 +2716,7 @@ async function generateValidatedProgram(intake, onProgress = async () => {}) {
           } catch (stillFlagged) {
             // Not clean yet. The improvement is still worth more than the
             // text the model wrote, so the next attempt starts from it.
-            void stillFlagged;
+            repairWeeks = weeksImplicatedBy(stillFlagged?.flags); // WEEK-SCOPED-REPAIR
           }
           repairCandidate = repairedByBundle; // REPAIRED-CANDIDATE-REUSE
           continue;
@@ -2730,6 +2747,7 @@ async function generateValidatedProgram(intake, onProgress = async () => {}) {
           }
         }
         repairCandidate = requiresFreshCandidate ? null : program; // STRUCTURAL-ONLY-FRESH-CANDIDATE
+        repairWeeks = repairCandidate ? weeksImplicatedBy(err?.flags) : null; // WEEK-SCOPED-REPAIR
         continue;
       }
       throw err;
