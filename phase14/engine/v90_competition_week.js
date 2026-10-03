@@ -302,7 +302,13 @@ export function repairCompetitionWeek(program, intake = {}, now = Date.now()) {
     if (!Number.isInteger(parsed.notes)) return;
     const said = live.some((r) => /\bcompetition prep\b|\btaper\b/i.test(String(rows[r.index][parsed.notes] || '')));
     if (said) return;
-    note(live[0].index, 'Competition prep: this session is deliberately short because the week is a descent into the event.');
+    // On the competition lift when the session has one: it is the row no trim
+    // reaches for. On the meet week whose Day -1 row had been written at the
+    // top of the table, the declaration landed on that stray accessory, a later
+    // repair removed the row, and the session shipped short and undeclared --
+    // V38_INCOMPLETE_SESSION in production on a program that converged offline.
+    const anchor = live.find((r) => matcher.re.test(r.name)) || live[0];
+    note(anchor.index, 'Competition prep: this session is deliberately short because the week is a descent into the event.');
     changed = true;
   });
 

@@ -83,3 +83,14 @@ test('it is idempotent', () => {
   const once = repairDeterministicContradictions(p, INTAKE).program;
   assert.equal(repairDeterministicContradictions(once, INTAKE).program, once);
 });
+
+test('a ".;"-joined note is read as separate sentences, so the unverifiable one can go', () => {
+  // The warm-up enrichment joins its clauses with "; ". Read as one sentence,
+  // "rack.; Ramp ...: 50 kg x 5" was the whole note, nothing could be dropped,
+  // and the gate cost a regeneration on a meet week that converged offline.
+  const p = block('Mon\tWeighted Pull-up\tBand assistance\t3\t1\t4 min\t8\tUsual wrist prep first.; Ramp pull-ups: 10 kg x 5, 20 kg x 3 before work sets.; Keep it crisp.\t');
+  assert.ok(flags(p) > 0, 'fixture must raise it');
+  const out = repairDeterministicContradictions(p, INTAKE).program;
+  assert.equal(flags(out), 0);
+  assert.match(noteOf(out, 'Weighted Pull-up'), /Usual wrist prep first\..*Keep it crisp\./);
+});

@@ -992,7 +992,11 @@ function repairUndefinedLoadReferences(program, intake, repairs) {
       // Deleting is the fallback, and it keeps its old caution: where the claim
       // is the whole note there is nothing to delete down to, and an empty note
       // is worse than an unverifiable one. Those reach the gate.
-      const sentences = String(cells[parsed.notes] || '').split(/(?<=[.!?])\s+/).filter((x) => x.trim());
+      // ".; " is a sentence boundary too: it is how the warm-up enrichment joins
+      // its clauses, and reading "rack.; Ramp Clean and jerk: 50 kg x 5 ..." as one
+      // sentence made the ramp the whole note, so nothing could be dropped and the
+      // gate cost a regeneration.
+      const sentences = String(cells[parsed.notes] || '').split(/(?<=[.!?]);?\s+/).filter((x) => x.trim());
       const kept = sentences.filter((sentence) => !loadTokensIn(sentence).some(unverifiable));
       if (kept.length === sentences.length || !kept.length) continue;
 
@@ -1748,6 +1752,18 @@ export function repairDeterministicContradictions(program, intake = {}) {
   if (honest !== candidate) {
     candidate = honest;
     repairs.push({ type: 'v92_prescription_says_what_decides' });
+
+    // v92 drops movements the block never taught, and the freshness budget was
+    // judged before it did. On the meet week that took a ballistic-swap Box
+    // Jump off Day -3 and left Day -2 heavier than the day before it:
+    // V90_SESSION_GROWS_INTO_DAY_ZERO in production on a program the budget
+    // had already made descend. The budget judges what is left, and v92 then
+    // re-reads the week so its stop rule sits on a row that survived.
+    const rebudgeted = repairCompetitionWeek(candidate, intake);
+    if (rebudgeted !== candidate) {
+      candidate = repairPrescriptionIntegrity(rebudgeted, intake);
+      repairs.push({ type: 'v90_competition_week_rebudgeted_after_v92' });
+    }
   }
 
   const coherent = repairTimelineIntegrity(candidate, intake);

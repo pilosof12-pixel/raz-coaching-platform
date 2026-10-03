@@ -171,3 +171,19 @@ test('the exposure cap does not govern the competition lifts', () => {
   ]);
   assert.equal(collectCompetitionWeekFlags(program, MEET).filter((f) => f.code === 'V90_EXPOSURE_REPEATED_ALL_WEEK').length, 0);
 });
+
+test('the competition-prep declaration sits on the competition lift, not on a row a later repair can drop', () => {
+  // The meet week whose Day -1 accessory had been written at the top of the
+  // table: the declaration landed on that stray row, a later repair removed it,
+  // and the session shipped short and undeclared (V38_INCOMPLETE_SESSION).
+  const program = block([
+    row('Day -1', 'Chest-Supported Row', 1, 8),
+    row('Day -2', 'Clean and jerk', 2, 1),
+    row('Day -1', 'Snatch', 1, 1, 'Optional primer; skip it if you already feel sharp.'),
+  ]);
+  const out = repairCompetitionWeek(program, MEET);
+  const lines = out.split('\n');
+  const declared = (name) => lines.find((l) => l.startsWith(`Day -1\t${name}\t`))?.includes('Competition prep');
+  assert.equal(declared('Snatch'), true);
+  assert.equal(declared('Chest-Supported Row'), false);
+});

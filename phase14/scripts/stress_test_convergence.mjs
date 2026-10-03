@@ -850,11 +850,7 @@ for (const [label, ok] of checks) {
 // regeneration live. They are listed rather than hidden, the list can only
 // shrink, and a divergence not on it fails the verdict -- the same discipline
 // as the gate-repair registry.
-const KNOWN_PRODUCTION_DIVERGENCE = new Set([
-  'weightlifter_meet_week/week4-not-consolidating',
-  'weightlifter_meet_week/repeated-doubles-in-comp-week',
-  'weightlifter_meet_week/session-grows-into-day-zero',
-]);
+const KNOWN_PRODUCTION_DIVERGENCE = new Set([]);
 const divergent = results.filter((r) => r.applied && r.converged && !r.productionConverged)
   .map((r) => `${r.avatar}/${r.perturbation}`);
 const unaccounted = divergent.filter((k) => !KNOWN_PRODUCTION_DIVERGENCE.has(k));
