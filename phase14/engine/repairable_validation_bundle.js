@@ -76,6 +76,7 @@ import { collectTimelineIntegrityFlags } from './v91_timeline_integrity.js'; // 
 import { collectPrescriptionIntegrityFlags } from './v92_prescription_integrity.js'; // V92-PRESCRIPTION-INTEGRITY-WIRED
 import { collectLanguageAccuracyFlags, LANGUAGE_HARD_CODES, repairCountClaims } from './v46_language_accuracy.js'; // V46-LANGUAGE-ACCURACY-WIRED
 import { repairDeterministicContradictions } from './v35_deterministic_repair.js'; // V35-DETERMINISTIC-REPAIR-WIRED
+import { restoreMissingOapExposures } from './v35_deterministic_repair.js'; // V35-OAP-RESTORE-EARLY
 import { normalizeAdvancedHybridWeek4OapConsolidation } from './advanced_hybrid_oap_consolidation_normalizer.js';
 import {
   normalizeAdvancedHybridSecondaryRunStability,
@@ -620,6 +621,19 @@ export function collectRepairableValidationFailures(program, intake = {}, option
   // A stated no-consecutive-running rule protects a tendon. A short run the
   // model put between two run days is removed, and the ride that led into it
   // stops promising a run. Main runs are never moved.
+  // The strict and assisted one-arm pull-up exposures are restored here, ahead of
+  // ADVANCED_HYBRID_OAP_SPECIFICITY, which checks for them. The restore lived only
+  // in v35, which runs after the semantic gates, so in production the gate saw the
+  // missing exposure first and refused the program -- a regeneration -- while the
+  // stress suite, which runs v35 before this bundle, reported the same defect as
+  // converging. That code killed a live build on 2026-08-28. Only this repair
+  // moves; the rest of v35 stays where it is.
+  const oapRestore = restoreMissingOapExposures(candidate, intake);
+  if (oapRestore.repaired) {
+    candidate = oapRestore.program;
+    deterministic_repairs.push({ type: 'v35_strict_oap_restored_early', repairs: oapRestore.repairs });
+  }
+
   const runSpacing = normalizeRunDaySpacing(candidate, intake);
   if (runSpacing.repaired) {
     candidate = runSpacing.program;
@@ -663,6 +677,7 @@ export function collectRepairableValidationFailures(program, intake = {}, option
     () => validateWeeklyVolumeBudgetSemantic(candidate, intake, model),
   ];
 
+  const semanticFlagsStart = flags.length;
   for (let i = 0; i < semanticChecks.length; i++) {
     const checked = runRepairable(flags, semanticChecks[i]);
     if (checked.ok && checked.value?.model) model = checked.value.model;
@@ -671,6 +686,7 @@ export function collectRepairableValidationFailures(program, intake = {}, option
       schedule = checked.value?.schedule || [];
     }
   }
+  const semanticFlagsEnd = flags.length;
 
   candidate = reformatWarmupCells(candidate);
   candidate = repairPhase15Program(candidate);
@@ -1018,6 +1034,27 @@ export function collectRepairableValidationFailures(program, intake = {}, option
   }
 
   runRepairable(flags, () => validatePhase15FinalProgram(candidate, intake));
+
+  // A program is refused only for defects it still has when it ships.
+  //
+  // The semantic gates above ran on an intermediate candidate, and some forty
+  // order-dependent repairs ran after them. When a later repair fixed what an
+  // earlier gate had flagged, the flag stayed in this array and refused a
+  // program that was fine -- a regeneration live, at minutes and a paid call.
+  // The advanced hybrid with its strict one-arm pull-ups removed is the measured
+  // case: at the gate, Week 4 had no strict exposure; by the end of the bundle
+  // all four weeks had it back; the stale flag refused the program anyway. That
+  // code, ADVANCED_HYBRID_OAP_SPECIFICITY, killed a live build on 2026-08-28.
+  //
+  // So the same gates are asked again of the candidate that ships, and their
+  // answer replaces the intermediate one. Nothing is loosened: a defect still
+  // present at the end is found by the identical validator. The closures read
+  // `candidate` and `model` when called, so they see the final program.
+  if (semanticFlagsEnd > semanticFlagsStart) {
+    flags.splice(semanticFlagsStart, semanticFlagsEnd - semanticFlagsStart);
+    model = parseProgramModel(candidate, intake);
+    for (let i = 0; i < semanticChecks.length; i++) runRepairable(flags, semanticChecks[i]);
+  }
 
   // Contraindicated movements the substitution could not answer. These do not
   // refuse the program -- there is no safe swap to make, and failing the build

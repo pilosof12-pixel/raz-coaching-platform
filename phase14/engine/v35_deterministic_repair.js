@@ -770,6 +770,16 @@ function insertStrictOapRow(program, parsed, work, intake) {
   return String(program).replace(parsed.re, `$1${rebuilt}$3`);
 }
 
+// Exported on its own so the bundle can run it ahead of the gate that checks
+// for it. See repairable_validation_bundle.js: the whole of v35 cannot move
+// earlier -- run before the dictionary pass it breaks the fight-camp and Hyrox
+// corpus -- but this one repair can, and it is the one the OAP gate needs.
+export function restoreMissingOapExposures(program, intake = {}) {
+  const repairs = [];
+  const out = repairMissingOapAssistance(String(program || ''), intake, repairs);
+  return { program: out, repaired: repairs.length > 0, repairs };
+}
+
 function repairMissingOapAssistance(program, intake, repairs) {
   if (!wantsOapExposures(intake)) return program;
   let candidate = program;
