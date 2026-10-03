@@ -47,7 +47,7 @@ import { repairNextRowClaim, repairTransitionClaim } from './structural_claim_ru
 import { repairSkillFoundation } from './skill_foundation_repair.js';
 import { canonicaliseDayOrder } from './day_order_canonicalization.js';
 import { repairConsecutiveRepGoal } from './consecutive_rep_goal.js';
-import { ladderOf, kgOf } from './tsv_rows.js';
+import { ladderOf, kgOf, repCount } from './tsv_rows.js';
 import { repairSupportivePullBudget } from './supportive_pull_budget.js';
 import { repairSupportivePressVolume } from './supportive_press_volume.js';
 import { repairAccessoryBudget } from './accessory_budget.js';
@@ -106,19 +106,8 @@ function rebuild(program, parsed) {
   const inner = [parsed.header.join('\t'), ...parsed.rows.map((c) => c.join('\t'))].join('\n');
   return program.replace(parsed.re, parsed.match[1] + inner + parsed.match[3]);
 }
-function repCount(raw) {
-  const s = String(raw || '').trim();
-  if (/\b(?:sec|secs|second|seconds|min|mins|minute|minutes|km)\b/i.test(s)) return null;
-  // A ladder has no single rep count. "3/1/1/1" is a triple and three singles,
-  // and reading the top of it as THE rep count made the note reconciler rewrite
-  // every rep word in the note to match: "stay at a double" became "stay at a
-  // triples", and "keep the back-off singles" became "keep the back-off
-  // triples". Both shipped in run #139 and the coach charged them. A row whose
-  // note legitimately describes several different set lengths must not have
-  // those lengths restated as one.
-  if (ladderOf(s)) return null;
-  return firstNum(s);
-}
+// repCount is the shared one in tsv_rows.js: a private copy disagreed with the
+// gate about "30s" and "500 m", which is how a repair and a rule end up fighting.
 
 // The reps a ladder row actually prescribes, so volume claims still reconcile.
 function ladderVolume(raw) {

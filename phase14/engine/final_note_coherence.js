@@ -13,7 +13,7 @@
 // cues, symptom gating, readiness rules, autoregulation -- is never rewritten.
 // When a claim cannot be verified against structured fields, it is left alone.
 
-import { ladderOf } from './tsv_rows.js';
+import { ladderOf, repCount } from './tsv_rows.js';
 
 const WEEKDAYS = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'];
 
@@ -53,12 +53,8 @@ function rebuild(program, parsed) {
 // distance and makes an exception for per-arm work, and that difference is load
 // bearing here. The ladder rule is the same everywhere -- a row prescribing
 // several different set lengths has no single rep count.
-function repCount(raw) {
-  const s = String(raw || '').trim();
-  if (/\b(?:sec|secs|second|seconds|min|mins|minute|minutes|km|m)\b/i.test(s) && !/per\s+arm|per\s+side/i.test(s)) return null;
-  if (ladderOf(s)) return null;
-  return firstNum(s);
-}
+// repCount is the shared one in tsv_rows.js: a private copy disagreed with the
+// gate about "30s" and "500 m", which is how a repair and a rule end up fighting.
 
 const ORDINALS = { second: 2, third: 3, fourth: 4, fifth: 5 };
 const ORDINAL_WORD = { 1: 'first', 2: 'second', 3: 'third', 4: 'fourth', 5: 'fifth' };
