@@ -29,6 +29,7 @@ import {
 } from "./skill_progressions.js";
 import { weekdayKey } from './weekday.js';
 import { bodyweightKg } from "./intake_bodyweight.js";
+import { YOUTH_PRIMARY_SKILL_NAME, isYouthAthlete } from './youth_primary_skill.js';
 
 // ---------------------------------------------------------------------------
 // 1. CANONICAL EXERCISE DICTIONARY
@@ -1480,9 +1481,20 @@ function classifyRow(cells, header, isHebrew) {
 }
 
 const INTRADAY_RANK = {
-  warmup: 0, strength_primary: 1, strength_secondary: 2, accessory: 3,
+  warmup: 0, youth_primary_skill: 0.5, strength_primary: 1, strength_secondary: 2, accessory: 3,
   conditioning_hard: 4, conditioning_easy: 5, mobility_finisher: 6,
 };
+
+// A youth athlete's primary skill practice comes straight after the warm-up,
+// ahead of any strength work: it is learned fresh or not at all, and the youth
+// rule refuses anything else. Without this the sort ranked a Ring Dip as
+// primary strength and moved it above the bar muscle-up drills.
+function intradayClass(cells, header, isHebrew, intake) {
+  const cls = classifyRow(cells, header, isHebrew);
+  if (cls === "warmup" || !isYouthAthlete(intake)) return cls;
+  const name = cellAt(cells, colIdx(header, "exercise"));
+  return YOUTH_PRIMARY_SKILL_NAME.test(name) ? "youth_primary_skill" : cls;
+}
 
 function dayTokenOf(cells, header) {
   return cellAt(cells, colIdx(header, "day")).trim();
@@ -1520,7 +1532,7 @@ export function enforceIntradayConditioningOrder(program, intake = {}) {
     const outRows = [];
     for (const g of groups) {
       const tagged = g.rows.map((cells, origIdx) => ({
-        cells, origIdx, cls: classifyRow(cells, header, isHebrew),
+        cells, origIdx, cls: intradayClass(cells, header, isHebrew, intake),
       }));
       // Incoherence check: a secondary strictly before a primary.
       const firstPrimary = tagged.findIndex((t) => t.cls === "strength_primary");
@@ -1570,7 +1582,7 @@ export function forceIntradayReorder(program, intake = {}) {
       const groups = groupByDay(dataRows, header);
       const outRows = [];
       for (const g of groups) {
-        const tagged = g.rows.map((cells, i) => ({ cells, stable: i, cls: classifyRow(cells, header, isHebrew) }));
+        const tagged = g.rows.map((cells, i) => ({ cells, stable: i, cls: intradayClass(cells, header, isHebrew, intake) }));
         tagged.sort((a, b) => (INTRADAY_RANK[a.cls] - INTRADAY_RANK[b.cls]) || (a.stable - b.stable));
         for (const t of tagged) outRows.push(t.cells);
       }

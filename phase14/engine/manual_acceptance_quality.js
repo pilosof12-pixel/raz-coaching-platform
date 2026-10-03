@@ -3,6 +3,7 @@ import { parseProgramModel, WEEKDAY_ORDER } from './program_model.js';
 import { isHighConcurrencyHybrid, currentRunBaseline } from './advanced_hybrid_concurrency.js';
 import { parseWeek as parseWeekRows } from './v34_workload_accounting.js';
 import { weekdayKey } from './weekday.js';
+import { YOUTH_PRIMARY_SKILL_NAME, YOUTH_PRIMARY_SKILL_BASES } from './youth_primary_skill.js';
 
 function arr(v) { return Array.isArray(v) ? v : v ? [v] : []; }
 function text(v) {
@@ -73,7 +74,7 @@ function effortUpper(exercise) {
 function isPrimaryYouthSkill(exercise) {
   const base = String(exercise?.base_movement || '');
   const name = String(exercise?.display_name || '');
-  return ['bar_muscle_up', 'handstand'].includes(base) || /bar muscle-up|transition|hip-to-bar|handstand|kick-up/i.test(name);
+  return YOUTH_PRIMARY_SKILL_BASES.includes(base) || YOUTH_PRIMARY_SKILL_NAME.test(name);
 }
 
 export function validateYouthManualAcceptanceSemantic(program, intake = {}, suppliedModel = null) {

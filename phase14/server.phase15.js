@@ -2731,7 +2731,15 @@ async function generateValidatedProgram(intake, onProgress = async () => {}) {
       const swept = validateRepairableProgramBundle(salvaged, intake);
       salvaged = swept.program || salvaged;
     } catch (sweepErr) {
-      if (typeof sweepErr?.program === "string" && sweepErr.program) salvaged = sweepErr.program;
+      // The bundle carries its repaired program on the error as repairedProgram.
+      // Reading .program, which it never sets, shipped the model's raw text with
+      // none of the deterministic repairs: run #163's youth program reached the
+      // customer with a stray tenth column on all 84 rows that the bundle had
+      // already removed.
+      const repaired = typeof sweepErr?.repairedProgram === "string" && sweepErr.repairedProgram
+        ? sweepErr.repairedProgram
+        : sweepErr?.program;
+      if (typeof repaired === "string" && repaired) salvaged = repaired;
       const flags = Array.isArray(sweepErr?.flags) ? sweepErr.flags : [];
       unresolved = [...new Set(flags.map((f) => f && f.code).filter(Boolean))];
       if (!unresolved.length && sweepErr?.code) unresolved = [sweepErr.code];

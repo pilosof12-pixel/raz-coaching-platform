@@ -27,7 +27,27 @@ test('the candidate is swept through the deterministic chain before it ships', (
   // Delivering what the model last wrote would be worse than what we had. The
   // bundle hands back its improved program whether or not the flags cleared.
   assert.match(runtime, /const swept = validateRepairableProgramBundle\(salvaged, intake\)/);
-  assert.match(runtime, /if \(typeof sweepErr\?\.program === "string" && sweepErr\.program\) salvaged = sweepErr\.program/);
+  // The bundle carries its repaired program on the error as repairedProgram.
+  // This used to read sweepErr.program, which the bundle never sets, so every
+  // salvage shipped the model's raw text: run #163's youth program reached the
+  // customer with a stray column on all 84 rows that the bundle had removed.
+  assert.match(runtime, /sweepErr\?\.repairedProgram/);
+  assert.match(runtime, /if \(typeof repaired === "string" && repaired\) salvaged = repaired;/);
+});
+
+test('the bundle error really carries the repaired program under the name the salvage reads', async () => {
+  const { validateRepairableProgramBundle } = await import('../engine/repairable_validation_bundle.js');
+  const header = 'Day\tExercise\tWeight\tSets\tReps\tRest\tTarget RPE\tNotes\tResults';
+  // Ten cells on every row: a shape the bundle repairs, inside a program it
+  // still refuses for other reasons.
+  const row = 'Mon\tBack Squat\t100 kg\t3\t5\t2 min\t7\tSteady.\t\t';
+  const program = [1, 2, 3, 4].map((w) => `START_WEEK${w}_TSV\n${header}\n${row}\nEND_WEEK${w}_TSV`).join('\n\n');
+  let thrown = null;
+  try { validateRepairableProgramBundle(program, { age: 30, primary_goals: ['Squat 140 kg'], days_per_week: 3 }); }
+  catch (err) { thrown = err; }
+  assert.ok(thrown, 'fixture must be refused');
+  assert.equal(typeof thrown.repairedProgram, 'string');
+  assert.ok(!/\t\t$/m.test(thrown.repairedProgram.split('END_WEEK1_TSV')[0]), 'the repaired program is the one with the row shape fixed');
 });
 
 test('the rules that stayed broken are recorded, not forgotten', () => {
