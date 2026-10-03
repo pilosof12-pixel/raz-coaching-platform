@@ -141,7 +141,7 @@ export function retrieveCuratedCoachingExcerpts(engineText, intake = {}, options
   return selected.map((x,i)=>`${x.kind} SOURCE EXCERPT ${i+1}\n${x.text}`).join('\n\n');
 }
 
-function exerciseFamilyTerms(intake = {}) {
+export function exerciseFamilyTerms(intake = {}) {
   const raw = rawIntake(intake);
   const terms = new Set(['warm-up','plank','dead bug','pallof','carry','row','push-up','pull-up','chin-up']);
   const add = xs => xs.forEach(x => terms.add(x));
@@ -171,6 +171,15 @@ function requiredExerciseTerms(intake = {}) {
   return tendon ? (tendon.catalog || []) : [];
 }
 
+// The cap has to hold every routed name. At 120 it was cut alphabetically, so
+// every avatar lost 38-71 of the names routed to it, always from the end of
+// the alphabet: Weighted Pull-up for the one-arm pull-up hybrid, Wall Handstand
+// Hold for the youth gymnast, Tuck Planche and Tuck Front Lever for the
+// calisthenics athlete, and Side Plank, which the system prompt itself tells
+// the model to use. The largest routed set is 191 names, about 1.4k characters
+// more prompt than before against a 70k budget.
+const CATALOG_CAP = 220;
+
 export function canonicalExerciseCatalog(exerciseDictionary, intake = {}) {
   const all = [...(exerciseDictionary || [])].map(String).filter(Boolean);
   if (all.length < 50) throw new Error('SOURCE_GROUNDING_EXERCISE_CATALOG_TOO_SMALL');
@@ -187,7 +196,7 @@ export function canonicalExerciseCatalog(exerciseDictionary, intake = {}) {
   const must = required.length
     ? [...new Set(all.filter(name => required.some(term => name.toLowerCase().includes(term))))]
     : [];
-  return [...must, ...[...unique, ...fallback].filter(x => !must.includes(x))].slice(0, 120).join(' | ');
+  return [...must, ...[...unique, ...fallback].filter(x => !must.includes(x))].slice(0, CATALOG_CAP).join(' | ');
 }
 
 export function buildPhase15SourceGrounding(engineText, intake, exerciseDictionary) {
