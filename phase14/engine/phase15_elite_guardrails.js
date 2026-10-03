@@ -95,6 +95,12 @@ function explicitModalityGoals(intake={}) {
   return out.filter(x=>{const k=`${x.priority}:${x.def.key}:${x.text}`;if(seen.has(k))return false;seen.add(k);return true;});
 }
 
+// The pattern that makes a row count as practice of a modality, for repairs
+// that must agree with the gate about what counts.
+export function modalityExposurePattern(key='') {
+  return MODALITY_DEFS.find(x=>x.key===key)?.exposure || null;
+}
+
 export function currentTargetModalityExposure(intake={}, key='') {
   const def=MODALITY_DEFS.find(x=>x.key===key); if(!def) return 0;
   const evidence=JSON.stringify({notes:intake.notes,clarification_answers:intake.clarification_answers,current:intake.current_training,current_week:intake.current_week,sport:intake.sport}).replace(/\\n/g,' ');
@@ -204,6 +210,7 @@ export function endurancePerformanceIntegrityFlags(program, intake={}, parsed=nu
     const required=existing>0?existing:1;
     if(actualDays<required) flags.push({
       code:'TARGET_MODALITY_EXPOSURE_REDUCED',
+      key:def.key, actual_days:actualDays, required_days:required,
       message:`${def.key} is a named ${priority} performance goal. The intake documents about ${existing||'at least one'} current ${def.key} exposure(s) per week, but this week programs ${actualDays}. Do not silently remove target-modality practice; preserve the athlete's stated current exposure unless the authored plan makes and explains a deliberate recovery tradeoff.`
     });
     if(def.key==='running') {

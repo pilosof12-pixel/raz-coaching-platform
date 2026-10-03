@@ -117,7 +117,7 @@ for (const file of engineFiles) {
 const repairExports = new Map(); // file -> [repair function names]
 for (const file of engineFiles) {
   const src = fs.readFileSync(file, 'utf8');
-  const names = [...src.matchAll(/export function ((?:repair|normalize|swap|fix|enforce|trim|apply)\w*)/g)].map((m) => m[1]);
+  const names = [...src.matchAll(/export function ((?:repair|normalize|swap|fix|enforce|trim|apply|restore)\w*)/g)].map((m) => m[1]);
   if (names.length) repairExports.set(path.relative(root, file), names);
 }
 
@@ -138,6 +138,11 @@ for (const file of engineFiles) {
 // from this map. Declaring a repair moves a code from UNREPAIRED to repaired;
 // it does not make it proven.
 const DECLARED_REPAIRS = {
+  // Raised in phase15_elite_guardrails.js, answered from the athlete's
+  // sport_schedule in its own module.
+  TARGET_MODALITY_EXPOSURE_REDUCED: [
+    ['engine/scheduled_modality_restore.js', 'restoreScheduledModalityExposure'],
+  ],
   TACTICAL_SCHEDULE_ARCHITECTURE_VIOLATION: [
     ['engine/tactical_strength_spacing.js', 'normalizeTacticalStrengthSpacing'],
   ],

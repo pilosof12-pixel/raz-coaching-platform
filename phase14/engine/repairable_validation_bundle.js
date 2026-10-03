@@ -38,6 +38,7 @@ import { normalizePaceRangeOrder } from './pace_range_order.js'; // PACE-RANGE-O
 import { normalizeTacticalStrengthSpacing } from './tactical_strength_spacing.js'; // TACTICAL-DAY-SPACING-WIRED
 import { normalizeTrainingDaysReading } from './training_days_reading.js'; // TRAINING-DAYS-READING-WIRED
 import { normalizeRunDaySpacing } from './run_day_spacing.js'; // RUN-DAY-SPACING-WIRED
+import { restoreScheduledModalityExposure } from './scheduled_modality_restore.js'; // SCHEDULED-MODALITY-RESTORE-WIRED
 import { validatePhase15FinalProgram } from './phase15_final_qa.js';
 import { parseProgramModel } from './program_model.js';
 import { trimExcessSupportVolume } from './mrv_support_trim.js';
@@ -638,6 +639,14 @@ export function collectRepairableValidationFailures(program, intake = {}, option
   if (runSpacing.repaired) {
     candidate = runSpacing.program;
     deterministic_repairs.push({ type: 'stated_run_spacing', repairs: runSpacing.repairs });
+  }
+
+  // After the spacing repair, which can remove a run: the restore only ever
+  // fills a day the athlete's own schedule gives that modality.
+  const modalityRestore = restoreScheduledModalityExposure(candidate, intake);
+  if (modalityRestore.repaired) {
+    candidate = modalityRestore.program;
+    deterministic_repairs.push({ type: 'scheduled_modality_restored', repairs: modalityRestore.repairs });
   }
 
   const daysReading = normalizeTrainingDaysReading(candidate, intake);

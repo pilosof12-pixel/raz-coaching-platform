@@ -1724,7 +1724,8 @@
     "code": "TARGET_MODALITY_EXPOSURE_REDUCED",
     "modules": [
       "engine/phase15_elite_guardrails.js",
-      "engine/semantic_program_qa.js"
+      "engine/semantic_program_qa.js",
+      "scripts/stress_test_convergence.mjs"
     ],
     "owners": [
       "currentTargetModalityExposure",
@@ -1734,13 +1735,15 @@
     "reachable": true,
     "repairs": [
       "repairUnbenchmarkedVariationLoads",
-      "repairEnduranceRedundancy"
+      "repairEnduranceRedundancy",
+      "restoreScheduledModalityExposure"
     ],
     "wired": [
-      "repairEnduranceRedundancy"
+      "repairEnduranceRedundancy",
+      "restoreScheduledModalityExposure"
     ],
     "tested": true,
-    "stressed": false,
+    "stressed": true,
     "killedLive": ""
   },
   {

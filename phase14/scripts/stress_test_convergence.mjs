@@ -538,6 +538,12 @@ const PERTURBATIONS = [
     }).join('\n')),
   },
   {
+    id: 'scheduled-run-dropped', seen: 'run #163 triathlete, Week 4 ran twice against three runs a week',
+    applies: ['sprint_triathlete'],
+    code: 'TARGET_MODALITY_EXPOSURE_REDUCED',
+    apply: (p) => p.replace(/(START_WEEK4_TSV[\s\S]*?)\nWed\tRun\t[^\n]*/, '$1'),
+  },
+  {
     id: 'session-grows-into-day-zero', seen: 'run #104 meet week, Day -4 heavier than Day -5',
     applies: ['weightlifter_meet_week'],
     apply: (p) => p.replace(/(START_WEEK4_TSV\s*\n[^\n]*\n)/,
