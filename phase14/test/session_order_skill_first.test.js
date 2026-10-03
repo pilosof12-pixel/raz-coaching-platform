@@ -29,8 +29,34 @@ test('a youth athlete keeps primary skill practice straight after the warm-up', 
   assert.ok(out.indexOf('Ring Dip') > out.indexOf('Controlled Handstand Kick-up'));
 });
 
-test('an adult day is ordered exactly as before', () => {
-  const adult = order(forceIntradayReorder(program, { age: 30 }));
-  const unknownAge = order(forceIntradayReorder(program, {}));
-  assert.deepEqual(adult, unknownAge);
+// The rule (engine rule 60c, and the owner's): skill, then strength, then
+// hypertrophy/accessories. Power primers sit between skill and heavy strength.
+// The old reorder knew no skill tier and put "primary strength" first for
+// everyone but the youth athlete.
+const day = (lines) => [1, 2, 3, 4].map((w) => `START_WEEK${w}_TSV\n${header}\n${lines.join('\n')}\nEND_WEEK${w}_TSV`).join('\n\n');
+const squat = 'Mon\tBack Squat\t170 kg\t3\t3\t3 min\t8\tHeavy triples.\t';
+const oap = 'Mon\tOne-Arm Pull-up\tBodyweight\t3\t1 each side\t3 min\t8\tStrict singles.\t';
+const pseudo = 'Mon\tPseudo Planche Push-up\tBodyweight\t2\t6\t90s\t7\tPressing support.\t';
+const jump = 'Mon\tBox Jump\tBodyweight\t3\t3\t90s\t6\tStep down; full reset.\t';
+const curl = 'Mon\tMachine Hamstring Curl\tRPE-selected load\t2\t10\t60s\t7\tAccessory.\t';
+
+test('an adult whose goal names the skill trains it first, then power, then strength, then accessories', () => {
+  const intake = { age: 30, primary_goals: ['220kg back squat', '4 One arm pullups'] };
+  assert.deepEqual(order(forceIntradayReorder(day([curl, squat, jump, oap]), intake)),
+    ['One-Arm Pull-up', 'Box Jump', 'Back Squat', 'Machine Hamstring Curl']);
+});
+
+test('skill work that only supports another goal is not promoted ahead of the primary lift', () => {
+  // engine_instructions line 535: a barbell-primary athlete's support skill
+  // does not have to lead.
+  const intake = { age: 30, primary_goals: ['220kg back squat'] };
+  const out = order(forceIntradayReorder(day([squat, pseudo]), intake));
+  assert.equal(out[0], 'Back Squat');
+});
+
+test("a weightlifter's competition lift leads, ahead of any primer", () => {
+  const snatch = 'Day -5\tSnatch\t95 kg\t2\t1\t2 min\t7\tCrisp singles.\t';
+  const push = 'Day -5\tExplosive Push-up\tBodyweight\t3\t3\t90s\t7\tPrimer.\t';
+  const intake = { age: 26, primary_goals: ['Snatch 120 kg at the national qualifier'] };
+  assert.deepEqual(order(forceIntradayReorder(day([push, snatch]), intake)), ['Explosive Push-up', 'Snatch'].reverse());
 });

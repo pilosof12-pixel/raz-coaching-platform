@@ -29,7 +29,7 @@ import {
 } from "./skill_progressions.js";
 import { weekdayKey } from './weekday.js';
 import { bodyweightKg } from "./intake_bodyweight.js";
-import { YOUTH_PRIMARY_SKILL_NAME, isYouthAthlete } from './youth_primary_skill.js';
+import { isLeadingSkill, isPowerPrimer, isPrimaryGoalModality, isAccessoryByName } from './exercise_roles.js';
 
 // ---------------------------------------------------------------------------
 // 1. CANONICAL EXERCISE DICTIONARY
@@ -1469,7 +1469,9 @@ function classifyRow(cells, header, isHebrew) {
 
   if (MOBILITY_RE.test(low)) return "mobility_finisher";
   const intervalNotation = /\b\d+\s*(?:x|×)\s*\d+\s*s\b.*\/\s*\d+\s*s|\bon\/off\b|\d+\s*s\s*\/\s*\d+\s*s/i.test(low);
-  if (CONDITIONING_HARD_RE.test(low) || (rpe != null && rpe >= 9) || intervalNotation) return "conditioning_hard";
+  // RPE 9 marks hard conditioning only for aerobic work: a heavy single or a
+  // Nordic curl at RPE 9 is lifting, not a finisher to move to the end.
+  if (CONDITIONING_HARD_RE.test(low) || (rpe != null && rpe >= 9 && patternOf(core) === "aerobic") || intervalNotation) return "conditioning_hard";
   if (CONDITIONING_EASY_RE.test(low) || (rpe != null && rpe <= 6 && patternOf(core) === "aerobic")) return "conditioning_easy";
 
   const highIntensity = (rir != null && rir <= 2) || (rpe != null && rpe >= 7.5);
@@ -1480,20 +1482,32 @@ function classifyRow(cells, header, isHebrew) {
   return "accessory";
 }
 
+// Lifting is one tier and keeps the order it was written in. The classifier
+// cannot tell a primary lift from an accessory reliably -- a 3-rep back squat
+// at RPE 7 falls below its 7.5 threshold and sorted behind an 8-rep row -- so
+// it does not get to reorder lifts against each other. What it does order is
+// what the rule is about: the goal skill and power primers first, hard
+// conditioning after the lifting, mobility last.
 const INTRADAY_RANK = {
-  warmup: 0, youth_primary_skill: 0.5, strength_primary: 1, strength_secondary: 2, accessory: 3,
-  conditioning_hard: 4, conditioning_easy: 5, mobility_finisher: 6,
+  warmup: 0, skill: 0.5, power: 0.75, strength_primary: 1, strength_secondary: 1, accessory: 1,
+  isolation: 2, conditioning_hard: 4, conditioning_easy: 5, mobility_finisher: 6,
 };
 
-// A youth athlete's primary skill practice comes straight after the warm-up,
-// ahead of any strength work: it is learned fresh or not at all, and the youth
-// rule refuses anything else. Without this the sort ranked a Ring Dip as
-// primary strength and moved it above the bar muscle-up drills.
+// Skill, then power, then strength, then hypertrophy/accessories (engine rule
+// 60c and the exercise-order rule). The role vocabulary lives in
+// exercise_roles.js so the reorder and the validators read one definition.
 function intradayClass(cells, header, isHebrew, intake) {
   const cls = classifyRow(cells, header, isHebrew);
-  if (cls === "warmup" || !isYouthAthlete(intake)) return cls;
+  if (cls === "warmup") return cls;
   const name = cellAt(cells, colIdx(header, "exercise"));
-  return YOUTH_PRIMARY_SKILL_NAME.test(name) ? "youth_primary_skill" : cls;
+  if (isLeadingSkill(name, intake)) return "skill";
+  if (isPowerPrimer(name) && cls !== "conditioning_hard" && cls !== "conditioning_easy") return "power";
+  // Engine rule 4: a primary-goal modality may lead, so it is not pushed behind
+  // the lifting. It keeps the place it was written in.
+  if ((cls === "conditioning_hard" || cls === "conditioning_easy") && isPrimaryGoalModality(name, intake)) return "accessory";
+  // Hypertrophy, isolation and trunk work after the lifting.
+  if ((cls === "strength_primary" || cls === "strength_secondary" || cls === "accessory") && isAccessoryByName(name)) return "isolation";
+  return cls;
 }
 
 function dayTokenOf(cells, header) {
@@ -1563,7 +1577,7 @@ export function enforceIntradayConditioningOrder(program, intake = {}) {
     const days = [...new Set(conflicts.map((c) => c.day))].join(", ");
     const amendment =
       "PRIOR ATTEMPT FAILED VALIDATION. Within a training day the order MUST be: " +
-      "warm-up, then primary strength, then secondary strength, then accessories, then " +
+      "warm-up, then the athlete's goal skill work, then power primers, then primary strength, then secondary strength, then accessories, then " +
       "hard conditioning, then easy conditioning, then mobility/finisher. The following " +
       `day(s) placed strength work out of order (secondary before primary): [${days}]. ` +
       "Re-sequence each day so the heaviest, most technical strength work comes first and " +

@@ -97,6 +97,14 @@ function explicitModalityGoals(intake={}) {
 
 // The pattern that makes a row count as practice of a modality, for repairs
 // that must agree with the gate about what counts.
+// The exposure pattern of every modality named in the PRIMARY goals, as one
+// regex, or null. Shared with the session-order vocabulary.
+export function primaryGoalModalityPattern(intake={}) {
+  const keys=new Set(explicitModalityGoals(intake).filter(g=>g.priority==='primary').map(g=>g.def.key));
+  const sources=MODALITY_DEFS.filter(d=>keys.has(d.key)).map(d=>d.exposure.source);
+  return sources.length ? new RegExp(sources.join('|'),'i') : null;
+}
+
 export function modalityExposurePattern(key='') {
   return MODALITY_DEFS.find(x=>x.key===key)?.exposure || null;
 }
