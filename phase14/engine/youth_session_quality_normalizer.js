@@ -21,7 +21,16 @@ function hasBarAndBands(intake = {}) {
 function warmup(name) { return /^\s*\[WARMUP\](?:\s|$)/i.test(String(name || '')); }
 function barSkill(name) { return /bar muscle[- ]?up|muscle[- ]?up transition/i.test(String(name || '')); }
 function kickup(name) { return /controlled handstand kick[- ]?up|freestanding handstand/i.test(String(name || '')); }
-function handstandHold(name) { return /handstand/i.test(String(name || '')) && /hold/i.test(String(name || '')); }
+// Capacity holds only, the same classification youth_session_quality.js uses.
+// An unsupported hold is balance time, and deduplicating it against a wall hold
+// would drop the exposure V106 requires -- which V106 then re-inserts after this
+// runs, and the build loops. Both modules have to agree on what a duplicate is.
+function handstandHold(name) {
+  const n = String(name || '');
+  if (!/handstand/i.test(n) || !/hold/i.test(n)) return false;
+  const unsupported = /\bfree[- ]?standing\s+handstand\s+hold\b/i.test(n) && !/\bwall\b/i.test(n);
+  return !unsupported;
+}
 function explicitWallHold(name) { return /wall/i.test(String(name || '')) && handstandHold(name); }
 // "15-20 sec" and "25s" both describe a hold; the longest number in the cell is
 // what the athlete is working toward, so it is the one that measures the dose.

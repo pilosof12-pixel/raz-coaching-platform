@@ -186,3 +186,54 @@ test('a compliant single-hold session is left alone', () => {
   assert.equal(out.repaired, false);
   assert.equal(out.program, good);
 });
+
+// Three rules could not be satisfied together. V106 requires a Freestanding
+// Handstand Hold every week because "a kick-up is the entry and a wall hold is
+// position capacity; neither is balance time". The coaching spec wants one
+// wall-supported capacity row per session. And the redundancy rule -- whose own
+// message asks for "one substantive wall-supported handstand-capacity row" --
+// counted the freestanding hold as a second capacity row.
+//
+// Run #162: the model wrote a clean block, V106 added the freestanding hold
+// after the dedupe had already run, and four attempts were refused identically.
+
+test('a freestanding hold beside a wall hold is balance time plus capacity, not a duplicate', () => {
+  const session = week([
+    row('Session A','Controlled Handstand Kick-up'),
+    row('Session A','Bar Muscle-up Transition Drill','BW + moderate band'),
+    row('Session A','Freestanding Handstand Hold','BW','3','5-10 sec'),
+    row('Session A','Wall Handstand Hold','BW','3','20 sec'),
+    row('Session B','Controlled Handstand Kick-up'),
+    row('Session B','Bar Muscle-up Transition Drill','BW + moderate band'),
+    row('Session B','Freestanding Handstand Hold','BW','3','5-10 sec'),
+    row('Session B','Wall Handstand Hold','BW','3','20 sec'),
+  ]);
+  assert.doesNotThrow(() => validateYouthSessionQualitySemantic(session, intake));
+});
+
+test('two capacity holds in one session are still a duplicate', () => {
+  const stacked = week([
+    row('Session A','Controlled Handstand Kick-up'),
+    row('Session A','Bar Muscle-up Transition Drill','BW + moderate band'),
+    row('Session A','Wall Handstand Hold','BW','3','20 sec'),
+    row('Session A','Handstand Hold','BW','3','20 sec'),
+  ]);
+  assert.throws(
+    () => validateYouthSessionQualitySemantic(stacked, intake),
+    (error) => error?.code === 'YOUTH_REDUNDANT_HANDSTAND_CAPACITY',
+  );
+});
+
+test('the dedupe keeps the freestanding hold V106 requires', () => {
+  const stacked = week([
+    row('Session A','Controlled Handstand Kick-up'),
+    row('Session A','Bar Muscle-up Transition Drill','BW + moderate band'),
+    row('Session A','Freestanding Handstand Hold','BW','3','5-10 sec'),
+    row('Session A','Wall Handstand Hold','BW','3','20 sec'),
+    row('Session A','Handstand Hold','BW','2','15 sec'),
+  ]);
+  const fixed = normalizeYouthSessionQuality(stacked, intake);
+  assert.match(fixed.program, /Session A\tFreestanding Handstand Hold/,
+    'dropping it here is what made V106 re-insert it after this ran');
+  assert.doesNotThrow(() => validateYouthSessionQualitySemantic(fixed.program, intake));
+});

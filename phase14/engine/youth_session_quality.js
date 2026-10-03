@@ -35,8 +35,28 @@ function independentBalance(exercise) {
   const name = String(exercise?.display_name || '');
   return exercise?.base_movement === 'handstand' && /controlled handstand kick[- ]?up|kick[- ]?up|freestanding handstand/i.test(name);
 }
+// A static hold that counts toward handstand CAPACITY: wall-supported, or a
+// generic hold. An unsupported hold is not capacity, it is balance time.
+//
+// This used to count every handstand row with "hold" in it, and that made three
+// rules impossible to satisfy together. V106 requires a Freestanding Handstand
+// Hold every week, in its own words because "a kick-up is the entry and a wall
+// hold is position capacity; neither is balance time". The coaching spec wants
+// one wall-supported capacity row per session. And this rule, whose own message
+// asks for "one substantive wall-supported handstand-capacity row", counted the
+// freestanding hold as a second capacity row and refused the session.
+//
+// In run #162 the model wrote a clean youth block -- a kick-up and one hold per
+// session -- and our own repairs turned it into a violation: V106 added the
+// freestanding hold after the dedupe had already run, the final check saw two
+// holds, and four attempts were refused identically. No output from the model
+// could have passed. Two capacity holds in one session are still caught.
+const UNSUPPORTED_HOLD = /\bfree[- ]?standing\s+handstand\s+hold\b/i;
+const SUPPORTED_HOLD = /\bwall\b|\bchest[- ]to[- ]wall\b|\bback[- ]to[- ]wall\b/i;
 function staticHandstand(exercise) {
-  return exercise?.base_movement === 'handstand' && /hold/i.test(String(exercise?.display_name || ''));
+  const name = String(exercise?.display_name || '');
+  if (exercise?.base_movement !== 'handstand' || !/hold/i.test(name)) return false;
+  return !(UNSUPPORTED_HOLD.test(name) && !SUPPORTED_HOLD.test(name));
 }
 
 export function youthSessionQualityAnalysis(program, intake = {}, suppliedModel = null) {
