@@ -89,6 +89,10 @@ export function topSetOf(cell) {
 export function repCount(cell) {
   const s = String(cell || '').trim();
   if (/\b(?:sec|secs|second|seconds|min|mins|minute|minutes|km)\b/i.test(s)) return null;
+  // The abbreviated units too. "30s each side" is a 30-second hold, and reading
+  // it as 30 reps made the hybrid's Side Plank note ("single set") a rep-word
+  // mismatch that cost run #163 a regeneration. Same for a distance in metres.
+  if (/\d\s*(?:s|m)\b/i.test(s)) return null;
   if (ladderOf(s)) return null;
   const m = s.match(/\d+(?:\.\d+)?/);
   return m ? Number(m[0]) : null;
