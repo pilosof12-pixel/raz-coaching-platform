@@ -1,67 +1,39 @@
 {
-  "timestamp": "2026-10-03T14:00:36.503Z",
+  "timestamp": "2026-10-03T14:22:27.214Z",
   "base": "https://raz-coaching-platform.onrender.com",
-  "head_sha": "d450c2026449391ee8dbf5128eb6d2b1a78526ee",
-  "runtime": "live100 2026-10-03T13:59:00Z",
+  "head_sha": "ee5f530f4b09a2a23df9a2fa7d84f030f6415f28",
+  "runtime": "live101 2026-10-03T14:20:00Z",
   "results": [
     {
       "id": "advanced_hybrid",
-      "job_id": "1660aab9d895be061dd379bc81cd163e",
+      "job_id": "7cd7b6f39b3f9a6becac9a505dbb6620",
       "ok": true,
       "status": "done",
       "stage": "finalizing",
       "attempt": 1,
-      "detail": "saving program after 1 model call(s) QA trace: E0:medium -> W:engine-weeks-2-4. Timing: total 166s, model 160s across 1 call(s), engine 5s. Tokens: reasoning 10179, output 11796, input 16599.",
+      "detail": "saving program after 1 model call(s) QA trace: E0:medium -> W:engine-weeks-2-4. Timing: total 199s, model 194s across 1 call(s), engine 5s. Tokens: reasoning 14393, output 15891, input 16599.",
       "last_seen_status": "done",
       "error": null,
-      "program_chars": 30171,
-      "seconds": 168
-    },
-    {
-      "id": "masters_return",
-      "job_id": "e36b5c8468bb373ab809ac15d769bad9",
-      "ok": true,
-      "status": "done",
-      "stage": "finalizing",
-      "attempt": 1,
-      "detail": "saving program after 1 model call(s) QA trace: E0:medium -> W:engine-weeks-2-4. Timing: total 153s, model 150s across 1 call(s), engine 2s. Tokens: reasoning 10087, output 11317, input 14342.",
-      "last_seen_status": "done",
-      "error": null,
-      "program_chars": 23034,
-      "seconds": 156
+      "program_chars": 28041,
+      "seconds": 202
     },
     {
       "id": "advanced_calisthenics",
-      "job_id": "5143fd4aefbbb70642063e1ffee56e4a",
+      "job_id": "0bc644608fa83786f0ecb488e9a626f2",
       "ok": true,
       "status": "done",
       "stage": "finalizing",
-      "attempt": 3,
-      "detail": "saving program after 3 model call(s) QA trace: E0:medium -> W:engine-weeks-2-4 -> A1:PROGRESSION_ARCHITECTURE_MISSING -> S2:weeks1 -> W:rebuilt-from-week1 -> A2:PROGRESSION_ARCHITECTURE_MISSING. First failure evidence: PRIOR ATTEMPT FAILED FOUR-WEEK PROGRESSION VALIDATION. primary goal 'Weighted pull-up with 40 kg for 3' repeats the same direct prescription across the block. A progression target does not require guaranteed athlete improvement, but the prescription must show a credible progression pathway across the four weeks. For loaded strength use load/reps/sets or a deliberate harder-easier exposure structure. For bodyweight strength use reps, sets, tempo, pause, ROM or a verified harder variation. For skill acquisition use a visible change in assistance, attempt target, hold target, ROM or verified prog Timing: total 392s, model 374s across 3 call(s), engine 17s. Tokens: reasoning 21840, output 35221, input 70180.",
+      "attempt": 1,
+      "detail": "saving program after 1 model call(s) QA trace: E0:medium -> W:engine-weeks-2-4. Timing: total 175s, model 169s across 1 call(s), engine 4s. Tokens: reasoning 11098, output 13127, input 16929.",
       "last_seen_status": "done",
       "error": null,
-      "program_chars": 29123,
-      "seconds": 394
-    },
-    {
-      "id": "sprint_triathlete",
-      "job_id": "88af49d0623f9ec62e9181a846f315d8",
-      "ok": true,
-      "status": "done",
-      "stage": "finalizing",
-      "attempt": 2,
-      "detail": "saving program after 2 model call(s) QA trace: E0:medium -> W:engine-weeks-2-4 -> A1:TARGET_MODALITY_EXPOSURE_REDUCED -> S2:weeks2. First failure evidence: Week 2: running is a named primary performance goal. The intake documents about 3 current running exposure(s) per week, but this week programs 2 (Wed, Sat). Do not silently remove target-modality practice; preserve the athlete's stated current exposure unless the authored plan makes and explains a deliberate recovery tradeoff. Timing: total 282s, model 275s across 2 call(s), engine 6s. Tokens: reasoning 17069, output 20557, input 39798.",
-      "last_seen_status": "done",
-      "error": null,
-      "program_chars": 25524,
-      "seconds": 284
+      "program_chars": 28529,
+      "seconds": 177
     }
   ],
   "selection": [
     "advanced_hybrid",
-    "masters_return",
-    "advanced_calisthenics",
-    "sprint_triathlete"
+    "advanced_calisthenics"
   ],
   "ok": true
 }
