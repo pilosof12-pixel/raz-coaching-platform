@@ -1,3 +1,4 @@
+import { tendonIsometricRules } from './tendon_isometric_rule.js';
 // Goal-specific specialist rule router for the compact Phase 15 path.
 // These are distilled decision rules from authored coaching clusters plus the
 // Overcoming Gravity gymnastics decision layer. They are injected only when relevant.
@@ -163,6 +164,8 @@ export function buildSpecialistRules(intake = {}) {
     ...streetLiftingRules(intake),
     ...manualAcceptanceRules(intake),
     ...enduranceFamilySpecialistRules(intake),
+    // Any sport: an active tendon gets an isometric. See tendon_isometric_rule.js.
+    ...tendonIsometricRules(intake),
   ];
   const roadmap = buildRoadmapPromptRules(intake);
   if (!rules.length && !roadmap) return '';
