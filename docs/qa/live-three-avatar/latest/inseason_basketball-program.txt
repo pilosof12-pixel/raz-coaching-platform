@@ -1,0 +1,86 @@
+Match day is Wednesday and Saturday, and every session in this block is placed by its distance from match day. Two short gym touches this week: early tendon isometrics, crisp box jumps, one direct trap-bar strength touch, and minimum-effective upper-body maintenance. Court work already gives you the repeat-effort conditioning, so the gym dose stays low-cost and is there to keep you available and keep your jump output from getting blunted by fatigue.
+
+Back squat is out this block because heavy slow squatting inside the fixture cycle is the thing that flares your tendon. If knee pain during Wall Sit or split-squat work rises above your normal game-week level, shorten the hold or ROM and keep the effort submaximal; if that still feels wrong, swap that assistance slot for Glute Bridge. On Trap Bar Deadlift and Bench Press, if the RPE cap is reached early, hold the load or stop one set short rather than forcing the listed volume.
+
+```tsv
+
+WEEKLY SCHEDULE
+The sport is the load. The gym is placed around it, and the day before a match is protected.
+
+ | Mon | Tue | Wed | Thu | Fri | Sat | Sun
+Every week | Basketball, semi-professional moderate + gym | Basketball, semi-professional hard (protected) | Basketball, semi-professional MATCH | Basketball, semi-professional moderate + gym | Basketball, semi-professional light (protected) | Basketball, semi-professional MATCH | rest
+
+This repeats for all four weeks: the fixture repeats, so the week does. Progress is measured in what the athlete can do on this schedule, not in load added to it.
+
+START_WEEK1_TSV
+Day	Exercise	Weight	Sets	Reps	Rest	Target RPE	Notes	Results
+Mon	[WARMUP] Spiderman Lunge	Bodyweight	1	6/side	30 sec	N/A	MD-2 short-sharp prep; smooth range and no forcing depth.; Hip-hinge drill x 8; Glute bridge x 10; Squat-and-reach x 6; Bodyweight squat x 8; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Ramp Trap Bar Deadlift: 62.5 kg x 5, 92.5 kg x 3, 120 kg x 1-2 before 155 kg work sets.; Open shoulders and upper back without fatigue.	
+Mon	Box Jump	Bodyweight	3	2	60-90 sec	N/A	Crisp takeoff, quiet landing, full reset each rep; stop before height or snap drops.	
+Mon	Wall Sit	Bodyweight	4	35 sec	45 sec	6	Patellar tendon isometric; use a tolerable knee angle and keep pain no higher than your usual game-week baseline.	
+Mon	Trap Bar Deadlift	155 kg	2	2	2.5-3 min	6.5-7	About 86% of your current 180 kg x 3 benchmark. In-season strength touch; stop after 1 set if RPE exceeds 8, lockout slows, or it feels costly for the next team day. Week 1 standard: set the benchmark. Use a load you can repeat cleanly on every set and note a full, controlled lockout with the ribs down and no lumbar extension to finish - that is what Weeks 2 and 3 are measured against, not a bigger number.	
+Mon	Front-Loaded Split Squat	RPE-selected load	2	6/side	90 sec	7	Back-squat replacement this block because heavy slow back squatting inside the fixture cycle flares the tendon. Choose a load that leaves 2 reps in reserve on the last set and record it.	
+Mon	Chest-Supported Row	RPE-selected load	2	8	90 sec	7	Horizontal pull maintenance. Choose a load that leaves 2 reps in reserve on the last set and record it; beat it with cleaner squeeze before more weight.	
+Mon	Side Plank	Bodyweight	2	30-40 sec/side	45 sec	7	Trunk stiffness for change-of-direction control; straight line from shoulder to ankle.	
+Thu	[WARMUP] Spiderman Lunge	Bodyweight	1	6/side	30 sec	N/A	Post-match prep; smooth range and stop before the knee feels pinchy.; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Band shoulder pass-through x 10; Scapular push-up x 8; Ramp Bench Press: 35 kg x 5, 50 kg x 3, 67.5 kg x 1-2 before 85 kg work sets.; Quick upper-back and shoulder prep without fatigue.	
+Thu	Box Jump	Bodyweight	3	2	60-90 sec	N/A	Keep height honest and landings quiet; full reset each rep, stop before velocity loss.	
+Thu	Wall Sit	Bodyweight	4	35 sec	45 sec	6	Patellar tendon isometric; same knee-angle standard as Monday and keep pain no higher than usual baseline.	
+Thu	Bench Press	85 kg	2	2	2-3 min	6.5-7	About 85% of your current 100 kg x 5 benchmark. Maintenance dose only; stop after 1 set if RPE exceeds 8 or lockout speed clearly drops. Week 1 standard: set the benchmark. Use a load you can repeat cleanly on every set and note a controlled lowering and a lockout that does not slow down across sets - that is what Weeks 2 and 3 are measured against, not a bigger number.	
+Thu	Weighted Chin-up	RPE-selected added load	2	5	2 min	7	Vertical pull maintenance. Bodyweight is part of the total; choose added load that leaves 2-3 reps in reserve on the last set and record it. Week 1 standard: set the benchmark. Use a load you can repeat cleanly on every set and note a full range from a dead hang, finishing with the back rather than a kip - that is what Weeks 2 and 3 are measured against, not a bigger number.	
+Thu	Glute Bridge	RPE-selected load	2	8	75 sec	6.5	Low-cost posterior-chain support on the day after the match. Choose a load that leaves 2-3 reps in reserve and record it. Week 1 standard: set the benchmark. Use a load you can repeat cleanly on every set and note a full, controlled lockout with the ribs down and no lumbar extension to finish - that is what Weeks 2 and 3 are measured against, not a bigger number.	
+Thu	Farmer Carry	RPE-selected load	2	20 m	60 sec	6	GPP and trunk/bracing support. Pick the heaviest pair you can carry for the full distance with upright posture and closed grip; first thing to remove if recovery or time is tight. Load selection: pick a weight you can carry the full distance with a tall posture and no grip failure, stopping the set the moment either goes, write it in the Results column, and start from that number next week.	
+END_WEEK1_TSV
+
+START_WEEK2_TSV
+Day	Exercise	Weight	Sets	Reps	Rest	Target RPE	Notes	Results
+Mon	[WARMUP] Spiderman Lunge	Bodyweight	1	6/side	30 sec	N/A	MD-2 short-sharp prep; smooth range and no forcing depth.; Hip-hinge drill x 8; Glute bridge x 10; Squat-and-reach x 6; Bodyweight squat x 8; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Ramp Trap Bar Deadlift: 62.5 kg x 5, 92.5 kg x 3, 120 kg x 1-2 before 155 kg work sets.; Open shoulders and upper back without fatigue.	
+Mon	Box Jump	Bodyweight	3	2	60-90 sec	N/A	Same dose; every rep fast and fully reset.	
+Mon	Wall Sit	Bodyweight	4	35 sec	45 sec	6	Held at the Week 1 dose: this lift supports your goals, so it keeps its place without taking recovery from them.	
+Mon	Trap Bar Deadlift	155 kg	2	2	2.5-3 min	6.5-7	Held at the Week 1 dose: this lift supports your goals, so it keeps its place without taking recovery from them. Week 2 advance: beat Week 1 on a full, controlled lockout with the ribs down and no lumbar extension to finish, at the same or a lower RPE. The numbers hold on purpose - this week the progression is execution.	
+Mon	Front-Loaded Split Squat	RPE-selected load	2	6/side	90 sec	7	Held at the Week 1 dose: this lift supports your goals, so it keeps its place without taking recovery from them. Load selection: pick a weight you could stop with about 3 clean reps still in reserve on the last set, write it in the Results column, and start from that number next week.	
+Mon	Chest-Supported Row	RPE-selected load	2	8	90 sec	7	Held at the Week 1 dose: this lift supports your goals, so it keeps its place without taking recovery from them. Load selection: pick a weight you could stop with about 3 clean reps still in reserve on the last set, write it in the Results column, and start from that number next week.	
+Mon	Side Plank	Bodyweight	2	30-40 sec/side	45 sec	7	Same dose; cleaner reps.	
+Thu	[WARMUP] Spiderman Lunge	Bodyweight	1	6/side	30 sec	N/A	Post-match prep; smooth range and stop before the knee feels pinchy.; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Band shoulder pass-through x 10; Scapular push-up x 8; Ramp Bench Press: 35 kg x 5, 50 kg x 3, 67.5 kg x 1-2 before 85 kg work sets.; Quick upper-back and shoulder prep without fatigue.	
+Thu	Box Jump	Bodyweight	3	2	60-90 sec	N/A	Same dose; every rep fast and fully reset.	
+Thu	Wall Sit	Bodyweight	4	35 sec	45 sec	6	Held at the Week 1 dose: this lift supports your goals, so it keeps its place without taking recovery from them.	
+Thu	Bench Press	85 kg	2	2	2-3 min	6.5-7	Held at the Week 1 dose: this lift supports your goals, so it keeps its place without taking recovery from them. Week 2 advance: beat Week 1 on a controlled lowering and a lockout that does not slow down across sets, at the same or a lower RPE. The numbers hold on purpose - this week the progression is execution.	
+Thu	Weighted Chin-up	RPE-selected added load	2	5	2 min	7	Held at the Week 1 dose: this lift supports your goals, so it keeps its place without taking recovery from them. Load selection: pick a weight you could stop with about 3 clean reps still in reserve on the last set, write it in the Results column, and start from that number next week. Week 2 advance: beat Week 1 on a full range from a dead hang, finishing with the back rather than a kip, at the same or a lower RPE. The numbers hold on purpose - this week the progression is execution.	
+Thu	Glute Bridge	RPE-selected load	2	8	75 sec	6.5	Held at the Week 1 dose: this lift supports your goals, so it keeps its place without taking recovery from them. Week 2 advance: beat Week 1 on a full, controlled lockout with the ribs down and no lumbar extension to finish, at the same or a lower RPE. The numbers hold on purpose - this week the progression is execution.	
+Thu	Farmer Carry	RPE-selected load	2	20 m	60 sec	6	Held at the Week 1 dose: this lift supports your goals, so it keeps its place without taking recovery from them. Load selection: pick a weight you can carry the full distance with a tall posture and no grip failure, stopping the set the moment either goes, write it in the Results column, and start from that number next week.	
+END_WEEK2_TSV
+
+START_WEEK3_TSV
+Day	Exercise	Weight	Sets	Reps	Rest	Target RPE	Notes	Results
+Mon	[WARMUP] Spiderman Lunge	Bodyweight	1	6/side	30 sec	N/A	MD-2 short-sharp prep; smooth range and no forcing depth.; Hip-hinge drill x 8; Glute bridge x 10; Squat-and-reach x 6; Bodyweight squat x 8; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Ramp Trap Bar Deadlift: 62.5 kg x 5, 92.5 kg x 3, 120 kg x 1-2 before 155 kg work sets.; Open shoulders and upper back without fatigue.	
+Mon	Box Jump	Bodyweight	4	2	60-90 sec	N/A	One more set only if speed held through Week 2; stop when it drops.	
+Mon	Wall Sit	Bodyweight	4	35 sec	45 sec	6	Held at the Week 1 dose: this lift supports your goals, so it keeps its place without taking recovery from them.	
+Mon	Trap Bar Deadlift	155 kg	2	2	2.5-3 min	6.5-7	Held at the Week 1 dose: this lift supports your goals, so it keeps its place without taking recovery from them. Week 3 advance: hold the numbers once more and keep a full, controlled lockout with the ribs down and no lumbar extension to finish. If every set in Week 2 was clean at or below the target RPE, you may add one clean rep to the last set only - earned, optional, and skipped entirely on any slowdown, symptom or loss of position.	
+Mon	Front-Loaded Split Squat	RPE-selected load	2	6/side	90 sec	7	Held at the Week 1 dose: this lift supports your goals, so it keeps its place without taking recovery from them. Load selection: pick a weight you could stop with about 3 clean reps still in reserve on the last set, write it in the Results column, and start from that number next week.	
+Mon	Chest-Supported Row	RPE-selected load	2	8	90 sec	7	Held at the Week 1 dose: this lift supports your goals, so it keeps its place without taking recovery from them. Load selection: pick a weight you could stop with about 3 clean reps still in reserve on the last set, write it in the Results column, and start from that number next week.	
+Mon	Side Plank	Bodyweight	2	30-45 sec/side	45 sec	7	Five seconds longer per hold.	
+Thu	[WARMUP] Spiderman Lunge	Bodyweight	1	6/side	30 sec	N/A	Post-match prep; smooth range and stop before the knee feels pinchy.; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Band shoulder pass-through x 10; Scapular push-up x 8; Ramp Bench Press: 35 kg x 5, 50 kg x 3, 67.5 kg x 1-2 before 85 kg work sets.; Quick upper-back and shoulder prep without fatigue.	
+Thu	Box Jump	Bodyweight	4	2	60-90 sec	N/A	One more set only if speed held through Week 2; stop when it drops.	
+Thu	Wall Sit	Bodyweight	4	35 sec	45 sec	6	Held at the Week 1 dose: this lift supports your goals, so it keeps its place without taking recovery from them.	
+Thu	Bench Press	85 kg	2	2	2-3 min	6.5-7	Held at the Week 1 dose: this lift supports your goals, so it keeps its place without taking recovery from them. Week 3 advance: hold the numbers once more and keep a controlled lowering and a lockout that does not slow down across sets. If every set in Week 2 was clean at or below the target RPE, you may add one clean rep to the last set only - earned, optional, and skipped entirely on any slowdown, symptom or loss of position.	
+Thu	Weighted Chin-up	RPE-selected added load	2	5	2 min	7	Held at the Week 1 dose: this lift supports your goals, so it keeps its place without taking recovery from them. Load selection: pick a weight you could stop with about 3 clean reps still in reserve on the last set, write it in the Results column, and start from that number next week. Week 3 advance: hold the numbers once more and keep a full range from a dead hang, finishing with the back rather than a kip. If every set in Week 2 was clean at or below the target RPE, you may add one clean rep to the last set only - earned, optional, and skipped entirely on any slowdown, symptom or loss of position.	
+Thu	Glute Bridge	RPE-selected load	2	8	75 sec	6.5	Held at the Week 1 dose: this lift supports your goals, so it keeps its place without taking recovery from them. Week 3 advance: hold the numbers once more and keep a full, controlled lockout with the ribs down and no lumbar extension to finish. If every set in Week 2 was clean at or below the target RPE, you may add one clean rep to the last set only - earned, optional, and skipped entirely on any slowdown, symptom or loss of position.	
+Thu	Farmer Carry	RPE-selected load	2	20 m	60 sec	6	Held at the Week 1 dose: this lift supports your goals, so it keeps its place without taking recovery from them. Load selection: pick a weight you can carry the full distance with a tall posture and no grip failure, stopping the set the moment either goes, write it in the Results column, and start from that number next week.	
+END_WEEK3_TSV
+
+START_WEEK4_TSV
+Day	Exercise	Weight	Sets	Reps	Rest	Target RPE	Notes	Results
+Mon	[WARMUP] Spiderman Lunge	Bodyweight	1	6/side	30 sec	N/A	MD-2 short-sharp prep; smooth range and no forcing depth.; Hip-hinge drill x 8; Glute bridge x 10; Squat-and-reach x 6; Bodyweight squat x 8; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Ramp Trap Bar Deadlift: 62.5 kg x 5, 92.5 kg x 3, 120 kg x 1-2 before 155 kg work sets.; Open shoulders and upper back without fatigue.	
+Mon	Box Jump	Bodyweight	2	2	60-90 sec	N/A	Consolidation: maximal intent, one set fewer.	
+Mon	Wall Sit	Bodyweight	3	35 sec	45 sec	6	Consolidation: one set fewer.	
+Mon	Trap Bar Deadlift	155 kg	2	2	2.5-3 min	6-6.5	Consolidation: a little easier.	
+Mon	Front-Loaded Split Squat	RPE-selected load	2	6/side	90 sec	6.5	Consolidation: a little easier. Load selection: pick a weight you could stop with about 4 clean reps still in reserve on the last set, write it in the Results column, and start from that number next week.	
+Mon	Chest-Supported Row	RPE-selected load	2	8	90 sec	6.5	Consolidation: a little easier. Load selection: pick a weight you could stop with about 4 clean reps still in reserve on the last set, write it in the Results column, and start from that number next week.	
+Mon	Side Plank	Bodyweight	2	30-45 sec/side	45 sec	6.5	Consolidation: keep the Week 3 reps, a little easier.	
+Thu	[WARMUP] Spiderman Lunge	Bodyweight	1	6/side	30 sec	N/A	Post-match prep; smooth range and stop before the knee feels pinchy.; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Band shoulder pass-through x 10; Scapular push-up x 8; Ramp Bench Press: 35 kg x 5, 50 kg x 3, 67.5 kg x 1-2 before 85 kg work sets.; Quick upper-back and shoulder prep without fatigue.	
+Thu	Box Jump	Bodyweight	2	2	60-90 sec	N/A	Consolidation: maximal intent, one set fewer.	
+Thu	Wall Sit	Bodyweight	3	35 sec	45 sec	6	Consolidation: one set fewer.	
+Thu	Bench Press	85 kg	2	2	2-3 min	6-6.5	Consolidation: a little easier.	
+Thu	Weighted Chin-up	RPE-selected added load	2	5	2 min	6.5	Consolidation: a little easier. Load selection: pick a weight you could stop with about 4 clean reps still in reserve on the last set, write it in the Results column, and start from that number next week.	
+Thu	Glute Bridge	RPE-selected load	2	8	75 sec	6	Consolidation: a little easier.	
+Thu	Farmer Carry	RPE-selected load	2	20 m	60 sec	5.5	Consolidation: a little easier. Load selection: pick a weight you can carry the full distance with a tall posture and no grip failure, stopping the set the moment either goes, write it in the Results column, and start from that number next week.	
+END_WEEK4_TSV
+```

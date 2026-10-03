@@ -1,119 +1,117 @@
-Week 1 sits 7.9 weeks out from race day, so this is a prepeak-specific build week, not a taper. The bias is toward the swim because it is your biggest and cheapest limiter to improve, while the bike is held with enough race-relevant work and the run stays on the same three non-consecutive days your achilles already tolerates. The two Tue/Fri gym sessions stay low-fatigue and full-body so you keep squat, single-leg strength, calf capacity, trunk and hip work without stealing from the triathlon sessions. This week uses a controlled bike-to-run brick rather than forcing a bigger rehearsal, because protecting the no-consecutive-run rule matters more than cramming in extra transition load.
+This block sits about 7.9 to 4.9 weeks from race day, so it is a prepeak-specific build rather than a taper. The emphasis stays on the cheapest limiter to improve first, your swim, while keeping bike work specific and preserving your current three non-consecutive run exposures.
 
-If the right achilles stiffens during training or the next morning, adjust the provoking run first, not the whole week. First change Monday by cutting one interval or easing the reps to 4:40-4:45/km, or shorten Saturday's off-bike run to 4 km at the same pace. Keep Wednesday flat and easy, skip hills entirely, do not add any extra running day, and keep the slow calf work unless that is the specific irritant. On squat/lunge work, reduce load or range before skipping the session.
+Weeks 2 and 3 nudge the main swim, bike, and run work up one step at a time while the strength work mostly holds its job. Week 4 is a consolidation week: less nonessential volume, same general intensity, and a fresher finish without going flat.
+
+If the right Achilles is sore during a run or is stiffer the next morning than your normal baseline, first reduce the run session that most likely caused it: Monday interval reps or the Saturday pick-up segment. Repeat the last clean week before cutting the Wednesday easy run or the stable easy portion on Saturday, and do not add hills or any extra run day. On Tuesday strength, skip the second split-squat set if Monday still left the calves or tendon loaded.
 
 Your two gym sessions are on Tuesday and Friday; every other day in this block is one of your triathlon sessions, taken from the schedule you gave, so the week covers more days than two without adding gym work.
 
 START_WEEK1_TSV
 Day	Exercise	Weight	Sets	Reps	Rest	Target RPE	Notes	Results
-Mon	[WARMUP] Run	N/A	1	2 km	N/A	3	Flat easy build; keep this truly easy before the pace work.; Easy jog 6-8 min; dynamic running drills; 3 relaxed strides before the hard running work	
-Mon	Run	4:35-4:40/km	4	800 m	2:00 walk	7	Main run quality; current-capacity pace exposure, not goal-pace guessing; stop after 3 reps if pace fades by more than a few seconds or the achilles tightens.	
-Mon	Run	5:20-5:40/km	1	1.5 km	N/A	2	Easy cooldown on flat ground.	
-Tue	[WARMUP] Swim	N/A	1	300 m	N/A	3	Easy + 4 x 25 m build inside the 300 m; long exhale and quiet kick.; Squat-and-reach x 6; Bodyweight squat x 8; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Band shoulder pass-through x 10; Wall slide x 8; Low-cost recovery-contingent strength support day; if time or recovery is tight, keep lower-body, row and calf work, then cut Overhead Press first.; Easy spin and gradual cadence build.	
-Tue	Swim	1:03-1:05/50 m	8	50 m	0:15	5	Technique/economy set with pull buoy; hold even stroke count.	
-Tue	Swim	1:00-1:02/50 m	4	50 m	0:20	6	Paddles only if the catch stays clean; smooth pressure, not a sprint.	
-Tue	Reverse Lunge	RPE-selected DB load	2	6/leg	1:30	7	Choose dumbbells that leave 2 reps in reserve on the last set; record load for next week; controlled step back and full foot pressure.	
-Tue	Chest-Supported Row	RPE-selected load	2	8	1:15	7	Choose a load that leaves 2 reps in reserve on the last set; pause briefly and finish with elbows to hips.	
-Tue	Overhead Press	RPE-selected load	2	6	1:30	6	Easy support pressing only; 3 reps in reserve; record load and skip this row first if work or family fatigue is high. Week 1 standard: set the benchmark. Use a load you can repeat cleanly on every set and note a controlled lowering and a lockout that does not slow down across sets - that is what Weeks 2 and 3 are measured against, not a bigger number.	
-Tue	Standing Calf Raise	RPE-selected load	2	8/side	1:00	7	Heavy slow tendon-capacity work; 3 s up, 1 s pause, 3 s down; match sides rather than chasing fatigue. Load selection: pick a weight you could stop with about 3 clean reps still in reserve on the last set, write it in the Results column, and start from that number next week.	
-Tue	Side Plank	Bodyweight	2	30 s/side	0:30	6	Trunk maintenance; straight line from ear to ankle and steady breathing.	
-Wed	[WARMUP] Run	N/A	1	5 min	N/A	2	Start easy on flat ground and let the pace come to you.	
-Wed	Run	5:15-5:35/km	1	8 km	N/A	3-4	Easy aerobic run; conversational, flat route, no hills and no strides this week.	
-Fri	[WARMUP] Bike	135-150 W	1	10 min	N/A	2	Easy spin; build cadence gradually.; Squat-and-reach x 6; Bodyweight squat x 8; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Ramp Back Squat: 25 kg x 5, 37.5 kg x 3, 50 kg x 1-2 before 62.5 kg work sets.; Easy spin into race cadence.	
-Fri	Swim	2:06-2:08/100 m	1	100 m	0:20	7	Main swim set for the week; hold relaxed form, stop at 5 if pace misses twice or stroke count jumps.	
-Fri	Swim	1:00-1:02/50 m	1	50 m	0:20	7	Faster 50s with full form; same body line as the 100s.	
-Fri	Back Squat	62.5 kg	1	4	2:30	7	About 83% of your 75 kg x 5 benchmark load; up to 3 sets, stop after 2 if RPE goes above 7.5, depth changes, or bracing slows.	
-Fri	Barbell Hip Thrust	RPE-selected load	1	8	1:30	7	Choose a load that leaves 2 reps in reserve on the last set; 1 s pause at full lockout and record the load used. Week 1 standard: set the benchmark. Use a load you can repeat cleanly on the set and note a full, controlled lockout with the ribs down and no lumbar extension to finish - that is what Weeks 2 and 3 are measured against, not a bigger number.	
-Fri	Standing Calf Raise	RPE-selected load	1	8/side	1:00	7	Same heavy slow calf dose as Tuesday; if one side feels stiffer, match the smoother side's quality. Load selection: pick a weight you could stop with about 3 clean reps still in reserve on the last set, write it in the Results column, and start from that number next week.	
-Fri	Run	4:48-4:55/km	1	6 km	N/A	7	Race-specific brick run; flat route, settle in quickly off the Standing Calf Raise, stop early if stride shortens or achilles stiffness appears.	
-Fri	Pallof Press	RPE-selected cable load	1	10/side	0:45	6	Trunk and hip-control maintenance; ribs down and no torso rotation. Load selection: pick a weight you could stop with about 4 clean reps still in reserve on the last set, write it in the Results column, and start from that number next week.	
-Fri	Zone-2 Bike	135-150 W	1	45 min	N/A	3	Hold bike aerobic support with low fatigue; conversational effort and stable power.	
-Fri	Bike	170-180 W	1	20 min	N/A	6	Brick lead-in; ride steady and transition to the run within 3 minutes.	
-Tue	Bike	180-185 W	2	12 min	5:00 easy spin	7	Hard bike set held near current 20 km TT power; stop after 1 rep if Saturday's brick leaves the legs flat.	
+Mon	[WARMUP] Run	5:35-6:00/km	1	15 min	N/A	2-3	Easy warm-up on flat ground or treadmill; include 4 x 20 s relaxed strides inside the 15 min and finish feeling springy, not worked.	
+Mon	Run	4:32-4:37/km	5	3 min	2 min easy jog	7.5-8	Quality run at about current standalone 5 km pace; flat route or treadmill only. Stop at 4 reps if Achilles tightens, form changes, or pace slips by more than about 3 s/km.	
+Mon	Run	5:35-6:00/km	1	10 min	N/A	2-3	Easy cool-down jog; this counts toward weekly run volume.	
+Tue	[WARMUP] Swim	easy	1	300 m	N/A	2-3	Easy swim with 4 x 25 m build inside the 300 m; smooth exhale and long line.; Squat-and-reach x 6; Bodyweight squat x 8; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Band shoulder pass-through x 10; Wall slide x 8; Quick lift prep after the swim: a few easy ramp sets plus ankle and hip prep before the first work set.; Build smoothly into the first work rep.	
+Tue	Swim	2:04-2:08/100 m	6	100 m	20 s	7	Main swim set. Hold even splits and tidy body position; if pace drifts after rep 4, use pull buoy for reps 5-6 instead of forcing turnover.	
+Tue	Overhead Press	RPE-selected load	3	5	2 min	7	Choose a load that leaves about 3 reps in reserve on set 1 and record it; stop after 2 sets if whole-body fatigue or shoulder discomfort pushes above RPE 8. Week 1 standard: set the benchmark. Use a load you can repeat cleanly on every set and note a controlled lowering and a lockout that does not slow down across sets - that is what Weeks 2 and 3 are measured against, not a bigger number.	
+Tue	Chest-Supported Row	RPE-selected load	3	8	90 s	7	Use a load you can pause briefly at the top; record the load used so the next week starts from a real number. Load selection: pick a weight you could stop with about 3 clean reps still in reserve on the last set, write it in the Results column, and start from that number next week.	
+Tue	Dumbbell Bulgarian Split Squat	RPE-selected load	2	6/side	90 s	6.5-7	Low-cost sets of 6-leg strength hold. If Monday still left the calves or Achilles loaded, keep this very light or skip the second set. Load selection: pick a weight you could stop with about 3-4 clean reps still in reserve on the last set, write it in the Results column, and start from that number next week.	
+Tue	Standing Calf Raise	RPE-selected load	3	8/side	60 s	7	Heavy slow calf work that has been tolerated well: 3 s up, 3 s down, full stretch at the bottom, no bouncing. Load selection: pick a weight you could stop with about 3 clean reps still in reserve on the last set, write it in the Results column, and start from that number next week.	
+Tue	Side Plank	bodyweight	2	30 s/side	45 s	6	Trunk and hip maintenance; straight line from shoulder to ankle and stop before the position sags.	
+Tue	Bike	180-185 W	4	5 min	3 min easy spin	7.5-8	Hard bike session at around current 20 km TT power. Hold posture and cadence; if power fades clearly by rep 3, stop at 3 reps and spin easy home.	
+Wed	[WARMUP] Run	5:40-6:05/km	1	5 min	N/A	2	Just ease into the session; keep it light from the first step.	
+Wed	Run	5:25-5:50/km	1	40 min	N/A	3-4	Easy aerobic run. Conversational effort only; no hills and no fast finish.	
+Fri	[WARMUP] Bike	120-135 W	1	10 min	N/A	2-3	Easy spin building smoothly, not a workout yet.; Squat-and-reach x 6; Bodyweight squat x 8; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Band shoulder pass-through x 10; Scapular push-up x 8; Ramp Back Squat: 25 kg x 5, 37.5 kg x 3, 50 kg x 1-2 before 62.5 kg work sets.; Easy settle-in before the rehearsal; no hard pulling.	
+Fri	Swim	1:05-1:08/50 m	1	50 m	15 s	5	Light technique swim. Smooth catch, quiet kick, easy breathing; this is not a grind.	
+Fri	Back Squat	62.5 kg	1	4	2.5-3 min	7-7.5	About 83 percent of your current 75 kg x 5 benchmark. Up to 3 sets; stop after 2 if RPE exceeds 8, depth or bracing slips, or Saturday's run would clearly suffer.	
+Fri	Ring Push-up	bodyweight	1	8	75 s	7	Keep the rings stable, body rigid, and stop 1-2 reps before form breaks.	
+Fri	Standing Calf Raise	RPE-selected load	1	8/side	60 s	7	Repeat the same heavy-slow calf exposure; do not chase fatigue here. Load selection: pick a weight you could stop with about 3 clean reps still in reserve on the last set, write it in the Results column, and start from that number next week.	
+Fri	Ring Hamstring Curl	bodyweight	1	8	75 s	7	Keep hips extended and curl the heels toward you under control; shorten the lever if needed.	
+Fri	Pallof Press	RPE-selected load	1	10/side	45 s	6	Trunk stiffness for swim-bike-run posture; this is the first accessory to remove if time or fatigue is tight. Load selection: pick a weight you could stop with about 4 clean reps still in reserve on the last set, write it in the Results column, and start from that number next week.	
+Fri	Bike	140-155 W	1	50 min	N/A	3-4	Steady aerobic hold ride; keep it genuinely easy so Sunday bike quality and Friday squat stay sharp.	
+Sat	Run	5:25-5:50/km	1	20 min	N/A	3-4	Stable easy run body to keep your third weekly run exposure intact on a non-consecutive day. Flat route only; conversational effort and no surges.	
+Sat	Run	4:48-4:58/km	1	12 min	N/A	7	Race-cadence finish inside the run day. Find race cadence early; end the run immediately if Achilles tightens or stride changes.	
 END_WEEK1_TSV
 
 START_WEEK2_TSV
 Day	Exercise	Weight	Sets	Reps	Rest	Target RPE	Notes	Results
-Mon	[WARMUP] Run	N/A	1	2 km	N/A	3	Flat easy build; keep this truly easy before the pace work.; Easy jog 6-8 min; dynamic running drills; 3 relaxed strides before the hard running work	
-Mon	Run	4:35-4:40/km	5	800 m	2:00 walk	7	One more repetition; pace and recovery unchanged.	
-Mon	Run	5:20-5:40/km	1	1.5 km	N/A	2	Easy cooldown on flat ground. About 10% more than Week 1; same easy effort. Distance or time is the only lever.	
-Tue	[WARMUP] Swim	N/A	1	300 m	N/A	3	Easy + 4 x 25 m build inside the 300 m; long exhale and quiet kick.; Squat-and-reach x 6; Bodyweight squat x 8; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Band shoulder pass-through x 10; Wall slide x 8; Low-cost recovery-contingent strength support day; if time or recovery is tight, keep lower-body, row and calf work, then cut Overhead Press first.; Easy spin and gradual cadence build.	
-Tue	Swim	1:03-1:05/50 m	9	50 m	0:15	5	Technique/economy set with pull buoy; hold even stroke count. One more repetition; pace and recovery unchanged.	
-Tue	Swim	1:00-1:02/50 m	5	50 m	0:20	6	Paddles only if the catch stays clean; smooth pressure, not a sprint. One more repetition; pace and recovery unchanged.	
-Tue	Reverse Lunge	RPE-selected DB load	2	6/leg	1:30	7	Same reps; choose a load that sits at the target RPE. Add a little if Week 1 felt easy.	
-Tue	Chest-Supported Row	RPE-selected load	2	8	1:15	7	Held at the Week 1 dose: this lift supports your goals, so it keeps its place without taking recovery from them. Load selection: pick a weight you could stop with about 3 clean reps still in reserve on the last set, write it in the Results column, and start from that number next week.	
-Tue	Overhead Press	RPE-selected load	2	6	1:30	6	Held at the Week 1 dose: this lift supports your goals, so it keeps its place without taking recovery from them. Load selection: pick a weight you could stop with about 4 clean reps still in reserve on the last set, write it in the Results column, and start from that number next week. Week 2 advance: beat Week 1 on a controlled lowering and a lockout that does not slow down across sets, at the same or a lower RPE. The numbers hold on purpose - this week the progression is execution.	
-Tue	Standing Calf Raise	RPE-selected load	2	8/side	1:00	7	Held at the Week 1 dose: this lift supports your goals, so it keeps its place without taking recovery from them. Load selection: pick a weight you could stop with about 3 clean reps still in reserve on the last set, write it in the Results column, and start from that number next week.	
-Tue	Side Plank	Bodyweight	2	30 s/side	0:30	6	Same dose; cleaner reps.	
-Wed	[WARMUP] Run	N/A	1	5 min	N/A	2	Start easy on flat ground and let the pace come to you.	
-Wed	Run	5:15-5:35/km	1	9 km	N/A	3-4	About 10% more than Week 1; same easy effort. Distance or time is the only lever.	
-Fri	[WARMUP] Bike	135-150 W	1	10 min	N/A	2	Easy spin; build cadence gradually.; Squat-and-reach x 6; Bodyweight squat x 8; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Ramp Back Squat: 25 kg x 5, 40 kg x 3, 50 kg x 1-2 before 65 kg work sets.; Easy spin into race cadence.; Easy jog 6-8 min; dynamic running drills; 3 relaxed strides before the hard running work	
-Fri	Swim	2:06-2:08/100 m	1	100 m	0:20	7	One more repetition; pace and recovery unchanged.	
-Fri	Swim	1:00-1:02/50 m	1	50 m	0:20	7	One more repetition; pace and recovery unchanged.	
-Fri	Back Squat	65 kg	1	4	2:30	7	A small load step from Week 1; same reps and RPE ceiling. If Week 1 felt above target, repeat it instead.	
-Fri	Barbell Hip Thrust	RPE-selected load	1	8	1:30	7	Held at the Week 1 dose: this lift supports your goals, so it keeps its place without taking recovery from them. Load selection: pick a weight you could stop with about 3 clean reps still in reserve on the last set, write it in the Results column, and start from that number next week. Week 2 advance: beat Week 1 on a full, controlled lockout with the ribs down and no lumbar extension to finish, at the same or a lower RPE. The numbers hold on purpose - this week the progression is execution.	
-Fri	Standing Calf Raise	RPE-selected load	1	8/side	1:00	7	Held at the Week 1 dose: this lift supports your goals, so it keeps its place without taking recovery from them. Load selection: pick a weight you could stop with about 3 clean reps still in reserve on the last set, write it in the Results column, and start from that number next week.	
-Fri	Run	4:55-5:00/km	1	6.5 km	N/A	7	Race-specific brick run; flat route, settle in quickly off the Standing Calf Raise, stop early if stride shortens or achilles stiffness appears. Extend the brick slightly from Week 1, but keep the pace controlled and no faster than current standalone 5K pace.	
-Fri	Pallof Press	RPE-selected cable load	1	10/side	0:45	6	Same dose; cleaner reps. Load selection: pick a weight you could stop with about 4 clean reps still in reserve on the last set, write it in the Results column, and start from that number next week.	
-Fri	Zone-2 Bike	135-150 W	1	50 min	N/A	3	Hold bike aerobic support with low fatigue; conversational effort and stable power. About 10% more than Week 1; same easy effort. Distance or time is the only lever.	
-Fri	Bike	170-180 W	1	20 min	N/A	6	About 10% more than Week 1; same easy effort. Distance or time is the only lever.	
-Tue	Bike	180-185 W	3	12 min	5:00 easy spin	7	One more repetition; pace and recovery unchanged.	
+Mon	[WARMUP] Run	5:35-6:00/km	1	15 min	N/A	2-3	Easy warm-up on flat ground or treadmill; include 4 x 20 s relaxed strides inside the 15 min and finish feeling springy, not worked.	
+Mon	Run	4:32-4:37/km	6	3 min	2 min easy jog	7.5-8	One more repetition; pace and recovery unchanged.	
+Mon	Run	5:35-6:00/km	1	10 min	N/A	2-3	Easy cool-down jog; this counts toward weekly run volume. About 10% more than Week 1; same easy effort. Distance or time is the only lever.	
+Tue	[WARMUP] Swim	easy	1	300 m	N/A	2-3	Easy swim with 4 x 25 m build inside the 300 m; smooth exhale and long line.; Squat-and-reach x 6; Bodyweight squat x 8; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Band shoulder pass-through x 10; Wall slide x 8; Quick lift prep after the swim: a few easy ramp sets plus ankle and hip prep before the first work set.; Build smoothly into the first work rep.	
+Tue	Swim	2:04-2:08/100 m	7	100 m	20 s	7	Main swim set. One more repetition; pace and recovery unchanged.	
+Tue	Overhead Press	RPE-selected load	3	5	2 min	7	Held at the Week 1 dose: this lift supports your goals, so it keeps its place without taking recovery from them. Load selection: pick a weight you could stop with about 3 clean reps still in reserve on the last set, write it in the Results column, and start from that number next week. Week 2 advance: beat Week 1 on a controlled lowering and a lockout that does not slow down across sets, at the same or a lower RPE. The numbers hold on purpose - this week the progression is execution.	
+Tue	Chest-Supported Row	RPE-selected load	3	8	90 s	7	Held at the Week 1 dose: this lift supports your goals, so it keeps its place without taking recovery from them. Load selection: pick a weight you could stop with about 3 clean reps still in reserve on the last set, write it in the Results column, and start from that number next week.	
+Tue	Dumbbell Bulgarian Split Squat	RPE-selected load	2	6/side	90 s	6.5-7	Same reps; choose a load that sits at the target RPE. Add a little if Week 1 felt easy.	
+Tue	Standing Calf Raise	RPE-selected load	3	8/side	60 s	7	Held at the Week 1 dose: this lift supports your goals, so it keeps its place without taking recovery from them. Load selection: pick a weight you could stop with about 3 clean reps still in reserve on the last set, write it in the Results column, and start from that number next week.	
+Tue	Side Plank	bodyweight	2	30 s/side	45 s	6	Same dose; cleaner reps.	
+Tue	Bike	180-185 W	5	5 min	3 min easy spin	7.5-8	One more repetition; pace and recovery unchanged.	
+Wed	[WARMUP] Run	5:40-6:05/km	1	5 min	N/A	2	Just ease into the session; keep it light from the first step.	
+Wed	Run	5:25-5:50/km	1	45 min	N/A	3-4	Easy aerobic run. About 10% more than Week 1; same easy effort. Distance or time is the only lever.	
+Fri	[WARMUP] Bike	120-135 W	1	10 min	N/A	2-3	Easy spin building smoothly, not a workout yet.; Squat-and-reach x 6; Bodyweight squat x 8; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Band shoulder pass-through x 10; Scapular push-up x 8; Ramp Back Squat: 25 kg x 5, 40 kg x 3, 50 kg x 1-2 before 65 kg work sets.; Easy settle-in before the rehearsal; no hard pulling.	
+Fri	Swim	1:05-1:08/50 m	1	50 m	15 s	5	Light technique swim. One more repetition; pace and recovery unchanged.	
+Fri	Back Squat	65 kg	1	4	2.5-3 min	7-7.5	A small load step from Week 1; same reps and RPE ceiling. If Week 1 felt above target, repeat it instead.	
+Fri	Ring Push-up	bodyweight	1	8	75 s	7	Keep the rings stable, body rigid, and stop 1-2 reps before form breaks.	
+Fri	Standing Calf Raise	RPE-selected load	1	8/side	60 s	7	Held at the Week 1 dose: this lift supports your goals, so it keeps its place without taking recovery from them. Load selection: pick a weight you could stop with about 3 clean reps still in reserve on the last set, write it in the Results column, and start from that number next week.	
+Fri	Ring Hamstring Curl	bodyweight	1	8	75 s	7	Keep hips extended and curl the heels toward you under control; shorten the lever if needed.	
+Fri	Pallof Press	RPE-selected load	1	10/side	45 s	6	Same dose; cleaner reps. Load selection: pick a weight you could stop with about 4 clean reps still in reserve on the last set, write it in the Results column, and start from that number next week.	
+Fri	Bike	140-155 W	1	55 min	N/A	3-4	Steady aerobic hold ride; keep it genuinely easy so Sunday bike quality and Friday squat stay sharp. About 10% more than Week 1; same easy effort. Distance or time is the only lever.	
+Sat	Run	5:25-5:50/km	1	20 min	N/A	3-4	Held on purpose as the stable easy body of your third weekly run exposure while Monday and Wednesday progress. Flat route only; conversational effort and no surges.	
+Sat	Run	4:48-4:58/km	1	15 min	N/A	7	About 10% more than Week 1; same pace and effort. Distance or time is the only lever.	
 END_WEEK2_TSV
 
 START_WEEK3_TSV
 Day	Exercise	Weight	Sets	Reps	Rest	Target RPE	Notes	Results
-Mon	[WARMUP] Run	N/A	1	2 km	N/A	3	Flat easy build; keep this truly easy before the pace work.; Easy jog 6-8 min; dynamic running drills; 3 relaxed strides before the hard running work	
-Mon	Run	4:35-4:40/km	6	800 m	2:00 walk	7	One more repetition again; same pace. Volume is the only lever this week.	
-Mon	Run	5:20-5:40/km	1	2 km	N/A	2	Easy cooldown on flat ground. About 10% more than Week 2; same easy effort. Distance or time is the only lever.	
-Tue	[WARMUP] Swim	N/A	1	300 m	N/A	3	Easy + 4 x 25 m build inside the 300 m; long exhale and quiet kick.; Squat-and-reach x 6; Bodyweight squat x 8; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Band shoulder pass-through x 10; Wall slide x 8; Low-cost recovery-contingent strength support day; if time or recovery is tight, keep lower-body, row and calf work, then cut Overhead Press first.; Easy spin and gradual cadence build.	
-Tue	Swim	1:03-1:05/50 m	10	50 m	0:15	5	Technique/economy set with pull buoy; hold even stroke count. One more repetition again; same pace. Volume is the only lever this week.	
-Tue	Swim	1:00-1:02/50 m	6	50 m	0:20	6	Paddles only if the catch stays clean; smooth pressure, not a sprint. One more repetition again; same pace. Volume is the only lever this week.	
-Tue	Reverse Lunge	RPE-selected DB load	2	6/leg	1:30	7	Push the load slightly: about half an RPE harder than Week 2, technique unchanged. Load selection: pick a weight you could stop with about 3 clean reps still in reserve on the last set, write it in the Results column, and start from that number next week. Held to the minimum useful dose: this sits beside key endurance work, and the run is the goal this accessory is meant to support.	
-Tue	Chest-Supported Row	RPE-selected load	2	8	1:15	7	Held at the Week 1 dose: this lift supports your goals, so it keeps its place without taking recovery from them. Load selection: pick a weight you could stop with about 3 clean reps still in reserve on the last set, write it in the Results column, and start from that number next week.	
-Tue	Overhead Press	RPE-selected load	2	6	1:30	6	Held at the Week 1 dose: this lift supports your goals, so it keeps its place without taking recovery from them. Load selection: pick a weight you could stop with about 4 clean reps still in reserve on the last set, write it in the Results column, and start from that number next week. Week 3 advance: hold the numbers once more and keep a controlled lowering and a lockout that does not slow down across sets. If every set in Week 2 was clean at or below the target RPE, you may add one clean rep to the last set only - earned, optional, and skipped entirely on any slowdown, symptom or loss of position.	
-Tue	Standing Calf Raise	RPE-selected load	2	8/side	1:00	7	Held at the Week 1 dose: this lift supports your goals, so it keeps its place without taking recovery from them. Load selection: pick a weight you could stop with about 3 clean reps still in reserve on the last set, write it in the Results column, and start from that number next week.	
-Tue	Side Plank	Bodyweight	2	35 s/side	0:30	6	Five seconds longer per hold.	
-Wed	[WARMUP] Run	N/A	1	5 min	N/A	2	Start easy on flat ground and let the pace come to you.	
-Wed	Run	5:15-5:35/km	1	9.5 km	N/A	3-4	About 10% more than Week 2; same easy effort. Distance or time is the only lever.	
-Fri	[WARMUP] Bike	135-150 W	1	10 min	N/A	2	Easy spin; build cadence gradually.; Squat-and-reach x 6; Bodyweight squat x 8; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Ramp Back Squat: 25 kg x 5, 40 kg x 3, 50 kg x 1-2 before 65 kg work sets.; Easy spin into race cadence.	
-Fri	Swim	2:06-2:08/100 m	1	100 m	0:20	7	One more repetition again; same pace. Volume is the only lever this week.	
-Fri	Swim	1:00-1:02/50 m	1	50 m	0:20	7	One more repetition again; same pace. Volume is the only lever this week.	
-Fri	Back Squat	65 kg	1	4	2:30	7.5	The block's heaviest week. Stop the set if bar speed or technique drops.	
-Fri	Barbell Hip Thrust	RPE-selected load	1	8	1:30	7	Held at the Week 1 dose: this lift supports your goals, so it keeps its place without taking recovery from them. Load selection: pick a weight you could stop with about 3 clean reps still in reserve on the last set, write it in the Results column, and start from that number next week. Week 3 advance: hold the numbers once more and keep a full, controlled lockout with the ribs down and no lumbar extension to finish. If the set in Week 2 was clean at or below the target RPE, you may add one clean rep to the last set only - earned, optional, and skipped entirely on any slowdown, symptom or loss of position.	
-Fri	Standing Calf Raise	RPE-selected load	1	8/side	1:00	7	Held at the Week 1 dose: this lift supports your goals, so it keeps its place without taking recovery from them. Load selection: pick a weight you could stop with about 3 clean reps still in reserve on the last set, write it in the Results column, and start from that number next week.	
-Fri	Run	4:55-5:00/km	1	7 km	N/A	7	Race-specific brick run; flat route, settle in quickly off the Standing Calf Raise, stop early if stride shortens or achilles stiffness appears. About 10% more than Week 2; same easy effort. Distance or time is the only lever.	
-Fri	Pallof Press	RPE-selected cable load	1	12/side	0:45	6	Two more reps per set at the same effort. Load selection: pick a weight you could stop with about 4 clean reps still in reserve on the last set, write it in the Results column, and start from that number next week.	
-Fri	Zone-2 Bike	135-150 W	1	55 min	N/A	3	Hold bike aerobic support with low fatigue; conversational effort and stable power. About 10% more than Week 2; same easy effort. Distance or time is the only lever.	
-Fri	Bike	170-180 W	1	25 min	N/A	6	About 10% more than Week 2; same easy effort. Distance or time is the only lever.	
-Tue	Bike	180-185 W	3	12 min	5:00 easy spin	7	One more repetition again; same pace. Volume is the only lever this week.	
+Mon	[WARMUP] Run	5:35-6:00/km	1	15 min	N/A	2-3	Easy warm-up on flat ground or treadmill; include 4 x 20 s relaxed strides inside the 15 min and finish feeling springy, not worked.	
+Mon	Run	4:32-4:37/km	7	3 min	2 min easy jog	7.5-8	One more repetition again; same pace. Volume is the only lever this week.	
+Mon	Run	5:35-6:00/km	1	10 min	N/A	2-3	Easy cool-down jog; this counts toward weekly run volume. About 10% more than Week 2; same easy effort. Distance or time is the only lever.	
+Tue	[WARMUP] Swim	easy	1	300 m	N/A	2-3	Easy swim with 4 x 25 m build inside the 300 m; smooth exhale and long line.; Squat-and-reach x 6; Bodyweight squat x 8; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Band shoulder pass-through x 10; Wall slide x 8; Quick lift prep after the swim: a few easy ramp sets plus ankle and hip prep before the first work set.; Build smoothly into the first work rep.	
+Tue	Swim	2:04-2:08/100 m	8	100 m	20 s	7	Main swim set. One more repetition again; same pace. Volume is the only lever this week.	
+Tue	Overhead Press	RPE-selected load	3	5	2 min	7	Held at the Week 1 dose: this lift supports your goals, so it keeps its place without taking recovery from them. Load selection: pick a weight you could stop with about 3 clean reps still in reserve on the last set, write it in the Results column, and start from that number next week. Week 3 advance: hold the numbers once more and keep a controlled lowering and a lockout that does not slow down across sets. If every set in Week 2 was clean at or below the target RPE, you may add one clean rep to the last set only - earned, optional, and skipped entirely on any slowdown, symptom or loss of position.	
+Tue	Chest-Supported Row	RPE-selected load	3	8	90 s	7	Held at the Week 1 dose: this lift supports your goals, so it keeps its place without taking recovery from them. Load selection: pick a weight you could stop with about 3 clean reps still in reserve on the last set, write it in the Results column, and start from that number next week.	
+Tue	Dumbbell Bulgarian Split Squat	RPE-selected load	2	6/side	90 s	7	Push the load slightly: about half an RPE harder than Week 2, technique unchanged. Load selection: pick a weight you could stop with about 3 clean reps still in reserve on the last set, write it in the Results column, and start from that number next week. Held to the minimum useful dose: this sits beside key endurance work, and the run is the goal this accessory is meant to support.	
+Tue	Standing Calf Raise	RPE-selected load	3	8/side	60 s	7	Held at the Week 1 dose: this lift supports your goals, so it keeps its place without taking recovery from them. Load selection: pick a weight you could stop with about 3 clean reps still in reserve on the last set, write it in the Results column, and start from that number next week.	
+Tue	Side Plank	bodyweight	2	35 s/side	45 s	6	Five seconds longer per hold.	
+Tue	Bike	180-185 W	6	5 min	3 min easy spin	7.5-8	One more repetition again; same pace. Volume is the only lever this week.	
+Wed	[WARMUP] Run	5:40-6:05/km	1	5 min	N/A	2	Just ease into the session; keep it light from the first step.	
+Wed	Run	5:25-5:50/km	1	50 min	N/A	3-4	Easy aerobic run. About 10% more than Week 2; same easy effort. Distance or time is the only lever.	
+Fri	[WARMUP] Bike	120-135 W	1	10 min	N/A	2-3	Easy spin building smoothly, not a workout yet.; Squat-and-reach x 6; Bodyweight squat x 8; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Band shoulder pass-through x 10; Scapular push-up x 8; Ramp Back Squat: 25 kg x 5, 40 kg x 3, 50 kg x 1-2 before 65 kg work sets.; Easy settle-in before the rehearsal; no hard pulling.	
+Fri	Swim	1:05-1:08/50 m	1	50 m	15 s	5	Light technique swim. One more repetition again; same pace. Volume is the only lever this week.	
+Fri	Back Squat	65 kg	1	4	2.5-3 min	7.5-8	The block's heaviest week. Stop the set if bar speed or technique drops.	
+Fri	Ring Push-up	bodyweight	1	8	75 s	7	Keep the rings stable, body rigid, and stop 1-2 reps before form breaks.	
+Fri	Standing Calf Raise	RPE-selected load	1	8/side	60 s	7	Held at the Week 1 dose: this lift supports your goals, so it keeps its place without taking recovery from them. Load selection: pick a weight you could stop with about 3 clean reps still in reserve on the last set, write it in the Results column, and start from that number next week.	
+Fri	Ring Hamstring Curl	bodyweight	1	10	75 s	7	Keep hips extended and curl the heels toward you under control; shorten the lever if needed.	
+Fri	Pallof Press	RPE-selected load	1	12/side	45 s	6	Two more reps per set at the same effort. Load selection: pick a weight you could stop with about 4 clean reps still in reserve on the last set, write it in the Results column, and start from that number next week.	
+Fri	Bike	140-155 W	1	60 min	N/A	3-4	Steady aerobic hold ride; keep it genuinely easy so Sunday bike quality and Friday squat stay sharp. About 10% more than Week 2; same easy effort. Distance or time is the only lever.	
+Sat	Run	5:25-5:50/km	1	20 min	N/A	3-4	Held on purpose as the stable easy body of your third weekly run exposure while Monday and Wednesday carry the main progressions. Flat route only; conversational effort and no surges.	
+Sat	Run	4:48-4:58/km	1	15 min	N/A	7	About 10% more than Week 2; same pace and effort. Distance or time is the only lever.	
 END_WEEK3_TSV
 
 START_WEEK4_TSV
 Day	Exercise	Weight	Sets	Reps	Rest	Target RPE	Notes	Results
-Mon	[WARMUP] Run	N/A	1	2 km	N/A	3	Flat easy build; keep this truly easy before the pace work.; Easy jog 6-8 min; dynamic running drills; 3 relaxed strides before the hard running work	
-Mon	Run	4:35-4:40/km	3	800 m	2:00 walk	7	Consolidation: fewer repetitions at the same pace, finishing fresh.	
-Mon	Run	5:20-5:40/km	1	1.5 km	N/A	2	Easy cooldown on flat ground. Consolidation: shorter, fully easy, finishing fresher than Week 3.	
-Tue	[WARMUP] Swim	N/A	1	300 m	N/A	3	Easy + 4 x 25 m build inside the 300 m; long exhale and quiet kick.; Squat-and-reach x 6; Bodyweight squat x 8; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Band shoulder pass-through x 10; Wall slide x 8; Low-cost recovery-contingent strength support day; if time or recovery is tight, keep lower-body, row and calf work, then cut Overhead Press first.; Easy spin and gradual cadence build.	
-Tue	Swim	1:03-1:05/50 m	7	50 m	0:15	5	Technique/economy set with pull buoy; hold even stroke count. Consolidation: fewer repetitions at the same pace, finishing fresh.	
-Tue	Swim	1:00-1:02/50 m	3	50 m	0:20	6	Paddles only if the catch stays clean; smooth pressure, not a sprint. Consolidation: fewer repetitions at the same pace, finishing fresh.	
-Tue	Reverse Lunge	RPE-selected DB load	2	6/leg	1:30	6.5	Consolidation at a Week 2 feel: a little easier. Load selection: pick a weight you could stop with about 4 clean reps still in reserve on the last set, write it in the Results column, and start from that number next week.	
-Tue	Chest-Supported Row	RPE-selected load	2	8	1:15	6.5	Consolidation: a little easier. Load selection: pick a weight you could stop with about 4 clean reps still in reserve on the last set, write it in the Results column, and start from that number next week.	
-Tue	Overhead Press	RPE-selected load	2	6	1:30	5.5	Consolidation: a little easier. Load selection: pick a weight you could stop with about 5 clean reps still in reserve on the last set, write it in the Results column, and start from that number next week.	
-Tue	Standing Calf Raise	RPE-selected load	2	8/side	1:00	6.5	Consolidation: a little easier. Load selection: pick a weight you could stop with about 4 clean reps still in reserve on the last set, write it in the Results column, and start from that number next week.	
-Tue	Side Plank	Bodyweight	2	35 s/side	0:30	5.5	Consolidation: keep the Week 3 reps, a little easier.	
-Wed	[WARMUP] Run	N/A	1	5 min	N/A	2	Start easy on flat ground and let the pace come to you.	
-Wed	Run	5:15-5:35/km	1	7 km	N/A	3-4	Consolidation: shorter, fully easy, finishing fresher than Week 3.	
-Fri	[WARMUP] Bike	135-150 W	1	10 min	N/A	2	Easy spin; build cadence gradually.; Squat-and-reach x 6; Bodyweight squat x 8; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Ramp Back Squat: 25 kg x 5, 40 kg x 3, 50 kg x 1-2 before 65 kg work sets.; Easy spin into race cadence.	
-Fri	Swim	2:06-2:08/100 m	1	100 m	0:20	7	Consolidation: fewer repetitions at the same pace, finishing fresh.	
-Fri	Swim	1:00-1:02/50 m	1	50 m	0:20	7	Consolidation: fewer repetitions at the same pace, finishing fresh.	
-Fri	Back Squat	65 kg	1	4	2:30	7	Consolidation at the Week 2 load: one set fewer, so you finish fresher, not flatter.	
-Fri	Barbell Hip Thrust	RPE-selected load	1	8	1:30	6.5	Consolidation: a little easier. Load selection: pick a weight you could stop with about 4 clean reps still in reserve on the last set, write it in the Results column, and start from that number next week.	
-Fri	Standing Calf Raise	RPE-selected load	1	8/side	1:00	6.5	Consolidation: a little easier. Load selection: pick a weight you could stop with about 4 clean reps still in reserve on the last set, write it in the Results column, and start from that number next week.	
-Fri	Run	5:00-5:08/km	1	5 km	N/A	7	Race-specific brick run; flat route, settle in quickly off the Standing Calf Raise, stop early if stride shortens or achilles stiffness appears. Consolidation: shorter, fully easy, finishing fresher than Week 3.	
-Fri	Pallof Press	RPE-selected cable load	1	12/side	0:45	5.5	Consolidation: keep the Week 3 reps, a little easier. Load selection: pick a weight you could stop with about 5 clean reps still in reserve on the last set, write it in the Results column, and start from that number next week.	
-Fri	Zone-2 Bike	135-150 W	1	40 min	N/A	3	Hold bike aerobic support with low fatigue; conversational effort and stable power. Consolidation: shorter, fully easy, finishing fresher than Week 3.	
-Fri	Bike	170-180 W	1	15 min	N/A	6	Consolidation: shorter, fully easy, finishing fresher than Week 3.	
-Tue	Bike	180-185 W	2	12 min	5:00 easy spin	7	Consolidation: fewer repetitions at the same pace, finishing fresh.	
+Mon	[WARMUP] Run	5:35-6:00/km	1	15 min	N/A	2-3	Easy warm-up on flat ground or treadmill; include 4 x 20 s relaxed strides inside the 15 min and finish feeling springy, not worked.	
+Mon	Run	4:32-4:37/km	4	3 min	2 min easy jog	7.5-8	Consolidation: fewer repetitions at the same pace, finishing fresh.	
+Mon	Run	5:35-6:00/km	1	10 min	N/A	2-3	Easy cool-down jog; this counts toward weekly run volume. Consolidation: shorter, fully easy, finishing fresher than Week 3.	
+Tue	[WARMUP] Swim	easy	1	300 m	N/A	2-3	Easy swim with 4 x 25 m build inside the 300 m; smooth exhale and long line.; Squat-and-reach x 6; Bodyweight squat x 8; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Band shoulder pass-through x 10; Wall slide x 8; Quick lift prep after the swim: a few easy ramp sets plus ankle and hip prep before the first work set.; Build smoothly into the first work rep.	
+Tue	Swim	2:04-2:08/100 m	5	100 m	20 s	7	Main swim set. Consolidation: fewer repetitions at the same pace, finishing fresh.	
+Tue	Overhead Press	RPE-selected load	2	5	2 min	7	Consolidation: one set fewer. Load selection: pick a weight you could stop with about 3 clean reps still in reserve on the last set, write it in the Results column, and start from that number next week.	
+Tue	Chest-Supported Row	RPE-selected load	2	8	90 s	7	Consolidation: one set fewer. Load selection: pick a weight you could stop with about 3 clean reps still in reserve on the last set, write it in the Results column, and start from that number next week.	
+Tue	Dumbbell Bulgarian Split Squat	RPE-selected load	2	6/side	90 s	6-6.5	Consolidation at a Week 2 feel: a little easier. Load selection: pick a weight you could stop with about 4 clean reps still in reserve on the last set, write it in the Results column, and start from that number next week.	
+Tue	Standing Calf Raise	RPE-selected load	2	8/side	60 s	7	Consolidation: one set fewer. Load selection: pick a weight you could stop with about 3 clean reps still in reserve on the last set, write it in the Results column, and start from that number next week.	
+Tue	Side Plank	bodyweight	2	35 s/side	45 s	5.5	Consolidation: keep the Week 3 reps, a little easier.	
+Tue	Bike	180-185 W	3	5 min	3 min easy spin	7.5-8	Consolidation: fewer repetitions at the same pace, finishing fresh.	
+Wed	[WARMUP] Run	5:40-6:05/km	1	5 min	N/A	2	Just ease into the session; keep it light from the first step.	
+Wed	Run	5:25-5:50/km	1	35 min	N/A	3-4	Easy aerobic run. Consolidation: shorter, fully easy, finishing fresher than Week 3.	
+Fri	[WARMUP] Bike	120-135 W	1	10 min	N/A	2-3	Easy spin building smoothly, not a workout yet.; Squat-and-reach x 6; Bodyweight squat x 8; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Band shoulder pass-through x 10; Scapular push-up x 8; Ramp Back Squat: 25 kg x 5, 40 kg x 3, 50 kg x 1-2 before 65 kg work sets.; Easy settle-in before the rehearsal; no hard pulling.	
+Fri	Swim	1:05-1:08/50 m	1	50 m	15 s	5	Light technique swim. Consolidation: fewer repetitions at the same pace, finishing fresh.	
+Fri	Back Squat	65 kg	1	4	2.5-3 min	7-7.5	Consolidation at the Week 2 load: one set fewer, so you finish fresher, not flatter.	
+Fri	Ring Push-up	bodyweight	1	8	75 s	6.5	Keep the rings stable, body rigid, and stop 1-2 reps before form breaks.	
+Fri	Standing Calf Raise	RPE-selected load	2	8/side	60 s	7	Consolidation: one set fewer. Load selection: pick a weight you could stop with about 3 clean reps still in reserve on the last set, write it in the Results column, and start from that number next week.	
+Fri	Ring Hamstring Curl	bodyweight	1	10	75 s	6.5	Keep hips extended and curl the heels toward you under control; shorten the lever if needed.	
+Fri	Pallof Press	RPE-selected load	1	12/side	45 s	5.5	Consolidation: keep the Week 3 reps, a little easier. Load selection: pick a weight you could stop with about 5 clean reps still in reserve on the last set, write it in the Results column, and start from that number next week.	
+Fri	Bike	140-155 W	1	45 min	N/A	3-4	Steady aerobic hold ride; keep it genuinely easy so Sunday bike quality and Friday squat stay sharp. Consolidation: shorter, fully easy, finishing fresher than Week 3.	
+Sat	Run	5:25-5:50/km	1	15 min	N/A	3-4	Consolidation: shorter stable easy body for the third weekly run exposure, fully conversational and flat only.	
+Sat	Run	4:48-4:58/km	1	10 min	N/A	7	Consolidation: shorter at the same pace, finishing fresher than Week 3.	
 END_WEEK4_TSV
 
 TAPER AUDIT
@@ -123,9 +121,9 @@ Sport sessions counted as load: 7 per week.
 WEEK PHASES: 1=prepeak_specificity 2=prepeak_specificity 3=prepeak_specificity 4=prepeak_specificity EVENT=triathlon
 
     phase                sets  exercises  competition lift  power sets  peak RPE  peak % max
-W1  prepeak specificity  39    12         -                 -           7         -
-W2  prepeak specificity  43    12         -                 -           7         -
-W3  prepeak specificity  46    12         -                 -           7.5       -
-W4  prepeak specificity  36    12         -                 -           7         -
+W1  prepeak specificity  39    12         -                 -           8         -
+W2  prepeak specificity  42    12         -                 -           8         -
+W3  prepeak specificity  45    12         -                 -           8         -
+W4  prepeak specificity  34    12         -                 -           8         -
 
-Across the block: volume -3 sets, exercises unchanged, competition-lift share unchanged, peak effort unchanged, accessory volume unchanged.
+Across the block: volume -5 sets, exercises unchanged, competition-lift share unchanged, peak effort unchanged, accessory volume -1 sets.
