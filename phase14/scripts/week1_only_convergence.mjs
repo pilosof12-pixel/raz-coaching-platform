@@ -675,11 +675,12 @@ if (process.env.RECUT) {
   // Rebuild Weeks 2-4 from the Week 1 of the latest live program, and judge it.
   const id = process.env.RECUT;
   const prog = fs.readFileSync(path.join(root, '..', '..', 'docs', 'qa', 'live-three-avatar', 'latest', `${id}-program.txt`), 'utf8');
-  const intake = INTAKES[id];
+  const intake = INTAKES[id] || workflowIntake({ advanced_calisthenics: 'calisthenics' }[id] || id);
   const w1only = prog.slice(0, prog.indexOf('START_WEEK2_TSV')).replace(/\s+$/, '') + '\n';
   const built = buildWeeksFromWeekOne(w1only, intake);
   const r = collectRepairableValidationFailures(built.program, intake, { skipSkillCalibration: true });
   console.log(id, 'built', built.built, 'ok', r.ok);
+  if (process.env.SHOW) for (const w of [1, 2, 3, 4]) { const mm = String(r.program).match(new RegExp(`START_WEEK${w}_TSV\\n([\\s\\S]*?)\\nEND_WEEK${w}_TSV`)); console.log('  W' + w, mm[1].split('\n').filter((l) => new RegExp(process.env.SHOW, 'i').test(l)).map((l) => { const c = l.split('\t'); return `${c[0]} ${c[1]} ${c[2]} ${c[3]}x${c[4]}`; }).join(' | ')); }
   for (const f of r.flags || []) console.log('  ', f.code, String(f.amendment || f.message || '').slice(0, 500));
   process.exit(0);
 }

@@ -90,7 +90,7 @@ function addedBenchmark(intake = {}, name = '', reps = null) {
   for (const line of txt([intake.current_numbers, intake.performance_markers]).split(/\n|\|/)) {
     const l = line.toLowerCase();
     if (!core || !l.includes(core.replace(/^weighted\s+/, '')) || !/weighted|\+/.test(l)) continue;
-    const m = l.match(/\+\s*(\d+(?:\.\d+)?)\s*kg(?:\s*(?:x|×)\s*(\d+))?/);
+    const m = l.match(/\+?\s*(\d+(?:\.\d+)?)\s*kg(?:\s*(?:x|×)\s*(\d+))?/);
     if (!m) continue;
     const r = m[2] ? Number(m[2]) : 1;
     if (reps != null && r < reps) continue;
@@ -110,6 +110,9 @@ export function skillMaxReps(intake = {}, name = '') {
   const words = SKILL_BENCH_WORDS[fam];
   if (!words) return null;
   if (/handstand/.test(fam) && !/push|hspu/i.test(name)) return null;
+  // The athlete's max is for the unassisted movement; an assisted or banded
+  // variant is a different load and keeps the ordinary skill rule.
+  if (/assist|band|negative|eccentric/i.test(name)) return null;
   let best = null;
   for (const line of txt([intake.current_numbers, intake.performance_markers]).split(/\n|\||;/)) {
     if (!words.test(line) || /assist|band|negative|weighted|\+\s*\d/i.test(line)) continue;
@@ -192,7 +195,8 @@ function progressRow(cells, p, role, week, plateau) {
 
   if (role === 'warmup') return c;
 
-  if (role === 'strength' && kg.plus) {
+  const addedLoad = kg && (kg.plus || /^\s*weighted\b/i.test(String(cells[p.exercise] || '')));
+  if (role === 'strength' && addedLoad) {
     // An added load on bodyweight (a weighted pull-up, chin-up or dip). Epley
     // describes the whole mass moved, not the plate on the belt, so the RPE cap
     // below would read +30 kg as already at the ceiling and hold a primary goal
@@ -268,6 +272,26 @@ function progressRow(cells, p, role, week, plateau) {
       note = `Consolidation: keep the Week 3 reps and load, ${consolidate(c, p, sets)}.`;
     }
     if (plateau && (week === 2 || week === 3)) note += ' Plateau intensifier: on the last set, a drop set -- take about 20% off and continue twice, no rest between drops.';
+  } else if (role === 'skill' && p.skillMax != null && /\d[^,]*,\s*\d/.test(reps)) {
+    // A set-by-set ladder ("2, 1, 1 each side"). Week 2 adds a single; Week 3
+    // lengthens the first single into the athlete's max instead; Week 4 is the
+    // Week 1 ladder. No set is ever longer than the max.
+    const unit = reps.replace(/^[\d,\s]*?(\d+)\s*/, '').replace(/^[^a-z]*/i, '').trim();
+    const parts = reps.split(',').map((x) => num(x)).filter((x) => x != null);
+    const suffix = (reps.match(/\d+\s*([a-z][^,]*)$/i) || [])[1] || '';
+    const fmtLadder = (xs) => xs.map((x) => `${x}${suffix ? ` ${suffix.trim()}` : ''}`).join(', ');
+    let next = parts.slice();
+    if (week === 2) { next = [...parts, 1]; note = 'One more single than Week 1; every rep strict and crisp.'; }
+    if (week === 3) {
+      next = [...parts, 1];
+      const i = next.findIndex((x) => x < p.skillMax);
+      if (i >= 0) next[i] = p.skillMax;
+      note = `One of the singles becomes a ${p.skillMax}-rep set, never longer than your current max. Only if every Week 2 rep was crisp; otherwise repeat Week 2.`;
+    }
+    if (week === 4) { next = parts.slice(); note = 'Consolidation: the Week 1 ladder, at the quality Week 3 earned.'; }
+    c[p.reps] = fmtLadder(next);
+    setsTo(c, p.sets, next.length);
+    void unit;
   } else if (role === 'skill' && p.skillMax != null && !isRange(reps) && num(reps) != null) {
     // A rep goal near the athlete's max progresses the LENGTH of one set, not
     // every set. Coach on run #166: OAP at a 2-rep max going to 2x3 is not the
@@ -365,7 +389,7 @@ function progressRow(cells, p, role, week, plateau) {
   // added load on bodyweight, which Epley does not describe) that load is set.
   if (plateau && (role === 'strength' || role === 'strength_rpe') && (week === 2 || week === 3)) {
     c[p.reps] = '5 (2+2+1)';
-    if (kg && !kg.plus && p.max) {
+    if (kg && !kg.plus && !/^\s*weighted\b/i.test(String(cells[p.exercise] || '')) && p.max) {
       const double = Math.floor(p.max / (1 + 2 / 30) / 2.5) * 2.5 - (week === 2 ? 2.5 : 0);
       if (double > kg.kg) c[p.load] = setKg(c[p.load], double);
     }

@@ -177,3 +177,24 @@ test('a consecutive-rep skill goal near the max lengthens one set, never jumps p
   for (const w of [2, 3, 4]) for (const d of day(w)) assert.ok(Number(d.split('x')[1]) <= 2, d);
   assert.match(out, /Make the first set 3 reps only if every Week 2 set was crisp/);
 });
+
+test('a "Weighted" lift written without a plus sign is still an added load', () => {
+  // Run #167: "Weighted Pull-up 27.5 kg" fell through to the whole-lift rule,
+  // which read the benchmark as a max and held a primary goal flat.
+  const intake = { primary_goals: ['Weighted pull-up with 40 kg for 3'], current_numbers: 'Weighted pull-up: 32 kg x 3' };
+  const out = buildWeeksFromWeekOne(w1(['Mon\tWeighted Pull-up\t27.5 kg\t3\t3\t3 min\t8\tStrict.\t']), intake).program;
+  assert.deepEqual([2, 3].map((w) => rowOf(out, w, 'Weighted Pull-up').load), ['30 kg', '32.5 kg']);
+  assert.equal(rowOf(out, 3, 'Weighted Pull-up').reps, '2', 'past the 32 kg benchmark the set is one rep shorter');
+});
+
+test('a set-by-set ladder near the max adds singles, then lengthens one, never past the max', () => {
+  const intake = { primary_goals: ['4 One arm pullups'], current_numbers: 'One-Arm Pull-up: 2 strict reps each arm' };
+  const out = buildWeeksFromWeekOne(w1([
+    'Mon\tOne-Arm Pull-up\tBodyweight\t3\t2 each side, 1 each side, 1 each side\t3 min\t8\tStrict.\t',
+    'Tue\tAssisted One-Arm Pull-up\tLight assistance\t2\t1 per arm\t2 min\t7\tClean.\t',
+  ]), intake).program;
+  assert.equal(rowOf(out, 2, 'One-Arm Pull-up').reps, '2 each side, 1 each side, 1 each side, 1 each side');
+  assert.equal(rowOf(out, 3, 'One-Arm Pull-up').reps, '2 each side, 2 each side, 1 each side, 1 each side');
+  assert.equal(rowOf(out, 4, 'One-Arm Pull-up').reps, '2 each side, 1 each side, 1 each side');
+  assert.notEqual(rowOf(out, 2, 'Assisted One-Arm Pull-up').reps, '2 per arm', 'the assisted variant is not held to the unassisted max');
+});
