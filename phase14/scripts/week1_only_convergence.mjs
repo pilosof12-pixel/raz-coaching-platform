@@ -684,7 +684,7 @@ if (process.env.RECUT) {
   process.exit(0);
 }
 if (process.env.LATEST) {
-  for (const id of ['advanced_hybrid', 'youth_gymnastics', 'masters_return', 'sprint_triathlete']) {
+  for (const id of (process.env.LATEST === '1' ? ['advanced_hybrid', 'youth_gymnastics', 'masters_return', 'sprint_triathlete'] : process.env.LATEST.split(','))) {
     const prog = fs.readFileSync(path.join(root, '..', '..', 'docs', 'qa', 'live-three-avatar', 'latest', `${id}-program.txt`), 'utf8');
     const intake = INTAKES[id];
     const f = [...gradeProgram(prog, intake)];

@@ -1,0 +1,67 @@
+{
+  "timestamp": "2026-10-03T12:55:51.798Z",
+  "base": "https://raz-coaching-platform.onrender.com",
+  "head_sha": "339b70307a7946d5887b98ea247cd7c7c451047c",
+  "runtime": "live99 2026-10-03T12:55:00Z",
+  "results": [
+    {
+      "id": "tactical_3k",
+      "job_id": "329b90990834f55c925eb38a0c5dce00",
+      "ok": true,
+      "status": "done",
+      "stage": "finalizing",
+      "attempt": 2,
+      "detail": "saving program after 2 model call(s) QA trace: E0:medium -> W:engine-weeks-2-4 -> A1:SPORT_DAY_COUPLING_VIOLATION+TACTICAL_3K_INTERVAL_PROGRESSION_VIOLATION. First failure evidence: PRIOR ATTEMPT FAILED SPORT/CALENDAR VALIDATION. days_per_week means requested strength sessions, not total active calendar days. Week 1: expected 3 strength/skill-strength days, found 4 (tuesday, wednesday, friday, sunday). Week 2: expected 3 strength/skill-strength days, found 4 (tuesday, wednesday, friday, sunday). Week 3: expected 3 strength/skill-strength days, found 4 (tuesday, wednesday, friday, sunday). Week 4: expected 3 strength/skill-strength days, found 4 (tuesday, wednesday, friday, sunday). Keep run-only, ruck-only, sport-only and conditioning-only days in the weekly calendar for  Timing: total 433s, model 423s across 2 call(s), engine 9s. Tokens: reasoning 23916, output 32566, input 42532.",
+      "last_seen_status": "done",
+      "error": null,
+      "program_chars": 25233,
+      "seconds": 435
+    },
+    {
+      "id": "advanced_calisthenics",
+      "job_id": "1f3c287684648584fe0082198c7fb2ef",
+      "ok": true,
+      "status": "done",
+      "stage": "finalizing",
+      "attempt": 1,
+      "detail": "saving program after 1 model call(s) QA trace: E0:medium -> W:engine-weeks-2-4. Timing: total 229s, model 224s across 1 call(s), engine 4s. Tokens: reasoning 14826, output 16858, input 16979.",
+      "last_seen_status": "done",
+      "error": null,
+      "program_chars": 26657,
+      "seconds": 232
+    },
+    {
+      "id": "sprint_triathlete",
+      "job_id": "1ccabe3e1ea942b2d96b96e434661171",
+      "ok": true,
+      "status": "done",
+      "stage": "finalizing",
+      "attempt": 3,
+      "detail": "saving program after 3 model call(s) QA trace: E0:medium -> W:engine-weeks-2-4 -> A1:TARGET_MODALITY_EXPOSURE_REDUCED -> A2:TARGET_MODALITY_EXPOSURE_REDUCED. First failure evidence: running is a named primary performance goal. The intake documents about 3 current running exposure(s) per week, but this week programs 2 (Mon, Wed). Do not silently remove target-modality practice; preserve the athlete's stated current exposure unless the authored plan makes and explains a deliberate recovery tradeoff. Timing: total 412s, model 401s across 3 call(s), engine 10s. Tokens: reasoning 20117, output 34509, input 61984.",
+      "last_seen_status": "done",
+      "error": null,
+      "program_chars": 22228,
+      "seconds": 414
+    },
+    {
+      "id": "inseason_basketball",
+      "job_id": "208bd2de0257b7c396f84df7f0823363",
+      "ok": true,
+      "status": "done",
+      "stage": "finalizing",
+      "attempt": 1,
+      "detail": "saving program after 1 model call(s) QA trace: E0:medium -> W:engine-weeks-2-4. Timing: total 150s, model 148s across 1 call(s), engine 1s. Tokens: reasoning 9777, output 10761, input 14701.",
+      "last_seen_status": "done",
+      "error": null,
+      "program_chars": 17158,
+      "seconds": 152
+    }
+  ],
+  "selection": [
+    "tactical_3k",
+    "advanced_calisthenics",
+    "sprint_triathlete",
+    "inseason_basketball"
+  ],
+  "ok": true
+}

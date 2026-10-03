@@ -1,0 +1,141 @@
+Week 1 puts the two primaries together on Mon and Fri, keeps the straight-arm work away from back-to-back days, and makes Saturday intentionally low-cost so Monday’s heavy pull stays fresh.
+
+If the old medial-elbow ache shows up after straight-arm work, trim in this default order: Tue Band-Assisted Straddle Planche, Sat Advanced Tuck Planche, Tue Advanced Tuck Planche, Tue Advanced Tuck Front Lever, then Fri Strict Muscle-up back-off singles, Fri Weighted Pull-up +25 kg, and Mon Weighted Pull-up +30 kg last. If symptoms instead follow bent-arm pulling, trim Wed Ring Row first, then Tue Advanced Tuck Front Lever, then Fri Weighted Pull-up +25 kg 4x4, and touch Mon Weighted Pull-up +30 kg 3x3 only if it still persists. That order is only the default: if one named row clearly reproduces the ache and an earlier row does not, reduce the row that reproduces it first and leave the asymptomatic one alone. If recovery slips with no pain yet, same load feels harder, sleep worsens, warm-ups feel slow, trim Fri Weighted Pull-up +25 kg 4x4 to 3 sets before you change the heavy Monday pull.
+
+On Weighted pull-up with 40 kg for 3: this block holds it at a maintenance dose rather than developing it, on purpose. Strict muscle-up on rings for 5 clean reps and Freestanding handstand push-up are what this block develops. Keeping the exposure protects what you already have and keeps it ready to progress in the next block; it is not an attempt to improve it in these four weeks.
+
+START_WEEK1_TSV
+Day	Exercise	Weight	Sets	Reps	Rest	Target RPE	Notes	Results
+Mon	[WARMUP] Band Pull-Apart Warm-up	Band	2	15	30s	N/A	Open shoulders and upper back; smooth reps only.; Squat-and-reach x 6; Bodyweight squat x 8; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Band shoulder pass-through x 10; Scapular push-up x 8; Ramp Weighted Pull-up: 12.5 kg x 5, 17.5 kg x 3, 22.5 kg x 1-2 before 30 kg work sets.; Depress and upwardly rotate cleanly; no swinging.	
+Mon	Strict Muscle-up	BW	5	1	3 min	7.5	Quality singles only; false grip and high turnover. Ceiling not quota: stop on any miss, low catch or elbow flare.	
+Mon	Weighted Pull-up	+30 kg	3	3	4 min	8	Added load only; bodyweight is part of total. If Set 1 is above 8.5, keep+30 kg and cut Set 3; if bar speed stays high, keep all 3 sets.	
+Mon	Weighted Dip	+30 kg	2	5	3 min	7.5	Foundational push for the muscle-up; if shoulders feel off or Set 1 is above 8.5, stop at 1-2 sets.	
+Mon	Weighted Pistol Squat	RPE-selected load	3	5/side	90s	7.5	Use a belt load that leaves about 2 reps in reserve on Set 3; record the load used for next week.	
+Mon	Side Plank	BW	2	30s/side	45s	7	Ribs down and glutes tight; quality trunk brace, not max duration.	
+Tue	[WARMUP] Scapular Push-up	BW	2	10	30s	N/A	Protract fully at the top; easy prep only.; Squat-and-reach x 6; Bodyweight squat x 8; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Band shoulder pass-through x 10; Scapular push-up x 8; Open ankles and hips; relaxed breathing.	
+Tue	Controlled Handstand Kick-up	BW	5	3 attempts	45s	N/A	Fresh unsupported entries; count only controlled kick-ups and bail cleanly. Stop when line or landing gets wild.	
+Tue	Advanced Tuck Planche	BW	4	5s	2 min	8	Main planche volume at your owned rung; locked elbows, protraction and hollow body. Stop before position degrades.	
+Tue	Band-Assisted Straddle Planche	Assistance that lets every rep stay clean and fast	2	4s	2.5 min	8	Assisted Straddle Planche: this is the rung to beat. If every rep is clean and fast, take a measurable step off the assistance next week -- a lighter band, less foot, less hand. Stop the set the moment a rep slows.	
+Tue	Wall Handstand Push-up	BW	3	4	2.5 min	8	Same folded-towel depth as your benchmark; stop before head-first reps or rib flare. If Set 1 is above 8, hold 3x4 and keep it clean.	
+Tue	Advanced Tuck Front Lever	BW	2	6s	2 min	6.5	Maintenance only; repeat this exact dose unless the primaries are progressing and the elbow stays quiet. Prescribed attempts are a ceiling, not a quota: stop the set early if quality, symmetry or balance breaks down.	
+Wed	[WARMUP] Band Pull-Apart Warm-up	Band	2	15	30s	N/A	Reset shoulder position and upper-back tension.; Squat-and-reach x 6; Bodyweight squat x 8; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Band shoulder pass-through x 10; Scapular push-up x 8; Easy prep; full protraction each rep.	
+Wed	Freestanding Handstand Hold	BW	6	5-10s	45s	N/A	Unsupported balance practice; count only controlled holds with a clean bail. End sets when line or balance breaks. Take the top of the range only when the previous set closed at 9 with the standard intact; otherwise stay at 5 and keep every rep clean. The range is a ceiling to earn, not a target to hit.	
+Wed	Freestanding Handstand Push-up Negative	BW	4	1	2.5 min	7	Lower only as far as you can stay stacked and exit cleanly; if balance or head path drifts, stop the rep there. Lower under control for about 3s.	
+Wed	Ring Push-up	BW	2	10	75s	8	Keep the rings stable, body rigid, and stop 1-2 reps before form breaks.	
+Wed	Reverse Lunge	RPE-selected load	3	8/side	90s	7.5	Use a load that leaves 2 reps in reserve on the last set; record the load used.	
+Wed	Glute Bridge	BW	3	12	60s	8	One-second pause at the top; keep ribs down and finish full hip lockout.	
+Fri	[WARMUP] Band Pull-Apart Warm-up	Band	2	15	30s	N/A	Prime the turnover and ring support position.; Squat-and-reach x 6; Bodyweight squat x 8; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Band shoulder pass-through x 10; Scapular push-up x 8; Ramp Weighted Pull-up: 10 kg x 5, 15 kg x 3, 20 kg x 1-2 before 25 kg work sets.; Clean depression and upward rotation; no kip.	
+Fri	Strict Muscle-up	BW	1	2	3 min	8	Set-length day: top set is 2 clean reps only. If Rep 2 is not clean, stop at 1 and keep the back-off singles crisp.	
+Fri	Strict Muscle-up	BW	3	1	3 min	7.5	Back-off singles after the top set; same standard as Monday. End early if turnover slows or the catch gets soft.	
+Fri	Weighted Pull-up	+25 kg	4	4	3 min	7.5	Volume exposure and the first planned row to trim when recovery slips. If Set 1 is above 8, keep+25 kg and stop at 3 sets.	
+Fri	Weighted Dip	+35 kg	3	5	2.5 min	8	Support strength for the turnover and lockout; stop before speed slows into a grind.	
+Fri	Band Pallof Press	Band	2	10/side	45s	7	Anti-rotation trunk work; keep hips and ribs square.	
+Sat	[WARMUP] Scapular Push-up	BW	2	10	30s	N/A	Low-cost Saturday; keep the day crisp so Monday pull stays fresh.; Squat-and-reach x 6; Bodyweight squat x 8; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Band shoulder pass-through x 10; Scapular push-up x 8; Easy ankle and hip opening only.	
+Sat	Controlled Handstand Kick-up	BW	4	3 attempts	45s	N/A	Low-cost day; keep attempts fresh and stop when entries lose shape.	
+Sat	Advanced Tuck Planche	BW	3	5s	2 min	7.5	Second planche exposure is quality-biased, not a volume chase; stop before elbow or hip position changes.	
+Sat	Wall Handstand Hold	BW	3	20s	60s	6	Position capacity only; shrug tall, ribs down and toes stacked over wrists. Prescribed attempts are a ceiling, not a quota: stop the set early if quality, symmetry or balance breaks down.	
+Sat	Ring Row	BW	2	10	75s	6.5	Low-fatigue horizontal pull; smooth tempo and leave reps in the tank.	
+Sat	Ring Push-up	BW	2	12	75s	7	Keep the rings stable, body rigid, and stop 1-2 reps before form breaks.	
+Sat	Standing Calf Raise	BW	2	15	45s	7	This is the first accessory to cut if Saturday needs to stay shorter or fresher.	
+END_WEEK1_TSV
+
+START_WEEK2_TSV
+Day	Exercise	Weight	Sets	Reps	Rest	Target RPE	Notes	Results
+Mon	[WARMUP] Band Pull-Apart Warm-up	Band	2	15	30s	N/A	Open shoulders and upper back; smooth reps only.; Squat-and-reach x 6; Bodyweight squat x 8; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Band shoulder pass-through x 10; Scapular push-up x 8; Ramp Weighted Pull-up: 12.5 kg x 5, 17.5 kg x 3, 22.5 kg x 1-2 before 30 kg work sets.; Depress and upwardly rotate cleanly; no swinging.	
+Mon	Strict Muscle-up	BW	5	1	3 min	7.5	One more set of the same quality as Week 1. Stop a set at the first clearly worse rep.	
+Mon	Weighted Pull-up	+30 kg	3	3	4 min	8	Same load as Week 1, done with better speed; it is already near your current ceiling for these reps.	
+Mon	Weighted Pistol Squat	RPE-selected load	3	5/side	90s	7.5	Same reps; choose a load that sits at the target RPE. Add a little if Week 1 felt easy.	
+Mon	Side Plank	BW	2	30s/side	45s	7	Same dose; cleaner reps.	
+Tue	[WARMUP] Scapular Push-up	BW	2	10	30s	N/A	Protract fully at the top; easy prep only.; Squat-and-reach x 6; Bodyweight squat x 8; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Band shoulder pass-through x 10; Scapular push-up x 8; Open ankles and hips; relaxed breathing.	
+Tue	Controlled Handstand Kick-up	BW	4	3 attempts	45s	N/A	One more set of the same quality as Week 1. Stop a set at the first clearly worse rep. Held at 9 sets across the week: the primary quality session advances, so secondary volume stays where it was.	
+Tue	Advanced Tuck Planche	BW	3	5s	2 min	8	One more set of the same quality as Week 1. Stop a set at the first clearly worse rep. Held at 7 sets across the week: the primary quality session advances, so secondary volume stays where it was.	
+Tue	Band-Assisted Straddle Planche	One measurable step less than Week 1, if Week 1 was clean	2	4s	2.5 min	8	Assisted Straddle Planche: assistance comes off before reps or sets do. Take the step down only if every Week 1 rep was clean and fast; if it was not, repeat Week 1's assistance and earn it this week. Same reps and sets either way. Held at 2 sets across the week: the primary quality session advances, so secondary volume stays where it was.	
+Tue	Wall Handstand Push-up	BW	3	4	2.5 min	8	One more set of the same quality as Week 1. Stop a set at the first clearly worse rep. Held at 3 sets across the week: the primary quality session advances, so secondary volume stays where it was.	
+Tue	Advanced Tuck Front Lever	BW	2	6s	2 min	6.5	Same reps; choose a load that sits at the target RPE. Add a little if Week 1 felt easy. Prescribed attempts are a ceiling, not a quota: stop the set early if quality, symmetry or balance breaks down.	
+Wed	[WARMUP] Band Pull-Apart Warm-up	Band	2	15	30s	N/A	Reset shoulder position and upper-back tension.; Squat-and-reach x 6; Bodyweight squat x 8; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Band shoulder pass-through x 10; Scapular push-up x 8; Easy prep; full protraction each rep.	
+Wed	Freestanding Handstand Hold	BW	6	5-10s	45s	N/A	One more set of the same quality as Week 1. Stop a set at the first clearly worse rep. Take the top of the range only when the previous set closed at 9 with the standard intact; otherwise stay at 5 and keep every rep clean. The range is a ceiling to earn, not a target to hit.	
+Wed	Freestanding Handstand Push-up Negative	BW	4	1	2.5 min	7	One more set of the same quality as Week 1. Stop a set at the first clearly worse rep. Held at 4 sets across the week: the primary quality session advances, so secondary volume stays where it was. Lower under control for about 4s.	
+Wed	Reverse Lunge	RPE-selected load	3	9/side	90s	7.5	sets of 9 reps, progression: same load, one or two more reps per set. Load selection: pick a weight you could stop with about 3 clean reps still in reserve on the last set, write it in the Results column, and start from that number next week.	
+Wed	Glute Bridge	BW	3	14	60s	8	sets of 14 reps, progression: same load, one or two more reps per set.	
+Fri	[WARMUP] Band Pull-Apart Warm-up	Band	2	15	30s	N/A	Prime the turnover and ring support position.; Squat-and-reach x 6; Bodyweight squat x 8; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Band shoulder pass-through x 10; Scapular push-up x 8; Ramp Weighted Pull-up: 10 kg x 5, 17.5 kg x 3, 22.5 kg x 1-2 before 27.5 kg work sets.; Clean depression and upward rotation; no kip.	
+Fri	Strict Muscle-up	BW	2	2	3 min	8	One more set of the same quality as Week 1. Stop a set at the first clearly worse rep.	
+Fri	Strict Muscle-up	BW	4	1	3 min	7.5	One more set of the same quality as Week 1. Stop a set at the first clearly worse rep.	
+Fri	Weighted Pull-up	+27.5 kg	4	4	3 min	7.5	A small load step from Week 1; same reps and RPE ceiling. If Week 1 felt above target, repeat it instead.	
+Fri	Weighted Dip	+37.5 kg	2	5	2.5 min	8	A small load step from Week 1; same reps and RPE ceiling. If Week 1 felt above target, repeat it instead.	
+Fri	Band Pallof Press	Band	2	10/side	45s	7	Same dose; cleaner reps.	
+Sat	[WARMUP] Scapular Push-up	BW	2	10	30s	N/A	Low-cost Saturday; keep the day crisp so Monday pull stays fresh.; Squat-and-reach x 6; Bodyweight squat x 8; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Band shoulder pass-through x 10; Scapular push-up x 8; Easy ankle and hip opening only.	
+Sat	Controlled Handstand Kick-up	BW	5	3 attempts	45s	N/A	One more set of the same quality as Week 1. Stop a set at the first clearly worse rep. Held at 9 sets across the week: the primary quality session advances, so secondary volume stays where it was.	
+Sat	Advanced Tuck Planche	BW	4	5s	2 min	7.5	One more set of the same quality as Week 1. Stop a set at the first clearly worse rep. Held at 7 sets across the week: the primary quality session advances, so secondary volume stays where it was.	
+Sat	Wall Handstand Hold	BW	3	20s	60s	6	One more set of the same quality as Week 1. Stop a set at the first clearly worse rep. Held at 3 sets across the week: the primary quality session advances, so secondary volume stays where it was.	
+Sat	Ring Row	BW	2	12	75s	6.5	sets of 12 reps, progression: same load, one or two more reps per set.	
+Sat	Ring Push-up	BW	2	14	75s	7	Keep the rings stable, body rigid, and stop 1-2 reps before form breaks.	
+Sat	Standing Calf Raise	BW	2	17	45s	7	sets of 17 reps, progression: same load, one or two more reps per set.	
+END_WEEK2_TSV
+
+START_WEEK3_TSV
+Day	Exercise	Weight	Sets	Reps	Rest	Target RPE	Notes	Results
+Mon	[WARMUP] Band Pull-Apart Warm-up	Band	2	15	30s	N/A	Open shoulders and upper back; smooth reps only.; Squat-and-reach x 6; Bodyweight squat x 8; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Band shoulder pass-through x 10; Scapular push-up x 8; Ramp Weighted Pull-up: 12.5 kg x 5, 17.5 kg x 3, 22.5 kg x 1-2 before 30 kg work sets.; Depress and upwardly rotate cleanly; no swinging.	
+Mon	Strict Muscle-up	BW	5	2	3 min	7.5	One more clean rep per set if every Week 2 rep was crisp; otherwise repeat Week 2.	
+Mon	Weighted Pull-up	+30 kg	3	3	4 min	8.5	The block's heaviest week. Stop the set if bar speed or technique drops.	
+Mon	Weighted Pistol Squat	RPE-selected load	3	5/side	90s	8	Push the load slightly: about half an RPE harder than Week 2, technique unchanged. Load selection: pick a weight you could stop with about 2 clean reps still in reserve on the last set, write it in the Results column, and start from that number next week.	
+Mon	Side Plank	BW	2	35s/side	45s	7	Five seconds longer per hold.	
+Tue	[WARMUP] Scapular Push-up	BW	2	10	30s	N/A	Protract fully at the top; easy prep only.; Squat-and-reach x 6; Bodyweight squat x 8; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Band shoulder pass-through x 10; Scapular push-up x 8; Open ankles and hips; relaxed breathing.	
+Tue	Controlled Handstand Kick-up	BW	4	4 attempts	45s	N/A	One more clean rep per set if every Week 2 rep was crisp; otherwise repeat Week 2. Held at 9 sets across the week: the primary quality session advances, so secondary volume stays where it was.	
+Tue	Advanced Tuck Planche	BW	3	10s	2 min	8	Five seconds longer per hold, same body line. Prescribed attempts are a ceiling, not a quota: stop the set early if quality, symmetry or balance breaks down. Held at 7 sets across the week: the primary quality session advances, so secondary volume stays where it was.	
+Tue	Band-Assisted Straddle Planche	The least assistance you can still hold clean form on	2	9s	2.5 min	8	Assisted Straddle Planche: least useful assistance. If Week 2 was clean, take one or two fresh unassisted attempts before the assisted work and stop at the first slow one. The assisted sets stay as written whether or not the attempts go in. Held at 2 sets across the week: the primary quality session advances, so secondary volume stays where it was.	
+Tue	Wall Handstand Push-up	BW	3	4	2.5 min	8	One more clean rep per set if every Week 2 rep was crisp; otherwise repeat Week 2. Held at 3 sets across the week: the primary quality session advances, so secondary volume stays where it was.	
+Tue	Advanced Tuck Front Lever	BW	2	6s	2 min	7	Push the load slightly: about half an RPE harder than Week 2, technique unchanged. Prescribed attempts are a ceiling, not a quota: stop the set early if quality, symmetry or balance breaks down.	
+Wed	[WARMUP] Band Pull-Apart Warm-up	Band	2	15	30s	N/A	Reset shoulder position and upper-back tension.; Squat-and-reach x 6; Bodyweight squat x 8; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Band shoulder pass-through x 10; Scapular push-up x 8; Easy prep; full protraction each rep.	
+Wed	Freestanding Handstand Hold	BW	6	5-15s	45s	N/A	Five seconds longer per hold, same body line. Take the top of the range only when the previous set closed at 14 with the standard intact; otherwise stay at 5 and keep every rep clean. The range is a ceiling to earn, not a target to hit.	
+Wed	Freestanding Handstand Push-up Negative	BW	4	2	2.5 min	7	One more clean rep per set if every Week 2 rep was crisp; otherwise repeat Week 2. Held at 4 sets across the week: the primary quality session advances, so secondary volume stays where it was. Lower under control for about 5s.	
+Wed	Reverse Lunge	RPE-selected load	3	10/side	90s	7.5	sets of 10 reps, progression: the top of what Week 2 earned on every set. Load selection: pick a weight you could stop with about 3 clean reps still in reserve on the last set, write it in the Results column, and start from that number next week.	
+Wed	Glute Bridge	BW	3	16	60s	8	sets of 16 reps, progression: the top of what Week 2 earned on every set.	
+Fri	[WARMUP] Band Pull-Apart Warm-up	Band	2	15	30s	N/A	Prime the turnover and ring support position.; Squat-and-reach x 6; Bodyweight squat x 8; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Band shoulder pass-through x 10; Scapular push-up x 8; Ramp Weighted Pull-up: 10 kg x 5, 17.5 kg x 3, 22.5 kg x 1-2 before 27.5 kg work sets.; Clean depression and upward rotation; no kip.	
+Fri	Strict Muscle-up	BW	2	3	3 min	8	One more clean rep per set if every Week 2 rep was crisp; otherwise repeat Week 2.	
+Fri	Strict Muscle-up	BW	4	2	3 min	7.5	One more clean rep per set if every Week 2 rep was crisp; otherwise repeat Week 2.	
+Fri	Weighted Pull-up	+27.5 kg	4	4	3 min	8	The block's heaviest week. Stop the set if bar speed or technique drops.	
+Fri	Weighted Dip	+37.5 kg	2	5	2.5 min	8.5	The block's heaviest week. Stop the set if bar speed or technique drops.	
+Fri	Band Pallof Press	Band	2	12/side	45s	7	Two more reps per set at the same effort.	
+Sat	[WARMUP] Scapular Push-up	BW	2	10	30s	N/A	Low-cost Saturday; keep the day crisp so Monday pull stays fresh.; Squat-and-reach x 6; Bodyweight squat x 8; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Band shoulder pass-through x 10; Scapular push-up x 8; Easy ankle and hip opening only.	
+Sat	Controlled Handstand Kick-up	BW	5	4 attempts	45s	N/A	One more clean rep per set if every Week 2 rep was crisp; otherwise repeat Week 2. Held at 9 sets across the week: the primary quality session advances, so secondary volume stays where it was.	
+Sat	Advanced Tuck Planche	BW	4	10s	2 min	7.5	Five seconds longer per hold, same body line. Prescribed attempts are a ceiling, not a quota: stop the set early if quality, symmetry or balance breaks down. Held at 7 sets across the week: the primary quality session advances, so secondary volume stays where it was.	
+Sat	Wall Handstand Hold	BW	3	25s	60s	6	Five seconds longer per hold, same body line. Prescribed attempts are a ceiling, not a quota: stop the set early if quality, symmetry or balance breaks down. Held at 3 sets across the week: the primary quality session advances, so secondary volume stays where it was.	
+Sat	Ring Row	BW	2	14	75s	6.5	sets of 14 reps, progression: the top of what Week 2 earned on every set.	
+Sat	Ring Push-up	BW	2	16	75s	7	Keep the rings stable, body rigid, and stop 1-2 reps before form breaks.	
+Sat	Standing Calf Raise	BW	2	19	45s	7	sets of 19 reps, progression: the top of what Week 2 earned on every set.	
+END_WEEK3_TSV
+
+START_WEEK4_TSV
+Day	Exercise	Weight	Sets	Reps	Rest	Target RPE	Notes	Results
+Mon	[WARMUP] Band Pull-Apart Warm-up	Band	2	15	30s	N/A	Open shoulders and upper back; smooth reps only.; Squat-and-reach x 6; Bodyweight squat x 8; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Band shoulder pass-through x 10; Scapular push-up x 8; Ramp Weighted Pull-up: 12.5 kg x 5, 17.5 kg x 3, 22.5 kg x 1-2 before 30 kg work sets.; Depress and upwardly rotate cleanly; no swinging.	
+Mon	Strict Muscle-up	BW	5	2	3 min	7.5	Consolidation: Week 1 set count, keeping the best Week 3 standard.	
+Mon	Weighted Pull-up	+30 kg	2	3	4 min	8	Consolidation at the Week 2 load: one set fewer, so you finish fresher, not flatter.	
+Mon	Weighted Dip	+32.5 kg	1	5	3 min	7	Consolidation at the Week 2 load: a little easier, so you finish fresher, not flatter.	
+Mon	Weighted Pistol Squat	RPE-selected load	2	5/side	90s	7.5	Consolidation at a Week 2 feel: one set fewer. Load selection: pick a weight you could stop with about 3 clean reps still in reserve on the last set, write it in the Results column, and start from that number next week.	
+Mon	Side Plank	BW	2	35s/side	45s	6.5	Consolidation: keep the Week 3 reps, a little easier.	
+Tue	[WARMUP] Scapular Push-up	BW	2	10	30s	N/A	Protract fully at the top; easy prep only.; Squat-and-reach x 6; Bodyweight squat x 8; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Band shoulder pass-through x 10; Scapular push-up x 8; Open ankles and hips; relaxed breathing.	
+Tue	Controlled Handstand Kick-up	BW	5	4 attempts	45s	N/A	Consolidation: Week 1 set count, keeping the best Week 3 standard. Prescribed attempts are a ceiling, not a quota: stop the set early if quality, symmetry or balance breaks down.	
+Tue	Advanced Tuck Planche	BW	4	10s	2 min	8	Consolidation: Week 1 set count, keeping the best Week 3 standard. Prescribed attempts are a ceiling, not a quota: stop the set early if quality, symmetry or balance breaks down.	
+Tue	Band-Assisted Straddle Planche	The least assistance you owned in Week 3 -- no new step this week	2	9s	2.5 min	8	Assisted Straddle Planche: consolidation. Repeat the assistance you owned in Week 3 rather than chasing a lighter one, and keep every rep clean.	
+Tue	Wall Handstand Push-up	BW	3	4	2.5 min	8	Consolidation: Week 1 set count, keeping the best Week 3 standard. Prescribed attempts are a ceiling, not a quota: stop the set early if quality, symmetry or balance breaks down.	
+Tue	Advanced Tuck Front Lever	BW	2	6s	2 min	6	Consolidation at a Week 2 feel: a little easier. Prescribed attempts are a ceiling, not a quota: stop the set early if quality, symmetry or balance breaks down.	
+Tue	Ring Row	BW	1	10	90s	6.5	Consolidation: keep the Week 3 reps and load, one set fewer.	
+Wed	[WARMUP] Band Pull-Apart Warm-up	Band	2	15	30s	N/A	Reset shoulder position and upper-back tension.; Squat-and-reach x 6; Bodyweight squat x 8; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Band shoulder pass-through x 10; Scapular push-up x 8; Easy prep; full protraction each rep.	
+Wed	Freestanding Handstand Hold	BW	6	5-15s	45s	N/A	Consolidation: Week 1 set count, keeping the best Week 3 standard. Take the top of the range only when the previous set closed at 14 with the standard intact; otherwise stay at 5 and keep every rep clean. The range is a ceiling to earn, not a target to hit.	
+Wed	Freestanding Handstand Push-up Negative	BW	4	2	2.5 min	7	Consolidation: Week 1 set count, keeping the best Week 3 standard. Prescribed attempts are a ceiling, not a quota: stop the set early if quality, symmetry or balance breaks down. Lower under control for about 5s.	
+Wed	Ring Push-up	BW	1	14	75s	8	Keep the rings stable, body rigid, and stop 1-2 reps before form breaks.	
+Wed	Reverse Lunge	RPE-selected load	2	10/side	90s	7.5	Consolidation: keep the Week 3 reps and load, one set fewer. Load selection: pick a weight you could stop with about 3 clean reps still in reserve on the last set, write it in the Results column, and start from that number next week.	
+Wed	Glute Bridge	BW	2	16	60s	8	Consolidation: keep the Week 3 reps and load, one set fewer.	
+Fri	[WARMUP] Band Pull-Apart Warm-up	Band	2	15	30s	N/A	Prime the turnover and ring support position.; Squat-and-reach x 6; Bodyweight squat x 8; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Band shoulder pass-through x 10; Scapular push-up x 8; Ramp Weighted Pull-up: 10 kg x 5, 17.5 kg x 3, 22.5 kg x 1-2 before 27.5 kg work sets.; Clean depression and upward rotation; no kip.	
+Fri	Strict Muscle-up	BW	1	3	3 min	8	Consolidation: Week 1 set count, keeping the best Week 3 standard.	
+Fri	Strict Muscle-up	BW	3	2	3 min	7.5	Consolidation: Week 1 set count, keeping the best Week 3 standard.	
+Fri	Weighted Pull-up	+27.5 kg	3	4	3 min	7.5	Consolidation at the Week 2 load: one set fewer, so you finish fresher, not flatter.	
+Fri	Weighted Dip	+37.5 kg	1	5	2.5 min	8	Consolidation at the Week 2 load: one set fewer, so you finish fresher, not flatter.	
+Fri	Band Pallof Press	Band	2	12/side	45s	6.5	Consolidation: keep the Week 3 reps, a little easier.	
+Sat	[WARMUP] Scapular Push-up	BW	2	10	30s	N/A	Low-cost Saturday; keep the day crisp so Monday pull stays fresh.; Squat-and-reach x 6; Bodyweight squat x 8; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Band shoulder pass-through x 10; Scapular push-up x 8; Easy ankle and hip opening only.	
+Sat	Controlled Handstand Kick-up	BW	4	4 attempts	45s	N/A	Consolidation: Week 1 set count, keeping the best Week 3 standard. Prescribed attempts are a ceiling, not a quota: stop the set early if quality, symmetry or balance breaks down.	
+Sat	Advanced Tuck Planche	BW	3	10s	2 min	7.5	Consolidation: Week 1 set count, keeping the best Week 3 standard. Prescribed attempts are a ceiling, not a quota: stop the set early if quality, symmetry or balance breaks down.	
+Sat	Wall Handstand Hold	BW	3	25s	60s	6	Consolidation: Week 1 set count, keeping the best Week 3 standard. Prescribed attempts are a ceiling, not a quota: stop the set early if quality, symmetry or balance breaks down.	
+Sat	Ring Push-up	BW	1	16	75s	6.5	Keep the rings stable, body rigid, and stop 1-2 reps before form breaks.	
+Sat	Standing Calf Raise	BW	2	19	45s	6.5	Consolidation: keep the Week 3 reps and load, a little easier.	
+END_WEEK4_TSV
