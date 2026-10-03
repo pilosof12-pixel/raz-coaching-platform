@@ -1,0 +1,67 @@
+{
+  "timestamp": "2026-10-03T12:27:03.118Z",
+  "base": "https://raz-coaching-platform.onrender.com",
+  "head_sha": "c8e641dd8940d64f069dd062c36c378f22e0f067",
+  "runtime": "live98 2026-10-03T12:25:00Z",
+  "results": [
+    {
+      "id": "advanced_hybrid",
+      "job_id": "186322d2f8a917ebb4abbb08fb3c76c3",
+      "ok": true,
+      "status": "done",
+      "stage": "finalizing",
+      "attempt": 1,
+      "detail": "saving program after 1 model call(s) QA trace: E0:medium -> W:engine-weeks-2-4 -> A1:WEEKLY_MRV_EXCEEDED -> A1:converged-without-regeneration. First failure evidence: PRIOR ATTEMPT FAILED WEEKLY VOLUME VALIDATION. The following single-week workload is grossly above the internal reference band: [Week 1 push: 34.5 (18 program + 16.5 sport baseline debit; raw sport heuristic 30) vs reference 22; Week 2 pull: 35.8 (17 program + 18.8 sport baseline debit; raw sport heuristic 25) vs reference 25; Week 2 push: 34.5 (18 program + 16.5 sport baseline debit; raw sport heuristic 30) vs reference 22; Week 3 pull: 35.8 (17 program + 18.8 sport baseline debit; raw sport heuristic 25) vs reference 25; Week 3 push: 34.5 (18 program + 16.5 sport baseline debit; raw sport he Timing: total 162s, model 152s across 1 call(s), engine 9s. Tokens: reasoning 8804, output 10342, input 16551.",
+      "last_seen_status": "done",
+      "error": null,
+      "program_chars": 28270,
+      "seconds": 165
+    },
+    {
+      "id": "youth_gymnastics",
+      "job_id": "1a50a26781f161ad7040992d2679ea43",
+      "ok": true,
+      "status": "done",
+      "stage": "finalizing",
+      "attempt": 2,
+      "detail": "saving program after 2 model call(s) QA trace: E0:medium -> W:engine-weeks-2-4 -> A1:COACH_SPEC_V1_YG_FAILURE_BASED_DEFAULT -> S2:weeks1. First failure evidence: Coaching Specification v1.0 YG-07: Week 1 session b uses failure/grinding language for youth work (Band Pallof Press). Default youth strength/skill progression must remain technical and submaximal rather than failure-based. Timing: total 145s, model 139s across 2 call(s), engine 5s. Tokens: reasoning 7363, output 10022, input 38985.",
+      "last_seen_status": "done",
+      "error": null,
+      "program_chars": 20523,
+      "seconds": 148
+    },
+    {
+      "id": "masters_return",
+      "job_id": "cb99410cc46c6468236cf232dfebf9e0",
+      "ok": true,
+      "status": "done",
+      "stage": "finalizing",
+      "attempt": 1,
+      "detail": "saving program after 1 model call(s) QA trace: E0:medium -> W:engine-weeks-2-4. Timing: total 172s, model 170s across 1 call(s), engine 1s. Tokens: reasoning 9989, output 11337, input 14294.",
+      "last_seen_status": "done",
+      "error": null,
+      "program_chars": 26937,
+      "seconds": 175
+    },
+    {
+      "id": "sprint_triathlete",
+      "job_id": "3c38241261e7727025ff8f109350f880",
+      "ok": true,
+      "status": "done",
+      "stage": "finalizing",
+      "attempt": 4,
+      "detail": "saving program after 4 model call(s) QA trace: E0:medium -> W:engine-weeks-2-4 -> A1:LOW_INTENSITY_PACE_CONTRADICTS_CURRENT_PERFORMANCE -> S2:weeks2 -> A2:LOW_INTENSITY_PACE_CONTRADICTS_CURRENT_PERFORMANCE -> S3:weeks3 -> A3:LOW_INTENSITY_PACE_CONTRADICTS_CURRENT_PERFORMANCE -> S4:weeks4. First failure evidence: Week 4: A low-intensity/Zone-2 running row uses 4:48/km, while the athlete's demonstrated 5K performance is about 4:54/km. Zone 2 is explicitly below the first major threshold; do not label current race pace or faster as easy. Re-anchor from the authored field-performance + RPE/breathing hierarchy without inventing a universal zone formula. Timing: total 345s, model 331s across 4 call(s), engine 13s. Tokens: reasoning 18269, output 24757, input 86300.",
+      "last_seen_status": "done",
+      "error": null,
+      "program_chars": 23387,
+      "seconds": 348
+    }
+  ],
+  "selection": [
+    "advanced_hybrid",
+    "youth_gymnastics",
+    "masters_return",
+    "sprint_triathlete"
+  ],
+  "ok": true
+}

@@ -1,0 +1,103 @@
+Two skill-first sessions. Leave at least one rest day between Session A and Session B so the bar muscle-up and handstand work stay fresh.
+
+Normal muscular effort is fine. Sharp or local wrist, elbow, shoulder, or knee pain, or a visible form change, means stop that set and regress immediately: use more band or bench help on the bar muscle-up work, lower the kick-up height or stay with Wall Handstand Hold, and swap Ring Dip for Push-up if the shoulder feels pinchy.
+
+START_WEEK1_TSV
+Day	Exercise	Weight	Sets	Reps	Rest	Target RPE	Notes	Results
+Session A	[WARMUP] Band Pull-Apart Warm-up	Light band	2	12	30 sec	3	Easy scap and upper-back prep; smooth reps only.; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Band shoulder pass-through x 10; Scapular push-up x 8; Easy wrist and shoulder prep; keep elbows straight and motion small and clean.	
+Session A	Controlled Handstand Kick-up	Bodyweight	3	2	45-60 sec	N/A	2 attempts per set; ceiling 6 attempts total. Count only controlled entries; stop the set early if two entries in a row lose balance badly or the line arches hard. Six high-quality entries is a ceiling, not a quota; stop earlier if balance quality deteriorates.	
+Session A	Freestanding Handstand Hold	Bodyweight	3	2	45-60 sec	N/A	Use your best controlled entry or a light wall float. Count only stacked catches; stop if balance corrections get wild. Six high-quality entries is a ceiling, not a quota; stop earlier if balance quality deteriorates.	
+Session A	Wall Handstand Hold	Bodyweight	2	15-20 sec	45 sec	5	Chest-to-wall if possible. Ribs down and toes long; stop the set if the line breaks.	
+Session A	Bar Muscle-up Transition Drill	Moderate band assistance for a smooth, repeatable bar turnover	3	2	75 sec	N/A	Use only enough help to keep the turnover close, fast, and even. Stop the set if one side leads or the bar drifts away.	
+Session A	Banded Muscle-up	Band that lets you catch every rep cleanly	3	1	90 sec	N/A	Integrated assisted singles, taken after the component practice. This is the rung to beat: if both singles are fast and the catch is clean, take one band off next week. Stop after any miss or technical deterioration.	
+Session A	Strict Chest-to-Bar Pull-up	Bodyweight	4	2	120 sec	6	Explosive but controlled. Full reset each rep; stop the set if chest height drops or the pull slows clearly. Week 1 standard: set the benchmark. Use a load you can repeat cleanly on every set and note a full range from a dead hang, finishing with the back rather than a kip - that is what Weeks 2 and 3 are measured against, not a bigger number.	
+Session A	Ring Dip	Bodyweight	3	3	75-90 sec	7	Leave 2-3 clean reps in reserve. Smooth depth and strong lockout; if shoulders feel sharp or unstable, switch to Push-up for the same sets and reps. Week 1 standard: set the benchmark. Use a load you can repeat cleanly on every set and note a controlled lowering and a lockout that does not slow down across sets - that is what Weeks 2 and 3 are measured against, not a bigger number.	
+Session A	Ring Row	Bodyweight	3	8	60 sec	7	Body straight, 1-second squeeze at the top. If rep 8 would lose position, stop at 7 clean reps.	
+Session A	Side Plank	Bodyweight	2	20-25 sec/side	30 sec	6	Quiet trunk and straight line from shoulder to ankle; stop if hips sag.	
+Session B	[WARMUP] Band Pull-Apart Warm-up	Light band	2	12	30 sec	3	Easy scap and upper-back prep; smooth reps only.; Squat-and-reach x 6; Bodyweight squat x 8; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Band shoulder pass-through x 10; Scapular push-up x 8; Easy wrist and shoulder prep before handstand work.	
+Session B	Controlled Handstand Kick-up	Bodyweight	3	2	45-60 sec	N/A	2 attempts per set; ceiling 6 attempts total. Aim for the same kick-up every time; stop the set early if balance or body line gets worse. Six high-quality entries is a ceiling, not a quota; stop earlier if balance quality deteriorates.	
+Session B	Freestanding Handstand Hold	Bodyweight	3	2	45-60 sec	N/A	Brief clean catches only. Finish the rep as soon as balance is lost instead of saving it with a big arch. Six high-quality entries is a ceiling, not a quota; stop earlier if balance quality deteriorates.	
+Session B	Wall Handstand Hold	Bodyweight	2	15-20 sec	45 sec	5	Use this for line and shoulder comfort, not fatigue. Stop if ribs flare or you peel away from the wall.	
+Session B	Bar Muscle-up Transition Drill	Moderate band assistance for a smooth, repeatable bar turnover	3	2	75 sec	N/A	Lighter integrated bar work today. Keep the turnover close and smooth; if the rep slows or gets asymmetrical, add help and keep it clean.	
+Session B	Box Jump	Bodyweight	3	2	90-120 sec	N/A	Full reset between reps. Jump for quality, not fatigue; stop if landing quality or distance drops.	
+Session B	Pistol Squat	Bodyweight	3	4/leg	75-90 sec	7	Control the descent and pause 1 second at the bottom. Stop a set early if the foot twists or the knee caves.	
+Session B	Push-up	Bodyweight	3	8	60 sec	6-7	1-second pause at the bottom. Leave at least 2 clean reps in reserve; if body line breaks, end the set there.	
+Session B	Pull-up	Bodyweight	2	5	75 sec	6-7	Smooth strict reps well below max. Stop if chin barely clears or the swing starts. Week 1 standard: set the benchmark. Use a load you can repeat cleanly on every set and note a full range from a dead hang, finishing with the back rather than a kip - that is what Weeks 2 and 3 are measured against, not a bigger number.	
+Session B	Ring Hamstring Curl	Bodyweight	2	6	60-75 sec	7	Keep hips extended and curl the heels toward you under control; shorten the lever if needed.	
+Session B	Band Pallof Press	Light band	2	8/side	30-45 sec	6	Brace hard and keep the band from turning you; smooth controlled reps only, and stop if the torso rotates or you lose position.	
+END_WEEK1_TSV
+
+START_WEEK2_TSV
+Day	Exercise	Weight	Sets	Reps	Rest	Target RPE	Notes	Results
+Session A	[WARMUP] Band Pull-Apart Warm-up	Light band	2	12	30 sec	3	Easy scap and upper-back prep; smooth reps only.; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Band shoulder pass-through x 10; Scapular push-up x 8; Easy wrist and shoulder prep; keep elbows straight and motion small and clean.	
+Session A	Controlled Handstand Kick-up	Bodyweight	4	2	45-60 sec	N/A	One more set of the same quality as Week 1. Stop a set at the first clearly worse rep. Up to eight high-quality entries only if Week 1 stayed crisp; otherwise repeat the prior ceiling.	
+Session A	Freestanding Handstand Hold	Bodyweight	4	2	45-60 sec	N/A	One more set of the same quality as Week 1. Stop a set at the first clearly worse rep. Up to eight high-quality entries only if Week 1 stayed crisp; otherwise repeat the prior ceiling.	
+Session A	Wall Handstand Hold	Bodyweight	3	15-20 sec	45 sec	5	One more set of the same quality as Week 1. Stop a set at the first clearly worse rep.	
+Session A	Bar Muscle-up Transition Drill	Slightly lighter band assistance if every Week 1 turnover was clean	4	2	75 sec	N/A	One more set of the same quality as Week 1. Stop a set at the first clearly worse rep.	
+Session A	Banded Muscle-up	One band lighter than Week 1 if Week 1 was clean, otherwise repeat Week 1	4	1	90 sec	N/A	Assistance comes off before anything else does. Drop one band only if both Week 1 singles were fast with a clean catch; if they were not, repeat the Week 1 band and earn it this week. Same number of singles either way.	
+Session A	Strict Chest-to-Bar Pull-up	Bodyweight	4	2	120 sec	6	Same reps; choose a load that sits at the target RPE. Add a little if Week 1 felt easy. Week 2 advance: beat Week 1 on a full range from a dead hang, finishing with the back rather than a kip, at the same or a lower RPE. The numbers hold on purpose - this week the progression is execution.	
+Session A	Ring Dip	Bodyweight	3	3	75-90 sec	7	Same reps; choose a load that sits at the target RPE. Add a little if Week 1 felt easy. Week 2 advance: beat Week 1 on a controlled lowering and a lockout that does not slow down across sets, at the same or a lower RPE. The numbers hold on purpose - this week the progression is execution.	
+Session A	Ring Row	Bodyweight	3	9	60 sec	7	sets of 9 reps, progression: same load, one or two more reps per set.	
+Session A	Side Plank	Bodyweight	2	20-25 sec/side	30 sec	6	Same dose; cleaner reps.	
+Session B	[WARMUP] Band Pull-Apart Warm-up	Light band	2	12	30 sec	3	Easy scap and upper-back prep; smooth reps only.; Squat-and-reach x 6; Bodyweight squat x 8; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Band shoulder pass-through x 10; Scapular push-up x 8; Easy wrist and shoulder prep before handstand work.	
+Session B	Controlled Handstand Kick-up	Bodyweight	4	2	45-60 sec	N/A	One more set of the same quality as Week 1. Stop a set at the first clearly worse rep. Up to eight high-quality entries only if Week 1 stayed crisp; otherwise repeat the prior ceiling.	
+Session B	Freestanding Handstand Hold	Bodyweight	4	2	45-60 sec	N/A	One more set of the same quality as Week 1. Stop a set at the first clearly worse rep. Up to eight high-quality entries only if Week 1 stayed crisp; otherwise repeat the prior ceiling.	
+Session B	Wall Handstand Hold	Bodyweight	3	15-20 sec	45 sec	5	One more set of the same quality as Week 1. Stop a set at the first clearly worse rep.	
+Session B	Bar Muscle-up Transition Drill	Slightly lighter band assistance if every Week 1 turnover was clean	4	2	75 sec	N/A	One more set of the same quality as Week 1. Stop a set at the first clearly worse rep.	
+Session B	Box Jump	Bodyweight	3	2	90-120 sec	N/A	Same dose; every rep fast and fully reset.	
+Session B	Pistol Squat	Bodyweight	3	4/leg	75-90 sec	7	Same reps; choose a load that sits at the target RPE. Add a little if Week 1 felt easy.	
+Session B	Push-up	Bodyweight	3	9	60 sec	6-7	sets of 9 reps, progression: same load, one or two more reps per set.	
+Session B	Pull-up	Bodyweight	2	5	75 sec	6-7	Same reps; choose a load that sits at the target RPE. Add a little if Week 1 felt easy. Week 2 advance: beat Week 1 on a full range from a dead hang, finishing with the back rather than a kip, at the same or a lower RPE. The numbers hold on purpose - this week the progression is execution.	
+Session B	Ring Hamstring Curl	Bodyweight	2	6	60-75 sec	7	Keep hips extended and curl the heels toward you under control; shorten the lever if needed.	
+Session B	Band Pallof Press	Light band	2	8/side	30-45 sec	6	Same dose; cleaner reps.	
+END_WEEK2_TSV
+
+START_WEEK3_TSV
+Day	Exercise	Weight	Sets	Reps	Rest	Target RPE	Notes	Results
+Session A	[WARMUP] Band Pull-Apart Warm-up	Light band	2	12	30 sec	3	Easy scap and upper-back prep; smooth reps only.; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Band shoulder pass-through x 10; Scapular push-up x 8; Easy wrist and shoulder prep; keep elbows straight and motion small and clean.	
+Session A	Controlled Handstand Kick-up	Bodyweight	4	3	45-60 sec	N/A	One more clean rep per set if every Week 2 rep was crisp; otherwise repeat Week 2. Attempt count is a ceiling, not a quota: stay around 8-12 excellent entries and progress balance quality rather than adding attempts. Up to twelve high-quality entries only if control remains stable; stop before fatigue-driven misses.	
+Session A	Freestanding Handstand Hold	Bodyweight	4	3	45-60 sec	N/A	Five seconds longer per hold, same body line. Attempt count is a ceiling, not a quota: stay around 8-12 excellent entries and progress balance quality rather than adding attempts. Up to twelve high-quality entries only if control remains stable; stop before fatigue-driven misses.	
+Session A	Wall Handstand Hold	Bodyweight	3	15-25 sec	45 sec	5	Five seconds longer per hold, same body line. Prescribed attempts are a ceiling, not a quota: stop the set early if quality, symmetry or balance breaks down.	
+Session A	Bar Muscle-up Transition Drill	Lightest band assistance that still preserves a clean bar turnover	4	3	75 sec	N/A	One more clean rep per set if every Week 2 rep was crisp; otherwise repeat Week 2.	
+Session A	Banded Muscle-up	Lightest band you can still catch cleanly on	4	2	90 sec	N/A	Lightest useful assistance. If the Week 2 singles were clean, take up to 3 fresh unassisted attempts before the assisted singles and stop at the first slow one. The assisted doubles stay as written whether or not the attempts go in.	
+Session A	Strict Chest-to-Bar Pull-up	Bodyweight	4	2	120 sec	6.5	Push the load slightly: about half an RPE harder than Week 2, technique unchanged. Week 3 advance: hold the numbers once more and keep a full range from a dead hang, finishing with the back rather than a kip. If every set in Week 2 was clean at or below the target RPE, you may add one clean rep to the last set only - earned, optional, and skipped entirely on any slowdown, symptom or loss of position.	
+Session A	Ring Dip	Bodyweight	3	3	75-90 sec	7.5	Push the load slightly: about half an RPE harder than Week 2, technique unchanged. Week 3 advance: hold the numbers once more and keep a controlled lowering and a lockout that does not slow down across sets. If every set in Week 2 was clean at or below the target RPE, you may add one clean rep to the last set only - earned, optional, and skipped entirely on any slowdown, symptom or loss of position.	
+Session A	Ring Row	Bodyweight	3	10	60 sec	7	sets of 10 reps, progression: the top of what Week 2 earned on every set.	
+Session A	Side Plank	Bodyweight	2	20-30 sec/side	30 sec	6	Five seconds longer per hold.	
+Session B	[WARMUP] Band Pull-Apart Warm-up	Light band	2	12	30 sec	3	Easy scap and upper-back prep; smooth reps only.; Squat-and-reach x 6; Bodyweight squat x 8; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Band shoulder pass-through x 10; Scapular push-up x 8; Easy wrist and shoulder prep before handstand work.	
+Session B	Controlled Handstand Kick-up	Bodyweight	4	3	45-60 sec	N/A	One more clean rep per set if every Week 2 rep was crisp; otherwise repeat Week 2. Attempt count is a ceiling, not a quota: stay around 8-12 excellent entries and progress balance quality rather than adding attempts. Up to twelve high-quality entries only if control remains stable; stop before fatigue-driven misses.	
+Session B	Freestanding Handstand Hold	Bodyweight	4	3	45-60 sec	N/A	Five seconds longer per hold, same body line. Attempt count is a ceiling, not a quota: stay around 8-12 excellent entries and progress balance quality rather than adding attempts. Up to twelve high-quality entries only if control remains stable; stop before fatigue-driven misses.	
+Session B	Wall Handstand Hold	Bodyweight	3	15-25 sec	45 sec	5	Five seconds longer per hold, same body line. Prescribed attempts are a ceiling, not a quota: stop the set early if quality, symmetry or balance breaks down.	
+Session B	Bar Muscle-up Transition Drill	Lightest band assistance that still preserves a clean bar turnover	4	3	75 sec	N/A	One more clean rep per set if every Week 2 rep was crisp; otherwise repeat Week 2.	
+Session B	Box Jump	Bodyweight	3	2	90-120 sec	N/A	One more set only if speed held through Week 2; stop when it drops. Progress height, speed and technical output before adding power volume; stop if output drops.	
+Session B	Pistol Squat	Bodyweight	3	4/leg	75-90 sec	7.5	Push the load slightly: about half an RPE harder than Week 2, technique unchanged.	
+Session B	Push-up	Bodyweight	3	10	60 sec	6-7	sets of 10 reps, progression: the top of what Week 2 earned on every set.	
+Session B	Pull-up	Bodyweight	2	5	75 sec	6.5-7.5	Push the load slightly: about half an RPE harder than Week 2, technique unchanged. Week 3 advance: hold the numbers once more and keep a full range from a dead hang, finishing with the back rather than a kip. If every set in Week 2 was clean at or below the target RPE, you may add one clean rep to the last set only - earned, optional, and skipped entirely on any slowdown, symptom or loss of position.	
+Session B	Ring Hamstring Curl	Bodyweight	2	8	60-75 sec	7	Keep hips extended and curl the heels toward you under control; shorten the lever if needed.	
+Session B	Band Pallof Press	Light band	2	10/side	30-45 sec	6	Two more reps per set at the same effort.	
+END_WEEK3_TSV
+
+START_WEEK4_TSV
+Day	Exercise	Weight	Sets	Reps	Rest	Target RPE	Notes	Results
+Session A	[WARMUP] Band Pull-Apart Warm-up	Light band	2	12	30 sec	3	Easy scap and upper-back prep; smooth reps only.; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Band shoulder pass-through x 10; Scapular push-up x 8; Easy wrist and shoulder prep; keep elbows straight and motion small and clean.	
+Session A	Controlled Handstand Kick-up	Bodyweight	3	3	45-60 sec	N/A	Consolidation: Week 1 set count, keeping the best Week 3 standard. Consolidation week: reduce set exposure while preserving the best clean Week 3 balance and entry standard; stop before fatigue-driven misses.	
+Session A	Freestanding Handstand Hold	Bodyweight	3	3	45-60 sec	N/A	Consolidation: Week 1 set count, keeping the best Week 3 standard. Attempt count is a ceiling, not a quota: stay around 8-9 excellent entries and progress balance quality rather than adding attempts. Consolidation week: reduce set exposure while preserving the best clean Week 3 balance and entry standard; stop before fatigue-driven misses.	
+Session A	Wall Handstand Hold	Bodyweight	2	15-25 sec	45 sec	5	Consolidation: Week 1 set count, keeping the best Week 3 standard. Prescribed attempts are a ceiling, not a quota: stop the set early if quality, symmetry or balance breaks down.	
+Session A	Bar Muscle-up Transition Drill	Lightest band assistance that still preserves the clean Week 3 turnover; retain the earned assistance standard rather than chasing extra work	3	3	75 sec	N/A	Consolidation: Week 1 set count, keeping the best Week 3 standard.	
+Session A	Banded Muscle-up	The lightest band you owned in Week 3 -- no new rung this week	3	2	90 sec	N/A	Consolidation: keep the assistance you owned in Week 3 rather than chasing a lighter one. Up to 2 fresh unassisted attempts first if last week was clean.	
+Session A	Strict Chest-to-Bar Pull-up	Bodyweight	3	2	120 sec	6	Consolidation at a Week 2 feel: one set fewer.	
+Session A	Ring Dip	Bodyweight	2	3	75-90 sec	7	Consolidation at a Week 2 feel: one set fewer.	
+Session A	Ring Row	Bodyweight	2	10	60 sec	7	Consolidation: keep the Week 3 reps and load, one set fewer.	
+Session A	Side Plank	Bodyweight	2	20-30 sec/side	30 sec	5.5	Consolidation: keep the Week 3 reps, a little easier.	
+Session B	[WARMUP] Band Pull-Apart Warm-up	Light band	2	12	30 sec	3	Easy scap and upper-back prep; smooth reps only.; Squat-and-reach x 6; Bodyweight squat x 8; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Band shoulder pass-through x 10; Scapular push-up x 8; Easy wrist and shoulder prep before handstand work.	
+Session B	Controlled Handstand Kick-up	Bodyweight	3	3	45-60 sec	N/A	Consolidation: Week 1 set count, keeping the best Week 3 standard. Consolidation week: reduce set exposure while preserving the best clean Week 3 balance and entry standard; stop before fatigue-driven misses.	
+Session B	Freestanding Handstand Hold	Bodyweight	3	3	45-60 sec	N/A	Consolidation: Week 1 set count, keeping the best Week 3 standard. Attempt count is a ceiling, not a quota: stay around 8-9 excellent entries and progress balance quality rather than adding attempts. Consolidation week: reduce set exposure while preserving the best clean Week 3 balance and entry standard; stop before fatigue-driven misses.	
+Session B	Wall Handstand Hold	Bodyweight	2	15-25 sec	45 sec	5	Consolidation: Week 1 set count, keeping the best Week 3 standard. Prescribed attempts are a ceiling, not a quota: stop the set early if quality, symmetry or balance breaks down.	
+Session B	Bar Muscle-up Transition Drill	Lightest band assistance that still preserves the clean Week 3 turnover; retain the earned assistance standard rather than chasing extra work	3	3	75 sec	N/A	Consolidation: Week 1 set count, keeping the best Week 3 standard.	
+Session B	Box Jump	Bodyweight	2	2	90-120 sec	N/A	Consolidation: maximal intent, one set fewer.	
+Session B	Pistol Squat	Bodyweight	2	4/leg	75-90 sec	7	Consolidation at a Week 2 feel: one set fewer.	
+Session B	Push-up	Bodyweight	2	10	60 sec	6-7	Consolidation: keep the Week 3 reps and load, one set fewer.	
+Session B	Pull-up	Bodyweight	2	5	75 sec	5.5-6.5	Consolidation at a Week 2 feel: a little easier.	
+Session B	Ring Hamstring Curl	Bodyweight	2	8	60-75 sec	6.5	Keep hips extended and curl the heels toward you under control; shorten the lever if needed.	
+Session B	Band Pallof Press	Light band	2	10/side	30-45 sec	5.5	Consolidation: keep the Week 3 reps, a little easier.	
+END_WEEK4_TSV
