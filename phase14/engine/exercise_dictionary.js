@@ -30,6 +30,7 @@ import {
 import { weekdayKey } from './weekday.js';
 import { bodyweightKg } from "./intake_bodyweight.js";
 import { isLeadingSkill, isPowerPrimer, isPrimaryGoalModality, isAccessoryByName } from './exercise_roles.js';
+import { isYouthAthlete } from './youth_primary_skill.js';
 
 // ---------------------------------------------------------------------------
 // 1. CANONICAL EXERCISE DICTIONARY
@@ -1502,7 +1503,12 @@ function classifyRow(cells, header, isHebrew) {
 // what the rule is about: the goal skill and power primers first, hard
 // conditioning after the lifting, mobility last.
 const INTRADAY_RANK = {
-  warmup: 0, skill: 0.5, power: 0.75, strength_primary: 1, strength_secondary: 1, accessory: 1,
+  // Goal skill and power primers share the fresh tier and keep the order they
+  // were written in: an explosive push-up before the snatch is potentiation,
+  // the owner's call and the engine's ("power/throw/jump primers come after
+  // preparation and before heavy strength"). Only a youth athlete's primary
+  // skill must come strictly first (the youth rule), so their primers rank after it.
+  warmup: 0, skill: 0.5, power: 0.5, youth_power: 0.75, strength_primary: 1, strength_secondary: 1, accessory: 1,
   isolation: 2, conditioning_hard: 4, conditioning_easy: 5, mobility_finisher: 6,
 };
 
@@ -1514,7 +1520,7 @@ function intradayClass(cells, header, isHebrew, intake) {
   if (cls === "warmup") return cls;
   const name = cellAt(cells, colIdx(header, "exercise"));
   if (isLeadingSkill(name, intake)) return "skill";
-  if (isPowerPrimer(name) && cls !== "conditioning_hard" && cls !== "conditioning_easy") return "power";
+  if (isPowerPrimer(name) && cls !== "conditioning_hard" && cls !== "conditioning_easy") return isYouthAthlete(intake) ? "youth_power" : "power";
   // Engine rule 4: a primary-goal modality may lead, so it is not pushed behind
   // the lifting. It keeps the place it was written in.
   if ((cls === "conditioning_hard" || cls === "conditioning_easy") && isPrimaryGoalModality(name, intake)) return "accessory";

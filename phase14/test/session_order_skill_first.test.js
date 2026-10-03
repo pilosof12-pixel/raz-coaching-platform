@@ -40,9 +40,12 @@ const pseudo = 'Mon\tPseudo Planche Push-up\tBodyweight\t2\t6\t90s\t7\tPressing 
 const jump = 'Mon\tBox Jump\tBodyweight\t3\t3\t90s\t6\tStep down; full reset.\t';
 const curl = 'Mon\tMachine Hamstring Curl\tRPE-selected load\t2\t10\t60s\t7\tAccessory.\t';
 
-test('an adult whose goal names the skill trains it first, then power, then strength, then accessories', () => {
+test('an adult whose goal names the skill trains it, and any primer, before strength and accessories', () => {
   const intake = { age: 30, primary_goals: ['220kg back squat', '4 One arm pullups'] };
+  // Skill and primer share the fresh tier in the order written.
   assert.deepEqual(order(forceIntradayReorder(day([curl, squat, jump, oap]), intake)),
+    ['Box Jump', 'One-Arm Pull-up', 'Back Squat', 'Machine Hamstring Curl']);
+  assert.deepEqual(order(forceIntradayReorder(day([curl, oap, squat, jump]), intake)),
     ['One-Arm Pull-up', 'Box Jump', 'Back Squat', 'Machine Hamstring Curl']);
 });
 
@@ -54,9 +57,20 @@ test('skill work that only supports another goal is not promoted ahead of the pr
   assert.equal(out[0], 'Back Squat');
 });
 
-test("a weightlifter's competition lift leads, ahead of any primer", () => {
+test("a primer and the competition lift keep the order the coach wrote; both precede strength", () => {
+  // Owner: an explosive push-up is plyometric skill work in essence, and a good
+  // potentiation before the snatch. Either order is legitimate, so neither is forced.
   const snatch = 'Day -5\tSnatch\t95 kg\t2\t1\t2 min\t7\tCrisp singles.\t';
   const push = 'Day -5\tExplosive Push-up\tBodyweight\t3\t3\t90s\t7\tPrimer.\t';
+  const front = 'Day -5\tFront Squat\t130 kg\t2\t2\t3 min\t7\tStrength.\t';
+  const plank = 'Day -5\tSide Plank\tBodyweight\t1\t20 sec\t30s\t5\tTrunk.\t';
   const intake = { age: 26, primary_goals: ['Snatch 120 kg at the national qualifier'] };
-  assert.deepEqual(order(forceIntradayReorder(day([push, snatch]), intake)), ['Explosive Push-up', 'Snatch'].reverse());
+  assert.deepEqual(order(forceIntradayReorder(day([plank, front, push, snatch]), intake)), ['Explosive Push-up', 'Snatch', 'Front Squat', 'Side Plank']);
+  assert.deepEqual(order(forceIntradayReorder(day([front, snatch, push]), intake)), ['Snatch', 'Explosive Push-up', 'Front Squat']);
+});
+
+test('a youth athlete\'s primary skill still comes strictly first, ahead of any primer', () => {
+  const jump = 'Session A\tBox Jump\tBodyweight\t3\t3\t90s\t6\tPrimer.\t';
+  const drill = 'Session A\tBar Muscle-up Transition Drill\tModerate band\t3\t1\t90s\tN/A\tClean singles.\t';
+  assert.deepEqual(order(forceIntradayReorder(day([jump, drill]), { age: 13 })), ['Bar Muscle-up Transition Drill', 'Box Jump']);
 });
