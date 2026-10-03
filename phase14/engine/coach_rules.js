@@ -1071,9 +1071,21 @@ function sprintRows(program) {
     && metres(r) != null && (r.sets ?? 0) >= 1);
 }
 
+// "Sprint" also names a race distance. A sprint triathlon is 750 m, 20 km and
+// 5 km; it is not a goal about top-end speed, and the triathlete was charged
+// SPRINT_SPEED_EXPOSURE_MISSING for not doing flying 30s. Both sprint rules
+// asked the question with the same regex, so both made the same mistake;
+// they share this now so they cannot drift apart again. The distance
+// category is removed before asking, so "sprint triathlon" alone says
+// nothing, and "improve my 30 m sprint" still does.
+export function primaryGoalIsSpeed(intake = {}) {
+  const primary = arr(intake.primary_goals).join(' ')
+    .replace(/\bsprint[- ](?:distance\s+)?(?:tri(?:athlon)?|du(?:athlon)?|aqua(?:thlon)?|aquabike|distance|race distance)\b/gi, ' ');
+  return /\bsprint\b|\bspeed\b/i.test(primary);
+}
+
 export function sprintSpeedExposure(program, intake = {}) {
-  const primary = arr(intake.primary_goals).join(' ');
-  if (!/\bsprint\b|\bspeed\b/i.test(primary)) return [];
+  if (!primaryGoalIsSpeed(intake)) return [];
   // A sport session explicitly marked as speed work satisfies it.
   if (arr(intake.sport_schedule).some((s) => /sprint|speed/i.test(String((s && s.intensity) || '')))) return [];
   const byWeek = new Map();
@@ -1092,8 +1104,7 @@ export function sprintSpeedExposure(program, intake = {}) {
 // it at 95% or more. Derived from the difference he scored between B, which
 // stayed at 20 m against a 30 m benchmark, and C, which reached 30 m.
 export function sprintDistanceSpecificity(program, intake = {}) {
-  const primary = arr(intake.primary_goals).join(' ');
-  if (!/\bsprint\b|\bspeed\b/i.test(primary)) return [];
+  if (!primaryGoalIsSpeed(intake)) return [];
   const bench = sprintBenchmark(intake);
   if (!bench) return [];
   const need = bench.metres * 0.75;
@@ -1399,7 +1410,33 @@ export function accessoryRedundancy(program, intake = {}) {
   if (!families.length) return [];
   const benched = benchmarks(intake).map((b) => b.name);
 
-  const serves = (fn, names) => names.some((n) => families.some((f) => f.test(n))
+  // A function can serve a goal without sharing a word with it. The youth
+  // gymnast's block was charged for "horizontal press (Ring Dip, Ring Push-up)"
+  // serving none of her goals, while her secondary goal reads, word for word,
+  // "Build a strong general push and pull foundation" -- and the dip is the
+  // press-out that finishes the bar muscle-up her primary goal names. A coach
+  // reads both as goal work. Neither is in GOAL_MOVEMENTS, and they are kept out
+  // of it deliberately: that table also decides which goals must PROGRESS, and
+  // this rule only asks whether a slot is spent on something the athlete asked
+  // for. So the relevance lives here, scoped to that question.
+  const goalText = ['primary', 'secondary', 'maintenance']
+    .flatMap((t) => arr(intake[`${t}_goals`]).map(String)).join(' ');
+  //
+  // Narrow on purpose, and a test made it so. A first version read any "pull"
+  // in a goal as asking for rows, and the weightlifter's "Maintain back squat
+  // and pulling strength" stopped producing his own finding about four rowing
+  // exposures: a lifter's pulling strength is the snatch and clean pull, not a
+  // horizontal row. So push and pull only count where the goal asks for a
+  // general base -- "general", "foundation", "base" in the same clause -- and the
+  // muscle-up counts for the pull and the press-out that make it up.
+  const askedFor = new Set();
+  if (/\bmuscle[- ]?ups?\b/i.test(goalText)) { askedFor.add('vertical_pull'); askedFor.add('horizontal_press'); }
+  const foundationClauses = (goalText.match(/[^.;|]*\b(?:general|foundation(?:al)?|base)\b[^.;|]*/gi) || []).join(' ');
+  if (/\bpush(?:ing)?\b(?![- ]?ups?\b)/i.test(foundationClauses)) { askedFor.add('horizontal_press'); askedFor.add('vertical_press'); }
+  if (/\bpull(?:ing)?\b(?![- ]?ups?\b)/i.test(foundationClauses)) { askedFor.add('vertical_pull'); askedFor.add('horizontal_pull'); }
+
+  const serves = (fn, names) => askedFor.has(fn)
+    || names.some((n) => families.some((f) => f.test(n))
     || benched.some((b) => movementFunction(b) === fn && families.some((f) => f.test(b))));
 
   const byWeek = new Map();

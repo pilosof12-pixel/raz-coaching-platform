@@ -75,3 +75,28 @@ test('the live footballer block carries the same redundant pair', () => {
   assert.equal(live.length, 1);
   assert.deepEqual(live[0].functions, ['horizontal_pull']);
 });
+
+// A function can serve a goal without sharing a word with it. The youth
+// gymnast was charged for "horizontal press (Ring Dip, Ring Push-up)" serving
+// none of her goals, while her secondary goal asks for "a strong general push and
+// pull foundation" and the dip is the press-out that finishes the bar muscle-up
+// her primary goal names.
+test('a general push foundation and a muscle-up goal make pressing goal work', () => {
+  const H2 = 'Day\tExercise\tWeight\tSets\tReps\tRest\tTarget RPE\tNotes\tResults';
+  const prog = ['START_WEEK1_TSV', H2,
+    'Session A\tRing Dip\tBW\t3\t4\t2 min\t7\tControlled.\t',
+    'Session B\tRing Push-up\tBW\t3\t8\t90s\t7\tControlled.\t',
+    'END_WEEK1_TSV'].join('\n');
+  const youth = { primary_goals: ['Achieve first bar muscle-up'], secondary_goals: ['Build a strong general push and pull foundation'] };
+  assert.deepEqual(accessoryRedundancy(prog, youth), []);
+  // Without either goal, the same two presses are still a redundant pair.
+  const other = { primary_goals: ['220kg back squat'], secondary_goals: [] };
+  assert.equal(accessoryRedundancy(prog, other).length, 1);
+});
+
+// The narrow half, which a test enforced: a lifter's "pulling strength" is the
+// competition pull, not a row, and must not excuse four rowing exposures.
+test('"pulling strength" without a general-base clause does not excuse rows', () => {
+  const lifter = accessoryRedundancy(read('run101_weightlifter_peak.txt'), C.weightlifter_peak);
+  assert.deepEqual(lifter[0].functions, ['horizontal_pull']);
+});
