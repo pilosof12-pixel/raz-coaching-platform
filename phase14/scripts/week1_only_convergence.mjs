@@ -671,6 +671,17 @@ import { buildWeeksFromWeekOne, week1OnlyApplies } from '../engine/week_progress
 import { validatePhase15FinalProgram } from '../engine/phase15_final_qa.js';
 // Week-1-only convergence: the model writes Week 1, the engine builds Weeks 2-4,
 // and the result must clear the production bundle and the save boundary.
+if (process.env.LATEST) {
+  for (const id of ['advanced_hybrid', 'youth_gymnastics', 'masters_return', 'sprint_triathlete']) {
+    const prog = fs.readFileSync(path.join(root, '..', '..', 'docs', 'qa', 'live-three-avatar', 'latest', `${id}-program.txt`), 'utf8');
+    const intake = INTAKES[id];
+    const f = [...gradeProgram(prog, intake)];
+    for (const fn of [...RACE_BLOCK_RULES, ...EVENT_COMPONENT_RULES]) { try { f.push(...(fn(prog, intake) || [])); } catch {} }
+    const costed = f.filter((x) => DEDUCTIONS[COACH_COST[x.rule || x.code]]);
+    console.log(id.padEnd(22), 'severity', coachSeverity(prog, intake).toFixed(2), '|', costed.map((x) => `${x.rule || x.code}: ${String(x.detail || x.message || '').slice(0, 160)}`).join(' || '));
+  }
+  process.exit(0);
+}
 const out = [];
 for (const [id, intake] of Object.entries(INTAKES)) {
   const base = fixture(id);
