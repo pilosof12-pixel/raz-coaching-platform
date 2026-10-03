@@ -1,0 +1,81 @@
+Match day is Wednesday and Saturday, and every session in this block is placed by its distance from match day. No added conditioning here: practice and games already cover that. This block keeps the gym dose short, direct and repeatable so you stay available, keep some jump pop in the week, and hold lower-body strength without poking the tendon. Back squat is deliberately out for now; Trap Bar Deadlift plus split-squat work covers the same job with a friendlier symptom profile in this schedule.
+
+Weeks 2-4: Week 2 adds one small Monday jump set if height stays crisp. Week 3 keeps the jump dose steady and lengthens the tendon isometric slightly if the knee response stayed normal. Week 4 cuts non-essential volume and trims a rep from the main lifts so you finish fresher, not flatter.
+
+Pain guidance: keep tendon pain during the session at or below your usual training level, and if the next morning is clearly worse than your normal post-game baseline, first reduce split-squat load or ROM, then repeat the last clean week. Thursday is the recovery-contingent day after Wednesday’s game; if you come in heavy, keep the quality work and drop the last accessory first.
+
+WEEKLY SCHEDULE
+The sport is the load. The gym is placed around it, and the day before a match is protected.
+
+ | Mon | Tue | Wed | Thu | Fri | Sat | Sun
+Every week | Basketball, semi-professional moderate + gym | Basketball, semi-professional hard (protected) | Basketball, semi-professional MATCH | Basketball, semi-professional moderate + gym | Basketball, semi-professional light (protected) | Basketball, semi-professional MATCH | rest
+
+This repeats for all four weeks: the fixture repeats, so the week does. Progress is measured in what the athlete can do on this schedule, not in load added to it.
+
+START_WEEK1_TSV
+Day	Exercise	Weight	Sets	Reps	Rest	Target RPE	Notes	Results
+Mon	[WARMUP] Band Pull-Apart Warm-up	Bodyweight	2	12	30s	3	2 quick rounds, then 2 ramp sets each for Trap Bar Deadlift and Bench Press.; Hip-hinge drill x 8; Glute bridge x 10; Squat-and-reach x 6; Bodyweight squat x 8; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Ramp Trap Bar Deadlift: 57.5 kg x 5, 87.5 kg x 3, 112.5 kg x 1-2 before 145 kg work sets.; Ramp Bench Press: 32.5 kg x 5, 47.5 kg x 3, 62.5 kg x 1-2 before 80 kg work sets.	
+Mon	Bodyweight Squat	Bodyweight	4	30s	30s	5	MD-2: 2 days before the match. Isometric hold at a tolerable knee angle for patellar tendon management; keep pain no higher than your usual training level.	
+Mon	Box Jump	Bodyweight	3	2	60-75s	N/A	Reset every rep; crisp take-off and quiet landing; stop before jump height drops.	
+Mon	Trap Bar Deadlift	145 kg	2	3	2-3 min	6.5	About 81% of your 180 x 3. Low-fatigue strength maintenance; stop after 1-2 sets if RPE goes over 7.5, lockout slows, or legs feel heavy from court work.	
+Mon	Bench Press	80 kg	2	3	2 min	6.5	About 80% of your 100 x 5 benchmark load. Maintenance dose only; fast even lockout, and hold the load if bar speed says no. Week 1 standard: set the benchmark. Use a load you can repeat cleanly on every set and note a controlled lowering and a lockout that does not slow down across sets - that is what Weeks 2 and 3 are measured against, not a bigger number.	
+Mon	Seated Cable Row	RPE-selected load	2	8	75-90s	7	Choose a load that leaves 2 reps in reserve on set 2; 1 second squeeze to torso and record the stack pin used.	
+Mon	Side Plank	Bodyweight	2	30s/side	30s	5	Trunk brace; straight line from head to heel.	
+Thu	[WARMUP] Cossack Squat Warm-up	Bodyweight	2	5/side	30s	3	Move easy, then 2 ramp sets for Dumbbell Bulgarian Split Squat and Chin-up.; Squat-and-reach x 6; Bodyweight squat x 8; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12	
+Thu	Bodyweight Squat	Bodyweight	4	30s	30s	5	MD-6: 6 days before the match. Isometric hold at a tolerable knee angle for patellar tendon management; same pain rule as Monday.	
+Thu	Box Jump	Bodyweight	2	2	60-75s	N/A	Short sharp primer only; full reset and no chasing fatigue.	
+Thu	Dumbbell Bulgarian Split Squat	RPE-selected load	2	5/side	90s	7	Pick dumbbells that leave 2 reps in reserve on the last set and record the load used; smooth down, fast up.	
+Thu	Chin-up	Bodyweight	3	5	90s	6.5	Full hang each rep, no swing; keep 2-3 clean reps in reserve. Week 1 standard: set the benchmark. Use a load you can repeat cleanly on every set and note a full range from a dead hang, finishing with the back rather than a kip - that is what Weeks 2 and 3 are measured against, not a bigger number.	
+Thu	Side Plank	Bodyweight	2	30s/side	30s	5	Low-cost trunk work; this is the first thing to remove if Wednesday’s match left you flat.	
+END_WEEK1_TSV
+
+START_WEEK2_TSV
+Day	Exercise	Weight	Sets	Reps	Rest	Target RPE	Notes	Results
+Mon	[WARMUP] Band Pull-Apart Warm-up	Bodyweight	2	12	30s	3	2 quick rounds, then 2 ramp sets each for Trap Bar Deadlift and Bench Press.; Hip-hinge drill x 8; Glute bridge x 10; Squat-and-reach x 6; Bodyweight squat x 8; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Ramp Trap Bar Deadlift: 57.5 kg x 5, 87.5 kg x 3, 112.5 kg x 1-2 before 145 kg work sets.; Ramp Bench Press: 32.5 kg x 5, 47.5 kg x 3, 62.5 kg x 1-2 before 80 kg work sets.	
+Mon	Bodyweight Squat	Bodyweight	4	30s	30s	5	MD-2: 2 days before the match. Isometric hold at a tolerable knee angle for patellar tendon management; keep pain no higher than your usual training level.	
+Mon	Box Jump	Bodyweight	4	2	60-75s	N/A	Add only this one extra set if Week 1 height stayed crisp; same box, same landing quality, stop before any drop.	
+Mon	Trap Bar Deadlift	145 kg	2	3	2-3 min	6.5	Same load on purpose; beat Week 1 with cleaner speed off the floor and a controlled lockout. Stop if RPE goes over 7.5 or legs feel heavy.	
+Mon	Bench Press	80 kg	2	3	2 min	6.5	Same maintenance dose on purpose; match Week 1 with faster lockout and even bar path. Week 2 advance: beat Week 1 on a controlled lowering and a lockout that does not slow down across sets, at the same or a lower RPE. The numbers hold on purpose - this week the progression is execution.	
+Mon	Seated Cable Row	RPE-selected load	2	8	75-90s	7	Use last week’s load as the start point, keep 2 reps in reserve, and beat Week 1 with a cleaner pause to torso.	
+Mon	Side Plank	Bodyweight	2	30s/side	30s	5	Same dose; own the brace and keep hips stacked.	
+Thu	[WARMUP] Cossack Squat Warm-up	Bodyweight	2	5/side	30s	3	Move easy, then 2 ramp sets for Dumbbell Bulgarian Split Squat and Chin-up.; Squat-and-reach x 6; Bodyweight squat x 8; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12	
+Thu	Bodyweight Squat	Bodyweight	4	30s	30s	5	MD-6: 6 days before the match. Isometric hold at a tolerable knee angle for patellar tendon management; same pain rule as Monday.	
+Thu	Box Jump	Bodyweight	2	2	60-75s	N/A	Same low dose; fast clean contacts only, no fatigue chase.	
+Thu	Dumbbell Bulgarian Split Squat	RPE-selected load	2	5/side	90s	7	Match last week’s load if the tendon was calm the next morning; make both sides look the same. Load selection: pick a weight you could stop with about 3 clean reps still in reserve on the last set, write it in the Results column, and start from that number next week.	
+Thu	Chin-up	Bodyweight	3	5	90s	6.5	Same reps on purpose; full hang, no swing, and smoother top position than Week 1. Week 2 advance: beat Week 1 on a full range from a dead hang, finishing with the back rather than a kip, at the same or a lower RPE. The numbers hold on purpose - this week the progression is execution.	
+Thu	Side Plank	Bodyweight	2	30s/side	30s	5	Low-cost trunk work; remove this first if recovery is poor after the Wednesday game.	
+END_WEEK2_TSV
+
+START_WEEK3_TSV
+Day	Exercise	Weight	Sets	Reps	Rest	Target RPE	Notes	Results
+Mon	[WARMUP] Band Pull-Apart Warm-up	Bodyweight	2	12	30s	3	2 quick rounds, then 2 ramp sets each for Trap Bar Deadlift and Bench Press.; Hip-hinge drill x 8; Glute bridge x 10; Squat-and-reach x 6; Bodyweight squat x 8; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Ramp Trap Bar Deadlift: 57.5 kg x 5, 87.5 kg x 3, 112.5 kg x 1-2 before 145 kg work sets.; Ramp Bench Press: 32.5 kg x 5, 47.5 kg x 3, 62.5 kg x 1-2 before 80 kg work sets.	
+Mon	Bodyweight Squat	Bodyweight	4	35s	30s	5	MD-2: 2 days before the match. Lengthen the isometric only if Weeks 1-2 stayed at baseline the next morning; same pain ceiling as before.	
+Mon	Box Jump	Bodyweight	4	2	60-75s	N/A	Hold the set count; beat Week 2 with cleaner take-off and landing, or a slightly higher box only if speed looks identical.	
+Mon	Trap Bar Deadlift	145 kg	2	3	2-3 min	6.5	Same load on purpose in season; make rep 3 look like rep 1 and stop if RPE goes over 7.5 or bar speed clearly falls.	
+Mon	Bench Press	80 kg	2	3	2 min	6.5	Same maintenance dose; own the same load with no slowdown through lockout. Week 3 advance: hold the numbers once more and keep a controlled lowering and a lockout that does not slow down across sets. If every set in Week 2 was clean at or below the target RPE, you may add one clean rep to the last set only - earned, optional, and skipped entirely on any slowdown, symptom or loss of position.	
+Mon	Seated Cable Row	RPE-selected load	2	8	75-90s	7	Keep 2 reps in reserve and aim to use the same or one-pin-higher load only if the pause and torso position stay clean.	
+Mon	Side Plank	Bodyweight	2	30s/side	30s	5	Same trunk dose; no sagging or rotation.	
+Thu	[WARMUP] Cossack Squat Warm-up	Bodyweight	2	5/side	30s	3	Move easy, then 2 ramp sets for Dumbbell Bulgarian Split Squat and Chin-up.; Squat-and-reach x 6; Bodyweight squat x 8; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12	
+Thu	Bodyweight Squat	Bodyweight	4	35s	30s	5	MD-6: 6 days before the match. Lengthen the isometric only if the knee response after the last two weeks stayed normal.	
+Thu	Box Jump	Bodyweight	2	2	60-75s	N/A	Same low-cost primer; keep the height honest and stop early if contacts get slower.	
+Thu	Dumbbell Bulgarian Split Squat	RPE-selected load	2	5/side	90s	7	Same set and rep dose; keep 2 reps in reserve and make the right side accept the same load and rhythm as the left.	
+Thu	Chin-up	Bodyweight	3	5	90s	6.5	Same dose; full hang, still no swing, and cleaner chest-to-bar line without craning. Week 3 advance: hold the numbers once more and keep a full range from a dead hang, finishing with the back rather than a kip. If every set in Week 2 was clean at or below the target RPE, you may add one clean rep to the last set only - earned, optional, and skipped entirely on any slowdown, symptom or loss of position.	
+Thu	Side Plank	Bodyweight	2	30s/side	30s	5	Low-cost trunk work; remove this first if the Wednesday match took more out of you than usual.	
+END_WEEK3_TSV
+
+START_WEEK4_TSV
+Day	Exercise	Weight	Sets	Reps	Rest	Target RPE	Notes	Results
+Mon	[WARMUP] Band Pull-Apart Warm-up	Bodyweight	2	12	30s	3	2 quick rounds, then 2 ramp sets each for Trap Bar Deadlift and Bench Press.; Hip-hinge drill x 8; Glute bridge x 10; Squat-and-reach x 6; Bodyweight squat x 8; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12; Ramp Trap Bar Deadlift: 57.5 kg x 5, 87.5 kg x 3, 112.5 kg x 1-2 before 145 kg work sets.; Ramp Bench Press: 32.5 kg x 5, 47.5 kg x 3, 62.5 kg x 1-2 before 80 kg work sets.	
+Mon	Bodyweight Squat	Bodyweight	4	30s	30s	5	MD-2: 2 days before the match. Back to the Week 1 hold time for consolidation; keep pain at or below your usual training level.	
+Mon	Box Jump	Bodyweight	3	2	60-75s	N/A	Volume trims this week; keep the best Week 3 height and landing standard.	
+Mon	Trap Bar Deadlift	145 kg	2	2	2-3 min	6.5	Consolidation week: same load, one less rep per set, and every rep should look sharp. Stop early if legs are heavy.	
+Mon	Bench Press	80 kg	2	2	2 min	6.5	Consolidation week: same load, lower total reps, same fast lockout.	
+Mon	Seated Cable Row	RPE-selected load	1	8	75-90s	7	One set only this week; use last week’s clean load and keep 2 reps in reserve.	
+Mon	Side Plank	Bodyweight	1	30s/side	30s	5	One set only; keep the brace crisp.	
+Thu	[WARMUP] Cossack Squat Warm-up	Bodyweight	2	5/side	30s	3	Move easy, then 2 ramp sets for Dumbbell Bulgarian Split Squat and Chin-up.; Squat-and-reach x 6; Bodyweight squat x 8; Scapular pull-up 2 x 5-6; Band pull-apart x 10-12	
+Thu	Bodyweight Squat	Bodyweight	4	30s	30s	5	MD-6: 6 days before the match. Back to the Week 1 hold time for consolidation; same pain rule as Monday.	
+Thu	Box Jump	Bodyweight	1	2	60-75s	N/A	Just enough to stay sharp; match the best clean take-off and landing from Week 3.	
+Thu	Dumbbell Bulgarian Split Squat	RPE-selected load	1	5/side	90s	7	One set per side this week; use a clean Week 3 load and stop well before any grind. Load selection: pick a weight you could stop with about 3 clean reps still in reserve on the last set, write it in the Results column, and start from that number next week.	
+Thu	Chin-up	Bodyweight	2	5	90s	6.5	Trimmed volume this week; keep the same full-hang standard and 2-3 reps in reserve.	
+Thu	Side Plank	Bodyweight	1	30s/side	30s	5	Low-cost trunk work; remove this first if recovery is poor after the Wednesday game.	
+END_WEEK4_TSV

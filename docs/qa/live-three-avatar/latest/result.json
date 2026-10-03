@@ -1,67 +1,67 @@
 {
-  "timestamp": "2026-10-02T15:51:19.151Z",
+  "timestamp": "2026-10-03T07:17:28.521Z",
   "base": "https://raz-coaching-platform.onrender.com",
-  "head_sha": "2b7d36c26d074128c1823e96a21a3836c87f7d5f",
-  "runtime": "live94 2026-10-02T15:52:00Z",
+  "head_sha": "bdf824805ed8f7aff5aa5a9225255a4eac18c33c",
+  "runtime": "live95 2026-10-03T00:00:00Z",
   "results": [
     {
       "id": "advanced_hybrid",
-      "job_id": "ecf8225456d980e68ec7dff73073cf50",
+      "job_id": "da834e749c788ecfaab10a9ea1f9b386",
       "ok": true,
       "status": "done",
       "stage": "finalizing",
       "attempt": 2,
-      "detail": "saving program after 2 model call(s) QA trace: E0:medium -> A1:WEEKLY_MRV_EXCEEDED+EVENT_PROGRESSING_SESSION_MISSING. First failure evidence: PRIOR ATTEMPT FAILED WEEKLY VOLUME VALIDATION. The following single-week workload is grossly above the internal reference band: [Week 1 pull: 35.8 (17 program + 18.8 sport baseline debit; raw sport heuristic 25) vs reference 25; Week 1 push: 33.5 (17 program + 16.5 sport baseline debit; raw sport heuristic 30) vs reference 22; Week 2 pull: 35.8 (17 program + 18.8 sport baseline debit; raw sport heuristic 25) vs reference 25; Week 2 push: 32.5 (16 program + 16.5 sport baseline debit; raw sport heuristic 30) vs reference 22; Week 3 pull: 35.8 (17 program + 18.8 sport baseline debit; raw sport he",
+      "detail": "saving program after 2 model call(s) QA trace: E0:medium -> A1:V34_NOTE_REP_WORD_MISMATCH. First failure evidence: Prescription/note consistency: Side Plank (Week 4) prescribes 30 rep(s) per set but its note describes Single. Make every quantitative claim in a note agree with that row's own Sets, Reps and Weight fields, or state it as an explicitly conditional option. Do not reference a load that is neither prescribed on the row nor an established benchmark. Timing: total 258s, model 249s across 2 call(s), engine 8s.",
       "last_seen_status": "done",
       "error": null,
-      "program_chars": 28418,
-      "seconds": 491
+      "program_chars": 25566,
+      "seconds": 261
     },
     {
       "id": "youth_gymnastics",
-      "job_id": "94ed05cde783346cbd045ea113fa0f92",
+      "job_id": "8851b03f7ed0c487f86d5564cadb0bb6",
       "ok": true,
       "status": "done",
       "stage": "finalizing",
       "attempt": 4,
-      "detail": "delivered with unresolved rules: YOUTH_REDUNDANT_HANDSTAND_CAPACITY QA trace: E0:medium -> A1:YOUTH_REDUNDANT_HANDSTAND_CAPACITY+V43_SKILL_QUOTA_WITHOUT_CEILING -> A2:YOUTH_REDUNDANT_HANDSTAND_CAPACITY -> A3:YOUTH_REDUNDANT_HANDSTAND_CAPACITY -> A4:YOUTH_REDUNDANT_HANDSTAND_CAPACITY. First failure evidence: PRIOR ATTEMPT FAILED YOUTH PER-SESSION SKILL-QUALITY VALIDATION. Week 1 session a duplicates static handstand capacity (Freestanding Handstand Hold + Wall Handstand Hold); Week 1 session b duplicates static handstand capacity (Freestanding Handstand Hold + Handstand Hold); Week 2 session a duplicates static handstand capacity (Freestanding Handstand Hold + Wall Handstand Hold); Week 2 session b duplicates static handstand capacity (Freestanding Handstand Hold + Handstand Hold); Week 3 session a duplicates static handstand capacity (Freestanding Handstand Hold + Wall Handstand Hold); Week 3 ses",
+      "detail": "delivered with unresolved rules: YOUTH_PRIMARY_SKILL_NOT_FRESH+TSV_ROW_COLUMN_COUNT_MISMATCH QA trace: E0:medium -> A1:YOUTH_PRIMARY_SKILL_NOT_FRESH -> A2:YOUTH_PRIMARY_SKILL_NOT_FRESH -> A3:YOUTH_PRIMARY_SKILL_NOT_FRESH -> A4:YOUTH_PRIMARY_SKILL_NOT_FRESH. First failure evidence: Week 1 session a: primary bar-muscle-up/handstand skill work appears after 1 support exercise(s). Put primary skill practice first while fresh, then foundation strength and accessories.",
       "last_seen_status": "done",
       "error": null,
-      "program_chars": 18289,
-      "seconds": 528
+      "program_chars": 23651,
+      "seconds": 426
     },
     {
-      "id": "tactical_3k",
-      "job_id": "227641d8ecdbaace30050417d8d2dc98",
-      "ok": false,
-      "status": "error",
-      "stage": "generating",
-      "attempt": 2,
-      "detail": "regenerating after quality check [E0:medium -> T1:request_ceiling@low -> A1:SPORT_DAY_COUPLING_VIOLATION+PULL_UP_DOSE_EXCEEDS_KNOWN_CAPACITY+TACTICAL_GPP_COVERAGE_MISSING]",
-      "last_seen_status": "error",
-      "error": "You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/.",
-      "program_chars": 0,
-      "seconds": 701
+      "id": "sprint_triathlete",
+      "job_id": "8bc6bd360b1ce61d69e5f3973f6febb5",
+      "ok": true,
+      "status": "done",
+      "stage": "finalizing",
+      "attempt": 3,
+      "detail": "saving program after 3 model call(s) QA trace: E0:medium -> A1:TARGET_MODALITY_EXPOSURE_REDUCED+TARGET_MODALITY_EXPOSURE_REDUCED+EVENT_PROGRESSING_SESSION_MISSING -> A2:TARGET_MODALITY_EXPOSURE_REDUCED. First failure evidence: Week 4: running is a named primary performance goal. The intake documents about 3 current running exposure(s) per week, but this week programs 2. Do not silently remove target-modality practice; preserve the athlete's stated current exposure unless the authored plan makes and explains a deliberate recovery tradeoff. Timing: total 565s, model 556s across 3 call(s), engine 8s.",
+      "last_seen_status": "done",
+      "error": null,
+      "program_chars": 19838,
+      "seconds": 567
     },
     {
       "id": "inseason_basketball",
-      "job_id": "aea714e1f74ecadccd8b85b2b3d1e773",
-      "ok": false,
-      "status": "error",
-      "stage": "generating",
+      "job_id": "340606ed61a05edba10758932c91b257",
+      "ok": true,
+      "status": "done",
+      "stage": "finalizing",
       "attempt": 1,
-      "detail": "initial generation",
-      "last_seen_status": "error",
-      "error": "You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/.",
-      "program_chars": 0,
-      "seconds": 4
+      "detail": "saving program after 1 model call(s) QA trace: E0:medium. Timing: total 169s, model 168s across 1 call(s), engine 1s.",
+      "last_seen_status": "done",
+      "error": null,
+      "program_chars": 12994,
+      "seconds": 171
     }
   ],
   "selection": [
     "advanced_hybrid",
     "youth_gymnastics",
-    "tactical_3k",
+    "sprint_triathlete",
     "inseason_basketball"
   ],
-  "ok": false
+  "ok": true
 }
