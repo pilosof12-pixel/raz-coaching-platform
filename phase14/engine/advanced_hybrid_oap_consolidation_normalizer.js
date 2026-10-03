@@ -88,7 +88,21 @@ function addOapBuildStandard(program, intake, repairs) {
     if (!parsed || !Number.isInteger(parsed.index.notes)) continue;
     const rows = strictRows(parsed);
     if (!rows.length) continue;
-    const { marker, cue } = OAP_BUILD_STANDARD[week];
+    const { marker } = OAP_BUILD_STANDARD[week];
+    let { cue } = OAP_BUILD_STANDARD[week];
+    // The cue says what advances; it must not claim "same set count" over a
+    // week whose strict sets went up (the Week-1-only engine adds a short set
+    // as the clean-rep progression near the max).
+    if (week > 1) {
+      const w1 = parseWeek(candidate, 1);
+      const before = w1 ? totalSets(strictRows(w1)) : null;
+      const now = totalSets(rows);
+      if (before != null && now > before) {
+        cue = week === 2
+          ? 'Week 2 advance: one more short strict set than Week 1 - more clean reps, never a longer set than you own. Every single from a dead hang; stop a set at the first grind.'
+          : 'Week 3 advance: keep the Week 2 volume. A longer set is earned only if every Week 2 rep was clean at or below the target RPE with elbows and forearms normal - skipped entirely on any grind, miss or elbow niggle.';
+      }
+    }
     let changed = false;
     for (const { cells } of rows) {
       const note = String(cells[parsed.index.notes] || '').trim();
