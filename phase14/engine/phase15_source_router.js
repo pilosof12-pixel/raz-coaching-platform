@@ -2,6 +2,7 @@
 // Grounds compact generation in the authored RAZ coaching engine.
 
 import fs from 'node:fs';
+import { activeTendon } from './tendon_isometric_rule.js';
 
 const STOP = new Set(['about','after','again','also','around','because','before','between','build','client','could','days','from','goal','goals','have','into','like','more','most','only','other','over','program','session','sessions','some','than','that','their','them','then','they','this','training','using','very','want','week','weekly','what','when','where','which','while','with','without','work','would','your']);
 
@@ -161,6 +162,15 @@ function exerciseFamilyTerms(intake = {}) {
   return [...terms];
 }
 
+// Names a rule in the prompt asks for by name, so the catalog must offer them
+// whatever the cap cuts. Run #163's basketball block was asked for a wall-sit
+// hold, could only choose from a catalog without one -- "Wall Sit" sorts past
+// the 120-name cap -- and wrote "Bodyweight Squat 4 x 30s" instead.
+function requiredExerciseTerms(intake = {}) {
+  const tendon = activeTendon(intake);
+  return tendon ? (tendon.catalog || []) : [];
+}
+
 export function canonicalExerciseCatalog(exerciseDictionary, intake = {}) {
   const all = [...(exerciseDictionary || [])].map(String).filter(Boolean);
   if (all.length < 50) throw new Error('SOURCE_GROUNDING_EXERCISE_CATALOG_TOO_SMALL');
@@ -173,7 +183,11 @@ export function canonicalExerciseCatalog(exerciseDictionary, intake = {}) {
   // canonical names rather than sending the entire library and breaking prompt-size limits.
   const unique = [...new Set(selected)].sort((a,b)=>a.localeCompare(b));
   const fallback = all.filter(x=>!unique.includes(x)).slice(0, Math.max(0, 60-unique.length));
-  return [...unique, ...fallback].slice(0, 120).join(' | ');
+  const required = requiredExerciseTerms(intake);
+  const must = required.length
+    ? [...new Set(all.filter(name => required.some(term => name.toLowerCase().includes(term))))]
+    : [];
+  return [...must, ...[...unique, ...fallback].filter(x => !must.includes(x))].slice(0, 120).join(' | ');
 }
 
 export function buildPhase15SourceGrounding(engineText, intake, exerciseDictionary) {

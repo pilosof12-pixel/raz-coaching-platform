@@ -17,9 +17,9 @@
 const flat = (v) => (Array.isArray(v) ? v.map(flat).join(' | ') : v && typeof v === 'object' ? JSON.stringify(v) : String(v || ''));
 
 const TENDONS = [
-  { name: 'patellar tendon', re: /\bpatellar\b|\bjumper'?s knee\b|\bpatellar tendin/i, hold: 'a Wall Sit or a single-leg wall hold at a knee angle that is tolerable' },
-  { name: 'achilles tendon', re: /\bachilles\b/i, hold: 'a calf-raise hold at mid-range, double then single leg' },
-  { name: 'hamstring tendon', re: /\bproximal hamstring\b|\bhamstring (?:origin|tendin)/i, hold: 'a supine bridge hold or isometric hamstring bridge at a tolerable hip angle' },
+  { name: 'patellar tendon', re: /\bpatellar\b|\bjumper'?s knee\b|\bpatellar tendin/i, hold: 'a Wall Sit or a single-leg wall hold at a knee angle that is tolerable', catalog: ['wall sit'] },
+  { name: 'achilles tendon', re: /\bachilles\b/i, hold: 'a calf-raise hold at mid-range, double then single leg', catalog: ['calf raise'] },
+  { name: 'hamstring tendon', re: /\bproximal hamstring\b|\bhamstring (?:origin|tendin)/i, hold: 'a supine bridge hold or isometric hamstring bridge at a tolerable hip angle', catalog: ['glute bridge'] },
 ];
 
 export function activeTendon(intake = {}) {
