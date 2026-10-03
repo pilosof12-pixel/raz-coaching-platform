@@ -117,3 +117,13 @@ test('the model is asked for Week 1 only, and the runtime builds Weeks 2-4 befor
   const chain = runtime.indexOf('const finished = runQualityChain(program);', build);
   assert.ok(build > 0 && structural > build && chain > structural, 'built weeks are judged like any other candidate');
 });
+
+test('a race-pace run is never called easy', () => {
+  const out = buildWeeksFromWeekOne(w1([
+    'Fri\tRun\t4:48-4:55/km\t1\t6 km\tN/A\t7\tRace-specific brick run.\t',
+    'Wed\tRun\t5:15-5:35/km\t1\t8 km\tN/A\t3-4\tEasy aerobic run.\t',
+  ]), { primary_goals: ['Sprint triathlon sub-1:15'] }).program;
+  const notes = (day) => [2, 3, 4].map((w) => out.match(new RegExp(`START_WEEK${w}_TSV[\\s\\S]*?\\n(${day}\\tRun\\t[^\\n]*)`))[1].split('\t')[7]);
+  for (const n of notes('Fri')) assert.doesNotMatch(n, /\beasy\b/i);
+  assert.match(notes('Wed')[0], /same easy effort/);
+});

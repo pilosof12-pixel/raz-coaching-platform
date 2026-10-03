@@ -253,7 +253,17 @@ function progressRow(cells, p, role, week, plateau) {
       const factor = { 2: 1.1, 3: 1.2, 4: 0.85 }[week];
       const unitKm = /\d\s*km\b/i.test(reps);
       c[p.reps] = bumpFirst(reps, (n) => (unitKm ? Math.max(1, round(n * factor, 0.5)) : Math.max(5, round(n * factor, 5))));
-      note = week === 4 ? 'Consolidation: shorter, fully easy, finishing fresher than Week 3.' : `About 10% more than ${week === 2 ? 'Week 1' : 'Week 2'}; same easy effort. Distance or time is the only lever.`;
+      // "Easy" only where the row is easy. A race-pace brick at RPE 7 called
+      // "same easy effort" is a low-intensity label on race pace, and
+      // LOW_INTENSITY_PACE_CONTRADICTS_CURRENT_PERFORMANCE refused it week by
+      // week: three repairs on run #165's triathlete.
+      const rpeNums = String(Number.isInteger(rpeIdx) ? c[rpeIdx] : '').match(/\d+(?:\.\d+)?/g);
+      const rpeTop = rpeNums ? Math.max(...rpeNums.map(Number)) : null;
+      const easy = (rpeTop != null && rpeTop <= 5) || (rpeTop == null && /\b(?:easy|conversational|zone ?2|recovery|aerobic)\b/i.test(`${cells[p.notes] || ''} ${Number.isInteger(p.load) ? cells[p.load] : ''}`));
+      const effort = easy ? 'same easy effort' : 'same pace and effort';
+      note = week === 4
+        ? (easy ? 'Consolidation: shorter, fully easy, finishing fresher than Week 3.' : 'Consolidation: shorter at the same pace, finishing fresher than Week 3.')
+        : `About 10% more than ${week === 2 ? 'Week 1' : 'Week 2'}; ${effort}. Distance or time is the only lever.`;
     }
   }
 
