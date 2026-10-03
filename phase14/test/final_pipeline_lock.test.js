@@ -108,7 +108,8 @@ test('all repairable validator failures use one grounded internal repair path', 
   assert.match(out, /buildInternalQualityRepairPrompt/);
   assert.match(out, /buildDeterministicBrief\(intake\)/);
   assert.match(out, /phase15PromptRules\(intake\)/);
-  assert.match(out, /buildPhase15SourceGrounding\(ENGINE, intake, EXERCISE_DICTIONARY\)/);
+  // The athlete's own rules travel with it, so every exercise they name is in the catalog.
+  assert.match(out, /buildPhase15SourceGrounding\(ENGINE, intake, EXERCISE_DICTIONARY, \[skeleton, quality\]\)/);
   assert.match(out, /RETRIABLE_CODES\.has\(err\.code\)/);
   assert.match(out, /PHASE15_QUALITY_VIOLATION/);
   assert.match(out, /buildRolePreservingRepairFeedback\(err, intake\)/);

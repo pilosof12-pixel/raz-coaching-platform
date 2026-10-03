@@ -159,6 +159,11 @@ export function exerciseFamilyTerms(intake = {}) {
   if (/handstand|hspu/.test(raw)) add(['handstand','pike push-up']);
   if (/dip/.test(raw)) add(['dip']);
   if (/park|rings/.test(raw)) add(['ring','dip','pull-up','chin-up','sprint','broad jump','split squat']);
+  // Sports whose own movements were never routed.
+  if (/weightlift|snatch|clean and jerk|clean & jerk|olympic lift/.test(raw)) add(['snatch','clean','jerk','front squat','overhead squat','pull']);
+  if (/hyrox/.test(raw)) add(['sled','wall ball','ski','burpee','farmer','sandbag','lunge','row','run']);
+  if (/basketball|football|soccer|rugby|handball|volleyball|vertical jump|team sport/.test(raw)) add(['jump','bound','trap bar','sprint','nordic','copenhagen','romanian deadlift','bench press','medicine ball']);
+  if (/mma|boxing|muay|kickbox|wrestl|bjj|judo/.test(raw)) add(['trap bar','medicine ball','jump','neck','sled']);
   return [...terms];
 }
 
@@ -180,7 +185,24 @@ function requiredExerciseTerms(intake = {}) {
 // more prompt than before against a 70k budget.
 const CATALOG_CAP = 220;
 
-export function canonicalExerciseCatalog(exerciseDictionary, intake = {}) {
+// Exercise names this athlete's own rules name. A rule that says "use Trap Bar
+// Deadlift" while the catalog the model must choose from lacks it is two
+// instructions that cannot both be obeyed: the weightlifter's rules named
+// Snatch and Clean and Jerk, the Hyrox racer's named Sled Push and Wall Ball,
+// and neither catalog offered them.
+function namesInRules(all, ruleTexts = []) {
+  const text = (Array.isArray(ruleTexts) ? ruleTexts : [ruleTexts]).map(String).join('\n');
+  if (!text.trim()) return [];
+  const found = [];
+  let rest = text;
+  for (const name of [...all].sort((a, b) => b.length - a.length)) {
+    const re = new RegExp(`\\b${name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\b`, 'gi');
+    if (re.test(rest)) { found.push(name); rest = rest.replace(re, ' '); }
+  }
+  return found;
+}
+
+export function canonicalExerciseCatalog(exerciseDictionary, intake = {}, ruleTexts = []) {
   const all = [...(exerciseDictionary || [])].map(String).filter(Boolean);
   if (all.length < 50) throw new Error('SOURCE_GROUNDING_EXERCISE_CATALOG_TOO_SMALL');
   const terms = exerciseFamilyTerms(intake);
@@ -193,13 +215,14 @@ export function canonicalExerciseCatalog(exerciseDictionary, intake = {}) {
   const unique = [...new Set(selected)].sort((a,b)=>a.localeCompare(b));
   const fallback = all.filter(x=>!unique.includes(x)).slice(0, Math.max(0, 60-unique.length));
   const required = requiredExerciseTerms(intake);
-  const must = required.length
-    ? [...new Set(all.filter(name => required.some(term => name.toLowerCase().includes(term))))]
-    : [];
+  const must = [...new Set([
+    ...(required.length ? all.filter(name => required.some(term => name.toLowerCase().includes(term))) : []),
+    ...namesInRules(all, ruleTexts),
+  ])];
   return [...must, ...[...unique, ...fallback].filter(x => !must.includes(x))].slice(0, CATALOG_CAP).join(' | ');
 }
 
-export function buildPhase15SourceGrounding(engineText, intake, exerciseDictionary) {
+export function buildPhase15SourceGrounding(engineText, intake, exerciseDictionary, ruleTexts = []) {
   return [
     '=== CURATED COACHING SOURCE EXCERPTS ===',
     'These excerpts come from the authored RAZ coaching knowledge engine and the approved source-grounded Endurance / Conditioning cluster. Treat them as internal evidence, not client-facing copy. Do not use generic model memory to fill an unresolved source gap.',
@@ -207,6 +230,6 @@ export function buildPhase15SourceGrounding(engineText, intake, exerciseDictiona
     '',
     '=== CANONICAL EXERCISE CATALOG ===',
     'Exercise-column names must come from this catalog exactly. Do not paraphrase, pluralize, rename or invent exercise names. Aliases are handled by the deterministic server, not by the model.',
-    canonicalExerciseCatalog(exerciseDictionary, intake),
+    canonicalExerciseCatalog(exerciseDictionary, intake, ruleTexts),
   ].join('\n');
 }

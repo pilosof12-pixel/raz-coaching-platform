@@ -133,6 +133,10 @@ const DICTIONARY_LIST = [
   "Elliptical", "Leg Press Machine", "Seated Row Machine",
   // --- Bodyweight / gymnastics general ---
   "Push-up", "Diamond Push-up", "Decline Push-up", "Archer Push-up",
+  // The standard regressions. The engine's own push-up ladder (v53) names
+  // Incline Push-up as rung 1, and the gate rejected it as a hallucination, so
+  // a beginner, postpartum or masters block that used it paid a regeneration.
+  "Incline Push-up", "Knee Push-up",
   "Pull-up", "Chin-up", "Wide-Grip Pull-up", "Commando Pull-up",
   "Dip", "Ring Dip", "Bench Dip", "Parallel Bar Dip", "Korean Dip",
   "Inverted Row", "Ring Row", "Australian Pull-up", "Nordic Curl",
@@ -304,6 +308,8 @@ const ALIAS_LIST = [
   ["Chin Up", "Chin-up"],
   ["Push Up", "Push-up"],
   ["Pushup", "Push-up"],
+  ["Incline Pushup", "Incline Push-up"], ["Incline Push Up", "Incline Push-up"],
+  ["Knee Pushup", "Knee Push-up"], ["Kneeling Push-up", "Knee Push-up"],
   ["Pushups", "Push-up"],
   ["Pistol", "Pistol Squat"],
   ["Weighted Pistol", "Weighted Pistol Squat"],
@@ -701,8 +707,15 @@ const NORM_ALIAS = new Map([...EXERCISE_ALIASES].map(([k, v]) => [norm(k), v]));
 const NORM_SKILL_GRAPH = new Set();
 for (const family of SKILL_PROGRESSIONS.values()) {
   for (const rung of family.rungs || []) {
-    NORM_SKILL_GRAPH.add(norm(rung.name));
-    for (const name of rung.complementary || []) NORM_SKILL_GRAPH.add(norm(name));
+    // Under the form the lookup produces as well. coreExerciseName strips an
+    // equipment qualifier in parentheses before matching, so a rung stored as
+    // "Assisted Iron Cross (band)" was looked up as "Assisted Iron Cross" and
+    // never found: the engine wrote six of its own rung names into programs
+    // and its gate rejected every one as a hallucination.
+    for (const name of [rung.name, ...(rung.complementary || [])]) {
+      NORM_SKILL_GRAPH.add(norm(name));
+      NORM_SKILL_GRAPH.add(norm(String(name).replace(/\s*\([^)]*\)\s*/g, " ").trim()));
+    }
   }
 }
 

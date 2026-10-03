@@ -344,7 +344,7 @@ function buildOpenAICompactUser(userContent) {
   if (!intake) throw new Error("OpenAI compact path could not parse intake JSON.");
   const skeleton = buildDeterministicBrief(intake);
   const quality = phase15PromptRules(intake);
-  const sourceGrounding = buildPhase15SourceGrounding(ENGINE, intake, EXERCISE_DICTIONARY);
+  const sourceGrounding = buildPhase15SourceGrounding(ENGINE, intake, EXERCISE_DICTIONARY, [skeleton, quality]);
   return [
     "=== CLIENT INTAKE ===",
     JSON.stringify(intake),
@@ -2220,7 +2220,7 @@ app.get("/api/health", async (req, res) => {
 function buildInternalQualityRepairPrompt(intake, candidateProgram, validatorFeedback) {
   const skeleton = buildDeterministicBrief(intake);
   const quality = phase15PromptRules(intake);
-  const sourceGrounding = buildPhase15SourceGrounding(ENGINE, intake, EXERCISE_DICTIONARY);
+  const sourceGrounding = buildPhase15SourceGrounding(ENGINE, intake, EXERCISE_DICTIONARY, [skeleton, quality]);
   return [
     'INTERNAL QUALITY REPAIR MODE. This candidate has NOT been approved for the client.',
     'Repair ONLY the concrete validator defects below. Preserve every unaffected day, exercise, load, set, rep, rest period and coaching decision.',
