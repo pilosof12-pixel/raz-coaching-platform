@@ -4,6 +4,7 @@ import assert from 'node:assert/strict';
 import {
   validateTactical3KCoachingSpecV1,
   collectYouthCoachingSpecV1ReviewSignals,
+  validateAdvancedHybridCoachingSpecV1,
 } from '../engine/coaching_spec_v1_quality.js';
 import {
   normalizeAdvancedHybridSecondaryRunStability,
@@ -269,15 +270,65 @@ const advancedLiveIntake = {
   current_numbers: 'Back Squat: 205 kg 1RM | One-Arm Pull-up: 2 strict reps each arm | Running: 1 session a week, about 20 km total',
 };
 
-test('Advanced Hybrid convergence holds secondary long-run distance at the tolerated Week 1 dose', () => {
+// The secondary marathon used to be held flat at whatever the model wrote in
+// Week 1. On run162 that was 18 km for three weeks under an athlete whose
+// longest recent run is 20 km, with notes still promising 19 and 20 km. The
+// owner approved a small ladder instead: open at the tolerated distance, one
+// kilometre a week, consolidate in Week 4 (20 -> 21 -> 22 -> 18).
+const toleratedAdvancedIntake = {
+  ...advancedLiveIntake,
+  current_numbers: `${advancedLiveIntake.current_numbers}, longest recent run about 20 km`,
+};
+function longRuns(program) {
+  return [1, 2, 3, 4].map((week) => {
+    const m = program.match(new RegExp(`START_WEEK${week}_TSV[\\s\\S]*?END_WEEK${week}_TSV`));
+    return m[0].split('\n').filter((l) => /\tRun\t/.test(l)).map((l) => l.split('\t')[4]).join(',');
+  });
+}
+
+test('Advanced Hybrid secondary long run climbs one small step a week and consolidates in Week 4', () => {
   const program = fourWeeks((week) => [
     'Mon\tBack Squat\t170 kg\t3\t3\t3 min\t8\tPrimary squat.\t',
-    `Tue\tRun\tConversational easy pace\t1\t${[20,21,22,20][week-1]} km\tN/A\t5-6\tSecondary marathon run.\t`,
+    `Tue\tRun\tConversational easy pace\t1\t${[20,21,24,20][week-1]} km\tN/A\t5-6\tSecondary marathon run.\t`,
   ]);
   const repaired = normalizeAdvancedHybridSecondaryRunStability(program, advancedLiveIntake);
   assert.equal(repaired.repaired, true);
-  assert.doesNotMatch(repaired.program, /\t21 km\t|\t22 km\t/);
-  assert.equal((repaired.program.match(/\t20 km\t/g) || []).length, 4);
+  assert.deepEqual(longRuns(repaired.program), ['20 km', '21 km', '22 km', '18 km']);
+  assert.equal(normalizeAdvancedHybridSecondaryRunStability(repaired.program, advancedLiveIntake).repaired, false);
+});
+
+test('Advanced Hybrid long run never opens below the distance the athlete already tolerates, and its notes follow the table', () => {
+  const program = fourWeeks((week) => [
+    'Mon\tBack Squat\t170 kg\t3\t3\t3 min\t8\tPrimary squat.\t',
+    `Thu\tRun\tEasy conversational pace\t1\t18 km\tN/A\t4-5\t${[
+      'Keep it conversational for the full 18 km.',
+      'Long run; progress distance only to 19 km. Secondary endurance is held at the Week 1 tolerated dose so primary squat/One-Arm Pull-up progress and MMA recovery keep the recovery budget.',
+      'Longest of the block. Keep the full 20 km clearly easy.',
+      'Consolidation; keep the full 16 km easy.',
+    ][week - 1]}\t`,
+  ]);
+  const repaired = normalizeAdvancedHybridSecondaryRunStability(program, toleratedAdvancedIntake);
+  assert.deepEqual(longRuns(repaired.program), ['20 km', '21 km', '22 km', '18 km']);
+  assert.match(repaired.program, /full 20 km[^\t]*opens at your tolerated 20 km/);
+  assert.match(repaired.program, /only to 21 km/);
+  assert.match(repaired.program, /full 22 km clearly easy/);
+  assert.doesNotMatch(repaired.program, /\b(?:16|19) km|held at the Week 1 tolerated dose/);
+});
+
+test('Advanced Hybrid long run stays inside the AH-01 detector when it would be the fourth progressing family', () => {
+  const intake = {
+    ...toleratedAdvancedIntake,
+    current_numbers: `${toleratedAdvancedIntake.current_numbers} | Overhead Press: 80 kg x 4`,
+  };
+  const program = fourWeeks((week) => [
+    `Mon\tBack Squat\t${[165,170,175,150][week-1]} kg\t3\t3\t3 min\t7-8\tIf bar speed holds.\t`,
+    `Tue\tOne-Arm Pull-up\tBodyweight\t${[2,3,3,2][week-1]}\t2\t3 min\t8\tStrict each arm, only if clean.\t`,
+    `Fri\tOverhead Press\t${[70,72.5,75,65][week-1]} kg\t7\t3\t2 min\t7\tIf bar speed holds.\t`,
+    'Thu\tRun\tEasy conversational pace\t1\t20 km\tN/A\t4-5\tEasy long run.\t',
+  ]);
+  const repaired = normalizeAdvancedHybridSecondaryRunStability(program, intake);
+  assert.deepEqual(longRuns(repaired.program), ['20 km', '21 km', '21 km', '18 km']);
+  assert.equal(validateAdvancedHybridCoachingSpecV1(repaired.program, intake).ok, true);
 });
 
 // ---------------------------------------------------------------------------
@@ -513,7 +564,7 @@ test('[G2-13] Advanced Hybrid and Youth convergence outputs are unaffected by th
     advancedLiveIntake,
   );
   assert.equal(advanced.repaired, true);
-  assert.equal((advanced.program.match(/\t20 km\t/g) || []).length, 4);
+  assert.deepEqual(longRuns(advanced.program), ['20 km', '21 km', '22 km', '18 km']);
 
   const youth = normalizeYouthSkillAcquisitionQuality(youthProgram(), youthLiveIntake);
   assert.equal(youth.repaired, true);

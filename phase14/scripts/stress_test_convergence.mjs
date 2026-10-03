@@ -851,10 +851,6 @@ for (const [label, ok] of checks) {
 // shrink, and a divergence not on it fails the verdict -- the same discipline
 // as the gate-repair registry.
 const KNOWN_PRODUCTION_DIVERGENCE = new Set([
-  // The finisher is removed, and something later in the chain leaves the
-  // block without progression architecture. The stale-flag fix exposed this;
-  // it was hidden behind ADVANCED_HYBRID_EXTRA_HARD_CONDITIONING before.
-  'advanced_hybrid/optional-finisher-added',
   'weightlifter_meet_week/week4-not-consolidating',
   'weightlifter_meet_week/repeated-doubles-in-comp-week',
   'weightlifter_meet_week/session-grows-into-day-zero',

@@ -2,6 +2,7 @@ import { weekdayKey } from './weekday.js';
 import { isHighConcurrencyHybrid } from './advanced_hybrid_concurrency.js';
 import { endurancePerformanceIntegrityFlags, eventProgressionBearing } from './phase15_elite_guardrails.js';
 import { projectedWeeklyRunningKm } from './v34_workload_accounting.js';
+import { validateAdvancedHybridCoachingSpecV1 } from './coaching_spec_v1_quality.js';
 
 const WEEKDAYS = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'];
 
@@ -125,6 +126,83 @@ function isLowerStrengthName(name) {
   return /^\s*(?:Back Squat|Front Squat|Deadlift|Conventional Deadlift|Romanian Deadlift|Split Squat|Bulgarian Split Squat|Reverse Lunge|Forward Lunge|Walking Lunge)\s*$/i.test(String(name || ''));
 }
 
+// The athlete's own longest recent run, when the intake states one. It is the
+// distance they already tolerate, so the block does not open below it.
+export function statedLongestRunKm(intake = {}) {
+  const src = `${txt(intake.current_numbers)} ${txt(intake.clarification_answers)} ${txt(intake.notes)}`;
+  const m = src.match(/longest\s+(?:recent\s+)?(?:long\s+)?run[^.\d\n|]{0,25}?(\d+(?:\.\d+)?)\s*km\b/i);
+  const km = m ? Number(m[1]) : null;
+  return Number.isFinite(km) && km > 0 ? km : null;
+}
+
+const AH_HIERARCHY_CODE = 'COACH_SPEC_V1_AH_RECOVERY_HIERARCHY_OVERLOADED';
+function hierarchyAccepts(program, intake) {
+  try { return validateAdvancedHybridCoachingSpecV1(program, intake)?.ok !== false; }
+  catch (err) { return err?.code !== AH_HIERARCHY_CODE; }
+}
+function halfKm(km) { return Math.round(km * 2) / 2; }
+// The long-run ladder for a secondary marathon. It opens at the athlete's
+// tolerated distance, takes one small step a week and consolidates in Week 4.
+// When the full ladder would make the run a fourth materially progressing
+// family under AH-01, Week 3 stays within the detector's 5% so the frozen
+// hierarchy, not this repair, decides what the block can afford.
+function longRunLadder(base, { capped = false } = {}) {
+  const step = base + 1;
+  const peak = capped ? Math.min(step, Math.floor(base * 1.05 * 2) / 2) : base + 2;
+  return { 1: halfKm(base), 2: halfKm(Math.min(step, peak)), 3: halfKm(peak), 4: halfKm(base * 0.9) };
+}
+function longRunCue(week, km, base) {
+  if (week === 1) return `The block opens at your tolerated ${km} km long run.`;
+  if (week === 4) return `Consolidation week: the long run steps back to ${km} km so the block is absorbed before the next build.`;
+  if (km > base) return 'A small distance step on the only marathon run of the week; primary squat and one-arm pull-up work keep first call on recovery.';
+  return `The long run holds at ${km} km so primary squat and one-arm pull-up work keep first call on recovery.`;
+}
+// Distance figures in the note that describe this run (not a short segment of
+// it) follow the table, so a note never promises 19 km over an 18 km row.
+function alignNoteDistances(note, beforeKm, km) {
+  return String(note || '').replace(/\b(\d+(?:\.\d+)?)\s*km\b/gi, (whole, n) => {
+    const v = Number(n);
+    return v >= beforeKm * 0.6 && v <= beforeKm * 1.6 ? `${km} km` : whole;
+  });
+}
+const STALE_HOLD_CUE = /\s*Secondary endurance is held at the Week 1 tolerated dose[^.]*\./gi;
+
+function applyLongRunLadder(original, ladder, base) {
+  let candidate = original;
+  const repairs = [];
+  for (let week = 1; week <= 4; week++) {
+    const parsed = parseWeek(candidate, week);
+    if (!parsed) continue;
+    const runs = parsed.rows
+      .map((cells, row) => ({ cells, row, km: parseKm(cells[parsed.reps]) }))
+      .filter((r) => !isWarmup(r.cells[parsed.exercise]) && isRunName(r.cells[parsed.exercise]) && Number.isFinite(r.km));
+    if (!runs.length) continue;
+    const longest = runs.reduce((a, b) => (b.km > a.km ? b : a));
+    const target = ladder[week];
+    let changed = false;
+    for (const r of runs) {
+      const isLong = r === longest;
+      const next = isLong ? target : Math.min(r.km, target);
+      const notes = Number.isInteger(parsed.notes) ? String(r.cells[parsed.notes] || '') : '';
+      const stale = STALE_HOLD_CUE.test(notes);
+      STALE_HOLD_CUE.lastIndex = 0;
+      const contradicts = alignNoteDistances(notes, r.km, next) !== notes;
+      if (Math.abs(next - r.km) < 0.001 && !stale && !contradicts) continue;
+      const before = r.cells[parsed.reps];
+      r.cells[parsed.reps] = replaceKm(before, next);
+      if (Number.isInteger(parsed.notes)) {
+        let note = alignNoteDistances(notes.replace(STALE_HOLD_CUE, ''), r.km, next).trim();
+        if (isLong) note = addCue(note, longRunCue(week, next, base), longRunCue(week, next, base));
+        r.cells[parsed.notes] = note;
+      }
+      repairs.push({ type: 'advanced_secondary_long_run_ladder', week, row: r.row, before, after: r.cells[parsed.reps] });
+      changed = true;
+    }
+    if (changed) candidate = rebuild(candidate, parsed);
+  }
+  return { program: candidate, repairs };
+}
+
 export function normalizeAdvancedHybridSecondaryRunStability(program, intake = {}) {
   const original = String(program || '');
   const primary = lower(goals(intake, 'primary'));
@@ -135,38 +213,25 @@ export function normalizeAdvancedHybridSecondaryRunStability(program, intake = {
 
   const week1 = parseWeek(original, 1);
   if (!week1) return { program: original, repaired: false, repairs: [] };
-  const baseline = week1.rows
+  const week1Longest = week1.rows
     .filter((cells) => !isWarmup(cells[week1.exercise]) && isRunName(cells[week1.exercise]))
     .map((cells) => parseKm(cells[week1.reps]))
     .filter(Number.isFinite)
     .sort((a, b) => b - a)[0];
-  if (!Number.isFinite(baseline) || baseline <= 0) return { program: original, repaired: false, repairs: [] };
+  if (!Number.isFinite(week1Longest) || week1Longest <= 0) return { program: original, repaired: false, repairs: [] };
 
-  let candidate = original;
-  const repairs = [];
-  for (let week = 2; week <= 4; week++) {
-    const parsed = parseWeek(candidate, week);
-    if (!parsed) continue;
-    let changed = false;
-    parsed.rows.forEach((cells, row) => {
-      if (isWarmup(cells[parsed.exercise]) || !isRunName(cells[parsed.exercise])) return;
-      const km = parseKm(cells[parsed.reps]);
-      if (!Number.isFinite(km) || km <= baseline * 1.001) return;
-      const before = cells[parsed.reps];
-      cells[parsed.reps] = replaceKm(cells[parsed.reps], baseline);
-      if (Number.isInteger(parsed.notes)) {
-        cells[parsed.notes] = addCue(
-          cells[parsed.notes],
-          'Secondary endurance is held at the Week 1 tolerated dose so primary squat/OAP progress and MMA recovery keep the recovery budget.',
-          'secondary endurance is held at the week 1 tolerated dose',
-        );
-      }
-      repairs.push({ type: 'advanced_secondary_run_stability', week, row, before, after: cells[parsed.reps] });
-      changed = true;
-    });
-    if (changed) candidate = rebuild(candidate, parsed);
+  // The coach on a block that sat at 18 km for three weeks under a 20 km
+  // tolerated long run: secondary endurance was below what the athlete already
+  // does, and flat. The floor is the stated tolerance; the model's Week 1
+  // choice only raises it.
+  const tolerated = statedLongestRunKm(intake);
+  const base = Math.max(week1Longest, tolerated ?? 0);
+
+  let result = applyLongRunLadder(original, longRunLadder(base), base);
+  if (!hierarchyAccepts(result.program, intake)) {
+    result = applyLongRunLadder(original, longRunLadder(base, { capped: true }), base);
   }
-  return { program: candidate, repaired: repairs.length > 0, repairs };
+  return { program: result.program, repaired: result.repairs.length > 0, repairs: result.repairs };
 }
 
 function youthFullBarPrereqs(intake = {}) {
