@@ -63,7 +63,9 @@ const TIMING = /Timing: total (\d+)s, model (\d+)s across (\d+) call\(s\), engin
 export function timingFrom(detail) {
   const m = String(detail || '').match(TIMING);
   if (!m) return null;
-  return { total_s: Number(m[1]), model_s: Number(m[2]), calls: Number(m[3]), engine_s: Number(m[4]) };
+  const t = String(detail || '').match(/Tokens: reasoning (\d+), output (\d+), input (\d+)/);
+  const tokens = t ? { reasoning: Number(t[1]), output: Number(t[2]), input: Number(t[3]) } : null;
+  return { total_s: Number(m[1]), model_s: Number(m[2]), calls: Number(m[3]), engine_s: Number(m[4]), tokens };
 }
 
 export function deliveryVerdict(entry = {}) {

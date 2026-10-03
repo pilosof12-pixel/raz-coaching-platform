@@ -103,6 +103,11 @@ for (const entry of result.results || []) {
   const seconds = entry.seconds;
   if (timing) {
     console.log(`        timing: model ${timing.model_s}s across ${timing.calls} call(s), engine ${timing.engine_s}s, build total ${timing.total_s}s`);
+    if (timing.tokens) {
+      const share = timing.tokens.reasoning + timing.tokens.output
+        ? Math.round((100 * timing.tokens.reasoning) / (timing.tokens.reasoning + timing.tokens.output)) : 0;
+      console.log(`        tokens: reasoning ${timing.tokens.reasoning}, output ${timing.tokens.output} (${share}% of generated tokens are thinking), input ${timing.tokens.input}`);
+    }
     const harnessOverhead = seconds - timing.total_s;
     if (harnessOverhead > 5) console.log(`        plus ${harnessOverhead}s outside the build: deploy wait, queueing and polling`);
   }

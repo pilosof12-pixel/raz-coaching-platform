@@ -2860,7 +2860,7 @@ async function runBuildJob(jobId, token, intake, isNewToken = false) {
     // validators, the parsing. If that is seconds, there is something to cut;
     // if it is milliseconds, medium is the floor and the lever is elsewhere.
     const timingSuffix = intake && intake.qa_diagnostics === true
-      ? ` Timing: total ${Math.round((Date.now() - buildStarted) / 1000)}s, model ${Math.round(Number(buildUsage?.openai_ms || 0) / 1000)}s across ${Number(buildUsage?.calls || 0)} call(s), engine ${Math.round(Math.max(0, generationAndQaMs - Number(buildUsage?.openai_ms || 0)) / 1000)}s.`
+      ? ` Timing: total ${Math.round((Date.now() - buildStarted) / 1000)}s, model ${Math.round(Number(buildUsage?.openai_ms || 0) / 1000)}s across ${Number(buildUsage?.calls || 0)} call(s), engine ${Math.round(Math.max(0, generationAndQaMs - Number(buildUsage?.openai_ms || 0)) / 1000)}s. Tokens: reasoning ${Number(buildUsage?.reasoning_tokens || 0)}, output ${Number(buildUsage?.output_tokens || 0)}, input ${Number(buildUsage?.input_tokens || 0)}.`
       : ""; // QA-TIMING-BREAKDOWN
     await progress("finalizing", Number(buildUsage?.calls || 0), `saving program after ${Number(buildUsage?.calls || 0)} model call(s)${qaTraceSuffix}${timingSuffix}`);
     const saveStarted = Date.now();
