@@ -36,6 +36,7 @@ import { repairPhase15Program } from './phase15_program_qa.js';
 import { repairTsvRowShape } from './tsv_row_shape_repair.js'; // TSV-ROW-SHAPE-REPAIR-WIRED
 import { normalizePaceRangeOrder } from './pace_range_order.js'; // PACE-RANGE-ORDER-WIRED
 import { normalizeTacticalStrengthSpacing } from './tactical_strength_spacing.js'; // TACTICAL-DAY-SPACING-WIRED
+import { normalizeTrainingDaysReading } from './training_days_reading.js'; // TRAINING-DAYS-READING-WIRED
 import { validatePhase15FinalProgram } from './phase15_final_qa.js';
 import { parseProgramModel } from './program_model.js';
 import { trimExcessSupportVolume } from './mrv_support_trim.js';
@@ -612,6 +613,15 @@ export function collectRepairableValidationFailures(program, intake = {}, option
   // budget in order to spread the week out. The gate's own analysis scores each
   // candidate swap, so the repair converges on the real rule rather than a copy
   // of it.
+  // An athlete with two gym days and a sport schedule trains on more calendar
+  // days than days_per_week, and the coach charges a block that never says which
+  // reading governs. One sentence, written only when it is true of every week.
+  const daysReading = normalizeTrainingDaysReading(candidate, intake);
+  if (daysReading.repaired) {
+    candidate = daysReading.program;
+    deterministic_repairs.push({ type: 'training_days_reading', repairs: daysReading.repairs });
+  }
+
   const daySpacing = normalizeTacticalStrengthSpacing(candidate, intake);
   if (daySpacing.repaired) {
     candidate = daySpacing.program;
