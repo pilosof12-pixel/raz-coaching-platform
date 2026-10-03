@@ -37,6 +37,7 @@ import { repairTsvRowShape } from './tsv_row_shape_repair.js'; // TSV-ROW-SHAPE-
 import { normalizePaceRangeOrder } from './pace_range_order.js'; // PACE-RANGE-ORDER-WIRED
 import { normalizeTacticalStrengthSpacing } from './tactical_strength_spacing.js'; // TACTICAL-DAY-SPACING-WIRED
 import { normalizeTrainingDaysReading } from './training_days_reading.js'; // TRAINING-DAYS-READING-WIRED
+import { normalizeRunDaySpacing } from './run_day_spacing.js'; // RUN-DAY-SPACING-WIRED
 import { validatePhase15FinalProgram } from './phase15_final_qa.js';
 import { parseProgramModel } from './program_model.js';
 import { trimExcessSupportVolume } from './mrv_support_trim.js';
@@ -616,6 +617,15 @@ export function collectRepairableValidationFailures(program, intake = {}, option
   // An athlete with two gym days and a sport schedule trains on more calendar
   // days than days_per_week, and the coach charges a block that never says which
   // reading governs. One sentence, written only when it is true of every week.
+  // A stated no-consecutive-running rule protects a tendon. A short run the
+  // model put between two run days is removed, and the ride that led into it
+  // stops promising a run. Main runs are never moved.
+  const runSpacing = normalizeRunDaySpacing(candidate, intake);
+  if (runSpacing.repaired) {
+    candidate = runSpacing.program;
+    deterministic_repairs.push({ type: 'stated_run_spacing', repairs: runSpacing.repairs });
+  }
+
   const daysReading = normalizeTrainingDaysReading(candidate, intake);
   if (daysReading.repaired) {
     candidate = daysReading.program;

@@ -1545,6 +1545,26 @@
     "killedLive": ""
   },
   {
+    "code": "STATED_RUN_SPACING_VIOLATED",
+    "modules": [
+      "engine/run_day_spacing.js"
+    ],
+    "owners": [
+      "collectRunDaySpacingFlags"
+    ],
+    "advisory": false,
+    "reachable": true,
+    "repairs": [
+      "normalizeRunDaySpacing"
+    ],
+    "wired": [
+      "normalizeRunDaySpacing"
+    ],
+    "tested": true,
+    "stressed": false,
+    "killedLive": ""
+  },
+  {
     "code": "STRICT_OHP_SPECIFICITY_UNDERDOSED",
     "modules": [
       "engine/phase15_program_qa.js"

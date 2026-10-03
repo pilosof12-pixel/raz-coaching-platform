@@ -1,3 +1,4 @@
+import { statesNoConsecutiveRunDays } from './run_day_spacing.js';
 // Specialist rules for the archetypes the specialist layer never covered.
 //
 // phase15_specialist_rules.js has generators for gymnastics, street lifting and
@@ -104,6 +105,12 @@ export function multisportSpecialistRules(intake = {}) {
   out.push('ARTICLE 10 multisport exposure: every named component needs sufficient specific exposure in the block. A discipline that appears in the goal and not in the weeks is an uncovered component.');
   out.push('ARTICLE 10 limiter rule: train the limiter where it is cheapest to train. A technically limited discipline improves through technique and economy work before it responds to added metabolic load, and the discipline with the highest tissue cost is not automatically the one to add volume to.');
   out.push('SOURCE GAP (passed on): the corpus marks detailed Ironman and long-course volume, fuelling and periodization as beyond its resolution. Do not generate one.');
+  // Run #161 put a brick run between two run days every week for an athlete
+  // whose achilles flared after adding running days, and whose notes forbid
+  // back-to-back runs. Nothing told the model the rule covers a brick.
+  if (statesNoConsecutiveRunDays(intake)) {
+    out.push('ATHLETE CONSTRAINT (stated, injury-protective): no two running days may be consecutive, counting EVERY run of any length -- including a brick run off the bike, a shake-out or a run inside a strength session. A day beside a running day carries no running at all. If transition practice is wanted, run off the bike on a day that is already a running day; do not add a running day.');
+  }
   return out;
 }
 

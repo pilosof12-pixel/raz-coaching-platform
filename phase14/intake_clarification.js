@@ -1,3 +1,4 @@
+import { NO_CONSECUTIVE_RUN_DAYS as SHARED_NO_CONSECUTIVE_RUN_DAYS } from './engine/run_day_spacing.js';
 import { bodyweightKg } from './engine/intake_bodyweight.js';
 import { isInSeason } from './engine/v83_in_season.js';
 
@@ -57,12 +58,9 @@ function goalStatesBaselineAndTarget(s) {
 // back-to-back runs is not a contradiction -- plenty of runners train that way
 // -- so nothing is asked unless the athlete has said it should not happen.
 const WEEK_ORDER = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'];
-const NO_CONSECUTIVE_RUN_DAYS = [
-  /\bno\s+two\s+running\s+days?\s+(?:are|should\s+be|can\s+be)?\s*consecutive\b/i,
-  /\bconsecutive\s+running\s+days?\s+are\s+not\s+(?:tolerated|possible|an option)\b/i,
-  /\b(?:does\s+not|doesn't|cannot|can't)\s+tolerate\s+(?:back[- ]to[- ]back|consecutive)\s+(?:runs?|running)\b/i,
-  /\b(?:back[- ]to[- ]back|consecutive)\s+running\s+days?\s+are\s+not\b/i,
-];
+// The wording lives in engine/run_day_spacing.js, which enforces the same
+// statement on the delivered program, so the two checks cannot drift apart.
+const NO_CONSECUTIVE_RUN_DAYS = SHARED_NO_CONSECUTIVE_RUN_DAYS;
 
 function scheduleRunDays(intake = {}) {
   const schedule = Array.isArray(intake?.sport_schedule) ? intake.sport_schedule : [];
