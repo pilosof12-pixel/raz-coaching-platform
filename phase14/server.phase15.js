@@ -29,6 +29,7 @@ import { validateHardRunWarmupSemantic, validateYouthProgressionQualitySemantic 
 import { validateYouthConsolidationRetentionSemantic } from "./engine/coaching_consolidation_quality.js"; // CONSOLIDATION-RETENTION-SEMANTIC-QA-WIRED
 import { validateClientOutputCleanliness } from "./engine/client_output_qa.js"; // CLIENT-OUTPUT-CLEANLINESS-WIRED
 import { weeksImplicatedBy, scopeRepairPrompt, spliceWeekBlocks } from "./engine/week_scoped_repair.js"; // WEEK-SCOPED-REPAIR
+import { buildWeeksFromWeekOne, week1OnlySection } from "./engine/week_progression.js"; // WEEK1-ONLY
 import { validateRepairableProgramBundle } from "./engine/repairable_validation_bundle.js"; // AGGREGATE-REPAIR-VALIDATION-WIRED
 import { enrichSpecificWarmups } from "./engine/specific_warmup_enrichment.js"; // SPECIFIC-WARMUP-ENRICHMENT-WIRED
 import { normalizeYouthPrimarySkillOrder } from "./engine/youth_skill_order_normalizer.js"; // YOUTH-SKILL-ORDER-REPAIR-WIRED
@@ -380,7 +381,7 @@ function buildOpenAICompactUser(userContent) {
     "YOUTH HANDSTAND COMPONENT RULE: for a youth seeking a first freestanding handstand who still relies on the wall, preserve BOTH Wall Handstand Hold for position/static capacity and Controlled Handstand Kick-up for fresh entry/independent-balance practice. Do not delete wall-supported capacity merely because kick-ups are present, and do not replace balance practice with longer wall holds.",
     "YOUTH WEEK-4 RETENTION RULE: consolidation reduces fatigue, not earned capability. Reduce sets or attempts first while retaining the best clean Week-2/3 rep, assistance, balance, entry, ROM or execution standard. Explicitly reference retaining/matching the best Week-3 skill quality when volume is reduced.",
     "Week 4 is not automatically a deload. Consolidate or trim only when justified by the athlete constraints.",
-  ].join("\n") + qaCorrectionsFrom(src); // QA-CORRECTIONS-SURVIVE-COMPACTION
+  ].join("\n") + week1OnlySection(intake) + qaCorrectionsFrom(src); // QA-CORRECTIONS-SURVIVE-COMPACTION WEEK1-ONLY
 }
 
 // The compact prompt is rebuilt from the intake, and everything else in the
@@ -2560,6 +2561,14 @@ async function generateValidatedProgram(intake, onProgress = async () => {}) {
         `${aborted ? "generation ran past the time limit" : "model returned no content"}; starting over (${transientRetries}/${MAX_TRANSIENT_RETRIES})`,
       );
       continue;
+    }
+    if (!scopedWeeks && typeof raw === "string" && /START_WEEK1_TSV/i.test(raw) && !/START_WEEK2_TSV/i.test(raw)) {
+      // The model wrote Week 1; the rules write Weeks 2-4. // WEEK1-ONLY
+      const built = buildWeeksFromWeekOne(raw, intake);
+      if (built.built) {
+        raw = built.program;
+        qaTrace.push("W:engine-weeks-2-4");
+      }
     }
     if (scopedWeeks) {
       // Put the returned weeks into the candidate; a reply that does not carry

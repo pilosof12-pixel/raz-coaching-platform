@@ -12,7 +12,7 @@ const end = runtime.indexOf('\n}\n', start) + 2;
 const qaCorrectionsFrom = new Function(`${runtime.slice(start, end)}; return qaCorrectionsFrom;`)();
 
 test('the compact prompt keeps the corrections a regeneration carries', () => {
-  assert.match(runtime, /\]\.join\("\\n"\) \+ qaCorrectionsFrom\(src\); \/\/ QA-CORRECTIONS-SURVIVE-COMPACTION/);
+  assert.match(runtime, /\]\.join\("\\n"\)[^;]*\+ qaCorrectionsFrom\(src\); \/\/ QA-CORRECTIONS-SURVIVE-COMPACTION/);
   const src = 'A NEW CLIENT has submitted...\n=== CLIENT INTAKE ===\n{}\n\n=== ACCUMULATED QA CORRECTIONS ===\nWeek 4 runs twice; keep three runs.';
   assert.equal(qaCorrectionsFrom(src), '\n\n=== ACCUMULATED QA CORRECTIONS ===\nWeek 4 runs twice; keep three runs.');
   assert.equal(qaCorrectionsFrom('A NEW CLIENT has submitted... no corrections'), '');

@@ -35,9 +35,12 @@ const SWAPPABLE = /\b(?:row|pulldown|fly|curl|extension|lateral raise|plank|dead
 // manufacturing a violation of the next, and the build refused either way.
 // V82's own reasoning is the reason, not the rule: give the effort two minutes
 // or it stops being speed work.
+// The notes are sport-neutral because the catalogue serves every athlete: the
+// Broad Jump's "level changes and takedown entries" reached a Hyrox block and
+// the coach charged it as language borrowed from another athlete.
 export const BALLISTIC_OPTIONS = [
   { name: 'Medicine Ball Rotational Throw', needs: /med(?:icine)? ?ball/i, sets: '3', reps: '3 per side', rest: '2 min', rpe: '7',
-    note: 'Rotational power for striking and takedown drive. Throw hard, reset fully, stop the moment speed drops.' },
+    note: 'Rotational power through the hips and trunk. Throw hard, reset fully, stop the moment speed drops.' },
   { name: 'Medicine Ball Scoop Throw', needs: /med(?:icine)? ?ball/i, sets: '3', reps: '3', rest: '2 min', rpe: '7',
     note: 'Whole-body extension at speed. Three hard throws, full reset, nothing chased.' },
   { name: 'Explosive Push-up', needs: null, sets: '3', reps: '3', rest: '2 min', rpe: '7',
@@ -47,7 +50,7 @@ export const BALLISTIC_OPTIONS = [
   { name: 'Box Jump', needs: null, sets: '3', reps: '3', rest: '2 min', rpe: '6-7',
     note: 'Step down between reps: the jump is the exposure, the landing is not. Low volume, full recovery.' },
   { name: 'Broad Jump', needs: null, sets: '3', reps: '3', rest: '2 min', rpe: '6-7',
-    note: 'Horizontal power for level changes and takedown entries. Three hard jumps, walk back between each.' },
+    note: 'Horizontal power through the hips. Three hard jumps, walk back between each.' },
 ];
 
 function isWarmup(n) { return /^\s*\[WARMUP\]/i.test(String(n || '')); }

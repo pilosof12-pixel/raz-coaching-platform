@@ -59,7 +59,7 @@ const RUNGS = {
   },
   4: {
     weight: 'The lightest band you owned in Week 3 -- no new rung this week',
-    note: 'Consolidation: repeat the assistance you owned in Week 3 rather than chasing a lighter one. Up to 2 fresh unassisted attempts first if last week was clean.',
+    note: 'Consolidation: keep the assistance you owned in Week 3 rather than chasing a lighter one. Up to 2 fresh unassisted attempts first if last week was clean.',
   },
 };
 
