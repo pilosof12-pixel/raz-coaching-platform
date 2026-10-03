@@ -29,7 +29,7 @@ import { validateHardRunWarmupSemantic, validateYouthProgressionQualitySemantic 
 import { validateYouthConsolidationRetentionSemantic } from "./engine/coaching_consolidation_quality.js"; // CONSOLIDATION-RETENTION-SEMANTIC-QA-WIRED
 import { validateClientOutputCleanliness } from "./engine/client_output_qa.js"; // CLIENT-OUTPUT-CLEANLINESS-WIRED
 import { weeksImplicatedBy, scopeRepairPrompt, spliceWeekBlocks } from "./engine/week_scoped_repair.js"; // WEEK-SCOPED-REPAIR
-import { buildWeeksFromWeekOne, week1OnlySection } from "./engine/week_progression.js"; // WEEK1-ONLY
+import { buildWeeksFromWeekOne, week1OnlySection, keepWeekOne } from "./engine/week_progression.js"; // WEEK1-ONLY
 import { validateRepairableProgramBundle } from "./engine/repairable_validation_bundle.js"; // AGGREGATE-REPAIR-VALIDATION-WIRED
 import { enrichSpecificWarmups } from "./engine/specific_warmup_enrichment.js"; // SPECIFIC-WARMUP-ENRICHMENT-WIRED
 import { normalizeYouthPrimarySkillOrder } from "./engine/youth_skill_order_normalizer.js"; // YOUTH-SKILL-ORDER-REPAIR-WIRED
@@ -2373,6 +2373,9 @@ async function generateValidatedProgram(intake, onProgress = async () => {}) {
   let lastValid = null;
   let repairCandidate = null;
   let repairWeeks = null; // WEEK-SCOPED-REPAIR: the weeks the next repair may rewrite, or null for all
+  let engineBuiltWeeks = false; // WEEK1-ONLY
+  let rebuildFromWeekOne = false;
+  let weekOneRepairUsed = false;
   let repairFeedback = "";
   // The effort a build OPENS at, which the trace never recorded. Retries were
   // annotated with "@medium" but the first attempt was not, so a run could not
@@ -2568,6 +2571,7 @@ async function generateValidatedProgram(intake, onProgress = async () => {}) {
       if (built.built) {
         raw = built.program;
         qaTrace.push("W:engine-weeks-2-4");
+        engineBuiltWeeks = true;
       }
     }
     if (scopedWeeks) {
@@ -2577,6 +2581,15 @@ async function generateValidatedProgram(intake, onProgress = async () => {}) {
       if (spliced) {
         raw = spliced;
         qaTrace.push("S" + attempt + ":weeks" + scopedWeeks.join(""));
+        if (rebuildFromWeekOne) { // WEEK1-ONLY
+          const weekOne = keepWeekOne(raw);
+          const rebuilt = weekOne ? buildWeeksFromWeekOne(weekOne, intake) : null;
+          if (rebuilt && rebuilt.built) {
+            raw = rebuilt.program;
+            qaTrace.push("W:rebuilt-from-week1");
+          }
+          rebuildFromWeekOne = false;
+        }
       } else {
         qaTrace.push("S" + attempt + ":splice-failed");
         repairWeeks = null;
@@ -2741,6 +2754,11 @@ async function generateValidatedProgram(intake, onProgress = async () => {}) {
             // Not clean yet. The improvement is still worth more than the
             // text the model wrote, so the next attempt starts from it.
             repairWeeks = weeksImplicatedBy(stillFlagged?.flags); // WEEK-SCOPED-REPAIR
+            if (!repairWeeks && engineBuiltWeeks && !weekOneRepairUsed) { // WEEK1-ONLY
+              repairWeeks = [1];
+              rebuildFromWeekOne = true;
+              weekOneRepairUsed = true;
+            }
           }
           repairCandidate = repairedByBundle; // REPAIRED-CANDIDATE-REUSE
           continue;
@@ -2772,6 +2790,11 @@ async function generateValidatedProgram(intake, onProgress = async () => {}) {
         }
         repairCandidate = requiresFreshCandidate ? null : program; // STRUCTURAL-ONLY-FRESH-CANDIDATE
         repairWeeks = repairCandidate ? weeksImplicatedBy(err?.flags) : null; // WEEK-SCOPED-REPAIR
+        if (repairCandidate && !repairWeeks && engineBuiltWeeks && !weekOneRepairUsed) { // WEEK1-ONLY
+          repairWeeks = [1];
+          rebuildFromWeekOne = true;
+          weekOneRepairUsed = true;
+        }
         continue;
       }
       throw err;

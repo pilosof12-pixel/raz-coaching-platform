@@ -126,6 +126,22 @@ export function currentTargetModalityExposure(intake={}, key='') {
   return best;
 }
 
+// Days whose rows of this modality add up to at least 15 minutes (or carry a
+// distance), even when no single row does.
+function daysWithEnoughPractice(parsed, def) {
+  const e=parsed.idx.exercise,r=parsed.idx.reps,d=parsed.idx.day,st=parsed.idx.sets;
+  const minutes=new Map();
+  for (const row of parsed.rows) {
+    const ex=row.cells[e]||''; if(/^\s*\[WARMUP\]/i.test(ex) || !def.exposure.test(ex)) continue;
+    const reps=r>=0?String(row.cells[r]||''):'';
+    const sets=Math.max(1,Number(row.cells[st]||1)||1);
+    const m=reps.match(/(\d+(?:\.\d+)?)\s*(?:min|minutes?)\b/i);
+    const day=row.cells[d]||'unknown';
+    if(m) minutes.set(day,(minutes.get(day)||0)+Number(m[1])*sets);
+  }
+  return [...minutes].filter(([,total])=>total>=15).map(([day])=>day);
+}
+
 function meaningfulModalityRows(parsed, def) {
   const e=parsed.idx.exercise,n=parsed.idx.notes,r=parsed.idx.reps,w=parsed.idx.weight,d=parsed.idx.day;
   const rows=[];
@@ -213,14 +229,19 @@ export function endurancePerformanceIntegrityFlags(program, intake={}, parsed=nu
   }
   for(const {priority,text,def} of byKey.values()) {
     const rows=meaningfulModalityRows(parsed,def);
-    const actualDays=new Set(rows.map(x=>x.day)).size;
+    // A day counts when its practice of the modality adds up, not only when one
+    // row does. A brick's run legs are short by design: the sprint triathlete's
+    // Saturday ran 2 legs under 15 minutes each, the row-level floor counted
+    // neither, and run #166 regenerated twice for a run day it already had.
+    const countedDays=new Set([...rows.map(x=>x.day), ...daysWithEnoughPractice(parsed,def)]);
+    const actualDays=countedDays.size;
     const existing=currentTargetModalityExposure(intake,def.key);
     const required=existing>0?existing:1;
     if(actualDays<required) flags.push({
       code:'TARGET_MODALITY_EXPOSURE_REDUCED',
       key:def.key, actual_days:actualDays, required_days:required,
-      days:[...new Set(rows.map(x=>x.day))],
-      message:`${def.key} is a named ${priority} performance goal. The intake documents about ${existing||'at least one'} current ${def.key} exposure(s) per week, but this week programs ${actualDays}${actualDays?` (${[...new Set(rows.map(x=>x.day))].join(', ')})`:''}. Do not silently remove target-modality practice; preserve the athlete's stated current exposure unless the authored plan makes and explains a deliberate recovery tradeoff.`
+      days:[...countedDays],
+      message:`${def.key} is a named ${priority} performance goal. The intake documents about ${existing||'at least one'} current ${def.key} exposure(s) per week, but this week programs ${actualDays}${actualDays?` (${[...countedDays].join(', ')})`:''}. Do not silently remove target-modality practice; preserve the athlete's stated current exposure unless the authored plan makes and explains a deliberate recovery tradeoff.`
     });
     if(def.key==='running') {
       const race=currentRunningRaceAnchor(intake);

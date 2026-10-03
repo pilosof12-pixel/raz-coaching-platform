@@ -20,7 +20,7 @@ function swap(oldText, newText, label) {
 
 swap(
   'import { validateRepairableProgramBundle }',
-  `import { buildWeeksFromWeekOne, week1OnlySection } from "./engine/week_progression.js"; // ${MARK}\nimport { validateRepairableProgramBundle }`,
+  `import { buildWeeksFromWeekOne, week1OnlySection, keepWeekOne } from "./engine/week_progression.js"; // ${MARK}\nimport { validateRepairableProgramBundle }`,
   'import',
 );
 
@@ -38,11 +38,64 @@ swap(
       if (built.built) {
         raw = built.program;
         qaTrace.push("W:engine-weeks-2-4");
+        engineBuiltWeeks = true;
       }
     }
     if (scopedWeeks) {
       // Put the returned weeks into the candidate;`,
   'build',
+);
+
+// A defect repeated in every week of an engine-built block was written in
+// Week 1 and copied by the rules. Asking the model for the whole program again
+// cost run #166's tactical build 32,000 output tokens; asking for Week 1 and
+// rebuilding Weeks 2-4 from it answers the same defect. Once per build: if the
+// rebuilt block still fails, the next repair is the full one.
+swap(
+  '  let repairWeeks = null; // WEEK-SCOPED-REPAIR: the weeks the next repair may rewrite, or null for all',
+  `  let repairWeeks = null; // WEEK-SCOPED-REPAIR: the weeks the next repair may rewrite, or null for all
+  let engineBuiltWeeks = false; // ${MARK}
+  let rebuildFromWeekOne = false;
+  let weekOneRepairUsed = false;`,
+  'state',
+);
+swap(
+  '        repairWeeks = repairCandidate ? weeksImplicatedBy(err?.flags) : null; // WEEK-SCOPED-REPAIR',
+  `        repairWeeks = repairCandidate ? weeksImplicatedBy(err?.flags) : null; // WEEK-SCOPED-REPAIR
+        if (repairCandidate && !repairWeeks && engineBuiltWeeks && !weekOneRepairUsed) { // ${MARK}
+          repairWeeks = [1];
+          rebuildFromWeekOne = true;
+          weekOneRepairUsed = true;
+        }`,
+  'scope',
+);
+swap(
+  '            repairWeeks = weeksImplicatedBy(stillFlagged?.flags); // WEEK-SCOPED-REPAIR',
+  `            repairWeeks = weeksImplicatedBy(stillFlagged?.flags); // WEEK-SCOPED-REPAIR
+            if (!repairWeeks && engineBuiltWeeks && !weekOneRepairUsed) { // ${MARK}
+              repairWeeks = [1];
+              rebuildFromWeekOne = true;
+              weekOneRepairUsed = true;
+            }`,
+  'scope-reuse',
+);
+swap(
+  `      if (spliced) {
+        raw = spliced;
+        qaTrace.push("S" + attempt + ":weeks" + scopedWeeks.join(""));`,
+  `      if (spliced) {
+        raw = spliced;
+        qaTrace.push("S" + attempt + ":weeks" + scopedWeeks.join(""));
+        if (rebuildFromWeekOne) { // ${MARK}
+          const weekOne = keepWeekOne(raw);
+          const rebuilt = weekOne ? buildWeeksFromWeekOne(weekOne, intake) : null;
+          if (rebuilt && rebuilt.built) {
+            raw = rebuilt.program;
+            qaTrace.push("W:rebuilt-from-week1");
+          }
+          rebuildFromWeekOne = false;
+        }`,
+  'rebuild',
 );
 
 if (s !== before) fs.writeFileSync(target, s);

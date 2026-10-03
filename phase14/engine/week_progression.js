@@ -342,3 +342,15 @@ export function week1OnlySection(intake = {}) {
     'So Week 1 is the template for the whole block: every session, exercise, order, dose and coaching note must be complete and correct, and every row must name its real role (for example identify the long run as the long run).',
   ].join('\n');
 }
+
+// The program cut back to its intro and Week 1, so Weeks 2-4 can be rebuilt
+// from a repaired Week 1. Text after the last week (guidance, closing notes)
+// is kept.
+export function keepWeekOne(program) {
+  const src = String(program || '');
+  const start = src.search(/START_WEEK2_TSV/i);
+  const endMatch = [...src.matchAll(/END_WEEK4_TSV/gi)].pop();
+  if (start < 0 || !endMatch) return null;
+  const end = endMatch.index + endMatch[0].length;
+  return `${src.slice(0, start).replace(/\s+$/, '')}\n${src.slice(end)}`;
+}

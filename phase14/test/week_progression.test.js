@@ -127,3 +127,20 @@ test('a race-pace run is never called easy', () => {
   for (const n of notes('Fri')) assert.doesNotMatch(n, /\beasy\b/i);
   assert.match(notes('Wed')[0], /same easy effort/);
 });
+
+import { keepWeekOne } from '../engine/week_progression.js';
+
+test('a defect repeated in every engine-built week is repaired in Week 1 and the block rebuilt', () => {
+  const full = buildWeeksFromWeekOne(w1(['Mon\tBack Squat\t100 kg\t4\t5\t3 min\t7\tBrace.\t']) + '\nClosing guidance.', { primary_goals: ['Back squat 140 kg'] }).program;
+  const one = keepWeekOne(full);
+  assert.match(one, /START_WEEK1_TSV/);
+  assert.doesNotMatch(one, /START_WEEK2_TSV|START_WEEK4_TSV/);
+  assert.match(one, /Closing guidance\.$/);
+  assert.equal(keepWeekOne('no weeks'), null);
+  // The runtime: once per build, an unscoped repair of an engine-built block
+  // asks for Week 1 and rebuilds Weeks 2-4 from it.
+  assert.match(runtime, /if \(repairCandidate && !repairWeeks && engineBuiltWeeks && !weekOneRepairUsed\) \{/);
+  assert.match(runtime, /const rebuilt = weekOne \? buildWeeksFromWeekOne\(weekOne, intake\) : null;/);
+  const rebuild = runtime.indexOf('qaTrace.push("W:rebuilt-from-week1")');
+  assert.ok(rebuild > 0 && runtime.indexOf('if (!isValidProgram(raw)) {', rebuild) > rebuild);
+});

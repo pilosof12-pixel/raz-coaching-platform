@@ -671,6 +671,18 @@ import { buildWeeksFromWeekOne, week1OnlyApplies } from '../engine/week_progress
 import { validatePhase15FinalProgram } from '../engine/phase15_final_qa.js';
 // Week-1-only convergence: the model writes Week 1, the engine builds Weeks 2-4,
 // and the result must clear the production bundle and the save boundary.
+if (process.env.RECUT) {
+  // Rebuild Weeks 2-4 from the Week 1 of the latest live program, and judge it.
+  const id = process.env.RECUT;
+  const prog = fs.readFileSync(path.join(root, '..', '..', 'docs', 'qa', 'live-three-avatar', 'latest', `${id}-program.txt`), 'utf8');
+  const intake = INTAKES[id];
+  const w1only = prog.slice(0, prog.indexOf('START_WEEK2_TSV')).replace(/\s+$/, '') + '\n';
+  const built = buildWeeksFromWeekOne(w1only, intake);
+  const r = collectRepairableValidationFailures(built.program, intake, { skipSkillCalibration: true });
+  console.log(id, 'built', built.built, 'ok', r.ok);
+  for (const f of r.flags || []) console.log('  ', f.code, String(f.amendment || f.message || '').slice(0, 500));
+  process.exit(0);
+}
 if (process.env.LATEST) {
   for (const id of ['advanced_hybrid', 'youth_gymnastics', 'masters_return', 'sprint_triathlete']) {
     const prog = fs.readFileSync(path.join(root, '..', '..', 'docs', 'qa', 'live-three-avatar', 'latest', `${id}-program.txt`), 'utf8');
