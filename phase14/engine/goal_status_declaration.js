@@ -85,7 +85,13 @@ export function collectUndeclaredGoalStatusFlags(analysis, program) {
   const targets = analysis?.targets || [];
   const flags = [];
   for (const target of targets) {
-    if (target.tier !== 'primary' && target.tier !== 'secondary') continue;
+    // Only a secondary goal may be held by declaration. A primary goal held
+    // "on purpose" is the generator rewriting the athlete's hierarchy: run
+    // #166's calisthenics block declared the primary +40 kg weighted pull-up
+    // maintenance and named a secondary as what the block develops, and the
+    // coach called it the one P0 in the package. A primary that does not move
+    // is a defect for the progression gates, not something to explain away.
+    if (target.tier !== 'secondary') continue;
     if (target.progressed) continue;
     if (!FAMILY_WORDS[target.family]) continue;
     if (declaresMaintenance(program, target.family)) continue;

@@ -63,12 +63,16 @@ test('Week 4 is consolidation and is never touched', () => {
   assert.deepEqual(after, before);
 });
 
-test('a declared hold is a coaching decision, not a stall', () => {
+test('a declaration does not exempt a PRIMARY goal from developing', () => {
+  // It used to. The coach's P0 on run #166: the generator declared a primary
+  // goal maintenance and the gates accepted the declaration, so the athlete's
+  // hierarchy was rewritten without anyone choosing to. A primary goal moves;
+  // only a secondary may be held by declaration.
   const held = DELIVERED.replace(
     /^/,
     'Rowing is held at a maintenance dose rather than developed this block: this block holds it at a maintenance dose rather than developing it.\n\n',
   );
-  assert.deepEqual(collectPrimaryVolumeProgressionFlags(held, MASTERS), []);
+  assert.deepEqual(collectPrimaryVolumeProgressionFlags(held, MASTERS), collectPrimaryVolumeProgressionFlags(DELIVERED, MASTERS));
 });
 
 test('a primary strength goal is not judged on volume', () => {

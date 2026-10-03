@@ -171,7 +171,8 @@ export function progressionAnalysis(program, intake = {}, suppliedModel = null) 
     // requires the secondary press to hold through the build weeks -- and this
     // gate contradict each other, and a correct program fails for obeying one of
     // them. Silence is still a violation; the declaration is what earns the hold.
-    row.declared_maintenance = !progressed && declaresMaintenance(program, target.family);
+    // Secondary goals only: a primary goal cannot be declared out of developing.
+    row.declared_maintenance = !progressed && target.tier !== 'primary' && declaresMaintenance(program, target.family);
     if (present.length >= 3 && !progressed && !row.declared_maintenance) violations.push(row);
   }
 

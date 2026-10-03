@@ -144,3 +144,15 @@ test('a defect repeated in every engine-built week is repaired in Week 1 and the
   const rebuild = runtime.indexOf('qaTrace.push("W:rebuilt-from-week1")');
   assert.ok(rebuild > 0 && runtime.indexOf('if (!isValidProgram(raw)) {', rebuild) > rebuild);
 });
+
+test('a primary added-load goal progresses on the belt, and intensifies past the benchmark', () => {
+  // Run #166: the +40 kg weighted pull-up stayed at +30 because the cap read
+  // the plate on the belt as the whole lift, and the block then declared a
+  // PRIMARY goal maintenance.
+  const intake = { primary_goals: ['Weighted pull-up with 40 kg for 3'], current_numbers: 'Weighted Pull-up: +32 kg x 3' };
+  const out = buildWeeksFromWeekOne(w1(['Mon\tWeighted Pull-up\t+30 kg\t4\t3\t3 min\t8\tStrict.\t']), intake).program;
+  assert.equal(rowOf(out, 2, 'Weighted Pull-up').load, '+32.5 kg');
+  assert.equal(rowOf(out, 3, 'Weighted Pull-up').load, '+35 kg');
+  assert.equal(rowOf(out, 3, 'Weighted Pull-up').reps, '2');
+  assert.equal(rowOf(out, 4, 'Weighted Pull-up').load, '+32.5 kg');
+});

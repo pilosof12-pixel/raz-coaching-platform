@@ -28,7 +28,6 @@
 import { parseProgramModel, directGoalExposures } from './program_model.js';
 import { parseWeek } from './v34_workload_accounting.js';
 import { rebuild } from './tsv_rows.js';
-import { declaresMaintenance } from './goal_status_declaration.js';
 
 export const PRIMARY_VOLUME_STALLED = 'V107_PRIMARY_VOLUME_STALLED';
 
@@ -102,8 +101,8 @@ export function collectPrimaryVolumeProgressionFlags(program, intake = {}, suppl
   const flags = [];
 
   for (const goal of primaryVolumeGoals(model)) {
-    // A goal the block openly holds is a coaching decision, not a stall.
-    if (declaresMaintenance(text, goal.family)) continue;
+    // A primary goal is not held by declaration: holding a primary is the
+    // generator rewriting the athlete's hierarchy (goal_status_declaration.js).
     const weeks = BUILD_WEEKS.map((w) => {
       const found = goalRows(text, model, goal.family, w);
       return found && found.rows.length ? { week: w, totals: weekTotals(found.rows) } : null;
@@ -209,8 +208,6 @@ export function normalizePrimaryVolumeProgression(program, intake = {}) {
   try { model = parseProgramModel(out, intake); } catch { return { program: original, repaired: false, repairs: [] }; }
 
   for (const goal of primaryVolumeGoals(model)) {
-    if (declaresMaintenance(out, goal.family)) continue;
-
     for (let week = 2; week <= 3; week += 1) {
       const prev = goalRows(out, model, goal.family, week - 1);
       const here = goalRows(out, model, goal.family, week);

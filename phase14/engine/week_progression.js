@@ -82,6 +82,23 @@ export function knownMaxKg(intake = {}, name = '') {
   }
   return best;
 }
+// The athlete's own added load for this movement at the given reps or fewer,
+// from "Weighted Pull-up: +32 kg x 3".
+function addedBenchmark(intake = {}, name = '', reps = null) {
+  const core = String(name || '').toLowerCase().replace(/\(.*?\)/g, '').trim();
+  let best = null;
+  for (const line of txt([intake.current_numbers, intake.performance_markers]).split(/\n|\|/)) {
+    const l = line.toLowerCase();
+    if (!core || !l.includes(core.replace(/^weighted\s+/, '')) || !/weighted|\+/.test(l)) continue;
+    const m = l.match(/\+\s*(\d+(?:\.\d+)?)\s*kg(?:\s*(?:x|×)\s*(\d+))?/);
+    if (!m) continue;
+    const r = m[2] ? Number(m[2]) : 1;
+    if (reps != null && r < reps) continue;
+    best = Math.max(best ?? 0, Number(m[1]));
+  }
+  return best;
+}
+
 // The heaviest load a set of `reps` at `rpe` should carry for that max.
 function capFor(max, reps, rpeCell) {
   if (!max || !reps) return null;
@@ -155,7 +172,29 @@ function progressRow(cells, p, role, week, plateau) {
 
   if (role === 'warmup') return c;
 
-  if (role === 'strength') {
+  if (role === 'strength' && kg.plus) {
+    // An added load on bodyweight (a weighted pull-up, chin-up or dip). Epley
+    // describes the whole mass moved, not the plate on the belt, so the RPE cap
+    // below would read +30 kg as already at the ceiling and hold a primary goal
+    // flat -- which is how run #166's +40 kg weighted pull-up was declared
+    // "maintenance". It steps 2.5 kg a week instead, up to 2.5 kg past the
+    // athlete's own benchmark for the same or fewer reps.
+    const bench = addedBenchmark(p.intake, cells[p.exercise], num(reps));
+    const ceiling = bench != null ? round(bench + 2.5, 1.25) : Infinity;
+    const at = (x) => Math.min(x, Math.max(kg.kg, ceiling));
+    if (week === 2) { c[p.load] = setKg(c[p.load], at(kg.kg + 2.5)); note = 'A small step on the belt from Week 1; same reps. If Week 1 felt above target, repeat it instead.'; }
+    if (week === 3) {
+      const t = at(kg.kg + 5);
+      c[p.load] = setKg(c[p.load], t);
+      // Past the athlete's own benchmark for these reps, the set gets shorter:
+      // intensification, not a heavier copy of the same set.
+      const r = num(reps);
+      if (bench != null && t > bench && r != null && r > 1 && !isRange(reps)) c[p.reps] = bumpFirst(reps, (n) => n - 1);
+      if (Number.isInteger(rpeIdx)) c[rpeIdx] = shiftRpe(c[rpeIdx], 0.5);
+      note = t > (bench ?? Infinity) ? 'The block\'s heaviest week on the belt: heavier than your benchmark, so one rep fewer per set. Stop at the first rep that loses the strict line.' : 'The block\'s heaviest week on the belt. Stop the set at the first rep that loses the strict line.';
+    }
+    if (week === 4) { c[p.load] = setKg(c[p.load], at(kg.kg + 2.5)); note = `Consolidation at the Week 2 load: ${consolidate(c, p, sets)}.`; }
+  } else if (role === 'strength') {
     const step = (pct) => Math.max(2.5, round(kg.kg * pct, 2.5));
     const cap = capFor(p.max, num(reps), c[rpeIdx]);
     const target = (x) => (cap ? Math.min(x, Math.max(kg.kg, cap)) : x);
@@ -320,7 +359,7 @@ export function buildWeeksFromWeekOne(program, intake = {}) {
       const name = cells[p.exercise];
       const role = roleOf(name, cells[p.reps], Number.isInteger(p.load) ? cells[p.load] : '', intake);
       const plateau = plateauRows.some((re) => re.test(String(name || '')));
-      return progressRow(cells, { ...p, max: knownMaxKg(intake, name) }, role, week, plateau).join('\t');
+      return progressRow(cells, { ...p, max: knownMaxKg(intake, name), intake }, role, week, plateau).join('\t');
     });
     blocks.push(`START_WEEK${week}_TSV\n${header.join('\t')}\n${rows.join('\n')}\nEND_WEEK${week}_TSV`);
   }
